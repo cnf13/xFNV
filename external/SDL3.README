@@ -1,0 +1,9 @@
+SDL 3.4.20, vendored for the programs without the exe (their window and input, on every target).
+
+Source: https://github.com/libsdl-org/SDL, tag release-3.4.20, commit f00dc919ca35b9756316e86c4777392de442f9b2
+(`git clone --depth 1 --branch release-3.4.20 https://github.com/libsdl-org/SDL.git`).
+
+Kept from the tag, unchanged (`git archive` of these paths, so the files upstream's own .gitignore names but tracks
+are here too): CMakeLists.txt, LICENSE.txt, README.md, include/, src/ without src/test/, cmake/, wayland-protocols/.
+Left out: the tests, examples, docs, IDE projects (VisualC, Xcode, android-project) and build scripts. CMake builds it
+by add_subdirectory (CMakeLists.txt): static on Windows, shared elsewhere, without DirectInput (HAVE_DINPUT_H 0).

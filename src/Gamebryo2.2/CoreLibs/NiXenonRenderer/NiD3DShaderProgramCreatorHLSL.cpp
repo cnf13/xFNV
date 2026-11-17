@@ -1,0 +1,431 @@
+#include "Gamebryo2.2/CoreLibs/NiXenonRenderer/NiD3DShaderProgramCreatorHLSL.h"
+
+#include "Gamebryo2.2/CoreLibs/NiDX9Renderer/NiD3DDefines.h"
+#include "Gamebryo2.2/CoreLibs/NiDX9Renderer/NiDX9Renderer.h"
+#include "Gamebryo2.2/CoreLibs/NiMain/NiGPUProgram.h"
+#include "Gamebryo2.2/CoreLibs/NiMain/NiMemObject.h"
+#include "Gamebryo2.2/CoreLibs/NiMain/NiShaderFactory.h"
+#include "Gamebryo2.2/CoreLibs/NiSystem/NiMemoryDefines.h"
+#include "Gamebryo2.2/CoreLibs/NiSystem/NiSystem.h"
+#include "Gamebryo2.2/CoreLibs/NiXenonRenderer/NiD3DGPUProgramCache.h"
+#include "Gamebryo2.2/CoreLibs/NiXenonRenderer/NiD3DHLSLPixelShader.h"
+#include "Gamebryo2.2/CoreLibs/NiXenonRenderer/NiD3DHLSLVertexShader.h"
+#include "Gamebryo2.2/CoreLibs/NiXenonRenderer/NiD3DPixelShader.h"
+#include "Gamebryo2.2/CoreLibs/NiXenonRenderer/NiD3DShaderProgram.h"
+#include "Gamebryo2.2/CoreLibs/NiXenonRenderer/NiD3DShaderProgramCreator.h"
+#include "Gamebryo2.2/CoreLibs/NiXenonRenderer/NiD3DShaderProgramFactory.h"
+#include "Gamebryo2.2/CoreLibs/NiXenonRenderer/NiD3DVertexShader.h"
+#include "SDK/MSVC/string.h"
+
+NiD3DShaderProgramCreatorHLSL::NiD3DShaderProgramCreatorHLSL() : m_uiShaderCreationFlags(0) {}
+
+NiD3DShaderProgramCreatorHLSL::~NiD3DShaderProgramCreatorHLSL() {}
+
+NiD3DVertexShader* NiD3DShaderProgramCreatorHLSL::CreateVertexShaderFromFile(const char* pcFileName,
+	const char* pcShaderName, const char* pcEntryPoint, const char* pcShaderTarget, IDirect3DVertexDeclaration9* hDecl,
+	uint32_t uiUsage, int32_t bSoftwareVP, int32_t bRecoverable) {
+	NiD3DHLSLVertexShader* pkVertexShader =
+		static_cast<NiD3DHLSLVertexShader*>(NiMemObject::operator new(sizeof(NiD3DHLSLVertexShader)));
+	if (!pkVertexShader) {
+		return 0;
+	}
+	::new (pkVertexShader) NiD3DHLSLVertexShader(NiD3DShaderProgramCreator::ms_pkD3DRenderer);
+	uint32_t uiCodeSize = 0;
+	void* pvCode = 0;
+	ID3DXConstantTable* pkConstantTable = 0;
+	if (!pcEntryPoint) {
+		pcEntryPoint = "main";
+	}
+	if (!pcShaderTarget) {
+		pcShaderTarget = D3DXGetVertexShaderProfile_Thunk(NiD3DShaderProgramCreator::ms_pkD3DDevice);
+	}
+	if (!LoadShaderCodeFromFile(pcFileName, pcEntryPoint, pcShaderTarget, pvCode, uiCodeSize, pkConstantTable,
+			bRecoverable)) {
+		delete pkVertexShader;
+		return 0;
+	}
+	uint8_t v12 = bSoftwareVP;
+	IDirect3DVertexShader9* hShader = CreateVertexShader(pvCode, hDecl, uiUsage, 0, 0, bSoftwareVP);
+	if (hShader) {
+		pkVertexShader->SetName(pcShaderName);
+		pkVertexShader->SetShaderProgramName(pcFileName);
+		pkVertexShader->SetCode(uiCodeSize, pvCode);
+		pkVertexShader->SetCreator(this);
+		pkVertexShader->SetShaderHandle(hShader);
+		pkVertexShader->SetUsage(uiUsage);
+		pkVertexShader->SetSoftwareVertexProcessing(v12);
+		pkVertexShader->SetEntryPoint(pcEntryPoint);
+		pkVertexShader->SetShaderTarget(pcShaderTarget);
+		pkVertexShader->SetConstantTable(pkConstantTable);
+		if (pkConstantTable) {
+			pkConstantTable->Release();
+		}
+		return pkVertexShader;
+	} else {
+		NiShaderFactory::ReportError(1u, bRecoverable, "Failed CreateVertexShader call on %s\n", pcShaderName);
+		delete pkVertexShader;
+		return 0;
+	}
+}
+
+NiD3DVertexShader* NiD3DShaderProgramCreatorHLSL::CreateVertexShaderFromBuffer(const void* pvBuffer,
+	uint32_t uiBufferSize, const char* pcShaderName, const char* pcEntryPoint, const char* pcShaderTarget,
+	IDirect3DVertexDeclaration9* hDecl, uint32_t uiUsage, int32_t bSoftwareVP, int32_t bRecoverable) {
+	NiD3DHLSLVertexShader* pkVertexShader =
+		static_cast<NiD3DHLSLVertexShader*>(NiMemObject::operator new(sizeof(NiD3DHLSLVertexShader)));
+	if (!pkVertexShader) {
+		return 0;
+	}
+	::new (pkVertexShader) NiD3DHLSLVertexShader(NiD3DShaderProgramCreator::ms_pkD3DRenderer);
+	uint32_t uiCodeSize = 0;
+	void* pvCode = 0;
+	ID3DXConstantTable* pkConstantTable = 0;
+	if (!pcEntryPoint) {
+		pcEntryPoint = "main";
+	}
+	if (!pcShaderTarget) {
+		pcShaderTarget = D3DXGetVertexShaderProfile_Thunk(NiD3DShaderProgramCreator::ms_pkD3DDevice);
+	}
+	if (!LoadShaderCodeFromBuffer(pvBuffer, uiBufferSize, pcEntryPoint, pcShaderTarget, pvCode, uiCodeSize,
+			pkConstantTable, bRecoverable)) {
+		delete pkVertexShader;
+		return 0;
+	}
+	uint8_t v13 = bSoftwareVP;
+	IDirect3DVertexShader9* hShader = CreateVertexShader(pvCode, hDecl, uiUsage, 0, 0, bSoftwareVP);
+	if (hShader) {
+		pkVertexShader->SetName(pcShaderName);
+		pkVertexShader->SetShaderProgramName(0);
+		pkVertexShader->SetCode(uiCodeSize, pvCode);
+		pkVertexShader->SetCreator(this);
+		pkVertexShader->SetShaderHandle(hShader);
+		pkVertexShader->SetUsage(uiUsage);
+		pkVertexShader->SetSoftwareVertexProcessing(v13);
+		pkVertexShader->SetEntryPoint(pcEntryPoint);
+		pkVertexShader->SetShaderTarget(pcShaderTarget);
+		pkVertexShader->SetConstantTable(pkConstantTable);
+		if (pkConstantTable) {
+			pkConstantTable->Release();
+		}
+		return pkVertexShader;
+	} else {
+		NiShaderFactory::ReportError(1u, bRecoverable, "Failed CreateVertexShader call on %s\n", pcShaderName);
+		delete pkVertexShader;
+		return 0;
+	}
+}
+
+NiD3DPixelShader* NiD3DShaderProgramCreatorHLSL::CreatePixelShaderFromFile(const char* pcFileName,
+	const char* pcShaderName, const char* pcEntryPoint, const char* pcShaderTarget, int32_t bRecoverable) {
+	IDirect3DPixelShader9* hShader;
+	NiD3DHLSLPixelShader* pkPixelShader =
+		static_cast<NiD3DHLSLPixelShader*>(NiMemObject::operator new(sizeof(NiD3DHLSLPixelShader)));
+	if (!pkPixelShader) {
+		return 0;
+	}
+	::new (pkPixelShader) NiD3DHLSLPixelShader(NiD3DShaderProgramCreator::ms_pkD3DRenderer);
+	uint32_t uiCodeSize = 0;
+	void* pvCode = 0;
+	ID3DXConstantTable* pkConstantTable = 0;
+	if (!pcEntryPoint) {
+		pcEntryPoint = "main";
+	}
+	const char* v8 = pcShaderTarget;
+	if (!pcShaderTarget) {
+		v8 = D3DXGetPixelShaderProfile_Thunk(NiD3DShaderProgramCreator::ms_pkD3DDevice);
+	}
+	if (!LoadShaderCodeFromFile(pcFileName, pcEntryPoint, v8, pvCode, uiCodeSize, pkConstantTable, bRecoverable)) {
+		goto LABEL_9;
+	}
+	hShader = CreatePixelShader(pvCode);
+	if (!hShader) {
+		NiShaderFactory::ReportError(1u, bRecoverable, "Failed CreatePixelShader call on %s\n", pcShaderName);
+	LABEL_9:;
+		delete pkPixelShader;
+		return 0;
+	}
+	pkPixelShader->SetName(pcShaderName);
+	pkPixelShader->SetShaderProgramName(pcFileName);
+	pkPixelShader->SetCode(uiCodeSize, pvCode);
+	pkPixelShader->SetCreator(this);
+	pkPixelShader->SetShaderHandle(hShader);
+	pkPixelShader->SetEntryPoint(pcEntryPoint);
+	pkPixelShader->SetShaderTarget(v8);
+	pkPixelShader->SetConstantTable(pkConstantTable);
+	if (pkConstantTable) {
+		pkConstantTable->Release();
+	}
+	return pkPixelShader;
+}
+
+NiD3DPixelShader* NiD3DShaderProgramCreatorHLSL::CreatePixelShaderFromBuffer(const void* pvBuffer,
+	uint32_t uiBufferSize, const char* pcShaderName, const char* pcEntryPoint, const char* pcShaderTarget,
+	int32_t bRecoverable) {
+	IDirect3DPixelShader9* hShader;
+	void* pvCode;
+	ID3DXConstantTable* pkConstantTable;
+	uint32_t uiCodeSize;
+	NiD3DHLSLPixelShader* pkPixelShader =
+		static_cast<NiD3DHLSLPixelShader*>(NiMemObject::operator new(sizeof(NiD3DHLSLPixelShader)));
+	if (!pkPixelShader) {
+		return 0;
+	}
+	::new (pkPixelShader) NiD3DHLSLPixelShader(NiD3DShaderProgramCreator::ms_pkD3DRenderer);
+	uiCodeSize = 0;
+	pvCode = 0;
+	pkConstantTable = 0;
+	if (!pcEntryPoint) {
+		pcEntryPoint = "main";
+	}
+	const char* v9 = pcShaderTarget;
+	if (!pcShaderTarget) {
+		v9 = D3DXGetPixelShaderProfile_Thunk(NiD3DShaderProgramCreator::ms_pkD3DDevice);
+	}
+	if (!LoadShaderCodeFromBuffer(pvBuffer, uiBufferSize, pcEntryPoint, v9, pvCode, uiCodeSize, pkConstantTable,
+			bRecoverable)) {
+		goto LABEL_9;
+	}
+	hShader = CreatePixelShader(pvCode);
+	if (!hShader) {
+		NiShaderFactory::ReportError(1u, bRecoverable, "Failed CreatePixelShader call on %s\n", pcShaderName);
+	LABEL_9:;
+		delete pkPixelShader;
+		return 0;
+	}
+	pkPixelShader->SetName(pcShaderName);
+	pkPixelShader->SetShaderProgramName(0);
+	pkPixelShader->SetCode(uiCodeSize, pvCode);
+	pkPixelShader->SetCreator(this);
+	pkPixelShader->SetShaderHandle(hShader);
+	pkPixelShader->SetEntryPoint(pcEntryPoint);
+	pkPixelShader->SetShaderTarget(v9);
+	pkPixelShader->SetConstantTable(pkConstantTable);
+	if (pkConstantTable) {
+		pkConstantTable->Release();
+	}
+	return pkPixelShader;
+}
+
+// Recreates the device shader from the kept code and sets its constant table again.
+bool NiD3DShaderProgramCreatorHLSL::RecreateVertexShader(NiD3DVertexShader* pkVertexShader) {
+	void* pvCode = pkVertexShader->GetCode();
+	if (!pvCode)
+		return false;
+
+	IDirect3DVertexDeclaration9* hDecl = pkVertexShader->GetVertexDeclaration();
+	IDirect3DVertexShader9* hShader = CreateVertexShader(pvCode, hDecl, pkVertexShader->GetUsage(), nullptr, 0, 0);
+	if (!hShader)
+		return false;
+
+	pkVertexShader->SetShaderHandle(hShader);
+
+	// The exe treats pkVertexShader's argument slot as untyped storage: it passes the slot as the constant table's
+	// out pointer, so the table starts out holding the shader's address (read when D3DX fails without writing it).
+	ID3DXConstantTable* pkConstantTable = reinterpret_cast<ID3DXConstantTable*>(pkVertexShader);
+	// The reference source casts the shader to its HLSL class here.
+	NiD3DHLSLVertexShader* pkHLSLVS = static_cast<NiD3DHLSLVertexShader*>(pkVertexShader);
+	if (D3DXGetShaderConstantTable_Thunk(static_cast<const uint32_t*>(pvCode), &pkConstantTable) >= 0)
+		pkHLSLVS->SetConstantTable(pkConstantTable);
+
+	if (pkConstantTable)
+		pkConstantTable->Release();
+
+	return true;
+}
+
+// Recreates the device shader from the kept code and sets its constant table again.
+bool NiD3DShaderProgramCreatorHLSL::RecreatePixelShader(NiD3DPixelShader* pkPixelShader) {
+	void* pvCode = pkPixelShader->GetCode();
+	if (!pvCode)
+		return false;
+
+	IDirect3DPixelShader9* hShader = CreatePixelShader(pvCode);
+	if (!hShader)
+		return false;
+
+	pkPixelShader->SetShaderHandle(hShader);
+
+	// The exe treats pkPixelShader's argument slot as untyped storage: it passes the slot as the constant table's
+	// out pointer, so the table starts out holding the shader's address (read when D3DX fails without writing it).
+	ID3DXConstantTable* pkConstantTable = reinterpret_cast<ID3DXConstantTable*>(pkPixelShader);
+	// The reference source casts the shader to its HLSL class here.
+	NiD3DHLSLPixelShader* pkHLSLPS = static_cast<NiD3DHLSLPixelShader*>(pkPixelShader);
+	if (D3DXGetShaderConstantTable_Thunk(static_cast<const uint32_t*>(pvCode), &pkConstantTable) >= 0)
+		pkHLSLPS->SetConstantTable(pkConstantTable);
+
+	if (pkConstantTable)
+		pkConstantTable->Release();
+
+	return true;
+}
+
+// Wraps the compiled code of pkBuffer in a new NiD3DHLSLVertexShader; null on failure. The exe inlines the
+// NiD3DHLSLVertexShader constructor (NiD3DShaderProgram's vtable store elided), leaks the shader when the constant
+// table cannot be read, and stores the handle before the usage (the reference source's order is the reverse).
+NiD3DVertexShader* NiD3DShaderProgramCreatorHLSL::CreateVertexShaderFromD3DXBuffer(ID3DXBuffer* pkBuffer,
+	uint32_t uiBufferSize, const char* pcShaderName, const char* pcEntryPoint, const char* pcShaderTarget,
+	IDirect3DVertexDeclaration9* hDecl, uint32_t uiUsage, int32_t bSoftwareVP, int32_t bRecoverable) {
+	void* pvMemory = NiMemObject::operator new(sizeof(NiD3DHLSLVertexShader));
+	if (!pvMemory)
+		return nullptr;
+	NiD3DHLSLVertexShader* pkShader =
+		::new (pvMemory) NiD3DHLSLVertexShader(NiD3DShaderProgramCreator::ms_pkD3DRenderer);
+
+	ID3DXConstantTable* pkConstantTable = nullptr;
+	if (D3DXGetShaderConstantTable_Thunk(static_cast<const uint32_t*>(pkBuffer->GetBufferPointer()), &pkConstantTable) <
+		0)
+		return nullptr;
+
+	if (!pcEntryPoint)
+		pcEntryPoint = "main";
+	if (!pcShaderTarget)
+		pcShaderTarget = D3DXGetVertexShaderProfile_Thunk(NiD3DShaderProgramCreator::ms_pkD3DDevice);
+
+	IDirect3DVertexShader9* hShader =
+		CreateVertexShader(pkBuffer->GetBufferPointer(), hDecl, uiUsage, nullptr, 0, bSoftwareVP);
+	if (!hShader) {
+		NiShaderFactory::ReportError(1, bRecoverable, "Failed CreateVertexShader call on %s\n", pcShaderName);
+		// The scalar deleting destructor, slot 0, flag 1.
+		delete pkShader;
+		return nullptr;
+	}
+
+	void* pvCode = _NiMalloc(uiBufferSize);
+	uint32_t uiSize = pkBuffer->GetBufferSize();
+	rt::memcpy(pvCode, pkBuffer->GetBufferPointer(), uiSize);
+
+	pkShader->SetName(pcShaderName);
+	pkShader->SetShaderProgramName(nullptr);
+	pkShader->SetCode(uiBufferSize, pvCode);
+	pkShader->SetCreator(this);
+	pkShader->SetShaderHandle(hShader);
+	pkShader->SetUsage(uiUsage);
+	// The exe pushes bSoftwareVP's whole dword to the setter (vtable +0x98), which stores its low byte.
+	pkShader->SetSoftwareVertexProcessing(static_cast<uint8_t>(bSoftwareVP));
+	pkShader->SetEntryPoint(pcEntryPoint);
+	pkShader->SetShaderTarget(pcShaderTarget);
+	pkShader->SetConstantTable(pkConstantTable);
+	if (pkConstantTable)
+		pkConstantTable->Release();
+	return pkShader;
+}
+
+// Wraps the compiled code of pkBuffer in a new NiD3DHLSLPixelShader; null on failure. The exe inlines the
+// NiD3DHLSLPixelShader constructor (NiD3DPixelShader's vtable store elided) and leaks the shader when the constant
+// table cannot be read.
+NiD3DPixelShader* NiD3DShaderProgramCreatorHLSL::CreatePixelShaderFromD3DXBuffer(ID3DXBuffer* pkBuffer,
+	uint32_t uiBufferSize, const char* pcShaderName, const char* pcEntryPoint, const char* pcShaderTarget,
+	int32_t bRecoverable) {
+	void* pvMemory = NiMemObject::operator new(sizeof(NiD3DHLSLPixelShader));
+	if (!pvMemory)
+		return nullptr;
+	NiD3DHLSLPixelShader* pkShader = ::new (pvMemory) NiD3DHLSLPixelShader(NiD3DShaderProgramCreator::ms_pkD3DRenderer);
+
+	ID3DXConstantTable* pkConstantTable = nullptr;
+	if (D3DXGetShaderConstantTable_Thunk(static_cast<const uint32_t*>(pkBuffer->GetBufferPointer()), &pkConstantTable) <
+		0)
+		return nullptr;
+
+	if (!pcEntryPoint)
+		pcEntryPoint = "main";
+	if (!pcShaderTarget)
+		pcShaderTarget = D3DXGetPixelShaderProfile_Thunk(NiD3DShaderProgramCreator::ms_pkD3DDevice);
+
+	IDirect3DPixelShader9* hShader = CreatePixelShader(pkBuffer->GetBufferPointer());
+	if (!hShader) {
+		NiShaderFactory::ReportError(1, bRecoverable, "Failed CreatePixelShader call on %s\n", pcShaderName);
+		// The scalar deleting destructor, slot 0, flag 1.
+		delete pkShader;
+		return nullptr;
+	}
+
+	void* pvCode = _NiMalloc(uiBufferSize);
+	uint32_t uiSize = pkBuffer->GetBufferSize();
+	rt::memcpy(pvCode, pkBuffer->GetBufferPointer(), uiSize);
+
+	pkShader->SetName(pcShaderName);
+	pkShader->SetShaderProgramName(nullptr);
+	pkShader->SetCode(uiBufferSize, pvCode);
+	pkShader->SetCreator(this);
+	pkShader->SetShaderHandle(hShader);
+	pkShader->SetEntryPoint(pcEntryPoint);
+	pkShader->SetShaderTarget(pcShaderTarget);
+	pkShader->SetConstantTable(pkConstantTable);
+	if (pkConstantTable)
+		pkConstantTable->Release();
+	return pkShader;
+}
+
+bool NiD3DShaderProgramCreatorHLSL::LoadShaderCodeFromFile(const char* pcFileName, const char* pcEntryPoint,
+	const char* pcShaderTarget, void*& pvCode, uint32_t& uiCodeSize, ID3DXConstantTable*& pkConstantTable,
+	int32_t bRecoverable) {
+	ID3DXBuffer* pkErrors;
+	ID3DXBuffer* pkCode;
+	char acShaderPath[260];
+	pvCode = 0;
+	const void* pvBuff = pcShaderTarget;
+	ID3DXConstantTable** v18 = &pkConstantTable;
+	uiCodeSize = 0;
+	if (!pcFileName || !*pcFileName) {
+		NiShaderFactory::ReportError(1u, bRecoverable, "Invalid shader file name\n");
+		return 0;
+	}
+	if (!NiD3DShaderProgramFactory::ResolveShaderFileName(pcFileName, acShaderPath, 260u)) {
+		NiShaderFactory::ReportError(1u, bRecoverable, "Failed to find shader program file %s\n", pcFileName);
+		return 0;
+	}
+	if (D3DXCompileShaderFromFileA_Thunk(acShaderPath, 0, 0, pcEntryPoint, static_cast<const char*>(pvBuff),
+			NiD3DShaderProgramCreator::ms_uiUniversalShaderCreationFlags | this->m_uiShaderCreationFlags, &pkCode,
+			&pkErrors, v18) < 0) {
+		char* pcErr = 0;
+		if (pkErrors) {
+			void* pvBuff_2 = pkErrors->GetBufferPointer();
+			if (pvBuff_2) {
+				uint32_t uiLen = pkErrors->GetBufferSize();
+				pcErr = static_cast<char*>(_NiMalloc(uiLen));
+				NiStrcpy(pcErr, uiLen, static_cast<char*>(pvBuff_2));
+				NiShaderFactory::ReportError(1u, bRecoverable, "Failed to compile shader %s in file %s\nError: %s\n",
+					pcEntryPoint, pcFileName, pcErr);
+			}
+			pkErrors->Release();
+		} else {
+			NiShaderFactory::ReportError(1u, bRecoverable,
+				"Failed to compile shader %s in file %s\nError: NONE REPORTED\n", pcEntryPoint, pcFileName);
+		}
+		_NiFree(pcErr);
+		if (pkCode) {
+			pkCode->Release();
+		}
+		return 0;
+	}
+	uint32_t uiLen_2 = pkCode->GetBufferSize();
+	uiCodeSize = uiLen_2;
+	pvCode = _NiMalloc(uiLen_2);
+	uint32_t uiDestSize = uiCodeSize;
+	const void* v12 = pkCode->GetBufferPointer();
+	rt::memcpy(pvCode, v12, uiDestSize);
+	pkCode->Release();
+	if (pkErrors) {
+		pkErrors->Release();
+	}
+	return 1;
+}
+
+void NiD3DShaderProgramCreatorHLSL::_SDMInit() {
+	NiD3DShaderProgramCreatorHLSL* v0 =
+		static_cast<NiD3DShaderProgramCreatorHLSL*>(NiMemObject::operator new(sizeof(NiD3DShaderProgramCreatorHLSL)));
+	if (v0) {
+		::new (v0) NiD3DShaderProgramCreatorHLSL;
+		NiD3DShaderProgramCreatorHLSL::ms_pkCreator = v0;
+		NiD3DShaderProgramFactory::RegisterShaderCreator("hlsl", v0);
+	} else {
+		NiD3DShaderProgramCreatorHLSL::ms_pkCreator = 0;
+		NiD3DShaderProgramFactory::RegisterShaderCreator("hlsl", 0);
+	}
+}
+
+NiD3DHLSLPixelShader::NiD3DHLSLPixelShader(NiDX9Renderer* pkRenderer)
+	: NiD3DPixelShader(pkRenderer), m_pcEntryPoint(nullptr), m_pcShaderTarget(nullptr), m_pkConstantTable(nullptr) {}
+
+NiD3DHLSLVertexShader::NiD3DHLSLVertexShader(NiDX9Renderer* pkRenderer)
+	: NiD3DVertexShader(pkRenderer), m_pcEntryPoint(nullptr), m_pcShaderTarget(nullptr), m_pkConstantTable(nullptr) {}

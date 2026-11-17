@@ -1,0 +1,50 @@
+Libraries from outside the project the programs use: the versions, where they came from and how they were fetched.
+
+dxvk-native 3.1.1: Direct3D 9 for the Linux program (fnvd_linux), libdxvk_d3d9.so on Vulkan.
+
+Source: DXVK's own release build of tag v3.1.1 for x86-64 Linux (Steam Runtime sniper; glibc 2.27 symbols at most),
+https://github.com/doitsujin/dxvk/releases/download/v3.1.1/dxvk-native-3.1.1-steamrt-sniper.tar.gz
+(sha256 506fa1ea5bb6ce9a89e11436f7ab5191bc0196e8a577e0cf0b16a45bbc9991b7). Not kept in git:
+`harness/tools/dxvk-native.sh` downloads it, checks the hash and unpacks usr/lib/libdxvk_d3d9.so* into
+env/cache/dxvk-native/lib and dxvk's headers into env/cache/dxvk-native/include. By hand, the same:
+
+    curl -fsSLO https://github.com/doitsujin/dxvk/releases/download/v3.1.1/dxvk-native-3.1.1-steamrt-sniper.tar.gz
+    sha256sum dxvk-native-3.1.1-steamrt-sniper.tar.gz
+    tar -xzf dxvk-native-3.1.1-steamrt-sniper.tar.gz usr/lib usr/include/dxvk
+    mkdir -p env/cache/dxvk-native/lib && cp -P usr/lib/libdxvk_d3d9.so* env/cache/dxvk-native/lib/
+
+CMake links ${FNVD_DXVK_DIR}/lib/libdxvk_d3d9.so (FNVD_DXVK_DIR defaults to env/cache/dxvk-native) with an rpath to it
+and to the build's SDL3. At run time it needs DXVK_WSI_DRIVER=SDL3 (no default off Windows; harness/run.sh -L sets
+it): dxvk then opens libSDL3.so.0, which is the program's own shared SDL3 (external/SDL3, shared on Linux), and takes
+the game's HWND as the SDL_Window*. The game's src/SDK/DirectX/d3d9.h, not dxvk's headers, declares what the program
+calls; only harness/tools/adapter.cpp (run.sh -L's adapter probe) is built on dxvk's headers.
+
+libogg 1.3.6 and libvorbis 1.3.7 (Xiph.Org, BSD licence: external/ogg/COPYING, external/vorbis/COPYING): Ogg Vorbis
+decoding for every program (the game's voice and sound files), in external/ogg and external/vorbis.
+
+Source: Xiph.Org's release tarballs, https://downloads.xiph.org/releases/ogg/libogg-1.3.6.tar.gz (sha256
+83e6704730683d004d20e21b8f7f55dcb3383cdf84c0daedf30bde175f774638) and
+https://downloads.xiph.org/releases/vorbis/libvorbis-1.3.7.tar.gz (sha256
+0e982409a9c3fc82ee06e08205b1355e5c6aa4c36bca58146ef399621b0ce5ab), the hashes of the SHA256SUMS files beside them:
+
+    curl -fsSLO https://downloads.xiph.org/releases/ogg/libogg-1.3.6.tar.gz
+    curl -fsSLO https://downloads.xiph.org/releases/vorbis/libvorbis-1.3.7.tar.gz
+    sha256sum libogg-1.3.6.tar.gz libvorbis-1.3.7.tar.gz
+    tar -xzf libogg-1.3.6.tar.gz && tar -xzf libvorbis-1.3.7.tar.gz
+
+Kept, unchanged: from libogg, AUTHORS, COPYING, README.md, include/ogg/{ogg.h,os_types.h,config_types.h.in} and
+src/{bitwise.c,framing.c,crctable.h}; from libvorbis, AUTHORS, COPYING, include/vorbis/{codec.h,vorbisfile.h},
+lib/*.h and the sources of upstream's libvorbis and libvorbisfile (lib/*.c without vorbisenc.c, barkmel.c, psytune.c
+and tone.c). Left out: the encoder library (vorbisenc.c, vorbisenc.h, lib/modes, lib/books), the tools, docs,
+examples, tests and build scripts. CMake builds them as the static library fnvd_vorbis (CMakeLists.txt), writing
+libogg's config_types.h from config_types.h.in as upstream's configure does; the game includes
+<vorbis/vorbisfile.h> (src/BSAudio/BSWin32GameSound.h).
+
+minimp3 (lieff, CC0 1.0: external/minimp3/LICENSE): MP3 decoding for the music the game plays through DirectShow
+(external/dsound/DirectShowDecoder.cpp, the only file that includes it). Header-only.
+
+Source: https://github.com/lieff/minimp3, commit a2ad968c94819fb98589cca8026e0a57958c963c:
+
+    git clone https://github.com/lieff/minimp3 && git -C minimp3 checkout a2ad968c94819fb98589cca8026e0a57958c963c
+
+Kept, unchanged: minimp3.h, minimp3_ex.h and LICENSE. Left out: the tests, fuzzers, player and scripts.

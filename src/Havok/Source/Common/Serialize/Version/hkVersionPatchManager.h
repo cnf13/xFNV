@@ -1,0 +1,191 @@
+#pragma once
+
+#include "Havok/Source/Common/Base/Container/Array/hkArray.h"
+#include "Havok/Source/Common/Base/Container/PointerMap/hkMap.h"
+#include "Havok/Source/Common/Base/Container/PointerMap/hkPointerMap.h"
+#include "Havok/Source/Common/Base/Container/StringMap/hkStringMap.h"
+#include "Havok/Source/Common/Base/Object/hkReferencedObject.h"
+#include "Havok/Source/Common/Base/Object/hkSingleton.h"
+#include "Havok/Source/Common/Base/Types/hkBaseTypes.h"
+#include "Havok/Source/Common/Base/Types/hkResult.h"
+#include "Havok/Source/Common/Serialize/Data/hkDataObject.h"
+#include "Havok/Source/Common/Serialize/Util/hkSerializeMultiMap.h"
+#include "Reconstruction.hpp"
+
+#include <stdint.h>
+
+class hkClassNameRegistry;
+class hkDataWorldDict;
+
+// Havok SDK signature (hkSerialize.lib, tied by bytes,reloc).
+int32_t findPatchIndexInDependencies(int32_t indexToFind, int32_t startIndex,
+	const hkSerializeMultiMap<int32_t, int32_t>& incoming,
+	hkPointerMap<int32_t, int32_t, hkContainerHeapAllocator>& done);
+// The singleton's create function (SDK: HK_SINGLETON_IMPLEMENTATION, `new hkVersionPatchManager()`; cdecl, 0xDBA1E0).
+hkReferencedObject* hkVersionPatchManagercreate();
+
+// One entry of a patch manager's uid list (the PDB's UidItem, declared in its hkVersionPatchManager.cpp): a patch's
+// uid and its index in the manager's patch list. An hkArray<UidItem> holds 0x10-byte entries: hkArrayBase<UidItem>'s
+// _spliceInto (0xDBA270) reserves 0x10 per element and scales the index by 16, and its callers fill the uid's two words
+// at 0x0 and the index at 0x8.
+struct UidItem {
+	hkUint64 uid;
+	int32_t patchIndex;
+};
+
+// The PDB's HeapArray<T>, declared in its hkVersionPatchManager.cpp: the patch application's queue of uids, an
+// array kept ordered by insert. HeapArray<UidItem>'s members read the array's data at +0x0 and size at +0x4
+// (0xDBA230) and grow it through the heap allocator (0xDBA4D0).
+template <typename T> struct HeapArray {
+	// Inserts t before the first element whose patch index is greater, else appends it.
+	void insert(const T& e);
+	// Whether an element with t's uid is in the array.
+	bool hasElement(const T& e) const;
+
+	hkArray<T> m_elems;
+};
+// Compares t.patchIndex (+0x8) with each element's and inserts through hkArrayBase<UidItem>::_insertAt,
+// or appends the 16 bytes.
+template <> void HeapArray<UidItem>::insert(const UidItem& e);
+// Compares the uid's two words (+0x0, +0x4) only; sets al alone (thiscall, ret 4,
+// 0xDBA230).
+template <> bool HeapArray<UidItem>::hasElement(const UidItem& e) const;
+
+// The registry of the patches that bring old serialized classes up to date. The empty hkSingleton base shares offset 8
+// with m_uidFromClassVersion (Havok's hkserialize.pdb). src models only the members its bodies use.
+class hkVersionPatchManager : public hkReferencedObject, public hkSingleton<hkVersionPatchManager> {
+public:
+	// The kind of a patch component. Values from the Xbox PDB (in order from 0).
+	enum PatchType : int32_t {
+		PATCH_INVALID,
+		PATCH_MEMBER_ADDED,
+		PATCH_MEMBER_REMOVED,
+		PATCH_MEMBER_RENAMED,
+		PATCH_FUNCTION,
+		PATCH_CAST,
+		PATCH_DEPENDS,
+		PATCH_PARENT_SET,
+		PATCH_END,
+	};
+
+	// One registered patch: the class it takes from oldName at oldVersion to newName at newVersion, and its steps
+	// (names and order from the Xbox PDB and the SDK).
+	struct PatchInfo {
+		// One step of a patch: its kind and the kind's own patch struct.
+		struct Component {
+			PatchType type;
+			const void* patch;
+		};
+
+		const char* oldName;
+		const char* newName;
+		int32_t oldVersion;
+		int32_t newVersion;
+		const Component* component;
+		int32_t numComponent;
+	};
+
+	// A function patch's function: rewrites one object of the patched class.
+	typedef void (*Function)(hkDataObject& o);
+
+	// The patch kinds' own structs, which a PatchInfo::Component's patch points to by its type (members from the
+	// SDK; layouts from Havok's release hkserialize.pdb).
+	// PATCH_DEPENDS: the patch needs class name at version.
+	struct DependsPatch {
+		const char* name;
+		int32_t version;
+	};
+
+	// PATCH_MEMBER_RENAMED.
+	struct MemberRenamedPatch {
+		const char* oldName;
+		const char* newName;
+	};
+
+	// PATCH_MEMBER_ADDED: the member's name, type, type name (for objects and structs) and tuple count.
+	struct MemberAddedPatch {
+		const char* name;
+		hkDataObject::Type type;
+		const char* typeName;
+		int32_t tuples;
+	};
+
+	// PATCH_MEMBER_REMOVED: as MemberAddedPatch, for the member removed.
+	struct MemberRemovedPatch {
+		const char* name;
+		hkDataObject::Type type;
+		const char* typeName;
+		int32_t tuples;
+	};
+
+	// PATCH_PARENT_SET: the class's parent changes from oldParent to newParent.
+	struct SetParentPatch {
+		const char* oldParent;
+		const char* newParent;
+	};
+
+	// PATCH_FUNCTION: the function named name, run on each object.
+	struct FunctionPatch {
+		const char* name;
+		Function function;
+	};
+
+	// PATCH_CAST.
+	struct CastPatch {
+		const char* name;
+	};
+
+	// Numbers each class name and version pair: the low word is the name's index in m_names, the high word the
+	// version.
+	class UidFromClassVersion {
+	public:
+		~UidFromClassVersion();
+
+		// The uid of name at version ver; a name not seen before is cached and numbered.
+		hkUint64 get(const char* name, int32_t ver);
+
+	protected:
+		// The map's own copy of name, made on its first use; null for null.
+		const char* cache(const char* name);
+
+	public:
+		// The name of the uid's low word (the PDB's getName; thiscall, ret 8, 0xDB7CF0).
+		const char* getName(hkUint64 uid) const;
+
+		hkStringMap<int32_t> m_indexFromName;
+		hkArray<const char*> m_names;
+		hkStringMap<const char*> m_cachedNames;
+	};
+
+	hkVersionPatchManager();
+	~hkVersionPatchManager();
+
+	// The uid of class name at version ver.
+	hkUint64 getUid(const char* name, int32_t ver) const;
+	const hkArray<const hkVersionPatchManager::PatchInfo*, hkContainerHeapAllocator>& getPatches();
+	// Havok SDK signature (hkSerialize.lib, tied by bytes,reloc).
+	int32_t findLastPatchIndexForUid(uint64_t uid, int32_t allowRenames) const;
+	void addPatch(const hkVersionPatchManager::PatchInfo* p);
+	// Havok SDK signature (hkSerialize.lib, tied by bytes,reloc,string).
+	hkResult preparePatches(hkDataWorldDict& worldToUpdate, const hkClassNameRegistry& finalClassesReg,
+		hkArray<const hkVersionPatchManager::PatchInfo*, hkContainerHeapAllocator>& patchInfosOut) const;
+	hkResult applyPatchesDebug(hkDataWorldDict& worldToUpdate);
+	// The class name of uid (the PDB's getClassName; thiscall, ret 8, 0xDB7D40).
+	const char* getClassName(hkUint64 uid) const;
+	// Checks the patches and sorts m_patchInfos so that each follows those it depends on, indexing them in
+	// m_patchIndexFromUid (the PDB's recomputePatchDependencies; thiscall, ret 0, 0xDB8670).
+	hkResult recomputePatchDependencies() const;
+	hkResult applyPatches(hkDataWorldDict& worldToUpdate, const hkClassNameRegistry* finalClassesReg);
+	// Havok SDK signature (hkSerialize.lib, tied by reloc).
+	int32_t getClassVersion(uint64_t uid) const;
+
+	UidFromClassVersion* m_uidFromClassVersion;
+	// The patches added so far (getPatches, 0xDB7C80, returns its address; addPatch, 0xDB7EF0, appends to it).
+	mutable hkArray<const PatchInfo*> m_patchInfos;
+	// The index in m_patchInfos of each patch, by its uid.
+	mutable hkPointerMap<hkUint64, int32_t> m_patchIndexFromUid;
+
+	// hkSingleton<hkVersionPatchManager>::s_instance.
+	static inline hkVersionPatchManager* s_instance;
+};
+inline constexpr fnvd::Vtable hkVersionPatchManager_vftable{};

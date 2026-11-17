@@ -1,0 +1,51 @@
+#pragma once
+
+#include "BSMain/Setting.h"
+#include "Fallout Shared/TESObjectACTI.h"
+#include "Reconstruction.hpp"
+
+// A furniture base form (FURN).
+class TESFurniture : public TESObjectACTI {
+public:
+	TESFurniture();
+	~TESFurniture() override;
+
+	void InitializeData() override;
+	bool Load(TESFile* apFile) override;
+	void Save() override;
+	void InitItem() override;
+	void Copy(TESForm* apCopy) override;
+	bool Compare(TESForm* apCompare) override;
+	bool Activate(TESObjectREFR* apItemActivated, TESObjectREFR* apActionRef, bool abIdFlag,
+		TESBoundObject* apObjectToGet, int32_t aicount) override;
+
+	using TESObjectACTI::Save;
+
+	// Whether the furniture is a bed: the top bit of its marker flags.
+	bool CanSleepOn();
+	bool CanSitOn();
+	void VerifyMarkers();
+	// The offset of marker number aiIndex from the reference, scaled by afScale; the result
+	// goes through a hidden pointer.
+	NiPoint3 GetMarkerTargetOffset(uint32_t aiIndex, float afScale);
+	// The heading offset of marker number aiIndex, returned in ST0 (thiscall, ret 4,
+	// 0x5099C0).
+	float GetMarkerHeadingOffset(uint32_t aiIndex);
+	// Whether furniture marker aiMarkerIndex is enabled.
+	bool GetMarkerEnabled(uint32_t aiMarkerIndex);
+
+	static bool IsSleepMarker(uint32_t aiNumber);
+	static bool IsSitMarker(uint32_t aiNumber);
+
+	// The marker flags; the exe types them unsigned.
+	uint32_t iFurnFlags;
+};
+
+using FurnitureMarkerDeltaSettings = SettingT<GameSettingCollection>* [40][4];
+extern FurnitureMarkerDeltaSettings pFurnitureMarkerDelta;
+inline constexpr fnvd::Vtable TESFurniture_vftable_BGSOpenCloseForm{};
+inline constexpr fnvd::Vtable TESFurniture_vftable_BGSDestructibleObjectForm{};
+inline constexpr fnvd::Vtable TESFurniture_vftable_TESScriptableForm{};
+inline constexpr fnvd::Vtable TESFurniture_vftable_TESModelTextureSwap{};
+inline constexpr fnvd::Vtable TESFurniture_vftable_TESFullName{};
+inline constexpr fnvd::Vtable TESFurniture_vftable{};

@@ -1,0 +1,41 @@
+#pragma once
+
+#include "Havok/Source/Common/Base/Types/hkBaseTypes.h"
+#include "Havok/Source/Common/Internal/KdTree/QueryUtils/hkKdTreeCastCollector.h"
+#include "Havok/Source/Physics/Collide/Agent/Query/hkpLinearCastCollisionInput.h"
+#include "Havok/Source/Physics/Collide/Shape/hkpShapeType.h"
+#include "Reconstruction.hpp"
+
+#include <xmmintrin.h>
+
+class hkpCdPointCollector;
+class hkpCollidable;
+class hkpCollidableCollidableFilter;
+class hkpCollisionAgentConfig;
+class hkpLinearCastInput;
+
+// The PDB's file-static hkGetOneOver65K, this file's copy (cdecl, ret 0, 0xD98620): returns the file's static x in
+// xmm0. The address names it apart from hkKdTreeAabbCastUtils.cpp's copy (0xDF2740).
+__m128 hkGetOneOver65K_D98620();
+
+// Performs world linear casts using the KD-tree candidate collector.
+class hkpKdTreeWorldLinearCaster : public hkKdTreeCastCollector {
+public:
+	hkBool* addMidPhaseHit(hkBool* arResult, hkPrimitiveId primitiveId) override;
+	hkBool* hasHit(hkBool* arResult) override;
+	float getHitFraction() override;
+
+	void linearCast(const hkKdTree* tree, const hkpCollidable* collA, const hkpLinearCastInput& input,
+		const hkpCollidableCollidableFilter* filter, const hkpCollisionInput& collInput,
+		hkpCollisionAgentConfig* config, hkpCdPointCollector& castCollector, hkpCdPointCollector* startPointCollector);
+
+	const hkpLinearCastInput* m_input;
+	const hkpCollidableCollidableFilter* m_filter;
+	hkpCdPointCollector* m_castCollector;
+	hkpCdPointCollector* m_startPointCollector;
+	const hkpCollidable* m_collidableA;
+	hkEnum<hkpShapeType, int32_t> m_typeA;
+	// 4 bytes of padding: m_shapeInput is 16-byte aligned (its hkVector4 members), so it starts at 0x20.
+	hkpLinearCastCollisionInput m_shapeInput;
+};
+inline constexpr fnvd::Vtable hkpKdTreeWorldLinearCaster_vftable{};

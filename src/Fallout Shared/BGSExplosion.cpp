@@ -1,0 +1,412 @@
+#include "Fallout Shared/BGSExplosion.h"
+
+#include "BSCore/MemoryManager.h"
+#include "BSCore/RTTI.h"
+#include "BSMain/BSCloningProcess.h"
+#include "BSMain/IOManager.h"
+#include "BSMain/QueuedFiles.h"
+#include "BSMain/Setting.h"
+#include "BSShader/BSFadeNode.h"
+#include "Fallout Shared/AiFormulas.h"
+#include "Fallout Shared/BGSImpactDataSet.h"
+#include "Fallout Shared/BGSPreloadable.h"
+#include "Fallout Shared/GamePlayFormulas.h"
+#include "Fallout Shared/GlobalFunc.h"
+#include "Fallout Shared/Magic/MagicSystem.h"
+#include "Fallout Shared/ModelLoader.h"
+#include "Fallout Shared/TES.h"
+#include "Fallout Shared/TESCreature.h"
+#include "Fallout Shared/TESDataHandler.h"
+#include "Fallout Shared/TESEnchantableForm.h"
+#include "Fallout Shared/TESFile.h"
+#include "Fallout Shared/TESFullName.h"
+#include "Fallout Shared/TESImageSpaceModifiableForm.h"
+#include "Fallout Shared/TESLight.h"
+#include "Fallout Shared/TESModel.h"
+#include "Fallout Shared/TESObject.h"
+#include "Fallout Shared/TESObjectREFR.h"
+#include "Fallout Shared/TESSound.h"
+#include "Fallout/AI/Combat/Explosion.h"
+#include "Gamebryo2.2/CoreLibs/NiMain/NiAVObject.h"
+#include "SDK/MSVC/rtti.h"
+
+// Reads the explosion's chunks. ENAM/EITM and ANAM/EAMT are the enchantment's form ID and amount, MNAM its image
+// space modifier, INAM the placed object; the DATA chunk holds the explosion data, which a big-endian file stores
+// swapped.
+bool BGSExplosion::Load(TESFile* apFile) {
+	// The exe compares only al (the form type byte), not the whole of eax.
+	uint8_t ucFormType = static_cast<uint8_t>(apFile->GetTESForm());
+	if (ucFormType != EXPL_ID) {
+		return false;
+	}
+	static_cast<TESForm*>(this)->ClearData();
+	this->LoadForm(apFile);
+	this->SetInitialized(false);
+	do {
+		uint32_t eChunk = apFile->GetTESChunk();
+		if (eChunk == NO_CHUNK) {
+			break;
+		}
+		switch (eChunk) {
+		case DATA_ID:
+			this->LoadData(apFile, reinterpret_cast<char*>(&Data), 0x34u);
+#if FNVD_64BIT
+			// The file's record is 0x34 bytes, with a 4-byte form ID in each pointer field.
+			TESFile::WidenFormIDRecords(&Data, 1, 0x34, sizeof(Data),
+				{{0xC, offsetof(BGSExplosionData, pLight)}, {0x10, offsetof(BGSExplosionData, pSound1)},
+					{0x1C, offsetof(BGSExplosionData, pImpactDataSet)}, {0x20, offsetof(BGSExplosionData, pSound2)}});
+#endif
+			break;
+		case EDID_ID: {
+			// The exe's _alloca (__alloca_probe_16, 0xEC5EC0): a 16-byte aligned buffer of the chunk's size.
+			char* pBuffer = static_cast<char*>(__builtin_alloca_with_align(apFile->GetChunkSize(), 128));
+			apFile->GetChunkData(pBuffer, 0x200u);
+			static_cast<TESForm*>(this)->SetFormEditorID(pBuffer);
+			break;
+		}
+		case ENAM_ID:
+		case EITM_ID: {
+			// The chunk holds a form ID, which the exe passes on as the raw pointer value.
+			uint32_t uiFormID = 0;
+			apFile->GetChunkData<uint32_t>(uiFormID);
+			static_cast<TESEnchantableForm*>(this)
+				->SetFormEnchanting(reinterpret_cast<EnchantmentItem*>(static_cast<uintptr_t>(uiFormID)));
+			break;
+		}
+		case ANAM_ID:
+		case EAMT_ID: {
+			int16_t sAmount = 0;
+			apFile->LoadWord(&sAmount);
+			static_cast<TESEnchantableForm*>(this)->SetFormEnchantmentAmount(static_cast<uint16_t>(sAmount));
+			break;
+		}
+		case FULL_ID:
+			TESFullName::LoadFullNameChunk(this, apFile);
+			break;
+		case INAM_ID: {
+			// The chunk holds a form ID, which the exe stores as the raw pointer value.
+			uint32_t uiFormID = 0;
+			apFile->GetChunkData<uint32_t>(uiFormID);
+			pImpactPlacedObject = reinterpret_cast<TESBoundObject*>(static_cast<uintptr_t>(uiFormID));
+			break;
+		}
+		case MODL_ID:
+		case MODT_ID:
+			TESModel::LoadModelChunk(this, apFile);
+			break;
+		case MNAM_ID: {
+			// The chunk holds a form ID, which the exe passes on as the raw pointer value.
+			uint32_t uiFormID = 0;
+			apFile->GetChunkData<uint32_t>(uiFormID);
+			static_cast<TESImageSpaceModifiableForm*>(this)->SetFormImageSpaceModifying(reinterpret_cast<
+				TESImageSpaceModifier*>(static_cast<uintptr_t>(uiFormID)));
+			break;
+		}
+		case OBND_ID:
+			static_cast<TESForm*>(this)->LoadObjectBound(apFile);
+			break;
+		}
+		if (eChunk == DATA_ID && apFile->QEndian()) {
+			Data.Endian();
+		}
+	} while (apFile->NextChunk());
+	return true;
+}
+
+BGSExplosionData::BGSExplosionData() {
+	Initialize();
+}
+
+// Swaps all thirteen dwords read from a big-endian file, in field order. CASINO_DATA::Endian shares the code.
+void BGSExplosionData::Endian() {
+	ENDIAN(fForce, false);
+	ENDIAN(fDamage, false);
+	ENDIAN(fRadius, false);
+	ENDIAN(pLight, false);
+	ENDIAN(pSound1, false);
+	ENDIAN(iFlags, false);
+	ENDIAN(fImageSpaceRadius, false);
+	ENDIAN(pImpactDataSet, false);
+	ENDIAN(pSound2, false);
+	ENDIAN(fRadiationRads, false);
+	ENDIAN(fRadiationDissipationTime, false);
+	ENDIAN(fRadiationRadius, false);
+	ENDIAN(eSoundLevel, false);
+}
+
+void BGSExplosionData::Initialize() {
+	fForce = (float)0.0;
+	fDamage = (float)0.0;
+	fRadius = (float)0.0;
+	fRadiationRads = (float)0.0;
+	fRadiationDissipationTime = (float)0.0;
+	fRadiationRadius = (float)0.0;
+	pLight = nullptr;
+	pSound1 = nullptr;
+	iFlags = (uint32_t)0;
+	fImageSpaceRadius = (float)0.0;
+	pImpactDataSet = nullptr;
+	pSound2 = nullptr;
+	eSoundLevel = SOUND_LEVEL_NORMAL;
+}
+
+BGSExplosion::BGSExplosion()
+	: TESBoundObject(), TESFullName(), TESModel(), TESEnchantableForm(), BGSPreloadable(),
+	  TESImageSpaceModifiableForm(), Data() {
+	cFormType = 81;
+	BGSExplosion::InitializeData();
+	SetCastingType(MagicSystem::WHEN_STRIKES);
+}
+
+BGSExplosion::~BGSExplosion() {}
+
+void BGSExplosion::InitializeData() {
+	pImpactPlacedObject = nullptr;
+	GetData()->Initialize();
+}
+
+// Data is written with each form pointer replaced by its form ID (the exe stores the raw ID in the pointer field),
+// then the pointers are put back. The exe reads and writes each field through shared one-field getters and setters,
+// and each form ID through the shared +0xC getter 0x84E3A0.
+void BGSExplosion::Save() {
+	StartForm();
+	TESFullName::Save();
+	TESModel::Save(MODL_ID, MODT_ID);
+	SaveSubRecord();
+	TESImageSpaceModifiableForm::Save();
+	TESObjectLIGH* psaveLight = Data.pLight;
+	Data.pLight = reinterpret_cast<TESObjectLIGH*>(static_cast<uintptr_t>(Data.pLight ? Data.pLight->iFormID : 0));
+	TESSound* psaveSound1 = Data.pSound1;
+	Data.pSound1 = reinterpret_cast<TESSound*>(static_cast<uintptr_t>(Data.pSound1 ? Data.pSound1->iFormID : 0));
+	TESSound* psaveSound2 = Data.pSound2;
+	Data.pSound2 = reinterpret_cast<TESSound*>(static_cast<uintptr_t>(Data.pSound2 ? Data.pSound2->iFormID : 0));
+	BGSImpactDataSet* psaveImpactDataSet = Data.pImpactDataSet;
+	Data.pImpactDataSet =
+		reinterpret_cast<BGSImpactDataSet*>(static_cast<uintptr_t>(Data.pImpactDataSet ? Data.pImpactDataSet->iFormID
+																					   : 0));
+	if (TESForm::QEndianSwapOnSave()) {
+		Data.Endian();
+	}
+	__SaveData(&Data, 52u);
+	if (TESForm::QEndianSwapOnSave()) {
+		Data.Endian();
+	}
+	Data.pLight = psaveLight;
+	Data.pSound1 = psaveSound1;
+	Data.pSound2 = psaveSound2;
+	Data.pImpactDataSet = psaveImpactDataSet;
+	if (QImpactPlacedObject()) {
+		TESForm::AddChunk(INAM_ID, QImpactPlacedObject()->iFormID);
+	}
+	CloseForm();
+}
+
+// Before InitItem the form pointers in Data and pImpactPlacedObject hold the form IDs the file stored: the exe treats
+// those fields as raw form IDs until they are resolved.
+void BGSExplosion::InitItem() {
+	if (!GetInitialized()) {
+		uint32_t itempInt = static_cast<uint32_t>(reinterpret_cast<uintptr_t>(Data.pLight));
+		if (itempInt) {
+			TESFile* File = GetFile(-1);
+			TESForm::AddCompileIndex(itempInt, File);
+			TESForm* FormByNumericID = TESForm::GetFormByNumericID(itempInt);
+			Data.pLight = dynamic_cast<TESObjectLIGH*>(FormByNumericID);
+		}
+		itempInt = static_cast<uint32_t>(reinterpret_cast<uintptr_t>(Data.pSound1));
+		if (itempInt) {
+			TESFile* v3 = GetFile(-1);
+			TESForm::AddCompileIndex(itempInt, v3);
+			TESForm* v4 = TESForm::GetFormByNumericID(itempInt);
+			Data.pSound1 = dynamic_cast<TESSound*>(v4);
+		}
+		itempInt = static_cast<uint32_t>(reinterpret_cast<uintptr_t>(Data.pSound2));
+		if (itempInt) {
+			TESFile* v5 = GetFile(-1);
+			TESForm::AddCompileIndex(itempInt, v5);
+			TESForm* v6 = TESForm::GetFormByNumericID(itempInt);
+			Data.pSound2 = dynamic_cast<TESSound*>(v6);
+		}
+		itempInt = static_cast<uint32_t>(reinterpret_cast<uintptr_t>(Data.pImpactDataSet));
+		if (itempInt) {
+			TESFile* v7 = GetFile(-1);
+			TESForm::AddCompileIndex(itempInt, v7);
+			TESForm* v8 = TESForm::GetFormByNumericID(itempInt);
+			Data.pImpactDataSet = dynamic_cast<BGSImpactDataSet*>(v8);
+			if (!Data.pImpactDataSet) {
+				int32_t CastingType = iFormID;
+				const char* v11 = GetFormEditorID();
+				Warning("MASTERFILE: Could not find impact data set (%08X) for explosion '%s' (%08X).", itempInt, v11,
+					CastingType);
+			}
+		}
+		itempInt = static_cast<uint32_t>(reinterpret_cast<uintptr_t>(pImpactPlacedObject));
+		if (itempInt) {
+			TESFile* v9 = GetFile(-1);
+			TESForm::AddCompileIndex(itempInt, v9);
+			TESForm* v10 = TESForm::GetFormByNumericID(itempInt);
+			pImpactPlacedObject = dynamic_cast<TESBoundObject*>(v10);
+			if (!pImpactPlacedObject) {
+				int32_t v14 = iFormID;
+				const char* v12 = GetFormEditorID();
+				Warning("MASTERFILE: Could not find impact placed object (%08X) for explosion '%s' (%08X).", itempInt,
+					v12, v14);
+			}
+		}
+		TESImageSpaceModifiableForm::InitItem(this);
+		TESEnchantableForm::InitItem(this);
+		SetInitialized(1);
+	}
+}
+
+// The other's data is fetched before this one's, as the exe does.
+void BGSExplosion::Copy(TESForm* apCopy) {
+	BGSExplosion* pCopy = dynamic_cast<BGSExplosion*>(apCopy);
+	if (pCopy) {
+		CopyAllComponents(pCopy);
+		BGSExplosionData* pSource = pCopy->GetData();
+		ourMemcpy(GetData(), pSource, sizeof(BGSExplosionData));
+		SetImpactPlacedObject(pCopy->QImpactPlacedObject());
+	}
+}
+
+// True when the forms differ. The exe reads this form's data in place and the other's through GetData.
+bool BGSExplosion::Compare(TESForm* apCompare) {
+	BGSExplosion* pCompare = dynamic_cast<BGSExplosion*>(apCompare);
+	if (!pCompare) {
+		return true;
+	}
+	if (CompareAllComponents(pCompare)) {
+		return true;
+	}
+	if (std::memcmp(&Data, pCompare->GetData(), sizeof(BGSExplosionData))) {
+		return true;
+	}
+	TESForm* pPlaced = QImpactPlacedObject();
+	return pPlaced != pCompare->QImpactPlacedObject();
+}
+
+// The exe's cleanup-only C++ EH frame is left out.
+NiAVObject* BGSExplosion::Clone3D(TESObjectREFR* pRequester, bool deepCopy) {
+	NiAVObject* pav = 0;
+	bool bunderWater = 0;
+	Explosion* pexplosion = static_cast<Explosion*>(pRequester);
+	if (!static_cast<Explosion*>(pRequester)->Explosion::GetUnderWater()) {
+		return TESBoundObject::Clone3D(pRequester, deepCopy);
+	}
+	const char* pfilename = pWaterExplosion->GetModel();
+	NiAVObject* ploadedArt = pModelLoader->LoadFile(pfilename, LOD_MULT_NONE, 1, 0, 0, 0);
+	FNVD_CONSTRUCTED_LOCAL(BSCloningProcess, cloneData, &BSCloningProcess::Destruct, 1.0f);
+	if (ploadedArt) {
+		pav = static_cast<NiAVObject*>(ploadedArt->Clone(cloneData));
+	}
+	return pav;
+}
+
+void BGSExplosion::UnClone3D(TESObjectREFR* apRequester) {
+	if (static_cast<Explosion*>(apRequester)->Explosion::GetUnderWater()) {
+		const char* pfilename = pWaterExplosion->GetModel();
+		pModelLoader->ReleaseFile(pfilename);
+	} else {
+		TESObject::UnClone3D(apRequester);
+	}
+}
+
+void BGSExplosion::QueueFiles(IO_TASK_PRIORITY aePriority, QueuedFile* apParent) {
+	if (GetModelLength()) {
+		TESModel* apModel;
+		if (this == nullptr) {
+			apModel = 0;
+		} else {
+			apModel = static_cast<TESModel*>(this);
+		}
+		ENUM_LOD_MULT LODMult = TES::GetLODMult(this);
+		pModelLoader->QueueModel(apModel, aePriority, apParent, LODMult, 1, 0, 0);
+	}
+	if (Data.pImpactDataSet) {
+		Data.pImpactDataSet->QueueFiles(aePriority, apParent);
+	}
+	if (pWaterExplosion) {
+		if (pWaterExplosion->GetModelLength()) {
+			// The exe tests the global again before adjusting it to its TESModel base.
+			TESModel* v5 = pWaterExplosion;
+			ENUM_LOD_MULT v4 = TES::GetLODMult(this);
+			pModelLoader->QueueModel(v5, aePriority, apParent, v4, 1, 0, 0);
+		}
+	}
+}
+
+float BGSExplosion::GetRadiusBSUnits() {
+	if (GetFlag(1)) {
+		return (float)(Data.fRadius);
+	} else {
+		return (float)(Data.fRadius * ((&fBSUnitsPerFoot)->Float()));
+	}
+}
+
+bool BGSExplosion::GetFlag(int32_t aiFlag) {
+	return (((int32_t)(aiFlag & GetData()->iFlags)) != 0);
+}
+
+double BGSExplosion::GetDissipationTime() {
+	return Data.fRadiationDissipationTime;
+}
+
+double BGSExplosion::GetISRadius() {
+	if (GetFlag(1)) {
+		return Data.fImageSpaceRadius;
+	} else {
+		return (float)(Data.fImageSpaceRadius * ((&fBSUnitsPerFoot)->Float()));
+	}
+}
+
+double BGSExplosion::GetRADRadius() {
+	if (GetFlag(1)) {
+		return Data.fRadiationRadius;
+	} else {
+		return (float)(Data.fRadiationRadius * ((&fBSUnitsPerFoot)->Float()));
+	}
+}
+
+BGSExplosionData* BGSExplosion::GetData() {
+	return &Data;
+}
+
+TESBoundObject* BGSExplosion::QImpactPlacedObject() {
+	return pImpactPlacedObject;
+}
+
+void BGSExplosion::SetImpactPlacedObject(TESBoundObject* apObj) {
+	pImpactPlacedObject = apObj;
+}
+
+void BGSExplosion::SetForce(float afValue) {
+	Data.fForce = afValue;
+}
+
+BGSImpactData* BGSExplosion::GetImpactData(HavokMaterialType aehkMatType) {
+	BGSImpactData* pImpactData = nullptr;
+	if (GetImpactDataSet()) {
+		pImpactData = GetImpactDataSet()->GetImpactDataForMaterial(aehkMatType);
+	}
+	return pImpactData;
+}
+
+int32_t BGSExplosion::GetSoundLevelValue() {
+	uint32_t iValue = 0;
+	switch (Data.eSoundLevel) {
+	case SOUND_LEVEL_LOUD:
+		iValue = iSoundLevelLoud.UInt();
+		break;
+	case SOUND_LEVEL_NORMAL:
+		iValue = iSoundLevelNormal.UInt();
+		break;
+	case SOUND_LEVEL_SILENT:
+		iValue = iSoundLevelSilent.UInt();
+		break;
+	}
+	return iValue;
+}
+
+bool Explosion::GetUnderWater() {
+	return bUnderWater;
+}

@@ -1,0 +1,592 @@
+#include "Fallout/Misc/SaveLoad/BGSSaveLoadInitialData.h"
+
+#include "BSCore/MemoryManager.h"
+#include "BSCore/RTTI.h"
+#include "Fallout Shared/BGSProjectile.h"
+#include "Fallout Shared/ExtraDataList.h"
+#include "Fallout Shared/GlobalFunc.h"
+#include "Fallout Shared/TES.h"
+#include "Fallout Shared/TESDataHandler.h"
+#include "Fallout Shared/TESForm.h"
+#include "Fallout Shared/TESObjectCELL.h"
+#include "Fallout Shared/TESObjectREFR.h"
+#include "Fallout Shared/TESWorldSpace.h"
+#include "Fallout/AI/Actor.h"
+#include "Fallout/AI/Combat/Explosion.h"
+#include "Fallout/AI/PlayerCharacter.h"
+#include "Fallout/Misc/SaveLoad/BGSChangeFlags.h"
+#include "Fallout/Misc/SaveLoad/BGSLoadFormBuffer.h"
+#include "Fallout/Misc/SaveLoad/BGSLoadGameBuffer.h"
+#include "Fallout/Misc/SaveLoad/BGSLoadGameSubBuffer.h"
+#include "Fallout/Misc/SaveLoad/BGSSaveFormBuffer.h"
+#include "Fallout/Misc/SaveLoad/BGSSaveLoadDefines.h"
+#include "Fallout/Misc/SaveLoad/BGSSaveLoadFile.h"
+#include "Fallout/Misc/SaveLoad/BGSSaveLoadFormHeader.h"
+#include "Fallout/Misc/SaveLoad/BGSSaveLoadFormIDMap.h"
+#include "Fallout/Misc/SaveLoad/BGSSaveLoadGame.h"
+#include "Fallout/Misc/SaveLoad/InteriorCellInitialData.h"
+#include "Gamebryo2.2/CoreLibs/NiMain/NiPoint3.h"
+#include "SDK/MSVC/rtti.h"
+
+INITIAL_DATA_TYPE BGSSaveLoadInitialData::GetInitialDataType(uint32_t aiFormID, int32_t aeFormType,
+	BGSChangeFlags aChangeFlags) {
+	if (TESObjectREFR::IsReferenceFormType(aeFormType)) {
+		if (pDataHandler->IsFormIDCreated(aiFormID)) {
+			return INITIAL_DATA_CREATED_REFERENCE;
+		}
+		if (aChangeFlags.CheckFlags(8)) {
+			return INITIAL_DATA_MOVED_REFERENCE;
+		}
+		if (aChangeFlags.CheckFlags(6)) {
+			return INITIAL_DATA_REFERENCE_LOCATION;
+		}
+		return INITIAL_DATA_NONE;
+	}
+	if (aeFormType != CELL_ID || !aChangeFlags.CheckFlags(CHANGE_CELL_DETACHTIME)) {
+		return INITIAL_DATA_NONE;
+	}
+	if (aChangeFlags.CheckFlags(CHANGE_CELL_EXTERIOR_CHAR)) {
+		return INITIAL_DATA_EXTERIOR_CELL_CHAR;
+	}
+	if (aChangeFlags.CheckFlags(CHANGE_CELL_EXTERIOR_SHORT)) {
+		return INITIAL_DATA_EXTERIOR_CELL_SHORT;
+	}
+	return INITIAL_DATA_INTERIOR_CELL;
+}
+
+INITIAL_DATA_TYPE BGSSaveLoadInitialData::GetInitialDataType(TESForm* apForm, BGSChangeFlags aiChangeFlags) {
+	const ENUM_FORM_ID eFormType = static_cast<ENUM_FORM_ID>(apForm->GetFormType());
+	uint32_t iFormID = apForm->GetFormID();
+	return BGSSaveLoadInitialData::GetInitialDataType(iFormID, eFormType, aiChangeFlags);
+}
+
+uint32_t BGSSaveLoadInitialData::GetInitialDataTypeSize(INITIAL_DATA_TYPE aeType) {
+	return (uint32_t)kInitialDataTypeData[aeType].cSize;
+}
+
+bool BGSSaveLoadInitialData::IsInitialDataRefType(INITIAL_DATA_TYPE aeType) {
+	return (bool)((uint8_t)kInitialDataTypeData[aeType].bRefType);
+}
+
+uint32_t BGSSaveLoadInitialData::GetInitialDataTypeDataSize(INITIAL_DATA_TYPE aeType) {
+	return ((uint32_t)BGSSaveLoadInitialData::GetInitialDataTypeSize(aeType)) + 1;
+}
+
+bool BGSSaveLoadInitialData::IsInitialDataCellType(INITIAL_DATA_TYPE aeType) {
+	return (bool)((uint8_t)kInitialDataTypeData[(int32_t)aeType].bCellType);
+}
+
+// Writes the form's initial data by its type, then its saved Havok state when the change flags ask for it: the
+// stored sub-buffer when the reference has no 3D, else the live state.
+INITIAL_DATA_TYPE BGSSaveLoadInitialData::SaveInitialData(BGSSaveFormBuffer* apSaveGameBuffer, TESForm* apForm,
+	BGSChangeFlags aiChangeFlags) {
+	INITIAL_DATA_TYPE eType = BGSSaveLoadInitialData::GetInitialDataType(apForm, aiChangeFlags);
+	switch (eType) {
+	case INITIAL_DATA_EXTERIOR_CELL_CHAR: {
+		TESObjectCELL* pCell = static_cast<TESObjectCELL*>(apForm);
+		ExteriorCellInitialDataChar kData;
+		TESWorldSpace* pWorldSpace = pCell->GetWorldSpace();
+		kData.sWorldSpaceIDIndex = pSaveLoadGame->pWorldspaceFormIDMap->AddFormID(pWorldSpace->iFormID);
+		kData.cCellX = static_cast<char>(pCell->GetDataX());
+		kData.cCellY = static_cast<char>(pCell->GetDataY());
+		kData.iDetachTime = static_cast<int32_t>(pCell->GetDetachTime());
+		apSaveGameBuffer->SaveDataEndian(&kData, sizeof(ExteriorCellInitialDataChar), 0);
+		break;
+	}
+	case INITIAL_DATA_EXTERIOR_CELL_SHORT: {
+		TESObjectCELL* pCell = static_cast<TESObjectCELL*>(apForm);
+		ExteriorCellInitialDataShort kData;
+		TESWorldSpace* pWorldSpace = pCell->GetWorldSpace();
+		kData.sWorldSpaceIDIndex = pSaveLoadGame->pWorldspaceFormIDMap->AddFormID(pWorldSpace->iFormID);
+		kData.sCellX = static_cast<int16_t>(pCell->GetDataX());
+		kData.sCellY = static_cast<int16_t>(pCell->GetDataY());
+		kData.iDetachTime = static_cast<int32_t>(pCell->GetDetachTime());
+		apSaveGameBuffer->SaveDataEndian(&kData, sizeof(ExteriorCellInitialDataShort), 0);
+		break;
+	}
+	case INITIAL_DATA_INTERIOR_CELL: {
+		TESObjectCELL* pCell = static_cast<TESObjectCELL*>(apForm);
+		uint32_t iDetachTime = pCell->GetDetachTime();
+		apSaveGameBuffer->SaveDataEndian(&iDetachTime, sizeof(iDetachTime), 0);
+		break;
+	}
+	case INITIAL_DATA_REFERENCE_LOCATION: {
+		TESObjectREFR* pRef = static_cast<TESObjectREFR*>(apForm);
+		TESForm* pLocation = pRef->GetWorldSpace();
+		if (!pLocation) {
+			pLocation = pRef->GetParentCell();
+		}
+		NiPoint3 kLocation = *pRef->QLocationOnReference();
+		NiPoint3 kAngle = pRef->GetAngleOnReference();
+		if (!pLocation && !pRef->GetEditorLocation(kLocation, kAngle, pLocation, 0)) {
+			pLocation = pPlayer->GetWorldSpace();
+			if (!pLocation) {
+				pLocation = pPlayer->GetParentCell();
+			}
+			kLocation = *pRef->QLocationOnReference();
+			kAngle = pRef->GetAngleOnReference();
+		}
+		ReferenceLocationInitialData kRefLocationData;
+		kRefLocationData.~ReferenceLocationInitialData();
+		::new (&kRefLocationData) ReferenceLocationInitialData;
+		kRefLocationData.LocationIDIndex.SetNumericID(pLocation->iFormID);
+		kRefLocationData.Location = kLocation;
+		kRefLocationData.Angle = kAngle;
+		apSaveGameBuffer->SaveDataEndian(&kRefLocationData, sizeof(ReferenceLocationInitialData), 0);
+		break;
+	}
+	case INITIAL_DATA_CREATED_REFERENCE: {
+		TESObjectREFR* pRef = static_cast<TESObjectREFR*>(apForm);
+		TESForm* pLocation = pRef->GetWorldSpace();
+		if (!pLocation) {
+			pLocation = pRef->GetParentCell();
+		}
+		CreatedReferenceInitialData kCreatedRefData;
+		kCreatedRefData.~CreatedReferenceInitialData();
+		::new (&kCreatedRefData) CreatedReferenceInitialData;
+		kCreatedRefData.RefLocationData.LocationIDIndex.SetNumericID(pLocation->iFormID);
+		kCreatedRefData.RefLocationData.Location = pRef->GetLocationOnReference();
+		kCreatedRefData.RefLocationData.Angle = pRef->GetAngleOnReference();
+		TESBoundObject* pObjectReference = pRef->GetObjectReference();
+		// The leveled actor's original base is saved in place of its base.
+		if (pRef->IsActor() && aiChangeFlags.CheckFlags(CHANGE_ACTOR_EXTRA_LEVELED_ACTOR)) {
+			TESActorBase* pOriginalActorBase = pRef->m_Extra.GetLevCreaOriginalBase();
+			if (pOriginalActorBase) {
+				pObjectReference = pOriginalActorBase;
+			}
+		}
+		kCreatedRefData.BoundIDIndex.SetNumericID(pObjectReference->iFormID);
+		kCreatedRefData.cCreatedReferenceFlags = 1;
+		if (pRef->GetRefPersists()) {
+			kCreatedRefData.cCreatedReferenceFlags |= 2;
+		}
+		if (pRef->IsMobileObject()) {
+			if (static_cast<MobileObject*>(pRef)->IsTalkingActivator()) {
+				kCreatedRefData.cCreatedReferenceFlags |= 4;
+			}
+		}
+		apSaveGameBuffer->SaveDataEndian(&kCreatedRefData, sizeof(CreatedReferenceInitialData), 0);
+		break;
+	}
+	case INITIAL_DATA_MOVED_REFERENCE: {
+		TESObjectREFR* pRef = static_cast<TESObjectREFR*>(apForm);
+		TESForm* pLocation = pRef->GetWorldSpace();
+		if (!pLocation) {
+			pLocation = pRef->GetParentCell();
+		}
+		NiPoint3 kLocation = *pRef->QLocationOnReference();
+		NiPoint3 kAngle = pRef->GetAngleOnReference();
+		if (!pLocation && !pRef->GetEditorLocation(kLocation, kAngle, pLocation, 0)) {
+			pLocation = pPlayer->GetWorldSpace();
+			if (!pLocation) {
+				pLocation = pPlayer->GetParentCell();
+			}
+			kLocation = *pRef->QLocationOnReference();
+			kAngle = pRef->GetAngleOnReference();
+		}
+		MovedReferenceInitialData kMovedRefData;
+		kMovedRefData.~MovedReferenceInitialData();
+		::new (&kMovedRefData) MovedReferenceInitialData;
+		kMovedRefData.RefLocationData.LocationIDIndex.SetNumericID(pLocation->iFormID);
+		kMovedRefData.RefLocationData.Location = kLocation;
+		kMovedRefData.RefLocationData.Angle = kAngle;
+		NiPoint3 kEditorLocation;
+		NiPoint3 kEditorAngle;
+		TESForm* pEditorLocationForm = nullptr;
+		if (pRef->GetEditorLocation(kEditorLocation, kEditorAngle, pEditorLocationForm, 0)) {
+			kMovedRefData.OriginalLocationIDIndex.SetNumericID(pEditorLocationForm->iFormID);
+			kMovedRefData.sOriginalCellX = FloatToInt(kEditorLocation.x) >> 12;
+			kMovedRefData.sOriginalCellY = FloatToInt(kEditorLocation.y) >> 12;
+		} else {
+			kMovedRefData.sOriginalCellX = 0;
+			kMovedRefData.sOriginalCellY = 0;
+			// The exe evaluates the arguments from the last to the first.
+			TESBoundObject* pObjectReference = pRef->GetObjectReference();
+			uint32_t iObjectID = pRef->GetObjectReference()->iFormID;
+			const char* pObjectEditorID = pObjectReference->GetFormEditorID();
+			uint32_t iRefID = pRef->iFormID;
+			const char* pRefEditorID = pRef->GetFormEditorID();
+			SaveGameWarning("EDITOR: Could not get editor location for reference '%s' (%08X) of type '%s' (%08X)",
+				pRefEditorID, iRefID, pObjectEditorID, iObjectID);
+		}
+		apSaveGameBuffer->SaveDataEndian(&kMovedRefData, sizeof(MovedReferenceInitialData), 0);
+		break;
+	}
+	default:
+		break;
+	}
+	if (apForm->IsReference() && aiChangeFlags.CheckFlags(CHANGE_REFR_HAVOK_MOVE)) {
+		TESObjectREFR* pRef = static_cast<TESObjectREFR*>(apForm);
+		BGSLoadGameSubBuffer kSavedHavokData;
+		FNVD_RECONSTRUCT(BGSLoadGameSubBuffer)(&kSavedHavokData, pRef->m_Extra.GetSavedHavokData());
+		if (!pRef->Get3D() && kSavedHavokData.pBuffer) {
+			kSavedHavokData.SaveGame(apSaveGameBuffer);
+		} else {
+			uint32_t iSizePosition = apSaveGameBuffer->StartVariableSizedValue();
+			uint32_t iPosition1 = apSaveGameBuffer->iBufferPosition;
+			pRef->SaveHavokData(apSaveGameBuffer);
+			uint32_t iPosition2 = apSaveGameBuffer->iBufferPosition;
+			apSaveGameBuffer->SaveVariableSizedValue(iPosition2 - iPosition1, iSizePosition);
+		}
+	}
+	return eType;
+}
+
+// The cell types only store their detach time. The reference types read their location data, then place the
+// reference: a created one is made at its saved location, or moved into its saved cell, and a located or moved one is
+// moved to its saved location. The exe's cleanup-only EH frame is left out.
+INITIAL_DATA_TYPE BGSSaveLoadInitialData::LoadInitialData(BGSLoadFormBuffer* apLoadGameBuffer, TESForm* apForm,
+	BGSChangeFlags aiChangeFlags) {
+	INITIAL_DATA_TYPE eType = GetInitialDataType(apForm, aiChangeFlags);
+	if (IsInitialDataCellType(eType)) {
+		CellInitialData kCellData;
+		LoadInitialDataStruct(apLoadGameBuffer, eType, &kCellData);
+		static_cast<TESObjectCELL*>(apForm)->SetDetachTime((uint32_t)kCellData.iDetachTime, true);
+		return eType;
+	}
+	if (!IsInitialDataRefType(eType)) {
+		if (eType != INITIAL_DATA_NONE) {
+			SaveGameWarning("SAVELOAD: Unknown initial data type %i", eType);
+		}
+		return eType;
+	}
+	ReferenceInitialData kRefData;
+	kRefData.~ReferenceInitialData();
+	::new (&kRefData) ReferenceInitialData;
+	LoadInitialDataStruct(apLoadGameBuffer, eType, &kRefData);
+	TESObjectCELL* pCell = nullptr;
+	TESWorldSpace* pWorldSpace = nullptr;
+	kRefData.GetLocationCellAndWorld(pCell, pWorldSpace);
+	TESObjectREFR* pRef = static_cast<TESObjectREFR*>(apForm);
+	if (eType == INITIAL_DATA_CREATED_REFERENCE) {
+		TESForm* pBoundForm = TESForm::GetFormByNumericID(kRefData.iBoundID);
+		TESBoundObject* pBoundObject = dynamic_cast<TESBoundObject*>(pBoundForm);
+		if (kRefData.cCreatedReferenceFlags & 4) {
+			pRef->SetLocationOnReference(kRefData.Location);
+			pRef->SetAngleOnReference(kRefData.Angle);
+			if (pCell) {
+				pRef->SetParentCell(pCell);
+			} else if (pWorldSpace) {
+				// The exe reads the world space's interior cell before the reference's extra data.
+				TESObjectCELL* pInterior = pWorldSpace->QPersistentCell();
+				ExtraDataList* pExtra = pRef->GetExtra();
+				pExtra->SetPersistentCell(pInterior);
+			}
+		} else {
+			pDataHandler->CreateReferenceAtLocation(pBoundObject, kRefData.Location, kRefData.Angle, pCell, pWorldSpace,
+				pRef, nullptr, nullptr);
+		}
+		if (pCell || pWorldSpace) {
+			pRef->Update3DPosition();
+			if (pRef->IsActor()) {
+				pSaveLoadGame->CancelInitPackageLocations(pRef);
+			}
+		} else {
+			const char* pTypeName = pBoundObject ? pBoundObject->GetFormTypeString() : "UNKNOWN";
+			SaveGameWarning("Created reference %08X with bound object %08X of type %s is loading into a "
+							"non-existent cell/worldspace and will be deleted",
+				pRef->GetFormID(), kRefData.iBoundID, pTypeName);
+			pRef->SetStillLoading(false);
+			pSaveLoadGame->DeleteForm(pRef);
+			apLoadGameBuffer->SetForm(nullptr);
+			return eType;
+		}
+	} else if (eType == INITIAL_DATA_REFERENCE_LOCATION || eType == INITIAL_DATA_MOVED_REFERENCE) {
+		if (pRef == pPlayer) {
+			if (!pSaveLoadGame->GetPlayerLocationInvalid()) {
+				pRef->SetAngleOnReference(kRefData.Angle);
+				pRef->SetLocationOnReference(kRefData.Location);
+			}
+		} else {
+			pRef->SetAngleOnReference(kRefData.Angle);
+			pRef->SetLocationOnReference(kRefData.Location);
+		}
+		pRef->Update3DPosition();
+		if (pRef != pPlayer) {
+			if (pCell && pCell->GetInterior()) {
+				if (pCell != pRef->GetParentCell()) {
+					TESObjectREFR::MoveRefToNewSpace(pRef, pCell, nullptr);
+				}
+			} else if (pWorldSpace) {
+				if ((pCell && (pCell == pRef->GetParentCell() || TES::pInstance->IsCellLoaded(pCell, false))) ||
+					pRef->GetRefPersists()) {
+					if (!pCell || pCell != pRef->GetParentCell()) {
+						TESObjectREFR::MoveRefToNewSpace(pRef, nullptr, pWorldSpace);
+					}
+				} else {
+					SaveGameWarning("Trying to load non-persistent reference '%s' (%08X) into unloaded cell in "
+									"worldspace '%s' (%08X)",
+						pRef->GetFormEditorID(), pRef->GetFormID(), pWorldSpace->GetFormEditorID(),
+						pWorldSpace->GetFormID());
+					apLoadGameBuffer->SetCellChanged(true);
+				}
+			} else {
+				SaveGameWarning("Could not find world or cell %08X for reference '%s' (%08X)", kRefData.iLocationID,
+					pRef->GetFormEditorID(), pRef->GetFormID());
+			}
+			if (!pRef->Get3D() || (pCell && TES::pInstance->IsCellLoaded(pCell, false))) {
+				if (pRef->Get3D()) {
+					if (pRef->IsActor()) {
+						pRef->InitHavok();
+					}
+				}
+			} else {
+				pRef->Set3D(nullptr, false);
+			}
+		}
+		if (pRef->IsActor()) {
+			Actor* pActor = static_cast<Actor*>(pRef);
+			pSaveLoadGame->CancelInitPackageLocations(pRef);
+			if (eType == INITIAL_DATA_MOVED_REFERENCE && !pActor->HasEditorLocation()) {
+				pActor->pEditorLocForm = TESForm::GetFormByNumericID(kRefData.iOriginalLocationID);
+			}
+		}
+	}
+	if (aiChangeFlags.CheckFlags(CHANGE_REFR_HAVOK_MOVE)) {
+		pSaveLoadGame->QueueSubBuffer(QUEUED_SUB_BUFFER_HAVOK_DATA, apLoadGameBuffer, nullptr);
+	}
+	return eType;
+}
+
+uint32_t BGSSaveLoadInitialData::LoadInitialDataStruct(BGSLoadFormBuffer* apLoadGameBuffer, INITIAL_DATA_TYPE aeType,
+	void* apData) {
+	if (aeType == INITIAL_DATA_NONE) {
+		return 0;
+	}
+	char apDataa[128];
+	uint32_t aiSize = BGSSaveLoadInitialData::GetInitialDataTypeSize(aeType);
+	apLoadGameBuffer->LoadData(apDataa, aiSize);
+	return BGSSaveLoadInitialData::LoadInitialDataStruct(apDataa, aeType, apData);
+}
+
+uint32_t BGSSaveLoadInitialData::LoadInitialDataStruct(BGSSaveLoadFile* apFile, INITIAL_DATA_TYPE aeType,
+	void* apInitialDataBuffer) {
+	char apBuffer[128];
+	if (aeType == INITIAL_DATA_NONE) {
+		return 0;
+	}
+	uint32_t aiBytes = BGSSaveLoadInitialData::GetInitialDataTypeDataSize(aeType);
+	apFile->Read(apBuffer, aiBytes);
+	return BGSSaveLoadInitialData::LoadInitialDataStruct(apBuffer, aeType, apInitialDataBuffer);
+}
+
+uint32_t BGSSaveLoadInitialData::LoadInitialDataStruct(char* apBuffer, INITIAL_DATA_TYPE aeType,
+	void* apInitialDataBuffer) {
+	ReferenceLocationInitialData apMemory;
+	InteriorCellInitialData v10;
+	ExteriorCellInitialDataShort apDest;
+	ExteriorCellInitialDataChar a2;
+	uint32_t aCount = BGSSaveLoadInitialData::GetInitialDataTypeSize(aeType);
+	switch (aeType) {
+	case INITIAL_DATA_EXTERIOR_CELL_CHAR: {
+		ourMemcpy(&a2, apBuffer, aCount);
+		CellInitialData* v14 = static_cast<CellInitialData*>(apInitialDataBuffer);
+		static_cast<CellInitialData*>(apInitialDataBuffer)->Initialize_CHAR(&a2);
+		break;
+	}
+	case INITIAL_DATA_EXTERIOR_CELL_SHORT: {
+		ourMemcpy(&apDest, apBuffer, aCount);
+		CellInitialData* v13 = static_cast<CellInitialData*>(apInitialDataBuffer);
+		static_cast<CellInitialData*>(apInitialDataBuffer)->Initialize_SHORT(&apDest);
+		break;
+	}
+	case INITIAL_DATA_INTERIOR_CELL: {
+		ourMemcpy(&v10, apBuffer, aCount);
+		CellInitialData* v11 = static_cast<CellInitialData*>(apInitialDataBuffer);
+		static_cast<CellInitialData*>(apInitialDataBuffer)->Initialize_INTERIOR(&v10);
+		break;
+	}
+	case INITIAL_DATA_REFERENCE_LOCATION: {
+		apMemory.~ReferenceLocationInitialData();
+		::new (&apMemory) ReferenceLocationInitialData;
+		ourMemcpy(&apMemory, apBuffer, aCount);
+		ReferenceInitialData* v8 = static_cast<ReferenceInitialData*>(apInitialDataBuffer);
+		static_cast<ReferenceInitialData*>(apInitialDataBuffer)->Initialize_LOCATION(&apMemory);
+		break;
+	}
+	case INITIAL_DATA_CREATED_REFERENCE: {
+		FNVD_CONSTRUCTED_LOCAL(CreatedReferenceInitialData, v6, nullptr);
+		ourMemcpy(&v6, apBuffer, aCount);
+		ReferenceInitialData* v7 = static_cast<ReferenceInitialData*>(apInitialDataBuffer);
+		static_cast<ReferenceInitialData*>(apInitialDataBuffer)->Initialize_CREATED(&v6);
+		break;
+	}
+	case INITIAL_DATA_MOVED_REFERENCE: {
+		FNVD_CONSTRUCTED_LOCAL(MovedReferenceInitialData, v4, nullptr);
+		ourMemcpy(&v4, apBuffer, aCount);
+		ReferenceInitialData* v5 = static_cast<ReferenceInitialData*>(apInitialDataBuffer);
+		static_cast<ReferenceInitialData*>(apInitialDataBuffer)->Initialize_MOVED(&v4);
+		break;
+	}
+	default: {
+		return BGSSaveLoadInitialData::GetInitialDataTypeDataSize(aeType);
+	}
+	}
+	return BGSSaveLoadInitialData::GetInitialDataTypeDataSize(aeType);
+}
+
+// The exe's cleanup-only C++ EH frame is left out.
+TESObjectREFR* BGSSaveLoadInitialData::CreateReference(uint32_t aiFormID, ReferenceInitialData* apReferenceInitialData,
+	TESForm* apPreExistingForm) {
+	TESObjectREFR* pRef = static_cast<TESObjectREFR*>(apPreExistingForm);
+	if (!apPreExistingForm) {
+		pRef = static_cast<TESObjectREFR*>(TESForm::GetFormByNumericID(aiFormID));
+	}
+	if (pDataHandler->IsFormIDCreated(apReferenceInitialData->iBoundID)) {
+		apReferenceInitialData->iBoundID = 0;
+	}
+	TESForm* pBoundForm = TESForm::GetFormByNumericID(apReferenceInitialData->iBoundID);
+	TESBoundObject* pBoundObject = dynamic_cast<TESBoundObject*>(pBoundForm);
+	if (!pBoundObject) {
+		SaveGameWarning("SAVELOAD: Bound object %08X no longer exists.  Reference %08X will not be created.",
+			apReferenceInitialData->iBoundID, aiFormID);
+		return nullptr;
+	}
+	if (pRef) {
+		bool bClear = false;
+		if (pRef->IsReference()) {
+			if (pRef->GetObjectReference() != pBoundObject &&
+				(!pRef->IsActor() || pRef->m_Extra.GetLevCreaOriginalBase() != pBoundObject)) {
+				bClear = true;
+			}
+		} else {
+			bClear = true;
+		}
+		if (bClear) {
+			pSaveLoadGame->ClearForm(pRef);
+			pRef = nullptr;
+		}
+	}
+	uint8_t cCreatedType = apReferenceInitialData->cCreatedReferenceFlags;
+	if (!pRef) {
+		TESObjectREFR* pNewRef = nullptr;
+		// A dword local in the exe; CreateReference takes its low byte.
+		ENUM_FORM_ID eRefFormType = REFR_ID;
+		switch (pBoundObject->GetFormType()) {
+		case NPC__ID:
+			eRefFormType = ACHR_ID;
+			break;
+		case CREA_ID:
+			eRefFormType = ACRE_ID;
+			break;
+		case PROJ_ID:
+			eRefFormType = static_cast<BGSProjectile*>(pBoundObject)->GetProjectileRefFormType();
+			break;
+		case EXPL_ID: {
+			Explosion* pMemory = static_cast<Explosion*>(ourMalloc(sizeof(Explosion)));
+			pNewRef = pMemory ? ::new (pMemory) Explosion : nullptr;
+			break;
+		}
+		default:
+			break;
+		}
+		if (cCreatedType & 4) {
+			eRefFormType = TACT_ID;
+		}
+		if (cCreatedType & 3) {
+			if (!pNewRef) {
+				pNewRef = TESObjectREFR::CreateReference(static_cast<uint8_t>(eRefFormType), true);
+			}
+			pNewRef->SetObjectReference(pBoundObject);
+			pNewRef->SetFormID(aiFormID, true);
+			pRef = pNewRef;
+		} else {
+			SaveGameWarning("SAVELOAD: Invalid created reference type %i for form %08X with bound object %08X in "
+							"location %08X",
+				cCreatedType, aiFormID, apReferenceInitialData->iBoundID, apReferenceInitialData->iLocationID);
+		}
+	}
+	if (pRef && (cCreatedType & 2)) {
+		pRef->SetRefPersists(true);
+	}
+	if (pRef) {
+		pRef->SetStillLoading(true);
+	}
+	return pRef;
+}
+
+ReferenceLocationInitialData::ReferenceLocationInitialData() {}
+
+void ReferenceInitialData::Initialize_LOCATION(ReferenceLocationInitialData* a2) {
+	iLocationID = (uint32_t)((int32_t)a2->LocationIDIndex.GetNumericID());
+	iBoundID = (uint32_t)0;
+	iOriginalLocationID = (uint32_t)0;
+	iOriginalCellX = 0;
+	iOriginalCellY = 0;
+	Location = a2->Location;
+	Angle = a2->Angle;
+	cCreatedReferenceFlags = (uint8_t)0;
+}
+
+bool ReferenceInitialData::GetLocationCellAndWorld(TESObjectCELL*& arpCell, TESWorldSpace*& arpWorld) {
+	TESWorldSpace* apLocation = static_cast<TESWorldSpace*>(TESForm::GetFormByNumericID(iLocationID));
+	bool LocationCellOrWorld = GetLocationCellOrWorld(apLocation, arpCell, arpWorld);
+	if (arpWorld) {
+		int32_t aiX = FloatToInt(Location.x) >> 12;
+		int32_t aiY = FloatToInt(Location.y) >> 12;
+		arpCell = arpWorld->GetCellFromCellCoord(aiX, aiY);
+	}
+	return LocationCellOrWorld;
+}
+
+bool ReferenceInitialData::GetOriginalLocationCellAndWorld(TESObjectCELL*& arpCell, TESWorldSpace*& arpWorld) {
+	TESWorldSpace* apLocation = static_cast<TESWorldSpace*>(TESForm::GetFormByNumericID(iOriginalLocationID));
+	bool LocationCellOrWorld = GetLocationCellOrWorld(apLocation, arpCell, arpWorld);
+	if (arpWorld) {
+		arpCell = arpWorld->GetCellFromCellCoord(iOriginalCellX, iOriginalCellY);
+	}
+	return LocationCellOrWorld;
+}
+
+void ReferenceInitialData::Initialize_CREATED(CreatedReferenceInitialData* a2) {
+	iLocationID = a2->RefLocationData.LocationIDIndex.GetNumericID();
+	iBoundID = a2->BoundIDIndex.GetNumericID();
+	iOriginalLocationID = 0;
+	iOriginalCellX = 0;
+	iOriginalCellY = 0;
+	Location = a2->RefLocationData.Location;
+	Angle = a2->RefLocationData.Angle;
+	cCreatedReferenceFlags = a2->cCreatedReferenceFlags;
+}
+
+void ReferenceInitialData::Initialize_MOVED(MovedReferenceInitialData* a2) {
+	iLocationID = a2->RefLocationData.LocationIDIndex.GetNumericID();
+	iBoundID = 0;
+	iOriginalLocationID = a2->OriginalLocationIDIndex.GetNumericID();
+	iOriginalCellX = a2->sOriginalCellX;
+	iOriginalCellY = a2->sOriginalCellY;
+	Location = a2->RefLocationData.Location;
+	Angle = a2->RefLocationData.Angle;
+	cCreatedReferenceFlags = 0;
+}
+
+void CellInitialData::Initialize_INTERIOR(InteriorCellInitialData* a2) {
+	iCellX = 0;
+	iCellY = 0;
+	iDetachTime = a2->iDetachTime;
+	iWorldSpaceID = (uint32_t)0;
+}
+
+void CellInitialData::Initialize_CHAR(ExteriorCellInitialDataChar* a2) {
+	iCellX = a2->cCellX;
+	iCellY = a2->cCellY;
+	iDetachTime = a2->iDetachTime;
+	uint32_t sWorldSpaceIDIndex = a2->sWorldSpaceIDIndex;
+	BGSSaveLoadFormIDMap* CastingType = pSaveLoadGame->pWorldspaceFormIDMap;
+	iWorldSpaceID = CastingType->GetFormID(sWorldSpaceIDIndex);
+}
+
+void CellInitialData::Initialize_SHORT(ExteriorCellInitialDataShort* a2) {
+	iCellX = a2->sCellX;
+	iCellY = a2->sCellY;
+	iDetachTime = a2->iDetachTime;
+	uint32_t sWorldSpaceIDIndex = a2->sWorldSpaceIDIndex;
+	BGSSaveLoadFormIDMap* CastingType = pSaveLoadGame->pWorldspaceFormIDMap;
+	iWorldSpaceID = CastingType->GetFormID(sWorldSpaceIDIndex);
+}
+
+CreatedReferenceInitialData::CreatedReferenceInitialData() {}
+
+MovedReferenceInitialData::MovedReferenceInitialData() {}
+
+BGSNumericIDIndex::BGSNumericIDIndex() : cData1(0), cData2(0), cData3(0) {}

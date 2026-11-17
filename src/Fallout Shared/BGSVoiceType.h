@@ -1,0 +1,33 @@
+#pragma once
+
+#include "BSCore/BSStringT.h"
+#include "Fallout Shared/TESForm.h"
+#include "Reconstruction.hpp"
+
+// A voice type's DNAM data: its flags (the sex bit among them).
+struct VOICE_TYPE_DATA {
+	uint8_t cFlags;
+};
+
+// A voice type form (VTYP).
+class BGSVoiceType : public TESForm {
+public:
+	BGSVoiceType();
+
+	~BGSVoiceType() override;
+
+	bool Load(TESFile* apFile) override;
+	void Save() override;
+	void Copy(TESForm* apCopy) override;
+	bool Compare(TESForm* apCompare) override;
+	const char* GetFormEditorID() override;
+	bool SetFormEditorID(const char* apEditorID) override;
+
+	using TESForm::Save;
+
+	VOICE_TYPE_DATA Data;
+	uint8_t padding19[3];
+	// IDA name (strEditorID); not in the PDB.
+	BSStringT<char> strEditorID;
+};
+inline constexpr fnvd::Vtable BGSVoiceType_vftable{};

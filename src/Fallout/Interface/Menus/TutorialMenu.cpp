@@ -1,0 +1,244 @@
+#include "Fallout/Interface/Menus/TutorialMenu.h"
+
+#include "BSCore/BSSimpleList.h"
+#include "BSCore/BSStringT.h"
+#include "BSCore/MemoryManager.h"
+#include "BSCore/RTTI.h"
+#include "BSMenu/Tile.h"
+#include "BSMenu/TileImage.h"
+#include "BSMenu/TileMenu.h"
+#include "Fallout Shared/BGSListForm.h"
+#include "Fallout Shared/BGSMessage.h"
+#include "Fallout Shared/GlobalFunc.h"
+#include "Fallout Shared/MenuGameSettings.h"
+#include "Fallout Shared/TESDescription.h"
+#include "Fallout Shared/TESFile.h"
+#include "Fallout Shared/TESForm.h"
+#include "Fallout Shared/TESFullName.h"
+#include "Fallout/Interface/Interface.h"
+#include "Fallout/Interface/InterfaceManager.h"
+#include "Fallout/Interface/Menus/StartMenu.h"
+#include "SDK/MSVC/rtti.h"
+
+SettingT<INIPrefSettingCollection> TutorialMenu::bHelpEnabled("bHelpEnabled:Interface", true);
+
+void TutorialMenu::AttachTileByID(int32_t aiID, Tile* apTile) {
+	if (aiID >= 0 && aiID < 8) {
+		pTiles[aiID] = apTile;
+	}
+}
+
+void TutorialMenu::DoClick(int32_t a1, Tile* a2) {
+	if (!a2 && a1 >= 0 && a1 < 8) {
+		a2 = pTiles[a1];
+	}
+	switch (a1) {
+	case 1: {
+		NextPage();
+		break;
+	}
+	case 2: {
+		PrevPage();
+		break;
+	}
+	case 3: {
+		TutorialMenu::Close();
+		break;
+	}
+	}
+}
+
+int32_t TutorialMenu::GetClass() {
+	return 1059;
+}
+
+bool TutorialMenu::DoGamepad(int32_t a1, float a2) {
+	return (bool)0;
+}
+
+bool TutorialMenu::DoGamepadUpEvent(int32_t a1, float a2) {
+	Interface::enumMenus v3 = static_cast<Interface::enumMenus>(GetClass());
+	if (!Interface::IsTopMenuID(v3) || a1 != 10) {
+		return 0;
+	}
+	InterfaceManager::Instance();
+	InterfaceManager::ClearMenuButton(Interface::eButtonB);
+	TutorialMenu::Close();
+	return 1;
+}
+
+void TutorialMenu::NextPage() {
+	SetPage(iCurrentPage + 1);
+}
+
+void TutorialMenu::PrevPage() {
+	SetPage(iCurrentPage - 1);
+}
+
+// The exe's cleanup-only C++ EH frame is left out.
+void TutorialMenu::SetPage(uint32_t a1) {
+	FNVD_INLINED_LOCAL(BSStringT<char>, v5, std::nullopt, std::nullopt);
+	if (a1 < iNumPages) {
+		BSSimpleList<TESForm*>* pformlist;
+		::new (&v5) BSStringT<char>;
+		iCurrentPage = a1;
+		v5.SPrintF("%d/%d", a1 + 1, iNumPages);
+		pTiles[5]->Set(4036, v5.pString, 1);
+		for (pformlist = pHelpManual; pformlist; pformlist = pformlist->m_pkNext) {
+			if (!a1--) {
+				break;
+			}
+		}
+		if (pformlist) {
+			BGSMessage* pMessage = dynamic_cast<BGSMessage*>(pformlist->m_item);
+			SetTitleAndText(pMessage);
+			UpdatePrevNext();
+		} else {
+			Warning(WARN_MENUS, "End of Help Manual reached while searching for page %d in help manual.", a1);
+		}
+		v5.~BSStringT<char>();
+	}
+}
+
+// Shows apMessage's name in pTiles[4] and its description in pTiles[0] (trait 4030 set when the text starts with
+// '<'), and scrolls pTiles[6] back to the top.
+void TutorialMenu::SetTitleAndText(BGSMessage* apMessage) {
+	if (!apMessage) {
+		return;
+	}
+	if (pTiles[4]) {
+		pTiles[4]->Set(4036, static_cast<TESFullName*>(apMessage)->GetFullName(), 1);
+	}
+	if (pTiles[0]) {
+		const char* pText = static_cast<TESDescription*>(apMessage)->GetDescription(nullptr, DESC_ID);
+		if (pText) {
+			pTiles[0]->Set(4030, static_cast<int32_t>(*pText == '<'));
+			pTiles[0]->Set(4036, pText, 1);
+		}
+	}
+	if (pTiles[6]) {
+		int32_t iCurrentValue = Tile::AddUserTrait("_current_value", -1);
+		pTiles[6]->Set(iCurrentValue, 0.0f, 0);
+	}
+}
+
+void TutorialMenu::UpdatePrevNext() {
+	pTiles[2]->Set(4015, static_cast<int32_t>(iCurrentPage != 0));
+	pTiles[1]->Set(4015, static_cast<int32_t>(iCurrentPage + 1 < iNumPages));
+}
+
+// The exe reaches the menu's tile through the shared getter 0x726070.
+void TutorialMenu::Close() {
+	if (pMe) {
+		pMe->GetMenuTile()->Set(6002, 1);
+		if (Interface::GetCurrentRenderedMenu())
+			pMe->InstantFadeOut();
+		else
+			pMe->StartFadeOut();
+		StartMenu::ChooseBack();
+	}
+}
+
+// The exe's cleanup-only C++ EH frame is left out.
+bool TutorialMenu::Create(BGSMessage* apMessage, bool abHelpManual) {
+	int32_t v4;
+	TutorialMenu* Menu_;
+	FNVD_INLINED_LOCAL(BSStringT<char>, strtmp, std::nullopt, std::nullopt);
+	int32_t ClassStatic = TutorialMenu::GetClassStatic();
+	Tile* pold_menu_tile = Menu::GetMenuByClass(ClassStatic);
+	if (pold_menu_tile) {
+		delete pold_menu_tile;
+	}
+	InterfaceManager* v3 = InterfaceManager::Instance();
+	Tile* ptile = v3->GetMenusRoot()->ReadFile("Data\\Menus\\tutorial_menu.xml");
+	if (ptile) {
+		Menu_ = static_cast<TutorialMenu*>(ptile->GetMenu());
+	} else {
+		Menu_ = 0;
+	}
+	TutorialMenu::pMe = Menu_;
+	if (Menu_ && (v4 = TutorialMenu::pMe->GetClass(), v4 == TutorialMenu::GetClassStatic())) {
+		TileMenu* v5 = dynamic_cast<TileMenu*>(ptile);
+		TutorialMenu::pMe->SetMenuTile(v5, 0);
+		if (ptile->GetFloat(4007) == 6006.0 || ptile->GetFloat(4007) == 102.0) {
+			float afValue = Tile::GetMaximumDepth();
+			ptile->Set(4013, afValue, 1);
+		}
+		const char* v6 = sVDSGManual.String();
+		TutorialMenu::pMe->pTiles[7]->Set(4036, v6, 1);
+		if (abHelpManual) {
+			TESForm* FormByNumericID;
+			if (InterfaceManager::Has360Controller()) {
+				FormByNumericID = TESForm::GetFormByNumericID(357u);
+			} else {
+				FormByNumericID = TESForm::GetFormByNumericID(355u);
+			}
+			BGSListForm* plistform = dynamic_cast<BGSListForm*>(FormByNumericID);
+			if (plistform) {
+				TutorialMenu::pMe->pHelpManual = &plistform->ListOfForms;
+				if (!apMessage) {
+					apMessage = dynamic_cast<BGSMessage*>(TutorialMenu::pMe->pHelpManual->m_item);
+				}
+			}
+			const char* v10 = sNext.String();
+			TutorialMenu::pMe->pTiles[1]->Set(4036, v10, 1);
+			const char* v11 = sPrevious.String();
+			TutorialMenu::pMe->pTiles[2]->Set(4036, v11, 1);
+		} else {
+			TutorialMenu::pMe->pTiles[1]->Set(4003, 0);
+			TutorialMenu::pMe->pTiles[2]->Set(4003, 0);
+		}
+		const char* v12 = sCloseButton.String();
+		TutorialMenu::pMe->pTiles[3]->Set(4036, v12, 1);
+		if (!apMessage) {
+			Warning(WARN_MENUS, "Warning:  Unable to find valid starting message for Tutorial Menu.");
+		}
+		TutorialMenu::pMe->iNumPages = 0;
+		TutorialMenu::pMe->iCurrentPage = 0;
+		bool bfound = 0;
+		for (BSSimpleList<TESForm*>* pformlist = TutorialMenu::pMe->pHelpManual; pformlist && pformlist->m_item;
+			pformlist = pformlist->m_pkNext) {
+			if (!bfound && pformlist->m_item == apMessage) {
+				TutorialMenu::pMe->iCurrentPage = TutorialMenu::pMe->iNumPages;
+				bfound = 1;
+			}
+			++TutorialMenu::pMe->iNumPages;
+		}
+		if (bfound) {
+			::new (&strtmp) BSStringT<char>;
+			strtmp.SPrintF("%d/%d", TutorialMenu::pMe->iCurrentPage + 1, TutorialMenu::pMe->iNumPages);
+			char* afValuea = strtmp.pString;
+			TutorialMenu::pMe->pTiles[5]->Set(4036, afValuea, 1);
+			strtmp.~BSStringT<char>();
+		} else {
+			TutorialMenu::pMe->pTiles[5]->Set(4003, 0);
+			TutorialMenu::pMe->iNumPages = 0;
+		}
+		if (apMessage) {
+			TutorialMenu::pMe->SetTitleAndText(apMessage);
+			TutorialMenu::pMe->UpdatePrevNext();
+			InterfaceManager* v13 = InterfaceManager::Instance();
+			v13->pCursor->Set(4009, 255.0f, 1);
+			TutorialMenu::pMe->PrepForVisibility(0);
+			return 1;
+		} else {
+			if (TutorialMenu::pMe) {
+				delete TutorialMenu::pMe;
+			}
+			return 0;
+		}
+	} else {
+		if (TutorialMenu::pMe) {
+			if (TutorialMenu::pMe->pMenu) {
+				if (TutorialMenu::pMe) {
+					delete TutorialMenu::pMe;
+				}
+			}
+		}
+		return 0;
+	}
+}
+
+int32_t TutorialMenu::GetClassStatic() {
+	return 1059;
+}

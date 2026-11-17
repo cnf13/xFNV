@@ -1,0 +1,83 @@
+#pragma once
+
+#include "BSHavok/bhkPhantom.h"
+#include "Havok/Source/Common/Base/Math/Matrix/hkTransform.h"
+#include "BSHavok/bhkTransform.h"
+#include "Reconstruction.hpp"
+
+#include <stdint.h>
+
+class NiTransform;
+class hkpCdBodyPairCollector;
+class hkpCdPointCollector;
+class hkpLinearCastInput;
+
+// The creation info of a shape phantom: the phantom's info and where the shape sits.
+struct hkShapePhantomCinfo : public hkPhantomCinfo {
+	// The serialized form (bhkSerialized.h): the 32-bit layout, 0x60 bytes (hkPhantomCinfo adds nothing to the world
+	// object's form).
+	struct Serialized : hkWorldObjectCinfo::Serialized {
+		uint8_t padding18[8];
+		bhkTransform m_transform;
+	};
+
+	hkShapePhantomCinfo();
+	~hkShapePhantomCinfo();
+
+	// Fills the info from its serialized form; the shape is left null (LinkObject binds it).
+	void ReadSerialized(const Serialized& arForm) {
+		hkWorldObjectCinfo::ReadSerialized(arForm);
+		m_transform = arForm.m_transform;
+	}
+
+	// The PDB's type: the constructor (0x56E0B0) builds it with bhkTransform's constructor and setIdentity, and the
+	// Init bodies convert it with bhkTransform::ToHK.
+	bhkTransform m_transform;
+};
+
+static_assert(offsetof(hkShapePhantomCinfo::Serialized, m_transform) == 0x20);
+static_assert(sizeof(hkShapePhantomCinfo::Serialized) == 0x60);
+
+// A phantom with a Havok shape. Only what the reconstructed code uses is declared.
+class bhkShapePhantom : public bhkPhantom {
+public:
+	// The class does not override the base's virtual: its own CopyCinfo below takes the phantom's creation info.
+	using bhkSerializable::CopyCinfo;
+
+	bhkShapePhantom();
+
+	const NiRTTI* GetRTTI() const override { return &ms_RTTI; }
+	void GetViewerStrings(NiTPrimitiveArray<char*>* apStrings) override;
+	~bhkShapePhantom() override;
+
+	// The contact pairs of the phantom, stored in apCollector.
+	void GetPenetrations(hkpCdBodyPairCollector* arCollector);
+	// The phantom's world transform, or nothing without a Havok phantom.
+	void GetTransform(hkTransform& arTrans);
+	// The phantom's world transform in game units: the Havok transform converted into
+	// arTrans's rotation and translation.
+	void GetTransform(NiTransform& arTrans);
+
+	// Moves the phantom to arTrans, converted to Havok units.
+	void SetTransform(const NiTransform& arTrans);
+	// Moves the Havok phantom to arPos inside the world's write marks.
+	void SetPosition(const hkVector4& arPos);
+	// Moves the Havok phantom to arPos, converted from game units.
+	void SetPosition(const NiPoint3& arPos);
+	// Runs the wrapped phantom's linear cast from arPos, collecting the start overlaps in arPnts and the hits in
+	// apStart, inside the shape's critical section and the world's write marks.
+	void SetPositionAndLinearCast(const hkVector4& arPos, const hkpLinearCastInput& arIn, hkpCdPointCollector& arPnts,
+		hkpCdPointCollector* apStart);
+
+protected:
+	// Fills apInfo from the wrapped phantom.
+	void CopyCinfo(hkShapePhantomCinfo& arInfo);
+
+public:
+	// Inferred type: a2: hkTransform* from 0x56df59 (result of NI2HK)
+	void setTransform(hkTransform* a2);
+
+	static NiRTTI ms_RTTI;
+	static inline int32_t iCount;
+};
+inline constexpr fnvd::Vtable bhkShapePhantom_vftable{};

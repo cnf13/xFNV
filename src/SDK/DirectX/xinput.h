@@ -1,0 +1,24 @@
+#pragma once
+
+#include "Reconstruction.hpp"
+
+// The DirectX SDK's <XInput.h> declarations the exe's code uses (xinput1_3.dll), with the SDK's names.
+
+// The XInput button bits (the SDK's XINPUT_GAMEPAD_* values); IDA name; not in the PDB.
+enum XINPUT_GAMEPAD_BUTTONS : int32_t {
+	XINPUT_GAMEPAD_DPAD_UP = 0x1,
+	XINPUT_GAMEPAD_DPAD_DOWN = 0x2,
+	XINPUT_GAMEPAD_DPAD_LEFT = 0x4,
+	XINPUT_GAMEPAD_DPAD_RIGHT = 0x8,
+	XINPUT_GAMEPAD_START = 0x10,
+	XINPUT_GAMEPAD_BACK = 0x20,
+	XINPUT_GAMEPAD_LEFT_THUMB = 0x40,
+	XINPUT_GAMEPAD_RIGHT_THUMB = 0x80,
+	XINPUT_GAMEPAD_LEFT_SHOULDER = 0x100,
+	XINPUT_GAMEPAD_RIGHT_SHOULDER = 0x200,
+	XINPUT_GAMEPAD_A = 0x1000,
+	XINPUT_GAMEPAD_B = 0x2000,
+	XINPUT_GAMEPAD_X = 0x4000,
+	XINPUT_GAMEPAD_Y = 0x8000,
+};
+

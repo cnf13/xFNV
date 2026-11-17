@@ -1,0 +1,218 @@
+name	uses	class	new	header	reason
+memset	1066	1	std::memset	<cstring>	plain forward
+string	694	1	std::string	<string>	alias of std::string
+_fabsIntrinsic	447	1	std::fabs	<cmath>	VC9's intrinsic fabs (/Oi). A float argument now picks the float overload (float result) where msvc9's took double
+allocator	410	1	std::allocator	<memory>	alias of std::allocator
+eh_vector_constructor_iterator	312	4	rt::eh_vector_constructor_iterator	SDK/MSVC/ehvec.h	compiler array helper called by name
+fabs	306	1	std::fabs	<cmath>	plain forward; std's float overload as msvc9's
+memcpy	278	3	rt::memcpy	SDK/MSVC/string.h	VC9's memcpy copies overlapping ranges right, as memmove; the game relies on it
+vector	256	1	std::vector	<vector>	alias of std::vector
+_CIsqrtCall	216	1	std::sqrt	<cmath>	the __CIsqrt call: the double sqrt. A float argument now picks the float overload where msvc9's took double
+strlen	202	1	std::strlen	<cstring>	plain forward
+strcpy_s	186	2	strcpy_s	SDK/MSVC/string.h	MSVC-only; the Windows CRT has it (string.h says why it is not redefined there)
+EhVectorCallback	182	4	rt::EhVectorCallback	SDK/MSVC/ehvec.h	the array helpers' callback type
+char_traits	141	1	std::char_traits	<string>	alias of std::char_traits
+basic_string	135	1	std::basic_string	<string>	alias of std::basic_string
+sprintf	121	1	std::sprintf	<cstdio>	plain forward; no format string passes a Microsoft-only conversion (%I64 and %S are not passed to it)
+memcmp	113	1	std::memcmp	<cstring>	plain forward
+strcat_s	91	2	strcat_s	SDK/MSVC/string.h	MSVC-only; the Windows CRT has it
+strrchr	89	1	std::strrchr	<cstring>	plain forward; the char* overload (0x40AB30) is std's own
+rand	74	3	rt::rand	SDK/MSVC/stdlib.h	VC9's range 0..32767 (the callers divide by 32767 and mask with 0x7FFF); a standard engine per thread
+_strnicmp	70	2	_strnicmp	SDK/MSVC/string.h	MSVC-only; the Windows CRT has it
+strstr	68	1	std::strstr	<cstring>	plain forward
+abs	68	1	std::abs	<cstdlib>	plain forward (every argument is an int: checked by deleting the other overloads)
+tan	65	1	std::tan	<cmath>	plain forward
+sin	56	1	std::sin	<cmath>	plain forward
+exception	53	4	rt::exception	SDK/MSVC/exception.h	not std's: VC9's exception with the exe's layout (a const char* constructor std has not), thrown and caught by name
+cos	51	1	std::cos	<cmath>	plain forward
+strstr_4812F0	46	1	std::strstr	<cstring>	VC9's char* strstr(char*, const char*) out of line: std's char* overload
+eh_vector_destructor_iterator	43	4	rt::eh_vector_destructor_iterator	SDK/MSVC/ehvec.h	compiler array helper called by name
+_CIcos	43	1	std::cos	<cmath>	the __CIcos call: the double cos. A float argument now picks the float overload
+atoi	40	1	std::atoi	<cstdlib>	plain forward
+strchr	39	1	std::strchr	<cstring>	plain forward; std's const overload returns const char* (the callers that stored char* are retyped)
+floor	39	1	std::floor	<cmath>	plain forward
+sqrt	37	1	std::sqrt	<cmath>	plain forward
+_CIsin	37	1	std::sin	<cmath>	the __CIsin call: the double sin. A float argument now picks the float overload
+_isnan	35	1	std::isnan	<cmath>	1 for a NaN: std's bool
+_toupper	33	1	std::toupper	<cctype>	VC9's toupper code: a-z to A-Z in the C locale, std's in the C locale
+pow	32	1	std::pow	<cmath>	plain forward; pow(float, int) (0x685D20, sub_688F10's repeated multiplication) had no caller
+_finite	32	1	std::isfinite	<cmath>	1 unless infinite or NaN: std's bool
+_iobuf	30	1	std::FILE	<cstdio>	VC9's struct _iobuf is FILE (already the C library's)
+_CIsqrt	29	1	std::sqrt	<cmath>	the float square root
+strncmp	28	1	std::strncmp	<cstring>	plain forward
+fprintf	27	1	std::fprintf	<cstdio>	plain forward
+tolower	26	1	std::tolower	<cctype>	plain forward
+strncpy_s	26	2	strncpy_s	SDK/MSVC/string.h	MSVC-only; the Windows CRT has it
+strcmp	25	1	std::strcmp	<cstring>	plain forward
+_stricmp	25	2	_stricmp	SDK/MSVC/string.h	MSVC-only; the Windows CRT has it
+floorf	24	1	std::floorf	<cmath>	VC9's inline float function out of line (0x406CE0): the double function rounded to float, std's float function
+ceil	24	1	std::ceil	<cmath>	plain forward
+atof	23	1	std::atof	<cstdlib>	plain forward
+placement_new	22	1	::operator new	<new>	VC9's placement operator new(size_t, void*) out of line: the standard one
+fabsf	22	1	std::fabsf	<cmath>	VC9's inline float function out of line (0x408860)
+strcat	20	1	std::strcat	<cstring>	plain forward
+sscanf	18	1	std::sscanf	<cstdio>	plain forward
+pair	18	1	std::pair	<utility>	alias of std::pair
+memmove	17	1	std::memmove	<cstring>	plain forward
+_tcsncmp	17	2	_tcsncmp	SDK/MSVC/tchar.h	MSVC-only (<tchar.h>'s _MBCS form); no CRT header the program includes declares it
+fclose	16	1	std::fclose	<cstdio>	plain forward
+fmod	15	1	std::fmod	<cmath>	plain forward
+fopen	14	3	rt::fopen	SDK/MSVC/stdio.h	the game path's native path (platform::NativePath)
+atan2	14	1	std::atan2	<cmath>	plain forward
+strtok_s	13	2	strtok_s	SDK/MSVC/string.h	MSVC-only; the Windows CRT has it
+_tcscmp	13	2	_tcscmp	SDK/MSVC/tchar.h	MSVC-only (<tchar.h>'s _MBCS form)
+_splitpath_s	13	2	_splitpath_s	SDK/MSVC/stdlib.h	MSVC-only; the Windows CRT has it
+_byteswap_ulong	13	1	std::byteswap<uint32_t>	<bit>	the four bytes reversed (the template argument keeps msvc9's parameter type)
+_CIacos	13	1	std::acos	<cmath>	the __CIacos call: the double acos. A float argument now picks the float overload
+strcpy	12	1	std::strcpy	<cstring>	plain forward
+runtime_error	12	4	rt::runtime_error	SDK/MSVC/stdexcept.h	not std's: VC9's runtime_error with the exe's layout, the base of IdvFileError, default-constructible for FNVD_INLINED_LOCAL
+BSFaceGenRGBAVector	12	game	BSFaceGenRGBAVector	Fallout Shared/FaceGen/BSFaceGenImage.h	game alias declared in a msvc9 block: global
+log10	11	1	std::log10	<cmath>	plain forward
+isalpha	11	1	std::isalpha	<cctype>	plain forward
+fseek	11	1	std::fseek	<cstdio>	plain forward
+asin	11	1	std::asin	<cmath>	plain forward
+_access	11	3	rt::_access	SDK/MSVC/io.h	the game path's native path
+_CIpow	11	1	std::pow	<cmath>	the __CIpow call: the double pow
+strpbrk	10	1	std::strpbrk	<cstring>	plain forward; std's const overload returns const char*
+sqrtf	10	1	std::sqrtf	<cmath>	VC9's inline float function out of line (0x4019D0)
+fmodf	10	1	std::fmodf	<cmath>	VC9's inline float function out of line (0x4B1520)
+atanf	10	1	std::atanf	<cmath>	VC9's inline float function out of line (0x4B1460)
+sinf	9	1	std::sinf	<cmath>	VC9's inline float function out of line (0x4E44D0)
+qsort	9	1	std::qsort	<cstdlib>	plain forward
+_tcsnicmp	9	2	_tcsnicmp	SDK/MSVC/tchar.h	MSVC-only (<tchar.h>'s _MBCS form)
+_sub_65CEA0	9	game	_sub_65CEA0	Fallout Shared/FaceGen/BSFaceGenModel.h	game function declared in a msvc9 block: global
+_strupr_s	9	2	_strupr_s	SDK/MSVC/string.h	MSVC-only; the Windows CRT has it
+_CIfmod	9	1	std::fmod	<cmath>	the __CIfmod call: the double fmod
+strtok	8	1	std::strtok	<cstring>	plain forward
+log	8	1	std::log	<cmath>	plain forward
+exp	8	1	std::exp	<cmath>	plain forward
+bad_alloc	8	4	rt::bad_alloc	SDK/MSVC/exception.h	not std's: VC9's bad_alloc with the exe's layout, built in place by algs.cpp
+atan	8	1	std::atan	<cmath>	plain forward
+acosf	8	1	std::acosf	<cmath>	VC9's inline float function out of line (0x4F6E40)
+_tcsicmp	8	2	_tcsicmp	SDK/MSVC/tchar.h	MSVC-only (<tchar.h>'s _MBCS form)
+_makepath_s	8	2	_makepath_s	SDK/MSVC/stdlib.h	MSVC-only; the Windows CRT has it
+powf	7	1	std::powf	<cmath>	VC9's inline float function out of line (0x4DD150)
+map	7	1	std::map	<map>	alias of std::map
+ftell	7	1	std::ftell	<cstdio>	plain forward (std's long; the callers keep 32 bits)
+_errno	7	1	errno	<cerrno>	the thread's errno address: `*_errno()` is errno, a bare call &errno
+_CIexp	7	1	std::exp	<cmath>	the __CIexp call: the double exp
+strncpy	6	1	std::strncpy	<cstring>	plain forward
+memmove_s	6	2	memmove_s	SDK/MSVC/string.h	MSVC-only; the Windows CRT has it
+fopen_s	6	3	rt::fopen_s	SDK/MSVC/stdio.h	the game path's native path
+ceilf	6	1	std::ceilf	<cmath>	VC9's inline float function out of line (0x4E4450)
+asinf	6	1	std::asinf	<cmath>	VC9's inline float function out of line (0x4B5530)
+acos	6	1	std::acos	<cmath>	plain forward
+_time64	6	1	std::time	<ctime>	the seconds since 1970 (msvc9's -1 past the year 3000 is not relied on)
+_gcvt	6	2	_gcvt	SDK/MSVC/stdlib.h	MSVC-only; the Windows CRT has it
+_absIntrinsic	6	1	std::abs	<cstdlib>	VC9's intrinsic abs (/Oi); every argument is an int (checked); INT32_MIN is the one value std leaves undefined
+time	5	1	std::time	<ctime>	VC9's inline time(__int64*) out of line (0x61B9D0): time_t is 64 bits on every target
+srand	5	3	rt::srand	SDK/MSVC/stdlib.h	reseeds rt::rand's engine
+ios_base	5	1	std::ios_base	<ios>	alias of std::ios_base
+fwrite	5	1	std::fwrite	<cstdio>	the stream locked around the write, as std's
+_sub_657BC0	5	game	_sub_657BC0	Fallout Shared/FaceGen/BSFaceGenModel.h	game function declared in a msvc9 block: global
+_allmul	5	1	({0} * {1})	-	the compiler's 64-bit multiply helper: the operator
+_CIatan	5	1	std::atan	<cmath>	the __CIatan call: the double atan
+StrVector	5	game	StrVector	SDK/FaceGen/StrContainers.h	game alias declared in a msvc9 block: global
+strerror	4	1	std::strerror	<cstring>	plain forward
+rename	4	3	rt::rename	SDK/MSVC/stdio.h	the game paths' native paths
+fread	4	1	std::fread	<cstdio>	fread_s with an unlimited buffer: std's fread
+cosf	4	1	std::cosf	<cmath>	VC9's inline float function out of line (0x4E4490)
+basic_istream	4	1	std::basic_istream	<istream>	alias of std::basic_istream
+atol	4	1	std::atol	<cstdlib>	strtol base 10 (std's long; the callers keep 32 bits)
+_vsnprintf	4	2	_vsnprintf	SDK/MSVC/stdio.h	MSVC-only; the Windows CRT has it
+_stat64i32	4	3	rt::_stat64i32	SDK/MSVC/sys/stat.h	VC9's file status record and its fill, on the game path's native path
+_alldiv	4	1	({0} / {1})	-	the compiler's 64-bit division helper: the operator
+_CItan	4	1	std::tan	<cmath>	the __CItan call: the double tan
+FR2Vect3SVector	4	game	FR2Vect3SVector	Fallout Shared/FaceGen/BSFaceGenModel.h	game alias declared in a msvc9 block: global
+FILE	4	1	std::FILE	<cstdio>	the C library's FILE already
+vsprintf	3	1	std::vsprintf	<cstdio>	plain forward
+vsnprintf	3	2	vsprintf_s	SDK/MSVC/stdio.h	IDA's name; its code is VC9's vsprintf_s (an overlong text empties the buffer): the MSVC-only name
+tanf	3	1	std::tanf	<cmath>	VC9's inline float function out of line (0x57DD90)
+strtoul	3	1	std::strtoul	<cstdlib>	plain forward (std's unsigned long; the callers keep 32 bits)
+strtol	3	1	std::strtol	<cstdlib>	plain forward (std's long; the callers keep 32 bits)
+strtod	3	1	std::strtod	<cstdlib>	plain forward
+snprintf	3	2	_snprintf	SDK/MSVC/stdio.h	its code is VC9's _snprintf (no terminator when the text fills the buffer): the MSVC-only name
+runtime_error_ThrowInfo	3	4	rt::runtime_error_ThrowInfo	SDK/MSVC/stdexcept.h	compiler record named by FNVD_THROW
+memcpy_s	3	2	memcpy_s	SDK/MSVC/string.h	MSVC-only; the Windows CRT has it
+malloc	3	1	std::malloc	<cstdlib>	plain forward
+logic_error	3	1	std::logic_error	<stdexcept>	alias of std::logic_error
+logf	3	1	std::logf	<cmath>	VC9's inline float function out of line (0x5DC460)
+log10f	3	1	std::log10f	<cmath>	VC9's inline float function out of line (0x82FFF0)
+isalnum	3	1	std::isalnum	<cctype>	plain forward
+ifstream	3	1	std::ifstream	<fstream>	alias of std::ifstream
+getline	3	1	std::getline	<string>	std's getline already
+expf	3	1	std::expf	<cmath>	VC9's inline float function out of line (0x630AC0)
+exit	3	1	std::exit	<cstdlib>	plain forward
+atan2f	3	1	std::atan2f	<cmath>	VC9's inline float function out of line (0x4B5590)
+abs_72FA80	3	1	std::abs	<cstdlib>	VC9's long abs(long) out of line: std's
+_CxxThrowException	3	4	rt::_CxxThrowException	SDK/MSVC/ehdata.h	the compiler's throw, called by name
+_CIasin	3	1	std::asin	<cmath>	the __CIasin call: the double asin
+wcstombs	2	3	rt::wcstombs	SDK/MSVC/stdlib.h	VC9's wcstombs on the game's 2-byte characters (char16_t)
+sub_65ECD0	2	game	sub_65ECD0	Fallout Shared/FaceGen/BSFaceGenModel.h	game function declared in a msvc9 block: global
+sort	2	1	std::sort	<algorithm>	std's sort already
+realloc	2	1	std::realloc	<cstdlib>	plain forward
+length_error_ThrowInfo	2	4	rt::length_error_ThrowInfo	SDK/MSVC/stdexcept.h	compiler record, named only in FNVD_THROW's comment
+free	2	1	std::free	<cstdlib>	plain forward
+fgets	2	1	std::fgets	<cstdio>	plain forward
+fflush	2	1	std::fflush	<cstdio>	plain forward
+clock	2	3	rt::clock	SDK/MSVC/time.h	VC9's clock is wall milliseconds since the start (glibc's is processor microseconds)
+bsearch	2	1	std::bsearch	<cstdlib>	plain forward
+_sub_65EB50	2	game	_sub_65EB50	Fallout Shared/FaceGen/BSFaceGenModel.h	game function declared in a msvc9 block: global
+_sub_659290	2	game	_sub_659290	Fallout Shared/FaceGen/BSFaceGenManager.h	game function declared in a msvc9 block: global
+_strlwr_s	2	2	_strlwr_s	SDK/MSVC/string.h	MSVC-only; the Windows CRT has it
+_s__ThrowInfo	2	4	rt::_s__ThrowInfo	SDK/MSVC/ehdata.h	the compiler's ThrowInfo record
+_mbstok	2	2	_mbstok	SDK/MSVC/mbstring.h	MSVC-only; no CRT header the program includes declares it
+_mbsicmp	2	2	_mbsicmp	SDK/MSVC/mbstring.h	MSVC-only
+_invalid_parameter_noinfo	2	4	rt::_invalid_parameter_noinfo	SDK/MSVC/crtdefs.h	the CRT's parameter-check failure, called by inlined checks
+_byteswap_ushort	2	1	std::byteswap<uint16_t>	<bit>	the two bytes swapped
+_Med3	2	1	std::_Med3	-	named only in comments (an exe instance of VC9's sort helper)
+FffModeTexImgVector	2	game	FffModeTexImgVector	Fallout Shared/FaceGen/BSFaceGenModel.h	game alias declared in a msvc9 block: global
+wcstombs_s	1	3	rt::wcstombs_s	SDK/MSVC/stdlib.h	VC9's wcstombs_s on the game's 2-byte characters
+wcslen	1	3	rt::wcslen	SDK/MSVC/string.h	VC9's wcslen on the game's 2-byte characters
+vprintf	1	1	std::vprintf	<cstdio>	plain forward
+printf	1	1	std::printf	<cstdio>	plain forward
+ofstream	1	1	std::ofstream	<fstream>	alias of std::ofstream
+istringstream	1	1	std::istringstream	<sstream>	alias of std::istringstream
+isspace_l	1	gone	-	-	the locale-aware isspace; its one use was msvc9's own
+isspace	1	1	std::isspace	<cctype>	plain forward
+isdigit_l	1	gone	-	-	the locale-aware isdigit; its one use was msvc9's own
+isdigit	1	1	std::isdigit	<cctype>	plain forward
+fread_s	1	2	fread_s	SDK/MSVC/stdio.h	MSVC-only; the Windows CRT has it
+fill	1	1	std::fill	<algorithm>	std's fill already
+feof	1	1	std::feof	<cstdio>	plain forward
+exception_UnknownText	1	4	rt::exception_UnknownText	SDK/MSVC/exception.h	rt::exception's text without one
+_msize	1	2	_msize	SDK/MSVC/malloc.h	MSVC-only; the Windows CRT has it
+_mbsnbicmp	1	2	_mbsnbicmp	SDK/MSVC/mbstring.h	MSVC-only
+_mbsnbcpy	1	2	_mbsnbcpy	SDK/MSVC/mbstring.h	MSVC-only
+_mbsnbcmp	1	2	_mbsnbcmp	SDK/MSVC/mbstring.h	MSVC-only
+_mbscmp	1	2	_mbscmp	SDK/MSVC/mbstring.h	MSVC-only
+_getcwd	1	3	rt::_getcwd	SDK/MSVC/direct.h	the current directory (std::filesystem), with VC9's buffer rules
+_byteswap_uint64	1	1	std::byteswap<uint64_t>	<bit>	the eight bytes reversed
+__RTDynamicCast	1	4	rt::__RTDynamicCast	SDK/MSVC/rtti.h	the code behind dynamic_cast, named in FNVD_DYNAMIC_CAST's comment
+_Uninit_copy	1	1	std::_Uninit_copy	-	named only in comments (an exe instance of VC9's copy helper)
+_StrVector_Assign	1	game	_StrVector_Assign	SDK/FaceGen/StrContainers.h	game function declared in a msvc9 block: global
+UnknownExceptionText	1	4	rt::UnknownExceptionText	SDK/MSVC/exception.h	the type of rt::exception_UnknownText
+UIntVector	1	game	UIntVector	SDK/FaceGen/TriFileIO.h	game alias declared in a msvc9 block: global
+TI2_AVbad_alloc_std	1	4	rt::TI2_AVbad_alloc_std	SDK/MSVC/exception.h	compiler record named by FNVD_THROW
+FffModeTexSVector	1	game	FffModeTexSVector	Fallout Shared/FaceGen/BSFaceGenModel.h	game alias declared in a msvc9 block: global
+wstring	0	1	std::wstring	<string>	alias of std::wstring
+istream	0	1	std::istream	<istream>	alias
+ostream	0	1	std::ostream	<ostream>	alias
+basic_ostream	0	1	std::basic_ostream	<ostream>	alias
+less	0	1	std::less	<functional>	alias
+swap	0	1	std::swap	<utility>	alias
+fill_n	0	1	std::fill_n	<algorithm>	alias
+make_heap	0	1	std::make_heap	<algorithm>	alias
+pop_heap	0	1	std::pop_heap	<algorithm>	alias
+memchr	0	1	std::memchr	<cstring>	plain forward
+setvbuf	0	1	std::setvbuf	<cstdio>	plain forward
+ungetc	0	1	std::ungetc	<cstdio>	plain forward
+fputc	0	1	std::fputc	<cstdio>	plain forward
+fgetc	0	1	std::fgetc	<cstdio>	plain forward
+atexit	0	1	std::atexit	<cstdlib>	plain forward
+bad_cast	0	4	rt::bad_cast	SDK/MSVC/typeinfo.h	VC9's bad_cast with the exe's layout
+bad_cast_ThrowInfo	0	4	rt::bad_cast_ThrowInfo	SDK/MSVC/typeinfo.h	compiler record
+eh_vector_copy_constructor_iterator	0	4	rt::eh_vector_copy_constructor_iterator	SDK/MSVC/ehvec.h	compiler array helper
+EhVectorCopyCallback	0	4	rt::EhVectorCopyCallback	SDK/MSVC/ehvec.h	the copy helper's callback type
+CPPEH_RECORD	0	4	rt::CPPEH_RECORD	SDK/MSVC/ehdata.h	the __try frame record
+invalid_parameter	0	4	rt::invalid_parameter	SDK/MSVC/crtdefs.h	the CRT's parameter-check failure

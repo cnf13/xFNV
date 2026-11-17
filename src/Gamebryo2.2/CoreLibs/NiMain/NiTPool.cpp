@@ -1,0 +1,11 @@
+#include "Gamebryo2.2/CoreLibs/NiMain/NiTPool.h"
+
+#include "BSCore/MemoryManager.h"
+#include "Fallout Shared/TempEffects/BSTECreateTask.h"
+#include "Gamebryo2.2/CoreLibs/NiAnimation/NiGeomMorpherUpdateTask.h"
+#include "Gamebryo2.2/CoreLibs/NiMain/NiPointer.h"
+#include "Gamebryo2.2/CoreLibs/NiMain/NiTCollection.h"
+#include "Gamebryo2.2/CoreLibs/NiParticle/NiPSysUpdateTask.h"
+#include "Gamebryo2.2/CoreLibs/NiXenonRenderer/NiD3DTextureStage.h"
+#include "Gamebryo2.2/CoreLibs/NiXenonRenderer/NiD3DTextureStageGroup.h"
+#include "Reconstruction.hpp"

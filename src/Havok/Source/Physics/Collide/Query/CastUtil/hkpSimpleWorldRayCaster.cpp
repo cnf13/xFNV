@@ -1,0 +1,186 @@
+#include "Havok/Source/Physics/Collide/Query/CastUtil/hkpSimpleWorldRayCaster.h"
+
+#include "Havok/Source/Common/Base/Memory/Router/hkMemoryRouter.h"
+#include "Havok/Source/Common/Base/Memory/Util/Stack/hkStackMemory.h"
+#include "Havok/Source/Common/Base/Monitor/hkMonitorStream.h"
+#include "Havok/Source/Physics/Collide/Dispatch/BroadPhase/hkpBroadPhaseHandle.h"
+#include "Havok/Source/Physics/Collide/Filter/hkpRayCollidableFilter.h"
+#include "Havok/Source/Physics/Collide/Query/CastUtil/hkpWorldRayCastInput.h"
+#include "Havok/Source/Physics/Collide/Query/CastUtil/hkpWorldRayCastOutput.h"
+#include "Havok/Source/Physics/Collide/BroadPhase/hkpBroadPhase.h"
+#include "Havok/Source/Physics/Collide/Filter/hkpCollisionFilter.h"
+#include "Havok/Source/Common/Base/Math/Matrix/hkTransform.h"
+#include "Havok/Source/Common/Base/Types/Physics/MotionState/hkMotionState.h"
+#include "Havok/Source/Physics/Collide/Agent/Collidable/hkpCollidable.h"
+#include "Havok/Source/Physics/Collide/Dispatch/BroadPhase/hkpTypedBroadPhaseHandle.h"
+#include "Havok/Source/Common/Base/Types/Geometry/Aabb/hkAabb.h"
+#include "Havok/Source/Physics/Collide/Filter/hkpRayShapeCollectionFilter.h"
+#include "Havok/Source/Physics/Collide/Shape/hkpShape.h"
+
+#include <xmmintrin.h>
+
+// The SDK's body: when the filter lets the ray through, the ray taken into the collidable's space and cast against
+// its shape; on a hit, the root collidable and the normal turned back into world space. The exe inlines getOwner,
+// setTransformedInversePos and setRotatedDir; src writes them out in the exe's order and reloads m_input and
+// m_result where the exe does.
+float hkpSimpleWorldRayCaster::addBroadPhaseHandle(const hkpBroadPhaseHandle* broadPhaseHandle, int32_t castIndex) {
+	const hkpTypedBroadPhaseHandle* pHandle = static_cast<const hkpTypedBroadPhaseHandle*>(broadPhaseHandle);
+	// The owner sits m_ownerOffset bytes from the handle (getOwner: a byte offset over untyped memory).
+	// EXE-INLINED 0x9B2C90
+	hkpCollidable* col = static_cast<hkpCollidable*>(static_cast<
+		void*>(const_cast<char*>(static_cast<const char*>(static_cast<const void*>(pHandle))) +
+		pHandle->m_ownerOffset));
+	const hkpShape* shape = col->m_shape;
+	if (shape) {
+		if (!m_filter->isCollisionEnabled(m_input[castIndex], *col).m_bool) {
+			return m_result->m_hitFraction;
+		}
+		const hkTransform& trans = col->m_motion.pState->m_transform;
+		const hkpWorldRayCastInput& input = m_input[castIndex];
+		// EXE-INLINED 0xC7F690
+		{
+			__m128 col0 = trans.m_rotation.m_col0.m_quad;
+			__m128 col1 = trans.m_rotation.m_col1.m_quad;
+			__m128 col2 = trans.m_rotation.m_col2.m_quad;
+			__m128 v = _mm_sub_ps(input.m_from.m_quad, trans.m_translation.m_quad);
+			__m128 lo = _mm_unpacklo_ps(col0, col1);
+			__m128 row0 = _mm_movelh_ps(lo, col2);
+			__m128 row1 = _mm_shuffle_ps(_mm_movehl_ps(row0, lo), col2, 0xD4);
+			__m128 row2 = _mm_shuffle_ps(_mm_unpackhi_ps(col0, col1), col2, 0xE4);
+			m_shapeInput.m_from.m_quad = _mm_add_ps(_mm_add_ps(_mm_mul_ps(_mm_shuffle_ps(v, v, 0x55), row1),
+														_mm_mul_ps(_mm_shuffle_ps(v, v, 0x00), row0)),
+				_mm_mul_ps(row2, _mm_shuffle_ps(v, v, 0xAA)));
+		}
+		// EXE-INLINED 0xC7F690
+		{
+			__m128 col0 = trans.m_rotation.m_col0.m_quad;
+			__m128 col1 = trans.m_rotation.m_col1.m_quad;
+			__m128 col2 = trans.m_rotation.m_col2.m_quad;
+			__m128 v = _mm_sub_ps(input.m_to.m_quad, trans.m_translation.m_quad);
+			__m128 lo = _mm_unpacklo_ps(col0, col1);
+			__m128 row0 = _mm_movelh_ps(lo, col2);
+			__m128 row1 = _mm_shuffle_ps(_mm_movehl_ps(row0, lo), col2, 0xD4);
+			__m128 row2 = _mm_shuffle_ps(_mm_unpackhi_ps(col0, col1), col2, 0xE4);
+			m_shapeInput.m_to.m_quad = _mm_add_ps(_mm_add_ps(_mm_mul_ps(_mm_shuffle_ps(v, v, 0x55), row1),
+													  _mm_mul_ps(_mm_shuffle_ps(v, v, 0x00), row0)),
+				_mm_mul_ps(row2, _mm_shuffle_ps(v, v, 0xAA)));
+		}
+		m_shapeInput.m_filterInfo = input.m_filterInfo;
+		if (!shape->castRay(m_shapeInput, *m_result).m_bool) {
+			return m_result->m_hitFraction;
+		}
+		m_result->m_rootCollidable = col;
+		hkpWorldRayCastOutput* pResult = m_result;
+		// EXE-INLINED 0xC7F700
+		__m128 n = pResult->m_normal.m_quad;
+		pResult->m_normal.m_quad =
+			_mm_add_ps(_mm_add_ps(_mm_mul_ps(_mm_shuffle_ps(n, n, 0x00), trans.m_rotation.m_col0.m_quad),
+						   _mm_mul_ps(_mm_shuffle_ps(n, n, 0x55), trans.m_rotation.m_col1.m_quad)),
+				_mm_mul_ps(_mm_shuffle_ps(n, n, 0xAA), trans.m_rotation.m_col2.m_quad));
+	}
+	return m_result->m_hitFraction;
+}
+
+// The SDK's body: the caster's input, filters and output set, then one ray cast through the broad phase with the
+// caller's AABB cache, between the timer's begin and end.
+void hkpSimpleWorldRayCaster::castRay(const hkpBroadPhase& broadphase, const hkpWorldRayCastInput& input,
+	const hkpCollisionFilter* filter, const char* cache, hkpWorldRayCastOutput& output) {
+	HK_TIMER_BEGIN("RayCstCchSim", nullptr);
+	m_input = &input;
+	m_result = &output;
+	m_filter = static_cast<const hkpRayCollidableFilter*>(filter);
+	if (input.m_enableShapeCollectionFilter.m_bool) {
+		m_shapeInput.m_rayShapeCollectionFilter = static_cast<const hkpRayShapeCollectionFilter*>(filter);
+	} else {
+		m_shapeInput.m_rayShapeCollectionFilter = nullptr;
+	}
+	hkpBroadPhase::hkpCastRayInput rayInput;
+	rayInput.m_from.m_quad = input.m_from.m_quad;
+	rayInput.m_numCasts = 1;
+	rayInput.m_toBase = &input.m_to;
+	rayInput.m_toStriding = sizeof(hkVector4);
+	rayInput.m_aabbCacheInfo = cache;
+	broadphase.castRay(rayInput, this, 0);
+	HK_TIMER_END();
+}
+
+// The SDK's castRayGroup: one AABB around every ray, the broad phase's AABB cache for it in stack memory, then each
+// ray cast through that cache into its output.
+void hkpSimpleWorldRayCaster::castRayGroup(const hkpBroadPhase& broadphase, const hkpWorldRayCastInput* inputArray,
+	int32_t numRays, const hkpCollisionFilter* filter, hkpWorldRayCastOutput* outputs) {
+	HK_TIMER_BEGIN("RayCstGrpSim", nullptr);
+	FNVD_INLINED_LOCAL(hkAabb, aabb, std::nullopt, std::nullopt);
+	__m128 vMin = _mm_min_ps(inputArray->m_from.m_quad, inputArray->m_to.m_quad);
+	__m128 vMax = _mm_max_ps(inputArray->m_from.m_quad, inputArray->m_to.m_quad);
+	const hkpWorldRayCastInput* pRay = inputArray + 1;
+	for (int32_t i = numRays - 2; i >= 0; --i) {
+		vMin = _mm_min_ps(_mm_min_ps(vMin, pRay->m_to.m_quad), pRay->m_from.m_quad);
+		vMax = _mm_max_ps(_mm_max_ps(vMax, pRay->m_to.m_quad), pRay->m_from.m_quad);
+		++pRay;
+	}
+	aabb.m_min.m_quad = vMin;
+	aabb.m_max.m_quad = vMax;
+	int32_t iCacheSize = broadphase.getAabbCacheSize();
+	// EXE-INLINED none: hkAllocateStack<char>
+	hkMemoryRouter* pRouter = &hkMemoryRouter::getInstance();
+	char* pCache = pRouter->m_stack.m_next.m_storage;
+	pRouter->m_stack.m_next.m_storage += (iCacheSize + 127) & ~127;
+	broadphase.calcAabbCache(aabb, pCache);
+	const hkpWorldRayCastInput* pInput = inputArray;
+	hkpWorldRayCastOutput* pOutput = outputs;
+	for (int32_t i = numRays - 1; i >= 0; --i) {
+		castRay(broadphase, *pInput, filter, pCache, *pOutput);
+		++pOutput;
+		++pInput;
+	}
+	// EXE-INLINED none: hkDeallocateStack<char>
+	hkMemoryRouter::getInstance().m_stack.m_next.m_storage = pCache;
+	HK_TIMER_END();
+}
+
+// castRay without an AABB cache: the caster's input, filters and output set, then one ray cast through the broad
+// phase, between the timer's begin and end.
+void hkpSimpleWorldRayCaster::castRay_0(const hkpBroadPhase& broadphase, const hkpWorldRayCastInput& input,
+	const hkpCollisionFilter* filter, hkpWorldRayCastOutput& output) {
+	HK_TIMER_BEGIN("RayCastSimpl", nullptr);
+	m_input = &input;
+	m_result = &output;
+	m_filter = static_cast<const hkpRayCollidableFilter*>(filter);
+	if (input.m_enableShapeCollectionFilter.m_bool) {
+		m_shapeInput.m_rayShapeCollectionFilter = static_cast<const hkpRayShapeCollectionFilter*>(filter);
+	} else {
+		m_shapeInput.m_rayShapeCollectionFilter = nullptr;
+	}
+	hkpBroadPhase::hkpCastRayInput rayInput;
+	rayInput.m_from.m_quad = input.m_from.m_quad;
+	rayInput.m_toBase = &input.m_to;
+	rayInput.m_numCasts = 1;
+	rayInput.m_toStriding = sizeof(hkVector4);
+	rayInput.m_aabbCacheInfo = nullptr;
+	broadphase.castRay(rayInput, this, 0);
+	HK_TIMER_END();
+}
+
+// The SDK's castRaysFromSinglePoint: numRays rays from inputArray[0]'s start to each input's end, cast through the
+// broad phase in one call with the caller's AABB cache; the results go to outputs.
+void hkpSimpleWorldRayCaster::castRaysFromSinglePoint(const hkpBroadPhase& broadphase,
+	const hkpWorldRayCastInput* inputArray, int32_t numRays, const hkpCollisionFilter* filter, const char* cache,
+	hkpWorldRayCastOutput* outputs) {
+	HK_TIMER_BEGIN("RayCstFSPSim", nullptr);
+	m_input = inputArray;
+	m_result = outputs;
+	m_filter = static_cast<const hkpRayCollidableFilter*>(filter);
+	if (inputArray->m_enableShapeCollectionFilter.m_bool) {
+		m_shapeInput.m_rayShapeCollectionFilter = static_cast<const hkpRayShapeCollectionFilter*>(filter);
+	} else {
+		m_shapeInput.m_rayShapeCollectionFilter = nullptr;
+	}
+	hkpBroadPhase::hkpCastRayInput rayInput;
+	rayInput.m_from.m_quad = inputArray->m_from.m_quad;
+	rayInput.m_toBase = &inputArray->m_to;
+	rayInput.m_aabbCacheInfo = cache;
+	rayInput.m_numCasts = numRays;
+	rayInput.m_toStriding = sizeof(hkpWorldRayCastInput);
+	broadphase.castRay(rayInput, this, 0);
+	HK_TIMER_END();
+}

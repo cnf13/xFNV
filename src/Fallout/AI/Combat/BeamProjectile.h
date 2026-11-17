@@ -1,0 +1,50 @@
+#pragma once
+
+#include "BSShader/BeamShaderProperty.h"
+#include "Fallout/AI/Combat/Projectile.h"
+#include "Gamebryo2.2/CoreLibs/NiMain/NiPointer.h"
+#include "Reconstruction.hpp"
+
+class BGSProjectile;
+class NiGeometry;
+class NiParticleSystem;
+class TESObjectWEAP;
+
+// A beam projectile: one that hits along its whole line at once.
+// Only the entry points the reconstructed code calls are declared.
+class BeamProjectile : public Projectile {
+public:
+	// A projectile, with a process when abAdd.
+	explicit BeamProjectile(bool abAdd);
+	BeamProjectile(BGSProjectile* apProjectileBase, TESObjectREFR* apShooter, TESObjectWEAP* apFromWeapon,
+		NiPoint3 aOrigin, float afZAngle, float afXAngle);
+
+	void SaveGame(BGSSaveFormBuffer* apSaveGameBuffer) override;
+	void FinishLoadGame(BGSLoadFormBuffer* apLoadGameBuffer) override;
+	void LoadGame(BGSLoadFormBuffer* apLoadGameBuffer) override;
+	void InitLoadGame(BGSLoadFormBuffer* apLoadGameBuffer) override;
+	void Revert(BGSLoadFormBuffer* apLoadGameBuffer) override;
+	using Projectile::Revert;
+	Projectile::PROJECTILE_TYPE GetProjectileType() override;
+	void Initialize() override;
+	void Process3D() override;
+	void UpdateProjectile(float afDelta) override;
+
+protected:
+	bool AddImpact(TESObjectREFR* apCollidee, const NiPoint3& aContactPoint, const NiPoint3& aContactNormal,
+		const hkpCollidable* apTargetCollidable, uint32_t aiKey, HavokMaterialType aeForceMaterial) override;
+
+public:
+	// IDA name FindBeamGeometryLength; not in the PDB. A distance for apObject (thiscall, ST0,
+	// ret 4, 0x979840).
+	float FindBeamGeometryLength(NiParticleSystem* apObject);
+	// IDA name ScaleBeamGeometryLength; not in the PDB. Scales apObject's bound and geometry by afValue (thiscall, ret 8,
+	// 0x9795E0). Its caller ScaleBeam3D passes an object it tested as NiGeometry, and the body reads it as one.
+	void ScaleBeamGeometryLength(NiGeometry* apObject, float afValue);
+	// Walks apObject's children within afRange.
+	void ScaleBeam3D(NiAVObject* ap3D, float afDesiredLength, float afCurrentLength);
+
+	NiPointer<BeamShaderProperty> spBeamProperty;
+};
+inline constexpr fnvd::Vtable BeamProjectile_vftable_TESChildCell{};
+inline constexpr fnvd::Vtable BeamProjectile_vftable{};

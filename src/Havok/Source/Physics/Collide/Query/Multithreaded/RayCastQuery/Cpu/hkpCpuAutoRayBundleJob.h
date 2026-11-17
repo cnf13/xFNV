@@ -1,0 +1,56 @@
+#pragma once
+
+#include "Havok/Source/Common/Base/Math/Vector/hkVector4.h"
+#include "Havok/Source/Common/Base/Thread/JobQueue/hkJobQueue.h"
+#include "Havok/Source/Common/Base/Container/Array/hkArray.h"
+#include "Reconstruction.hpp"
+
+struct hkpWorldRayCastBundleCommand;
+struct hkpWorldRayCastCommand;
+
+// The auto ray bundle job's helpers (hkpCpuAutoRayBundleJob.cpp). None is named in the PDB or by IDA: the names are
+// chosen here.
+
+// Up to four rays the job casts as one bundle: their indices and how
+// many there are (the 20-byte element of the job's local array).
+struct hkpAutoRayBundle {
+	int32_t m_rayIndices[4];
+	int32_t m_numRays;
+};
+
+// Writes each ray's unit direction and squared length, then sorts the
+// ray indices into eight arrays by the signs of the direction's x, y and z, counting each.
+// Inferred type: numRays: int32_t: signed uses from 0xe29b91
+void hkpAutoRayBundleJob_sortRaysByOctant(const hkVector4* from, const hkVector4* to, int32_t numRays,
+	hkVector4* directionsOut, hkVector4* lengthsSquaredOut, hkArray<int32_t>* octantRaysOut, int32_t* octantCountsOut);
+// Groups the listed rays into bundles of up to four close rays of
+// similar direction, then writes the commands.
+// Inferred type: numIndices: int32_t: signed uses from 0xe29d42; maxDistanceFactor: float: used as one at 0xe29e9b
+void hkpAutoRayBundleJob_bundleIndexedRays(const int32_t* rayIndices, int32_t numIndices, const hkVector4* from,
+	const hkVector4* to, int32_t numRays, float maxAngle, float maxDistanceFactor, hkpWorldRayCastOutput* outputs,
+	hkpWorldRayCastCommand* commandsOut, int32_t* numCommandsOut, hkpWorldRayCastBundleCommand* bundleCommandsOut,
+	int32_t* numBundleCommandsOut);
+// The same grouping for the rays whose direction lies in octant.
+// Inferred type: numRays: int32_t: signed uses from 0xe2a087; maxDistanceFactor: float: used as one at 0xe2a207
+void hkpAutoRayBundleJob_bundleOctantRays(int32_t octant, const hkVector4* from, const hkVector4* to, int32_t numRays,
+	float maxAngle, float maxDistanceFactor, hkpWorldRayCastOutput* outputs, hkpWorldRayCastCommand* commandsOut,
+	int32_t* numCommandsOut, hkpWorldRayCastBundleCommand* bundleCommandsOut, int32_t* numBundleCommandsOut);
+// Not named in the PDB or IDA; name chosen here. Whether the second ray may join the first's
+// bundle: the directions' dot product is at least minCos and both the start points and the end points are within
+// maxDistanceSquared of each other; the result is in al (cdecl, 0xE29920).
+// Inferred type: minCos: float: used as one at 0xe29958; maxDistanceSquared: float: used as one at 0xe299b6
+bool hkpAutoRayBundleJob_canBundleRays(const hkVector4& from0, const hkVector4& to0, const hkVector4& direction0,
+	const hkVector4& from1, const hkVector4& to1, const hkVector4& direction1, float minCos, float maxDistanceSquared);
+// Writes a single-ray command for each bundle of
+// one ray and a bundle command for each larger one, and their counts; returns the single-ray count, or 0 when there
+// are no bundles.
+int32_t hkpAutoRayBundleJob_writeCommands(const hkArray<hkpAutoRayBundle>& bundles, const hkVector4* from,
+	const hkVector4* to, hkpWorldRayCastOutput* outputs, hkpWorldRayCastCommand* commandsOut, int32_t* numCommandsOut,
+	hkpWorldRayCastBundleCommand* bundleCommandsOut, int32_t* numBundleCommandsOut);
+// The SDK's job function: bundles the job's rays into single-ray and bundle commands.
+hkJobQueue::JobStatus hkCpuAutoRayBundleJob(hkJobQueue& jobQueue, hkJobQueue::JobQueueEntry& nextJobOut);
+// The VC9 CRT's inline time(time_t*) (time.inl): _time64(apTime).
+// The link's custom convention passes apTime in eax (`push eax` before the call, 0xE29900); the exe has no caller.
+int64_t time64(int64_t* apTime);
+// Inferred type: return: int32_t: signed uses from 0xdf248d
+int32_t getCurrentTime();

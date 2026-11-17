@@ -1,0 +1,147 @@
+external/platform: what the game needs from the operating system beyond the standard library
+================================================================================================
+
+Four headers in include/platform/ (namespace platform), two implementations chosen by CMake (`fnvd_platform`, a
+static library): Win32/ holds the Win32 calls the exe makes, unchanged; Posix/ the POSIX side (Linux: /proc is read
+where noted), SDL3 where SDL covers it. No `#if` in either. Every src target gets the headers through
+fnvd_src_target; a program links the library itself.
+
+Paths.h
+-------
+NativePath(gamePath)
+    Win32: the path as given. POSIX: `\` becomes `/`; the path as given when it exists; else each component is
+    looked up case-insensitively (ASCII) in its folder. A component with no match, and every one after it, keeps
+    the given case, so a new file keeps the case of its existing folders and its own given case. Of names differing
+    only in case, an exact match wins, else the first in byte order. Each folder's listing is cached and read again
+    when the folder's device, inode or modification time changes, so creates, deletes and renames by anyone (the
+    game's own fopen included) are seen without being reported.
+FindFiles(gamePattern)
+    FindFirstFileA/FindNextFileA's entries: name, 64-bit size, FILE_ATTRIBUTE_* bits, write, creation and last
+    access times as FILETIME values, the 8.3 short name. `*` and `?` in the last component, case-insensitive, `*.*`
+    matches every name; a pattern without wildcards gives the one entry with its on-disk spelling. POSIX: `.` and
+    `..` first, then by upper-cased name (NTFS's order; Wine gives the same); attributes as Wine reports them
+    (directory or archive, read-only without the owner's write bit, hidden for dot files); the creation time is
+    statx's birth time where the file system records one, else the write time; the short name is empty. DOS
+    short-name matches and `?` matching nothing at a name's end are not modelled.
+UserFolder(LocalAppData | Documents)
+    SHGetFolderPathA's CSIDL_LOCAL_APPDATA / CSIDL_PERSONAL, without a trailing separator. POSIX (the user's
+    decision, XDG only): `$XDG_DATA_HOME` (default `~/.local/share`) and `$XDG_DATA_HOME/FalloutNV/Documents`; the
+    game appends `\FalloutNV\` and `\My Games\FalloutNV\` itself. POSIX creates the folder (Windows' exist).
+InstallFolder()
+    With a trailing separator. Win32: HKLM\Software\Bethesda Softworks\FalloutNV "Installed Path" (empty when
+    missing). POSIX: the executable's folder (/proc/self/exe).
+UserName()
+    GetUserNameA; POSIX: the passwd entry's name, else $USER.
+
+Ini.h (GetPrivateProfile*/WritePrivateProfile*; Win32 calls them, POSIX parses to Wine's profile.c rules)
+-------------------------------------------------------------------------------------------------------
+- Lines end at `\n` (or `\r` where no `\n` follows); lines, section names (inside the brackets), keys and values
+  are trimmed of spaces, tabs, CR/LF and the 0x1A end mark; `[name]` up to the last `]` is a header.
+- Section and key match case-insensitively; only the first section of a name is searched; its first key wins.
+- A value loses one pair of enclosing `"` or `'`; a line without `=` has no value (the default is returned).
+- IniGetString: the result is copied to at most out.size() - 1 characters; returns the count. The default loses
+  trailing spaces (a one-character default is kept) and its quotes; when the file cannot be read (its folder is
+  missing) the default is copied as is. Only the result's characters and one NUL are written.
+- IniGetKeys (= a null key): the names of the entries with a value, comments (`;`) skipped, each NUL-terminated,
+  an extra NUL at the end; a short buffer truncates the last name and returns out.size() - 2, with the list's two
+  NULs at the end (Windows' documented form; Wine writes only one there: the one known difference to Wine).
+- IniGetInt: the string read with sign and 0x/0o/0b prefixes (lower-case), up to the first non-digit, wrapping in
+  32 bits; the default when the key is missing or empty.
+- IniWriteString: the value loses its leading spaces; a null value deletes the key, a null key the section; false
+  when the file cannot be written (a missing folder). POSIX edits the file in place as Windows does: the key's line
+  is replaced, a new key goes after its section's last entry, a new section at the end; every other line is kept;
+  the file is written with CRLF. Wine instead rewrites the whole file; reads give the same either way.
+- Files are cached per path and read again when their device, inode, size or time changes.
+
+Memory.h
+--------
+Reserve(size, address = nullptr)
+    MEM_RESERVE: no access, no memory. With an address: exactly there (64 KB-aligned) or nullptr. POSIX: an
+    anonymous PROT_NONE MAP_NORESERVE mapping, 64 KB-aligned like Windows'; with an address, mmap's hint is checked
+    and refused when not honoured.
+Commit / Decommit(address, size)
+    MEM_COMMIT read-write / MEM_DECOMMIT for the pages covering the range, inside a reservation. Fresh or decommitted
+    pages read as zero; committed ones keep their contents. POSIX: mprotect; decommit maps fresh PROT_NONE pages over
+    the range (memory returned).
+Release(base)
+    MEM_RELEASE of a whole reservation by Reserve's address (POSIX keeps each reservation's size).
+PageSize(), AllocationGranularity()
+    4 KB and 64 KB (POSIX: the system's page size; the granularity is fixed at 64 KB as on Windows).
+MemoryStatus()
+    GlobalMemoryStatusEx's figures in bytes. POSIX: physical from sysconf and /proc/meminfo's MemAvailable; page
+    file = physical + swap (available: MemAvailable + SwapFree); virtual = the 47-bit user space minus the process's
+    size. The 32-bit program's GlobalMemoryStatus (not Ex) caps at 4 GB; a site printing a 32-bit field clamps.
+
+System.h
+--------
+SetThreadPriority(thread, THREAD_PRIORITY_*), SetCurrentThreadIdealProcessor(n)
+    Win32: the calls. POSIX: no effect (true): a normal thread's priority cannot be raised without privileges, and
+    there is no soft processor hint.
+SetThreadName(thread, name), SetCurrentThreadName(name)
+    Win32: the debugger's 0x406D1388 exception inside __try, raised only while a debugger is attached (the exe's
+    form). POSIX: pthread_setname_np, the first 15 characters, always.
+ShowMessageBox(text, caption, MB_* type)
+    MessageBoxA with no owner, returning IDOK..IDCONTINUE. POSIX: SDL_ShowMessageBox with the type's buttons in
+    Windows' order and labels, MB_DEFBUTTONn as the Return default, Cancel (or a lone OK) as Escape and on close,
+    MB_ICONERROR/WARNING else information; without a display the text goes to stderr and the result is 0
+    (MessageBoxA's failure). MB_TOPMOST and the other flags have no effect.
+MessageBoxCancelTextBegin(text) / MessageBoxCancelTextActive() / MessageBoxCancelTextEnd()
+    MessageHandler's "Yes to all": the calling thread's next message box shows its Cancel button with the text.
+    Win32: the exe's WH_CBT hook on the thread (SetWindowsHookExA), which finds the box's "Cancel" button on
+    activation, renames it and unhooks itself. POSIX: ShowMessageBox's Cancel label, taken by the next box the same
+    thread shows.
+RemoteSession()
+    GetSystemMetrics(SM_REMOTESESSION) != 0. POSIX: false.
+LauncherAvailable()
+    Whether FalloutNVLauncher.exe can be started when the display settings do not fit the adapter. Win32: true
+    (the game starts it and exits). POSIX: false; the game then writes FalloutPrefs.ini itself (CreateDisplayDriver,
+    src/Fallout Shared/Renderer.cpp) and carries on.
+SingleInstance(name)
+    False when another process holds the name. Win32: CreateMutexA + ERROR_ALREADY_EXISTS (handle kept). POSIX: an
+    fcntl write lock on `<LocalAppData>/FalloutNV/<name>.lock`, kept open; true when the file cannot be made.
+DebuggerPresent / DebuggerBreak / DebuggerOutput
+    IsDebuggerPresent, DebugBreak, OutputDebugStringA. POSIX: TracerPid in /proc/self/status, raise(SIGTRAP) (ends
+    the process without a debugger, as DebugBreak's unhandled breakpoint does), the text on stderr.
+LibraryLoad / LibrarySymbol / LibraryFree
+    LoadLibraryA, GetProcAddress, FreeLibrary. POSIX: dlopen(RTLD_NOW | RTLD_LOCAL) / dlsym / dlclose;
+    `D3D9.DLL` in any case loads `libdxvk_d3d9.so.0` (dxvk-native); other `.dll` names fail, so the game's
+    not-found paths run (ATI ADL, ATIMGPUD, dbghelp).
+Open(pathOrUrl)
+    ShellExecuteA(nullptr, "open", target, ..., SW_SHOWNORMAL), true above 32. (The exe's two sites pass "open"/
+    SW_SHOW and a null verb/SW_SHOWNORMAL; for a new process both show it normally.) POSIX: a URL as given, else
+    the absolute NativePath as a percent-encoded file:// URL, to SDL_OpenURL; a `.exe` path fails (false) without
+    reaching the desktop, as there is no Windows program to run (the game's launcher).
+MouseSettings()
+    Win32: SwapMouseButton's state (read and restored), GetDoubleClickTime, HKCU\Control Panel\Mouse
+    "MouseSensitivity" through atoi (6 when missing). POSIX: no swap, 500 ms, 10 (Windows' defaults).
+RegistryOpen/Close/Read/Write
+    RegSettingCollection's store. Win32: HKLM\<key> with KEY_ALL_ACCESS (create or open), RegSetValueExA,
+    RegQueryValueExA (false and the needed size when the buffer is short). POSIX: the section [key] of
+    `<LocalAppData>/FalloutNV/Registry.ini` through Ini; a value is `name=<type>:<data>`, REG_SZ data as quoted
+    text (its size counts the NUL), any other type as hex bytes. Opening without create fails while the section has
+    no values.
+CommandLine()
+    The arguments, the program first. Win32: CommandLineToArgvW(GetCommandLineW()) as UTF-8. POSIX: argv.
+QuitOnDisplayLoss(window)
+    The window's display connection lost becomes one SDL_EVENT_QUIT, so the game leaves through its quit path.
+    Win32: no effect. POSIX: on X11, a process-wide Xlib I/O error handler that reports once and returns, and an
+    I/O error exit handler (XSetIOErrorExitHandler, libX11 1.7+) on the window's Display that pushes the event and
+    returns; Xlib's defaults of both call exit() (under the game's live threads). Xlib's core calls on the broken
+    display then fail; extension requests can crash (libXi's grab calls). SDL's second Display (its wake-up
+    requests) keeps the default exit handler: the game only polls, so nothing waits to be woken. Wayland: SDL sends
+    the quit itself.
+DisplayLost()
+    Whether QuitOnDisplayLoss saw the connection go: external/dinput_sdl then leaves the mouse grab alone. Win32:
+    false.
+
+Posix/Main.cpp
+--------------
+`main` keeps argv for CommandLine(), joins the arguments after the program's name into WinMain's lpCmdLine (an
+argument with a space or tab, or an empty one, quoted) and returns the game's
+`WinMain(nullptr, nullptr, lpCmdLine, SW_SHOWNORMAL)`.
+
+Posix/Runtime.cpp
+-----------------
+vcruntime's `_CxxThrowException` (rt::_CxxThrowException's target, src/SDK/MSVC/ehdata.cpp), which Windows links
+from vcruntime: an MSVC throw record cannot be raised through the Itanium ABI, so it reports the call on stderr and
+aborts.

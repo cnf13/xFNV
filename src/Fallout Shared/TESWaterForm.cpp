@@ -1,0 +1,737 @@
+#include "Fallout Shared/TESWaterForm.h"
+
+#include "BSAudio/BSAudio.h"
+#include "BSCore/BSSimpleArray.h"
+#include "BSCore/BSSimpleList.h"
+#include "BSCore/BSString.h"
+#include "BSCore/BSStringT.h"
+#include "BSCore/MemoryManager.h"
+#include "BSCore/RTTI.h"
+#include "BSCore/TLSData.h"
+#include "BSMain/BSMultiBoundNode.h"
+#include "BSMain/BSUtilities.h"
+#include "BSMain/SettingCollection.h"
+#include "BSShader/BSRenderedTexture.h"
+#include "BSShader/BSShaderManager.h"
+#include "Fallout Shared/ActorValueOwner.h"
+#include "Fallout Shared/Animation.h"
+#include "Fallout Shared/BGSBodyPart.h"
+#include "Fallout Shared/BGSDecalManager.h"
+#include "Fallout Shared/BGSEntryPoint.h"
+#include "Fallout Shared/BGSLoadedReferenceCollection.h"
+#include "Fallout Shared/BGSNote.h"
+#include "Fallout Shared/BGSPerk.h"
+#include "Fallout Shared/BGSPlaceableWater.h"
+#include "Fallout Shared/BGSQuestObjective.h"
+#include "Fallout Shared/BGSRadiation.h"
+#include "Fallout Shared/BGSTalkingActivator.h"
+#include "Fallout Shared/BSAnimGroupSequence.h"
+#include "Fallout Shared/BaseFormComponent.h"
+#include "Fallout Shared/BipedAnim.h"
+#include "Fallout Shared/CombatFormulas.h"
+#include "Fallout Shared/ContainerItemExtra.h"
+#include "Fallout Shared/Distant Terrain System/BGSTerrainManager.h"
+#include "Fallout Shared/ExtraDataList.h"
+#include "Fallout Shared/ExtraDataObjects.h"
+#include "Fallout Shared/GlobalFunc.h"
+#include "Fallout Shared/Havok/FOCollisionListener.h"
+#include "Fallout Shared/InventoryChanges.h"
+#include "Fallout Shared/Magic/EffectSettingCollection.h"
+#include "Fallout Shared/Magic/SpellItem.h"
+#include "Fallout Shared/MiscStats.h"
+#include "Fallout Shared/Package.h"
+#include "Fallout Shared/PackageEventAction.h"
+#include "Fallout Shared/Pathfinding/PathBuilder.h"
+#include "Fallout Shared/Pathfinding/PathingRequest.h"
+#include "Fallout Shared/ScreenCustomSplatter.h"
+#include "Fallout Shared/ScreenSplatter.h"
+#include "Fallout Shared/Script.h"
+#include "Fallout Shared/Sky/Sky.h"
+#include "Fallout Shared/Sky/SkyTextureManager.h"
+#include "Fallout Shared/SpeedTree/BSTreeManager.h"
+#include "Fallout Shared/TES.h"
+#include "Fallout Shared/TESActorBaseData.h"
+#include "Fallout Shared/TESAnimGroup.h"
+#include "Fallout Shared/TESAttackDamageForm.h"
+#include "Fallout Shared/TESBipedModelForm.h"
+#include "Fallout Shared/TESConditionFunctions.h"
+#include "Fallout Shared/TESContainer.h"
+#include "Fallout Shared/TESCreature.h"
+#include "Fallout Shared/TESDataHandler.h"
+#include "Fallout Shared/TESEnchantableForm.h"
+#include "Fallout Shared/TESFile.h"
+#include "Fallout Shared/TESForm.h"
+#include "Fallout Shared/TESFullName.h"
+#include "Fallout Shared/TESIdleForm.h"
+#include "Fallout Shared/TESIdleManager.h"
+#include "Fallout Shared/TESImageSpaceModifier.h"
+#include "Fallout Shared/TESModel.h"
+#include "Fallout Shared/TESNPC.h"
+#include "Fallout Shared/TESObject.h"
+#include "Fallout Shared/TESObjectCELL.h"
+#include "Fallout Shared/TESObjectREFR.h"
+#include "Fallout Shared/TESObjectWEAP.h"
+#include "Fallout Shared/TESQuestTarget.h"
+#include "Fallout Shared/TESRace.h"
+#include "Fallout Shared/TESRaceForm.h"
+#include "Fallout Shared/TESSaveLoadGame.h"
+#include "Fallout Shared/TESScript.h"
+#include "Fallout Shared/TESScriptCompiler.h"
+#include "Fallout Shared/TESScriptFunctions.h"
+#include "Fallout Shared/TESSound.h"
+#include "Fallout Shared/TESTexture.h"
+#include "Fallout Shared/TESTopic.h"
+#include "Fallout Shared/TESWaterSystem.h"
+#include "Fallout Shared/WaterShaderData.h"
+#include "Fallout/AI/Actor.h"
+#include "Fallout/AI/BaseProcess.h"
+#include "Fallout/AI/CharacterProgression.h"
+#include "Fallout/AI/Combat/CombatCoverMap.h"
+#include "Fallout/AI/Combat/CombatGroup.h"
+#include "Fallout/AI/Combat/CombatManager.h"
+#include "Fallout/AI/Combat/CombatTargetMap.h"
+#include "Fallout/AI/Combat/CombatThreatMap.h"
+#include "Fallout/AI/Combat/CombatUtilities.h"
+#include "Fallout/AI/Combat/HitData.h"
+#include "Fallout/AI/CombatController.h"
+#include "Fallout/AI/FleePackage.h"
+#include "Fallout/AI/MiddleHighProcess.h"
+#include "Fallout/AI/MobileObject.h"
+#include "Fallout/AI/PlayerCharacter.h"
+#include "Fallout/AI/ProcessLists.h"
+#include "Fallout/Audio/FalloutRadio.h"
+#include "Fallout/Audio/ImpactMixer.h"
+#include "Fallout/Debug/DebugTextManager.h"
+#include "Fallout/Dialogue/DialogueResponse.h"
+#include "Fallout/Interface/Interface.h"
+#include "Fallout/Interface/InterfaceManager.h"
+#include "Fallout/Interface/Menus/LoadingMenu.h"
+#include "Fallout/Interface/Menus/VATSMenu.h"
+#include "Fallout/Magic/MagicTarget.h"
+#include "Fallout/Misc/Main.h"
+#include "Fallout/Misc/SaveLoad/BGSChangeFlags.h"
+#include "Fallout/Misc/SaveLoad/BGSLoadFormBuffer.h"
+#include "Fallout/Misc/SaveLoad/BGSLoadGameBuffer.h"
+#include "Fallout/Misc/SaveLoad/BGSSaveFormBuffer.h"
+#include "Fallout/Misc/SaveLoad/BGSSaveLoadGame.h"
+#include "Fallout/Misc/TaskQueueInterface.h"
+#include "Gamebryo2.2/CoreLibs/NiMain/BSTexturePalette.h"
+#include "Gamebryo2.2/CoreLibs/NiMain/NiColor.h"
+#include "Gamebryo2.2/CoreLibs/NiMain/NiPointer.h"
+#include "Gamebryo2.2/CoreLibs/NiMain/NiTArray.h"
+#include "Gamebryo2.2/CoreLibs/NiMain/NiTCollection.h"
+#include "Gamebryo2.2/CoreLibs/NiMain/NiTMapBase.h"
+#include "Gamebryo2.2/CoreLibs/NiMain/NiTexture.h"
+#include "Reconstruction.hpp"
+#include "SDK/MSVC/rtti.h"
+#include "SDK/MSVC/string.h"
+
+#include <stdint.h>
+
+SettingT<INISettingCollection> TESWaterForm::iWaterNoiseResolution("iWaterNoiseResolution:Water", 256);
+
+// The exe reads the MNAM and EDID alloca buffers uninitialised when the chunk is empty (malformed data); src
+// initialises each to "" (one zeroed byte, allocated only for an empty chunk).
+// The record's chunks: the name, the bound, the editor ID, the alpha and flags, the shader data (whose height scales
+// and amplitudes are set to their defaults when the chunk carries the whole structure), the material name, the noise
+// texture, the sound, the drink effect and the three weather control waters.
+bool TESWaterForm::Load(TESFile* apFile) {
+	if (static_cast<uint8_t>(apFile->GetTESForm()) != 78) {
+		return false;
+	}
+	LoadForm(apFile);
+	SetInitialized(false);
+	do {
+		uint32_t uiChunk = apFile->GetTESChunk();
+		if (uiChunk == NO_CHUNK) {
+			break;
+		}
+		if (uiChunk > FNAM_ID) {
+			if (uiChunk == GNAM_ID) {
+				apFile->GetChunkData(pWaterWeatherControl, 0xC);
+#if FNVD_64BIT
+				// The file keeps a 4-byte form ID for each water form, resolved by InitItem.
+				TESFile::WidenFormIDRecords(pWaterWeatherControl, 3, 4, sizeof(TESWaterForm*), {{0, 0}});
+#endif
+				if (apFile->QEndian()) {
+					for (int32_t i = 0; i < 3; ++i) {
+						ENDIAN(pWaterWeatherControl[i], false);
+					}
+				}
+			} else if (uiChunk == MNAM_ID) {
+				// the exe's _alloca (__alloca_probe_16, 0xEC5EC0): a 16-byte aligned buffer of the chunk's size
+				uint32_t uiChunkSize = apFile->GetChunkSize();
+				char* pBuffer = static_cast<char*>(__builtin_alloca_with_align(uiChunkSize ? uiChunkSize : 1, 128));
+				// Not in the exe: an empty chunk leaves the buffer unwritten (see above).
+				pBuffer[0] = '\0';
+				apFile->GetChunkData(pBuffer, 0);
+				cMaterialID.Set(pBuffer, 0);
+			} else if (uiChunk == NNAM_ID) {
+				TESTexture::LoadTextureChunk(&NoiseTexture, apFile);
+			} else if (uiChunk == SNAM_ID) {
+				uint32_t uiSoundID = 0;
+				apFile->GetChunkData(uiSoundID);
+				// the chunk holds the sound's form ID, which the exe keeps in the pointer until InitItem resolves it
+				SetWaterSound(reinterpret_cast<TESSound*>(static_cast<uintptr_t>(uiSoundID)));
+			} else if (uiChunk == XNAM_ID) {
+				uint32_t uiDrinkEffectID = 0;
+				apFile->GetChunkData(uiDrinkEffectID);
+				SetSpellItem(reinterpret_cast<SpellItem*>(static_cast<uintptr_t>(uiDrinkEffectID)));
+			}
+		} else if (uiChunk == FNAM_ID) {
+			apFile->GetChunkData(&cFlags, 1);
+		} else if (uiChunk > FULL_ID) {
+			if (uiChunk == ANAM_ID) {
+				apFile->GetChunkData(&cAlpha, 1);
+			} else if (uiChunk == DNAM_ID) {
+				apFile->GetChunkData(&Data, 0xC4);
+				if (apFile->QEndian()) {
+					Data.Endian();
+				}
+			}
+		} else if (uiChunk == FULL_ID) {
+			TESFullName::LoadFullNameChunk(this, apFile);
+		} else if (uiChunk == DATA_ID) {
+			if (apFile->GetChunkSize() - GetDataSizeAdded()) {
+				// LoadData reads the chunk's bytes into an untyped buffer, as the exe passes the shader data
+				LoadData(apFile, reinterpret_cast<char*>(&Data), 0xC4);
+				if (apFile->QEndian()) {
+					Data.Endian();
+				}
+				Data.fHeightUVScale0 = 100.0f;
+				Data.fHeightUVScale1 = 100.0f;
+				Data.fHeightUVScale2 = 100.0f;
+				Data.fAmplitude0 = 1.0f;
+				Data.fAmplitude1 = 0.5f;
+				Data.fAmplitude2 = 0.25f;
+				TESAttackDamageForm::SetDamage(0);
+			} else {
+				LoadData(apFile, nullptr, 0);
+				if (apFile->QEndian()) {
+					Data.Endian();
+				}
+			}
+		} else if (uiChunk == EDID_ID) {
+			// the exe's _alloca (__alloca_probe_16, 0xEC5EC0): a 16-byte aligned buffer of the chunk's size
+			uint32_t uiChunkSize = apFile->GetChunkSize();
+			char* pBuffer = static_cast<char*>(__builtin_alloca_with_align(uiChunkSize ? uiChunkSize : 1, 128));
+			// Not in the exe: an empty chunk leaves the buffer unwritten (see above).
+			pBuffer[0] = '\0';
+			apFile->GetChunkData(pBuffer, 0x200);
+			SetFormEditorID(pBuffer);
+		} else if (uiChunk == OBND_ID) {
+			LoadObjectBound(apFile);
+		}
+	} while (apFile->NextChunk());
+	return true;
+}
+
+// The exe calls it thiscall and its class is not known yet: the object comes first, then the unused edx.
+void Init_57E9A0(WaterShaderData* apThis, [[maybe_unused]] void* apEdx) {
+	apThis->Initialize();
+}
+
+// InitializeData runs before the field stores, as in the exe, so they stay in the body after it.
+TESWaterForm::TESWaterForm()
+	: spNoiseNormalMap(nullptr), fTexScroll0{}, fTexScroll1{}, fTexScroll2{}, spNoiseTexture(nullptr) {
+	Data.Initialize();
+	cFormType = 78;
+	TESWaterForm::InitializeData();
+	iCurrentTextureSelect01 = 0;
+	iCurrentTextureSelect02 = 0;
+	fFrequencyX = 9;
+	fFrequencyY = 9;
+	iOctaves = 4;
+	fAmplitude = 0.5f;
+	fLacunarity = 2.0f;
+	fBias = 0.5f;
+	fGain = 0.5f;
+	pSpellItem = nullptr;
+	bNeedUpdate = true;
+	bResetNoiseTexture = false;
+	pPlaceableAutoWater = nullptr;
+	pPlaceableLODWater = nullptr;
+	iRadiationDamage = 0;
+	iHealthRestoration = 0;
+	pRemappedWaterForm = nullptr;
+}
+
+TESWaterForm::~TESWaterForm() {
+	spNoiseTexture = static_cast<NiTexture*>(nullptr);
+}
+
+void TESWaterForm::InitializeData() {
+	int32_t i;
+	cAlpha = (uint8_t)75;
+	cFlags = (uint8_t)0;
+	pWaterSound = nullptr;
+	(&cMaterialID)->Set(nullptr, (uint32_t)0);
+	WaterShaderData* visData = GetData();
+	visData->Initialize();
+	for (i = 0; i < 3; ++i) {
+		pWaterWeatherControl[i] = nullptr;
+	}
+}
+
+// The form's record: name, noise texture, alpha, flags, material, sound and spell IDs, the shader data (swapped for
+// the write and back) and the three weather control waters' IDs.
+void TESWaterForm::Save() {
+	StartForm();
+	TESFullName::Save();
+	uint32_t uiNoiseSize = NoiseTexture.GetTextureNameLength() + 1;
+	TESForm::AddChunkArray(NNAM_ID, const_cast<char*>(NoiseTexture.GetTextureName()), uiNoiseSize);
+	TESForm::AddChunk(ANAM_ID, cAlpha);
+	TESForm::AddChunk(FNAM_ID, cFlags);
+	uint32_t uiMaterialSize = cMaterialID.GetLength() + 1;
+	TESForm::AddChunkArray(MNAM_ID, const_cast<char*>(GetMaterialName()), uiMaterialSize);
+	if (pWaterSound) {
+		uint32_t uiSoundID = pWaterSound->GetFormID();
+		TESForm::AddChunk(SNAM_ID, uiSoundID);
+	}
+	if (pSpellItem) {
+		uint32_t uiSpellID = pSpellItem->GetFormID();
+		TESForm::AddChunk(XNAM_ID, uiSpellID);
+	}
+	SaveData();
+	if (TESForm::QEndianSwapOnSave()) {
+		Data.Endian();
+	}
+	TESForm::__AddChunkData(DNAM_ID, &Data, sizeof(WaterShaderData));
+	if (TESForm::QEndianSwapOnSave()) {
+		Data.Endian();
+	}
+	uint32_t auiControlIDs[3];
+	for (int32_t i = 0; i < 3; ++i) {
+		if (pWaterWeatherControl[i]) {
+			auiControlIDs[i] = pWaterWeatherControl[i]->GetFormID();
+		} else {
+			auiControlIDs[i] = 0;
+		}
+	}
+	TESForm::AddChunkArray(GNAM_ID, auiControlIDs, 3);
+	CloseForm();
+}
+
+// Saves the form's changes into the save buffer; a remapped water type is saved as its form ID.
+void TESWaterForm::SaveGame(BGSSaveFormBuffer* apSaveGameBuffer) {
+	TESForm::SaveGame(apSaveGameBuffer);
+	if (apSaveGameBuffer->GetChangeFlags().CheckFlags(CHANGE_WATER_REMAPPED)) {
+		apSaveGameBuffer->SaveFormID(pRemappedWaterForm, 0);
+	}
+}
+
+void TESWaterForm::LoadGame(BGSLoadFormBuffer* apLoadGameBuffer) {
+	int32_t formID_0;
+	TESForm* formByNumericID;
+	BGSChangeFlags v6;
+	TESForm::LoadGame(apLoadGameBuffer);
+	BGSChangeFlags* v2 = &(v6 = apLoadGameBuffer->GetChangeFlags());
+	if (v2->CheckFlags(0x80000000u)) {
+		formID_0 = (int32_t)apLoadGameBuffer->BGSLoadGameBuffer::LoadFormID();
+		formByNumericID = TESForm::GetFormByNumericID(formID_0);
+		pRemappedWaterForm = dynamic_cast<TESWaterForm*>(formByNumericID);
+	}
+}
+
+void TESWaterForm::Revert(BGSLoadFormBuffer* apLoadGameBuffer) {
+	if (apLoadGameBuffer->GetOldChangeFlags().CheckFlags(CHANGE_WATER_REMAPPED)) {
+		pRemappedWaterForm = 0;
+	}
+}
+
+void TESWaterForm::InitItem() {
+	if (!GetInitialized()) {
+		uint32_t itempint = static_cast<uint32_t>(reinterpret_cast<uintptr_t>(pWaterSound));
+		if (itempint) {
+			TESFile* File = GetFile(-1);
+			TESForm::AddCompileIndex(itempint, File);
+			TESForm* FormByNumericID = TESForm::GetFormByNumericID(itempint);
+			pWaterSound = dynamic_cast<TESSound*>(FormByNumericID);
+			if (!pWaterSound) {
+				int32_t CastingType = iFormID;
+				const char* v7 = GetFormEditorID();
+				Warning("MASTERFILE: Could not find sound (%08X) for water type '%s' (%08X).", itempint, v7,
+					CastingType);
+			}
+		}
+		itempint = static_cast<uint32_t>(reinterpret_cast<uintptr_t>(this->pSpellItem));
+		if (itempint) {
+			TESFile* v3 = GetFile(-1);
+			TESForm::AddCompileIndex(itempint, v3);
+			TESForm* v4 = TESForm::GetFormByNumericID(itempint);
+			this->pSpellItem = dynamic_cast<SpellItem*>(v4);
+			if (!this->pSpellItem) {
+				int32_t v11 = iFormID;
+				const char* v8 = GetFormEditorID();
+				Warning("MASTERFILE: Could not find sound (%08X) for spell item '%s' (%08X).", itempint, v8, v11);
+			}
+			if (this->pSpellItem) {
+				if (!this->pSpellItem->IsEmpty()) {
+					EffectItemList* plist;
+					SpellItem* pSpellItem = this->pSpellItem;
+					if (pSpellItem) {
+						plist = &static_cast<
+							EffectItemList&>(static_cast<MagicItem&>(static_cast<MagicItemForm&>(*pSpellItem)));
+					} else {
+						plist = 0;
+					}
+					EffectItemList* plist_3 = plist;
+					EffectItem* v21 = 0;
+					EffectItem* v22 = 0;
+					while (plist_3 && (!v21 || !v22)) {
+						EffectItemList* plist_2;
+						EffectItem* pdamageRadiationEffect__prestoreHealthEffect = plist_3->m_item;
+						if (pdamageRadiationEffect__prestoreHealthEffect->GetActorValueIndex() ==
+								ActorValue::RADIATION_RADS &&
+							pdamageRadiationEffect__prestoreHealthEffect->pEffectSetting
+								->IsFlagSet(EffectSetting::DETRIMENTAL)) {
+							v21 = pdamageRadiationEffect__prestoreHealthEffect;
+							iRadiationDamage = pdamageRadiationEffect__prestoreHealthEffect->GetMagnitude();
+						} else {
+							if (pdamageRadiationEffect__prestoreHealthEffect->GetActorValueIndex() ==
+									ActorValue::HEALTH &&
+								!pdamageRadiationEffect__prestoreHealthEffect->pEffectSetting
+									->IsFlagSet(EffectSetting::DETRIMENTAL)) {
+								v22 = pdamageRadiationEffect__prestoreHealthEffect;
+								iHealthRestoration = pdamageRadiationEffect__prestoreHealthEffect->GetMagnitude();
+							}
+						}
+						// The source walks the list as EffectItemList nodes: each next node is downcast (null-tested,
+						// -4 in the exe).
+						plist_3 = static_cast<EffectItemList*>(plist_3->GetNext());
+					}
+				}
+			}
+		}
+		for (int32_t i = 0; i < 3; ++i) {
+			itempint = static_cast<uint32_t>(reinterpret_cast<uintptr_t>(pWaterWeatherControl[i]));
+			if (itempint) {
+				TESFile* v5 = GetFile(-1);
+				TESForm::AddCompileIndex(itempint, v5);
+				TESForm* v6 = TESForm::GetFormByNumericID(itempint);
+				pWaterWeatherControl[i] = dynamic_cast<TESWaterForm*>(v6);
+				if (!pWaterWeatherControl[i]) {
+					int32_t v12 = iFormID;
+					const char* v9 = GetFormEditorID();
+					Warning("MASTERFILE: Could not find WaterForm (%08X) for water type '%s' (%08X).", itempint, v9,
+						v12);
+				}
+			}
+		}
+		SetInitialized(1);
+	}
+}
+
+void TESWaterForm::Copy(TESForm* apCopy) {
+	TESWaterForm* pcopy = dynamic_cast<TESWaterForm*>(apCopy);
+	if (pcopy) {
+		CopyAllComponents(pcopy);
+		cFlags = pcopy->cFlags;
+		cAlpha = pcopy->cAlpha;
+		WaterShaderData* Data = pcopy->GetData();
+		WaterShaderData* v2 = GetData();
+		ourMemcpy(v2, Data, sizeof(WaterShaderData));
+		SetWaterSound(pcopy->pWaterSound);
+		SpellItem* SpellItem_ = pcopy->GetSpellItem();
+		SetSpellItem(SpellItem_);
+		ourMemcpy(pWaterWeatherControl, pcopy->pWaterWeatherControl, sizeof(pWaterWeatherControl));
+		// The exe calls slot 2 through the component's vtable: a base pointer keeps clang from devirtualising.
+		static_cast<BaseFormComponent*>(&NoiseTexture)->CopyComponent(&pcopy->NoiseTexture);
+		const char* MaterialName = pcopy->GetMaterialName();
+		SetMaterialName(MaterialName);
+	}
+}
+
+bool TESWaterForm::Compare(TESForm* apCompare) {
+	TESWaterForm* pcomp = dynamic_cast<TESWaterForm*>(apCompare);
+	if (!pcomp) {
+		return 1;
+	}
+	if (CompareAllComponents(pcomp)) {
+		return 1;
+	}
+	if (cFlags != pcomp->cFlags) {
+		return 1;
+	}
+	if (cAlpha != pcomp->cAlpha) {
+		return 1;
+	}
+	WaterShaderData* Data = pcomp->GetData();
+	WaterShaderData* v3 = GetData();
+	if (std::memcmp(v3, Data, sizeof(WaterShaderData))) {
+		return 1;
+	}
+	if (NoiseTexture.CompareComponent(&pcomp->NoiseTexture)) {
+		return 1;
+	}
+	TESSound* WaterSound = pWaterSound;
+	if (WaterSound != pcomp->pWaterSound) {
+		return 1;
+	}
+	const char* MaterialName = GetMaterialName();
+	if (MaterialName != pcomp->GetMaterialName()) {
+		return 1;
+	}
+	SpellItem* SpellItem_ = GetSpellItem();
+	return SpellItem_ != pcomp->GetSpellItem() ||
+		std::memcmp(pWaterWeatherControl, pcomp->pWaterWeatherControl, sizeof(pWaterWeatherControl)) != 0;
+}
+
+// Drinking from the water: the activating reference's magic caster casts the form's spell, with an effectiveness the
+// perk owner's ADJUST_DRINKING_RADIATION entry point may adjust first. The exe tests pSpellItem twice: once to bail
+// out and again when it forms the MagicItem base pointer.
+bool TESWaterForm::Activate(TESObjectREFR* apItemActivated, TESObjectREFR* apActionRef, bool abIdFlag,
+	TESBoundObject* apObjecttoGet, int32_t aiCount) {
+	if (!pSpellItem || !apActionRef) {
+		return false;
+	}
+	MagicCaster* pCaster = apActionRef->GetMagicCaster();
+	if (!pCaster) {
+		return false;
+	}
+	float fEffectivenessMult = 1.0f;
+	if (apActionRef->IsActor()) {
+		BGSEntryPoint::HandleEntryPoint(BGSEntryPoint::ADJUST_DRINKING_RADIATION, static_cast<Actor*>(apActionRef),
+			&fEffectivenessMult);
+	}
+	MagicItem* pMagicItem = pSpellItem ? static_cast<MagicItem*>(pSpellItem) : nullptr;
+	pCaster->CastSpellImmediate(pMagicItem, 0, nullptr, fEffectivenessMult, 1);
+	return true;
+}
+
+void TESWaterForm::SetWaterSound(TESSound* apSound) {
+	pWaterSound = apSound;
+}
+
+void TESWaterForm::SetSpellItem(SpellItem* pItem) {
+	pSpellItem = pItem;
+}
+
+uint32_t TESWaterForm::GetNoiseTextureNameLength() {
+	return (&NoiseTexture)->GetTextureNameLength();
+}
+
+const char* TESWaterForm::GetNoiseTextureName() {
+	return NoiseTexture.GetTextureName();
+}
+
+void TESWaterForm::SetNoiseTexture(NiTexture* apTexture) {
+	(&spNoiseTexture)->operator=(apTexture);
+}
+
+void TESWaterForm::GetNoiseTexture(NiPointer<NiTexture>& aspTexture) {
+	aspTexture = spNoiseTexture;
+}
+
+float TESWaterForm::GetLightRadius() {
+	return Data.fLightRadius;
+}
+
+float TESWaterForm::GetLightBrightness() {
+	return Data.fLightBrightness;
+}
+
+WaterShaderData* TESWaterForm::GetData() {
+	return &Data;
+}
+
+float TESWaterForm::GetAlpha() {
+	return (float)(((double)cAlpha) / 100.0);
+}
+
+int32_t TESWaterForm::GetRadiationDamage() {
+	return iRadiationDamage;
+}
+
+double TESWaterForm::GetFogScale() {
+	return Data.fFogAmount;
+}
+
+bool TESWaterForm::ShouldResetNoiseTextures() {
+	return (bool)((uint8_t)bResetNoiseTexture);
+}
+
+bool TESWaterForm::IsDangerous() {
+	return ((((int8_t)cFlags) & 1) != 0);
+}
+
+double TESWaterForm::GetDepthY() {
+	return Data.fDepthFalloffEnd;
+}
+
+SpellItem* TESWaterForm::GetSpellItem() {
+	return reinterpret_cast<SpellItem*>(static_cast<uintptr_t>(reinterpret_cast<uintptr_t>(pSpellItem)));
+}
+
+void TESWaterForm::SetMaterialName(const char* apMaterial) {
+	(&cMaterialID)->Set(apMaterial, (uint32_t)0);
+}
+
+const char* TESWaterForm::GetMaterialName() {
+	if ((&cMaterialID)->pString) {
+		return (&cMaterialID)->pString;
+	} else {
+		return "";
+	}
+}
+
+void TESWaterForm::SetRemappedWaterForm(TESWaterForm* apWater) {
+	if (this == apWater) {
+		pRemappedWaterForm = nullptr;
+		RemoveChange(0x80000000u);
+	} else {
+		pRemappedWaterForm = apWater;
+		AddChange(0x80000000u);
+	}
+}
+
+// The exe's cleanup-only C++ EH frame is left out.
+BGSPlaceableWater* TESWaterForm::GetPlaceableAutoWater() {
+	if (!pPlaceableAutoWater) {
+		BGSPlaceableWater* v2;
+		char apDest[268];
+		BGSPlaceableWater* apMemory = static_cast<BGSPlaceableWater*>(ourMalloc(sizeof(BGSPlaceableWater)));
+		if (apMemory) {
+			v2 = ::new (apMemory) BGSPlaceableWater;
+		} else {
+			v2 = 0;
+		}
+		pPlaceableAutoWater = v2;
+		pPlaceableAutoWater->SetTemporary();
+		pPlaceableAutoWater->SetAutomaticWater(1);
+		pPlaceableAutoWater->SetRefractsActors(1);
+		pPlaceableAutoWater->SetReflectsLODLand(1);
+		pPlaceableAutoWater->SetReflectsLODBuildings(1);
+		pPlaceableAutoWater->SetReflectsLODTrees(1);
+		BSsprintf(apDest, 260, "PlaceableAutoWater");
+		pPlaceableAutoWater->SetFormEditorID(apDest);
+		pPlaceableAutoWater->Data.pWaterType = this;
+	}
+	return pPlaceableAutoWater;
+}
+
+// The exe's cleanup-only C++ EH frame is left out.
+BGSPlaceableWater* TESWaterForm::GetPlaceableLODWater() {
+	if (!pPlaceableLODWater) {
+		BGSPlaceableWater* pWater;
+		char apDest[268];
+		BGSPlaceableWater* apMemory = static_cast<BGSPlaceableWater*>(ourMalloc(sizeof(BGSPlaceableWater)));
+		if (apMemory) {
+			pWater = ::new (apMemory) BGSPlaceableWater;
+		} else {
+			pWater = 0;
+		}
+		pPlaceableLODWater = pWater;
+		pPlaceableLODWater->SetTemporary();
+		pPlaceableLODWater->SetLODWater(1);
+		pPlaceableLODWater->SetReflectionEnabled(1);
+		pPlaceableLODWater->SetRefractionEnabled(0);
+		pPlaceableLODWater->SetReflectsActors(0);
+		pPlaceableLODWater->SetReflectsLand(0);
+		pPlaceableLODWater->SetReflectsLODLand(1);
+		pPlaceableLODWater->SetReflectsLODBuildings(1);
+		pPlaceableLODWater->SetReflectsLODTrees(0);
+		pPlaceableLODWater->SetReflectsSky(1);
+		pPlaceableLODWater->SetReflectsNoReference(0);
+		pPlaceableLODWater->SetReflectsDeadActors(0);
+		BSsprintf(apDest, 260, "PlaceableLODWater");
+		pPlaceableLODWater->SetFormEditorID(apDest);
+		pPlaceableLODWater->Data.pWaterType = this;
+	}
+	return pPlaceableLODWater;
+}
+
+// The default shader parameters of a new water form, stored in the exe's order.
+void WaterShaderData::Initialize() {
+	fWindVelocity = 0.1f;
+	fWindDirection = 90.0f;
+	fWaveAmplitude = 0.5f;
+	fWaveFrequency = 1.0f;
+	fSunPower = 50.0f;
+	fReflectionAmount = 0.5f;
+	fFresnelAmount = 0.025f;
+	fWaveSpeed = 0.0f;
+	fFogDistNear = 0.0f;
+	fFogDistFar = 0.0f;
+	fFogAmount = 1.0f;
+	fUnderwaterFogDistNear = 0.0f;
+	fUnderwaterFogDistFar = 1000.0f;
+	fUnderwaterFogAmount = 1.0f;
+	iShallowWaterColor = 0x808000;
+	iDeepWaterColor = 0x190000;
+	iReflectionWaterColor = 0xFFFFFF;
+	fRainForce = 0.1f;
+	fRainVelocity = 0.6f;
+	fRainFalloff = 0.985f;
+	fRainDampener = 2.0f;
+	fRainSize = 0.01f;
+	fDisplacementForce = 0.4f;
+	fDisplacementVelocity = 0.6f;
+	fDisplacementFalloff = 0.985f;
+	fDisplacementDampener = 10.0f;
+	fDisplacementSize = 0.05f;
+	fDepthFalloffStart = 0.0f;
+	fDepthFalloffEnd = 0.0f;
+	fNoiseScale = 1.0f;
+	fUVScale = 500.0f;
+	fHeightUVScale0 = 100.0f;
+	fHeightUVScale1 = 100.0f;
+	fHeightUVScale2 = 100.0f;
+	fRefractivityAmount = 250.0f;
+	fShininess = 100.0f;
+	fHDRMultiplier = 1.0f;
+	fLightRadius = 10000.0f;
+	fLightBrightness = 1.0f;
+}
+
+// Swaps the fields read from a big-endian file, in field order. The blend byte needs no swap.
+void WaterShaderData::Endian() {
+	ENDIAN(fWindVelocity, false);
+	ENDIAN(fWindDirection, false);
+	ENDIAN(fWaveAmplitude, false);
+	ENDIAN(fWaveFrequency, false);
+	ENDIAN(fSunPower, false);
+	ENDIAN(fReflectionAmount, false);
+	ENDIAN(fFresnelAmount, false);
+	ENDIAN(fWaveSpeed, false);
+	ENDIAN(fFogDistNear, false);
+	ENDIAN(fFogDistFar, false);
+	ENDIAN(iShallowWaterColor, false);
+	ENDIAN(iDeepWaterColor, false);
+	ENDIAN(iReflectionWaterColor, false);
+	ENDIAN(fRainForce, false);
+	ENDIAN(fRainVelocity, false);
+	ENDIAN(fRainFalloff, false);
+	ENDIAN(fRainDampener, false);
+	ENDIAN(fRainSize, false);
+	ENDIAN(fDisplacementForce, false);
+	ENDIAN(fDisplacementVelocity, false);
+	ENDIAN(fDisplacementFalloff, false);
+	ENDIAN(fDisplacementDampener, false);
+	ENDIAN(fDisplacementSize, false);
+	ENDIAN(fNoiseScale, false);
+	ENDIAN(fNoiseWindDirection0, false);
+	ENDIAN(fNoiseWindDirection1, false);
+	ENDIAN(fNoiseWindDirection2, false);
+	ENDIAN(fNoiseWindSpeed0, false);
+	ENDIAN(fNoiseWindSpeed1, false);
+	ENDIAN(fNoiseWindSpeed2, false);
+	ENDIAN(fDepthFalloffStart, false);
+	ENDIAN(fDepthFalloffEnd, false);
+	ENDIAN(fFogAmount, false);
+	ENDIAN(fUVScale, false);
+	ENDIAN(fUnderwaterFogAmount, false);
+	ENDIAN(fUnderwaterFogDistNear, false);
+	ENDIAN(fUnderwaterFogDistFar, false);
+	ENDIAN(fRefractivityAmount, false);
+	ENDIAN(fShininess, false);
+	ENDIAN(fHDRMultiplier, false);
+	ENDIAN(fLightRadius, false);
+	ENDIAN(fLightBrightness, false);
+	ENDIAN(fHeightUVScale0, false);
+	ENDIAN(fHeightUVScale1, false);
+	ENDIAN(fHeightUVScale2, false);
+	ENDIAN(fAmplitude0, false);
+	ENDIAN(fAmplitude1, false);
+	ENDIAN(fAmplitude2, false);
+}
