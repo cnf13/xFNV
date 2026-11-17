@@ -111,47 +111,40 @@ bool NiBlendTransformInterpolator::StoreSingleValue(float fTime, NiObjectNET* pk
 
 // Translation and scale are weighted averages over the interpolators that have them; the rotations are summed
 // weighted, each after the first turned into the hemisphere of the sum, and the sum normalized.
+// DEVIATION (kNVSE's BlendValuesFixFloatingPointError, its "spider hands fix"): the exe starts each channel's total
+// weight at 1.0f and subtracts the weight of every interpolator that skips, fails or lacks the channel. The float
+// subtractions leave a rounding error that is large next to a small remaining weight (and a nonzero residue where none
+// should remain), so the weighted sum divided by it throws the bone far off. Here each channel's total is the sum, in
+// double, of the weights that went into it, and a channel whose total is not above 1e-10 is left invalid.
 bool NiBlendTransformInterpolator::BlendValues(float fTime, NiObjectNET* pkInterpTarget, NiQuatTransform& kValue) {
-	float fTotalTransWeight = 1.0f;
-	float fTotalScaleWeight = 1.0f;
+	constexpr double dEpsilon = 1e-10;
+	double dTotalTransWeight = 0.0;
+	double dTotalRotWeight = 0.0;
+	double dTotalScaleWeight = 0.0;
 	NiPoint3 kFinalTranslate = NiPoint3_ZERO;
 	NiQuaternion kFinalRotate = kBlendRotateStart;
 	float fFinalScale = 0.0f;
-	bool bTransChanged = false;
-	bool bRotChanged = false;
-	bool bScaleChanged = false;
 	bool bFirstRotation = true;
 	for (uint8_t uc = 0; uc < m_ucArraySize; uc++) {
 		InterpArrayItem& kItem = m_pkInterpArray[uc];
 		if (!kItem.m_spInterpolator || !(kItem.m_fNormalizedWeight > 0.0f))
 			continue;
 		float fUpdateTime = fTime;
-		if (!GetUpdateTimeForItem(fUpdateTime, kItem)) {
-			fTotalTransWeight -= kItem.m_fNormalizedWeight;
-			fTotalScaleWeight -= kItem.m_fNormalizedWeight;
+		if (!GetUpdateTimeForItem(fUpdateTime, kItem))
 			continue;
-		}
 		NiQuatTransform kTransform;
 		kTransform.m_kTranslate = NiQuatTransform::INVALID_TRANSLATE;
 		kTransform.m_kRotate = NiQuatTransform::INVALID_ROTATE;
 		kTransform.m_fScale = -FLT_MAX;
-		if (!kItem.m_spInterpolator->Update(fUpdateTime, pkInterpTarget, kTransform)) {
-			fTotalTransWeight -= kItem.m_fNormalizedWeight;
-			fTotalScaleWeight -= kItem.m_fNormalizedWeight;
+		if (!kItem.m_spInterpolator->Update(fUpdateTime, pkInterpTarget, kTransform))
 			continue;
-		}
 
+		float fWeight = kItem.m_fNormalizedWeight;
 		if (kTransform.IsTranslateValid()) {
-			bTransChanged = true;
-			float fWeight = kItem.m_fNormalizedWeight;
-			float fX = kTransform.m_kTranslate.x * fWeight;
-			float fY = kTransform.m_kTranslate.y * fWeight;
-			float fZ = kTransform.m_kTranslate.z * fWeight;
-			kFinalTranslate.x = fX + kFinalTranslate.x;
-			kFinalTranslate.y = kFinalTranslate.y + fY;
-			kFinalTranslate.z = kFinalTranslate.z + fZ;
-		} else {
-			fTotalTransWeight -= kItem.m_fNormalizedWeight;
+			kFinalTranslate.x += kTransform.m_kTranslate.x * fWeight;
+			kFinalTranslate.y += kTransform.m_kTranslate.y * fWeight;
+			kFinalTranslate.z += kTransform.m_kTranslate.z * fWeight;
+			dTotalTransWeight += fWeight;
 		}
 
 		if (kTransform.IsRotateValid()) {
@@ -164,63 +157,39 @@ bool NiBlendTransformInterpolator::BlendValues(float fTime, NiObjectNET* pkInter
 				if (fDot < 0.0f)
 					kRotate = -kRotate;
 			}
-			bRotChanged = true;
-			float fWeight = kItem.m_fNormalizedWeight;
-			kRotate.m_fW = kRotate.m_fW * fWeight;
-			kRotate.m_fX = kRotate.m_fX * fWeight;
-			kRotate.m_fY = kRotate.m_fY * fWeight;
-			kFinalRotate.m_fW = kRotate.m_fW + kFinalRotate.m_fW;
-			kFinalRotate.m_fX = kFinalRotate.m_fX + kRotate.m_fX;
-			kFinalRotate.m_fY = kFinalRotate.m_fY + kRotate.m_fY;
-			float fZ = fWeight * kRotate.m_fZ;
-			kFinalRotate.m_fZ = fZ + kFinalRotate.m_fZ;
+			kFinalRotate.m_fW += kRotate.m_fW * fWeight;
+			kFinalRotate.m_fX += kRotate.m_fX * fWeight;
+			kFinalRotate.m_fY += kRotate.m_fY * fWeight;
+			kFinalRotate.m_fZ += kRotate.m_fZ * fWeight;
+			dTotalRotWeight += fWeight;
 		}
 
 		if (kTransform.IsScaleValid()) {
-			bScaleChanged = true;
-			fFinalScale = kTransform.m_fScale * kItem.m_fNormalizedWeight + fFinalScale;
-		} else {
-			fTotalScaleWeight -= kItem.m_fNormalizedWeight;
+			fFinalScale += kTransform.m_fScale * fWeight;
+			dTotalScaleWeight += fWeight;
 		}
 	}
 
 	kValue.m_kTranslate.x = -FLT_MAX;
 	kValue.m_kRotate.m_fX = -FLT_MAX;
 	kValue.m_fScale = -FLT_MAX;
-	if (bTransChanged || bRotChanged || bScaleChanged) {
-		if (fTotalTransWeight == 0.0f)
-			bTransChanged = false;
-		// the threshold is a double in the exe
-		if (fTotalScaleWeight < 0.0001)
-			bScaleChanged = false;
-
-		if (bTransChanged) {
-			float fInvTotal = 1.0f / fTotalTransWeight;
-			kFinalTranslate.x = fInvTotal * kFinalTranslate.x;
-			kValue.m_kTranslate.x = kFinalTranslate.x;
-			kFinalTranslate.y = kFinalTranslate.y * fInvTotal;
-			kValue.m_kTranslate.y = kFinalTranslate.y;
-			kFinalTranslate.z = fInvTotal * kFinalTranslate.z;
-			kValue.m_kTranslate.z = kFinalTranslate.z;
-		}
-		if (bRotChanged) {
-			float fLengthSquared = kFinalRotate.m_fX * kFinalRotate.m_fX + kFinalRotate.m_fW * kFinalRotate.m_fW +
-				kFinalRotate.m_fY * kFinalRotate.m_fY + kFinalRotate.m_fZ * kFinalRotate.m_fZ;
-			// The exe calls __CIsqrt (0xEC6040) out of line and stores its result as a float.
-			float fLength = static_cast<float>(std::sqrt(fLengthSquared));
-			float fInvLength = 1.0f / fLength;
-			kFinalRotate.m_fW = fInvLength * kFinalRotate.m_fW;
-			kValue.m_kRotate.m_fW = kFinalRotate.m_fW;
-			kFinalRotate.m_fX = kFinalRotate.m_fX * fInvLength;
-			kValue.m_kRotate.m_fX = kFinalRotate.m_fX;
-			kFinalRotate.m_fY = kFinalRotate.m_fY * fInvLength;
-			kValue.m_kRotate.m_fY = kFinalRotate.m_fY;
-			kFinalRotate.m_fZ = fInvLength * kFinalRotate.m_fZ;
-			kValue.m_kRotate.m_fZ = kFinalRotate.m_fZ;
-		}
-		if (bScaleChanged)
-			kValue.m_fScale = fFinalScale / fTotalScaleWeight;
+	if (dTotalTransWeight > dEpsilon) {
+		float fInvTotal = static_cast<float>(1.0 / dTotalTransWeight);
+		kValue.m_kTranslate.x = kFinalTranslate.x * fInvTotal;
+		kValue.m_kTranslate.y = kFinalTranslate.y * fInvTotal;
+		kValue.m_kTranslate.z = kFinalTranslate.z * fInvTotal;
 	}
+	if (dTotalRotWeight > dEpsilon) {
+		float fLengthSquared = kFinalRotate.m_fX * kFinalRotate.m_fX + kFinalRotate.m_fW * kFinalRotate.m_fW +
+			kFinalRotate.m_fY * kFinalRotate.m_fY + kFinalRotate.m_fZ * kFinalRotate.m_fZ;
+		float fInvLength = 1.0f / static_cast<float>(std::sqrt(fLengthSquared));
+		kValue.m_kRotate.m_fW = kFinalRotate.m_fW * fInvLength;
+		kValue.m_kRotate.m_fX = kFinalRotate.m_fX * fInvLength;
+		kValue.m_kRotate.m_fY = kFinalRotate.m_fY * fInvLength;
+		kValue.m_kRotate.m_fZ = kFinalRotate.m_fZ * fInvLength;
+	}
+	if (dTotalScaleWeight > dEpsilon)
+		kValue.m_fScale = fFinalScale * static_cast<float>(1.0 / dTotalScaleWeight);
 	return !kValue.IsTransformInvalid();
 }
 
