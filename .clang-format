@@ -1,0 +1,2 @@
+# Formatting is by hand (docs/WORKFLOW.md); keeps editors and clangd from reformatting whole files on save.
+DisableFormat: true

@@ -1,0 +1,9 @@
+# Generated bodies (gen/) and untracked runtime trees (env/: worktrees, scratch, run copies) are not
+# background-indexed or linted: they are large and derived, and indexing them costs many GB.
+If:
+  PathMatch: [gen/.*, env/.*, build/.*, resources/.*]
+Index:
+  Background: Skip
+Diagnostics:
+  ClangTidy:
+    Remove: '*'

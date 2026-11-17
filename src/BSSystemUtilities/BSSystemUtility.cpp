@@ -1,0 +1,152 @@
+#include "BSSystemUtilities/BSSystemUtility.h"
+
+#include "BSCore/MemoryManager.h"
+#include "BSSystemUtilities/BSCacheDriveSystemUtility.h"
+#include "BSSystemUtilities/BSDiscBootSystemUtility.h"
+#include "BSSystemUtilities/BSDLCSystemUtility.h"
+#include "BSSystemUtilities/BSGameDataSystemUtility.h"
+#include "BSSystemUtilities/BSMsgDialogSystemUtility.h"
+#include "BSSystemUtilities/BSNetworkSystemUtility.h"
+#include "BSSystemUtilities/BSSaveDataSystemUtility.h"
+#include "BSSystemUtilities/BSSteamAwardsSystemUtility.h"
+#include "BSSystemUtilities/BSSysInfoSystemUtility.h"
+#include "BSSystemUtilities/BSSystemUtilitiesStrings.h"
+#include "SDK/MSVC/stdlib.h"
+#include "SDK/MSVC/string.h"
+
+#include <stdint.h>
+
+void DestroySteamAwardsUtility() {
+	if (BSSteamAwardsSystemUtility::m_pInstance) {
+		BSSteamAwardsSystemUtility* Block = BSSteamAwardsSystemUtility::m_pInstance;
+		BSSteamAwardsSystemUtility::m_pInstance->~BSSteamAwardsSystemUtility();
+		MemoryManager_Singleton.Deallocate(Block);
+		BSSteamAwardsSystemUtility::m_pInstance = 0;
+	}
+}
+
+char InitDLCUtility() {
+	BSDLCSystemUtility::GetSingleton();
+	return 1;
+}
+
+void DestroyDLCUtility() {
+	if (BSDLCSystemUtility::pSingleton) {
+		BSDLCSystemUtility* Block = BSDLCSystemUtility::pSingleton;
+		BSDLCSystemUtility::pSingleton->~BSDLCSystemUtility();
+		MemoryManager_Singleton.Deallocate(Block);
+		BSDLCSystemUtility::pSingleton = 0;
+	}
+}
+
+BSSystemUtility::BSSystemUtility()
+	: pEventNotificationCallback(nullptr), pFocusNotificationCallback(nullptr), bVisible(false),
+	  eRegion(SYSUTIL_REGION_UNKNOWN), bLostFocus(false), bExitApp(false) {
+	std::memset(cTitle, 0, sizeof(cTitle));
+}
+
+BSSystemUtility::~BSSystemUtility() {}
+
+void BSSystemUtility::Initialize(const char* apcTitle, const char* apcDefaultTitleID,
+	uint32_t auiDefaultParentalLevel) {
+	Destroy();
+	if (apcTitle) {
+		size_t stCount;
+		size_t v12 = std::strlen(apcTitle);
+		if (v12 <= 127) {
+			stCount = v12;
+		} else {
+			stCount = 127;
+		}
+		strncpy_s(cTitle, stCount + 1, apcTitle, stCount);
+	}
+	BSSysInfoSystemUtility* Singleton = BSSysInfoSystemUtility::GetSingleton();
+	Singleton->Initialize();
+	BSDiscBootSystemUtility* v8 = BSDiscBootSystemUtility::GetSingleton();
+	v8->Initialize(apcDefaultTitleID, auiDefaultParentalLevel);
+	BSSaveDataSystemUtility* v7 = BSSaveDataSystemUtility::GetSingleton();
+	v7->Initialize();
+	BSSystemUtilitiesStrings* v6 = BSSystemUtilitiesStrings::QInstance();
+	v6->Initialize();
+	BSGameDataSystemUtility* v5 = BSGameDataSystemUtility::GetSingleton();
+	v5->Initialize();
+	BSCacheDriveSystemUtility* v4 = BSCacheDriveSystemUtility::GetSingleton();
+	v4->Initialize();
+	BSSteamAwardsSystemUtility::QInstance();
+	BSSteamAwardsSystemUtility::Initialize();
+	BSNetworkSystemUtility::QInstance();
+	BSNetworkSystemUtility::Initialize();
+	BSDLCSystemUtility::GetSingleton();
+	InitDLCUtility();
+}
+
+void BSSystemUtility::Destroy() {
+	BSDLCSystemUtility::GetSingleton();
+	DestroyDLCUtility();
+	BSNetworkSystemUtility::QInstance();
+	BSNetworkSystemUtility::Destroy();
+	BSSteamAwardsSystemUtility::QInstance();
+	DestroySteamAwardsUtility();
+	BSSysInfoSystemUtility* Singleton = BSSysInfoSystemUtility::GetSingleton();
+	Singleton->Destroy();
+	BSDiscBootSystemUtility* v5 = BSDiscBootSystemUtility::GetSingleton();
+	v5->Destroy();
+	BSSaveDataSystemUtility* v4 = BSSaveDataSystemUtility::GetSingleton();
+	v4->Destroy();
+	BSSystemUtilitiesStrings* v3 = BSSystemUtilitiesStrings::QInstance();
+	v3->Destroy();
+	BSGameDataSystemUtility* v2 = BSGameDataSystemUtility::GetSingleton();
+	v2->Destroy();
+	BSCacheDriveSystemUtility* v1 = BSCacheDriveSystemUtility::GetSingleton();
+	v1->Destroy();
+	std::memset(cTitle, 0, sizeof(cTitle));
+	bLostFocus = 0;
+	eRegion = SYSUTIL_REGION_UNKNOWN;
+	pEventNotificationCallback = 0;
+	pFocusNotificationCallback = 0;
+}
+
+void BSSystemUtility::Update() {
+	BSSteamAwardsSystemUtility::QInstance()->Idle();
+	BSNetworkSystemUtility::QInstance().Idle();
+	BSDLCSystemUtility::GetSingleton()->Idle();
+}
+
+// The PC build has no hardware dip switches: none is set.
+bool BSSystemUtility::QHardwareDipSwitch(uint32_t auiDipSwitch) {
+	return false;
+}
+
+BSDLCSystemUtility& BSSystemUtility::QDLCUtility() {
+	return *BSDLCSystemUtility::GetSingleton();
+}
+
+BSNetworkSystemUtility& BSSystemUtility::QNetworkUtility() {
+	return BSNetworkSystemUtility::QInstance();
+}
+
+BSMsgDialogSystemUtility* BSSystemUtility::GetMsgDialogUtility() {
+	return &BSMsgDialogSystemUtility::QInstance();
+}
+
+BSSaveDataSystemUtility* BSSystemUtility::GetSaveDataUtility() {
+	return BSSaveDataSystemUtility::GetSingleton();
+}
+
+void BSSystemUtility::SetLostFocus(bool abLostFocus) {
+	if (abLostFocus != bLostFocus) {
+		if (pFocusNotificationCallback) {
+			pFocusNotificationCallback(abLostFocus);
+		}
+	}
+	bLostFocus = abLostFocus;
+}
+
+BSSystemUtility& BSSystemUtility::QInstance() {
+	static BSSystemUtility stutility;
+	return stutility;
+}
+
+void BSSystemUtility::operator delete(void* apMemory) {
+	MemoryManager_Singleton.Deallocate(apMemory);
+}

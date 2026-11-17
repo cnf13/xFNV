@@ -1,0 +1,46 @@
+#include "Havok/Source/Common/Base/System/Io/Reader/hkStreamReader.h"
+
+#include "Havok/Source/Common/Base/Types/hkBaseTypes.h"
+
+int32_t hkStreamReader::skip(int32_t nbytes) {
+	int32_t i;
+	int32_t v5;
+	for (i = nbytes; i; i -= v5) {
+		char v7[512];
+		int32_t v4 = 512;
+		if (i <= 512) {
+			v4 = i;
+		}
+		v5 = read(v7, v4);
+		if (!v5) {
+			break;
+		}
+	}
+	return nbytes - i;
+}
+
+hkBool* hkStreamReader::markSupported(hkBool* arResult) const {
+	arResult->m_bool = 0;
+	return arResult;
+}
+
+hkResult hkStreamReader::setMark(int32_t markLimit) {
+	return static_cast<hkResult>(1);
+}
+
+hkResult hkStreamReader::rewindToMark() {
+	return static_cast<hkResult>(1);
+}
+
+hkBool* hkStreamReader::seekTellSupported(hkBool* arResult) const {
+	arResult->m_bool = 0;
+	return arResult;
+}
+
+hkResult hkStreamReader::seek(int32_t offset, SeekWhence whence) {
+	return static_cast<hkResult>(1);
+}
+
+int32_t hkStreamReader::tell() const {
+	return (-1);
+}
