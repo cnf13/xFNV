@@ -1,0 +1,30 @@
+{
+    "version": 6,
+    "cmakeMinimumRequired": { "major": 3, "minor": 25, "patch": 0 },
+    "configurePresets": [
+        {
+            "name": "windows-native",
+            "hidden": true,
+            "generator": "Ninja",
+            "condition": { "type": "equals", "lhs": "${hostSystemName}", "rhs": "Windows" }
+        },
+        {
+            "name": "noexe",
+            "inherits": "windows-native",
+            "displayName": "32-bit Windows program (native clang-cl)",
+            "binaryDir": "${sourceDir}/build/noexe",
+            "toolchainFile": "${sourceDir}/cmake/i686-windows-clang-cl-native.cmake"
+        },
+        {
+            "name": "noexe64",
+            "inherits": "windows-native",
+            "displayName": "64-bit Windows program (native clang-cl)",
+            "binaryDir": "${sourceDir}/build/noexe64",
+            "toolchainFile": "${sourceDir}/cmake/x86_64-windows-clang-cl-native.cmake"
+        }
+    ],
+    "buildPresets": [
+        { "name": "noexe", "configurePreset": "noexe", "targets": [ "fnvd_noexe" ] },
+        { "name": "noexe64", "configurePreset": "noexe64", "targets": [ "fnvd_noexe" ] }
+    ]
+}

@@ -1,0 +1,9 @@
+# Build folders (CMakePresets.json, harness/tools/noexe.py)
+/build/
+# The isolated runtime and the game copy (harness/env.sh); a worktree's are links, hence no trailing slash
+/env
+/game
+# Per-user CMake presets and editor state
+/CMakeUserPresets.json
+/.vs/
+__pycache__/
