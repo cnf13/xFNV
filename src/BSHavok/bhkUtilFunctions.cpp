@@ -302,10 +302,8 @@ bool bhkUtilFunctions::IsRigidBodyActive(NiAVObject* apObject) {
         if (v8) {
             // The rigid body's Havok entity (bhkRefObject::phkObject, +8).
             hkpEntity* v9 = static_cast<hkpEntity*>(static_cast<bhkRigidBody*>(v8)->phkObject);
-            if (v9) {
-                if (v9->isActive().m_bool) {
-                    return true;
-                }
+            if ((v9) && (v9->isActive().m_bool)) {
+                return true;
             }
         }
     }

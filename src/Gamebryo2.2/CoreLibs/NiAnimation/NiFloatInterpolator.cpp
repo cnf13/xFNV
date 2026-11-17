@@ -37,10 +37,9 @@ NiObject* NiFloatInterpolator::CreateClone(NiCloningProcess& kCloning) {
         CopyMembers(v4, kCloning);
         return v4;
     }
-    else {
-        CopyMembers(nullptr, kCloning);
-        return nullptr;
-    }
+
+    CopyMembers(nullptr, kCloning);
+    return nullptr;
 }
 
 void NiFloatInterpolator::LoadBinary(NiStream& kStream) {
@@ -228,12 +227,11 @@ NiFloatKey* NiFloatInterpolator::GetKeys(uint32_t& uiNumKeys, NiAnimationKey::Ke
         NiFloatData* v4 = m_spFloatData.m_pObject;
         return v4->GetAnim(uiNumKeys, eType, ucSize);
     }
-    else {
-        uiNumKeys = 0;
-        eType = NiAnimationKey::NOINTERP;
-        ucSize = 0;
-        return nullptr;
-    }
+
+    uiNumKeys = 0;
+    eType = NiAnimationKey::NOINTERP;
+    ucSize = 0;
+    return nullptr;
 }
 
 void NiFloatInterpolator::CopyMembers(NiFloatInterpolator* pkDest, NiCloningProcess& kCloning) {

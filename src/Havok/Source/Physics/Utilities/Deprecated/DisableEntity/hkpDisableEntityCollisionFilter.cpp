@@ -129,27 +129,25 @@ hkBool* hkpDisableEntityCollisionFilter::removeEntityFromFilter(hkBool* arResult
             arResult->m_bool = 0;
             return arResult;
         }
-        else {
-            hkpEntity** m_data = static_cast<hkArrayBase<hkpEntity*>&>(m_disabledEntities).begin();
-            while (*m_data != entity) {
-                ++v5;
-                ++m_data;
-                if (v5 >= m_size) {
-                    goto LABEL_7;
-                }
+
+        hkpEntity** m_data = static_cast<hkArrayBase<hkpEntity*>&>(m_disabledEntities).begin();
+        while (*m_data != entity) {
+            ++v5;
+            ++m_data;
+            if (v5 >= m_size) {
+                goto LABEL_7;
             }
-            uint32_t v7 = --m_disabledEntities.m_size;
-            if (v7 != v5) {
-                m_disabledEntities.m_data[v5] = m_disabledEntities.m_data[v7];
-            }
-            arResult->m_bool = 1;
-            return arResult;
         }
-    }
-    else {
-        arResult->m_bool = 0;
+        uint32_t v7 = --m_disabledEntities.m_size;
+        if (v7 != v5) {
+            m_disabledEntities.m_data[v5] = m_disabledEntities.m_data[v7];
+        }
+        arResult->m_bool = 1;
         return arResult;
     }
+
+    arResult->m_bool = 0;
+    return arResult;
 }
 
 hkBool* hkpDisableEntityCollisionFilter::addEntityToFilter(hkBool* apResult, hkpEntity* new_entity) {

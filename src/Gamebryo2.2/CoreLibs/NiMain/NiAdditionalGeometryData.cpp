@@ -361,9 +361,8 @@ uint8_t NiAdditionalGeometryData::NiAGDDataStream::ConvertFromConsistency(int32_
     if (eConsistency) {
         return 3;
     }
-    else {
-        return 2;
-    }
+
+    return 2;
 }
 
 void NiAdditionalGeometryData::NiAGDDataStream::FillInByteSizeArray(
@@ -1091,16 +1090,15 @@ bool NiAdditionalGeometryData::RemoveDataBlock(uint32_t uiIndex, bool bRemoveAss
             NiAdditionalGeometryData::NiAGDDataStream* pkEntries = m_pkDataStreamEntries;
             // This is SetDataStream(i, 0, ...) written out in place, and it deliberately keeps that function's own
             // bound and null tests, as the game does.
-            if (uiIndex == pkEntries[i].m_uiBlockIndex && i < uiStreamCount) {
-                if (pkEntries) {
-                    pkEntries[i].m_uiType = 0;
-                    pkEntries[i].m_uiTotalSize = 0;
-                    pkEntries[i].m_uiUnitSize = 0;
-                    pkEntries[i].m_uiStride = 0;
-                    pkEntries[i].m_uiBlockIndex = 0;
-                    pkEntries[i].m_uiBlockOffset = 0;
-                }
+            if ((uiIndex == pkEntries[i].m_uiBlockIndex && i < uiStreamCount) && (pkEntries)) {
+                pkEntries[i].m_uiType = 0;
+                pkEntries[i].m_uiTotalSize = 0;
+                pkEntries[i].m_uiUnitSize = 0;
+                pkEntries[i].m_uiStride = 0;
+                pkEntries[i].m_uiBlockIndex = 0;
+                pkEntries[i].m_uiBlockOffset = 0;
             }
+
             uiStreamCount = m_uiDataStreamCount;
         }
     }

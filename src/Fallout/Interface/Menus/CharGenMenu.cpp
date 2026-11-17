@@ -155,19 +155,17 @@ bool CharGenMenu::DoGamepad(int32_t a1, float a2) {
     switch (a1) {
         case 3:
         case 4: {
-            if (eItemType == CharGenMenu::IT_ATTRIBUTE) {
-                if (lbItemList.GetHighlightedItem()) {
-                    Tile* v3 = static_cast<Tile*>(lbItemList.GetHighlightedItem());
-                    Tile* parrowTile = v3->GetChildByID((a1 != 4) + 10);
-                    if (parrowTile) {
-                        if (parrowTile->IsTrue(4003)) {
-                            parrowTile->PlayTileSound(4043);
-                            DoClick((a1 != 4) + 10, parrowTile);
-                        }
-                    }
-                    bhandled = true;
+            if ((eItemType == CharGenMenu::IT_ATTRIBUTE) && (lbItemList.GetHighlightedItem())) {
+                Tile* v3 = static_cast<Tile*>(lbItemList.GetHighlightedItem());
+                Tile* parrowTile = v3->GetChildByID((a1 != 4) + 10);
+                if ((parrowTile) && (parrowTile->IsTrue(4003))) {
+                    parrowTile->PlayTileSound(4043);
+                    DoClick((a1 != 4) + 10, parrowTile);
                 }
+
+                bhandled = true;
             }
+
             break;
         }
         case 9: {
@@ -383,12 +381,8 @@ Tile* CharGenMenu::Create(int32_t aiItemType, int32_t aiMaxPoints, bool abOnlyAd
         }
     }
     else {
-        if (CharGenMenu::pMe) {
-            if (CharGenMenu::pMe->pMenu) {
-                if (CharGenMenu::pMe) {
-                    delete CharGenMenu::pMe;
-                }
-            }
+        if ((CharGenMenu::pMe) && (CharGenMenu::pMe->pMenu) && (CharGenMenu::pMe)) {
+            delete CharGenMenu::pMe;
         }
     }
     return nullptr;

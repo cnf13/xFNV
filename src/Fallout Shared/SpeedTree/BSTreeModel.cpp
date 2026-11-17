@@ -209,94 +209,92 @@ BSTreeNode* BSTreeModel::CreateArt(float afScale) {
         else {
             pretval = nullptr;
         }
-        if (pspBranchData) {
-            if (pspBranchShaderProperties) {
-                slevels = GetNumBranchLODLevels();
-                pshader = (NiD3DShader*)BSShaderManager::GetShader(4);
-                pnode = pretval->GetBranchNode();
-                for (slevel = 0; slevel < static_cast<int32_t>(slevels); ++slevel) {
-                    if (pspBranchData[slevel].m_pObject) {
-                        NiTriBasedGeom* pgeom;
-                        NiTriStrips* v20 = static_cast<NiTriStrips*>(NiMemObject::operator new(sizeof(NiTriStrips)));
-                        if (v20) {
-                            pgeom = (NiTriBasedGeom*)::new (v20) NiTriStrips(pspBranchData[slevel].m_pObject);
-                        }
-                        else {
-                            pgeom = nullptr;
-                        }
-                        pgeom_2 = pgeom;
-                        ppropAlpha = BSTreeModel::CreateAlphaProperty();
-                        if (ppropAlpha) {
-                            ppropAlpha->SetAlphaTesting(false);
-                            pgeom_2->AttachProperty(ppropAlpha);
-                        }
-                        if (pspBranchShaderProperties[slevel].m_pObject) {
-                            pspBranchShaderProperties[slevel].m_pObject->FreeRenderPasses();
-                            SpeedTreeBranchShaderProperty* a5 = pspBranchShaderProperties[slevel].m_pObject;
-                            pgeom_2->AttachProperty(a5);
-                            if (!pgeom_2->GetModelData()->GetAdditionalGeometryData()) {
-                                SpeedTreeBranchShaderProperty* v12 = pspBranchShaderProperties[slevel].m_pObject;
-                                NiAdditionalGeometryData* pdata = v12->CreateRendererSpecificProperty(pgeom_2);
-                                pgeom_2->SetAdditionalGeometryData(pdata);
-                            }
-                        }
-                        if (IsInstance()) {
-                            pgeom_2->SetShader(static_cast<BSShader*>(pshader));
-                        }
-                        pretval->AddBranchLevel(slevel, pgeom_2);
+        if ((pspBranchData) && (pspBranchShaderProperties)) {
+            slevels = GetNumBranchLODLevels();
+            pshader = (NiD3DShader*)BSShaderManager::GetShader(4);
+            pnode = pretval->GetBranchNode();
+            for (slevel = 0; slevel < static_cast<int32_t>(slevels); ++slevel) {
+                if (pspBranchData[slevel].m_pObject) {
+                    NiTriBasedGeom* pgeom;
+                    NiTriStrips* v20 = static_cast<NiTriStrips*>(NiMemObject::operator new(sizeof(NiTriStrips)));
+                    if (v20) {
+                        pgeom = (NiTriBasedGeom*)::new (v20) NiTriStrips(pspBranchData[slevel].m_pObject);
                     }
-                }
-                if (!IsInstance()) {
-                    for (slevel = 0; slevel < static_cast<int32_t>(slevels); ++slevel) {
-                        pgeom_2 = pretval->GetBranchLevel(slevel);
-                        if (pgeom_2) {
-                            BSShaderTextureSet* a5a = spBranchTextureSet.m_pObject;
-                            pspBranchShaderProperties[slevel].m_pObject->LoadTextureSet("STBranch", a5a);
-                            BSShaderManager::PrepareObject(pgeom_2, 0, 0);
-                            SpeedTreeBranchShaderProperty* v11 = pspBranchShaderProperties[slevel].m_pObject;
-                            NiAdditionalGeometryData* pdata_2 = v11->CreateRendererSpecificProperty(pgeom_2);
-                            pgeom_2->SetAdditionalGeometryData(pdata_2);
-                            if (!pgeom_2->GetModelData()->m_pkBuffData) {
-                                NiRenderer* Renderer_ = NiRenderer::GetRenderer();
-                                Renderer_->PrecacheGeometry(pgeom_2, 0, 0, nullptr);
-                            }
+                    else {
+                        pgeom = nullptr;
+                    }
+                    pgeom_2 = pgeom;
+                    ppropAlpha = BSTreeModel::CreateAlphaProperty();
+                    if (ppropAlpha) {
+                        ppropAlpha->SetAlphaTesting(false);
+                        pgeom_2->AttachProperty(ppropAlpha);
+                    }
+                    if (pspBranchShaderProperties[slevel].m_pObject) {
+                        pspBranchShaderProperties[slevel].m_pObject->FreeRenderPasses();
+                        SpeedTreeBranchShaderProperty* a5 = pspBranchShaderProperties[slevel].m_pObject;
+                        pgeom_2->AttachProperty(a5);
+                        if (!pgeom_2->GetModelData()->GetAdditionalGeometryData()) {
+                            SpeedTreeBranchShaderProperty* v12 = pspBranchShaderProperties[slevel].m_pObject;
+                            NiAdditionalGeometryData* pdata = v12->CreateRendererSpecificProperty(pgeom_2);
+                            pgeom_2->SetAdditionalGeometryData(pdata);
                         }
                     }
-                }
-            }
-        }
-        if (pspLeafData) {
-            if (pspLeafShaderProperties) {
-                slevels = GetNumLeafLODLevels();
-                pshader = (NiD3DShader*)BSShaderManager::GetShader(6);
-                for (slevel = 0; slevel < static_cast<int32_t>(slevels); ++slevel) {
-                    if (pspLeafData[slevel].m_pObject) {
-                        NiTriBasedGeom* pgeom_3;
-                        NiTriShape* v19 = static_cast<NiTriShape*>(NiMemObject::operator new(sizeof(NiTriShape)));
-                        if (v19) {
-                            pgeom_3 = (NiTriBasedGeom*)::new (v19) NiTriShape(pspLeafData[slevel].m_pObject);
-                        }
-                        else {
-                            pgeom_3 = nullptr;
-                        }
-                        pgeom_2 = pgeom_3;
-                        ppropAlpha = BSTreeModel::CreateAlphaProperty();
-                        if (ppropAlpha) {
-                            pgeom_2->AttachProperty(ppropAlpha);
-                        }
-                        if (pspLeafShaderProperties[slevel].m_pObject) {
-                            pspLeafShaderProperties[slevel].m_pObject->FreeRenderPasses();
-                            SpeedTreeLeafShaderProperty* a5b = pspLeafShaderProperties[slevel].m_pObject;
-                            pgeom_2->AttachProperty(a5b);
-                        }
-                        pretval->AddLeafLevel(slevel, pgeom_2);
+                    if (IsInstance()) {
                         pgeom_2->SetShader(static_cast<BSShader*>(pshader));
-                        NiRenderer* v4 = NiRenderer::GetRenderer();
-                        v4->PrecacheGeometry(pgeom_2, 0, 0, nullptr);
+                    }
+                    pretval->AddBranchLevel(slevel, pgeom_2);
+                }
+            }
+            if (!IsInstance()) {
+                for (slevel = 0; slevel < static_cast<int32_t>(slevels); ++slevel) {
+                    pgeom_2 = pretval->GetBranchLevel(slevel);
+                    if (pgeom_2) {
+                        BSShaderTextureSet* a5a = spBranchTextureSet.m_pObject;
+                        pspBranchShaderProperties[slevel].m_pObject->LoadTextureSet("STBranch", a5a);
+                        BSShaderManager::PrepareObject(pgeom_2, 0, 0);
+                        SpeedTreeBranchShaderProperty* v11 = pspBranchShaderProperties[slevel].m_pObject;
+                        NiAdditionalGeometryData* pdata_2 = v11->CreateRendererSpecificProperty(pgeom_2);
+                        pgeom_2->SetAdditionalGeometryData(pdata_2);
+                        if (!pgeom_2->GetModelData()->m_pkBuffData) {
+                            NiRenderer* Renderer_ = NiRenderer::GetRenderer();
+                            Renderer_->PrecacheGeometry(pgeom_2, 0, 0, nullptr);
+                        }
                     }
                 }
             }
         }
+
+        if ((pspLeafData) && (pspLeafShaderProperties)) {
+            slevels = GetNumLeafLODLevels();
+            pshader = (NiD3DShader*)BSShaderManager::GetShader(6);
+            for (slevel = 0; slevel < static_cast<int32_t>(slevels); ++slevel) {
+                if (pspLeafData[slevel].m_pObject) {
+                    NiTriBasedGeom* pgeom_3;
+                    NiTriShape* v19 = static_cast<NiTriShape*>(NiMemObject::operator new(sizeof(NiTriShape)));
+                    if (v19) {
+                        pgeom_3 = (NiTriBasedGeom*)::new (v19) NiTriShape(pspLeafData[slevel].m_pObject);
+                    }
+                    else {
+                        pgeom_3 = nullptr;
+                    }
+                    pgeom_2 = pgeom_3;
+                    ppropAlpha = BSTreeModel::CreateAlphaProperty();
+                    if (ppropAlpha) {
+                        pgeom_2->AttachProperty(ppropAlpha);
+                    }
+                    if (pspLeafShaderProperties[slevel].m_pObject) {
+                        pspLeafShaderProperties[slevel].m_pObject->FreeRenderPasses();
+                        SpeedTreeLeafShaderProperty* a5b = pspLeafShaderProperties[slevel].m_pObject;
+                        pgeom_2->AttachProperty(a5b);
+                    }
+                    pretval->AddLeafLevel(slevel, pgeom_2);
+                    pgeom_2->SetShader(static_cast<BSShader*>(pshader));
+                    NiRenderer* v4 = NiRenderer::GetRenderer();
+                    v4->PrecacheGeometry(pgeom_2, 0, 0, nullptr);
+                }
+            }
+        }
+
         pnode = pretval->GetBillboardNode();
         if (spBillboard.m_pObject) {
             NiTriShape* a5c = spBillboard.m_pObject;
@@ -308,9 +306,8 @@ BSTreeNode* BSTreeModel::CreateArt(float afScale) {
         pretval->MakeHavokLeaves(pSpeedTree, afScale);
         return pretval;
     }
-    else {
-        return nullptr;
-    }
+
+    return nullptr;
 }
 
 void BSTreeModel::ApplyBaseObject(TESObjectTREE* apTreeObj) {
@@ -379,14 +376,13 @@ void BSTreeModel::ApplyBaseObject(TESObjectTREE* apTreeObj) {
             BSShaderTextureSet* v4 = spBranchTextureSet.m_pObject;
             v4->SetTextureFilename(BSShaderProperty::TEXTYPE_NORMAL, a1);
         }
-        if (!spLeafFrondTexture.m_pObject) {
-            if (apTreeObj->GetTextureNameLength()) {
-                char Dst[268];
-                BSstrcpy(Dst, 260, "Textures\\Trees\\Leaves\\");
-                BSstrcat(Dst, 260, apTreeObj->GetTextureName());
-                TES::pInstance->CreateTextureImage(Dst, spLeafFrondTexture, true, false);
-            }
+        if ((!spLeafFrondTexture.m_pObject) && (apTreeObj->GetTextureNameLength())) {
+            char Dst[268];
+            BSstrcpy(Dst, 260, "Textures\\Trees\\Leaves\\");
+            BSstrcat(Dst, 260, apTreeObj->GetTextureName());
+            TES::pInstance->CreateTextureImage(Dst, spLeafFrondTexture, true, false);
         }
+
         if (!spBillboardTextureSet.m_pObject) {
             BSShaderTextureSet* v3;
             char path[264];
@@ -436,48 +432,45 @@ void BSTreeModel::ClearModel() {
 }
 
 void BSTreeModel::CreateGeometry(TESObjectTREE* apTreeObj) {
-    if (pSpeedTree) {
-        if (!IsInstance()) {
-            char Dst[264];
-            char pcSrc[268];
-            CreateBranchGeometry();
-            CreateLeafGeometry(apTreeObj);
-            if (apTreeObj->IsLargeEnoughForDistantLOD()) {
-                CreateBillboardGeometry(apTreeObj);
+    if ((pSpeedTree) && (!IsInstance())) {
+        char Dst[264];
+        char pcSrc[268];
+        CreateBranchGeometry();
+        CreateLeafGeometry(apTreeObj);
+        if (apTreeObj->IsLargeEnoughForDistantLOD()) {
+            CreateBillboardGeometry(apTreeObj);
+        }
+        spRigidBody.operator=(static_cast<bhkRigidBody*>(nullptr));
+        const char* v2 = apTreeObj->GetModel();
+        BSstrcpy(Dst, 260, v2);
+        int32_t ilen = BSstrlen(Dst);
+        if (ilen > 4) {
+            Dst[ilen - 4] = 0;
+        }
+        BSStream stream;
+        BSstrcpy(pcSrc, 260, "Data\\Meshes\\Trees");
+        BSstrcat(pcSrc, 260, Dst);
+        BSstrcat(pcSrc, 260, ".NIF");
+        if ((FileFinder::Locate(pcSrc, nullptr, 6u, 1u)) &&
+            (stream.BSStream::Load(pcSrc, static_cast<NiFile*>(nullptr)) && stream.GetObjectCount() == 1)) {
+            bhkRigidBody* WorldObject;
+            NiObject* pniObj = stream.GetObjectAt(0);
+            NiAVObject* pniAVObj = static_cast<NiAVObject*>(NiObject::DynamicCastStatic(&NiAVObject::ms_RTTI, pniObj));
+            bhkNiCollisionObject* pcol = bhkNiCollisionObject::GetbhkNiCollisionObject(pniAVObj);
+            if (pcol) {
+                WorldObject = static_cast<bhkRigidBody*>(pcol->GetWorldObject());
             }
-            spRigidBody.operator=(static_cast<bhkRigidBody*>(nullptr));
-            const char* v2 = apTreeObj->GetModel();
-            BSstrcpy(Dst, 260, v2);
-            int32_t ilen = BSstrlen(Dst);
-            if (ilen > 4) {
-                Dst[ilen - 4] = 0;
+            else {
+                WorldObject = nullptr;
             }
-            BSStream stream;
-            BSstrcpy(pcSrc, 260, "Data\\Meshes\\Trees");
-            BSstrcat(pcSrc, 260, Dst);
-            BSstrcat(pcSrc, 260, ".NIF");
-            if (FileFinder::Locate(pcSrc, nullptr, 6u, 1u)) {
-                if (stream.BSStream::Load(pcSrc, static_cast<NiFile*>(nullptr)) && stream.GetObjectCount() == 1) {
-                    bhkRigidBody* WorldObject;
-                    NiObject* pniObj = stream.GetObjectAt(0);
-                    NiAVObject* pniAVObj =
-                        static_cast<NiAVObject*>(NiObject::DynamicCastStatic(&NiAVObject::ms_RTTI, pniObj));
-                    bhkNiCollisionObject* pcol = bhkNiCollisionObject::GetbhkNiCollisionObject(pniAVObj);
-                    if (pcol) {
-                        WorldObject = static_cast<bhkRigidBody*>(pcol->GetWorldObject());
-                    }
-                    else {
-                        WorldObject = nullptr;
-                    }
-                    if (WorldObject) {
-                        spRigidBody.operator=(WorldObject);
-                    }
-                }
+            if (WorldObject) {
+                spRigidBody.operator=(WorldObject);
             }
-            if (!spRigidBody.m_pObject && fTrunkHeight > 64.0) {
-                float afRadius = fTrunkWidth / 2.0;
-                spRigidBody.operator=(bhkUtilFunctions::CreateCapsuleBody(fTrunkHeight, afRadius));
-            }
+        }
+
+        if (!spRigidBody.m_pObject && fTrunkHeight > 64.0) {
+            float afRadius = fTrunkWidth / 2.0;
+            spRigidBody.operator=(bhkUtilFunctions::CreateCapsuleBody(fTrunkHeight, afRadius));
         }
     }
 }
@@ -486,18 +479,16 @@ uint16_t BSTreeModel::GetNumBranchLODLevels() {
     if (pSpeedTree) {
         return pSpeedTree->GetNumBranchLodLevels();
     }
-    else {
-        return (uint16_t)0;
-    }
+
+    return (uint16_t)0;
 }
 
 uint16_t BSTreeModel::GetNumLeafLODLevels() {
     if (pSpeedTree) {
         return pSpeedTree->GetNumLeafLodLevels();
     }
-    else {
-        return (uint16_t)0;
-    }
+
+    return (uint16_t)0;
 }
 
 void BSTreeModel::SetInitialized(bool abVal) {
@@ -549,216 +540,208 @@ void BSTreeModel::CreateBranchGeometry() {
             this->pspBranchData[slevel].operator=(static_cast<NiTriStripsData*>(nullptr));
             this->pspBranchShaderProperties[slevel].operator=(static_cast<SpeedTreeBranchShaderProperty*>(nullptr));
         }
-        if (geom.m_sBranches.m_pTangents) {
-            if (geom.m_sBranches.m_pBinormals) {
-                NiPoint3* pnormals = reinterpret_cast<NiPoint3*>(const_cast<float*>(geom.m_sBranches.m_pNormals));
-                for (int32_t iv = 0; iv < sverts; ++iv) {
-                    NiPoint3* v3 = &pnormals[iv];
-                    float x_1 = v3->x;
-                    float y = v3->y;
-                    float z = v3->z;
-                    if (std::isnan(x_1) || (std::isnan(y) || std::isnan(z))) {
-                        pnormals[iv] = NiPoint3_UNIT_Z;
-                    }
+        if ((geom.m_sBranches.m_pTangents) && (geom.m_sBranches.m_pBinormals)) {
+            NiPoint3* pnormals = reinterpret_cast<NiPoint3*>(const_cast<float*>(geom.m_sBranches.m_pNormals));
+            for (int32_t iv = 0; iv < sverts; ++iv) {
+                NiPoint3* v3 = &pnormals[iv];
+                float x_1 = v3->x;
+                float y = v3->y;
+                float z = v3->z;
+                if (std::isnan(x_1) || (std::isnan(y) || std::isnan(z))) {
+                    pnormals[iv] = NiPoint3_UNIT_Z;
                 }
             }
         }
+
         for (slevel = 0; slevel < static_cast<int32_t>(slevels); ++slevel) {
             pSpeedTree->GetGeometry(geom, 1u, static_cast<int16_t>(slevel), -1, -1);
             sverts = geom.m_sBranches.m_usVertexCount;
-            if (geom.m_sBranches.m_usVertexCount) {
-                if (geom.m_sBranches.m_pStripLengths) {
-                    if (geom.m_sBranches.m_pStrips) {
-                        SpeedTreeBranchShaderProperty* SpeedTreeBranchShaderProperty_;
-                        NiTriStripsData* NiTriStripsData_;
-                        STSPData* STSPData_;
-                        bool btangentSpace;
-                        uint16_t svert;
-                        uint32_t index;
-                        uint16_t* pcompositeStripLength = static_cast<uint16_t*>(_NiMalloc(sizeof(uint16_t)));
-                        *pcompositeStripLength = *geom.m_sBranches.m_pStripLengths;
-                        uint16_t* pcompositeStrip =
-                            static_cast<uint16_t*>(_NiMalloc(sizeof(uint16_t) * *pcompositeStripLength));
-                        ourMemcpy(
-                            pcompositeStrip, *reinterpret_cast<const void* const*>(geom.m_sBranches.m_pStrips),
-                            2 * *pcompositeStripLength
-                        );
-                        bool* vertFlags = static_cast<bool*>(ourMalloc(geom.m_sBranches.m_usVertexCount));
-                        ourMemset(vertFlags, 0, geom.m_sBranches.m_usVertexCount);
-                        for (index = 0; index < *pcompositeStripLength; ++index) {
-                            vertFlags[pcompositeStrip[index]] = true;
-                        }
-                        NiTPrimitiveArray<uint32_t> vertsUsed(0, 1u);
-                        for (svert = 0; svert < static_cast<int32_t>(geom.m_sBranches.m_usVertexCount); ++svert) {
-                            if (vertFlags[svert]) {
-                                uiUsedVert = svert;
-                                vertsUsed.Add(uiUsedVert);
-                            }
-                        }
-                        ourFree(vertFlags);
-                        for (svert = 0;; ++svert) {
-                            uint32_t svert_1 = svert;
-                            if (svert_1 >= vertsUsed.m_usSize) {
-                                break;
-                            }
-                            uint32_t vertIndex = vertsUsed.operator[](svert);
-                            for (index = 0; index < *pcompositeStripLength; ++index) {
-                                if ((*geom.m_sBranches.m_pStrips)[index] == vertIndex) {
-                                    pcompositeStrip[index] = svert;
-                                }
-                            }
-                        }
-                        // new NiPoint3[n], new NiPoint2[n] and new D3DXVECTOR4[n] below: the size is all ones when it
-                        // overflows 32 bits, as new[] computes it, and each element gets the empty constructor.
-                        uint32_t numObjs = vertsUsed.m_usSize;
-                        NiPoint3* pcoords = static_cast<NiPoint3*>(
-                            ourMalloc(numObjs <= SIZE_MAX / sizeof(NiPoint3) ? sizeof(NiPoint3) * numObjs : SIZE_MAX)
-                        );
-                        if (pcoords) {
-                            rt::eh_vector_constructor_iterator(
-                                pcoords, sizeof(NiPoint3), numObjs, &emptyPointConstructor
-                            );
-                        }
-                        uint32_t count = vertsUsed.m_usSize;
-                        NiPoint2* ptex = static_cast<NiPoint2*>(
-                            ourMalloc(count <= SIZE_MAX / sizeof(NiPoint2) ? sizeof(NiPoint2) * count : SIZE_MAX)
-                        );
-                        if (ptex) {
-                            rt::eh_vector_constructor_iterator(ptex, sizeof(NiPoint2), count, &emptyPointConstructor);
-                        }
-                        NiPoint3* pnormals_2 = nullptr;
-                        NiPoint3* ptangents = nullptr;
-                        NiPoint3* pbinormals = nullptr;
-                        if (geom.m_sBranches.m_pTangents && geom.m_sBranches.m_pBinormals) {
-                            // One array holds the normals, then the binormals, then the tangents.
-                            uint32_t aiCount = 3 * vertsUsed.m_usSize;
-                            pnormals_2 = static_cast<NiPoint3*>(ourMalloc(
-                                aiCount <= SIZE_MAX / sizeof(NiPoint3) ? sizeof(NiPoint3) * aiCount : SIZE_MAX
-                            ));
-                            if (pnormals_2) {
-                                rt::eh_vector_constructor_iterator(
-                                    pnormals_2, sizeof(NiPoint3), aiCount, &emptyPointConstructor
-                                );
-                            }
-                            uint32_t v6 = vertsUsed.m_usSize;
-                            pbinormals = &pnormals_2[v6];
-                            uint32_t v7 = vertsUsed.m_usSize;
-                            ptangents = &pnormals_2[2 * v7];
-                            btangentSpace = true;
-                        }
-                        else {
-                            uint32_t aiCount_1 = vertsUsed.m_usSize;
-                            pnormals_2 = static_cast<NiPoint3*>(ourMalloc(
-                                aiCount_1 <= SIZE_MAX / sizeof(NiPoint3) ? sizeof(NiPoint3) * aiCount_1 : SIZE_MAX
-                            ));
-                            if (pnormals_2) {
-                                rt::eh_vector_constructor_iterator(
-                                    pnormals_2, sizeof(NiPoint3), aiCount_1, &emptyPointConstructor
-                                );
-                            }
-                            btangentSpace = false;
-                        }
-                        for (svert = 0;; ++svert) {
-                            uint32_t svert_2 = svert;
-                            if (svert_2 >= vertsUsed.m_usSize) {
-                                break;
-                            }
-                            uint32_t vertIndex_2 = vertsUsed.operator[](svert);
-                            uint32_t offset3_x = 3 * vertIndex_2;
-                            uint32_t offset3_y = 3 * vertIndex_2 + 1;
-                            uint32_t offset3_z = 3 * vertIndex_2 + 2;
-                            uint32_t offset2_x = 2 * vertIndex_2;
-                            uint32_t offset2_y = 2 * vertIndex_2 + 1;
-                            pcoords[svert] = NiPoint3(
-                                geom.m_sBranches.m_pCoords[3 * vertIndex_2], geom.m_sBranches.m_pCoords[offset3_y],
-                                geom.m_sBranches.m_pCoords[offset3_z]
-                            );
-                            pnormals_2[svert] = NiPoint3(
-                                geom.m_sBranches.m_pNormals[offset3_x], geom.m_sBranches.m_pNormals[offset3_y],
-                                geom.m_sBranches.m_pNormals[offset3_z]
-                            );
-                            ptex[svert] = NiPoint2(
-                                geom.m_sBranches.m_pTexCoords0[offset2_x], geom.m_sBranches.m_pTexCoords0[offset2_y]
-                            );
-                            if (btangentSpace) {
-                                ptangents[svert] = NiPoint3(
-                                    geom.m_sBranches.m_pTangents[offset3_x], geom.m_sBranches.m_pTangents[offset3_y],
-                                    geom.m_sBranches.m_pTangents[offset3_z]
-                                );
-                                pbinormals[svert] = NiPoint3(
-                                    geom.m_sBranches.m_pBinormals[offset3_x], geom.m_sBranches.m_pBinormals[offset3_y],
-                                    geom.m_sBranches.m_pBinormals[offset3_z]
-                                );
-                            }
-                        }
-                        uint32_t aiCount_2 = vertsUsed.m_usSize;
-                        D3DXVECTOR4* pwindinfo = static_cast<D3DXVECTOR4*>(ourMalloc(
-                            aiCount_2 <= SIZE_MAX / sizeof(D3DXVECTOR4) ? sizeof(D3DXVECTOR4) * aiCount_2 : SIZE_MAX
-                        ));
-                        if (pwindinfo) {
-                            rt::eh_vector_constructor_iterator(
-                                pwindinfo, sizeof(D3DXVECTOR4), aiCount_2, &emptyPointConstructor
-                            );
-                        }
-                        for (svert = 0;; ++svert) {
-                            uint32_t svert_4 = svert;
-                            if (svert_4 >= vertsUsed.m_usSize) {
-                                break;
-                            }
-                            uint32_t vertIndex_3 = vertsUsed.operator[](svert);
-                            float fcolor =
-                                static_cast<double>((geom.m_sBranches.m_pColors[vertIndex_3] & 0xFF00) >> 8) / 255.0;
-                            NiColorA kWindInfo(
-                                geom.m_sBranches.m_pWindWeights[vertIndex_3],
-                                static_cast<float>(4 * geom.m_sBranches.m_pWindMatrixIndices[vertIndex_3]), fcolor, 0.0f
-                            );
-                            NiColorA* pkWindInfo = &kWindInfo;
-                            // The NiColorA is reinterpreted as a D3DXVECTOR4, copying the colour's four components into
-                            // the vector.
-                            pwindinfo[svert] = std::bit_cast<D3DXVECTOR4>(*pkWindInfo);
-                        }
-                        STSPData* v43 = static_cast<STSPData*>(NiMemObject::operator new(sizeof(STSPData)));
-                        if (v43) {
-                            STSPData_ = ::new (v43) STSPData;
-                        }
-                        else {
-                            STSPData_ = nullptr;
-                        }
-                        NiPointer<STSPData> spshaderData(STSPData_);
-                        uint16_t asVertexCount = vertsUsed.m_usSize;
-                        spshaderData.m_pObject->SetData(pwindinfo, asVertexCount);
-                        NiTriStripsData* v42 =
-                            static_cast<NiTriStripsData*>(NiMemObject::operator new(sizeof(NiTriStripsData)));
-                        if (v42) {
-                            int32_t iTriangles = *geom.m_sBranches.m_pStripLengths - 2;
-                            int32_t eNBTMethod =
-                                btangentSpace ? NiGeometryData::NBT_METHOD_NDL : NiGeometryData::NBT_METHOD_NONE;
-                            uint32_t usVertices = vertsUsed.m_usSize;
-                            NiTriStripsData_ = ::new (v42) NiTriStripsData(
-                                usVertices, pcoords, pnormals_2, nullptr, ptex, 1, eNBTMethod, iTriangles, 1,
-                                pcompositeStripLength, pcompositeStrip
-                            );
-                        }
-                        else {
-                            NiTriStripsData_ = nullptr;
-                        }
-                        this->pspBranchData[slevel].operator=(NiTriStripsData_);
-                        this->pspBranchData[slevel].m_pObject->SetConsistency(NiGeometryData::STATIC);
-                        this->pspBranchData[slevel].m_pObject->m_ucKeepFlags = 17u;
-                        this->pspBranchData[slevel].m_pObject->SetCompressFlags(1u);
-                        SpeedTreeBranchShaderProperty* apMemory = static_cast<SpeedTreeBranchShaderProperty*>(
-                            NiMemObject::operator new(sizeof(SpeedTreeBranchShaderProperty))
-                        );
-                        if (apMemory) {
-                            SpeedTreeBranchShaderProperty_ =
-                                ::new (apMemory) SpeedTreeBranchShaderProperty(spshaderData.m_pObject);
-                        }
-                        else {
-                            SpeedTreeBranchShaderProperty_ = nullptr;
-                        }
-                        this->pspBranchShaderProperties[slevel].operator=(SpeedTreeBranchShaderProperty_);
+            if ((geom.m_sBranches.m_usVertexCount) && (geom.m_sBranches.m_pStripLengths) &&
+                (geom.m_sBranches.m_pStrips)) {
+                SpeedTreeBranchShaderProperty* SpeedTreeBranchShaderProperty_;
+                NiTriStripsData* NiTriStripsData_;
+                STSPData* STSPData_;
+                bool btangentSpace;
+                uint16_t svert;
+                uint32_t index;
+                uint16_t* pcompositeStripLength = static_cast<uint16_t*>(_NiMalloc(sizeof(uint16_t)));
+                *pcompositeStripLength = *geom.m_sBranches.m_pStripLengths;
+                uint16_t* pcompositeStrip =
+                    static_cast<uint16_t*>(_NiMalloc(sizeof(uint16_t) * *pcompositeStripLength));
+                ourMemcpy(
+                    pcompositeStrip, *reinterpret_cast<const void* const*>(geom.m_sBranches.m_pStrips),
+                    2 * *pcompositeStripLength
+                );
+                bool* vertFlags = static_cast<bool*>(ourMalloc(geom.m_sBranches.m_usVertexCount));
+                ourMemset(vertFlags, 0, geom.m_sBranches.m_usVertexCount);
+                for (index = 0; index < *pcompositeStripLength; ++index) {
+                    vertFlags[pcompositeStrip[index]] = true;
+                }
+                NiTPrimitiveArray<uint32_t> vertsUsed(0, 1u);
+                for (svert = 0; svert < static_cast<int32_t>(geom.m_sBranches.m_usVertexCount); ++svert) {
+                    if (vertFlags[svert]) {
+                        uiUsedVert = svert;
+                        vertsUsed.Add(uiUsedVert);
                     }
                 }
+                ourFree(vertFlags);
+                for (svert = 0;; ++svert) {
+                    uint32_t svert_1 = svert;
+                    if (svert_1 >= vertsUsed.m_usSize) {
+                        break;
+                    }
+                    uint32_t vertIndex = vertsUsed.operator[](svert);
+                    for (index = 0; index < *pcompositeStripLength; ++index) {
+                        if ((*geom.m_sBranches.m_pStrips)[index] == vertIndex) {
+                            pcompositeStrip[index] = svert;
+                        }
+                    }
+                }
+                // new NiPoint3[n], new NiPoint2[n] and new D3DXVECTOR4[n] below: the size is all ones when it
+                // overflows 32 bits, as new[] computes it, and each element gets the empty constructor.
+                uint32_t numObjs = vertsUsed.m_usSize;
+                NiPoint3* pcoords = static_cast<NiPoint3*>(
+                    ourMalloc(numObjs <= SIZE_MAX / sizeof(NiPoint3) ? sizeof(NiPoint3) * numObjs : SIZE_MAX)
+                );
+                if (pcoords) {
+                    rt::eh_vector_constructor_iterator(pcoords, sizeof(NiPoint3), numObjs, &emptyPointConstructor);
+                }
+                uint32_t count = vertsUsed.m_usSize;
+                NiPoint2* ptex = static_cast<NiPoint2*>(
+                    ourMalloc(count <= SIZE_MAX / sizeof(NiPoint2) ? sizeof(NiPoint2) * count : SIZE_MAX)
+                );
+                if (ptex) {
+                    rt::eh_vector_constructor_iterator(ptex, sizeof(NiPoint2), count, &emptyPointConstructor);
+                }
+                NiPoint3* pnormals_2 = nullptr;
+                NiPoint3* ptangents = nullptr;
+                NiPoint3* pbinormals = nullptr;
+                if (geom.m_sBranches.m_pTangents && geom.m_sBranches.m_pBinormals) {
+                    // One array holds the normals, then the binormals, then the tangents.
+                    uint32_t aiCount = 3 * vertsUsed.m_usSize;
+                    pnormals_2 = static_cast<NiPoint3*>(
+                        ourMalloc(aiCount <= SIZE_MAX / sizeof(NiPoint3) ? sizeof(NiPoint3) * aiCount : SIZE_MAX)
+                    );
+                    if (pnormals_2) {
+                        rt::eh_vector_constructor_iterator(
+                            pnormals_2, sizeof(NiPoint3), aiCount, &emptyPointConstructor
+                        );
+                    }
+                    uint32_t v6 = vertsUsed.m_usSize;
+                    pbinormals = &pnormals_2[v6];
+                    uint32_t v7 = vertsUsed.m_usSize;
+                    ptangents = &pnormals_2[2 * v7];
+                    btangentSpace = true;
+                }
+                else {
+                    uint32_t aiCount_1 = vertsUsed.m_usSize;
+                    pnormals_2 = static_cast<NiPoint3*>(
+                        ourMalloc(aiCount_1 <= SIZE_MAX / sizeof(NiPoint3) ? sizeof(NiPoint3) * aiCount_1 : SIZE_MAX)
+                    );
+                    if (pnormals_2) {
+                        rt::eh_vector_constructor_iterator(
+                            pnormals_2, sizeof(NiPoint3), aiCount_1, &emptyPointConstructor
+                        );
+                    }
+                    btangentSpace = false;
+                }
+                for (svert = 0;; ++svert) {
+                    uint32_t svert_2 = svert;
+                    if (svert_2 >= vertsUsed.m_usSize) {
+                        break;
+                    }
+                    uint32_t vertIndex_2 = vertsUsed.operator[](svert);
+                    uint32_t offset3_x = 3 * vertIndex_2;
+                    uint32_t offset3_y = 3 * vertIndex_2 + 1;
+                    uint32_t offset3_z = 3 * vertIndex_2 + 2;
+                    uint32_t offset2_x = 2 * vertIndex_2;
+                    uint32_t offset2_y = 2 * vertIndex_2 + 1;
+                    pcoords[svert] = NiPoint3(
+                        geom.m_sBranches.m_pCoords[3 * vertIndex_2], geom.m_sBranches.m_pCoords[offset3_y],
+                        geom.m_sBranches.m_pCoords[offset3_z]
+                    );
+                    pnormals_2[svert] = NiPoint3(
+                        geom.m_sBranches.m_pNormals[offset3_x], geom.m_sBranches.m_pNormals[offset3_y],
+                        geom.m_sBranches.m_pNormals[offset3_z]
+                    );
+                    ptex[svert] =
+                        NiPoint2(geom.m_sBranches.m_pTexCoords0[offset2_x], geom.m_sBranches.m_pTexCoords0[offset2_y]);
+                    if (btangentSpace) {
+                        ptangents[svert] = NiPoint3(
+                            geom.m_sBranches.m_pTangents[offset3_x], geom.m_sBranches.m_pTangents[offset3_y],
+                            geom.m_sBranches.m_pTangents[offset3_z]
+                        );
+                        pbinormals[svert] = NiPoint3(
+                            geom.m_sBranches.m_pBinormals[offset3_x], geom.m_sBranches.m_pBinormals[offset3_y],
+                            geom.m_sBranches.m_pBinormals[offset3_z]
+                        );
+                    }
+                }
+                uint32_t aiCount_2 = vertsUsed.m_usSize;
+                D3DXVECTOR4* pwindinfo = static_cast<D3DXVECTOR4*>(
+                    ourMalloc(aiCount_2 <= SIZE_MAX / sizeof(D3DXVECTOR4) ? sizeof(D3DXVECTOR4) * aiCount_2 : SIZE_MAX)
+                );
+                if (pwindinfo) {
+                    rt::eh_vector_constructor_iterator(
+                        pwindinfo, sizeof(D3DXVECTOR4), aiCount_2, &emptyPointConstructor
+                    );
+                }
+                for (svert = 0;; ++svert) {
+                    uint32_t svert_4 = svert;
+                    if (svert_4 >= vertsUsed.m_usSize) {
+                        break;
+                    }
+                    uint32_t vertIndex_3 = vertsUsed.operator[](svert);
+                    float fcolor = static_cast<double>((geom.m_sBranches.m_pColors[vertIndex_3] & 0xFF00) >> 8) / 255.0;
+                    NiColorA kWindInfo(
+                        geom.m_sBranches.m_pWindWeights[vertIndex_3],
+                        static_cast<float>(4 * geom.m_sBranches.m_pWindMatrixIndices[vertIndex_3]), fcolor, 0.0f
+                    );
+                    NiColorA* pkWindInfo = &kWindInfo;
+                    // The NiColorA is reinterpreted as a D3DXVECTOR4, copying the colour's four components into
+                    // the vector.
+                    pwindinfo[svert] = std::bit_cast<D3DXVECTOR4>(*pkWindInfo);
+                }
+                STSPData* v43 = static_cast<STSPData*>(NiMemObject::operator new(sizeof(STSPData)));
+                if (v43) {
+                    STSPData_ = ::new (v43) STSPData;
+                }
+                else {
+                    STSPData_ = nullptr;
+                }
+                NiPointer<STSPData> spshaderData(STSPData_);
+                uint16_t asVertexCount = vertsUsed.m_usSize;
+                spshaderData.m_pObject->SetData(pwindinfo, asVertexCount);
+                NiTriStripsData* v42 =
+                    static_cast<NiTriStripsData*>(NiMemObject::operator new(sizeof(NiTriStripsData)));
+                if (v42) {
+                    int32_t iTriangles = *geom.m_sBranches.m_pStripLengths - 2;
+                    int32_t eNBTMethod =
+                        btangentSpace ? NiGeometryData::NBT_METHOD_NDL : NiGeometryData::NBT_METHOD_NONE;
+                    uint32_t usVertices = vertsUsed.m_usSize;
+                    NiTriStripsData_ = ::new (v42) NiTriStripsData(
+                        usVertices, pcoords, pnormals_2, nullptr, ptex, 1, eNBTMethod, iTriangles, 1,
+                        pcompositeStripLength, pcompositeStrip
+                    );
+                }
+                else {
+                    NiTriStripsData_ = nullptr;
+                }
+                this->pspBranchData[slevel].operator=(NiTriStripsData_);
+                this->pspBranchData[slevel].m_pObject->SetConsistency(NiGeometryData::STATIC);
+                this->pspBranchData[slevel].m_pObject->m_ucKeepFlags = 17u;
+                this->pspBranchData[slevel].m_pObject->SetCompressFlags(1u);
+                SpeedTreeBranchShaderProperty* apMemory = static_cast<SpeedTreeBranchShaderProperty*>(
+                    NiMemObject::operator new(sizeof(SpeedTreeBranchShaderProperty))
+                );
+                if (apMemory) {
+                    SpeedTreeBranchShaderProperty_ =
+                        ::new (apMemory) SpeedTreeBranchShaderProperty(spshaderData.m_pObject);
+                }
+                else {
+                    SpeedTreeBranchShaderProperty_ = nullptr;
+                }
+                this->pspBranchShaderProperties[slevel].operator=(SpeedTreeBranchShaderProperty_);
             }
         }
         pSpeedTree->FreeBranchColors();
@@ -836,16 +819,15 @@ void BSTreeModel::CreateLeafGeometry(TESObjectTREE* apTreeObj) {
         }
         spLeafShaderData.operator=(STLSPData_);
         spLeafShaderData.m_pObject->SetCurveScalar(fCurveScalar);
-        if (pSpeedTree) {
-            if (pSpeedTree->m_pWindEngine) {
-                spLeafShaderData.m_pObject->SetRock(pSpeedTree->m_pWindEngine->m_fSpeedWindRockScalar);
-                spLeafShaderData.m_pObject->SetRustle(pSpeedTree->m_pWindEngine->m_fSpeedWindRustleScalar);
-                if (apTreeObj) {
-                    spLeafShaderData.m_pObject->SetRockSpeed(apTreeObj->GetRockSpeed());
-                    spLeafShaderData.m_pObject->SetRustleSpeed(apTreeObj->GetRustleSpeed());
-                }
+        if ((pSpeedTree) && (pSpeedTree->m_pWindEngine)) {
+            spLeafShaderData.m_pObject->SetRock(pSpeedTree->m_pWindEngine->m_fSpeedWindRockScalar);
+            spLeafShaderData.m_pObject->SetRustle(pSpeedTree->m_pWindEngine->m_fSpeedWindRustleScalar);
+            if (apTreeObj) {
+                spLeafShaderData.m_pObject->SetRockSpeed(apTreeObj->GetRockSpeed());
+                spLeafShaderData.m_pObject->SetRustleSpeed(apTreeObj->GetRustleSpeed());
             }
         }
+
         for (slevel = 0; slevel < static_cast<int32_t>(slevels); ++slevel) {
             pSpeedTree->GetGeometry(geom, 4u, -1, -1, static_cast<int16_t>(slevel));
             uint16_t sleafs = geom.m_sLeaves0.m_usLeafCount;
@@ -1133,110 +1115,95 @@ bool BSTreeModel::InitAsInstance(BSTreeModel* apInstanceFrom) {
             spRigidBody.operator=(static_cast<bhkRigidBody*>(nullptr));
         }
         uint16_t slevels = GetNumBranchLODLevels();
-        if (slevels) {
-            if (apInstanceFrom->pspBranchData) {
-                if (apInstanceFrom->pspBranchShaderProperties) {
-                    // new NiPointer<NiTriStripsData>[slevels] and new
-                    // NiPointer<SpeedTreeBranchShaderProperty>[slevels]: a count cookie, then the elements.
-                    NiPointer<NiTriStripsData>* pNewData = nullptr;
-                    size_t* pDataBlock =
-                        static_cast<size_t*>(ourMalloc(sizeof(size_t) + slevels * sizeof(NiPointer<NiTriStripsData>)));
-                    if (pDataBlock) {
-                        // new[]'s cookie: the element count stored just before the array.
-                        pDataBlock[0] = slevels;
-                        pNewData = reinterpret_cast<NiPointer<NiTriStripsData>*>(pDataBlock + 1);
-                        rt::eh_vector_constructor_iterator(
-                            pNewData, sizeof(NiPointer<NiTriStripsData>), slevels,
-                            &fnvd::constructElement<NiPointer<NiRefObject>>,
-                            &fnvd::destructElement<NiPointer<NiRefObject>>
-                        );
-                    }
-                    pspBranchData = pNewData;
-                    NiPointer<SpeedTreeBranchShaderProperty>* pNewProperties = nullptr;
-                    size_t* pPropertyBlock = static_cast<size_t*>(
-                        ourMalloc(sizeof(size_t) + slevels * sizeof(NiPointer<SpeedTreeBranchShaderProperty>))
+        if ((slevels) && (apInstanceFrom->pspBranchData) && (apInstanceFrom->pspBranchShaderProperties)) {
+            // new NiPointer<NiTriStripsData>[slevels] and new
+            // NiPointer<SpeedTreeBranchShaderProperty>[slevels]: a count cookie, then the elements.
+            NiPointer<NiTriStripsData>* pNewData = nullptr;
+            size_t* pDataBlock =
+                static_cast<size_t*>(ourMalloc(sizeof(size_t) + slevels * sizeof(NiPointer<NiTriStripsData>)));
+            if (pDataBlock) {
+                // new[]'s cookie: the element count stored just before the array.
+                pDataBlock[0] = slevels;
+                pNewData = reinterpret_cast<NiPointer<NiTriStripsData>*>(pDataBlock + 1);
+                rt::eh_vector_constructor_iterator(
+                    pNewData, sizeof(NiPointer<NiTriStripsData>), slevels,
+                    &fnvd::constructElement<NiPointer<NiRefObject>>, &fnvd::destructElement<NiPointer<NiRefObject>>
+                );
+            }
+            pspBranchData = pNewData;
+            NiPointer<SpeedTreeBranchShaderProperty>* pNewProperties = nullptr;
+            size_t* pPropertyBlock = static_cast<size_t*>(
+                ourMalloc(sizeof(size_t) + slevels * sizeof(NiPointer<SpeedTreeBranchShaderProperty>))
+            );
+            if (pPropertyBlock) {
+                // new[]'s cookie: the element count stored just before the array.
+                pPropertyBlock[0] = slevels;
+                pNewProperties = reinterpret_cast<NiPointer<SpeedTreeBranchShaderProperty>*>(pPropertyBlock + 1);
+                rt::eh_vector_constructor_iterator(
+                    pNewProperties, sizeof(NiPointer<SpeedTreeBranchShaderProperty>), slevels,
+                    &fnvd::constructElement<NiPointer<NiRefObject>>, &fnvd::destructElement<NiPointer<NiRefObject>>
+                );
+            }
+            pspBranchShaderProperties = pNewProperties;
+            for (slevel = 0; slevel < static_cast<int32_t>(slevels); ++slevel) {
+                pspBranchData[slevel].operator=(apInstanceFrom->pspBranchData[slevel]);
+                if (apInstanceFrom->pspBranchShaderProperties[slevel].m_pObject) {
+                    SpeedTreeBranchShaderProperty* a2 = static_cast<SpeedTreeBranchShaderProperty*>(
+                        apInstanceFrom->pspBranchShaderProperties[slevel].m_pObject->Clone()
                     );
-                    if (pPropertyBlock) {
-                        // new[]'s cookie: the element count stored just before the array.
-                        pPropertyBlock[0] = slevels;
-                        pNewProperties =
-                            reinterpret_cast<NiPointer<SpeedTreeBranchShaderProperty>*>(pPropertyBlock + 1);
-                        rt::eh_vector_constructor_iterator(
-                            pNewProperties, sizeof(NiPointer<SpeedTreeBranchShaderProperty>), slevels,
-                            &fnvd::constructElement<NiPointer<NiRefObject>>,
-                            &fnvd::destructElement<NiPointer<NiRefObject>>
-                        );
-                    }
-                    pspBranchShaderProperties = pNewProperties;
-                    for (slevel = 0; slevel < static_cast<int32_t>(slevels); ++slevel) {
-                        pspBranchData[slevel].operator=(apInstanceFrom->pspBranchData[slevel]);
-                        if (apInstanceFrom->pspBranchShaderProperties[slevel].m_pObject) {
-                            SpeedTreeBranchShaderProperty* a2 = static_cast<SpeedTreeBranchShaderProperty*>(
-                                apInstanceFrom->pspBranchShaderProperties[slevel].m_pObject->Clone()
-                            );
-                            pspBranchShaderProperties[slevel].operator=(a2);
-                        }
-                        else {
-                            pspBranchShaderProperties[slevel].operator=(
-                                static_cast<SpeedTreeBranchShaderProperty*>(nullptr)
-                            );
-                        }
-                    }
+                    pspBranchShaderProperties[slevel].operator=(a2);
+                }
+                else {
+                    pspBranchShaderProperties[slevel].operator=(static_cast<SpeedTreeBranchShaderProperty*>(nullptr));
                 }
             }
         }
+
         slevels = GetNumLeafLODLevels();
-        if (slevels) {
-            if (apInstanceFrom->pspLeafData) {
-                if (apInstanceFrom->pspLeafShaderProperties) {
-                    // new NiPointer<NiTriShapeData>[slevels] and new NiPointer<SpeedTreeLeafShaderProperty>[slevels]: a
-                    // count cookie, then the elements.
-                    NiPointer<NiTriShapeData>* pNewData = nullptr;
-                    size_t* pDataBlock =
-                        static_cast<size_t*>(ourMalloc(sizeof(size_t) + slevels * sizeof(NiPointer<NiTriShapeData>)));
-                    if (pDataBlock) {
-                        // new[]'s cookie: the element count stored just before the array.
-                        pDataBlock[0] = slevels;
-                        pNewData = reinterpret_cast<NiPointer<NiTriShapeData>*>(pDataBlock + 1);
-                        rt::eh_vector_constructor_iterator(
-                            pNewData, sizeof(NiPointer<NiTriShapeData>), slevels,
-                            &fnvd::constructElement<NiPointer<NiRefObject>>,
-                            &fnvd::destructElement<NiPointer<NiRefObject>>
-                        );
-                    }
-                    pspLeafData = pNewData;
-                    NiPointer<SpeedTreeLeafShaderProperty>* pNewProperties = nullptr;
-                    size_t* pPropertyBlock = static_cast<size_t*>(
-                        ourMalloc(sizeof(size_t) + slevels * sizeof(NiPointer<SpeedTreeLeafShaderProperty>))
+        if ((slevels) && (apInstanceFrom->pspLeafData) && (apInstanceFrom->pspLeafShaderProperties)) {
+            // new NiPointer<NiTriShapeData>[slevels] and new NiPointer<SpeedTreeLeafShaderProperty>[slevels]: a
+            // count cookie, then the elements.
+            NiPointer<NiTriShapeData>* pNewData = nullptr;
+            size_t* pDataBlock =
+                static_cast<size_t*>(ourMalloc(sizeof(size_t) + slevels * sizeof(NiPointer<NiTriShapeData>)));
+            if (pDataBlock) {
+                // new[]'s cookie: the element count stored just before the array.
+                pDataBlock[0] = slevels;
+                pNewData = reinterpret_cast<NiPointer<NiTriShapeData>*>(pDataBlock + 1);
+                rt::eh_vector_constructor_iterator(
+                    pNewData, sizeof(NiPointer<NiTriShapeData>), slevels,
+                    &fnvd::constructElement<NiPointer<NiRefObject>>, &fnvd::destructElement<NiPointer<NiRefObject>>
+                );
+            }
+            pspLeafData = pNewData;
+            NiPointer<SpeedTreeLeafShaderProperty>* pNewProperties = nullptr;
+            size_t* pPropertyBlock = static_cast<size_t*>(
+                ourMalloc(sizeof(size_t) + slevels * sizeof(NiPointer<SpeedTreeLeafShaderProperty>))
+            );
+            if (pPropertyBlock) {
+                // new[]'s cookie: the element count stored just before the array.
+                pPropertyBlock[0] = slevels;
+                pNewProperties = reinterpret_cast<NiPointer<SpeedTreeLeafShaderProperty>*>(pPropertyBlock + 1);
+                rt::eh_vector_constructor_iterator(
+                    pNewProperties, sizeof(NiPointer<SpeedTreeLeafShaderProperty>), slevels,
+                    &fnvd::constructElement<NiPointer<NiRefObject>>, &fnvd::destructElement<NiPointer<NiRefObject>>
+                );
+            }
+            pspLeafShaderProperties = pNewProperties;
+            for (slevel = 0; slevel < static_cast<int32_t>(slevels); ++slevel) {
+                pspLeafData[slevel].operator=(apInstanceFrom->pspLeafData[slevel]);
+                if (apInstanceFrom->pspLeafShaderProperties[slevel].m_pObject) {
+                    SpeedTreeLeafShaderProperty* a2a = static_cast<SpeedTreeLeafShaderProperty*>(
+                        apInstanceFrom->pspLeafShaderProperties[slevel].m_pObject->Clone()
                     );
-                    if (pPropertyBlock) {
-                        // new[]'s cookie: the element count stored just before the array.
-                        pPropertyBlock[0] = slevels;
-                        pNewProperties = reinterpret_cast<NiPointer<SpeedTreeLeafShaderProperty>*>(pPropertyBlock + 1);
-                        rt::eh_vector_constructor_iterator(
-                            pNewProperties, sizeof(NiPointer<SpeedTreeLeafShaderProperty>), slevels,
-                            &fnvd::constructElement<NiPointer<NiRefObject>>,
-                            &fnvd::destructElement<NiPointer<NiRefObject>>
-                        );
-                    }
-                    pspLeafShaderProperties = pNewProperties;
-                    for (slevel = 0; slevel < static_cast<int32_t>(slevels); ++slevel) {
-                        pspLeafData[slevel].operator=(apInstanceFrom->pspLeafData[slevel]);
-                        if (apInstanceFrom->pspLeafShaderProperties[slevel].m_pObject) {
-                            SpeedTreeLeafShaderProperty* a2a = static_cast<SpeedTreeLeafShaderProperty*>(
-                                apInstanceFrom->pspLeafShaderProperties[slevel].m_pObject->Clone()
-                            );
-                            pspLeafShaderProperties[slevel].operator=(a2a);
-                        }
-                        else {
-                            pspLeafShaderProperties[slevel].operator=(
-                                static_cast<SpeedTreeLeafShaderProperty*>(nullptr)
-                            );
-                        }
-                    }
+                    pspLeafShaderProperties[slevel].operator=(a2a);
+                }
+                else {
+                    pspLeafShaderProperties[slevel].operator=(static_cast<SpeedTreeLeafShaderProperty*>(nullptr));
                 }
             }
         }
+
         if (apInstanceFrom->spBillboard.m_pObject) {
             NiAlphaProperty::abCloneUnique = 1;
             spBillboard.operator=(static_cast<NiTriShape*>(apInstanceFrom->spBillboard.m_pObject->Clone()));
@@ -1245,10 +1212,9 @@ bool BSTreeModel::InitAsInstance(BSTreeModel* apInstanceFrom) {
         BSTreeModel::kCloneLock.Leave();
         return true;
     }
-    else {
-        BSTreeModel::kCloneLock.Leave();
-        return false;
-    }
+
+    BSTreeModel::kCloneLock.Leave();
+    return false;
 }
 
 bool BSTreeModel::InitFromBase(TESObjectTREE* apTreeObj, uint32_t aiSeed) {

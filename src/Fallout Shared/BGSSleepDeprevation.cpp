@@ -226,19 +226,16 @@ BGSSleepDeprevationStage* BGSSleepDeprevationStage::GetStage(uint32_t aiIndex) {
     if (aiIndex >= BGSSleepDeprevationStage::iNumStages) {
         return nullptr;
     }
-    else {
-        return pStagesArray[aiIndex];
-    }
+
+    return pStagesArray[aiIndex];
 }
 
 BGSSleepDeprevationStage* BGSSleepDeprevationStage::FindStageForRadLevel(float afRads) {
     BGSSleepDeprevationStage* pstage = nullptr;
     for (uint32_t i = 0; i < BGSSleepDeprevationStage::iNumStages && !pstage; ++i) {
         BGSSleepDeprevationStage* pcurrentStage = BGSSleepDeprevationStage::GetStage(i);
-        if (pcurrentStage) {
-            if (afRads >= static_cast<double>(pcurrentStage->data.iSleep)) {
-                pstage = pcurrentStage;
-            }
+        if ((pcurrentStage) && (afRads >= static_cast<double>(pcurrentStage->data.iSleep))) {
+            pstage = pcurrentStage;
         }
     }
     return pstage;

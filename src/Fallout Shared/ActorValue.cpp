@@ -78,10 +78,8 @@ void ActorValue::CheckCallModifiedCallback(
     ActorValueOwner* apActorSource
 ) {
     ActorValueInfo* pinfo = ActorValue::GetActorValueInfo(aiWhich);
-    if (pinfo) {
-        if (pinfo->pModifiedCallback) {
-            pinfo->pModifiedCallback(apActor, aiWhich, afOriginalValue, afDelta, apActorSource);
-        }
+    if ((pinfo) && (pinfo->pModifiedCallback)) {
+        pinfo->pModifiedCallback(apActor, aiWhich, afOriginalValue, afDelta, apActorSource);
     }
 }
 
@@ -217,9 +215,8 @@ const char* ActorValue::GetActorValueDesc(ActorValue::Index aiIndex) {
     if (pinfo) {
         return pinfo->GetDescription(nullptr, DESC_ID);
     }
-    else {
-        return nullptr;
-    }
+
+    return nullptr;
 }
 
 const char* ActorValue::GetActorValueIcon(ActorValue::Index aiIndex) {
@@ -227,9 +224,8 @@ const char* ActorValue::GetActorValueIcon(ActorValue::Index aiIndex) {
     if (ActorValueInfo_) {
         return ActorValueInfo_->GetTextureName();
     }
-    else {
-        return nullptr;
-    }
+
+    return nullptr;
 }
 
 const char* ActorValue::GetItemWeaponTypeBadge(ActorValue::Index aiIndex) {
@@ -623,12 +619,11 @@ bool ActorValue::GetDerivedActorValue(ActorValueOwner* apActor, ActorValue::Inde
     bool v5 = false;
     afValue = 0.0f;
     ActorValueInfo* pValueInfo = ActorValue::GetActorValueInfo(aiWhich);
-    if (pValueInfo) {
-        if (pValueInfo->pDerivationFunction) {
-            afValue = pValueInfo->pDerivationFunction(apActor, aiWhich);
-            return true;
-        }
+    if ((pValueInfo) && (pValueInfo->pDerivationFunction)) {
+        afValue = pValueInfo->pDerivationFunction(apActor, aiWhich);
+        return true;
     }
+
     return v5;
 }
 
@@ -688,18 +683,16 @@ void ActorValue::HandleXPChange(
     ActorValueOwner* apActorSource
 ) {
     Actor* pActor = static_cast<Actor*>(apActor);
-    if (pActor) {
-        if (pActor->IsPc()) {
-            CharacterProgression* pProgression = pPlayer->GetCharacterProgressionInfo();
-            if (!pProgression->pData->bIgnoreCallback && aiWhich == EXPERIENCE_POINTS && afDelta > 0.0) {
-                if (static_cast<int32_t>(afDelta) > 0) {
-                    HUDMainMenu::QueueXPMessage(static_cast<int32_t>(afDelta));
-                }
-                uint16_t Level = pPlayer->GetLevel();
-                if (Level < iMaxCharacterLevel.Int()) {
-                    uint16_t v5 = pPlayer->GetLevel();
-                    pProgression->pData->CheckCanLevelUp(v5 + 1);
-                }
+    if ((pActor) && (pActor->IsPc())) {
+        CharacterProgression* pProgression = pPlayer->GetCharacterProgressionInfo();
+        if (!pProgression->pData->bIgnoreCallback && aiWhich == EXPERIENCE_POINTS && afDelta > 0.0) {
+            if (static_cast<int32_t>(afDelta) > 0) {
+                HUDMainMenu::QueueXPMessage(static_cast<int32_t>(afDelta));
+            }
+            uint16_t Level = pPlayer->GetLevel();
+            if (Level < iMaxCharacterLevel.Int()) {
+                uint16_t v5 = pPlayer->GetLevel();
+                pProgression->pData->CheckCanLevelUp(v5 + 1);
             }
         }
     }

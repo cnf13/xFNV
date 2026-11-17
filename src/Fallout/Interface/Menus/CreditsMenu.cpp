@@ -89,12 +89,11 @@ void CloseCreditsMenu() {
         CreditsMenu* pMenu = static_cast<CreditsMenu*>(pMenuTile->GetMenu());
         if (pMenu) {
             Renderer::GetNIRenderer()->LockRenderer();
-            if (pMenu->spScrollRoot != static_cast<NiNode*>(nullptr)) {
-                if (pMenu->spScrollRoot->m_pkParent) {
-                    NiNode* pParent = pMenu->spScrollRoot->m_pkParent;
-                    pParent->DetachChild(pMenu->spScrollRoot);
-                }
+            if ((pMenu->spScrollRoot != static_cast<NiNode*>(nullptr)) && (pMenu->spScrollRoot->m_pkParent)) {
+                NiNode* pParent = pMenu->spScrollRoot->m_pkParent;
+                pParent->DetachChild(pMenu->spScrollRoot);
             }
+
             pMenu->spScrollRoot = static_cast<NiNode*>(nullptr);
             pMenuTile->Set(Tile::kTileValue_DeleteOnFade, 1);
             pMenu->StartFadeOut();
@@ -107,12 +106,10 @@ void CloseCreditsMenu() {
 void ContinuePlayingAfterCreditsCallback() {
     CloseCreditsMenu();
     StartMenu::pMe->SetFlag(StartMenu::kSomethingSave, 0);
-    if (!Interface::GetMessageMenuResult()) {
-        if (hooverDamSave) {
-            FalloutAudio::SetMainMenuMusic(false);
-            FalloutAudioMedia::MediaStop();
-            hooverDamSave->LoadGame();
-        }
+    if ((!Interface::GetMessageMenuResult()) && (hooverDamSave)) {
+        FalloutAudio::SetMainMenuMusic(false);
+        FalloutAudioMedia::MediaStop();
+        hooverDamSave->LoadGame();
     }
 }
 
@@ -216,11 +213,10 @@ void CreditsMenu::InitCreditsRoot() {
     bool v18 = Controls_->GetKeyboardButton(29, 0) ||
         (Controls_->GetKeyboardButton(157, 0) || pPlayer->GetPerkRank(v35, false));
     bool bUseWackyCredits = v18;
-    if (pPlayCredits) {
-        if (pPlayCredits->fValue == 2.0) {
-            bUseWackyCredits = true;
-        }
+    if ((pPlayCredits) && (pPlayCredits->fValue == 2.0)) {
+        bUseWackyCredits = true;
     }
+
     static constexpr char kDataPrefix[] = "DATA\\";
     for (uint32_t i = 0; i < sizeof(kDataPrefix); ++i) {
         Dst[i] = kDataPrefix[i];
@@ -667,10 +663,8 @@ bool CreditsMenu::Create() {
                 pme->pBackgroundTile->Set(4044, HandleString, true);
             }
             else {
-                if (bPlayingCreditsMenuMovie || !pme->BackgroundTextureFilenames.iSize) {
-                    if (pme->pBackgroundTile) {
-                        pme->pBackgroundTile->Set(4009, 0);
-                    }
+                if ((bPlayingCreditsMenuMovie || !pme->BackgroundTextureFilenames.iSize) && (pme->pBackgroundTile)) {
+                    pme->pBackgroundTile->Set(4009, 0);
                 }
             }
             double ScreenHeight = static_cast<double>(Renderer::GetScreenHeight());
@@ -684,19 +678,16 @@ bool CreditsMenu::Create() {
             }
             return true;
         }
-        else {
-            Warning("Credits Menu Creation Failed... Are your menu and art resources up to date?");
-            return false;
-        }
-    }
-    else {
-        if (pmenu) {
-            if (pmenu->pMenu) {
-                delete pmenu;
-            }
-        }
+
+        Warning("Credits Menu Creation Failed... Are your menu and art resources up to date?");
         return false;
     }
+
+    if ((pmenu) && (pmenu->pMenu)) {
+        delete pmenu;
+    }
+
+    return false;
 }
 
 int32_t CreditsMenu::GetClassStatic() {
@@ -705,33 +696,28 @@ int32_t CreditsMenu::GetClassStatic() {
 
 void CreditsMenu::Close() {
     pPlayCredits->SetValue(0.0f);
-    if (StartMenu::pMe->IsFlagSet(StartMenu::kSomethingSave)) {
-        if (BSstrlen(pSaveLoadManager->pSaveName.pString)) {
-            pSaveLoadManager->SetupSavesList();
-            if (pSaveLoadManager) {
-                if (pSaveLoadManager->pSaveGameList) {
-                    for (BGSSaveLoadFileEntry*& rpItem : pSaveLoadManager->pSaveGameList->ItemsUntilNull()) {
-                        hooverDamSave = rpItem;
-                        if (hooverDamSave->IsSystemSave()) {
-                            if (hooverDamSave->GetPlayerName()) {
-                                char* afValue = hooverDamSave->pFileName;
-                                if (BSstristr(pSaveLoadManager->pSaveName.pString, afValue)) {
-                                    const char* v1 = sNo.String();
-                                    const char* v0 = sYes.String();
-                                    Interface::CreateMessageMenu(
-                                        gs_sContinuePlayingAfterCredits.operator const char*(),
-                                        static_cast<const char*>(nullptr), static_cast<const char*>(nullptr),
-                                        &ContinuePlayingAfterCreditsCallback, 0, 18, 0.0f, 0.0f, v0, v1, nullptr
-                                    );
-                                    return;
-                                }
-                            }
-                        }
+    if ((StartMenu::pMe->IsFlagSet(StartMenu::kSomethingSave)) && (BSstrlen(pSaveLoadManager->pSaveName.pString))) {
+        pSaveLoadManager->SetupSavesList();
+        if ((pSaveLoadManager) && (pSaveLoadManager->pSaveGameList)) {
+            for (BGSSaveLoadFileEntry*& rpItem : pSaveLoadManager->pSaveGameList->ItemsUntilNull()) {
+                hooverDamSave = rpItem;
+                if ((hooverDamSave->IsSystemSave()) && (hooverDamSave->GetPlayerName())) {
+                    char* afValue = hooverDamSave->pFileName;
+                    if (BSstristr(pSaveLoadManager->pSaveName.pString, afValue)) {
+                        const char* v1 = sNo.String();
+                        const char* v0 = sYes.String();
+                        Interface::CreateMessageMenu(
+                            gs_sContinuePlayingAfterCredits.operator const char*(), static_cast<const char*>(nullptr),
+                            static_cast<const char*>(nullptr), &ContinuePlayingAfterCreditsCallback, 0, 18, 0.0f, 0.0f,
+                            v0, v1, nullptr
+                        );
+                        return;
                     }
                 }
             }
         }
     }
+
     StartMenu::pMe->SetFlag(StartMenu::kSomethingSave, 0);
     CloseCreditsMenu();
 }

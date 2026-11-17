@@ -424,11 +424,10 @@ void BSShaderProperty::SetAlpha(float afAlpha) {
             iLastRenderPassState = 0;
         }
     }
-    else if (fAlpha < 1.0f) {
-        if (afAlpha >= 1.0f) {
-            iLastRenderPassState = 0;
-        }
+    else if ((fAlpha < 1.0f) && (afAlpha >= 1.0f)) {
+        iLastRenderPassState = 0;
     }
+
     fAlpha = afAlpha;
 }
 
@@ -868,16 +867,15 @@ int32_t BSShaderProperty::AddDepthPassOrCount(NiGeometry* a2, uint16_t* a3, int3
         *bEnable = false;
         return 0;
     }
-    else {
-        if (static_cast<uint8_t>(a4) == 1) {
-            pRenderPassList->Add(a2, 592, *bEnable, 0, nullptr, nullptr, nullptr, nullptr);
-        }
-        else {
-            ++*a3;
-        }
-        *bEnable = false;
-        return 0;
+
+    if (static_cast<uint8_t>(a4) == 1) {
+        pRenderPassList->Add(a2, 592, *bEnable, 0, nullptr, nullptr, nullptr, nullptr);
     }
+    else {
+        ++*a3;
+    }
+    *bEnable = false;
+    return 0;
 }
 
 int32_t BSShaderProperty::AD2(
@@ -2399,12 +2397,11 @@ int32_t BSShaderProperty::ADT(
                         *abEnable = false;
                         return 0;
                     }
-                    else {
-                    LABEL_36:;
-                        pRenderPassList->Add(apGeometry, 251, 1, 1, pLight, nullptr, nullptr, nullptr);
-                        *abEnable = false;
-                        return 0;
-                    }
+
+                LABEL_36:;
+                    pRenderPassList->Add(apGeometry, 251, 1, 1, pLight, nullptr, nullptr, nullptr);
+                    *abEnable = false;
+                    return 0;
                 }
             LABEL_96:;
                 ++*apusPassCount;
@@ -2449,12 +2446,11 @@ int32_t BSShaderProperty::ADT(
         *abEnable = false;
         return 0;
     }
-    else {
-    LABEL_67:;
-        pRenderPassList->Add(apGeometry, 257, 1, 1, pLight, nullptr, nullptr, nullptr);
-        *abEnable = false;
-        return 0;
-    }
+
+LABEL_67:;
+    pRenderPassList->Add(apGeometry, 257, 1, 1, pLight, nullptr, nullptr, nullptr);
+    *abEnable = false;
+    return 0;
 }
 
 int32_t BSShaderProperty::Specular(

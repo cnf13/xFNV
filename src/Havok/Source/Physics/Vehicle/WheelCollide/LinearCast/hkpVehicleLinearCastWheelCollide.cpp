@@ -542,10 +542,9 @@ hkBool* hkpVehicleLinearCastWheelCollide::castSingleWheel(
         arResult->m_bool = 1;
         return arResult;
     }
-    else {
-        arResult->m_bool = 0;
-        return arResult;
-    }
+
+    arResult->m_bool = 0;
+    return arResult;
 }
 
 // The wheel's contact from the cast hit: the contact point, the body hit (when it is an entity) and its friction, the

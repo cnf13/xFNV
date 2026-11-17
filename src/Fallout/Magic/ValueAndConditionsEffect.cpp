@@ -109,7 +109,6 @@ ActiveEffect* ValueAndConditionsEffect::Create(MagicCaster* apCaster, MagicItem*
     if (v5) {
         return ::new (v5) ValueAndConditionsEffect(apCaster, apItem, apEffect);
     }
-    else {
-        return nullptr;
-    }
+
+    return nullptr;
 }

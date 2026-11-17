@@ -78,11 +78,10 @@ hkDataClassImpl* hkDataWorldDict::newClass(const hkDataClass::Cinfo& cinfo) {
             ++pParent->m_count;
         }
         hkDataClassDict* pOld = pClass->m_parent;
-        if (pOld) {
-            if (--pOld->m_count == 0) {
-                delete pOld;
-            }
+        if ((pOld) && (--pOld->m_count == 0)) {
+            delete pOld;
         }
+
         pClass->m_parent = pParent;
     }
     ++pClass->m_count;
@@ -704,10 +703,8 @@ hkDataClassDict::hkDataClassDict(hkDataWorldDict* root, const char* name, int32_
 // array and the name handle free themselves.
 hkDataClassDict::~hkDataClassDict() {
     selfDestruct();
-    if (m_parent) {
-        if (m_parent->m_count-- == 1) {
-            delete m_parent;
-        }
+    if ((m_parent) && (m_parent->m_count-- == 1)) {
+        delete m_parent;
     }
 }
 
@@ -885,10 +882,9 @@ const char** hkDataClassDict::intern(const char** result, const char* name) cons
         *result = v5;
         return result;
     }
-    else {
-        *result = nullptr;
-        return result;
-    }
+
+    *result = nullptr;
+    return result;
 }
 
 void hkDataClassDict::addMember(
@@ -1242,10 +1238,9 @@ char** hkDataWorldDict::ObjectTracker::intern(char** a1, const char* src) {
         *a1 = v4;
         return a1;
     }
-    else {
-        *a1 = nullptr;
-        return a1;
-    }
+
+    *a1 = nullptr;
+    return a1;
 }
 
 // The handle of name's interned class name, made on first use (an InternedStringRefCounted holding the interned
@@ -1540,16 +1535,12 @@ PointerArrayImplementation::PointerArrayImplementation(const hkDataClassImpl* a1
 PointerArrayImplementation::~PointerArrayImplementation() {
     for (int32_t i = 0; i < m_data.m_size; ++i) {
         hkDataObjectImpl* pObject = m_data.m_data[i];
-        if (pObject) {
-            if (pObject->m_count-- == 1) {
-                delete pObject;
-            }
+        if ((pObject) && (pObject->m_count-- == 1)) {
+            delete pObject;
         }
     }
-    if (m_class) {
-        if (m_class->m_count-- == 1) {
-            delete m_class;
-        }
+    if ((m_class) && (m_class->m_count-- == 1)) {
+        delete m_class;
     }
 }
 
@@ -2151,10 +2142,8 @@ StructArrayImplementation::~StructArrayImplementation() {
     if (iNext != -1) {
         rArrays.removeByIndex(m_class, iNext);
     }
-    if (m_class) {
-        if (m_class->m_count-- == 1) {
-            delete m_class;
-        }
+    if ((m_class) && (m_class->m_count-- == 1)) {
+        delete m_class;
     }
 }
 
@@ -2345,10 +2334,8 @@ int32_t StructArrayImplementation::_addMemberByName(char* a1) {
 // The members' values are released, then the class's reference; the member array frees itself.
 hkDataObjectDict::~hkDataObjectDict() {
     selfDestruct();
-    if (m_class) {
-        if (m_class->m_count-- == 1) {
-            delete m_class;
-        }
+    if ((m_class) && (m_class->m_count-- == 1)) {
+        delete m_class;
     }
 }
 
@@ -2374,11 +2361,10 @@ hkDataObject::Value hkDataObjectDict::accessByName(const char* name) {
         result.m_impl = this;
         return result;
     }
-    else {
-        result.m_name = nullptr;
-        result.m_impl = this;
-        return result;
-    }
+
+    result.m_name = nullptr;
+    result.m_impl = this;
+    return result;
 }
 
 // Whether the object has a member called name. Member names are interned, so they compare by pointer.
@@ -2706,11 +2692,10 @@ void hkDataObjectDict::_writeAccess(
 void hkDataObjectDict::releaseValue(hkDataObject::Type type, Union* value, int32_t count) {
     if (type & (hkDataObject::TYPE_ARRAY | hkDataObject::TYPE_TUPLE)) {
         hkDataArrayImpl* pArray = value->a;
-        if (pArray) {
-            if (--pArray->m_count == 0) {
-                delete pArray;
-            }
+        if ((pArray) && (--pArray->m_count == 0)) {
+            delete pArray;
         }
+
         return;
     }
     switch (type) {

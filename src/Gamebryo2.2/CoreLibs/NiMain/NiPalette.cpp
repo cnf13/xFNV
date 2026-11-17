@@ -139,10 +139,7 @@ bool NiPalette::IsEqual(NiObject* pkObject) {
     }
     const uint8_t* pucThis = reinterpret_cast<const uint8_t*>(m_pkPalette);
     const uint8_t* pucOther = reinterpret_cast<const uint8_t*>(pkOther->m_pkPalette);
-    if (m_uiEntries * 4 != 0 && pucOther[0] != pucThis[0]) {
-        return false;
-    }
-    return true;
+    return !(m_uiEntries * 4 != 0 && pucOther[0] != pucThis[0]);
 }
 
 void NiPalette::GetViewerStrings(NiTPrimitiveArray<char*>* pkStrings) {

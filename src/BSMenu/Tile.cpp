@@ -625,9 +625,8 @@ Tile::TileTemplate::GetItem(int32_t aiCmd, float afVal, const char* apStr, int32
         if (apMemory) {
             return ::new (apMemory) Tile::TileTemplateItem(aiCmd, afVal, apStr, aiTA, aiLine);
         }
-        else {
-            return nullptr;
-        }
+
+        return nullptr;
     }
     return pitem;
 }
@@ -729,11 +728,10 @@ Tile::~Tile() {
     }
     uiFlags &= ~DIRTY;
     Tile* pHibernating = this;
-    if (Tile::xHibernatingTiles.Remove(pHibernating)) {
-        if ((uiFlags & HIBERNATED) != 0) {
-            --Tile::iHibernatingTileCount;
-        }
+    if ((Tile::xHibernatingTiles.Remove(pHibernating)) && ((uiFlags & HIBERNATED) != 0)) {
+        --Tile::iHibernatingTileCount;
     }
+
     uiFlags &= ~HIBERNATED;
     uiFlags &= ~PROMOTED;
     NiObjectGarbage::Add(spModel.m_pObject);
@@ -2340,9 +2338,8 @@ float Tile::GetFadeEndFor(int32_t aiTrait) {
     if (static_cast<double>(fEndValue) == -1.0) {
         return GetFloat(aiTrait);
     }
-    else {
-        return static_cast<float>(fEndValue);
-    }
+
+    return static_cast<float>(fEndValue);
 }
 
 Tile::TILE_FADE_CONTROL_TYPE Tile::GetFadeType(int32_t aiTrait) {
@@ -3372,7 +3369,7 @@ Tile::BuildStorage* Tile::ParseFile(const char* apName, char* apData, uint32_t a
                 bReadFileError = true;
                 return nullptr;
             }
-            else if (text[i] == '=') {
+            if (text[i] == '=') {
                 if (!word[0]) {
                     Warning(
                         "MENUS: (XML ERROR) %s -- in file '%s' on line %i.", "Missing attribute name", apName, line
@@ -3808,9 +3805,8 @@ float Tile::RefValueAction::QFloat() {
     if (pRefValue) {
         return pRefValue->fValue;
     }
-    else {
-        return 0.0;
-    }
+
+    return 0.0;
 }
 
 Tile::Value* Tile::RefValueAction::QRefValue() {

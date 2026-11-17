@@ -1864,20 +1864,18 @@ void TESImageSpaceModifier::BlendApply(
     pmanager->ApplyDoubleVisionParamModifier(v34);
     NiPoint2 radialBlurCenter1(0.5f, 0.5f);
     NiPoint2 radialBlurCenter2(0.5f, 0.5f);
-    if (apMod1->Data.bUseTargetForRadialBlur) {
-        if (apTarget1) {
-            apTarget1->UpdateWorldBound();
-            const NiBound* WorldBound = &apTarget1->GetWorldBound();
-            ImageSpaceManager::GetRadialBlurCenterFromWorldBound(WorldBound, &radialBlurCenter1);
-        }
+    if ((apMod1->Data.bUseTargetForRadialBlur) && (apTarget1)) {
+        apTarget1->UpdateWorldBound();
+        const NiBound* WorldBound = &apTarget1->GetWorldBound();
+        ImageSpaceManager::GetRadialBlurCenterFromWorldBound(WorldBound, &radialBlurCenter1);
     }
-    if (apMod2->Data.bUseTargetForRadialBlur) {
-        if (apTarget2) {
-            apTarget1->UpdateWorldBound();
-            const NiBound* v12 = &apTarget2->GetWorldBound();
-            ImageSpaceManager::GetRadialBlurCenterFromWorldBound(v12, &radialBlurCenter2);
-        }
+
+    if ((apMod2->Data.bUseTargetForRadialBlur) && (apTarget2)) {
+        apTarget1->UpdateWorldBound();
+        const NiBound* v12 = &apTarget2->GetWorldBound();
+        ImageSpaceManager::GetRadialBlurCenterFromWorldBound(v12, &radialBlurCenter2);
     }
+
     if (!apMod1->Data.bUseTargetForRadialBlur) {
         float y = apMod1->Data.RadialBlurCenter.y;
         radialBlurCenter1.x = apMod1->Data.RadialBlurCenter.x;
@@ -1900,20 +1898,18 @@ void TESImageSpaceModifier::BlendApply(
     );
     NiPoint2 v70(0.0f, 0.0f);
     NiPoint2 v78(0.0f, 0.0f);
-    if (apMod1->Data.bUseTargetForDepthOfField) {
-        if (apTarget1) {
-            apTarget1->UpdateWorldBound();
-            const NiBound* v19 = &apTarget1->GetWorldBound();
-            pmanager->GetDepthOfFieldParamsFromPoint(&v19->m_kCenter, &v70);
-        }
+    if ((apMod1->Data.bUseTargetForDepthOfField) && (apTarget1)) {
+        apTarget1->UpdateWorldBound();
+        const NiBound* v19 = &apTarget1->GetWorldBound();
+        pmanager->GetDepthOfFieldParamsFromPoint(&v19->m_kCenter, &v70);
     }
-    if (apMod2->Data.bUseTargetForDepthOfField) {
-        if (apTarget2) {
-            apTarget2->UpdateWorldBound();
-            const NiBound* v20 = &apTarget2->GetWorldBound();
-            pmanager->GetDepthOfFieldParamsFromPoint(&v20->m_kCenter, &v78);
-        }
+
+    if ((apMod2->Data.bUseTargetForDepthOfField) && (apTarget2)) {
+        apTarget2->UpdateWorldBound();
+        const NiBound* v20 = &apTarget2->GetWorldBound();
+        pmanager->GetDepthOfFieldParamsFromPoint(&v20->m_kCenter, &v78);
     }
+
     if (!apMod1->Data.bUseTargetForDepthOfField) {
         NiPoint2* v21 = ::new (&v39) NiPoint2(fdofdistance1, fdofrange1);
         float v22 = v21->y;

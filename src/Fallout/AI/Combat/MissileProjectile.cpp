@@ -148,38 +148,36 @@ void MissileProjectile::Process3D() {
     NiPoint3 dst;
     NiBound tracerBound;
     NiNode* pnode = Get3D();
-    if (pnode) {
-        if (NiObject::IsKindOf_0(&NiNode::ms_RTTI, pnode)) {
-            pnode->SetAppCulled(false);
-            if (GetProjectileBase()->Data.fTracerChance > 0.0) {
-                if (pnode->GetAtChecked(0)) {
-                    bool z = IsFlagSet(Projectile::TRACER);
-                    NiAVObject* v1 = pnode->GetAt(0);
-                    v1->SetAppCulled(z);
-                }
-                if (pnode->GetAtChecked(1u)) {
-                    bool za = !IsFlagSet(Projectile::TRACER);
-                    NiAVObject* v2 = pnode->GetAt(1u);
-                    v2->SetAppCulled(za);
-                }
+    if ((pnode) && (NiObject::IsKindOf_0(&NiNode::ms_RTTI, pnode))) {
+        pnode->SetAppCulled(false);
+        if (GetProjectileBase()->Data.fTracerChance > 0.0) {
+            if (pnode->GetAtChecked(0)) {
+                bool z = IsFlagSet(Projectile::TRACER);
+                NiAVObject* v1 = pnode->GetAt(0);
+                v1->SetAppCulled(z);
             }
-            if (IsFlagSet(Projectile::TRACER)) {
-                tracerBound = pnode->GetWorldBound();
-                NiPoint3* zb = &(&tracerBound)->m_kCenter;
-                NiPoint3 fromCenter = pnode->GetTranslate() - *zb;
-                double v8 = fromCenter.Length();
-                float ffakeDistance = tracerBound.m_fRadius + v8;
-                double Speed = GetSpeed();
-                float ffakeTime = ffakeDistance / Speed;
-                NiPoint3 x = *::new (&dst) NiPoint3(0.0f, ffakeDistance, 0.0f);
-                Move(ffakeTime, x);
-                Sync3DWithReference(false, true);
-                NiUpdateData UpdateData(0.0f, false, false);
-                pnode->UpdateWorldData(UpdateData);
-                double IronSightFOV = fDistanceMoved;
-                if (GetRange() < IronSightFOV) {
-                    pnode->SetAppCulled(true);
-                }
+            if (pnode->GetAtChecked(1u)) {
+                bool za = !IsFlagSet(Projectile::TRACER);
+                NiAVObject* v2 = pnode->GetAt(1u);
+                v2->SetAppCulled(za);
+            }
+        }
+        if (IsFlagSet(Projectile::TRACER)) {
+            tracerBound = pnode->GetWorldBound();
+            NiPoint3* zb = &(&tracerBound)->m_kCenter;
+            NiPoint3 fromCenter = pnode->GetTranslate() - *zb;
+            double v8 = fromCenter.Length();
+            float ffakeDistance = tracerBound.m_fRadius + v8;
+            double Speed = GetSpeed();
+            float ffakeTime = ffakeDistance / Speed;
+            NiPoint3 x = *::new (&dst) NiPoint3(0.0f, ffakeDistance, 0.0f);
+            Move(ffakeTime, x);
+            Sync3DWithReference(false, true);
+            NiUpdateData UpdateData(0.0f, false, false);
+            pnode->UpdateWorldData(UpdateData);
+            double IronSightFOV = fDistanceMoved;
+            if (GetRange() < IronSightFOV) {
+                pnode->SetAppCulled(true);
             }
         }
     }
@@ -192,11 +190,10 @@ void MissileProjectile::UpdateProjectile(float afDelta) {
     NiMatrix3 mMatrix;
     NiPoint3 oldpos;
     NiPoint3 newpos;
-    if (bWaitingToInitialize3D) {
-        if (Get3D()) {
-            Initialize3D();
-        }
+    if ((bWaitingToInitialize3D) && (Get3D())) {
+        Initialize3D();
     }
+
     double IronSightFOV = fDistanceMoved;
     if (GetRange() < IronSightFOV && (ImpactList.IsEmpty() || bImpactProcessed)) {
         Kill();
@@ -219,15 +216,14 @@ void MissileProjectile::UpdateProjectile(float afDelta) {
                     ptargetAV = nullptr;
                 }
                 NiAVObject* p3d = (NiAVObject*)Get3D();
-                if (ptargetAV) {
-                    if (p3d) {
-                        NiTransform newTrans = ptargetAV->GetWorldTransform() * kFollowOffset;
-                        p3d->SetRotate(newTrans.m_Rotate);
-                        SetRotation(&newTrans.m_Rotate);
-                        p3d->SetTranslate(newTrans.m_Translate);
-                        SetLocationOnReference(newTrans.m_Translate);
-                    }
+                if ((ptargetAV) && (p3d)) {
+                    NiTransform newTrans = ptargetAV->GetWorldTransform() * kFollowOffset;
+                    p3d->SetRotate(newTrans.m_Rotate);
+                    SetRotation(&newTrans.m_Rotate);
+                    p3d->SetTranslate(newTrans.m_Translate);
+                    SetLocationOnReference(newTrans.m_Translate);
                 }
+
                 Sync3DWithReference(true, false);
             }
         }
@@ -420,12 +416,8 @@ void MissileProjectile::Initialize3D() {
             }
             pimpact = pimpact_2;
         }
-        if (pimpact) {
-            if (pimpact->pCollidee) {
-                if (pimpact->pCollidee->IsActor()) {
-                    ProcessImpale();
-                }
-            }
+        if ((pimpact) && (pimpact->pCollidee) && (pimpact->pCollidee->IsActor())) {
+            ProcessImpale();
         }
     }
     if (eImpactResult == MissileProjectile::IR_STICK) {
@@ -464,61 +456,60 @@ void MissileProjectile::DetermineImpactResult() {
 }
 
 bool MissileProjectile::ProcessBounce() {
-    if (Get3D()) {
-        if (!ImpactList.IsEmpty()) {
-            if (pVATS.pLastProjectile == this) {
-                pVATS.SetLastProjectile(nullptr);
+    if ((Get3D()) && (!ImpactList.IsEmpty())) {
+        if (pVATS.pLastProjectile == this) {
+            pVATS.SetLastProjectile(nullptr);
+        }
+        NiAVObject* p3d = Get3D();
+        Projectile::ImpactData* psCollisionData = ImpactList.m_item;
+        SetFlag(Projectile::NO_CHARCONTROLLER, true);
+        RemoveCharController();
+        bhkCollisionObject* pcoll = FindFirstCollisionObject(p3d);
+        if (pcoll) {
+            pcoll->SetNotify(true);
+        }
+        if (!pSaveLoadGameOLD->GetLoading() && !GetSecondaryItemChange()) {
+            p3d->SetTranslate(psCollisionData->kLocation);
+            NiUpdateData UpdateData(0.0f, false, false);
+            p3d->Update(UpdateData);
+        }
+        bhkWorld::SetMotion(p3d, hkpMotion::MOTION_DYNAMIC, true, false, true);
+        uint32_t NewSystemGroup = bhkCollisionFilter::GetNewSystemGroup();
+        bhkWorld::SetGroup(p3d, NewSystemGroup, true, false);
+        bhkWorld::EnableCollision(p3d, true, true, false);
+        if (!pSaveLoadGameOLD->GetLoading()) {
+            NiPoint3 force;
+            NiMatrix3 invrot;
+            NiPoint3 vton;
+            NiPoint3 reflectedVelocity = NiPoint3_ZERO;
+            NiPoint3 accum = -1.0f * GetMovementDirection();
+            NiPoint3::UnitizeVector(accum);
+            NiPoint3::UnitizeVector(psCollisionData->kNormal);
+            float fnormalDotDirection = psCollisionData->kNormal.Dot(accum);
+            vton = 2.0f * (fnormalDotDirection * psCollisionData->kNormal - accum);
+            reflectedVelocity = accum + vton;
+            float* v5 = &fArrowBounceLinearSpeed.Float();
+            float v12 = GetProjectileBase()->GetSpeed() * *v5;
+            reflectedVelocity.operator*=(v12);
+            TESHavokUtilities::AddVelocity(p3d, reflectedVelocity, true);
+            NiPoint3 angularVelocity = NiPoint3_ZERO;
+            NiNode* v6 = Get3D();
+            (&v6->GetWorldTransform())->m_Rotate.Inverse(invrot);
+            force = invrot * psCollisionData->kNormal;
+            double v11 = NiAbs(force.y);
+            if (NiAbs(force.z) < v11) {
+                double z = NiAbs(force.y);
+                force.z = NiSign(force.z) * z;
             }
-            NiAVObject* p3d = Get3D();
-            Projectile::ImpactData* psCollisionData = ImpactList.m_item;
-            SetFlag(Projectile::NO_CHARCONTROLLER, true);
-            RemoveCharController();
-            bhkCollisionObject* pcoll = FindFirstCollisionObject(p3d);
-            if (pcoll) {
-                pcoll->SetNotify(true);
-            }
-            if (!pSaveLoadGameOLD->GetLoading() && !GetSecondaryItemChange()) {
-                p3d->SetTranslate(psCollisionData->kLocation);
-                NiUpdateData UpdateData(0.0f, false, false);
-                p3d->Update(UpdateData);
-            }
-            bhkWorld::SetMotion(p3d, hkpMotion::MOTION_DYNAMIC, true, false, true);
-            uint32_t NewSystemGroup = bhkCollisionFilter::GetNewSystemGroup();
-            bhkWorld::SetGroup(p3d, NewSystemGroup, true, false);
-            bhkWorld::EnableCollision(p3d, true, true, false);
-            if (!pSaveLoadGameOLD->GetLoading()) {
-                NiPoint3 force;
-                NiMatrix3 invrot;
-                NiPoint3 vton;
-                NiPoint3 reflectedVelocity = NiPoint3_ZERO;
-                NiPoint3 accum = -1.0f * GetMovementDirection();
-                NiPoint3::UnitizeVector(accum);
-                NiPoint3::UnitizeVector(psCollisionData->kNormal);
-                float fnormalDotDirection = psCollisionData->kNormal.Dot(accum);
-                vton = 2.0f * (fnormalDotDirection * psCollisionData->kNormal - accum);
-                reflectedVelocity = accum + vton;
-                float* v5 = &fArrowBounceLinearSpeed.Float();
-                float v12 = GetProjectileBase()->GetSpeed() * *v5;
-                reflectedVelocity.operator*=(v12);
-                TESHavokUtilities::AddVelocity(p3d, reflectedVelocity, true);
-                NiPoint3 angularVelocity = NiPoint3_ZERO;
-                NiNode* v6 = Get3D();
-                (&v6->GetWorldTransform())->m_Rotate.Inverse(invrot);
-                force = invrot * psCollisionData->kNormal;
-                double v11 = NiAbs(force.y);
-                if (NiAbs(force.z) < v11) {
-                    double z = NiAbs(force.y);
-                    force.z = NiSign(force.z) * z;
-                }
-                force.y = 0.0f;
-                NiPoint3::UnitizeVector(force);
-                NiPoint3 angle(-force.z, 0.0f, -force.x);
-                angularVelocity = (&p3d->GetWorldTransform())->m_Rotate * angle;
-                angularVelocity.operator*=(fArrowBounceLinearSpeed.Float());
-                TESHavokUtilities::AddAngularVelocity(p3d, angularVelocity, true);
-            }
+            force.y = 0.0f;
+            NiPoint3::UnitizeVector(force);
+            NiPoint3 angle(-force.z, 0.0f, -force.x);
+            angularVelocity = (&p3d->GetWorldTransform())->m_Rotate * angle;
+            angularVelocity.operator*=(fArrowBounceLinearSpeed.Float());
+            TESHavokUtilities::AddAngularVelocity(p3d, angularVelocity, true);
         }
     }
+
     return true;
 }
 
@@ -614,10 +605,8 @@ void MissileProjectile::ProcessImpale() {
                     if (pdismemberedNode) {
                         for (int32_t n = 0; n < pdismemberedNode->GetArrayCount(); ++n) {
                             NiAVObject* pobj = pdismemberedNode->GetAt(static_cast<uint32_t>(n));
-                            if (pobj) {
-                                if (Animation::FindSkinnedNode(pobj)) {
-                                    BipedAnim::AttachToSkeleton(pdismemberedNode, pobj, pdismemberedNode, false);
-                                }
+                            if ((pobj) && (Animation::FindSkinnedNode(pobj))) {
+                                BipedAnim::AttachToSkeleton(pdismemberedNode, pobj, pdismemberedNode, false);
                             }
                         }
                     }
@@ -629,29 +618,28 @@ void MissileProjectile::ProcessImpale() {
                     }
                     pdismemberedLimb_2->SetTranslate(NiPoint3_ZERO);
                     pdismemberedLimb_2->SetRotate(NiMatrix3_IDENTITY);
-                    if (pdismemberedNode) {
-                        if (pdismemberedNode->GetAtChecked(0)) {
-                            rot = pdismemberedNode->GetAt(0)->GetWorldTransform();
-                            if (!bloading) {
-                                this->SetLocationOnReference(pimpact_2->kLocation);
-                            }
-                            this->Sync3DWithReference(false, false);
-                            alignas(16) NiUpdateData UpdateData(0.0f, false, false);
-                            p3d->UpdateWorldData(UpdateData);
-                            projectileWorld = p3d->GetWorldTransform();
-                            NiTransform rotMult;
-                            projectileWorld.InvertNonUniform(rotMult);
-                            rot = *::new (&v103) NiTransform(rotMult * rot);
-                            rot.m_Translate.y = rot.m_Translate.y - fpinLimDepth;
-                            NiAVObject* v1 = pdismemberedNode->GetAt(0);
-                            v1->SetTranslate(rot.m_Translate);
-                            NiAVObject* v2 = pdismemberedNode->GetAt(0);
-                            v2->SetRotate(rot.m_Rotate);
-                            float a2 = rot.m_fScale;
-                            NiAVObject* pdismemberedLimb_4 = pdismemberedNode->GetAt(0);
-                            pdismemberedLimb_4->SetScale(a2);
+                    if ((pdismemberedNode) && (pdismemberedNode->GetAtChecked(0))) {
+                        rot = pdismemberedNode->GetAt(0)->GetWorldTransform();
+                        if (!bloading) {
+                            this->SetLocationOnReference(pimpact_2->kLocation);
                         }
+                        this->Sync3DWithReference(false, false);
+                        alignas(16) NiUpdateData UpdateData(0.0f, false, false);
+                        p3d->UpdateWorldData(UpdateData);
+                        projectileWorld = p3d->GetWorldTransform();
+                        NiTransform rotMult;
+                        projectileWorld.InvertNonUniform(rotMult);
+                        rot = *::new (&v103) NiTransform(rotMult * rot);
+                        rot.m_Translate.y = rot.m_Translate.y - fpinLimDepth;
+                        NiAVObject* v1 = pdismemberedNode->GetAt(0);
+                        v1->SetTranslate(rot.m_Translate);
+                        NiAVObject* v2 = pdismemberedNode->GetAt(0);
+                        v2->SetRotate(rot.m_Rotate);
+                        float a2 = rot.m_fScale;
+                        NiAVObject* pdismemberedLimb_4 = pdismemberedNode->GetAt(0);
+                        pdismemberedLimb_4->SetScale(a2);
                     }
+
                     p3d->AttachChild(pdismemberedLimb_2, 1);
                     pdismemberedLimb_2->SetName(*FixedStrings::QPinnedLimb());
                     bhkWorld::UpdatePosition(pdismemberedLimb_2, true, true);
@@ -690,120 +678,118 @@ void MissileProjectile::ProcessImpale() {
                             bhkRigidBody* pprojectileRB = pcol ? pcol->GetRigidBody() : nullptr;
                             bhkCollisionObject* plimbCol = FindFirstCollisionObject(pconstrainedObject);
                             bhkRigidBody* plimbRB = plimbCol ? plimbCol->GetRigidBody() : nullptr;
-                            if (plimbRB) {
-                                if (plimbRB != pprojectileRB) {
-                                    alignas(16) NiMatrix3 rot2_3;
-                                    NiPoint3 direction_2;
-                                    bhkHingeConstraint* ph;
-                                    hkVector4 fixPointWorld;
-                                    hkVector4 axis;
-                                    NiPoint3 yAxisWorld;
-                                    alignas(16) hkHingeConstraintCinfo ci;
-                                    ci.hkHingeConstraintCinfo::CreateData();
-                                    ci.SetEntities(plimbRB, pprojectileRB);
-                                    const hkTransform* Transform = &plimbRB->operator*()->getTransform();
-                                    hkTransform fixPointa(*Transform);
-                                    const hkTransform* v10 = &pprojectileRB->operator*()->getTransform();
-                                    hkTransform fixPointb(*v10);
-                                    (&fixPointa)->m_rotation.renormalize();
-                                    (&fixPointb)->m_rotation.renormalize();
-                                    NiNode* v11 = this->Get3D();
-                                    (&v11->GetWorldTransform())->m_Rotate.GetCol(1u, yAxisWorld);
-                                    NI2HKNS(axis, yAxisWorld);
-                                    axis.normalize3();
-                                    projectileWorld_2 = this->Get3D()->GetWorldTransform();
-                                    float a2c = fpinLimDepth;
-                                    alignas(16) NiPoint3 offset = -NiPoint3_UNIT_Y * a2c;
-                                    NiPoint3 hingePoint__offset = projectileWorld_2 * offset;
-                                    NI2HK(fixPointWorld, hingePoint__offset);
-                                    ci.SetInWorldSpace(fixPointa, fixPointb, fixPointWorld, axis);
-                                    bhkHingeConstraint* v71 = static_cast<bhkHingeConstraint*>(
-                                        NiMemObject::operator new(sizeof(bhkHingeConstraint))
-                                    );
-                                    if (v71) {
-                                        ph = ::new (v71) bhkHingeConstraint(&ci);
+                            if ((plimbRB) && (plimbRB != pprojectileRB)) {
+                                alignas(16) NiMatrix3 rot2_3;
+                                NiPoint3 direction_2;
+                                bhkHingeConstraint* ph;
+                                hkVector4 fixPointWorld;
+                                hkVector4 axis;
+                                NiPoint3 yAxisWorld;
+                                alignas(16) hkHingeConstraintCinfo ci;
+                                ci.hkHingeConstraintCinfo::CreateData();
+                                ci.SetEntities(plimbRB, pprojectileRB);
+                                const hkTransform* Transform = &plimbRB->operator*()->getTransform();
+                                hkTransform fixPointa(*Transform);
+                                const hkTransform* v10 = &pprojectileRB->operator*()->getTransform();
+                                hkTransform fixPointb(*v10);
+                                (&fixPointa)->m_rotation.renormalize();
+                                (&fixPointb)->m_rotation.renormalize();
+                                NiNode* v11 = this->Get3D();
+                                (&v11->GetWorldTransform())->m_Rotate.GetCol(1u, yAxisWorld);
+                                NI2HKNS(axis, yAxisWorld);
+                                axis.normalize3();
+                                projectileWorld_2 = this->Get3D()->GetWorldTransform();
+                                float a2c = fpinLimDepth;
+                                alignas(16) NiPoint3 offset = -NiPoint3_UNIT_Y * a2c;
+                                NiPoint3 hingePoint__offset = projectileWorld_2 * offset;
+                                NI2HK(fixPointWorld, hingePoint__offset);
+                                ci.SetInWorldSpace(fixPointa, fixPointb, fixPointWorld, axis);
+                                bhkHingeConstraint* v71 = static_cast<bhkHingeConstraint*>(
+                                    NiMemObject::operator new(sizeof(bhkHingeConstraint))
+                                );
+                                if (v71) {
+                                    ph = ::new (v71) bhkHingeConstraint(&ci);
+                                }
+                                else {
+                                    ph = nullptr;
+                                }
+                                plimbRB->AddAction(ph);
+                                bhkWorld* v13 = this->GetParentCell()->GetbhkWorld();
+                                plimbRB->AddActConToWorld(v13);
+                                bhkWorld* pw_2 = this->GetParentCell()->GetbhkWorld();
+                                bhkPickData pd_2;
+                                NiPoint3 origin_2 = this->GetLocationOnReference();
+                                float a2d = this->GetHeading(false);
+                                rot_3.MakeZRotation(a2d);
+                                float a2e = this->GetLooking();
+                                rot2_3.MakeXRotation(a2e);
+                                rot_3 = *::new (&rot2_4) NiMatrix3(rot_3 * rot2_3);
+                                rot_3.GetCol(1u, direction_2);
+                                direction_2.Unitize();
+                                // The filter's one-field constructor is a trivial store.
+                                filter.iFilter = 0;
+                                if (this->GetCharController()) {
+                                    bhkCharacterController* CharController = this->GetCharController();
+                                    filter.iFilter = CharController->GetCollisionFilter(&v59)->iFilter;
+                                }
+                                else {
+                                    TESObjectREFR* Shooter;
+                                    filter.SetLayer(L_PROJECTILE);
+                                    if (this->GetShooter() && (Shooter = this->GetShooter(), Shooter->IsActor())) {
+                                        Actor* pactor_2 = static_cast<Actor*>(this->GetShooter());
+                                        // MobileObject::GetCollisionFilter returns its result pointer, &v57.
+                                        pactor_2->GetCollisionFilter(&v57.iFilter);
+                                        uint32_t Group = v57.GetGroup();
+                                        filter.SetGroup(Group);
                                     }
                                     else {
-                                        ph = nullptr;
+                                        uint32_t NewSystemGroup = bhkCollisionFilter::GetNewSystemGroup();
+                                        filter.SetGroup(NewSystemGroup);
                                     }
-                                    plimbRB->AddAction(ph);
-                                    bhkWorld* v13 = this->GetParentCell()->GetbhkWorld();
-                                    plimbRB->AddActConToWorld(v13);
-                                    bhkWorld* pw_2 = this->GetParentCell()->GetbhkWorld();
-                                    bhkPickData pd_2;
-                                    NiPoint3 origin_2 = this->GetLocationOnReference();
-                                    float a2d = this->GetHeading(false);
-                                    rot_3.MakeZRotation(a2d);
-                                    float a2e = this->GetLooking();
-                                    rot2_3.MakeXRotation(a2e);
-                                    rot_3 = *::new (&rot2_4) NiMatrix3(rot_3 * rot2_3);
-                                    rot_3.GetCol(1u, direction_2);
-                                    direction_2.Unitize();
-                                    // The filter's one-field constructor is a trivial store.
-                                    filter.iFilter = 0;
-                                    if (this->GetCharController()) {
-                                        bhkCharacterController* CharController = this->GetCharController();
-                                        filter.iFilter = CharController->GetCollisionFilter(&v59)->iFilter;
+                                }
+                                double Range = this->GetRange();
+                                float v55 = Range - this->fDistanceMoved;
+                                alignas(16) NiPoint3 length = direction_2 * v55;
+                                pd_2.SetFilter(filter);
+                                pd_2.NiSetFrom(origin_2);
+                                pd_2.NiSetLength(length);
+                                hkpAllRayHitCollector collector_2;
+                                pd_2.SetAllCollector(&collector_2);
+                                bhkWorld* v52 = this->GetParentCell()->GetbhkWorld();
+                                v52->PickObject(pd_2);
+                                for (int32_t i_2 = 0; !v101; ++i_2) {
+                                    COL_LAYER ebodyLayer;
+                                    int32_t FormHealth_0 = (&pd_2.pAllCollector->getHits())->m_size;
+                                    if (i_2 >= FormHealth_0) {
+                                        break;
+                                    }
+                                    const hkpWorldRayCastOutput* v20 =
+                                        &(&pd_2.pAllCollector->getHits())->operator[]<hkpWorldRayCastOutput>(i_2);
+                                    hkpWorldRayCastOutput point(*v20);
+                                    NiAVObject* pav = GetAVObjectForCollidable(point.m_rootCollidable);
+                                    hkpRigidBody* RigidBody = hkpGetRigidBody(point.m_rootCollidable);
+                                    bhkRigidBody* pbody = static_cast<bhkRigidBody*>(bhkEntity::Getbhk(RigidBody));
+                                    TESObjectREFR* pref = TESObjectREFR::FindReferenceFor3D(pav);
+                                    if (pbody) {
+                                        CFilter* v22 = pbody->GetCollisionFilter(&v46);
+                                        ebodyLayer = v22->GetLayer();
                                     }
                                     else {
-                                        TESObjectREFR* Shooter;
-                                        filter.SetLayer(L_PROJECTILE);
-                                        if (this->GetShooter() && (Shooter = this->GetShooter(), Shooter->IsActor())) {
-                                            Actor* pactor_2 = static_cast<Actor*>(this->GetShooter());
-                                            // MobileObject::GetCollisionFilter returns its result pointer, &v57.
-                                            pactor_2->GetCollisionFilter(&v57.iFilter);
-                                            uint32_t Group = v57.GetGroup();
-                                            filter.SetGroup(Group);
-                                        }
-                                        else {
-                                            uint32_t NewSystemGroup = bhkCollisionFilter::GetNewSystemGroup();
-                                            filter.SetGroup(NewSystemGroup);
-                                        }
+                                        ebodyLayer = L_UNIDENTIFIED;
                                     }
-                                    double Range = this->GetRange();
-                                    float v55 = Range - this->fDistanceMoved;
-                                    alignas(16) NiPoint3 length = direction_2 * v55;
-                                    pd_2.SetFilter(filter);
-                                    pd_2.NiSetFrom(origin_2);
-                                    pd_2.NiSetLength(length);
-                                    hkpAllRayHitCollector collector_2;
-                                    pd_2.SetAllCollector(&collector_2);
-                                    bhkWorld* v52 = this->GetParentCell()->GetbhkWorld();
-                                    v52->PickObject(pd_2);
-                                    for (int32_t i_2 = 0; !v101; ++i_2) {
-                                        COL_LAYER ebodyLayer;
-                                        int32_t FormHealth_0 = (&pd_2.pAllCollector->getHits())->m_size;
-                                        if (i_2 >= FormHealth_0) {
+                                    COL_LAYER ebodyLayer_2 = ebodyLayer;
+                                    if (pbody &&
+                                        ((ebodyLayer_2 == L_STATIC ||
+                                          (ebodyLayer_2 == L_ANIMSTATIC ||
+                                           (ebodyLayer_2 == L_TREES ||
+                                            (ebodyLayer_2 == L_GROUND ||
+                                             (ebodyLayer_2 == L_TERRAIN || ebodyLayer_2 == L_DEBRIS_LARGE))))) &&
+                                         (pbody->GetMotionType() == 5 || pbody->GetMotionType() == 4))) {
+                                        v101 = 1;
+                                    }
+                                    else {
+                                        if (pbody && (pref != this && (pref && pref != pimpact_2->pCollidee))) {
                                             break;
-                                        }
-                                        const hkpWorldRayCastOutput* v20 =
-                                            &(&pd_2.pAllCollector->getHits())->operator[]<hkpWorldRayCastOutput>(i_2);
-                                        hkpWorldRayCastOutput point(*v20);
-                                        NiAVObject* pav = GetAVObjectForCollidable(point.m_rootCollidable);
-                                        hkpRigidBody* RigidBody = hkpGetRigidBody(point.m_rootCollidable);
-                                        bhkRigidBody* pbody = static_cast<bhkRigidBody*>(bhkEntity::Getbhk(RigidBody));
-                                        TESObjectREFR* pref = TESObjectREFR::FindReferenceFor3D(pav);
-                                        if (pbody) {
-                                            CFilter* v22 = pbody->GetCollisionFilter(&v46);
-                                            ebodyLayer = v22->GetLayer();
-                                        }
-                                        else {
-                                            ebodyLayer = L_UNIDENTIFIED;
-                                        }
-                                        COL_LAYER ebodyLayer_2 = ebodyLayer;
-                                        if (pbody &&
-                                            ((ebodyLayer_2 == L_STATIC ||
-                                              (ebodyLayer_2 == L_ANIMSTATIC ||
-                                               (ebodyLayer_2 == L_TREES ||
-                                                (ebodyLayer_2 == L_GROUND ||
-                                                 (ebodyLayer_2 == L_TERRAIN || ebodyLayer_2 == L_DEBRIS_LARGE))))) &&
-                                             (pbody->GetMotionType() == 5 || pbody->GetMotionType() == 4))) {
-                                            v101 = 1;
-                                        }
-                                        else {
-                                            if (pbody && (pref != this && (pref && pref != pimpact_2->pCollidee))) {
-                                                break;
-                                            }
                                         }
                                     }
                                 }
@@ -880,92 +866,83 @@ void MissileProjectile::ProcessStick() {
     CFilter filter;
     static float fCombatMissileStickDepth_11F2020 = fCombatMissileStickDepth.Float();
     bool bloading = pSaveLoadGame->GetSaveGameLoading();
-    if (Get3D()) {
-        if (!ImpactList.IsEmpty()) {
-            if (pVATS.pLastProjectile == this) {
-                pVATS.SetLastProjectile(nullptr);
+    if ((Get3D()) && (!ImpactList.IsEmpty())) {
+        if (pVATS.pLastProjectile == this) {
+            pVATS.SetLastProjectile(nullptr);
+        }
+        fStickTime = 10.0f;
+        Projectile::ImpactData* pimpact = (&ImpactList)->m_item;
+        if ((pimpact) && (pimpact->pTargetWorldObject)) {
+            COL_LAYER ebodyLayer;
+            NiAVObject* pav = (NiAVObject*)Get3D();
+            NiAVObject* ptargetAV = GetAVObjectForCollidable(pimpact->pTargetWorldObject->getCollidable());
+            bhkRigidBody* ptargetRB = static_cast<bhkRigidBody*>(bhkEntity::Getbhk(pimpact->pTargetWorldObject));
+            if (ptargetRB) {
+                CFilter* CollisionFilter = ptargetRB->GetCollisionFilter(&apResult);
+                ebodyLayer = CollisionFilter->GetLayer();
             }
-            fStickTime = 10.0f;
-            Projectile::ImpactData* pimpact = (&ImpactList)->m_item;
-            if (pimpact) {
-                if (pimpact->pTargetWorldObject) {
-                    COL_LAYER ebodyLayer;
-                    NiAVObject* pav = (NiAVObject*)Get3D();
-                    NiAVObject* ptargetAV = GetAVObjectForCollidable(pimpact->pTargetWorldObject->getCollidable());
-                    bhkRigidBody* ptargetRB =
-                        static_cast<bhkRigidBody*>(bhkEntity::Getbhk(pimpact->pTargetWorldObject));
-                    if (ptargetRB) {
-                        CFilter* CollisionFilter = ptargetRB->GetCollisionFilter(&apResult);
-                        ebodyLayer = CollisionFilter->GetLayer();
-                    }
-                    else {
-                        ebodyLayer = L_UNIDENTIFIED;
-                    }
-                    if (!ptargetRB ||
-                        (ebodyLayer == L_DEBRIS_SMALL || (pimpact->pCollidee && pimpact->pCollidee->IsActor()))) {
-                        ProcessBounce();
-                    }
-                    else {
-                        NiAVObject* pdismemberedLimb;
-                        bhkRigidBody* pprojectileRB;
-                        SetFlag(Projectile::NO_CHARCONTROLLER, true);
-                        RemoveCharController();
-                        bhkCollisionObject* pcol = FindFirstCollisionObject(pav);
-                        if (pcol) {
-                            pprojectileRB = pcol->GetRigidBody();
-                        }
-                        else {
-                            pprojectileRB = nullptr;
-                        }
-                        if (pprojectileRB) {
-                            pprojectileRB->GetCollisionFilter(&filter);
-                            filter.SetLayer(L_NONCOLLIDABLE);
-                            pprojectileRB->SetCollisionFilter(filter);
-                        }
-                        if (!bloading) {
-                            SetLocationOnReference(
-                                pimpact->kLocation + GetMovementDirection() * fCombatMissileStickDepth_11F2020
-                            );
-                        }
-                        Sync3DWithReference(false, false);
-                        bhkWorld::UpdatePosition(pav, true, true);
-                        NiUpdateData UpdateData(0.0f, false, false);
-                        pav->Update(UpdateData);
-                        if (ptargetRB->GetMotionType() == 5) {
-                            bhkWorld::SetMotion(pav, hkpMotion::MOTION_FIXED, true, false, true);
-                        }
-                        else {
-                            bhkWorld::SetMotion(pav, hkpMotion::MOTION_KEYFRAMED, true, false, true);
-                            if (!IsFlagSet(Projectile::POST_PROCESS)) {
-                                SetFlag(Projectile::POST_PROCESS, true);
-                                // The list's address is tested for null, which it never is, as the game does.
-                                BSSimpleList<void*>* plist = &ReferenceProcessLists.ProjectilePostProcessList;
-                                if (plist) {
-                                    void* item = this;
-                                    plist->AddHead(item);
-                                }
-                            }
-                            ptargetRB->SetFlags(256u, true);
-                            if (!bloading) {
-                                if (ptargetAV) {
-                                    NiTransform targetInvert;
-                                    (&ptargetAV->GetWorldTransform())->Invert(targetInvert);
-                                    kFollowOffset =
-                                        *::new (&kDest) NiTransform(targetInvert * pav->GetWorldTransform());
-                                }
-                            }
-                        }
-                        if (pav) {
-                            NiFixedString* PinnedLimb = FixedStrings::QPinnedLimb();
-                            pdismemberedLimb = pav->GetObjectByName(*PinnedLimb);
-                        }
-                        else {
-                            pdismemberedLimb = nullptr;
-                        }
-                        if (pdismemberedLimb) {
-                            bhkWorld::SetMotion(pdismemberedLimb, hkpMotion::MOTION_DYNAMIC, true, true, true);
+            else {
+                ebodyLayer = L_UNIDENTIFIED;
+            }
+            if (!ptargetRB || (ebodyLayer == L_DEBRIS_SMALL || (pimpact->pCollidee && pimpact->pCollidee->IsActor()))) {
+                ProcessBounce();
+            }
+            else {
+                NiAVObject* pdismemberedLimb;
+                bhkRigidBody* pprojectileRB;
+                SetFlag(Projectile::NO_CHARCONTROLLER, true);
+                RemoveCharController();
+                bhkCollisionObject* pcol = FindFirstCollisionObject(pav);
+                if (pcol) {
+                    pprojectileRB = pcol->GetRigidBody();
+                }
+                else {
+                    pprojectileRB = nullptr;
+                }
+                if (pprojectileRB) {
+                    pprojectileRB->GetCollisionFilter(&filter);
+                    filter.SetLayer(L_NONCOLLIDABLE);
+                    pprojectileRB->SetCollisionFilter(filter);
+                }
+                if (!bloading) {
+                    SetLocationOnReference(
+                        pimpact->kLocation + GetMovementDirection() * fCombatMissileStickDepth_11F2020
+                    );
+                }
+                Sync3DWithReference(false, false);
+                bhkWorld::UpdatePosition(pav, true, true);
+                NiUpdateData UpdateData(0.0f, false, false);
+                pav->Update(UpdateData);
+                if (ptargetRB->GetMotionType() == 5) {
+                    bhkWorld::SetMotion(pav, hkpMotion::MOTION_FIXED, true, false, true);
+                }
+                else {
+                    bhkWorld::SetMotion(pav, hkpMotion::MOTION_KEYFRAMED, true, false, true);
+                    if (!IsFlagSet(Projectile::POST_PROCESS)) {
+                        SetFlag(Projectile::POST_PROCESS, true);
+                        // The list's address is tested for null, which it never is, as the game does.
+                        BSSimpleList<void*>* plist = &ReferenceProcessLists.ProjectilePostProcessList;
+                        if (plist) {
+                            void* item = this;
+                            plist->AddHead(item);
                         }
                     }
+                    ptargetRB->SetFlags(256u, true);
+                    if ((!bloading) && (ptargetAV)) {
+                        NiTransform targetInvert;
+                        (&ptargetAV->GetWorldTransform())->Invert(targetInvert);
+                        kFollowOffset = *::new (&kDest) NiTransform(targetInvert * pav->GetWorldTransform());
+                    }
+                }
+                if (pav) {
+                    NiFixedString* PinnedLimb = FixedStrings::QPinnedLimb();
+                    pdismemberedLimb = pav->GetObjectByName(*PinnedLimb);
+                }
+                else {
+                    pdismemberedLimb = nullptr;
+                }
+                if (pdismemberedLimb) {
+                    bhkWorld::SetMotion(pdismemberedLimb, hkpMotion::MOTION_DYNAMIC, true, true, true);
                 }
             }
         }

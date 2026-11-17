@@ -64,9 +64,8 @@ uint16_t Date::GetDaysInMonth(CALENDAR_MONTH aIndex) {
     if (((int32_t)aIndex) < 12) {
         return Date::DaysInMonth[(int32_t)aIndex];
     }
-    else {
-        return (uint16_t)0;
-    }
+
+    return (uint16_t)0;
 }
 
 uint16_t Date::CalculateDate(uint16_t asDay, uint16_t asMonth) {

@@ -39,9 +39,8 @@ uint32_t TESHealthForm::GetFormHealth(TESForm* apForm) {
     if (pHealthForm) {
         return pHealthForm->GetFormHealth();
     }
-    else {
-        return (uint32_t)0;
-    }
+
+    return (uint32_t)0;
 }
 
 // The health component of apForm when its type has one (armor, weapon, NPC or creature), else null.

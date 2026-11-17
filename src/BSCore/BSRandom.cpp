@@ -38,9 +38,8 @@ uint32_t BSRandom::UnsignedInt(uint32_t aiMax) {
     if (aiMax == -1 || aiMax == 0x7FFF) {
         return aiMax & y;
     }
-    else {
-        return y % aiMax;
-    }
+
+    return y % aiMax;
 }
 
 float BSRandom::FloatTwoPi() {

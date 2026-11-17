@@ -329,12 +329,10 @@ void NiD3DShaderFactory::RestoreAllShaderRendererData() {
                 this->m_pkShaderMap->GetNext(kIter, pcName, pkShader);
                 // The source casts the map's shader to the D3D shader interface.
                 NiD3DShaderInterface* pkD3DShader = static_cast<NiD3DShaderInterface*>(pkShader);
-                if (pkD3DShader) {
-                    if (!pkD3DShader->IsInitialized()) {
-                        pkD3DShader->SetD3DRenderer(m_pkRenderer);
-                        pkD3DShader->RecreateRendererData();
-                        m_pkRenderer->RegisterD3DShader(pkD3DShader);
-                    }
+                if ((pkD3DShader) && (!pkD3DShader->IsInitialized())) {
+                    pkD3DShader->SetD3DRenderer(m_pkRenderer);
+                    pkD3DShader->RecreateRendererData();
+                    m_pkRenderer->RegisterD3DShader(pkD3DShader);
                 }
             }
         }

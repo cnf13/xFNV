@@ -195,9 +195,8 @@ BGSImpactData* BGSImpactDataSet::GetImpactData(BGSImpactDataSet::IMPACT_MATERIAL
     if (BGSImpactDataSet::pActiveImpactSwap) {
         return BGSImpactDataSet::pActiveImpactSwap->GetSwappedImpactData(aeType, ppImpactData[(int32_t)aeType]);
     }
-    else {
-        return ppImpactData[(int32_t)aeType];
-    }
+
+    return ppImpactData[(int32_t)aeType];
 }
 
 void BGSImpactDataSet::ApplyImpactSwap(ImpactSwap* apSwap) {

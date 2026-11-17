@@ -438,14 +438,13 @@ hkpCollisionAgent* hkpBvTreeStreamAgent::dispatchConvexListBvTree(
         v10->m_memSizeAndFlags = sizeof(hkpBvTreeStreamAgent);
         return ::new (v10) hkpBvTreeStreamAgent(bodyA, bodyB, input, mgr);
     }
-    else {
-        hkMemoryRouter* v11 = &hkMemoryRouter::getInstance();
-        hkpSymmetricAgent<hkpBvTreeStreamAgent>* v12 = static_cast<hkpSymmetricAgent<hkpBvTreeStreamAgent>*>(
-            v11->m_heap->blockAlloc(sizeof(hkpSymmetricAgent<hkpBvTreeStreamAgent>))
-        );
-        v12->m_memSizeAndFlags = sizeof(hkpSymmetricAgent<hkpBvTreeStreamAgent>);
-        return ::new (v12) hkpSymmetricAgent<hkpBvTreeStreamAgent>(bodyA, bodyB, input, nullptr);
-    }
+
+    hkMemoryRouter* v11 = &hkMemoryRouter::getInstance();
+    hkpSymmetricAgent<hkpBvTreeStreamAgent>* v12 = static_cast<hkpSymmetricAgent<hkpBvTreeStreamAgent>*>(
+        v11->m_heap->blockAlloc(sizeof(hkpSymmetricAgent<hkpBvTreeStreamAgent>))
+    );
+    v12->m_memSizeAndFlags = sizeof(hkpSymmetricAgent<hkpBvTreeStreamAgent>);
+    return ::new (v12) hkpSymmetricAgent<hkpBvTreeStreamAgent>(bodyA, bodyB, input, nullptr);
 }
 
 hkpCollisionAgent* hkpBvTreeStreamAgent::createBvTreeShapeAgent(
@@ -493,14 +492,13 @@ hkpCollisionAgent* hkpBvTreeStreamAgent::dispatchBvTreeConvexList(
         v10->m_memSizeAndFlags = sizeof(hkpSymmetricAgent<hkpBvTreeStreamAgent>);
         return ::new (v10) hkpSymmetricAgent<hkpBvTreeStreamAgent>(bodyA, bodyB, input, mgr);
     }
-    else {
-        hkMemoryRouter* v11 = &hkMemoryRouter::getInstance();
-        hkpSymmetricAgent<hkpBvTreeStreamAgent>* v12 = static_cast<hkpSymmetricAgent<hkpBvTreeStreamAgent>*>(
-            v11->m_heap->blockAlloc(sizeof(hkpSymmetricAgent<hkpBvTreeStreamAgent>))
-        );
-        v12->m_memSizeAndFlags = sizeof(hkpSymmetricAgent<hkpBvTreeStreamAgent>);
-        return ::new (v12) hkpSymmetricAgent<hkpBvTreeStreamAgent>(bodyA, bodyB, input, nullptr);
-    }
+
+    hkMemoryRouter* v11 = &hkMemoryRouter::getInstance();
+    hkpSymmetricAgent<hkpBvTreeStreamAgent>* v12 = static_cast<hkpSymmetricAgent<hkpBvTreeStreamAgent>*>(
+        v11->m_heap->blockAlloc(sizeof(hkpSymmetricAgent<hkpBvTreeStreamAgent>))
+    );
+    v12->m_memSizeAndFlags = sizeof(hkpSymmetricAgent<hkpBvTreeStreamAgent>);
+    return ::new (v12) hkpSymmetricAgent<hkpBvTreeStreamAgent>(bodyA, bodyB, input, nullptr);
 }
 
 // Registers the flipped agent for (bounding volume tree, multi-ray), then the plain one for (multi-ray, bounding volume

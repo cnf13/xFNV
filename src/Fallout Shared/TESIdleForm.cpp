@@ -90,13 +90,11 @@ void TESIdleForm::InitializeData() {
 }
 
 void TESIdleForm::ClearData() {
-    if (pDataHandler->GetSaveLoad() && (!pDataHandler->GetClearingData())) {
-        if (pIdleManager->GetInitialized()) {
-            if (TESForm::GetInitialized()) {
-                RemoveFromManager();
-            }
-        }
+    if ((pDataHandler->GetSaveLoad() && (!pDataHandler->GetClearingData())) && (pIdleManager->GetInitialized()) &&
+        (TESForm::GetInitialized())) {
+        RemoveFromManager();
     }
+
     TESCondition* mBRoomAccumList = TESIdleForm::GetConditions();
     mBRoomAccumList->ClearAllConditionItems();
 }
@@ -328,9 +326,8 @@ bool TESIdleForm::CheckConditions(TESObjectREFR* apActionRef, TESObjectREFR* apT
             TESIdleForm* State = GetParentIdle();
             return State->CheckConditions(apActionRef, apTargetRef, abRecurseUp);
         }
-        else {
-            return true;
-        }
+
+        return true;
     }
     return v8;
 }
@@ -606,11 +603,9 @@ bool TESIdleForm::GetNoAttacking() {
 
 void TESIdleForm::RemoveChild(TESIdleForm* apChild) {
     uint32_t indexForChild;
-    if (apChild) {
-        if (pChildIdles) {
-            indexForChild = GetIndexForChild(apChild);
-            RemoveChildAtIndex(indexForChild);
-        }
+    if ((apChild) && (pChildIdles)) {
+        indexForChild = GetIndexForChild(apChild);
+        RemoveChildAtIndex(indexForChild);
     }
 }
 

@@ -155,10 +155,9 @@ hkBool hkpConstrainedSystemFilter::isCollisionEnabled(
         result.m_bool = 1;
         return result;
     }
-    else {
-        result.m_bool = 0;
-        return result;
-    }
+
+    result.m_bool = 0;
+    return result;
 }
 
 hkBool hkpConstrainedSystemFilter::isCollisionEnabled(
@@ -180,10 +179,9 @@ hkBool hkpConstrainedSystemFilter::isCollisionEnabled(
         result.m_bool = 1;
         return result;
     }
-    else {
-        result.m_bool = 0;
-        return result;
-    }
+
+    result.m_bool = 0;
+    return result;
 }
 
 hkBool hkpConstrainedSystemFilter::isCollisionEnabled(
@@ -199,10 +197,9 @@ hkBool hkpConstrainedSystemFilter::isCollisionEnabled(
         result.m_bool = 1;
         return result;
     }
-    else {
-        result.m_bool = 0;
-        return result;
-    }
+
+    result.m_bool = 0;
+    return result;
 }
 
 hkBool
@@ -212,10 +209,9 @@ hkpConstrainedSystemFilter::isCollisionEnabled(const hkpWorldRayCastInput& a, co
         result.m_bool = 1;
         return result;
     }
-    else {
-        result.m_bool = 0;
-        return result;
-    }
+
+    result.m_bool = 0;
+    return result;
 }
 
 void hkpConstrainedSystemFilter::constraintAddedCallback(hkpConstraintInstance* constraint) {

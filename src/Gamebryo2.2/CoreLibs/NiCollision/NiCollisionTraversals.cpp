@@ -127,34 +127,31 @@ bool NiCollisionTraversals::FindIntersectionsNode(
                 kOrigin, kDir, kPick, static_cast<NiSwitchNode*>(pkNode)
             );
         }
-        else {
-        LABEL_8:;
-            int32_t v7 = 0;
-            bool bFound = false;
-            if (pkNode->m_kChildren.m_usSize) {
-                while (kPick.m_ePickType != NiPick::FIND_FIRST ||
-                       (kPick.m_eSortType != NiPick::NO_SORT || !kPick.m_pickResults.m_uiValidResults)) {
-                    NiPointer<NiAVObject>* m_pBase = pkNode->m_kChildren.m_pBase;
-                    if (m_pBase[v7].m_pObject) {
-                        if (NiCollisionTraversals::FindIntersections(kOrigin, kDir, kPick, m_pBase[v7].m_pObject)) {
-                            bFound = true;
-                        }
-                    }
-                    if (++v7 >= static_cast<uint32_t>(pkNode->m_kChildren.m_usSize)) {
-                        return bFound;
-                    }
+
+    LABEL_8:;
+        int32_t v7 = 0;
+        bool bFound = false;
+        if (pkNode->m_kChildren.m_usSize) {
+            while (kPick.m_ePickType != NiPick::FIND_FIRST ||
+                   (kPick.m_eSortType != NiPick::NO_SORT || !kPick.m_pickResults.m_uiValidResults)) {
+                NiPointer<NiAVObject>* m_pBase = pkNode->m_kChildren.m_pBase;
+                if ((m_pBase[v7].m_pObject) &&
+                    (NiCollisionTraversals::FindIntersections(kOrigin, kDir, kPick, m_pBase[v7].m_pObject))) {
+                    bFound = true;
                 }
-                return true;
+
+                if (++v7 >= static_cast<uint32_t>(pkNode->m_kChildren.m_usSize)) {
+                    return bFound;
+                }
             }
-            else {
-                return bFound;
-            }
+            return true;
         }
+
+        return bFound;
     }
-    else {
-        kPick.m_pickResults.AddNew(pkNode);
-        return true;
-    }
+
+    kPick.m_pickResults.AddNew(pkNode);
+    return true;
 }
 
 // Gamebryo's general picking of a triangle-based geometry: a one-strip NiTriStrips and an NiTriShape take their fast
@@ -1142,10 +1139,9 @@ NiPick::Record* NiPick::Results::AddNew(NiAVObject* pObject) {
         ++this->m_uiValidResults;
         return v7;
     }
-    else {
-        NiPick::Record* v4 = m_pBase[m_uiValidResults];
-        v4->Initialize(pObject);
-        ++this->m_uiValidResults;
-        return v4;
-    }
+
+    NiPick::Record* v4 = m_pBase[m_uiValidResults];
+    v4->Initialize(pObject);
+    ++this->m_uiValidResults;
+    return v4;
 }

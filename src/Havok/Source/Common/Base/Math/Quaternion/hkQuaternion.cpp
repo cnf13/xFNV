@@ -171,15 +171,14 @@ double hkQuaternion::getAngle() const {
         float ad = std::acos(v1);
         return (ad + ad);
     }
-    else {
-        bool v2 = v1 > 0.0;
-        double v3 = 0.0;
-        if (!v2) {
-            v3 = 3.1415927f;
-        }
-        float ab = v3;
-        return (ab + ab);
+
+    bool v2 = v1 > 0.0;
+    double v3 = 0.0;
+    if (!v2) {
+        v3 = 3.1415927f;
     }
+    float ab = v3;
+    return (ab + ab);
 }
 
 // this is copied into rest, axisRot's component is taken out of rest, the conjugate of rest (x, y and z negated, w
@@ -214,10 +213,9 @@ hkBool* hkQuaternion::isOk(hkBool* a1) const {
         a1->m_bool = 1;
         return a1;
     }
-    else {
-        a1->m_bool = 0;
-        return a1;
-    }
+
+    a1->m_bool = 0;
+    return a1;
 }
 
 void hkQuaternion::setFlippedRotation(const hkVector4& from) {

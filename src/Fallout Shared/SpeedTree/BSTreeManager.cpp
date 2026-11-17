@@ -93,9 +93,8 @@ bool TES_FreeTexture(TES* apTES, const char* apPath, uint32_t aiUser) {
         BSTexturePalette::RemoveTexture(spTexture.m_pObject);
         return true;
     }
-    else {
-        return false;
-    }
+
+    return false;
 }
 
 char sub_BB2FC0(uint32_t a1, float Yaw, float Pitch) {
@@ -236,10 +235,8 @@ BSTreeNode* BSTreeManager::CreateTreeForReference(TESObjectREFR* apTreeRefr, TES
 }
 
 void BSTreeManager::AddBackgroundLoadedTree(TESObjectREFR* apRef, BSTreeNode* apTreeNode) {
-    if (!pBackgroundLoadedTreeMap->SetAt(apRef, apTreeNode, false)) {
-        if (apTreeNode) {
-            delete apTreeNode;
-        }
+    if ((!pBackgroundLoadedTreeMap->SetAt(apRef, apTreeNode, false)) && (apTreeNode)) {
+        delete apTreeNode;
     }
 }
 
@@ -268,17 +265,15 @@ NiPointer<BSTreeModel>* BSTreeManager::GetModelArray(TESObjectTREE* apTree) {
             NiPointer<BSTreeModel>* v8 = pretval;
             return v8;
         }
-        else {
-            NiPointer<BSTreeModel>* pretval_2 = new NiPointer<BSTreeModel>[1];
-            pretval = pretval_2;
-            pModelMap->SetAt(apTree, pretval_2);
-            NiPointer<BSTreeModel>* v6 = pretval;
-            return v6;
-        }
+
+        NiPointer<BSTreeModel>* pretval_2 = new NiPointer<BSTreeModel>[1];
+        pretval = pretval_2;
+        pModelMap->SetAt(apTree, pretval_2);
+        NiPointer<BSTreeModel>* v6 = pretval;
+        return v6;
     }
-    else {
-        return nullptr;
-    }
+
+    return nullptr;
 }
 
 void BSTreeManager::GetModel(TESObjectTREE* apTree, uint32_t aiSeed, NiPointer<BSTreeModel>& aspBSTreeModel) {
@@ -572,26 +567,23 @@ void BSTreeManager::Update(NiCamera* apCamera, bool abMenuMode) {
         CSpeedTreeRT::SetCamera(fcamLoc, fcamDir);
     }
     if (!abMenuMode) {
-        if (TES::pInstance) {
-            if (TES::pInstance->pSky) {
-                if (TES::pInstance->pInteriorCell) {
-                    BSTreeManager::GetInstance(true)->fWindSpeed = 0.0f;
-                }
-                else {
-                    float windSpeed = TES::pInstance->pSky->fWindSpeed;
-                    BSTreeManager::GetInstance(true)->fWindSpeed = windSpeed;
-                }
-                if (BSTreeManager::GetInstance(true)->spBillboardMatProp.m_pObject) {
-                    if (TES::pInstance->pSky->GetFog()) {
-                        NiColor col = *&TES::pInstance->pSky->GetFog()->m_kColor;
-                        BSTreeManager* Singleton = BSTreeManager::GetInstance(true);
-                        BSTreeManager* v4 = BSTreeManager::GetInstance(true);
-                        BSTreeManager* v5 = BSTreeManager::GetInstance(true);
-                        v5->spBillboardMatProp.m_pObject->SetEmittance(col);
-                    }
-                }
+        if ((TES::pInstance) && (TES::pInstance->pSky)) {
+            if (TES::pInstance->pInteriorCell) {
+                BSTreeManager::GetInstance(true)->fWindSpeed = 0.0f;
+            }
+            else {
+                float windSpeed = TES::pInstance->pSky->fWindSpeed;
+                BSTreeManager::GetInstance(true)->fWindSpeed = windSpeed;
+            }
+            if ((BSTreeManager::GetInstance(true)->spBillboardMatProp.m_pObject) && (TES::pInstance->pSky->GetFog())) {
+                NiColor col = *&TES::pInstance->pSky->GetFog()->m_kColor;
+                BSTreeManager* Singleton = BSTreeManager::GetInstance(true);
+                BSTreeManager* v4 = BSTreeManager::GetInstance(true);
+                BSTreeManager* v5 = BSTreeManager::GetInstance(true);
+                v5->spBillboardMatProp.m_pObject->SetEmittance(col);
             }
         }
+
         BSTreeManager* v6 = BSTreeManager::GetInstance(true);
         v6->UpdateWindMatrices();
     }

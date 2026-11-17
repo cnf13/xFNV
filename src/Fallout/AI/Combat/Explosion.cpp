@@ -451,46 +451,42 @@ MagicCaster* Explosion::GetMagicCaster() {
 }
 
 void Explosion::InitHavok() {
-    if (spPhantom.operator==(static_cast<bhkSimpleShapePhantom*>(nullptr))) {
-        if (this->GetParentCell()) {
-            if (this->GetParentCell()->GetbhkWorld()) {
-                bhkSimpleShapePhantom* v6;
-                bhkSphereShape* pshape;
-                alignas(16) hkSimpleShapePhantomCinfo info;
-                bhkSphereShape* v12 = static_cast<bhkSphereShape*>(NiMemObject::operator new(sizeof(bhkSphereShape)));
-                if (v12) {
-                    float afRadius = this->fRadius;
-                    pshape = ::new (v12) bhkSphereShape(afRadius, true);
-                }
-                else {
-                    pshape = nullptr;
-                }
-                info.m_shape = pshape->operator*();
-                uint32_t NewSystemGroup = bhkCollisionFilter::GetNewSystemGroup();
-                CFilter v8;
-                info.m_collisionFilterInfo =
-                    FNVD_RECONSTRUCT(CFilter)(&v8, L_SPELLEXPLOSION, NewSystemGroup, P_OTHER)->iFilter;
-                if (this->Get3D()) {
-                    NiNode* v2 = this->Get3D();
-                    info.m_transform.NI2HK(v2->GetWorldTransform());
-                }
-                else {
-                    info.m_transform.setIdentity();
-                }
-                bhkSimpleShapePhantom* v7 =
-                    static_cast<bhkSimpleShapePhantom*>(NiMemObject::operator new(sizeof(bhkSimpleShapePhantom)));
-                if (v7) {
-                    v6 = ::new (v7) bhkSimpleShapePhantom(info);
-                }
-                else {
-                    v6 = nullptr;
-                }
-                this->spPhantom.operator=(v6);
-                bhkSimpleShapePhantom* v5 = this->spPhantom.m_pObject;
-                bhkWorld* v3 = this->GetParentCell()->GetbhkWorld();
-                v5->Add(v3);
-            }
+    if ((spPhantom.operator==(static_cast<bhkSimpleShapePhantom*>(nullptr))) && (this->GetParentCell()) &&
+        (this->GetParentCell()->GetbhkWorld())) {
+        bhkSimpleShapePhantom* v6;
+        bhkSphereShape* pshape;
+        alignas(16) hkSimpleShapePhantomCinfo info;
+        bhkSphereShape* v12 = static_cast<bhkSphereShape*>(NiMemObject::operator new(sizeof(bhkSphereShape)));
+        if (v12) {
+            float afRadius = this->fRadius;
+            pshape = ::new (v12) bhkSphereShape(afRadius, true);
         }
+        else {
+            pshape = nullptr;
+        }
+        info.m_shape = pshape->operator*();
+        uint32_t NewSystemGroup = bhkCollisionFilter::GetNewSystemGroup();
+        CFilter v8;
+        info.m_collisionFilterInfo = FNVD_RECONSTRUCT(CFilter)(&v8, L_SPELLEXPLOSION, NewSystemGroup, P_OTHER)->iFilter;
+        if (this->Get3D()) {
+            NiNode* v2 = this->Get3D();
+            info.m_transform.NI2HK(v2->GetWorldTransform());
+        }
+        else {
+            info.m_transform.setIdentity();
+        }
+        bhkSimpleShapePhantom* v7 =
+            static_cast<bhkSimpleShapePhantom*>(NiMemObject::operator new(sizeof(bhkSimpleShapePhantom)));
+        if (v7) {
+            v6 = ::new (v7) bhkSimpleShapePhantom(info);
+        }
+        else {
+            v6 = nullptr;
+        }
+        this->spPhantom.operator=(v6);
+        bhkSimpleShapePhantom* v5 = this->spPhantom.m_pObject;
+        bhkWorld* v3 = this->GetParentCell()->GetbhkWorld();
+        v5->Add(v3);
     }
 }
 
@@ -506,14 +502,13 @@ bool Explosion::ChangeProcessLevel() {
     if ((Get3D() || pModelLoader->IsReferenceQueued(this)) && TES::pInstance->IsCellLoaded(pcell, true)) {
         enewLevel = PROCESS_TYPE_HIGH;
     }
-    if (eoldLevel != enewLevel) {
-        if (enewLevel) {
-            if (this) {
-                delete this;
-            }
-            return false;
+    if ((eoldLevel != enewLevel) && (enewLevel)) {
+        if (this) {
+            delete this;
         }
+        return false;
     }
+
     return bchange;
 }
 
@@ -913,10 +908,8 @@ void Explosion::ApplyImpactDecals() {
                                             &v64, RigidBody, bhkPropertyKey(NiTriStrips::ms_RTTI)
                                         );
                                         Count = static_cast<NiAVObject*>(Property->getPtr());
-                                        if (Count) {
-                                            if (Count->m_pkParent) {
-                                                Count = (NiAVObject*)Count->m_pkParent;
-                                            }
+                                        if ((Count) && (Count->m_pkParent)) {
+                                            Count = (NiAVObject*)Count->m_pkParent;
                                         }
                                     }
                                 }
@@ -1028,12 +1021,10 @@ void Explosion::ApplyImpactDecals() {
 }
 
 void Explosion::UpdateNonRenderSafeMovement(float afDelta) {
-    if (IsDistant()) {
-        if (Get3D()) {
-            NiUpdateData a2(fCellAppTime, true, false);
-            NiNode* v2 = Get3D();
-            v2->Update(a2);
-        }
+    if ((IsDistant()) && (Get3D())) {
+        NiUpdateData a2(fCellAppTime, true, false);
+        NiNode* v2 = Get3D();
+        v2->Update(a2);
     }
 }
 
@@ -1095,16 +1086,14 @@ Explosion::ExplosionTarget* Explosion::AddTarget(TESObjectREFR* apTargetRef, boo
     for (BSSimpleList<ExplosionTarget*>* pList = &TargetList; pList && !pList->IsEmpty(); pList = pList->GetNext()) {
         ExplosionTarget* pTarget = pList->GetItem();
         if (pTarget && pTarget->pRef == apTargetRef) {
-            if (abWeakPoint) {
-                if (!pTarget->bHitWeakPoint) {
-                    pTarget->bHitWeakPoint = abWeakPoint;
-                }
+            if ((abWeakPoint) && (!pTarget->bHitWeakPoint)) {
+                pTarget->bHitWeakPoint = abWeakPoint;
             }
-            if (abMobile) {
-                if (!pTarget->bMobile) {
-                    pTarget->bMobile = abMobile;
-                }
+
+            if ((abMobile) && (!pTarget->bMobile)) {
+                pTarget->bMobile = abMobile;
             }
+
             return pTarget;
         }
     }
@@ -1146,10 +1135,8 @@ BSSimpleList<Explosion::ExplodedLimb*>* Explosion::GetAffectedLimbList(TESObject
     for (BSSimpleList<Explosion::ExplosionTarget*>* ptargets = &TargetList;
          !presult && (ptargets && !ptargets->IsEmpty()); ptargets = ptargets->m_pkNext) {
         Explosion::ExplosionTarget* ptarget = ptargets->m_item;
-        if (ptarget) {
-            if (ptarget->pRef == apTarget) {
-                presult = &ptarget->limbList;
-            }
+        if ((ptarget) && (ptarget->pRef == apTarget)) {
+            presult = &ptarget->limbList;
         }
     }
     return presult;
@@ -1333,27 +1320,24 @@ void Explosion::Init3D() {
                 bhkLiquidAction* v26 = pliquid;
                 pbody_2->AddAction(pliquid);
             }
-            if (this->GetParentCell()) {
-                if (this->GetParentCell()->GetbhkWorld()) {
-                    this->GetParentCell()->GetbhkWorld();
-                    bhkWorld::UpdatePosition(pav, true, true);
-                    NiUpdateData update(0.0f, false, false);
-                    pav->Update(update);
-                    bhkWorld* v24 = this->GetParentCell()->GetbhkWorld();
-                    v24->AddObjects(pav, true, true, 0, true);
-                }
-            }
-        }
-        if (this->GetParentCell()) {
-            if (this->GetParentCell()->GetbhkWorld()) {
+            if ((this->GetParentCell()) && (this->GetParentCell()->GetbhkWorld())) {
                 this->GetParentCell()->GetbhkWorld();
                 bhkWorld::UpdatePosition(pav, true, true);
-                NiUpdateData update_2(0.0f, false, false);
-                pav->Update(update_2);
-                bhkWorld* v22 = this->GetParentCell()->GetbhkWorld();
-                v22->AddObjects(pav, true, true, 0, true);
+                NiUpdateData update(0.0f, false, false);
+                pav->Update(update);
+                bhkWorld* v24 = this->GetParentCell()->GetbhkWorld();
+                v24->AddObjects(pav, true, true, 0, true);
             }
         }
+        if ((this->GetParentCell()) && (this->GetParentCell()->GetbhkWorld())) {
+            this->GetParentCell()->GetbhkWorld();
+            bhkWorld::UpdatePosition(pav, true, true);
+            NiUpdateData update_2(0.0f, false, false);
+            pav->Update(update_2);
+            bhkWorld* v22 = this->GetParentCell()->GetbhkWorld();
+            v22->AddObjects(pav, true, true, 0, true);
+        }
+
         if (pav->IsNode()) {
             NiNode* v9 = pav->IsNode();
             if (TESObjectREFR::HasAddonFlags(v9)) {
@@ -1361,23 +1345,20 @@ void Explosion::Init3D() {
                 TESObjectREFR::AddMasterParticleAddonNodes(v10);
             }
         }
-        if (this->GetParentCell()) {
-            if (this->GetParentCell()->GetbhkWorld()) {
-                bhkWorld* v11 = this->GetParentCell()->GetbhkWorld();
-                if (v11->QDebugDisplay()) {
-                    bhkWorld* v21 = this->GetParentCell()->GetbhkWorld();
-                    v21->SetDebugDisplay(pav, true);
-                    PrepareObjectWithNoLightingRecurse(pav);
-                }
+        if ((this->GetParentCell()) && (this->GetParentCell()->GetbhkWorld())) {
+            bhkWorld* v11 = this->GetParentCell()->GetbhkWorld();
+            if (v11->QDebugDisplay()) {
+                bhkWorld* v21 = this->GetParentCell()->GetbhkWorld();
+                v21->SetDebugDisplay(pav, true);
+                PrepareObjectWithNoLightingRecurse(pav);
             }
         }
+
         NiTimeController* po = pav->GetControllers();
         if (!po) {
             NiNode* pn = pav->IsNode();
-            if (pn) {
-                if (pn->GetAtChecked(0)) {
-                    po = pn->GetAt(0)->GetControllers();
-                }
+            if ((pn) && (pn->GetAtChecked(0))) {
+                po = pn->GetAt(0)->GetControllers();
             }
         }
         NiControllerManager* pmanager = nullptr;
@@ -1444,10 +1425,8 @@ void Explosion::ApplyForces() {
                     }
                 }
             }
-            if (prb) {
-                if (prb->GetMotionType() < 4 || v16 == L_DEBRIS_LARGE) {
-                    PushRigidBody(prb);
-                }
+            if ((prb) && (prb->GetMotionType() < 4 || v16 == L_DEBRIS_LARGE)) {
+                PushRigidBody(prb);
             }
         }
     }
@@ -1462,187 +1441,178 @@ void Explosion::ProcessTargets() {
     while (plist && !plist->IsEmpty()) {
         Explosion::ExplosionTarget* ptarget = plist->m_item;
         plist = plist->m_pkNext;
-        if (ptarget) {
-            if (ptarget->pRef) {
-                if (!ptarget->bProcessed && !ptarget->pRef->GetDestroyed() && !ptarget->pRef->GetDisabled()) {
-                    float fimagespacepower;
-                    const NiPoint3* afDistance = &GetLocationOnReference();
-                    const NiPoint3* v1 = &ptarget->pRef->GetLocationOnReference();
-                    float fdistance = (*v1 - *afDistance).Length();
-                    float fdistance_2 = fdistance;
-                    float afStrength = fRadius;
-                    float fpower = CombatFormulas::CalcExplosionPower(afStrength, fdistance_2);
-                    float fimagespaceradius = fImageSpaceRadius;
-                    if (!(fimagespaceradius > 0.0)) {
-                        fimagespacepower = 1.0f;
+        if ((ptarget) && (ptarget->pRef) &&
+            (!ptarget->bProcessed && !ptarget->pRef->GetDestroyed() && !ptarget->pRef->GetDisabled())) {
+            float fimagespacepower;
+            const NiPoint3* afDistance = &GetLocationOnReference();
+            const NiPoint3* v1 = &ptarget->pRef->GetLocationOnReference();
+            float fdistance = (*v1 - *afDistance).Length();
+            float fdistance_2 = fdistance;
+            float afStrength = fRadius;
+            float fpower = CombatFormulas::CalcExplosionPower(afStrength, fdistance_2);
+            float fimagespaceradius = fImageSpaceRadius;
+            if (!(fimagespaceradius > 0.0)) {
+                fimagespacepower = 1.0f;
+            }
+            else {
+                fimagespacepower = CombatFormulas::CalcExplosionPower(fimagespaceradius, fdistance);
+            }
+            float fimagespacepower_2 = fimagespacepower;
+            if (fimagespacepower > 0.0 && ptarget->pRef->IsActor()) {
+                PlayerCharacter* pactor_2 = static_cast<PlayerCharacter*>(ptarget->pRef);
+                if (pactor_2 == pPlayer) {
+                    BGSExplosion* pbase = GetExplosionBase();
+                    TESImageSpaceModifier* pmodifier = pbase->pFormImageSpaceModifying;
+                    if (pmodifier) {
+                        ImageSpaceModifierInstanceForm::Trigger(pmodifier, fimagespacepower_2, nullptr);
                     }
-                    else {
-                        fimagespacepower = CombatFormulas::CalcExplosionPower(fimagespaceradius, fdistance);
+                }
+            }
+            if (fpower > 0.0) {
+                Actor* a1;
+                Actor* pactor;
+                if (ptarget->bMobile) {
+                    ActorCause* v3 = GetActorCause();
+                    ptarget->pRef->SetActorCause(v3);
+                }
+                if (ptarget->pRef->IsActor()) {
+                    pactor = static_cast<Actor*>(ptarget->pRef);
+                }
+                else {
+                    pactor = nullptr;
+                }
+                Actor* pactor_3 = pactor;
+                if (pactor) {
+                    pactor_3->ClearLastHitData();
+                }
+                if (GetActorCause()) {
+                    a1 = GetActorCause()->pActor;
+                }
+                else {
+                    a1 = nullptr;
+                }
+                Script::SetActionFlag(a1, &ptarget->pRef->m_Extra, SCRIPT_ACTION_ONHIT);
+                if (GetSourceWeapon()) {
+                    ExtraDataList* afStrengtha = &ptarget->pRef->m_Extra;
+                    TESObjectWEAP* SourceWeapon = GetSourceWeapon();
+                    Script::SetActionFlag(SourceWeapon, afStrengtha, SCRIPT_ACTION_ONHITWITH);
+                }
+                else {
+                    Script::SetActionFlag(GetExplosionBase(), &ptarget->pRef->m_Extra, SCRIPT_ACTION_ONHITWITH);
+                }
+                double Damage = GetDamage();
+                float fdamage = Damage * fpower;
+                if (ptarget->pRef->GetDestroyed()) {
+                    PlayerCharacter* Owner = static_cast<PlayerCharacter*>(GetOwner());
+                    if (Owner == pPlayer) {
+                        pPlayer->AddPlayerAction(PLAYER_ACTION_DESTROY_OBJECT, 8.0f, nullptr);
                     }
-                    float fimagespacepower_2 = fimagespacepower;
-                    if (fimagespacepower > 0.0 && ptarget->pRef->IsActor()) {
-                        PlayerCharacter* pactor_2 = static_cast<PlayerCharacter*>(ptarget->pRef);
-                        if (pactor_2 == pPlayer) {
-                            BGSExplosion* pbase = GetExplosionBase();
-                            TESImageSpaceModifier* pmodifier = pbase->pFormImageSpaceModifying;
-                            if (pmodifier) {
-                                ImageSpaceModifierInstanceForm::Trigger(pmodifier, fimagespacepower_2, nullptr);
+                }
+                if (pactor_3) {
+                    Actor* afDistancea = pactor_3;
+                    NiPoint3 afScale = GetLocationOnReference();
+                    if (RunLOSPick(afScale, afDistancea)) {
+                        HitData data;
+                        if (pOwner && pOwner->IsActor()) {
+                            HitData::InitializeExplosionData(
+                                &data, static_cast<Actor*>(pOwner), pactor_3, this, fdamage
+                            );
+                        }
+                        else {
+                            HitData::InitializeExplosionData(&data, nullptr, pactor_3, this, fdamage);
+                        }
+                        pactor_3->HitMe(&data, 0);
+                        if (pactor_3 == pPlayer) {
+                            float* v7 = &fExplosionShudderPowerMin.Float();
+                            if (*v7 < static_cast<double>(fpower)) {
+                                float afDistanceb = fExplosionShudderDurationY.Float();
+                                float* v8 = &fExplosionShudderDurationX.Float();
+                                NiPoint2 kduration(*v8, afDistanceb);
+                                float afDistancec = fExplosionShudderIntensityY.Float();
+                                float* v9 = &fExplosionShudderIntensityX.Float();
+                                NiPoint2 kintensity(*v9, afDistancec);
+                                float afDistanced = fExplosionShudderFrequencyY.Float();
+                                float* v10 = &fExplosionShudderFrequencyX.Float();
+                                NiPoint2 kfrequency(*v10, afDistanced);
+                                NiPoint2* afStrengthb = NiPoint2::Scale_(&apResult, fpower, &kintensity);
+                                NiPoint2* afTime = NiPoint2::Scale_(&v33, fpower, &kduration);
+                                FOHUDEffectManager* HUDEffects = Interface::GetHUDEffects();
+                                HUDEffects->TriggerShudder_007F78F0(*afTime, *afStrengthb, kfrequency);
                             }
                         }
-                    }
-                    if (fpower > 0.0) {
-                        Actor* a1;
-                        Actor* pactor;
-                        if (ptarget->bMobile) {
-                            ActorCause* v3 = GetActorCause();
-                            ptarget->pRef->SetActorCause(v3);
-                        }
-                        if (ptarget->pRef->IsActor()) {
-                            pactor = static_cast<Actor*>(ptarget->pRef);
-                        }
-                        else {
-                            pactor = nullptr;
-                        }
-                        Actor* pactor_3 = pactor;
-                        if (pactor) {
-                            pactor_3->ClearLastHitData();
-                        }
-                        if (GetActorCause()) {
-                            a1 = GetActorCause()->pActor;
-                        }
-                        else {
-                            a1 = nullptr;
-                        }
-                        Script::SetActionFlag(a1, &ptarget->pRef->m_Extra, SCRIPT_ACTION_ONHIT);
-                        if (GetSourceWeapon()) {
-                            ExtraDataList* afStrengtha = &ptarget->pRef->m_Extra;
-                            TESObjectWEAP* SourceWeapon = GetSourceWeapon();
-                            Script::SetActionFlag(SourceWeapon, afStrengtha, SCRIPT_ACTION_ONHITWITH);
-                        }
-                        else {
-                            Script::SetActionFlag(GetExplosionBase(), &ptarget->pRef->m_Extra, SCRIPT_ACTION_ONHITWITH);
-                        }
-                        double Damage = GetDamage();
-                        float fdamage = Damage * fpower;
-                        if (ptarget->pRef->GetDestroyed()) {
-                            PlayerCharacter* Owner = static_cast<PlayerCharacter*>(GetOwner());
-                            if (Owner == pPlayer) {
-                                pPlayer->AddPlayerAction(PLAYER_ACTION_DESTROY_OBJECT, 8.0f, nullptr);
-                            }
-                        }
-                        if (pactor_3) {
-                            Actor* afDistancea = pactor_3;
-                            NiPoint3 afScale = GetLocationOnReference();
-                            if (RunLOSPick(afScale, afDistancea)) {
-                                HitData data;
-                                if (pOwner && pOwner->IsActor()) {
-                                    HitData::InitializeExplosionData(
-                                        &data, static_cast<Actor*>(pOwner), pactor_3, this, fdamage
-                                    );
-                                }
-                                else {
-                                    HitData::InitializeExplosionData(&data, nullptr, pactor_3, this, fdamage);
-                                }
-                                pactor_3->HitMe(&data, 0);
-                                if (pactor_3 == pPlayer) {
-                                    float* v7 = &fExplosionShudderPowerMin.Float();
-                                    if (*v7 < static_cast<double>(fpower)) {
-                                        float afDistanceb = fExplosionShudderDurationY.Float();
-                                        float* v8 = &fExplosionShudderDurationX.Float();
-                                        NiPoint2 kduration(*v8, afDistanceb);
-                                        float afDistancec = fExplosionShudderIntensityY.Float();
-                                        float* v9 = &fExplosionShudderIntensityX.Float();
-                                        NiPoint2 kintensity(*v9, afDistancec);
-                                        float afDistanced = fExplosionShudderFrequencyY.Float();
-                                        float* v10 = &fExplosionShudderFrequencyX.Float();
-                                        NiPoint2 kfrequency(*v10, afDistanced);
-                                        NiPoint2* afStrengthb = NiPoint2::Scale_(&apResult, fpower, &kintensity);
-                                        NiPoint2* afTime = NiPoint2::Scale_(&v33, fpower, &kduration);
-                                        FOHUDEffectManager* HUDEffects = Interface::GetHUDEffects();
-                                        HUDEffects->TriggerShudder_007F78F0(*afTime, *afStrengthb, kfrequency);
-                                    }
-                                }
-                                EnchantmentItem* FormEnchanting = GetExplosionBase()->pFormEnchanting;
-                                if (FormEnchanting) {
-                                    TESObjectREFR* v28;
-                                    if ((GetOwner() && (v28 = GetOwner(), v28->IsActor())) || pCaster) {
-                                        if (pCaster) {
-                                            MagicItem* v26;
-                                            MagicTarget* v27;
-                                            if (pactor_3) {
-                                                v27 = static_cast<MagicTarget*>(pactor_3);
-                                            }
-                                            else {
-                                                v27 = nullptr;
-                                            }
-                                            if (FormEnchanting) {
-                                                v26 = &static_cast<MagicItem&>(
-                                                    static_cast<MagicItemForm&>(*FormEnchanting)
-                                                );
-                                            }
-                                            else {
-                                                v26 = nullptr;
-                                            }
-                                            pCaster->CastSpellImmediate(v26, false, v27, 1.0f, false);
-                                        }
-                                        else {
-                                            MagicItem* v24;
-                                            MagicTarget* v25;
-                                            if (pactor_3) {
-                                                v25 = static_cast<MagicTarget*>(pactor_3);
-                                            }
-                                            else {
-                                                v25 = nullptr;
-                                            }
-                                            if (FormEnchanting) {
-                                                v24 = &static_cast<MagicItem&>(
-                                                    static_cast<MagicItemForm&>(*FormEnchanting)
-                                                );
-                                            }
-                                            else {
-                                                v24 = nullptr;
-                                            }
-                                            // The owner is an actor here (tested above); the call goes through its
-                                            // MagicCaster with no null test.
-                                            static_cast<Actor*>(GetOwner())
-                                                ->CastSpellImmediate(v24, false, v25, 1.0f, false);
-                                        }
-                                    }
-                                }
-                                if (!pactor_3->IsDead(false)) {
-                                    char ShouldDamageKnockdownTarget;
-                                    if (GetExplosionBase()->GetFlag(4) ||
-                                        (GetExplosionBase()->GetFlag(8) &&
-                                         (!pactor_3 ? ShouldDamageKnockdownTarget =
-                                                          ActorValueOwner::ShouldDamageKnockdownTarget(
-                                                              nullptr, static_cast<int32_t>(data.fHealthDamage)
-                                                          )
-                                                    : ShouldDamageKnockdownTarget =
-                                                          ActorValueOwner::ShouldDamageKnockdownTarget(
-                                                              pactor_3, static_cast<int32_t>(data.fHealthDamage)
-                                                          ),
-                                          ShouldDamageKnockdownTarget))) {
-                                        PushActor(pactor_3, fpower);
-                                    }
-                                }
-                                if (pactor_3->IsDead(false)) {
-                                    NiAVObject* apObject;
-                                    if (pactor_3 == pPlayer) {
-                                        apObject = pPlayer->Get3D(false);
+                        EnchantmentItem* FormEnchanting = GetExplosionBase()->pFormEnchanting;
+                        if (FormEnchanting) {
+                            TESObjectREFR* v28;
+                            if ((GetOwner() && (v28 = GetOwner(), v28->IsActor())) || pCaster) {
+                                if (pCaster) {
+                                    MagicItem* v26;
+                                    MagicTarget* v27;
+                                    if (pactor_3) {
+                                        v27 = static_cast<MagicTarget*>(pactor_3);
                                     }
                                     else {
-                                        apObject = (NiAVObject*)pactor_3->Get3D();
+                                        v27 = nullptr;
                                     }
-                                    bhkWorld::SetMotion(apObject, hkpMotion::MOTION_DYNAMIC, true, false, true);
-                                    NiUpdateData UpdateData(0.0f, false, false);
-                                    apObject->Update(UpdateData);
+                                    if (FormEnchanting) {
+                                        v26 = &static_cast<MagicItem&>(static_cast<MagicItemForm&>(*FormEnchanting));
+                                    }
+                                    else {
+                                        v26 = nullptr;
+                                    }
+                                    pCaster->CastSpellImmediate(v26, false, v27, 1.0f, false);
+                                }
+                                else {
+                                    MagicItem* v24;
+                                    MagicTarget* v25;
+                                    if (pactor_3) {
+                                        v25 = static_cast<MagicTarget*>(pactor_3);
+                                    }
+                                    else {
+                                        v25 = nullptr;
+                                    }
+                                    if (FormEnchanting) {
+                                        v24 = &static_cast<MagicItem&>(static_cast<MagicItemForm&>(*FormEnchanting));
+                                    }
+                                    else {
+                                        v24 = nullptr;
+                                    }
+                                    // The owner is an actor here (tested above); the call goes through its
+                                    // MagicCaster with no null test.
+                                    static_cast<Actor*>(GetOwner())->CastSpellImmediate(v24, false, v25, 1.0f, false);
                                 }
                             }
                         }
-                        else {
-                            ptarget->pRef->DamageObject(fdamage, false);
+                        if (!pactor_3->IsDead(false)) {
+                            char ShouldDamageKnockdownTarget;
+                            if (GetExplosionBase()->GetFlag(4) ||
+                                (GetExplosionBase()->GetFlag(8) &&
+                                 (!pactor_3
+                                      ? ShouldDamageKnockdownTarget = ActorValueOwner::ShouldDamageKnockdownTarget(
+                                            nullptr, static_cast<int32_t>(data.fHealthDamage)
+                                        )
+                                      : ShouldDamageKnockdownTarget = ActorValueOwner::ShouldDamageKnockdownTarget(
+                                            pactor_3, static_cast<int32_t>(data.fHealthDamage)
+                                        ),
+                                  ShouldDamageKnockdownTarget))) {
+                                PushActor(pactor_3, fpower);
+                            }
+                        }
+                        if (pactor_3->IsDead(false)) {
+                            NiAVObject* apObject;
+                            if (pactor_3 == pPlayer) {
+                                apObject = pPlayer->Get3D(false);
+                            }
+                            else {
+                                apObject = (NiAVObject*)pactor_3->Get3D();
+                            }
+                            bhkWorld::SetMotion(apObject, hkpMotion::MOTION_DYNAMIC, true, false, true);
+                            NiUpdateData UpdateData(0.0f, false, false);
+                            apObject->Update(UpdateData);
                         }
                     }
+                }
+                else {
+                    ptarget->pRef->DamageObject(fdamage, false);
                 }
             }
         }
@@ -1651,15 +1621,12 @@ void Explosion::ProcessTargets() {
 
 void Explosion::PushActor(Actor* apTargetActor, float afExplosionPower) {
     BaseProcess* CurrentAIProcess;
-    if (apTargetActor) {
-        if (apTargetActor->pCurrentProcess) {
-            if (fExplosionForceKnockdownMinimum.Float() < static_cast<double>(afExplosionPower)) {
-                CurrentAIProcess = apTargetActor->pCurrentProcess;
-                NiPoint3 v5 = GetLocationOnReference();
-                // The magnitude is 0.
-                CurrentAIProcess->KnockExplosion(apTargetActor, v5, 0.0f);
-            }
-        }
+    if ((apTargetActor) && (apTargetActor->pCurrentProcess) &&
+        (fExplosionForceKnockdownMinimum.Float() < static_cast<double>(afExplosionPower))) {
+        CurrentAIProcess = apTargetActor->pCurrentProcess;
+        NiPoint3 v5 = GetLocationOnReference();
+        // The magnitude is 0.
+        CurrentAIProcess->KnockExplosion(apTargetActor, v5, 0.0f);
     }
 }
 
@@ -1690,12 +1657,10 @@ void Explosion::StartSounds() {
 }
 
 void Explosion::AttachLight() {
-    if (Get3D()) {
-        if (GetExplosionBase()->Data.pLight) {
-            NiNode* v2 = Get3D();
-            TESObjectLIGH* WaterType = GetExplosionBase()->Data.pLight;
-            spLight.operator=(static_cast<NiPointLight*>(WaterType->GenDynamic(this, v2, false)));
-        }
+    if ((Get3D()) && (GetExplosionBase()->Data.pLight)) {
+        NiNode* v2 = Get3D();
+        TESObjectLIGH* WaterType = GetExplosionBase()->Data.pLight;
+        spLight.operator=(static_cast<NiPointLight*>(WaterType->GenDynamic(this, v2, false)));
     }
 }
 
@@ -1754,35 +1719,34 @@ bool Explosion::RunLOSPick(NiPoint3 aLocation, TESObjectREFR* apTarget) {
     rt::eh_vector_constructor_iterator(targetLocation, sizeof(NiPoint3), 7, &emptyPointConstructor);
     targetLocation[0] = (&ptarget3D_2->GetWorldBound())->m_kCenter;
     char bInFurniture = 0;
-    if (apTarget->IsActor()) {
-        if (apTarget->GetSitSleepState()) {
-            bInFurniture = 1;
-            targetLocation[1] = targetLocation[0];
-            const NiBound* WorldBound = &ptarget3D_2->GetWorldBound();
-            double Seconds = WorldBound->m_fRadius;
-            targetLocation[1].z = Seconds + Seconds + targetLocation[1].z;
-            targetLocation[2] = targetLocation[0];
-            const NiBound* v6 = &ptarget3D_2->GetWorldBound();
-            double v7 = v6->m_fRadius;
-            targetLocation[2].z = targetLocation[2].z - (v7 + v7);
-            targetLocation[3] = targetLocation[0];
-            const NiBound* v8 = &ptarget3D_2->GetWorldBound();
-            double v9 = v8->m_fRadius;
-            targetLocation[3].y = v9 + v9 + targetLocation[3].y;
-            targetLocation[4] = targetLocation[0];
-            const NiBound* v10 = &ptarget3D_2->GetWorldBound();
-            double v11 = v10->m_fRadius;
-            targetLocation[4].y = targetLocation[4].y - (v11 + v11);
-            targetLocation[5] = targetLocation[0];
-            const NiBound* v12 = &ptarget3D_2->GetWorldBound();
-            double v13 = v12->m_fRadius;
-            targetLocation[5].x = v13 + v13 + targetLocation[5].x;
-            targetLocation[6] = targetLocation[0];
-            const NiBound* v14 = &ptarget3D_2->GetWorldBound();
-            double v15 = v14->m_fRadius;
-            targetLocation[6].x = targetLocation[6].x - (v15 + v15);
-        }
+    if ((apTarget->IsActor()) && (apTarget->GetSitSleepState())) {
+        bInFurniture = 1;
+        targetLocation[1] = targetLocation[0];
+        const NiBound* WorldBound = &ptarget3D_2->GetWorldBound();
+        double Seconds = WorldBound->m_fRadius;
+        targetLocation[1].z = Seconds + Seconds + targetLocation[1].z;
+        targetLocation[2] = targetLocation[0];
+        const NiBound* v6 = &ptarget3D_2->GetWorldBound();
+        double v7 = v6->m_fRadius;
+        targetLocation[2].z = targetLocation[2].z - (v7 + v7);
+        targetLocation[3] = targetLocation[0];
+        const NiBound* v8 = &ptarget3D_2->GetWorldBound();
+        double v9 = v8->m_fRadius;
+        targetLocation[3].y = v9 + v9 + targetLocation[3].y;
+        targetLocation[4] = targetLocation[0];
+        const NiBound* v10 = &ptarget3D_2->GetWorldBound();
+        double v11 = v10->m_fRadius;
+        targetLocation[4].y = targetLocation[4].y - (v11 + v11);
+        targetLocation[5] = targetLocation[0];
+        const NiBound* v12 = &ptarget3D_2->GetWorldBound();
+        double v13 = v12->m_fRadius;
+        targetLocation[5].x = v13 + v13 + targetLocation[5].x;
+        targetLocation[6] = targetLocation[0];
+        const NiBound* v14 = &ptarget3D_2->GetWorldBound();
+        double v15 = v14->m_fRadius;
+        targetLocation[6].x = targetLocation[6].x - (v15 + v15);
     }
+
     bhkPickData pd;
     fltr.iFilter = 0;
     fltr.SetLayer(L_CUSTOMPICK1);
@@ -1840,35 +1804,34 @@ bool Explosion::RunLOSPick(NiPoint3 aLocation, TESObjectREFR* apTarget) {
         NiAVObject* pdebug = (NiAVObject*)MakeLine(aLocation, v35, *targetLocation, v35, true);
         TES::pInstance->AddTempDebugObject(pdebug, 25.0f);
     }
-    if (bInFurniture) {
-        if (bIsBlocked) {
-            for (int32_t i_2 = 1; bIsBlocked && i_2 < 7; ++i_2) {
-                bIsBlocked = 0;
-                hkpAllRayHitCollector collector_2;
-                pd.SetAllCollector(&collector_2);
-                pd.NiSetTo(targetLocation[i_2]);
-                pw->PickObject(pd);
-                for (int32_t i_3 = 0; !bIsBlocked; ++i_3) {
-                    int32_t v24 = (&pd.pAllCollector->getHits())->m_size;
-                    if (i_3 >= v24) {
-                        break;
-                    }
-                    const hkpWorldRayCastOutput* v25 =
-                        &(&pd.pAllCollector->getHits())->operator[]<hkpWorldRayCastOutput>(i_3);
-                    hkpWorldRayCastOutput point_2(*v25);
-                    NiPoint3 length_2 = targetLocation[i_3] - aLocation;
-                    NiPoint3 toHit_2 = point_2.m_hitFraction * length_2;
-                    if (this->ClosestPointNormal.operator[](2) < -0.98) {
-                        double v27 = toHit_2.Length();
-                        if (fExplosionLOSBuffer.Float() > v27) {
-                            continue;
-                        }
-                    }
-                    bIsBlocked = 1;
+    if ((bInFurniture) && (bIsBlocked)) {
+        for (int32_t i_2 = 1; bIsBlocked && i_2 < 7; ++i_2) {
+            bIsBlocked = 0;
+            hkpAllRayHitCollector collector_2;
+            pd.SetAllCollector(&collector_2);
+            pd.NiSetTo(targetLocation[i_2]);
+            pw->PickObject(pd);
+            for (int32_t i_3 = 0; !bIsBlocked; ++i_3) {
+                int32_t v24 = (&pd.pAllCollector->getHits())->m_size;
+                if (i_3 >= v24) {
+                    break;
                 }
+                const hkpWorldRayCastOutput* v25 =
+                    &(&pd.pAllCollector->getHits())->operator[]<hkpWorldRayCastOutput>(i_3);
+                hkpWorldRayCastOutput point_2(*v25);
+                NiPoint3 length_2 = targetLocation[i_3] - aLocation;
+                NiPoint3 toHit_2 = point_2.m_hitFraction * length_2;
+                if (this->ClosestPointNormal.operator[](2) < -0.98) {
+                    double v27 = toHit_2.Length();
+                    if (fExplosionLOSBuffer.Float() > v27) {
+                        continue;
+                    }
+                }
+                bIsBlocked = 1;
             }
         }
     }
+
     bool v26 = bIsBlocked == 0;
     return v26;
 }
@@ -1882,64 +1845,61 @@ bool Explosion::TestExplosionUnderWater() {
     bool binWater = false;
     float fExplosionRadiusRatio = fExplosionWaterRadiusRatio.Float();
     TESObjectCELL* pcell = this->GetParentCell();
-    if (!this->IsDistant()) {
-        if (pcell) {
-            const NiPoint3* v1 = &this->GetLocationOnReference();
-            double v27 = this->fRadius * fExplosionRadiusRatio + v1->z;
-            if (!(pcell->GetWaterHeight() > v27)) {
-                hkpBroadPhase* pbroadphase;
-                hkpWorld* phkworld;
-                bhkWorld* pworld = pcell->GetbhkWorld();
-                if (pworld) {
-                    phkworld = pworld->operator*();
-                }
-                else {
-                    phkworld = nullptr;
-                }
-                if (phkworld) {
-                    pbroadphase = phkworld->m_broadPhase;
-                }
-                else {
-                    pbroadphase = nullptr;
-                }
-                if (pbroadphase) {
-                    NiPoint3* v7 = &(v20 = 1.0f * NiPoint3_UNIT_ALL);
-                    const NiPoint3* v2 = &this->GetLocationOnReference();
-                    alignas(16) NiPoint3 min = *v2 - *v7;
-                    NiPoint3* v8 = &(v18 = 1.0f * NiPoint3_UNIT_ALL);
-                    const NiPoint3* v3 = &this->GetLocationOnReference();
-                    NiPoint3 max = *v3 + *v8;
-                    hkAabb aabb;
-                    NI2HK(aabb.m_min, min);
-                    NI2HK(aabb.m_max, max);
-                    using hits_t = hkInplaceArray<hkpBroadPhaseHandlePair, 128, hkContainerHeapAllocator>;
-                    alignas(16) hits_t hits(0);
-                    pbroadphase->querySingleAabb(aabb, hits);
-                    for (int32_t i = 0; !binWater && i < hits.m_size; ++i) {
-                        hkpBroadPhaseHandlePair* v13 = &hits.operator[](i);
-                        const hkpCollidable* collB = static_cast<const hkpCollidable*>(
-                            static_cast<hkpTypedBroadPhaseHandle*>(v13->m_b)->hkpTypedBroadPhaseHandle::getOwner()
-                        );
-                        NiAVObject* pav = GetAVObjectForCollidable(collB);
-                        TESObjectREFR* pwaterRef = TESObjectREFR::FindReferenceFor3D(pav);
-                        if (pwaterRef) {
-                            if (pwaterRef->GetObjectReference()->GetFormType() == PWAT_ID) {
-                                const NiPoint3* v4 = &this->GetLocationOnReference();
-                                double Radius = this->fRadius;
-                                double v9 = Radius * fExplosionRadiusRatio + v4->z;
-                                if ((&pwaterRef->GetLocationOnReference())->z > v9) {
-                                    binWater = true;
-                                }
-                            }
+    if ((!this->IsDistant()) && (pcell)) {
+        const NiPoint3* v1 = &this->GetLocationOnReference();
+        double v27 = this->fRadius * fExplosionRadiusRatio + v1->z;
+        if (!(pcell->GetWaterHeight() > v27)) {
+            hkpBroadPhase* pbroadphase;
+            hkpWorld* phkworld;
+            bhkWorld* pworld = pcell->GetbhkWorld();
+            if (pworld) {
+                phkworld = pworld->operator*();
+            }
+            else {
+                phkworld = nullptr;
+            }
+            if (phkworld) {
+                pbroadphase = phkworld->m_broadPhase;
+            }
+            else {
+                pbroadphase = nullptr;
+            }
+            if (pbroadphase) {
+                NiPoint3* v7 = &(v20 = 1.0f * NiPoint3_UNIT_ALL);
+                const NiPoint3* v2 = &this->GetLocationOnReference();
+                alignas(16) NiPoint3 min = *v2 - *v7;
+                NiPoint3* v8 = &(v18 = 1.0f * NiPoint3_UNIT_ALL);
+                const NiPoint3* v3 = &this->GetLocationOnReference();
+                NiPoint3 max = *v3 + *v8;
+                hkAabb aabb;
+                NI2HK(aabb.m_min, min);
+                NI2HK(aabb.m_max, max);
+                using hits_t = hkInplaceArray<hkpBroadPhaseHandlePair, 128, hkContainerHeapAllocator>;
+                alignas(16) hits_t hits(0);
+                pbroadphase->querySingleAabb(aabb, hits);
+                for (int32_t i = 0; !binWater && i < hits.m_size; ++i) {
+                    hkpBroadPhaseHandlePair* v13 = &hits.operator[](i);
+                    const hkpCollidable* collB = static_cast<const hkpCollidable*>(
+                        static_cast<hkpTypedBroadPhaseHandle*>(v13->m_b)->hkpTypedBroadPhaseHandle::getOwner()
+                    );
+                    NiAVObject* pav = GetAVObjectForCollidable(collB);
+                    TESObjectREFR* pwaterRef = TESObjectREFR::FindReferenceFor3D(pav);
+                    if ((pwaterRef) && (pwaterRef->GetObjectReference()->GetFormType() == PWAT_ID)) {
+                        const NiPoint3* v4 = &this->GetLocationOnReference();
+                        double Radius = this->fRadius;
+                        double v9 = Radius * fExplosionRadiusRatio + v4->z;
+                        if ((&pwaterRef->GetLocationOnReference())->z > v9) {
+                            binWater = true;
                         }
                     }
                 }
             }
-            else {
-                binWater = true;
-            }
+        }
+        else {
+            binWater = true;
         }
     }
+
     this->bUnderWater |= binWater;
     return binWater;
 }
@@ -1956,33 +1916,29 @@ void Explosion::FindTargets() {
             pDetails = &spPhantom.m_pObject->GetCollisionDetails();
             NiAVObject* pav = GetAVObjectForCollidable(pDetails->operator[]<Detail>(uiIndex).m_collidable);
             Actor* pactor = static_cast<Actor*>(TESObjectREFR::FindReferenceFor3D(pav));
-            if (pactor) {
-                if (!pactor->IsActor() || !pactor->GetGhost()) {
-                    bool bdynamic;
-                    pDetails = &spPhantom.m_pObject->GetCollisionDetails();
-                    hkpRigidBody* pbody = hkpGetRigidBody(pDetails->operator[]<Detail>(uiIndex).m_collidable);
-                    if (pbody) {
-                        bdynamic = pbody->getMotionType() < hkpMotion::MOTION_KEYFRAMED;
+            if ((pactor) && (!pactor->IsActor() || !pactor->GetGhost())) {
+                bool bdynamic;
+                pDetails = &spPhantom.m_pObject->GetCollisionDetails();
+                hkpRigidBody* pbody = hkpGetRigidBody(pDetails->operator[]<Detail>(uiIndex).m_collidable);
+                if (pbody) {
+                    bdynamic = pbody->getMotionType() < hkpMotion::MOTION_KEYFRAMED;
+                }
+                else {
+                    bdynamic = false;
+                }
+                Explosion::ExplosionTarget* ptargetEntry = nullptr;
+                if (pactor == pPlayer || pactor == pOwner) {
+                    if (pactor == pPlayer) {
+                        ptargetEntry = pplayerTargetEntry;
                     }
-                    else {
-                        bdynamic = false;
-                    }
-                    Explosion::ExplosionTarget* ptargetEntry = nullptr;
-                    if (pactor == pPlayer || pactor == pOwner) {
-                        if (pactor == pPlayer) {
-                            ptargetEntry = pplayerTargetEntry;
-                        }
-                    }
-                    else {
-                        ptargetEntry = AddTarget(pactor, false, bdynamic);
-                    }
-                    if (ptargetEntry) {
-                        if (pactor->IsActor() && GetDamage() > 0.0) {
-                            const NiPoint3* v7 = &GetLocationOnReference();
-                            float afDistanceb = (pav->GetWorldTranslate() - *v7).Length();
-                            CheckLimbTarget(ptargetEntry, pav, afDistanceb);
-                        }
-                    }
+                }
+                else {
+                    ptargetEntry = AddTarget(pactor, false, bdynamic);
+                }
+                if ((ptargetEntry) && (pactor->IsActor() && GetDamage() > 0.0)) {
+                    const NiPoint3* v7 = &GetLocationOnReference();
+                    float afDistanceb = (pav->GetWorldTranslate() - *v7).Length();
+                    CheckLimbTarget(ptargetEntry, pav, afDistanceb);
                 }
             }
         }
@@ -2015,15 +1971,13 @@ void Explosion::PushRigidBody(bhkRigidBody* apRigidBody) {
                     pav = nullptr;
                 }
                 TESObjectREFR* pref = TESObjectREFR::FindReferenceFor3D(pav);
-                if (pref) {
-                    if (pref == this->pExplodedRef) {
-                        CFilter kLayerFilter;
-                        if (apRigidBody->GetCollisionFilter(&kLayerFilter)->GetLayer() == L_DEBRIS_LARGE) {
-                            apRigidBody->SetMotionType(hkpMotion::MOTION_DYNAMIC);
-                        }
-                        fforce = fforce * fExplosionSourceRefMult.Float();
-                        bSourceRef = 1;
+                if ((pref) && (pref == this->pExplodedRef)) {
+                    CFilter kLayerFilter;
+                    if (apRigidBody->GetCollisionFilter(&kLayerFilter)->GetLayer() == L_DEBRIS_LARGE) {
+                        apRigidBody->SetMotionType(hkpMotion::MOTION_DYNAMIC);
                     }
+                    fforce = fforce * fExplosionSourceRefMult.Float();
+                    bSourceRef = 1;
                 }
             }
             fforce = TESHavokUtilities::ScaleGameplayImpulseForce(fforce, apRigidBody, true);
@@ -2048,23 +2002,20 @@ float Explosion::GetDamage() {
         fCalculatedDamage = CombatFormulas::CalcExplosionDamage(GetExplosionBase());
         if (GetOwner()) {
             Actor* pSource = static_cast<Actor*>(GetOwner());
-            if (pSource->IsActor()) {
-                if (GetSourceWeapon()) {
-                    Actor* Owner = static_cast<Actor*>(GetOwner());
-                    TESObjectWEAP* SourceWeapon = GetSourceWeapon();
-                    ActorValue::Index WeaponSkill = SourceWeapon->GetWeaponSkill();
-                    float fActorValue = Owner->GetActorFloatValue(WeaponSkill);
-                    float* v4 = &fDamageSkillBase.Float();
-                    float fDamageMult = fActorValue * 0.009999999776482582 * fDamageSkillMult.Float() + *v4;
-                    fCalculatedDamage = fCalculatedDamage * fDamageMult;
-                }
+            if ((pSource->IsActor()) && (GetSourceWeapon())) {
+                Actor* Owner = static_cast<Actor*>(GetOwner());
+                TESObjectWEAP* SourceWeapon = GetSourceWeapon();
+                ActorValue::Index WeaponSkill = SourceWeapon->GetWeaponSkill();
+                float fActorValue = Owner->GetActorFloatValue(WeaponSkill);
+                float* v4 = &fDamageSkillBase.Float();
+                float fDamageMult = fActorValue * 0.009999999776482582 * fDamageSkillMult.Float() + *v4;
+                fCalculatedDamage = fCalculatedDamage * fDamageMult;
             }
         }
         return fCalculatedDamage;
     }
-    else {
-        return fCalculatedDamage;
-    }
+
+    return fCalculatedDamage;
 }
 
 void Explosion::DetachLight() {
@@ -2077,28 +2028,24 @@ void Explosion::DetachLight() {
 }
 
 void Explosion::CheckLimbTarget(Explosion::ExplosionTarget* apTarget, NiAVObject* apTargetObject, float afDistance) {
-    if (apTarget) {
-        if (apTarget->pRef) {
-            if (apTarget->pRef->IsActor()) {
-                Actor* ptargetActor = static_cast<Actor*>(apTarget->pRef);
-                int32_t icount = 0;
-                Explosion::ExplodedLimb* pfarthestLimb = nullptr;
-                BSSimpleList<Explosion::ExplodedLimb*>* plist = &apTarget->limbList;
-                while (plist && !plist->IsEmpty()) {
-                    ++icount;
-                    Explosion::ExplodedLimb* plimb = plist->m_item;
-                    plist = plist->m_pkNext;
-                    if (!pfarthestLimb || plimb->fDistance < static_cast<double>(pfarthestLimb->fDistance)) {
-                        pfarthestLimb = plimb;
-                    }
-                }
-                if (icount < 2 || (!pfarthestLimb || afDistance < static_cast<double>(pfarthestLimb->fDistance))) {
-                    NiNode* v4 = apTargetObject->IsNode();
-                    BGSBodyPart::LIMB_ENUM elimb = ptargetActor->GetDamageLocation(v4);
-                    if (elimb != BGSBodyPart::LIMB_NONE && elimb != BGSBodyPart::LIMB_WEAPON) {
-                        AddLimbTarget(apTarget, elimb, afDistance);
-                    }
-                }
+    if ((apTarget) && (apTarget->pRef) && (apTarget->pRef->IsActor())) {
+        Actor* ptargetActor = static_cast<Actor*>(apTarget->pRef);
+        int32_t icount = 0;
+        Explosion::ExplodedLimb* pfarthestLimb = nullptr;
+        BSSimpleList<Explosion::ExplodedLimb*>* plist = &apTarget->limbList;
+        while (plist && !plist->IsEmpty()) {
+            ++icount;
+            Explosion::ExplodedLimb* plimb = plist->m_item;
+            plist = plist->m_pkNext;
+            if (!pfarthestLimb || plimb->fDistance < static_cast<double>(pfarthestLimb->fDistance)) {
+                pfarthestLimb = plimb;
+            }
+        }
+        if (icount < 2 || (!pfarthestLimb || afDistance < static_cast<double>(pfarthestLimb->fDistance))) {
+            NiNode* v4 = apTargetObject->IsNode();
+            BGSBodyPart::LIMB_ENUM elimb = ptargetActor->GetDamageLocation(v4);
+            if (elimb != BGSBodyPart::LIMB_NONE && elimb != BGSBodyPart::LIMB_WEAPON) {
+                AddLimbTarget(apTarget, elimb, afDistance);
             }
         }
     }
@@ -2139,11 +2086,9 @@ void Explosion::CheckRefDeleted(TESObjectREFR* apDeletedRef) {
     for (BSSimpleList<Explosion::ExplosionTarget*>* plist = &TargetList; plist && !plist->IsEmpty(); plist = pnext) {
         pnext = plist->m_pkNext;
         Explosion::ExplosionTarget* ptarget = plist->m_item;
-        if (ptarget) {
-            if (ptarget->pRef == apDeletedRef) {
-                ptarget->bProcessed = true;
-                ptarget->pRef = nullptr;
-            }
+        if ((ptarget) && (ptarget->pRef == apDeletedRef)) {
+            ptarget->bProcessed = true;
+            ptarget->pRef = nullptr;
         }
     }
 }

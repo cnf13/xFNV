@@ -41,13 +41,12 @@ TESAmmo* BGSAmmoForm::GetAmmoHelper() {
         if ((&GetAmmoFormList()->ListOfForms)->ItemsInList() <= uiItemCount) {
             return static_cast<TESAmmo*>((&GetAmmoFormList()->ListOfForms)->m_item);
         }
-        else {
-            BSSimpleList<TESForm*>* ecx0 = &GetAmmoFormList()->ListOfForms;
-            for (uint32_t i = 0; i < uiItemCount; ++i) {
-                ecx0 = ecx0->m_pkNext;
-            }
-            return static_cast<TESAmmo*>(ecx0->m_item);
+
+        BSSimpleList<TESForm*>* ecx0 = &GetAmmoFormList()->ListOfForms;
+        for (uint32_t i = 0; i < uiItemCount; ++i) {
+            ecx0 = ecx0->m_pkNext;
         }
+        return static_cast<TESAmmo*>(ecx0->m_item);
     }
     return pAmmoReturn;
 }
@@ -56,18 +55,16 @@ TESAmmo* BGSAmmoForm::GetAmmoForm() {
     if (pFormAmmo && (((int32_t)pFormAmmo->GetFormType()) == 41)) {
         return static_cast<TESAmmo*>(pFormAmmo);
     }
-    else {
-        return nullptr;
-    }
+
+    return nullptr;
 }
 
 BGSListForm* BGSAmmoForm::GetAmmoFormList() {
     if (pFormAmmo && (((int32_t)pFormAmmo->GetFormType()) == 85)) {
         return static_cast<BGSListForm*>(pFormAmmo);
     }
-    else {
-        return nullptr;
-    }
+
+    return nullptr;
 }
 
 bool BGSAmmoForm::IsRockItLauncher() {
@@ -75,10 +72,8 @@ bool BGSAmmoForm::IsRockItLauncher() {
     if (GetAmmoFormList()) {
         BGSListForm* AmmoFormList = GetAmmoFormList();
         TESForm* pFirstForm = AmmoFormList->ListOfForms.GetItem();
-        if (pFirstForm) {
-            if (!dynamic_cast<TESAmmo*>(pFirstForm)) {
-                return true;
-            }
+        if ((pFirstForm) && (!dynamic_cast<TESAmmo*>(pFirstForm))) {
+            return true;
         }
     }
     return result;
@@ -98,11 +93,10 @@ void BGSAmmoForm::InitItem(TESForm* apOwner) {
         TESFile* File = apOwner->GetFile(-1);
         TESForm::AddCompileIndex(itempint, File);
         pFormAmmo = TESForm::GetFormByNumericID(itempint);
-        if (pFormAmmo) {
-            if (pFormAmmo->GetFormType() != AMMO_ID && pFormAmmo->GetFormType() != FLST_ID) {
-                pFormAmmo = nullptr;
-            }
+        if ((pFormAmmo) && (pFormAmmo->GetFormType() != AMMO_ID && pFormAmmo->GetFormType() != FLST_ID)) {
+            pFormAmmo = nullptr;
         }
+
         if (!pFormAmmo) {
             if (apOwner) {
                 if (apOwner->GetFormEditorIDLength()) {

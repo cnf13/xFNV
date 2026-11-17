@@ -22,15 +22,15 @@ public:
     ) const;
     void removePairs(hkpTypedBroadPhaseHandlePair* deletedPairs, int32_t numDeletedPairs) const;
 
-    inline hkpBroadPhaseListener* getBroadPhaseListener(int32_t typeA, int32_t typeB) {
+    hkpBroadPhaseListener* getBroadPhaseListener(int32_t typeA, int32_t typeB) {
         return m_broadPhaseListeners[typeA][typeB];
     }
 
-    inline void setBroadPhaseListener(hkpBroadPhaseListener* listener, int32_t a, int32_t b) {
+    void setBroadPhaseListener(hkpBroadPhaseListener* listener, int32_t a, int32_t b) {
         m_broadPhaseListeners[a][b] = listener;
     }
 
-    inline hkpBroadPhaseListener* getNullBroadPhaseListener() {
+    hkpBroadPhaseListener* getNullBroadPhaseListener() {
         return &m_nullBroadPhaseListener;
     }
 

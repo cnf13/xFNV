@@ -128,16 +128,14 @@ void ItemModMenu::DoEnter(int32_t a1, Tile* a2) {
             iprevHighlightIndex = inewHighlightIndex;
         }
         pTiles[13]->Set(4036, "", true);
-        if (pcurrItem) {
-            if (ItemModMenu::pBrokenItem) {
-                TESObjectIMOD* pImod = static_cast<TESObjectIMOD*>(pcurrItem->pContainerObj);
-                const char* v6 = pImod->GetDescription(nullptr, DESC_ID);
-                pTiles[13]->Set(4036, v6, true);
-                const char* IconOne = pcurrItem->GetIconOne(nullptr);
-                ItemModMenu::pMe->pTiles[3]->Set(4044, IconOne, true);
-                int32_t v8 = Tile::TextToTrait("_line_alpha");
-                pTiles[11]->Set(v8, 255.0f, true);
-            }
+        if ((pcurrItem) && (ItemModMenu::pBrokenItem)) {
+            TESObjectIMOD* pImod = static_cast<TESObjectIMOD*>(pcurrItem->pContainerObj);
+            const char* v6 = pImod->GetDescription(nullptr, DESC_ID);
+            pTiles[13]->Set(4036, v6, true);
+            const char* IconOne = pcurrItem->GetIconOne(nullptr);
+            ItemModMenu::pMe->pTiles[3]->Set(4044, IconOne, true);
+            int32_t v8 = Tile::TextToTrait("_line_alpha");
+            pTiles[11]->Set(v8, 255.0f, true);
         }
     }
 }
@@ -266,13 +264,12 @@ char ItemModMenu::ItemModItem(ItemChange* a1) {
             pbrokenExtra_3 = nullptr;
         }
     }
-    if (pweap->GetModEffect(mSlot) == WEAPON_MOD_MAX_HEALTH) {
-        if (pbrokenExtra_3) {
-            double Health = pbrokenExtra_3->GetHealth();
-            float v7 = pweap->GetModEffectValue(WEAPON_MOD_MAX_HEALTH, 0) + Health;
-            pbrokenExtra_3->SetHealth(v7);
-        }
+    if ((pweap->GetModEffect(mSlot) == WEAPON_MOD_MAX_HEALTH) && (pbrokenExtra_3)) {
+        double Health = pbrokenExtra_3->GetHealth();
+        float v7 = pweap->GetModEffectValue(WEAPON_MOD_MAX_HEALTH, 0) + Health;
+        pbrokenExtra_3->SetHealth(v7);
     }
+
     if (bReturn) {
         MiscStatManager::Increment(MiscStatManager::MS_WEAPONS_MODDED);
     }
@@ -305,21 +302,16 @@ Tile* ItemModMenu::Create() {
             ItemModMenu::pMe->PrepForVisibility(true);
             return th_s;
         }
-        else {
-            Warning("MENUS: ItemMod Menu Creation Failed... Are your menu and art resources up to date?");
-            return nullptr;
-        }
-    }
-    else {
-        if (ItemModMenu::pMe) {
-            if (ItemModMenu::pMe->pMenu) {
-                if (ItemModMenu::pMe) {
-                    delete ItemModMenu::pMe;
-                }
-            }
-        }
+
+        Warning("MENUS: ItemMod Menu Creation Failed... Are your menu and art resources up to date?");
         return nullptr;
     }
+
+    if ((ItemModMenu::pMe) && (ItemModMenu::pMe->pMenu) && (ItemModMenu::pMe)) {
+        delete ItemModMenu::pMe;
+    }
+
+    return nullptr;
 }
 
 int32_t ItemModMenu::GetClassStatic() {
@@ -334,16 +326,15 @@ void ItemModMenu::InitItemModMenu(ItemChange* apBrokenItem, bool bCheckEquip) {
         if (apBrokenItem) {
             ItemModMenu::pBrokenItem = apBrokenItem;
         }
-        if (ItemModMenu::pBrokenItem) {
-            if (bCheckEquip && ItemModMenu::pBrokenItem->GetWorn(false)) {
-                ItemModMenu::pBrokenItem->SetIsModding();
-                ExtraDataList* afCondition = ItemModMenu::pBrokenItem->pExtraObjectList->m_item;
-                uint32_t FormHealth_0 = ItemModMenu::pBrokenItem->iNumber;
-                TESBoundObject* FormFlags = ItemModMenu::pBrokenItem->pContainerObj;
-                pPlayer->QueueUnEquipObject(FormFlags, FormHealth_0, afCondition, false, false, true);
-                ItemModMenu::bIsEquipped = true;
-            }
+        if ((ItemModMenu::pBrokenItem) && (bCheckEquip && ItemModMenu::pBrokenItem->GetWorn(false))) {
+            ItemModMenu::pBrokenItem->SetIsModding();
+            ExtraDataList* afCondition = ItemModMenu::pBrokenItem->pExtraObjectList->m_item;
+            uint32_t FormHealth_0 = ItemModMenu::pBrokenItem->iNumber;
+            TESBoundObject* FormFlags = ItemModMenu::pBrokenItem->pContainerObj;
+            pPlayer->QueueUnEquipObject(FormFlags, FormHealth_0, afCondition, false, false, true);
+            ItemModMenu::bIsEquipped = true;
         }
+
         float fcondition = ItemModMenu::pBrokenItem->GetItemHealth(true) / 100.0;
         ItemModMenu::pMe->pTiles[4]->Set(Tile::kTileValue_User0, fcondition, true);
         ItemModMenu::pMe->pTiles[4]->Set(4003, 1);
@@ -380,13 +371,12 @@ void ItemModMenu::InitItemModMenu(ItemChange* apBrokenItem, bool bCheckEquip) {
         ItemModMenu::pMe->lbItemModList.Traverse(&ItemModMenu::SetTileAlpha, 0, 0x7FFFFFFF);
         ListBox<ItemChange*>* pSortedList = &ItemModMenu::pMe->lbItemModList;
         pSortedList->Sort(&ItemModMenu::CompareForSorting);
-        if (apBrokenItem) {
-            if (InterfaceManager::Has360Controller()) {
-                Tile* afVala = static_cast<ListBoxBase*>(&ItemModMenu::pMe->lbItemModList)->GetTileAt(1u, false);
-                InterfaceManager* v9 = InterfaceManager::Instance();
-                v9->SetCurrentFocusTarget(afVala, 4035, true);
-            }
+        if ((apBrokenItem) && (InterfaceManager::Has360Controller())) {
+            Tile* afVala = static_cast<ListBoxBase*>(&ItemModMenu::pMe->lbItemModList)->GetTileAt(1u, false);
+            InterfaceManager* v9 = InterfaceManager::Instance();
+            v9->SetCurrentFocusTarget(afVala, 4035, true);
         }
+
         ListBoxBase* pHighlightList = &ItemModMenu::pMe->lbItemModList;
         Tile* v10 = static_cast<Tile*>(pHighlightList->GetHighlightedItem());
         ItemModMenu::pMe->DoEnter(15, v10);
@@ -529,21 +519,19 @@ void ItemModMenu::Update() {
 }
 
 void ItemModMenu::SetTileAlpha(Tile* a1, ItemChange* a2) {
-    if (a1) {
-        if (a2) {
-            a2->GetItemHealth(true);
-            a1->Set(4010, 15);
-            int32_t a3 = a1->GetFloat(4012) >= 0.0;
-            a1->Set(4003, a3);
-            a1->Set(4003, 1.0f, true);
-            TESObjectWEAP* FormFlags = static_cast<TESObjectWEAP*>(ItemModMenu::pBrokenItem->pContainerObj);
-            if (ItemModMenu::pBrokenItem->GetModSlots()) {
-                TESObjectIMOD* v3 = static_cast<TESObjectIMOD*>(a2->pContainerObj);
-                if (((ItemModMenu::pBrokenItem->GetModSlots() & 1) != 0 && v3 == FormFlags->GetModItem(1u)) ||
-                    (((ItemModMenu::pBrokenItem->GetModSlots() & 2) != 0 && v3 == FormFlags->GetModItem(2u)) ||
-                     ((ItemModMenu::pBrokenItem->GetModSlots() & 4) != 0 && v3 == FormFlags->GetModItem(4u)))) {
-                    a1->xChildren.GetTail()->Set(4009, 127.5f, true);
-                }
+    if ((a1) && (a2)) {
+        a2->GetItemHealth(true);
+        a1->Set(4010, 15);
+        int32_t a3 = a1->GetFloat(4012) >= 0.0;
+        a1->Set(4003, a3);
+        a1->Set(4003, 1.0f, true);
+        TESObjectWEAP* FormFlags = static_cast<TESObjectWEAP*>(ItemModMenu::pBrokenItem->pContainerObj);
+        if (ItemModMenu::pBrokenItem->GetModSlots()) {
+            TESObjectIMOD* v3 = static_cast<TESObjectIMOD*>(a2->pContainerObj);
+            if (((ItemModMenu::pBrokenItem->GetModSlots() & 1) != 0 && v3 == FormFlags->GetModItem(1u)) ||
+                (((ItemModMenu::pBrokenItem->GetModSlots() & 2) != 0 && v3 == FormFlags->GetModItem(2u)) ||
+                 ((ItemModMenu::pBrokenItem->GetModSlots() & 4) != 0 && v3 == FormFlags->GetModItem(4u)))) {
+                a1->xChildren.GetTail()->Set(4009, 127.5f, true);
             }
         }
     }

@@ -32,9 +32,8 @@ char BSMAX_1(char a1, char a2) {
     if (a1 <= a2) {
         return a2;
     }
-    else {
-        return a1;
-    }
+
+    return a1;
 }
 
 PathingLOSMap::PathingLOSMap(NiPoint3 aCenter, float afRadius)

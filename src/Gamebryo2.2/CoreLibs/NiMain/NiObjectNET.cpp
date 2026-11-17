@@ -345,40 +345,38 @@ bool NiObjectNET::InsertExtraData(NiExtraData* pkExtra) {
             LeaveCriticalSection(&NiObjectNET::ExtraDataCrit.m_kCriticalSection);
             return true;
         }
-        else {
-            while (true) {
-                int32_t i_4 = i_3;
-                const char* m_kHandle = (&this->m_ppkExtra[i_4 - 1]->GetName())->GetHandle();
-                int32_t v13 = m_kHandle - (&this->m_ppkExtra[i_4]->GetName())->GetHandle();
-                if (!v13) {
-                    break;
-                }
-                if (v13 > 0) {
-                    NiExtraData** m_ppkExtra = this->m_ppkExtra;
-                    NiExtraData* pkTmpED = m_ppkExtra[i_4 - 1];
-                    m_ppkExtra[i_3 - 1] = m_ppkExtra[i_3];
-                    --i_3;
-                    this->m_ppkExtra[i_4] = pkTmpED;
-                    if (i_3) {
-                        continue;
-                    }
-                }
-                goto LABEL_13;
+
+        while (true) {
+            int32_t i_4 = i_3;
+            const char* m_kHandle = (&this->m_ppkExtra[i_4 - 1]->GetName())->GetHandle();
+            int32_t v13 = m_kHandle - (&this->m_ppkExtra[i_4]->GetName())->GetHandle();
+            if (!v13) {
+                break;
             }
-            DeleteExtraData(i_3);
-            LeaveCriticalSection(&NiObjectNET::ExtraDataCrit.m_kCriticalSection);
-            return false;
+            if (v13 > 0) {
+                NiExtraData** m_ppkExtra = this->m_ppkExtra;
+                NiExtraData* pkTmpED = m_ppkExtra[i_4 - 1];
+                m_ppkExtra[i_3 - 1] = m_ppkExtra[i_3];
+                --i_3;
+                this->m_ppkExtra[i_4] = pkTmpED;
+                if (i_3) {
+                    continue;
+                }
+            }
+            goto LABEL_13;
         }
-    }
-    else {
-        this->m_usMaxSize = 1;
-        m_usExtraDataSize = 1;
-        NiExtraData** ppkNewExtra = static_cast<NiExtraData**>(_NiMalloc(sizeof(NiExtraData*)));
-        this->m_ppkExtra = ppkNewExtra;
-        *ppkNewExtra = pkExtra;
+        DeleteExtraData(i_3);
         LeaveCriticalSection(&NiObjectNET::ExtraDataCrit.m_kCriticalSection);
-        return true;
+        return false;
     }
+
+    this->m_usMaxSize = 1;
+    m_usExtraDataSize = 1;
+    NiExtraData** ppkNewExtra = static_cast<NiExtraData**>(_NiMalloc(sizeof(NiExtraData*)));
+    this->m_ppkExtra = ppkNewExtra;
+    *ppkNewExtra = pkExtra;
+    LeaveCriticalSection(&NiObjectNET::ExtraDataCrit.m_kCriticalSection);
+    return true;
 }
 
 const NiFixedString& NiObjectNET::GetName() const {
@@ -488,28 +486,27 @@ void NiObjectNET::CopyMembers(NiObjectNET* pkDest, NiCloningProcess& kCloning) {
             pkDest->m_kName.SetHandle(kHandle);
         }
     }
-    else if (kCloning.m_eCopyType == COPY_UNIQUE) {
-        if (m_kName.GetHandle()) {
-            size_t stQuantity = strlen(m_kName.GetHandle()) + 2;
-            char* pcNamePlus = static_cast<char*>(_NiMalloc(stQuantity));
-            strcpy_s(pcNamePlus, stQuantity, m_kName.GetHandle());
-            pcNamePlus[stQuantity - 2] = kCloning.m_cAppendChar;
-            pcNamePlus[stQuantity - 1] = 0;
-            // The temporary NiFixedString(pcNamePlus).
-            // EXE-INLINED 0x438170
-            NiGlobalStringTable::GlobalStringHandle kNew =
-                pcNamePlus ? NiGlobalStringTable::AddString(pcNamePlus) : NiGlobalStringTable::NULL_STRING;
-            NiFixedString kName;
-            kName.SetHandle(kNew);
-            pkDest->SetName(kName);
-            // EXE-INLINED 0x4381B0
-            if (kNew != NiGlobalStringTable::NULL_STRING) {
-                // EXE-INLINED 0x438210
-                InterlockedDecrementUInt32(reinterpret_cast<volatile uint32_t*>(const_cast<char*>(kNew - 8)));
-            }
-            _NiFree(pcNamePlus);
+    else if ((kCloning.m_eCopyType == COPY_UNIQUE) && (m_kName.GetHandle())) {
+        size_t stQuantity = strlen(m_kName.GetHandle()) + 2;
+        char* pcNamePlus = static_cast<char*>(_NiMalloc(stQuantity));
+        strcpy_s(pcNamePlus, stQuantity, m_kName.GetHandle());
+        pcNamePlus[stQuantity - 2] = kCloning.m_cAppendChar;
+        pcNamePlus[stQuantity - 1] = 0;
+        // The temporary NiFixedString(pcNamePlus).
+        // EXE-INLINED 0x438170
+        NiGlobalStringTable::GlobalStringHandle kNew =
+            pcNamePlus ? NiGlobalStringTable::AddString(pcNamePlus) : NiGlobalStringTable::NULL_STRING;
+        NiFixedString kName;
+        kName.SetHandle(kNew);
+        pkDest->SetName(kName);
+        // EXE-INLINED 0x4381B0
+        if (kNew != NiGlobalStringTable::NULL_STRING) {
+            // EXE-INLINED 0x438210
+            InterlockedDecrementUInt32(reinterpret_cast<volatile uint32_t*>(const_cast<char*>(kNew - 8)));
         }
+        _NiFree(pcNamePlus);
     }
+
     for (uint16_t i = 0; i < m_usExtraDataSize; ++i) {
         NiExtraData* pkExtra = m_ppkExtra[i];
         if (pkExtra && pkExtra->IsCloneable()) {
@@ -577,29 +574,28 @@ bool NiObjectNET::RemoveExtraData(const NiFixedString& kKey) {
         LeaveCriticalSection(&NiObjectNET::ExtraDataCrit.m_kCriticalSection);
         return false;
     }
-    else {
-        int16_t sMiddle;
-        while (true) {
-            const char* m_kHandle = (&kKey)->GetHandle();
-            sMiddle = (sBottom + sTop) >> 1;
-            int32_t v8 = m_kHandle - (&this->m_ppkExtra[sMiddle]->GetName())->GetHandle();
-            if (!v8) {
-                break;
-            }
-            if (v8 <= 0) {
-                sTop = sMiddle - 1;
-            }
-            else {
-                sBottom = sMiddle + 1;
-            }
-            if (sBottom > sTop) {
-                goto LABEL_11;
-            }
+
+    int16_t sMiddle;
+    while (true) {
+        const char* m_kHandle = (&kKey)->GetHandle();
+        sMiddle = (sBottom + sTop) >> 1;
+        int32_t v8 = m_kHandle - (&this->m_ppkExtra[sMiddle]->GetName())->GetHandle();
+        if (!v8) {
+            break;
         }
-        DeleteExtraData(static_cast<uint16_t>(sMiddle));
-        LeaveCriticalSection(&NiObjectNET::ExtraDataCrit.m_kCriticalSection);
-        return true;
+        if (v8 <= 0) {
+            sTop = sMiddle - 1;
+        }
+        else {
+            sBottom = sMiddle + 1;
+        }
+        if (sBottom > sTop) {
+            goto LABEL_11;
+        }
     }
+    DeleteExtraData(static_cast<uint16_t>(sMiddle));
+    LeaveCriticalSection(&NiObjectNET::ExtraDataCrit.m_kCriticalSection);
+    return true;
 }
 
 // Names an unnamed pkExtra "<RTTI name up to 'ExtraData'>ED<index>" before inserting it.

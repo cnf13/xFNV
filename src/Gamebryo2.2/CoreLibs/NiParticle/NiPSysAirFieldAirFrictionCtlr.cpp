@@ -24,10 +24,9 @@ NiObject* NiPSysAirFieldAirFrictionCtlr::CreateClone(NiCloningProcess& kCloning)
         NiPSysModifierCtlr::CopyMembers(v4, kCloning);
         return v4;
     }
-    else {
-        NiPSysModifierCtlr::CopyMembers(nullptr, kCloning);
-        return nullptr;
-    }
+
+    NiPSysModifierCtlr::CopyMembers(nullptr, kCloning);
+    return nullptr;
 }
 
 // The streaming and compare slots are jumps to the NiPSysModifierFloatCtlr bodies, shared by every

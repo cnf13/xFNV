@@ -198,41 +198,37 @@ void TESUseWeaponPackageData::InitItem(TESForm* apOwner) {
     // apOwner is the package that owns this data (TESPackage::InitItem passes itself).
     PackageLocation* ppackLoc = static_cast<TESPackage*>(apOwner)->GetLocation();
     char v11 = 1;
-    if (!pAttackTarget) {
-        if (ppackLoc) {
-            if (ppackLoc->GetLocType() == PLT_REFERENCE) {
-                TESObjectREFR* plocRef = ppackLoc->GetLocReference();
-                if (plocRef) {
-                    TESBoundObject* pboundObj = plocRef->GetObjectReference();
-                    if (pboundObj == pXMarker || pboundObj == pXMarkerHeading) {
-                        ExtraDataList* pextra = &plocRef->m_Extra;
-                        if (pextra) {
-                            TESObjectREFR* pattackTarget = pextra->GetXTarget();
-                            if (pattackTarget) {
-                                PackageTarget* v3;
-                                PackageTarget* v5 = static_cast<PackageTarget*>(ourMalloc(sizeof(PackageTarget)));
-                                if (v5) {
-                                    v3 = ::new (v5) PackageTarget;
-                                }
-                                else {
-                                    v3 = nullptr;
-                                }
-                                pAttackTarget = v3;
-                                pAttackTarget->SetTargType(PTT_REFERENCE);
-                                pAttackTarget->SetTargReference(pattackTarget);
-                                v11 = 0;
-                            }
+    if ((!pAttackTarget) && (ppackLoc) && (ppackLoc->GetLocType() == PLT_REFERENCE)) {
+        TESObjectREFR* plocRef = ppackLoc->GetLocReference();
+        if (plocRef) {
+            TESBoundObject* pboundObj = plocRef->GetObjectReference();
+            if (pboundObj == pXMarker || pboundObj == pXMarkerHeading) {
+                ExtraDataList* pextra = &plocRef->m_Extra;
+                if (pextra) {
+                    TESObjectREFR* pattackTarget = pextra->GetXTarget();
+                    if (pattackTarget) {
+                        PackageTarget* v3;
+                        PackageTarget* v5 = static_cast<PackageTarget*>(ourMalloc(sizeof(PackageTarget)));
+                        if (v5) {
+                            v3 = ::new (v5) PackageTarget;
                         }
+                        else {
+                            v3 = nullptr;
+                        }
+                        pAttackTarget = v3;
+                        pAttackTarget->SetTargType(PTT_REFERENCE);
+                        pAttackTarget->SetTargReference(pattackTarget);
+                        v11 = 0;
                     }
                 }
             }
         }
     }
-    if (pAttackTarget) {
-        if (v11) {
-            pAttackTarget->InitItem(apOwner);
-        }
+
+    if ((pAttackTarget) && (v11)) {
+        pAttackTarget->InitItem(apOwner);
     }
+
     TESForm* FormByNumericID = TESForm::GetFormByNumericID(static_cast<uint32_t>(reinterpret_cast<uintptr_t>(pWeapon)));
     pWeapon = dynamic_cast<TESObjectWEAP*>(FormByNumericID);
 }

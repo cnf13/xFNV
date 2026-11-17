@@ -90,9 +90,8 @@ const char* TESTexture::GetTextureName() const {
     if (TextureName.pString) {
         return TextureName.pString;
     }
-    else {
-        return "";
-    }
+
+    return "";
 }
 
 void TESTexture::SetTextureName(const char* apTextureName) {
@@ -108,9 +107,8 @@ const char* TESTexture::GetTextureName(TESForm* apForm, TESObjectREFR* apRef) {
     if (piconFilename) {
         return piconFilename;
     }
-    else {
-        return "";
-    }
+
+    return "";
 }
 
 // Record code 'ICON' as a little-endian integer.
@@ -127,13 +125,12 @@ void TESTexture::LoadTextureChunk(TESTexture* apTexture, TESFile* apFile) {
     if (apFile->GetChunkSize()) {
         char* pTextureName = static_cast<char*>(__builtin_alloca(apFile->GetChunkSize()));
         apFile->GetChunkData(pTextureName, 0);
-        if (std::strlen(pTextureName)) {
-            if (pTextureName[0] == '\\') {
-                for (uint32_t i = 0; i < std::strlen(pTextureName); ++i) {
-                    pTextureName[i] = pTextureName[i + 1];
-                }
+        if ((std::strlen(pTextureName)) && (pTextureName[0] == '\\')) {
+            for (uint32_t i = 0; i < std::strlen(pTextureName); ++i) {
+                pTextureName[i] = pTextureName[i + 1];
             }
         }
+
         apTexture->TESTexture::SetTextureName(pTextureName);
     }
     else {

@@ -168,15 +168,13 @@ void hkBallAndSocketConstraintCinfo::GetViewerStrings(NiTPrimitiveArray<char*>* 
 // Scales both pivots of the constraint data by afScale, broadcast to the four lanes (scale times pivot, in that operand
 // order), unless the data is null or the scale is exactly 1.
 void hkBallAndSocketConstraintCinfo::ApplyScale(float afScale, hkpConstraintData* apInfo) {
-    if (apInfo) {
-        if (1.0f != afScale) {
-            hkpBallAndSocketConstraintData* pBallData = static_cast<hkpBallAndSocketConstraintData*>(apInfo);
-            hkVector4& rTranslationA = pBallData->m_atoms.m_pivots.m_translationA;
-            hkVector4& rTranslationB = pBallData->m_atoms.m_pivots.m_translationB;
-            rTranslationA.m_quad =
-                _mm_mul_ps(_mm_shuffle_ps(_mm_set_ss(afScale), _mm_set_ss(afScale), 0), rTranslationA.m_quad);
-            rTranslationB.m_quad =
-                _mm_mul_ps(_mm_shuffle_ps(_mm_set_ss(afScale), _mm_set_ss(afScale), 0), rTranslationB.m_quad);
-        }
+    if ((apInfo) && (1.0f != afScale)) {
+        hkpBallAndSocketConstraintData* pBallData = static_cast<hkpBallAndSocketConstraintData*>(apInfo);
+        hkVector4& rTranslationA = pBallData->m_atoms.m_pivots.m_translationA;
+        hkVector4& rTranslationB = pBallData->m_atoms.m_pivots.m_translationB;
+        rTranslationA.m_quad =
+            _mm_mul_ps(_mm_shuffle_ps(_mm_set_ss(afScale), _mm_set_ss(afScale), 0), rTranslationA.m_quad);
+        rTranslationB.m_quad =
+            _mm_mul_ps(_mm_shuffle_ps(_mm_set_ss(afScale), _mm_set_ss(afScale), 0), rTranslationB.m_quad);
     }
 }

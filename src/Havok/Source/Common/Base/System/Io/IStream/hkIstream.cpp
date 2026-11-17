@@ -193,10 +193,9 @@ hkBool* hkIstream::isOk(hkBool* apResult) {
         m_streamReader->isOk(apResult);
         return apResult;
     }
-    else {
-        apResult->m_bool = 0;
-        return apResult;
-    }
+
+    apResult->m_bool = 0;
+    return apResult;
 }
 
 int32_t hkIstream::getline(char* str, int32_t maxlen, char delim) {
@@ -357,18 +356,16 @@ hkIstream& hkIstream::operator>>(hkBool& b) {
         m_streamReader->skip(4);
         return *this;
     }
-    else {
-        if (v3 >= 5 &&
-            (!hkString::strNcmp(Str1, "false", 4) &&
-             (v3 == 5 || (Str1[5] == 32 || (Str1[5] == 9 || (Str1[5] == 13 || Str1[5] == 10)))))) {
-            b.m_bool = 0;
-            m_streamReader->rewindToMark();
-            m_streamReader->skip(5);
-            return *this;
-        }
-        else {
-            m_streamReader->rewindToMark();
-            return *this;
-        }
+
+    if (v3 >= 5 &&
+        (!hkString::strNcmp(Str1, "false", 4) &&
+         (v3 == 5 || (Str1[5] == 32 || (Str1[5] == 9 || (Str1[5] == 13 || Str1[5] == 10)))))) {
+        b.m_bool = 0;
+        m_streamReader->rewindToMark();
+        m_streamReader->skip(5);
+        return *this;
     }
+
+    m_streamReader->rewindToMark();
+    return *this;
 }

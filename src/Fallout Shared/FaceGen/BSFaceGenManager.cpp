@@ -301,9 +301,8 @@ bool BSFaceGenModelMap::LoadEGTData(BSFaceGenModel* apModel) {
         BSFaceGenManager::UnlockFaceGenAccess();
         return bres;
     }
-    else {
-        return false;
-    }
+
+    return false;
 }
 
 uint32_t BSFaceGenModelMap::GetMaxDataSize(BSFaceGenModelMap::DataType aDataType) {
@@ -356,13 +355,11 @@ void BSFaceGenModelMap::UnloadAllEGMAndEGTData(bool abForce) {
             if (spEntry->spModel->GetRefCount() == 1) {
                 Map.RemoveAt(pKey);
             }
-            else if (spEntry.operator->()) {
-                if (spEntry->spModel.operator->()) {
-                    if (!spEntry->spModel->UnloadEGMData()) {
-                        bKeepData = true;
-                    }
-                    spEntry->spModel->UnloadEGTData();
+            else if ((spEntry.operator->()) && (spEntry->spModel.operator->())) {
+                if (!spEntry->spModel->UnloadEGMData()) {
+                    bKeepData = true;
                 }
+                spEntry->spModel->UnloadEGTData();
             }
         }
         if (!bKeepData) {
@@ -567,45 +564,42 @@ FR2MatrixVTC<float>* ConcatRows(FR2MatrixVTC<float>* a1, FR2MatrixVTC<float>* hP
         a1->data.resize(a1->nrows * a1->ncols, 0.0f);
         return a1;
     }
-    else {
-        if (v5) {
-            ::new (a1) FR2MatrixVTC<float>(*arg8);
-            return a1;
-        }
-        else {
-            if (v4) {
-                ::new (a1) FR2MatrixVTC<float>(*hProcess);
-                return a1;
-            }
-            else {
-                if (hProcess->ncols != arg8->ncols) {
-                    fr2Assert("d:\\_fallout3\\platforms\\common\\code\\sdk\\facegen\\matrixVT.hpp", 1278);
-                }
-                uint32_t ncols = hProcess->ncols;
-                uint32_t nrows = hProcess->nrows;
-                uint32_t v14 = arg8->nrows;
-                apMemory.data.~vector<float, std::allocator<float>>();
-                ::new (&apMemory.data) std::vector<float, std::allocator<float>>;
-                apMemory.nrows = v14 + nrows;
-                apMemory.ncols = ncols;
-                apMemory.data.resize((v14 + nrows) * ncols, 0.0f);
-                uint32_t v13 = hProcess->nrows;
-                uint32_t v12 = hProcess->ncols;
-                float* v21 = &hProcess->data[0];
-                uint32_t v11 = apMemory.ncols;
-                float* v19 = &apMemory.data[0];
-                rt::memcpy(v19, v21, sizeof(float) * (v12 * v13));
-                uint32_t v10 = arg8->nrows;
-                uint32_t v9 = arg8->ncols;
-                FR2MatrixVTC<float>::RowT* v8 = &(result = arg8->operator[](0));
-                v8->p;
-                float* p = v8->p;
-                rt::memcpy(apMemory.operator[](hProcess->nrows).p, p, sizeof(float) * (v9 * v10));
-                ::new (a1) FR2MatrixVTC<float>(apMemory);
-                return a1;
-            }
-        }
+
+    if (v5) {
+        ::new (a1) FR2MatrixVTC<float>(*arg8);
+        return a1;
     }
+
+    if (v4) {
+        ::new (a1) FR2MatrixVTC<float>(*hProcess);
+        return a1;
+    }
+
+    if (hProcess->ncols != arg8->ncols) {
+        fr2Assert("d:\\_fallout3\\platforms\\common\\code\\sdk\\facegen\\matrixVT.hpp", 1278);
+    }
+    uint32_t ncols = hProcess->ncols;
+    uint32_t nrows = hProcess->nrows;
+    uint32_t v14 = arg8->nrows;
+    apMemory.data.~vector<float, std::allocator<float>>();
+    ::new (&apMemory.data) std::vector<float, std::allocator<float>>;
+    apMemory.nrows = v14 + nrows;
+    apMemory.ncols = ncols;
+    apMemory.data.resize((v14 + nrows) * ncols, 0.0f);
+    uint32_t v13 = hProcess->nrows;
+    uint32_t v12 = hProcess->ncols;
+    float* v21 = &hProcess->data[0];
+    uint32_t v11 = apMemory.ncols;
+    float* v19 = &apMemory.data[0];
+    rt::memcpy(v19, v21, sizeof(float) * (v12 * v13));
+    uint32_t v10 = arg8->nrows;
+    uint32_t v9 = arg8->ncols;
+    FR2MatrixVTC<float>::RowT* v8 = &(result = arg8->operator[](0));
+    v8->p;
+    float* p = v8->p;
+    rt::memcpy(apMemory.operator[](hProcess->nrows).p, p, sizeof(float) * (v9 * v10));
+    ::new (a1) FR2MatrixVTC<float>(apMemory);
+    return a1;
 }
 
 // The end of the copy is computed first, from the byte span divided as signed, as the game does: a plain pointer
@@ -665,9 +659,8 @@ float FanGenCtlsGrpC::getAttribute(
         v11 = *v7->operator[](0).p;
         return v11 + attr[race][att][type].off;
     }
-    else {
-        return 0.0f;
-    }
+
+    return 0.0f;
 }
 
 void FanGenCtlsGrpC::setAttributes(FanRaceE race, FanTypeE type, const float* val, FR2MatrixVTC<float> (*coord)[2]) {
@@ -736,30 +729,28 @@ FanGenCtlsGrpC::getCaricature(FanRaceE race, FanTypeE type, FanSymmE symm, const
         float v13 = std::sqrt(static_cast<double>(coord[type][symm].nrows));
         return (v14 / v13);
     }
-    else {
-        if (symm) {
-            fr2Assert("D:\\_Fallout3\\Platforms\\Common\\Code\\SDK\\FaceGen\\FanControls.cpp", 344);
-            return 0.0;
-        }
-        else {
-            coord[type][symm].Sub(&v26, distrib[race].mean[type]);
-            for (uint32_t i = 0; i < 2; ++i) {
-                FR2MatrixVTC<float>* v11 = basis[4 * race + 2 * type + i].Mul(&apResult, v26);
-                float v23 = *(::new (&a2a) FR2MatrixVTC<float>::RowT(v11->operator[](0u)))->p;
-                FR2MatrixVTC<float>* v10 = basis[4 * race + 2 * type + i].transpose(&v20);
-                FR2MatrixVTC<float>* v9 = v10->MulScalar(&v19, v23);
-                v26.operator-=(*v9);
-            }
-            distrib[race].invEigBasis[type].Mul(&apThis, v26);
-            float v16 = apThis.lengthSqr();
-            float v8 = std::sqrt(static_cast<double>(v16));
-            float v7 = static_cast<double>(apThis.nrows) - 2.0;
-            float v6 = std::sqrt(static_cast<double>(v7));
-            float v18 = v8 / v6;
-            FNVD_DESTRUCT_IN_PLACE(FR2MatrixVTC<float>)(&apThis);
-            return v18;
-        }
+
+    if (symm) {
+        fr2Assert("D:\\_Fallout3\\Platforms\\Common\\Code\\SDK\\FaceGen\\FanControls.cpp", 344);
+        return 0.0;
     }
+
+    coord[type][symm].Sub(&v26, distrib[race].mean[type]);
+    for (uint32_t i = 0; i < 2; ++i) {
+        FR2MatrixVTC<float>* v11 = basis[4 * race + 2 * type + i].Mul(&apResult, v26);
+        float v23 = *(::new (&a2a) FR2MatrixVTC<float>::RowT(v11->operator[](0u)))->p;
+        FR2MatrixVTC<float>* v10 = basis[4 * race + 2 * type + i].transpose(&v20);
+        FR2MatrixVTC<float>* v9 = v10->MulScalar(&v19, v23);
+        v26.operator-=(*v9);
+    }
+    distrib[race].invEigBasis[type].Mul(&apThis, v26);
+    float v16 = apThis.lengthSqr();
+    float v8 = std::sqrt(static_cast<double>(v16));
+    float v7 = static_cast<double>(apThis.nrows) - 2.0;
+    float v6 = std::sqrt(static_cast<double>(v7));
+    float v18 = v8 / v6;
+    FNVD_DESTRUCT_IN_PLACE(FR2MatrixVTC<float>)(&apThis);
+    return v18;
 }
 
 void FanGenCtlsGrpC::setCaricature(
@@ -1086,9 +1077,8 @@ BSFaceGenModel* BSFaceGenManager::GetFaceGenModel(NiTriBasedGeom* apGeom) {
     if (pExtraData) {
         return pExtraData->GetModel();
     }
-    else {
-        return nullptr;
-    }
+
+    return nullptr;
 }
 
 bool BSFaceGenManager::GetUseEmotions() {
@@ -1235,132 +1225,126 @@ void BSFaceGenManager::PrepareHeadForShaders(BSFaceGenNiNode* apNode, FaceGenNpc
                 else {
                     ishaderindex = 14;
                 }
-                if (arNpcData.pModel.operator[](ipart)) {
-                    if (arNpcData.pTexture.operator[](ipart)) {
-                        NiFixedString* v33 = ::new (static_cast<void*>(&v36))
-                            NiFixedString(arNpcData.pHeadPartNodeName.operator[](ipart));
-                        NiAVObject* pobj = apNode->GetObjectByName(*v33);
-                        v36.~NiFixedString();
-                        if (pobj) {
-                            NiTriBasedGeom* pgeom = pobj->IsTriBasedGeom();
-                            if (pgeom) {
-                                BSFaceGenModel* pmodelFG = BSFaceGenManager::GetFaceGenModel(pgeom);
-                                if (pmodelFG) {
-                                    int32_t v32;
-                                    BSShaderManager::PrepareObject(pobj, 0, 0);
-                                    NiShadeProperty* pshaderprop = static_cast<NiShadeProperty*>(pobj->GetProperty(3));
-                                    if (pshaderprop) {
-                                        int32_t v31 = pshaderprop->iShaderPropertyType >= 8 &&
-                                            pshaderprop->iShaderPropertyType <= 12;
-                                        v32 = v31;
+                if ((arNpcData.pModel.operator[](ipart)) && (arNpcData.pTexture.operator[](ipart))) {
+                    NiFixedString* v33 =
+                        ::new (static_cast<void*>(&v36)) NiFixedString(arNpcData.pHeadPartNodeName.operator[](ipart));
+                    NiAVObject* pobj = apNode->GetObjectByName(*v33);
+                    v36.~NiFixedString();
+                    if (pobj) {
+                        NiTriBasedGeom* pgeom = pobj->IsTriBasedGeom();
+                        if (pgeom) {
+                            BSFaceGenModel* pmodelFG = BSFaceGenManager::GetFaceGenModel(pgeom);
+                            if (pmodelFG) {
+                                int32_t v32;
+                                BSShaderManager::PrepareObject(pobj, 0, 0);
+                                NiShadeProperty* pshaderprop = static_cast<NiShadeProperty*>(pobj->GetProperty(3));
+                                if (pshaderprop) {
+                                    int32_t v31 =
+                                        pshaderprop->iShaderPropertyType >= 8 && pshaderprop->iShaderPropertyType <= 12;
+                                    v32 = v31;
+                                }
+                                else {
+                                    v32 = 0;
+                                }
+                                BSShaderPPLightingProperty* pshaderpropLighting =
+                                    v32 ? static_cast<BSShaderPPLightingProperty*>(pshaderprop) : nullptr;
+                                if (pshaderpropLighting) {
+                                    const char* Xa;
+                                    if ((arNpcData.spTexBaseMod.m_usSize) && (arNpcData.bFaceGenTexturing)) {
+                                        sptexBaseMod.operator=(arNpcData.spTexBaseMod.operator[](ipart));
+                                    }
+
+                                    if (ipart ||
+                                        (cage < 0 ||
+                                         (Xa = arNpcData.pTexture.operator[](ipart)->GetTextureName(),
+                                          !BSFaceGenManager::GetAsNearestDetailDDSFile(
+                                              fileDetail, arNpcData.eSex, static_cast<uint8_t>(cage), Xa
+                                          )))) {
+                                        if (!arNpcData.spTexBaseMod.m_usSize ||
+                                            !(&arNpcData.spTexBaseMod.operator[](ipart))->m_pObject) {
+                                            uint32_t Xb = BSFaceGenManager::GetEGTClampSize();
+                                            pmodelFG->ApplyCoordinateTexturingToMesh(
+                                                &(&arNpcData)->FaceCoord, sptexBaseMod, Xb
+                                            );
+                                        }
+                                        BSStringT<char> tempstr;
+                                        TESTexture* pTexture = arNpcData.pTexture.operator[](ipart);
+                                        pTexture->GetAsNormalFile(tempstr);
+                                        if (tempstr.pString) {
+                                            fileSpecular.operator=("Textures\\");
+                                            fileSpecular.operator+=(static_cast<const char*>(tempstr.pString));
+                                        }
                                     }
                                     else {
-                                        v32 = 0;
-                                    }
-                                    BSShaderPPLightingProperty* pshaderpropLighting =
-                                        v32 ? static_cast<BSShaderPPLightingProperty*>(pshaderprop) : nullptr;
-                                    if (pshaderpropLighting) {
-                                        const char* Xa;
-                                        if (arNpcData.spTexBaseMod.m_usSize) {
-                                            if (arNpcData.bFaceGenTexturing) {
-                                                sptexBaseMod.operator=(arNpcData.spTexBaseMod.operator[](ipart));
-                                            }
+                                        if (!arNpcData.spTexBaseMod.m_usSize ||
+                                            !(&arNpcData.spTexBaseMod.operator[](ipart))->m_pObject) {
+                                            uint32_t EGTClampSize = BSFaceGenManager::GetEGTClampSize();
+                                            pmodelFG->ApplyCoordinateTexturingToMesh(
+                                                &(&arNpcData)->FaceCoord, sptexBaseMod, EGTClampSize
+                                            );
                                         }
-                                        if (ipart ||
-                                            (cage < 0 ||
-                                             (Xa = arNpcData.pTexture.operator[](ipart)->GetTextureName(),
-                                              !BSFaceGenManager::GetAsNearestDetailDDSFile(
-                                                  fileDetail, arNpcData.eSex, static_cast<uint8_t>(cage), Xa
-                                              )))) {
-                                            if (!arNpcData.spTexBaseMod.m_usSize ||
-                                                !(&arNpcData.spTexBaseMod.operator[](ipart))->m_pObject) {
-                                                uint32_t Xb = BSFaceGenManager::GetEGTClampSize();
-                                                pmodelFG->ApplyCoordinateTexturingToMesh(
-                                                    &(&arNpcData)->FaceCoord, sptexBaseMod, Xb
-                                                );
-                                            }
-                                            BSStringT<char> tempstr;
-                                            TESTexture* pTexture = arNpcData.pTexture.operator[](ipart);
-                                            pTexture->GetAsNormalFile(tempstr);
-                                            if (tempstr.pString) {
-                                                fileSpecular.operator=("Textures\\");
-                                                fileSpecular.operator+=(static_cast<const char*>(tempstr.pString));
-                                            }
+                                        char* fR = fileDetail.pString;
+                                        TES::pInstance->CreateTextureImage(fR, sptexDetailMod, true, true);
+                                        BSUtils::CreateNormalMapString(fileSpecular, fileDetail.pString);
+                                    }
+                                    if (fileSpecular.pString) {
+                                        char* fRa = fileSpecular.pString;
+                                        TES::pInstance->CreateTextureImage(fRa, sptexNormal, true, true);
+                                    }
+                                    if (sptexNormal.m_pObject) {
+                                        NiTexture* Xc = sptexNormal.m_pObject;
+                                        pshaderpropLighting->SetNormalTexture(0, Xc);
+                                        const NiPixelFormat* PixelFormat =
+                                            sptexNormal.m_pObject->NiTexture::GetPixelFormat();
+                                        uint32_t eFormat = PixelFormat->m_eFormat;
+                                        bool bspecular = eFormat == 5 || (eFormat == 6 || eFormat == 1);
+                                        pshaderpropLighting->SetFlag(0, bspecular);
+                                    }
+                                    else {
+                                        if (!pshaderpropLighting->GetNormalTexture(0)) {
+                                            NiSourceTexture* DefNormalMap = BSShader::GetDefNormalMap();
+                                            pshaderpropLighting->SetNormalTexture(0, DefNormalMap);
+                                        }
+                                    }
+                                    if (arNpcData.bFaceGenTexturing && ishaderindex == 14) {
+                                        NiTexture* pDetailTexture;
+                                        NiTexture* Xd = sptexBaseMod.m_pObject;
+                                        pshaderpropLighting->SetDiffuseTexture(1u, Xd);
+                                        if (sptexDetailMod.m_pObject) {
+                                            pDetailTexture = sptexDetailMod.m_pObject;
                                         }
                                         else {
-                                            if (!arNpcData.spTexBaseMod.m_usSize ||
-                                                !(&arNpcData.spTexBaseMod.operator[](ipart))->m_pObject) {
-                                                uint32_t EGTClampSize = BSFaceGenManager::GetEGTClampSize();
-                                                pmodelFG->ApplyCoordinateTexturingToMesh(
-                                                    &(&arNpcData)->FaceCoord, sptexBaseMod, EGTClampSize
-                                                );
-                                            }
-                                            char* fR = fileDetail.pString;
-                                            TES::pInstance->CreateTextureImage(fR, sptexDetailMod, true, true);
-                                            BSUtils::CreateNormalMapString(fileSpecular, fileDetail.pString);
+                                            pDetailTexture = BSFaceGenManager::GetDefaultDetailModulationTexture();
                                         }
+                                        pshaderpropLighting->SetNormalTexture(1, pDetailTexture);
+                                        pshaderpropLighting->SetFlag(10u, 1);
+                                        NiMaterialProperty* pmatprop =
+                                            static_cast<NiMaterialProperty*>(pobj->GetProperty(2));
+                                        if ((pmatprop) && (pmatprop->m_fShine < 1.0)) {
+                                            pmatprop->SetShineness(4.0f);
+                                        }
+
                                         if (fileSpecular.pString) {
-                                            char* fRa = fileSpecular.pString;
-                                            TES::pInstance->CreateTextureImage(fRa, sptexNormal, true, true);
-                                        }
-                                        if (sptexNormal.m_pObject) {
-                                            NiTexture* Xc = sptexNormal.m_pObject;
-                                            pshaderpropLighting->SetNormalTexture(0, Xc);
-                                            const NiPixelFormat* PixelFormat =
-                                                sptexNormal.m_pObject->NiTexture::GetPixelFormat();
-                                            uint32_t eFormat = PixelFormat->m_eFormat;
-                                            bool bspecular = eFormat == 5 || (eFormat == 6 || eFormat == 1);
-                                            pshaderpropLighting->SetFlag(0, bspecular);
-                                        }
-                                        else {
-                                            if (!pshaderpropLighting->GetNormalTexture(0)) {
-                                                NiSourceTexture* DefNormalMap = BSShader::GetDefNormalMap();
-                                                pshaderpropLighting->SetNormalTexture(0, DefNormalMap);
+                                            char Src[264];
+                                            char DstBuf[268];
+                                            BSsprintf(Src, 260, "%s", fileSpecular.String());
+                                            BSShaderManager::GetModifiedTextureFilename(DstBuf, Src, "_sk", true);
+                                            if (DstBuf[0]) {
+                                                NiPointer<NiSourceTexture> spTempSourceTexture(
+                                                    static_cast<NiSourceTexture*>(nullptr)
+                                                );
+                                                TES::pInstance->CreateTextureImage(
+                                                    DstBuf, spTempSourceTexture, true, true
+                                                );
+                                                NiTexture* Xe = spTempSourceTexture.m_pObject;
+                                                pshaderpropLighting->SetTexture(BSShaderProperty::TEXTYPE_GLOW, 0, Xe);
                                             }
                                         }
-                                        if (arNpcData.bFaceGenTexturing && ishaderindex == 14) {
-                                            NiTexture* pDetailTexture;
-                                            NiTexture* Xd = sptexBaseMod.m_pObject;
-                                            pshaderpropLighting->SetDiffuseTexture(1u, Xd);
-                                            if (sptexDetailMod.m_pObject) {
-                                                pDetailTexture = sptexDetailMod.m_pObject;
-                                            }
-                                            else {
-                                                pDetailTexture = BSFaceGenManager::GetDefaultDetailModulationTexture();
-                                            }
-                                            pshaderpropLighting->SetNormalTexture(1, pDetailTexture);
-                                            pshaderpropLighting->SetFlag(10u, 1);
-                                            NiMaterialProperty* pmatprop =
-                                                static_cast<NiMaterialProperty*>(pobj->GetProperty(2));
-                                            if (pmatprop) {
-                                                if (pmatprop->m_fShine < 1.0) {
-                                                    pmatprop->SetShineness(4.0f);
-                                                }
-                                            }
-                                            if (fileSpecular.pString) {
-                                                char Src[264];
-                                                char DstBuf[268];
-                                                BSsprintf(Src, 260, "%s", fileSpecular.String());
-                                                BSShaderManager::GetModifiedTextureFilename(DstBuf, Src, "_sk", true);
-                                                if (DstBuf[0]) {
-                                                    NiPointer<NiSourceTexture> spTempSourceTexture(
-                                                        static_cast<NiSourceTexture*>(nullptr)
-                                                    );
-                                                    TES::pInstance->CreateTextureImage(
-                                                        DstBuf, spTempSourceTexture, true, true
-                                                    );
-                                                    NiTexture* Xe = spTempSourceTexture.m_pObject;
-                                                    pshaderpropLighting->SetTexture(
-                                                        BSShaderProperty::TEXTYPE_GLOW, 0, Xe
-                                                    );
-                                                }
-                                            }
-                                        }
-                                        sptexBaseMod = (sptexDetailMod = nullptr);
-                                        sptexNormal = nullptr;
-                                        BSFaceGenManager::PrecacheFaceGeometry(pobj, ishaderindex, 1u);
-                                        pshaderpropLighting->PrecacheTextures();
                                     }
+                                    sptexBaseMod = (sptexDetailMod = nullptr);
+                                    sptexNormal = nullptr;
+                                    BSFaceGenManager::PrecacheFaceGeometry(pobj, ishaderindex, 1u);
+                                    pshaderpropLighting->PrecacheTextures();
                                 }
                             }
                         }
@@ -1602,9 +1586,8 @@ BSFaceGenModelMap* BSFaceGenManager::GetModelCache() {
     if (pInstance) {
         return pInstance->pModelMap;
     }
-    else {
-        return nullptr;
-    }
+
+    return nullptr;
 }
 
 auto BSFaceGenManager::GetFaceGenCoord() -> FR2MatrixVTC<float> (*)[2][2] {
@@ -1907,11 +1890,10 @@ BSFaceGenModel* BSFaceGenManager::GetFaceGenModel(
     if (apEGMFilename) {
         BSFaceGenManager* v10 = BSFaceGenManager::GetInstance();
         if (v10->pModelMap->GetAt(apEGMFilename, spnewModel)) {
-            if (apEGTFilename) {
-                if (!spnewModel.m_pObject->GetEGTFilename()) {
-                    spnewModel.m_pObject->LoadModelTexture(apEGTFilename);
-                }
+            if ((apEGTFilename) && (!spnewModel.m_pObject->GetEGTFilename())) {
+                spnewModel.m_pObject->LoadModelTexture(apEGTFilename);
             }
+
             BSFaceGenModel* v22 = spnewModel.m_pObject;
             return v22;
         }
@@ -2089,7 +2071,7 @@ bool BSFaceGenManager::LoadEGTData(BSFaceGenModel* apModel) {
 // Compares the lock's result with 1.
 bool BSFaceGenManager::TryLockFaceGenAccess() {
     bool bLocked = FGAccessCrit.TryLock();
-    if (bLocked == true) {
+    if (bLocked) {
         ++iLockCount;
     }
     return bLocked;
@@ -2151,20 +2133,18 @@ void BSFaceGenManager::RefreshMeshFromBaseMorphExtraData(
     BSFaceGenBaseMorphExtraData* FaceGenExtra = static_cast<BSFaceGenBaseMorphExtraData*>(
         BSFaceGenUtils::GetFaceGenExtraData<BSFaceGenBaseMorphExtraData>(apGeom)
     );
-    if (FaceGenExtra) {
-        if (arIterator.m_pvCurrentPosition) {
-            NiGeometryDataIteratorNiPoint3 v5 = arIterator;
-            uint32_t i = 0;
-            NiPoint3* pVerts = FaceGenExtra->pVerts;
-            while (i < apGeom->GetVertexCount()) {
-                v5.SetData(*pVerts);
-                v5.Next();
-                ++i;
-                ++pVerts;
-            }
-            if (apGeom->GetVertices()) {
-                apGeom->GetModelData()->MarkAsChanged(1);
-            }
+    if ((FaceGenExtra) && (arIterator.m_pvCurrentPosition)) {
+        NiGeometryDataIteratorNiPoint3 v5 = arIterator;
+        uint32_t i = 0;
+        NiPoint3* pVerts = FaceGenExtra->pVerts;
+        while (i < apGeom->GetVertexCount()) {
+            v5.SetData(*pVerts);
+            v5.Next();
+            ++i;
+            ++pVerts;
+        }
+        if (apGeom->GetVertices()) {
+            apGeom->GetModelData()->MarkAsChanged(1);
         }
     }
 }
@@ -2261,10 +2241,8 @@ void BSFaceGenManager::SetUseProceduralEyeBlinking(bool abUse) {
 }
 
 void BSFaceGenManager::SetToZero(float* apQuantities, uint32_t aiNumQuantities) {
-    if (apQuantities) {
-        if (aiNumQuantities) {
-            ourMemset(apQuantities, 0, sizeof(float) * ((int32_t)aiNumQuantities));
-        }
+    if ((apQuantities) && (aiNumQuantities)) {
+        ourMemset(apQuantities, 0, sizeof(float) * ((int32_t)aiNumQuantities));
     }
 }
 
@@ -2308,9 +2286,8 @@ BSFaceGenMorphDataHair* BSFaceGenManager::GetFaceGenMorphDataHair(NiTriBasedGeom
             BSFaceGenMorphDataHair::DynamicCast(&BSFaceGenMorphDataHair::ms_RTTI, pmorph)
         );
     }
-    else {
-        return nullptr;
-    }
+
+    return nullptr;
 }
 
 // Applies apGeom's hair morph data to its base vertices, scaled by afModifierValue. The value is tested against 0.0 as
@@ -2450,11 +2427,10 @@ void BSFaceGenManager::ReplaceFaceMeshLOD(BSFaceGenNiNode* apNode, int32_t aDeta
                     }
                 }
                 NiMaterialProperty* pmatprop = static_cast<NiMaterialProperty*>(pshapeHead->GetProperty(2));
-                if (pmatprop) {
-                    if (pmatprop->m_fShine < 1.0) {
-                        pmatprop->SetShineness(4.0f);
-                    }
+                if ((pmatprop) && (pmatprop->m_fShine < 1.0)) {
+                    pmatprop->SetShineness(4.0f);
                 }
+
                 apNode->SetAt(static_cast<uint32_t>(i), pshapeHead);
                 pshapeHead->UpdateProperties();
                 apNode->FixSkinInstances(apNode->m_pkParent, false);
@@ -2517,36 +2493,30 @@ void BSFaceGenManager::OffsetFaceGenCoord(
     bool abNoTextureOffset
 ) {
     int32_t a2;
-    if (apCopyCoordOld) {
-        if (apCopyCoordNew) {
-            if (apCopyToCoord) {
-                for (int32_t etype = 0; etype < 2; ++etype) {
-                    for (int32_t esymm = 0; esymm < 2; ++esymm) {
-                        uint32_t irows = (*apCopyCoordOld)[etype][esymm].nrows;
-                        uint32_t icols = (*apCopyCoordOld)[etype][esymm].ncols;
-                        if (irows && icols) {
-                            (*apCopyToCoord)[etype][esymm].resize(
-                                static_cast<int32_t>(irows), static_cast<int32_t>(icols)
-                            );
-                            if (etype == 1 && abNoTextureOffset) {
-                                (*apCopyToCoord)[etype][esymm].operator=((*apCopyCoordOld)[etype][esymm]);
-                            }
-                            else {
-                                uint32_t isize = icols * irows;
-                                (*apCopyToCoord)[etype][esymm].data.clear();
-                                for (uint32_t i = 0; i < isize; ++i) {
-                                    // The const coordinates are read through the same non-const operator[] body.
-                                    float f1 = const_cast<FloatVector&>((*apCopyCoordOld)[etype][esymm].data)[i];
-                                    float f2 = const_cast<FloatVector&>((*apCopyCoordNew)[etype][esymm].data)[i];
-                                    *reinterpret_cast<float*>(&a2) = f2 - f1;
-                                    (*apCopyToCoord)[etype][esymm].data.push_back(*reinterpret_cast<float*>(&a2));
-                                }
-                            }
-                        }
-                        else {
-                            (*apCopyToCoord)[etype][esymm].resize(0, 0);
+    if ((apCopyCoordOld) && (apCopyCoordNew) && (apCopyToCoord)) {
+        for (int32_t etype = 0; etype < 2; ++etype) {
+            for (int32_t esymm = 0; esymm < 2; ++esymm) {
+                uint32_t irows = (*apCopyCoordOld)[etype][esymm].nrows;
+                uint32_t icols = (*apCopyCoordOld)[etype][esymm].ncols;
+                if (irows && icols) {
+                    (*apCopyToCoord)[etype][esymm].resize(static_cast<int32_t>(irows), static_cast<int32_t>(icols));
+                    if (etype == 1 && abNoTextureOffset) {
+                        (*apCopyToCoord)[etype][esymm].operator=((*apCopyCoordOld)[etype][esymm]);
+                    }
+                    else {
+                        uint32_t isize = icols * irows;
+                        (*apCopyToCoord)[etype][esymm].data.clear();
+                        for (uint32_t i = 0; i < isize; ++i) {
+                            // The const coordinates are read through the same non-const operator[] body.
+                            float f1 = const_cast<FloatVector&>((*apCopyCoordOld)[etype][esymm].data)[i];
+                            float f2 = const_cast<FloatVector&>((*apCopyCoordNew)[etype][esymm].data)[i];
+                            *reinterpret_cast<float*>(&a2) = f2 - f1;
+                            (*apCopyToCoord)[etype][esymm].data.push_back(*reinterpret_cast<float*>(&a2));
                         }
                     }
+                }
+                else {
+                    (*apCopyToCoord)[etype][esymm].resize(0, 0);
                 }
             }
         }
@@ -2558,17 +2528,12 @@ void BSFaceGenManager::ScaleFaceCoord(
     FR2MatrixVTC<float> (*apCoordToScale)[2][2],
     bool abNoTextureScale
 ) {
-    if (apCoordToScale) {
-        if (!(afScaleAmount < 0.0) && !(afScaleAmount > 1.0)) {
-            for (int32_t i = 0; i < 2; ++i) {
-                for (int32_t j = 0; j < 2; ++j) {
-                    if ((*apCoordToScale)[i][j].nrows) {
-                        if ((*apCoordToScale)[i][j].ncols) {
-                            if (!i || ((i == 1 && abNoTextureScale) || !abNoTextureScale)) {
-                                (*apCoordToScale)[i][j].operator*=(afScaleAmount);
-                            }
-                        }
-                    }
+    if ((apCoordToScale) && (!(afScaleAmount < 0.0) && !(afScaleAmount > 1.0))) {
+        for (int32_t i = 0; i < 2; ++i) {
+            for (int32_t j = 0; j < 2; ++j) {
+                if (((*apCoordToScale)[i][j].nrows) && ((*apCoordToScale)[i][j].ncols) &&
+                    (!i || ((i == 1 && abNoTextureScale) || !abNoTextureScale))) {
+                    (*apCoordToScale)[i][j].operator*=(afScaleAmount);
                 }
             }
         }
@@ -2606,33 +2571,29 @@ const char* BSFaceGenManager::GetAsNIFFileLowLOD(BSStringT<char>& aOutFilename, 
             aOutFilename.Set(cDest, 0);
             return apModel;
         }
-        else {
-            char* pextension = std::strrchr(cDest, 46);
-            if (pextension) {
-                char cFormattedDest[264];
-                *pextension = 0;
-                BSsprintf(cFormattedDest, 260, "%s_50.NIF", cDest);
-                aOutFilename.Set(cFormattedDest, 0);
-                pcheckFilename.SPrintF("Meshes\\%s", aOutFilename.pString);
-                BSHash::MakeDirAndFile(pcheckFilename.pString, DirectoryHash, FileNameHash);
-                if (ArchiveManager::GetFileEntryForFileFromAllArchives(
-                        ARCHIVE_TYPE_INDEX_MESHES, DirectoryHash, FileNameHash, pcheckFilename.pString
-                    )) {
-                    char* result = aOutFilename.pString;
-                    return result;
-                }
-                else {
-                    return nullptr;
-                }
+
+        char* pextension = std::strrchr(cDest, 46);
+        if (pextension) {
+            char cFormattedDest[264];
+            *pextension = 0;
+            BSsprintf(cFormattedDest, 260, "%s_50.NIF", cDest);
+            aOutFilename.Set(cFormattedDest, 0);
+            pcheckFilename.SPrintF("Meshes\\%s", aOutFilename.pString);
+            BSHash::MakeDirAndFile(pcheckFilename.pString, DirectoryHash, FileNameHash);
+            if (ArchiveManager::GetFileEntryForFileFromAllArchives(
+                    ARCHIVE_TYPE_INDEX_MESHES, DirectoryHash, FileNameHash, pcheckFilename.pString
+                )) {
+                char* result = aOutFilename.pString;
+                return result;
             }
-            else {
-                return apModel;
-            }
+
+            return nullptr;
         }
+
+        return apModel;
     }
-    else {
-        return nullptr;
-    }
+
+    return nullptr;
 }
 
 const char* BSFaceGenManager::GetAsNIFFileHighLOD(BSStringT<char>& aOutFilename, const char* apModel) {
@@ -2680,215 +2641,176 @@ bool BSFaceGenManager::CreateFaceGenHead(
     BSStringT<char> fileLowLOD;
     matrot.MakeYRotation(-1.5707964f);
     for (uint32_t ipart = 0; ipart < 8; ++ipart) {
-        if (arNpcData.pModel.m_usSize) {
-            if (arNpcData.pModel.operator[](ipart)) {
-                if (arNpcData.pModel.operator[](ipart)->GetModelLength()) {
-                    if (arNpcData.pTexture.m_usSize) {
-                        if (arNpcData.pTexture.operator[](ipart)) {
-                            if (arNpcData.pTexture.operator[](ipart)->GetTextureNameLength()) {
-                                TESModel* v32 = arNpcData.pModel.operator[](ipart);
-                                filename.SPrintF("Meshes\\%s", v32->GetModel());
-                                if (arNpcData.eLod == BS_FACEGEN_LOD_LOW && !ipart) {
-                                    BSFaceGenManager::GetAsNIFFileLowLOD(fileLowLOD, filename.pString);
-                                    BSFileEntry* FileEntryForFileFromAllArchives = nullptr;
-                                    if (fileLowLOD.pString) {
-                                        BSHash::MakeDirAndFile(fileLowLOD.pString, v43, v44);
-                                        FileEntryForFileFromAllArchives =
-                                            ArchiveManager::GetFileEntryForFileFromAllArchives(
-                                                ARCHIVE_TYPE_INDEX_MESHES, v43, v44, fileLowLOD.pString
-                                            );
-                                    }
-                                    if (FileEntryForFileFromAllArchives) {
-                                        BSFaceGenManager::GetAsNIFFileLowLOD(filename, filename.pString);
-                                    }
-                                }
-                                const char* pegtFileName = nullptr;
-                                switch (ipart) {
-                                    case 0u: {
-                                        if (arNpcData.bPlayer || BSFaceGenManager::bLoadFaceGenHeadEGTFiles.Bool()) {
-                                            pegtFileName = BSFaceGenManager::GetAsEGTFile(fileEGT, filename.pString);
-                                        }
-                                        const char* v19 = pegtFileName;
-                                        const char* AsTRIFile =
-                                            BSFaceGenManager::GetAsTRIFile(fileTRI, filename.pString, HAIR_PART_NONE);
-                                        char* v11 = filename.pString;
-                                        const char* AsEGMFile =
-                                            BSFaceGenManager::GetAsEGMFile(fileEGM, filename.pString, HAIR_PART_NONE);
-                                        pmodelFG = BSFaceGenManager::GetFaceGenModel(
-                                            AsEGMFile, v11, AsTRIFile, v19, true, HAIR_PART_NONE, false
-                                        );
-                                        break;
-                                    }
-                                    case 1u: {
-                                        const char* AsEGTFile =
-                                            BSFaceGenManager::GetAsEGTFile(fileEGT, filename.pString);
-                                        const char* v16 =
-                                            BSFaceGenManager::GetAsTRIFile(fileTRI, filename.pString, HAIR_PART_NONE);
-                                        char* v12 = filename.pString;
-                                        const char* v5 =
-                                            BSFaceGenManager::GetAsEGMFile(fileEGM, filename.pString, HAIR_PART_NONE);
-                                        pmodelFG = BSFaceGenManager::GetFaceGenModel(
-                                            v5, v12, v16, AsEGTFile, true, HAIR_PART_NONE, false
-                                        );
-                                        break;
-                                    }
-                                    case 2u:
-                                    case 3u:
-                                    case 4u:
-                                    case 5u: {
-                                        const char* v17 =
-                                            BSFaceGenManager::GetAsTRIFile(fileTRI, filename.pString, HAIR_PART_NONE);
-                                        char* v13 = filename.pString;
-                                        const char* v6 =
-                                            BSFaceGenManager::GetAsEGMFile(fileEGM, filename.pString, HAIR_PART_NONE);
-                                        pmodelFG = BSFaceGenManager::GetFaceGenModel(
-                                            v6, v13, v17, nullptr, true, HAIR_PART_NONE, false
-                                        );
-                                        break;
-                                    }
-                                    default: {
-                                        break;
-                                    }
-                                }
-                                if (pmodelFG) {
-                                    if (pmodelFG->ApplyCoordinateToNewMesh(&(&arNpcData)->FaceCoord, spshape)) {
-                                        if (spshape.m_pObject) {
-                                            int32_t v27;
-                                            NiFixedString* a2 = ::new (static_cast<void*>(&apString))
-                                                NiFixedString(arNpcData.pHeadPartNodeName.operator[](ipart));
-                                            spshape.m_pObject->SetName(*a2);
-                                            apString.~NiFixedString();
-                                            if (!ipart) {
-                                                pshapeHead = spshape.m_pObject;
-                                            }
-                                            if (ipart == 1) {
-                                                pshapeEars = spshape.m_pObject;
-                                            }
-                                            filename.SPrintF(
-                                                "Textures\\%s", arNpcData.pTexture.operator[](ipart)->GetTextureName()
-                                            );
-                                            char* v21 = filename.pString;
-                                            TES::pInstance->CreateTextureImage(v21, sptexBase, false, false);
-                                            if (sptexBase.m_pObject) {
-                                                int32_t v30;
-                                                NiShadeProperty* pprop =
-                                                    static_cast<NiShadeProperty*>(spshape.m_pObject->GetProperty(3));
-                                                if (pprop) {
-                                                    int32_t bIsLightingShader = pprop->iShaderPropertyType >= 8 &&
-                                                        pprop->iShaderPropertyType <= 12;
-                                                    v30 = bIsLightingShader;
-                                                }
-                                                else {
-                                                    v30 = 0;
-                                                }
-                                                BSShaderPPLightingProperty* pshaderprop =
-                                                    v30 ? static_cast<BSShaderPPLightingProperty*>(pprop) : nullptr;
-                                                if (pshaderprop) {
-                                                    NiSourceTexture* afAngle = sptexBase.m_pObject;
-                                                    pshaderprop->SetTexture(
-                                                        BSShaderProperty::TEXTYPE_DIFFUSE, 0, afAngle
-                                                    );
-                                                }
-                                            }
-                                            if (ipart == 4 || ipart == 3) {
-                                                if (spshape.m_pObject->GetProperty(0)) {
-                                                    spshape.m_pObject->RemoveProperty(0);
-                                                }
-                                                NiAlphaProperty* HairTeethAlphaProperty =
-                                                    BSFaceGenManager::GetHairTeethAlphaProperty();
-                                                spshape.m_pObject->AttachProperty(HairTeethAlphaProperty);
-                                            }
-                                            if (ipart <= 1) {
-                                                int32_t Type = NiMaterialProperty::GetType();
-                                                NiProperty* pprop_2 = spshape.m_pObject->GetProperty(Type);
-                                                NiMaterialProperty* pmatprop =
-                                                    static_cast<NiMaterialProperty*>(pprop_2);
-                                                if (pprop_2) {
-                                                    pmatprop->SetName(*FixedStrings::QSkin());
-                                                }
-                                                else {
-                                                    NiMaterialProperty* pmatprop_2;
-                                                    NiMaterialProperty* v34 = static_cast<NiMaterialProperty*>(
-                                                        NiMemObject::operator new(sizeof(NiMaterialProperty))
-                                                    );
-                                                    if (v34) {
-                                                        pmatprop_2 = ::new (v34) NiMaterialProperty;
-                                                    }
-                                                    else {
-                                                        pmatprop_2 = nullptr;
-                                                    }
-                                                    NiMaterialProperty* v35 = pmatprop_2;
-                                                    pmatprop = pmatprop_2;
-                                                    pmatprop_2->SetName(*FixedStrings::QSkin());
-                                                    spshape.m_pObject->AttachProperty(pmatprop);
-                                                }
-                                            }
-                                            if (spshape.m_pObject->GetSkinInstance()) {
-                                                if (abForceNoSkinning) {
-                                                    spshape.m_pObject->SetSkinInstance(nullptr);
-                                                    spshape.m_pObject->SetTranslate(NiPoint3_ZERO);
-                                                    spshape.m_pObject->SetRotate(matrot);
-                                                    apOutNodeBiped->AttachChild(spshape.m_pObject, 1);
-                                                    NiProperty* pshadeprop = spshape.m_pObject->GetProperty(3);
-                                                    BSShaderProperty* pshprop =
-                                                        static_cast<BSShaderProperty*>(NiObject::DynamicCastStatic(
-                                                            &BSShaderProperty::ms_RTTI, pshadeprop
-                                                        ));
-                                                    if (pshprop) {
-                                                        pshprop->SetFlag(1u, 0);
-                                                    }
-                                                }
-                                                else {
-                                                    apOutNodeSkinned->AttachChild(spshape.m_pObject, 1);
-                                                }
-                                            }
-                                            else {
-                                                spshape.m_pObject->SetRotate(matrot);
-                                                apOutNodeBiped->AttachChild(spshape.m_pObject, 1);
-                                            }
-                                            NiProperty* pshadeprop_2 = spshape.m_pObject->GetProperty(3);
-                                            BSShaderProperty* pshprop_2 = static_cast<BSShaderProperty*>(pshadeprop_2);
-                                            if (pshadeprop_2) {
-                                                int32_t v26 = pshprop_2->iShaderPropertyType >= 8 &&
-                                                    pshprop_2->iShaderPropertyType <= 12;
-                                                v27 = v26;
-                                            }
-                                            else {
-                                                v27 = 0;
-                                            }
-                                            BSShaderPPLightingProperty* pppprop =
-                                                v27 ? static_cast<BSShaderPPLightingProperty*>(pshprop_2) : nullptr;
-                                            if (pppprop) {
-                                                pppprop->UseDefaultNormalMap();
-                                            }
-                                            pmodelFG = nullptr;
-                                            sptexBase.operator=(static_cast<NiSourceTexture*>(nullptr));
-                                            spshape.operator=(static_cast<NiTriBasedGeom*>(nullptr));
-                                        }
-                                    }
-                                }
-                            }
-                        }
-                    }
+        if ((arNpcData.pModel.m_usSize) && (arNpcData.pModel.operator[](ipart)) &&
+            (arNpcData.pModel.operator[](ipart)->GetModelLength()) && (arNpcData.pTexture.m_usSize) &&
+            (arNpcData.pTexture.operator[](ipart)) && (arNpcData.pTexture.operator[](ipart)->GetTextureNameLength())) {
+            TESModel* v32 = arNpcData.pModel.operator[](ipart);
+            filename.SPrintF("Meshes\\%s", v32->GetModel());
+            if (arNpcData.eLod == BS_FACEGEN_LOD_LOW && !ipart) {
+                BSFaceGenManager::GetAsNIFFileLowLOD(fileLowLOD, filename.pString);
+                BSFileEntry* FileEntryForFileFromAllArchives = nullptr;
+                if (fileLowLOD.pString) {
+                    BSHash::MakeDirAndFile(fileLowLOD.pString, v43, v44);
+                    FileEntryForFileFromAllArchives = ArchiveManager::GetFileEntryForFileFromAllArchives(
+                        ARCHIVE_TYPE_INDEX_MESHES, v43, v44, fileLowLOD.pString
+                    );
+                }
+                if (FileEntryForFileFromAllArchives) {
+                    BSFaceGenManager::GetAsNIFFileLowLOD(filename, filename.pString);
                 }
             }
-        }
-    }
-    if (BSFaceGenManager::GetFixNormals()) {
-        if (pshapeHead) {
-            if (pshapeEars) {
-                FixNormals(pshapeHead, pshapeEars, 0.1f, false, false);
+            const char* pegtFileName = nullptr;
+            switch (ipart) {
+                case 0u: {
+                    if (arNpcData.bPlayer || BSFaceGenManager::bLoadFaceGenHeadEGTFiles.Bool()) {
+                        pegtFileName = BSFaceGenManager::GetAsEGTFile(fileEGT, filename.pString);
+                    }
+                    const char* v19 = pegtFileName;
+                    const char* AsTRIFile = BSFaceGenManager::GetAsTRIFile(fileTRI, filename.pString, HAIR_PART_NONE);
+                    char* v11 = filename.pString;
+                    const char* AsEGMFile = BSFaceGenManager::GetAsEGMFile(fileEGM, filename.pString, HAIR_PART_NONE);
+                    pmodelFG =
+                        BSFaceGenManager::GetFaceGenModel(AsEGMFile, v11, AsTRIFile, v19, true, HAIR_PART_NONE, false);
+                    break;
+                }
+                case 1u: {
+                    const char* AsEGTFile = BSFaceGenManager::GetAsEGTFile(fileEGT, filename.pString);
+                    const char* v16 = BSFaceGenManager::GetAsTRIFile(fileTRI, filename.pString, HAIR_PART_NONE);
+                    char* v12 = filename.pString;
+                    const char* v5 = BSFaceGenManager::GetAsEGMFile(fileEGM, filename.pString, HAIR_PART_NONE);
+                    pmodelFG = BSFaceGenManager::GetFaceGenModel(v5, v12, v16, AsEGTFile, true, HAIR_PART_NONE, false);
+                    break;
+                }
+                case 2u:
+                case 3u:
+                case 4u:
+                case 5u: {
+                    const char* v17 = BSFaceGenManager::GetAsTRIFile(fileTRI, filename.pString, HAIR_PART_NONE);
+                    char* v13 = filename.pString;
+                    const char* v6 = BSFaceGenManager::GetAsEGMFile(fileEGM, filename.pString, HAIR_PART_NONE);
+                    pmodelFG = BSFaceGenManager::GetFaceGenModel(v6, v13, v17, nullptr, true, HAIR_PART_NONE, false);
+                    break;
+                }
+                default: {
+                    break;
+                }
+            }
+            if ((pmodelFG) && (pmodelFG->ApplyCoordinateToNewMesh(&(&arNpcData)->FaceCoord, spshape)) &&
+                (spshape.m_pObject)) {
+                int32_t v27;
+                NiFixedString* a2 =
+                    ::new (static_cast<void*>(&apString)) NiFixedString(arNpcData.pHeadPartNodeName.operator[](ipart));
+                spshape.m_pObject->SetName(*a2);
+                apString.~NiFixedString();
+                if (!ipart) {
+                    pshapeHead = spshape.m_pObject;
+                }
+                if (ipart == 1) {
+                    pshapeEars = spshape.m_pObject;
+                }
+                filename.SPrintF("Textures\\%s", arNpcData.pTexture.operator[](ipart)->GetTextureName());
+                char* v21 = filename.pString;
+                TES::pInstance->CreateTextureImage(v21, sptexBase, false, false);
+                if (sptexBase.m_pObject) {
+                    int32_t v30;
+                    NiShadeProperty* pprop = static_cast<NiShadeProperty*>(spshape.m_pObject->GetProperty(3));
+                    if (pprop) {
+                        int32_t bIsLightingShader = pprop->iShaderPropertyType >= 8 && pprop->iShaderPropertyType <= 12;
+                        v30 = bIsLightingShader;
+                    }
+                    else {
+                        v30 = 0;
+                    }
+                    BSShaderPPLightingProperty* pshaderprop =
+                        v30 ? static_cast<BSShaderPPLightingProperty*>(pprop) : nullptr;
+                    if (pshaderprop) {
+                        NiSourceTexture* afAngle = sptexBase.m_pObject;
+                        pshaderprop->SetTexture(BSShaderProperty::TEXTYPE_DIFFUSE, 0, afAngle);
+                    }
+                }
+                if (ipart == 4 || ipart == 3) {
+                    if (spshape.m_pObject->GetProperty(0)) {
+                        spshape.m_pObject->RemoveProperty(0);
+                    }
+                    NiAlphaProperty* HairTeethAlphaProperty = BSFaceGenManager::GetHairTeethAlphaProperty();
+                    spshape.m_pObject->AttachProperty(HairTeethAlphaProperty);
+                }
+                if (ipart <= 1) {
+                    int32_t Type = NiMaterialProperty::GetType();
+                    NiProperty* pprop_2 = spshape.m_pObject->GetProperty(Type);
+                    NiMaterialProperty* pmatprop = static_cast<NiMaterialProperty*>(pprop_2);
+                    if (pprop_2) {
+                        pmatprop->SetName(*FixedStrings::QSkin());
+                    }
+                    else {
+                        NiMaterialProperty* pmatprop_2;
+                        NiMaterialProperty* v34 =
+                            static_cast<NiMaterialProperty*>(NiMemObject::operator new(sizeof(NiMaterialProperty)));
+                        if (v34) {
+                            pmatprop_2 = ::new (v34) NiMaterialProperty;
+                        }
+                        else {
+                            pmatprop_2 = nullptr;
+                        }
+                        NiMaterialProperty* v35 = pmatprop_2;
+                        pmatprop = pmatprop_2;
+                        pmatprop_2->SetName(*FixedStrings::QSkin());
+                        spshape.m_pObject->AttachProperty(pmatprop);
+                    }
+                }
+                if (spshape.m_pObject->GetSkinInstance()) {
+                    if (abForceNoSkinning) {
+                        spshape.m_pObject->SetSkinInstance(nullptr);
+                        spshape.m_pObject->SetTranslate(NiPoint3_ZERO);
+                        spshape.m_pObject->SetRotate(matrot);
+                        apOutNodeBiped->AttachChild(spshape.m_pObject, 1);
+                        NiProperty* pshadeprop = spshape.m_pObject->GetProperty(3);
+                        BSShaderProperty* pshprop = static_cast<BSShaderProperty*>(
+                            NiObject::DynamicCastStatic(&BSShaderProperty::ms_RTTI, pshadeprop)
+                        );
+                        if (pshprop) {
+                            pshprop->SetFlag(1u, 0);
+                        }
+                    }
+                    else {
+                        apOutNodeSkinned->AttachChild(spshape.m_pObject, 1);
+                    }
+                }
+                else {
+                    spshape.m_pObject->SetRotate(matrot);
+                    apOutNodeBiped->AttachChild(spshape.m_pObject, 1);
+                }
+                NiProperty* pshadeprop_2 = spshape.m_pObject->GetProperty(3);
+                BSShaderProperty* pshprop_2 = static_cast<BSShaderProperty*>(pshadeprop_2);
+                if (pshadeprop_2) {
+                    int32_t v26 = pshprop_2->iShaderPropertyType >= 8 && pshprop_2->iShaderPropertyType <= 12;
+                    v27 = v26;
+                }
+                else {
+                    v27 = 0;
+                }
+                BSShaderPPLightingProperty* pppprop =
+                    v27 ? static_cast<BSShaderPPLightingProperty*>(pshprop_2) : nullptr;
+                if (pppprop) {
+                    pppprop->UseDefaultNormalMap();
+                }
+                pmodelFG = nullptr;
+                sptexBase.operator=(static_cast<NiSourceTexture*>(nullptr));
+                spshape.operator=(static_cast<NiTriBasedGeom*>(nullptr));
             }
         }
     }
+    if ((BSFaceGenManager::GetFixNormals()) && (pshapeHead) && (pshapeEars)) {
+        FixNormals(pshapeHead, pshapeEars, 0.1f, false, false);
+    }
+
     if (arNpcData.pHair) {
         BSFaceGenManager::AttachHairToHead(apOutNodeBiped, apOutNodeSkinned, arNpcData, abForceNoSkinning);
     }
-    if (arNpcData.pLeftEye) {
-        if (arNpcData.pRightEye) {
-            BSFaceGenManager::AttachEyesToHead(apOutNodeBiped, apOutNodeSkinned, arNpcData, abForceNoSkinning);
-        }
+    if ((arNpcData.pLeftEye) && (arNpcData.pRightEye)) {
+        BSFaceGenManager::AttachEyesToHead(apOutNodeBiped, apOutNodeSkinned, arNpcData, abForceNoSkinning);
     }
+
     for (BGSHeadPart*& rpItem : arNpcData.Accessories.ItemsUntilNull()) {
         TESModelTextureSwap* v25 = static_cast<TESModelTextureSwap*>(rpItem);
         filename.SPrintF("Meshes\\%s", v25->GetModel());
@@ -2896,18 +2818,15 @@ bool BSFaceGenManager::CreateFaceGenHead(
         char* v14 = filename.pString;
         const char* v9 = BSFaceGenManager::GetAsEGMFile(fileEGM, filename.pString, HAIR_PART_NONE);
         pmodelFG = BSFaceGenManager::GetFaceGenModel(v9, v14, v18, nullptr, true, HAIR_PART_NONE, true);
-        if (pmodelFG) {
-            if (pmodelFG->ApplyCoordinateToNewMesh(&(&arNpcData)->FaceCoord, spshape)) {
-                if (spshape.m_pObject) {
-                    spshape.m_pObject->SetRotate(matrot);
-                    apOutNodeBiped->AttachChild(spshape.m_pObject, 1);
-                    NiTriBasedGeom* afAnglea = spshape.m_pObject;
-                    rpItem->SwapTextures(afAnglea);
-                    NiFixedString v33("FaceGenAccessory");
-                    NiFixedString* kName = &v33;
-                    spshape.m_pObject->SetName(*kName);
-                }
-            }
+        if ((pmodelFG) && (pmodelFG->ApplyCoordinateToNewMesh(&(&arNpcData)->FaceCoord, spshape)) &&
+            (spshape.m_pObject)) {
+            spshape.m_pObject->SetRotate(matrot);
+            apOutNodeBiped->AttachChild(spshape.m_pObject, 1);
+            NiTriBasedGeom* afAnglea = spshape.m_pObject;
+            rpItem->SwapTextures(afAnglea);
+            NiFixedString v33("FaceGenAccessory");
+            NiFixedString* kName = &v33;
+            spshape.m_pObject->SetName(*kName);
         }
     }
     return true;
@@ -3178,11 +3097,9 @@ void BSFaceGenManager::RandomizeFaceGenetic(
     FR2MatrixVTC<float> (*apSourceCoord)[2][2],
     FR2MatrixVTC<float> (*apOutCoord)[2][2]
 ) {
-    if (apOutCoord) {
-        if (apSourceCoord) {
-            BSFaceGenManager* Instance = BSFaceGenManager::GetInstance();
-            Instance->GenCtrls.geneticRandom(afGeneticVariation, apSourceCoord, apOutCoord);
-        }
+    if ((apOutCoord) && (apSourceCoord)) {
+        BSFaceGenManager* Instance = BSFaceGenManager::GetInstance();
+        Instance->GenCtrls.geneticRandom(afGeneticVariation, apSourceCoord, apOutCoord);
     }
 }
 
@@ -3196,27 +3113,24 @@ uint32_t BSFaceGenBaseMorphExtraData::GetVertexCount(bool abMeshOnly) const {
     if (abMeshOnly) {
         return iVertsModelCount;
     }
-    else {
-        return iVertsCount;
-    }
+
+    return iVertsCount;
 }
 
 const char* BSFaceGenModel::GetEGMFilename() {
     if (pMeshData) {
         return pMeshData->EGMFilename.String();
     }
-    else {
-        return nullptr;
-    }
+
+    return nullptr;
 }
 
 const char* BSFaceGenModel::GetEGTFilename() {
     if (pTextureData) {
         return pTextureData->EGTFilename.String();
     }
-    else {
-        return nullptr;
-    }
+
+    return nullptr;
 }
 
 // Without mesh data the morph is read through a null temporary smart pointer, as the game does.

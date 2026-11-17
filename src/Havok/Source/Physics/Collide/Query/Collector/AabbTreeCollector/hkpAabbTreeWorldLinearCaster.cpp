@@ -95,7 +95,7 @@ void hkpAabbTreeWorldLinearCaster<BOUNDING_VOLUME>::linearCast(
     castInput.m_to.setAdd4(castInput.m_from, m_shapeInput.m_path);
     castInput.m_halfExtents.m_quad = _mm_mul_ps(kHalf, _mm_sub_ps(aabb.m_max.m_quad, aabb.m_min.m_quad));
     hkAabbTreeQueryUtils<BOUNDING_VOLUME, uint16_t>::castAabb(
-        tree, aabb, castInput, static_cast<typename hkAabbTreeQueryUtils<BOUNDING_VOLUME, uint16_t>::Collector*>(this),
+        tree, aabb, castInput, static_cast<hkAabbTreeQueryUtils<BOUNDING_VOLUME, uint16_t>::Collector*>(this),
         input.m_maxExtraPenetration, nullptr, 0
     );
 }

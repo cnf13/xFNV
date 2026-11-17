@@ -87,9 +87,8 @@ float CombatTimeStamp::DisplayElapsedTime() {
     if (!((CombatTimer::GetTimer() - fTimeStamp) > 1000.0)) {
         return (CombatTimer::GetTimer() - fTimeStamp);
     }
-    else {
-        return (float)1000.0;
-    }
+
+    return (float)1000.0;
 }
 
 CombatTimeStamp::operator float() const {

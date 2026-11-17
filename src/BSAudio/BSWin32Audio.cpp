@@ -41,9 +41,8 @@ int32_t SeekFileCallback(std::FILE* Stream, int32_t Offset, int32_t a3, int32_t 
     if (Stream) {
         return std::fseek(Stream, Offset, Origin);
     }
-    else {
-        return -1;
-    }
+
+    return -1;
 }
 
 BSWin32Audio::BSWin32Audio() : pDirectSound8(nullptr), pPrimarySoundBuffer(nullptr), kBufferCaps{}, hWindow(nullptr) {}
@@ -140,20 +139,18 @@ BSGameSound* BSWin32Audio::CreateNewGameSound(const char* apcFileName) {
     if (apMemory) {
         return ::new (apMemory) BSWin32GameSound(apcFileName);
     }
-    else {
-        return nullptr;
-    }
+
+    return nullptr;
 }
 
 void BSWin32Audio::FixSoundPath(char* FileName) {
-    if (FileName) {
-        if ((*FileName == 102 && FileName[1] == 120) ||
-            (*FileName == 115 && (FileName[1] == 111 && (FileName[2] == 110 && FileName[3] == 103)))) {
-            char pcDest[268];
-            strcpy_s(pcDest, 260, FileName);
-            strcpy_s(FileName, 260, "data\\sound\\");
-            strcat_s(FileName, 260, pcDest);
-        }
+    if ((FileName) &&
+        ((*FileName == 102 && FileName[1] == 120) ||
+         (*FileName == 115 && (FileName[1] == 111 && (FileName[2] == 110 && FileName[3] == 103))))) {
+        char pcDest[268];
+        strcpy_s(pcDest, 260, FileName);
+        strcpy_s(FileName, 260, "data\\sound\\");
+        strcat_s(FileName, 260, pcDest);
     }
 }
 

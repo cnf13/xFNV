@@ -100,9 +100,8 @@ int32_t hkStructureLayout::getMemberSize(
             if (v6->getCstyleArraySize()) {
                 return m_bytesInPointer * v6->getCstyleArraySize();
             }
-            else {
-                return m_bytesInPointer;
-            }
+
+            return m_bytesInPointer;
         }
         case hkClassMember::TYPE_SIMPLEARRAY: {
         LABEL_9:;
@@ -225,15 +224,14 @@ void hkStructureLayout::computeClassMemberOffsetsInplace(
             // Calls the non-const getMember, as the game does.
             hkClassMember& member = klass.getMember(i);
             // EXE-INLINED none: hkClassMember::hasClass
-            if (member.m_class) {
-                // EXE-INLINED none: hkPointerMap::hasKey
-                if (classesDone.m_map.findKey(
-                        hkPointerMap<const hkClass*, int32_t>::ToMapInt(&member.getStructClass())
-                    ) > classesDone.m_map.m_hashMod) {
-                    computeClassMemberOffsetsInplace(
-                        const_cast<hkClass&>(member.getStructClass()), rules, classesDone, recurse
-                    );
-                }
+            if ((member.m_class) &&
+                (classesDone.m_map.findKey(hkPointerMap<const hkClass*, int32_t>::ToMapInt(&member.getStructClass())) >
+                 classesDone.m_map.m_hashMod))
+            // EXE-INLINED none: hkPointerMap::hasKey
+            {
+                computeClassMemberOffsetsInplace(
+                    const_cast<hkClass&>(member.getStructClass()), rules, classesDone, recurse
+                );
             }
         }
     }

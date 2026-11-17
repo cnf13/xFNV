@@ -99,9 +99,8 @@ int32_t bhkRefObject::GetMotionType() {
     if (v3) {
         return (int32_t)v3->getMotionType();
     }
-    else {
-        return 5;
-    }
+
+    return 5;
 }
 
 void* bhkRefObject::GetLinearVelocityNi(NiPoint3* apVelocity) {
@@ -120,7 +119,6 @@ hkReferencedObject* bhkRefObject::operator*() const {
     if (this) {
         return GethkObject();
     }
-    else {
-        return nullptr;
-    }
+
+    return nullptr;
 }

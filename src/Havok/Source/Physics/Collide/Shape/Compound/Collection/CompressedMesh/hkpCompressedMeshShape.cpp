@@ -397,9 +397,8 @@ LABEL_14:;
     if (v5 < pThis->m_indices.m_size) {
         return v5;
     }
-    else {
-        return -1;
-    }
+
+    return -1;
 }
 
 void hkpCompressedMeshShape::Chunk::calcAabb(float error, hkAabb& out, const hkVector4& scaling) {

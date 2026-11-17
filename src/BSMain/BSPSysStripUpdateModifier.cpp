@@ -102,7 +102,6 @@ NiObject* BSPSysStripUpdateModifier::CreateObject() {
     if (apMemory) {
         return ::new (apMemory) BSPSysStripUpdateModifier;
     }
-    else {
-        return nullptr;
-    }
+
+    return nullptr;
 }

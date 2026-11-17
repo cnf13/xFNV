@@ -34,10 +34,9 @@ NiObject* NiQuaternionInterpolator::CreateClone(NiCloningProcess& kCloning) {
         CopyMembers(pkObject, kCloning);
         return pkObject;
     }
-    else {
-        CopyMembers(nullptr, kCloning);
-        return nullptr;
-    }
+
+    CopyMembers(nullptr, kCloning);
+    return nullptr;
 }
 
 void NiQuaternionInterpolator::LoadBinary(NiStream& kStream) {

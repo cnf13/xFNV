@@ -423,51 +423,48 @@ void Sun::Update(Sky* apSky, float afSecondsPassed) {
                 spLight.m_pObject->SetAmbientColor(*v14);
                 spLight.m_pObject->SetDiffuseColor(*apSky->GetSunLightColor());
                 spLight.m_pObject->SetSpecularColor(*&apSky->SunSpecularColor);
-                if (TES::pInstance) {
-                    if (TES::pInstance->pObjRoot) {
-                        float* v16;
-                        SceneGraph* WorldSceneGraph = Main::GetWorldSceneGraph();
-                        NiPoint3 v54 = WorldSceneGraph->GetCameraRoot()->GetTranslate();
-                        NiPoint3 direction = newLoc;
-                        float fscaleChange = Sun::fSunReduceGlareSpeed.Float() * afSecondsPassed;
-                        direction.Unitize();
-                        bool v28 = true;
-                        if (!(GetSunOcclusionPercent() >= 1.0)) {
-                            if (!TESWaterSystem::GetPlayerUnderwater()) {
-                                v28 = false;
-                            }
-                        }
-                        float v27 = 1.0 - GetSunOcclusionPercent();
-                        float fscale = std::pow(v27, 2.0f);
-                        StopSunOcclusion();
-                        if (v28 || (v16 = &Sun::fSunMinimumGlareScale.Float(), *v16 > static_cast<double>(fscale))) {
-                            double v26 = fGlareScale - fscaleChange;
-                            if (!(Sun::fSunMinimumGlareScale.Float() > v26)) {
-                                spSunGlareNode.m_pObject->SetAppCulled(false);
-                                fGlareScale = fGlareScale - fscaleChange;
-                                spSunGlareNode.m_pObject->SetScale(fGlareScale);
-                            }
-                            else {
-                                spSunGlareNode.m_pObject->SetAppCulled(true);
-                                fGlareScale = 0.0f;
-                            }
-                        }
-                        else {
-                            if (!(fscale <= fGlareScale + fscaleChange) &&
-                                !(fscale <= static_cast<double>(fGlareScale))) {
-                                fGlareScale = fGlareScale + fscaleChange;
-                            }
-                            else {
-                                fGlareScale = fscale;
-                            }
+                if ((TES::pInstance) && (TES::pInstance->pObjRoot)) {
+                    float* v16;
+                    SceneGraph* WorldSceneGraph = Main::GetWorldSceneGraph();
+                    NiPoint3 v54 = WorldSceneGraph->GetCameraRoot()->GetTranslate();
+                    NiPoint3 direction = newLoc;
+                    float fscaleChange = Sun::fSunReduceGlareSpeed.Float() * afSecondsPassed;
+                    direction.Unitize();
+                    bool v28 = true;
+                    if ((!(GetSunOcclusionPercent() >= 1.0)) && (!TESWaterSystem::GetPlayerUnderwater())) {
+                        v28 = false;
+                    }
+
+                    float v27 = 1.0 - GetSunOcclusionPercent();
+                    float fscale = std::pow(v27, 2.0f);
+                    StopSunOcclusion();
+                    if (v28 || (v16 = &Sun::fSunMinimumGlareScale.Float(), *v16 > static_cast<double>(fscale))) {
+                        double v26 = fGlareScale - fscaleChange;
+                        if (!(Sun::fSunMinimumGlareScale.Float() > v26)) {
                             spSunGlareNode.m_pObject->SetAppCulled(false);
+                            fGlareScale = fGlareScale - fscaleChange;
                             spSunGlareNode.m_pObject->SetScale(fGlareScale);
                         }
-                        if (!spSunGlareNode.m_pObject->GetDisplayObject()) {
+                        else {
                             spSunGlareNode.m_pObject->SetAppCulled(true);
+                            fGlareScale = 0.0f;
                         }
                     }
+                    else {
+                        if (!(fscale <= fGlareScale + fscaleChange) && !(fscale <= static_cast<double>(fGlareScale))) {
+                            fGlareScale = fGlareScale + fscaleChange;
+                        }
+                        else {
+                            fGlareScale = fscale;
+                        }
+                        spSunGlareNode.m_pObject->SetAppCulled(false);
+                        spSunGlareNode.m_pObject->SetScale(fGlareScale);
+                    }
+                    if (!spSunGlareNode.m_pObject->GetDisplayObject()) {
+                        spSunGlareNode.m_pObject->SetAppCulled(true);
+                    }
                 }
+
                 if (apSky->IsUnderwater()) {
                     GetSunBaseNode()->SetAppCulled(true);
                 }
@@ -547,9 +544,8 @@ float Sun::GetIntensity() {
     if (v7) {
         return v7->VertexColor.a;
     }
-    else {
-        return 0.0;
-    }
+
+    return 0.0;
 }
 
 // Clears the texture and texture file of the sky shader property on the sun base and on the glare.
@@ -587,18 +583,14 @@ void Sun::CalculateSunGlare(uint32_t aiTestNumber, BSShaderAccumulator* apAccumu
     AutoMemContext apMemory(
         MEM_CONTEXT_SKY, true, "D:\\_Fallout3\\Platforms\\Common\\Code\\Fallout Shared\\Sky\\Sun.cpp", 546
     );
-    if (GetBase()) {
-        if (bDoOcclusionTests) {
-            if (apAccumulator) {
-                spSunAccumulator.operator=(apAccumulator);
-                NiTriShape* pSunBase = static_cast<NiTriShape*>(GetBase());
-                float worldScale = pSunBase->GetWorldScale() / 25.0;
-                pSunBase->SetWorldScale(worldScale);
-                apAccumulator->DoSunOcclusionQuery(pSunBase, aiTestNumber, apCamera);
-                float worldScale2 = pSunBase->GetWorldScale() * 25.0;
-                pSunBase->SetWorldScale(worldScale2);
-            }
-        }
+    if ((GetBase()) && (bDoOcclusionTests) && (apAccumulator)) {
+        spSunAccumulator.operator=(apAccumulator);
+        NiTriShape* pSunBase = static_cast<NiTriShape*>(GetBase());
+        float worldScale = pSunBase->GetWorldScale() / 25.0;
+        pSunBase->SetWorldScale(worldScale);
+        apAccumulator->DoSunOcclusionQuery(pSunBase, aiTestNumber, apCamera);
+        float worldScale2 = pSunBase->GetWorldScale() * 25.0;
+        pSunBase->SetWorldScale(worldScale2);
     }
 }
 
@@ -611,7 +603,6 @@ float Sun::GetSunOcclusionPercent() {
         float WeaponMaxRangeMult = paccum->fPercentSunOccludedStored;
         return WeaponMaxRangeMult;
     }
-    else {
-        return 0.0f;
-    }
+
+    return 0.0f;
 }

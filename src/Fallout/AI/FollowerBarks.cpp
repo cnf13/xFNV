@@ -194,17 +194,15 @@ void FollowerBarks::TriggerFollowerBark(Actor* apSpeaker, FollowerBarks::Followe
     while (pHistory) {
         FollowerBarks::FollowerBarkEntry* pEntry = pHistory->m_item;
         pHistory = pHistory->m_pkNext;
-        if (pEntry) {
-            if (apSpeaker == pEntry->m_pSpeaker) {
-                int32_t BarkPriority = FollowerBarks::GetBarkPriority(pEntry->m_eBarkType);
-                if (BarkPriority >= FollowerBarks::GetBarkPriority(aeBarkType) &&
-                    pEntry->m_tNoOtherBarksExpiration > nCurrentTime) {
-                    bPlayBark = false;
-                }
-                if (pEntry->m_eBarkType == aeBarkType && pEntry->m_tNoRepeatExpiration > nCurrentTime) {
-                    bPlayBark = false;
-                    bAddBark = false;
-                }
+        if ((pEntry) && (apSpeaker == pEntry->m_pSpeaker)) {
+            int32_t BarkPriority = FollowerBarks::GetBarkPriority(pEntry->m_eBarkType);
+            if (BarkPriority >= FollowerBarks::GetBarkPriority(aeBarkType) &&
+                pEntry->m_tNoOtherBarksExpiration > nCurrentTime) {
+                bPlayBark = false;
+            }
+            if (pEntry->m_eBarkType == aeBarkType && pEntry->m_tNoRepeatExpiration > nCurrentTime) {
+                bPlayBark = false;
+                bAddBark = false;
             }
         }
     }
@@ -214,11 +212,10 @@ void FollowerBarks::TriggerFollowerBark(Actor* apSpeaker, FollowerBarks::Followe
         while (pHistory) {
             FollowerBarks::FollowerBarkEntry* pEntry_2 = pHistory->m_item;
             bool bDeleteEntry = false;
-            if (pEntry_2) {
-                if (apSpeaker == pEntry_2->m_pSpeaker) {
-                    bDeleteEntry = pEntry_2->m_eBarkType == aeBarkType;
-                }
+            if ((pEntry_2) && (apSpeaker == pEntry_2->m_pSpeaker)) {
+                bDeleteEntry = pEntry_2->m_eBarkType == aeBarkType;
             }
+
             if (bDeleteEntry) {
                 pHistory->RemoveHead();
             }
@@ -370,26 +367,23 @@ void FollowerBarks::ProcessFollowerBarks() {
     while (pHistory) {
         FollowerBarks::FollowerBarkEntry* pEntry = pHistory->m_item;
         bool bDeleteEntry = false;
-        if (pEntry) {
-            if (pEntry->m_pSpeaker) {
-                if (pEntry->m_tNoRepeatExpiration <= nCurrentTime) {
-                    if (pEntry->GetShouldRepeat() && pEntry->m_pSpeaker->IsPlayerTeammate()) {
-                        pEntry->BuildBarkEntry(pEntry->m_pSpeaker, pEntry->m_eBarkType);
-                        pEntry->Trigger();
+        if ((pEntry) && (pEntry->m_pSpeaker) && (pEntry->m_tNoRepeatExpiration <= nCurrentTime)) {
+            if (pEntry->GetShouldRepeat() && pEntry->m_pSpeaker->IsPlayerTeammate()) {
+                pEntry->BuildBarkEntry(pEntry->m_pSpeaker, pEntry->m_eBarkType);
+                pEntry->Trigger();
+            }
+            else {
+                if (pEntry->m_tNoOtherBarksExpiration > nCurrentTime) {
+                    if (!pEntry->m_pSpeaker->IsPlayerTeammate()) {
+                        bDeleteEntry = true;
                     }
-                    else {
-                        if (pEntry->m_tNoOtherBarksExpiration > nCurrentTime) {
-                            if (!pEntry->m_pSpeaker->IsPlayerTeammate()) {
-                                bDeleteEntry = true;
-                            }
-                        }
-                        else {
-                            bDeleteEntry = true;
-                        }
-                    }
+                }
+                else {
+                    bDeleteEntry = true;
                 }
             }
         }
+
         if (bDeleteEntry) {
             ourFree(pEntry);
             pHistory->RemoveHead();

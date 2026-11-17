@@ -44,10 +44,9 @@ NiObject* NiFlipController::CreateClone(NiCloningProcess& kCloning) {
         CopyMembers(pkObject, kCloning);
         return pkObject;
     }
-    else {
-        CopyMembers(nullptr, kCloning);
-        return nullptr;
-    }
+
+    CopyMembers(nullptr, kCloning);
+    return nullptr;
 }
 
 // Files before 10.1.0.104 store a start time and the seconds per frame in place of an interpolator: the controller
@@ -254,9 +253,8 @@ NiTexture* NiFlipController::GetTextureAt(uint32_t uiIndex) {
     if (uiIndex >= ((uint32_t)((int32_t)m_kTextures.m_usSize))) {
         return nullptr;
     }
-    else {
-        return m_kTextures.m_pBase[uiIndex].m_pObject;
-    }
+
+    return m_kTextures.m_pBase[uiIndex].m_pObject;
 }
 
 void NiFlipController::CopyMembers(NiFlipController* pkDest, NiCloningProcess& kCloning) {
@@ -285,9 +283,8 @@ NiObject* NiFlipController::CreateObject() {
     if (v0) {
         return ::new (v0) NiFlipController;
     }
-    else {
-        return nullptr;
-    }
+
+    return nullptr;
 }
 
 uint32_t NiTexturingProperty::GetShaderArrayCount() const {

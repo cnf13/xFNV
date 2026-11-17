@@ -92,28 +92,22 @@ void CombatProcedureAttackLow::Update() {
             HitData* a1 = spdata.m_pObject;
             ptarget->HitMe(a1, 0);
         }
-        if (pWeapon) {
-            if (pWeapon->GetCurrentAmmo(pattacker)) {
-                if (pattacker->ShouldWeaponUseAmmo(pWeapon)) {
-                    double WeaponRateOfFire;
-                    TESAmmo* pammo = pWeapon->GetCurrentAmmo(pattacker);
-                    int32_t iammoCount = pattacker->GetInventoryObjectCount(pammo);
-                    if (pattacker) {
-                        WeaponRateOfFire = CombatFormulas::GetWeaponRateOfFire(pattacker, pWeapon, nullptr);
-                    }
-                    else {
-                        WeaponRateOfFire = CombatFormulas::GetWeaponRateOfFire(nullptr, pWeapon, nullptr);
-                    }
-                    int32_t iammoUsed = BSMAX(static_cast<int32_t>(WeaponRateOfFire), 1);
-                    int32_t iammoUsed_2 = BSMIN(iammoUsed, iammoCount);
-                    pattacker->RemoveItem(
-                        pammo, nullptr, iammoUsed_2, false, false, nullptr, nullptr, nullptr, true, false
-                    );
-                    if (iammoUsed_2 == iammoCount) {
-                        pcombatState->SetInventoryDirty(true);
-                        eState = CombatProcedureAttackLow::ATTACK_STATE_INITIALIZING;
-                    }
-                }
+        if ((pWeapon) && (pWeapon->GetCurrentAmmo(pattacker)) && (pattacker->ShouldWeaponUseAmmo(pWeapon))) {
+            double WeaponRateOfFire;
+            TESAmmo* pammo = pWeapon->GetCurrentAmmo(pattacker);
+            int32_t iammoCount = pattacker->GetInventoryObjectCount(pammo);
+            if (pattacker) {
+                WeaponRateOfFire = CombatFormulas::GetWeaponRateOfFire(pattacker, pWeapon, nullptr);
+            }
+            else {
+                WeaponRateOfFire = CombatFormulas::GetWeaponRateOfFire(nullptr, pWeapon, nullptr);
+            }
+            int32_t iammoUsed = BSMAX(static_cast<int32_t>(WeaponRateOfFire), 1);
+            int32_t iammoUsed_2 = BSMIN(iammoUsed, iammoCount);
+            pattacker->RemoveItem(pammo, nullptr, iammoUsed_2, false, false, nullptr, nullptr, nullptr, true, false);
+            if (iammoUsed_2 == iammoCount) {
+                pcombatState->SetInventoryDirty(true);
+                eState = CombatProcedureAttackLow::ATTACK_STATE_INITIALIZING;
             }
         }
     }

@@ -1026,11 +1026,10 @@ void BSShaderManager::SetShaderVersion(
         goto LABEL_44;
     }
 LABEL_45:;
-    if (abForce1x) {
-        if (v6) {
-            BSShaderManager::eShaderLevel = 1;
-        }
+    if ((abForce1x) && (v6)) {
+        BSShaderManager::eShaderLevel = 1;
     }
+
     if (BSShaderManager::b30VFog && (BSShaderManager::b30Shaders && bDo30VFog.uValue.b)) {
         BSShaderManager::b30VFog = true;
         BSShaderManager::bImageSpaceEffects = gs_bImageSpaceEffects_Display.uValue.b;
@@ -1962,13 +1961,10 @@ void BSShaderManager::GetModifiedTextureFilename(
     char* pfilenameStart = const_cast<char*>(std::strrchr(static_cast<const char*>(Dst), '\\'));
     char* postfix = const_cast<char*>(std::strrchr(static_cast<const char*>(Dst), '_'));
     char* postfix_2 = postfix;
-    if (pfilenameStart) {
-        if (postfix) {
-            if (postfix < pfilenameStart) {
-                postfix_2 = nullptr;
-            }
-        }
+    if ((pfilenameStart) && (postfix) && (postfix < pfilenameStart)) {
+        postfix_2 = nullptr;
     }
+
     if (extension) {
         const char* v8;
         const char* v9;
@@ -5054,9 +5050,8 @@ double BSShaderManager::CalculateTime(int32_t iDelta) {
             if (Interface::IsInMenuMode()) {
                 return 0.0;
             }
-            else {
-                return (float)(((double)(&appTimer)->BSTimer::GetTime()) / 1000.0);
-            }
+
+            return (float)(((double)(&appTimer)->BSTimer::GetTime()) / 1000.0);
         }
         case 1: {
             if (!Interface::IsInMenuMode()) {
@@ -5068,9 +5063,8 @@ double BSShaderManager::CalculateTime(int32_t iDelta) {
             if (iDelta) {
                 return 0.0;
             }
-            else {
-                return (float)(((&appCalendar)->GetHour() * 60.0) * 60.0);
-            }
+
+            return (float)(((&appCalendar)->GetHour() * 60.0) * 60.0);
         }
     }
 }
@@ -5217,26 +5211,23 @@ void BSShaderManager::Free(eBool abFinal) {
 
 void BSShaderManager::Shutdown(eBool a1) {
     Free(a1);
-    if (a1) {
-        if (Renderer::spRenderer.m_pObject) {
-            if (Renderer::spRenderer.m_pObject->m_uiRefCount != 1) {
-                TESDataHandler::RegisterError();
-                if (Renderer::spRenderer.m_pObject->m_uiRefCount == 2) {
-                    Warning(
-                        "SHADERS: There is 1 object with a smart pointer to the renderer we are trying to "
-                        "release."
-                    );
-                }
-                else {
-                    Warning(
-                        "SHADERS: There are %d objects with smart pointers to the renderer we are trying to "
-                        "release.",
-                        Renderer::spRenderer.m_pObject->m_uiRefCount - 1
-                    );
-                }
-            }
+    if ((a1) && (Renderer::spRenderer.m_pObject) && (Renderer::spRenderer.m_pObject->m_uiRefCount != 1)) {
+        TESDataHandler::RegisterError();
+        if (Renderer::spRenderer.m_pObject->m_uiRefCount == 2) {
+            Warning(
+                "SHADERS: There is 1 object with a smart pointer to the renderer we are trying to "
+                "release."
+            );
+        }
+        else {
+            Warning(
+                "SHADERS: There are %d objects with smart pointers to the renderer we are trying to "
+                "release.",
+                Renderer::spRenderer.m_pObject->m_uiRefCount - 1
+            );
         }
     }
+
     Renderer::spRenderer.operator=(static_cast<NiDX9Renderer*>(nullptr));
 }
 

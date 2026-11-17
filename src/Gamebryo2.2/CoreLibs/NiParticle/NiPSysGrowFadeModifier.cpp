@@ -76,12 +76,11 @@ bool NiPSysGrowFadeModifier::IsEqual(NiObject* pkObject) {
     }
 
     NiPSysGrowFadeModifier* pkOther = static_cast<NiPSysGrowFadeModifier*>(pkObject);
-    if (m_fGrowTime != pkOther->m_fGrowTime || m_usGrowGeneration != pkOther->m_usGrowGeneration ||
+    return !(
+        m_fGrowTime != pkOther->m_fGrowTime || m_usGrowGeneration != pkOther->m_usGrowGeneration ||
         m_fFadeTime != pkOther->m_fFadeTime || m_fBaseScale != pkOther->m_fBaseScale ||
-        m_usFadeGeneration != pkOther->m_usFadeGeneration) {
-        return false;
-    }
-    return true;
+        m_usFadeGeneration != pkOther->m_usFadeGeneration
+    );
 }
 
 void NiPSysGrowFadeModifier::GetViewerStrings(NiTPrimitiveArray<char*>* pkStrings) {

@@ -172,9 +172,8 @@ const hkpWorld* bhkConstraint::GethkWorld() const {
     if (phkObject && (phkObject->m_world && (pe = GethkEntityA()) != nullptr)) {
         return (hkpWorld*)pe->m_world;
     }
-    else {
-        return nullptr;
-    }
+
+    return nullptr;
 }
 
 // Same as GethkWorld, through the virtual.
@@ -226,10 +225,9 @@ bool bhkConstraint::Remove() {
         v2->eMemContext = eMemContext;
         return bres;
     }
-    else {
-        v2->eMemContext = eMemContext;
-        return false;
-    }
+
+    v2->eMemContext = eMemContext;
+    return false;
 }
 
 // Loads the creation info through its own virtual, clears its constraint data's back pointer and returns the cinfo's
@@ -424,9 +422,8 @@ hkpConstraintInstance* bhkConstraint::operator*() {
     if (this) {
         return static_cast<hkpConstraintInstance*>(GethkObject());
     }
-    else {
-        return nullptr;
-    }
+
+    return nullptr;
 }
 
 // The new entity is referenced before the old one is released, under the Havok memory context.

@@ -773,17 +773,16 @@ void MagicBoltProjectile::Collide(
             NiPoint3 afTimeDelta = (&pav->GetWorldTransform())->m_Rotate * NiPoint3_UNIT_Y;
             ApplyCollisionForce(aContactPoint, afTimeDelta, apTargetBody);
         }
-        if (apCollidee) {
-            if (apCollidee != pPlayer || pPlayer->Is3rdPerson()) {
-                pTarget = apCollidee;
-                NiAVObject* pav_2 = pTarget->Get3D();
-                if (pav_2) {
-                    NiFixedString apString("Bip01 Spine2");
-                    NiFixedString* v22 = &apString;
-                    spTarget.operator=(pav_2->GetObjectByName(*v22));
-                }
+        if ((apCollidee) && (apCollidee != pPlayer || pPlayer->Is3rdPerson())) {
+            pTarget = apCollidee;
+            NiAVObject* pav_2 = pTarget->Get3D();
+            if (pav_2) {
+                NiFixedString apString("Bip01 Spine2");
+                NiFixedString* v22 = &apString;
+                spTarget.operator=(pav_2->GetObjectByName(*v22));
             }
         }
+
         NiPoint3 startingLocation = Get3D()->GetTranslate();
         float fBoltLength = (startingLocation - aContactPoint).Length();
         spBoltProperty.m_pObject->UpdateBolt(0.01f, fBoltLength, fSpeed, false);
@@ -819,16 +818,14 @@ void MagicBoltProjectile::Collide(
                 BSTempEffectParticle::Spawn(GetParentCell(), 5.0f, pfilename, orient, aContactPoint, 1.0f, 7u, nullptr);
             pareaEffect->PlaySequence("SpecialIdle_AreaEffect");
         }
-        if (pAVEffect->data.pAreaSound) {
-            if (!abFizzle) {
-                TESSound* OpenSound = pAVEffect->data.pAreaSound;
-                uint32_t isoundFileID = OpenSound->iFormID;
-                BSAudio* v13 = &BSAudio::QInstance();
-                v13->GetSoundHandleByNumericID(&soundHand, isoundFileID, 258u);
-                NiPoint3 v32 = GetLocationOnReference();
-                soundHand.SetPosition(v32.x, v32.y, v32.z);
-                soundHand.Play(false);
-            }
+        if ((pAVEffect->data.pAreaSound) && (!abFizzle)) {
+            TESSound* OpenSound = pAVEffect->data.pAreaSound;
+            uint32_t isoundFileID = OpenSound->iFormID;
+            BSAudio* v13 = &BSAudio::QInstance();
+            v13->GetSoundHandleByNumericID(&soundHand, isoundFileID, 258u);
+            NiPoint3 v32 = GetLocationOnReference();
+            soundHand.SetPosition(v32.x, v32.y, v32.z);
+            soundHand.Play(false);
         }
     }
 }

@@ -177,9 +177,8 @@ uint8_t BSAnimGroupSequence::GetInterpolatorPriority(uint32_t a2) {
     if (a2 >= m_uiArraySize) {
         return (uint8_t)(-1);
     }
-    else {
-        return m_pkInterpArray[a2].m_ucPriority;
-    }
+
+    return m_pkInterpArray[a2].m_ucPriority;
 }
 
 void BSAnimGroupSequence::SetAnimGroup(TESAnimGroup* apAnimGroup) {
@@ -297,244 +296,233 @@ bool BSAnimGroupSequence::PlaySounds(NiControllerSequence* apSeq, TESObjectREFR*
     FNVD_INLINED_LOCAL(BSSoundHandle, a1, std::nullopt, std::nullopt);
     uint32_t inumKeys;
     bool bdone = false;
-    if (apSeq) {
-        if (apSeq->GetState() == NiControllerSequence::kAnimating) {
-            float fstartTime = apSeq->m_fStartTime;
-            float fstopTime = apSeq->m_fLastScaledTime;
-            if (fstartTime != -3.4028235e+38f && fstopTime != -3.4028235e+38f && fstopTime != fstartTime) {
-                bool blooped = fstartTime > static_cast<double>(fstopTime);
-                inumKeys = 0;
-                NiTextKey* ptextKeys = nullptr;
-                if (apSeq->GetTextKeys()) {
-                    NiTextKeyExtraData* TextKeys = apSeq->GetTextKeys();
-                    ptextKeys = TextKeys->GetKeys(inumKeys);
-                }
-                for (uint32_t n = 0; n < inumKeys; ++n) {
-                    // The key's text is written into (the line ends and the attach node's space are cut off and put
-                    // back), so it is held as a char*.
-                    char* pnote = const_cast<char*>((&ptextKeys[n].m_kText)->GetHandleString());
-                    if (pnote) {
-                        char soundAttachNode_2[32];
-                        float ftestTime = ptextKeys[n].m_fTime;
-                        bool bplay = false;
-                        NiAVObject* pmovingSound = nullptr;
-                        if (blooped &&
-                            (fstartTime < static_cast<double>(ftestTime) ||
-                             fstopTime >= static_cast<double>(ftestTime))) {
+    if ((apSeq) && (apSeq->GetState() == NiControllerSequence::kAnimating)) {
+        float fstartTime = apSeq->m_fStartTime;
+        float fstopTime = apSeq->m_fLastScaledTime;
+        if (fstartTime != -3.4028235e+38f && fstopTime != -3.4028235e+38f && fstopTime != fstartTime) {
+            bool blooped = fstartTime > static_cast<double>(fstopTime);
+            inumKeys = 0;
+            NiTextKey* ptextKeys = nullptr;
+            if (apSeq->GetTextKeys()) {
+                NiTextKeyExtraData* TextKeys = apSeq->GetTextKeys();
+                ptextKeys = TextKeys->GetKeys(inumKeys);
+            }
+            for (uint32_t n = 0; n < inumKeys; ++n) {
+                // The key's text is written into (the line ends and the attach node's space are cut off and put
+                // back), so it is held as a char*.
+                char* pnote = const_cast<char*>((&ptextKeys[n].m_kText)->GetHandleString());
+                if (pnote) {
+                    char soundAttachNode_2[32];
+                    float ftestTime = ptextKeys[n].m_fTime;
+                    bool bplay = false;
+                    NiAVObject* pmovingSound = nullptr;
+                    if (blooped &&
+                        (fstartTime < static_cast<double>(ftestTime) || fstopTime >= static_cast<double>(ftestTime))) {
+                        bplay = true;
+                    }
+                    else {
+                        if (fstartTime <= static_cast<double>(ftestTime) &&
+                            fstopTime > static_cast<double>(ftestTime)) {
                             bplay = true;
                         }
-                        else {
-                            if (fstartTime <= static_cast<double>(ftestTime) &&
-                                fstopTime > static_cast<double>(ftestTime)) {
-                                bplay = true;
+                    }
+                    if ((bplay) && (_strnicmp("Sound: ", pnote, 7u))) {
+                        bplay = false;
+                        if (!_strnicmp("Enum: StopSounds ", pnote, 17u)) {
+                            char soundAttachNode[32];
+                            const char* psp = nullptr;
+                            soundAttachNode[0] = 0;
+                            char* pcr = std::strchr(pnote, 13);
+                            if (pcr) {
+                                *pcr = 0;
                             }
-                        }
-                        if (bplay) {
-                            if (_strnicmp("Sound: ", pnote, 7u)) {
-                                bplay = false;
-                                if (!_strnicmp("Enum: StopSounds ", pnote, 17u)) {
-                                    char soundAttachNode[32];
-                                    const char* psp = nullptr;
-                                    soundAttachNode[0] = 0;
-                                    char* pcr = std::strchr(pnote, 13);
-                                    if (pcr) {
-                                        *pcr = 0;
-                                    }
-                                    psp = pnote + 16;
-                                    if (pnote[16]) {
-                                        if (psp[1]) {
-                                            ourStrcpy(soundAttachNode, psp + 1);
-                                        }
-                                    }
-                                    if (pcr) {
-                                        *pcr = 13;
-                                    }
-                                    if (apRef->Get3D()) {
-                                        if (soundAttachNode[0]) {
-                                            NiNode* v40 = apRef->Get3D();
-                                            NiFixedString apString(static_cast<const char*>(soundAttachNode));
-                                            NiFixedString* v39 = &apString;
-                                            pmovingSound = v40->GetObjectByName(*v39);
-                                        }
-                                        else {
-                                            NiNode* v38 = apRef->Get3D();
-                                            NiFixedString* v3 = &FixedStrings::QAttachSound();
-                                            pmovingSound = v38->GetObjectByName(*v3);
-                                        }
-                                        if (!pmovingSound) {
-                                            pmovingSound = (NiAVObject*)apRef->Get3D();
-                                        }
-                                    }
-                                    if (pmovingSound) {
-                                        (&BSAudio::QInstance())
-                                            ->StopMovingSounds(
-                                                pmovingSound, 1.0f, BSGameSound::SOUND_FLAG_ANIMATION_DRIVEN
-                                            );
-                                    }
+                            psp = pnote + 16;
+                            if ((pnote[16]) && (psp[1])) {
+                                ourStrcpy(soundAttachNode, psp + 1);
+                            }
+
+                            if (pcr) {
+                                *pcr = 13;
+                            }
+                            if (apRef->Get3D()) {
+                                if (soundAttachNode[0]) {
+                                    NiNode* v40 = apRef->Get3D();
+                                    NiFixedString apString(static_cast<const char*>(soundAttachNode));
+                                    NiFixedString* v39 = &apString;
+                                    pmovingSound = v40->GetObjectByName(*v39);
                                 }
                                 else {
-                                    if (!_strnicmp("Enum: HitShader", pnote, 15u)) {
-                                        pPlayer->PlayImpactBasedHitShader(apRef);
-                                    }
+                                    NiNode* v38 = apRef->Get3D();
+                                    NiFixedString* v3 = &FixedStrings::QAttachSound();
+                                    pmovingSound = v38->GetObjectByName(*v3);
                                 }
-                            }
-                        }
-                        TESSound* psound = nullptr;
-                        char* psp_2 = nullptr;
-                        soundAttachNode_2[0] = 0;
-                        if (bplay) {
-                            char* pcr_2 = std::strchr(pnote, 13);
-                            if (pcr_2) {
-                                *pcr_2 = 0;
-                            }
-                            psp_2 = std::strchr(pnote + 7, 32);
-                            if (psp_2) {
-                                ourStrcpy(soundAttachNode_2, psp_2 + 1);
-                                *psp_2 = 0;
-                            }
-                            psound = pDataHandler->GetSound(pnote + 7);
-                            if (pcr_2) {
-                                *pcr_2 = 13;
-                            }
-                        }
-                        if (psound) {
-                            BSSoundHandle soundHand;
-                            NiPoint3 loc = NiPoint3_ZERO;
-                            uint32_t iFlags = TESSound::ConvertLoopFlag(psound->GetData().iFlags);
-                            bool v37 = (psound->GetData().iFlags & 64) != 0 && (psound->GetData().iFlags & 2048) == 0;
-                            bool b2dSound = v37;
-                            bool bloopingSound = (iFlags & BSGameSound::SOUND_FLAG_LOOP) != 0;
-                            iFlags |= pPlayer != apRef ? 0 : BSGameSound::SOUND_FLAG_IGNORE_TIMESCALE;
-                            if (apRef) {
-                                if (apRef->Get3D()) {
-                                    const NiPoint3* WorldTranslate;
-                                    if (soundAttachNode_2[0]) {
-                                        NiNode* v36 = apRef->Get3D();
-                                        NiFixedString v49(static_cast<const char*>(soundAttachNode_2));
-                                        NiFixedString* v35 = &v49;
-                                        pmovingSound = v36->GetObjectByName(*v35);
-                                    }
-                                    else {
-                                        NiNode* v34 = apRef->Get3D();
-                                        NiFixedString* v5 = &FixedStrings::QAttachSound();
-                                        pmovingSound = v34->GetObjectByName(*v5);
-                                    }
-                                    if (bloopingSound && !pmovingSound) {
-                                        pmovingSound = (NiAVObject*)apRef->Get3D();
-                                    }
-                                    if (pmovingSound) {
-                                        pmovingSound->SetHasMovingSound(true);
-                                    }
-                                    NiAVObject* pmovingSound_2 = (NiAVObject*)apRef->Get3D();
-                                    pmovingSound_2->SetHasMovingSound(true);
-                                    if (pmovingSound) {
-                                        WorldTranslate = &pmovingSound->GetWorldTranslate();
-                                    }
-                                    else {
-                                        WorldTranslate = &apRef->Get3D()->GetWorldTranslate();
-                                    }
-                                    loc = *WorldTranslate;
-                                }
-                            }
-                            if (apRef &&
-                                (bloopingSound || (b2dSound || FalloutAudio::SoundDistanceTest(psound, loc, 1.0f)))) {
-                                if (bloopingSound) {
-                                    uint32_t a4 = iFlags |
-                                        (BSGameSound::SOUND_FLAG_IS_3D | BSGameSound::SOUND_FLAG_MAYBE_UNDERWATER |
-                                         BSGameSound::SOUND_FLAG_ANIMATION_DRIVEN);
-                                    uint32_t aPosition_8 = psound->iFormID;
-                                    BSAudio* v8 = &BSAudio::QInstance();
-                                    BSSoundHandle* arHandle = v8->GetSoundHandleByNumericID(&a1, aPosition_8, a4);
-                                    soundHand.operator=(*arHandle);
-                                }
-                                else {
-                                    if ((psound->GetData().iFlags & 64) != 0) {
-                                        uint32_t a4a = iFlags |
-                                            (BSGameSound::SOUND_FLAG_IS_2D | BSGameSound::SOUND_FLAG_ONE_SHOT |
-                                             BSGameSound::SOUND_FLAG_MAYBE_UNDERWATER |
-                                             BSGameSound::SOUND_FLAG_ANIMATION_DRIVEN);
-                                        uint32_t aPosition_8a = psound->iFormID;
-                                        BSAudio* v9 = &BSAudio::QInstance();
-                                        BSSoundHandle* SoundHandleByNumericID =
-                                            v9->GetSoundHandleByNumericID(&apHandle, aPosition_8a, a4a);
-                                        soundHand.operator=(*SoundHandleByNumericID);
-                                    }
-                                    else {
-                                        uint32_t a4b = iFlags |
-                                            (BSGameSound::SOUND_FLAG_IS_3D | BSGameSound::SOUND_FLAG_ONE_SHOT |
-                                             BSGameSound::SOUND_FLAG_MAYBE_UNDERWATER |
-                                             BSGameSound::SOUND_FLAG_ANIMATION_DRIVEN);
-                                        uint32_t aPosition_8b = psound->iFormID;
-                                        BSAudio* v10 = &BSAudio::QInstance();
-                                        BSSoundHandle* v31 = v10->GetSoundHandleByNumericID(&th_s, aPosition_8b, a4b);
-                                        soundHand.operator=(*v31);
-                                    }
-                                }
-                            }
-                            else {
-                                if (!apRef) {
-                                    if (bloopingSound) {
-                                        uint32_t a4c = iFlags |
-                                            (BSGameSound::SOUND_FLAG_IS_3D | BSGameSound::SOUND_FLAG_SYSTEM_SOUND |
-                                             BSGameSound::SOUND_FLAG_ANIMATION_DRIVEN);
-                                        uint32_t aPosition_8c = psound->iFormID;
-                                        BSAudio* v11 = &BSAudio::QInstance();
-                                        BSSoundHandle* v30 =
-                                            v11->GetSoundHandleByNumericID(&apResult, aPosition_8c, a4c);
-                                        soundHand.operator=(*v30);
-                                    }
-                                    else {
-                                        if ((psound->GetData().iFlags & 64) != 0) {
-                                            uint32_t a4d = iFlags |
-                                                (BSGameSound::SOUND_FLAG_IS_2D | BSGameSound::SOUND_FLAG_SYSTEM_SOUND |
-                                                 BSGameSound::SOUND_FLAG_ONE_SHOT |
-                                                 BSGameSound::SOUND_FLAG_ANIMATION_DRIVEN);
-                                            uint32_t aPosition_8d = psound->iFormID;
-                                            BSAudio* v12 = &BSAudio::QInstance();
-                                            BSSoundHandle* v29 =
-                                                v12->GetSoundHandleByNumericID(&v42, aPosition_8d, a4d);
-                                            soundHand.operator=(*v29);
-                                        }
-                                        else {
-                                            uint32_t a4e = iFlags |
-                                                (BSGameSound::SOUND_FLAG_IS_3D | BSGameSound::SOUND_FLAG_SYSTEM_SOUND |
-                                                 BSGameSound::SOUND_FLAG_ONE_SHOT |
-                                                 BSGameSound::SOUND_FLAG_ANIMATION_DRIVEN);
-                                            uint32_t aPosition_8e = psound->iFormID;
-                                            BSAudio* v13 = &BSAudio::QInstance();
-                                            BSSoundHandle* v28 =
-                                                v13->GetSoundHandleByNumericID(&v41, aPosition_8e, a4e);
-                                            soundHand.operator=(*v28);
-                                        }
-                                    }
+                                if (!pmovingSound) {
+                                    pmovingSound = (NiAVObject*)apRef->Get3D();
                                 }
                             }
                             if (pmovingSound) {
-                                soundHand.SetObjectToFollow(pmovingSound);
+                                (&BSAudio::QInstance())
+                                    ->StopMovingSounds(pmovingSound, 1.0f, BSGameSound::SOUND_FLAG_ANIMATION_DRIVEN);
                             }
-                            soundHand.SetPosition(loc.x, loc.y, loc.z);
-                            soundHand.Play(bloopingSound);
                         }
-                        if (psp_2) {
-                            *psp_2 = 32;
+                        else {
+                            if (!_strnicmp("Enum: HitShader", pnote, 15u)) {
+                                pPlayer->PlayImpactBasedHitShader(apRef);
+                            }
                         }
                     }
-                }
-            }
-            if (apSeq->m_eCycleType) {
-                bdone = true;
-                if (-3.4028235e+38f == apSeq->GetOffset()) {
-                    return false;
-                }
-                else {
-                    double DataFogPower = apSeq->m_fLastScaledTime;
-                    if (apSeq->m_fEndKeyTime > DataFogPower) {
-                        return false;
+
+                    TESSound* psound = nullptr;
+                    char* psp_2 = nullptr;
+                    soundAttachNode_2[0] = 0;
+                    if (bplay) {
+                        char* pcr_2 = std::strchr(pnote, 13);
+                        if (pcr_2) {
+                            *pcr_2 = 0;
+                        }
+                        psp_2 = std::strchr(pnote + 7, 32);
+                        if (psp_2) {
+                            ourStrcpy(soundAttachNode_2, psp_2 + 1);
+                            *psp_2 = 0;
+                        }
+                        psound = pDataHandler->GetSound(pnote + 7);
+                        if (pcr_2) {
+                            *pcr_2 = 13;
+                        }
+                    }
+                    if (psound) {
+                        BSSoundHandle soundHand;
+                        NiPoint3 loc = NiPoint3_ZERO;
+                        uint32_t iFlags = TESSound::ConvertLoopFlag(psound->GetData().iFlags);
+                        bool v37 = (psound->GetData().iFlags & 64) != 0 && (psound->GetData().iFlags & 2048) == 0;
+                        bool b2dSound = v37;
+                        bool bloopingSound = (iFlags & BSGameSound::SOUND_FLAG_LOOP) != 0;
+                        iFlags |= pPlayer != apRef ? 0 : BSGameSound::SOUND_FLAG_IGNORE_TIMESCALE;
+                        if ((apRef) && (apRef->Get3D())) {
+                            const NiPoint3* WorldTranslate;
+                            if (soundAttachNode_2[0]) {
+                                NiNode* v36 = apRef->Get3D();
+                                NiFixedString v49(static_cast<const char*>(soundAttachNode_2));
+                                NiFixedString* v35 = &v49;
+                                pmovingSound = v36->GetObjectByName(*v35);
+                            }
+                            else {
+                                NiNode* v34 = apRef->Get3D();
+                                NiFixedString* v5 = &FixedStrings::QAttachSound();
+                                pmovingSound = v34->GetObjectByName(*v5);
+                            }
+                            if (bloopingSound && !pmovingSound) {
+                                pmovingSound = (NiAVObject*)apRef->Get3D();
+                            }
+                            if (pmovingSound) {
+                                pmovingSound->SetHasMovingSound(true);
+                            }
+                            NiAVObject* pmovingSound_2 = (NiAVObject*)apRef->Get3D();
+                            pmovingSound_2->SetHasMovingSound(true);
+                            if (pmovingSound) {
+                                WorldTranslate = &pmovingSound->GetWorldTranslate();
+                            }
+                            else {
+                                WorldTranslate = &apRef->Get3D()->GetWorldTranslate();
+                            }
+                            loc = *WorldTranslate;
+                        }
+
+                        if (apRef &&
+                            (bloopingSound || (b2dSound || FalloutAudio::SoundDistanceTest(psound, loc, 1.0f)))) {
+                            if (bloopingSound) {
+                                uint32_t a4 = iFlags |
+                                    (BSGameSound::SOUND_FLAG_IS_3D | BSGameSound::SOUND_FLAG_MAYBE_UNDERWATER |
+                                     BSGameSound::SOUND_FLAG_ANIMATION_DRIVEN);
+                                uint32_t aPosition_8 = psound->iFormID;
+                                BSAudio* v8 = &BSAudio::QInstance();
+                                BSSoundHandle* arHandle = v8->GetSoundHandleByNumericID(&a1, aPosition_8, a4);
+                                soundHand.operator=(*arHandle);
+                            }
+                            else {
+                                if ((psound->GetData().iFlags & 64) != 0) {
+                                    uint32_t a4a = iFlags |
+                                        (BSGameSound::SOUND_FLAG_IS_2D | BSGameSound::SOUND_FLAG_ONE_SHOT |
+                                         BSGameSound::SOUND_FLAG_MAYBE_UNDERWATER |
+                                         BSGameSound::SOUND_FLAG_ANIMATION_DRIVEN);
+                                    uint32_t aPosition_8a = psound->iFormID;
+                                    BSAudio* v9 = &BSAudio::QInstance();
+                                    BSSoundHandle* SoundHandleByNumericID =
+                                        v9->GetSoundHandleByNumericID(&apHandle, aPosition_8a, a4a);
+                                    soundHand.operator=(*SoundHandleByNumericID);
+                                }
+                                else {
+                                    uint32_t a4b = iFlags |
+                                        (BSGameSound::SOUND_FLAG_IS_3D | BSGameSound::SOUND_FLAG_ONE_SHOT |
+                                         BSGameSound::SOUND_FLAG_MAYBE_UNDERWATER |
+                                         BSGameSound::SOUND_FLAG_ANIMATION_DRIVEN);
+                                    uint32_t aPosition_8b = psound->iFormID;
+                                    BSAudio* v10 = &BSAudio::QInstance();
+                                    BSSoundHandle* v31 = v10->GetSoundHandleByNumericID(&th_s, aPosition_8b, a4b);
+                                    soundHand.operator=(*v31);
+                                }
+                            }
+                        }
+                        else {
+                            if (!apRef) {
+                                if (bloopingSound) {
+                                    uint32_t a4c = iFlags |
+                                        (BSGameSound::SOUND_FLAG_IS_3D | BSGameSound::SOUND_FLAG_SYSTEM_SOUND |
+                                         BSGameSound::SOUND_FLAG_ANIMATION_DRIVEN);
+                                    uint32_t aPosition_8c = psound->iFormID;
+                                    BSAudio* v11 = &BSAudio::QInstance();
+                                    BSSoundHandle* v30 = v11->GetSoundHandleByNumericID(&apResult, aPosition_8c, a4c);
+                                    soundHand.operator=(*v30);
+                                }
+                                else {
+                                    if ((psound->GetData().iFlags & 64) != 0) {
+                                        uint32_t a4d = iFlags |
+                                            (BSGameSound::SOUND_FLAG_IS_2D | BSGameSound::SOUND_FLAG_SYSTEM_SOUND |
+                                             BSGameSound::SOUND_FLAG_ONE_SHOT |
+                                             BSGameSound::SOUND_FLAG_ANIMATION_DRIVEN);
+                                        uint32_t aPosition_8d = psound->iFormID;
+                                        BSAudio* v12 = &BSAudio::QInstance();
+                                        BSSoundHandle* v29 = v12->GetSoundHandleByNumericID(&v42, aPosition_8d, a4d);
+                                        soundHand.operator=(*v29);
+                                    }
+                                    else {
+                                        uint32_t a4e = iFlags |
+                                            (BSGameSound::SOUND_FLAG_IS_3D | BSGameSound::SOUND_FLAG_SYSTEM_SOUND |
+                                             BSGameSound::SOUND_FLAG_ONE_SHOT |
+                                             BSGameSound::SOUND_FLAG_ANIMATION_DRIVEN);
+                                        uint32_t aPosition_8e = psound->iFormID;
+                                        BSAudio* v13 = &BSAudio::QInstance();
+                                        BSSoundHandle* v28 = v13->GetSoundHandleByNumericID(&v41, aPosition_8e, a4e);
+                                        soundHand.operator=(*v28);
+                                    }
+                                }
+                            }
+                        }
+                        if (pmovingSound) {
+                            soundHand.SetObjectToFollow(pmovingSound);
+                        }
+                        soundHand.SetPosition(loc.x, loc.y, loc.z);
+                        soundHand.Play(bloopingSound);
+                    }
+                    if (psp_2) {
+                        *psp_2 = 32;
                     }
                 }
             }
         }
+        if (apSeq->m_eCycleType) {
+            bdone = true;
+            if (-3.4028235e+38f == apSeq->GetOffset()) {
+                return false;
+            }
+
+            double DataFogPower = apSeq->m_fLastScaledTime;
+            if (apSeq->m_fEndKeyTime > DataFogPower) {
+                return false;
+            }
+        }
     }
+
     return bdone;
 }
 
@@ -750,12 +738,11 @@ void* BSAnimGroupSequence::InitAnimGroup(BSAnimGroupSequence* apSequence, const 
                                                             result->SetSoundCount(Interior + 1);
                                                             result->SetSoundTime(Interior, DecalMinWidth);
                                                             result->SetSoundObject(Interior, Sound);
-                                                            if (String) {
-                                                                if (*String) {
-                                                                    float v41 = std::atof(String);
-                                                                    result->SetSoundVolume(Interior, v41);
-                                                                }
+                                                            if ((String) && (*String)) {
+                                                                float v41 = std::atof(String);
+                                                                result->SetSoundVolume(Interior, v41);
                                                             }
+
                                                             if (v54) {
                                                                 float v40 = std::atof(v54);
                                                                 result->SetSoundPitch(Interior, v40);
@@ -1014,15 +1001,13 @@ void* BSAnimGroupSequence::InitAnimGroup(BSAnimGroupSequence* apSequence, const 
                 );
                 v79 = 1;
             }
-            if (result->cBlendFrames) {
-                if (result->cBlendInFrames || result->cBlendOutFrames) {
-                    Warning(
-                        "ANIMATION: (%s) too many blend values in \"%s\". Blend %d, BlendIn %d, BlendOut %d",
-                        animGroupInfo[result->GetType()].pName, a2, result->cBlendFrames, result->cBlendInFrames,
-                        result->cBlendOutFrames
-                    );
-                    v79 = 1;
-                }
+            if ((result->cBlendFrames) && (result->cBlendInFrames || result->cBlendOutFrames)) {
+                Warning(
+                    "ANIMATION: (%s) too many blend values in \"%s\". Blend %d, BlendIn %d, BlendOut %d",
+                    animGroupInfo[result->GetType()].pName, a2, result->cBlendFrames, result->cBlendInFrames,
+                    result->cBlendOutFrames
+                );
+                v79 = 1;
             }
         }
     }

@@ -402,7 +402,6 @@ NiObject* NiPSysGravityModifier::CreateObject() {
     if (v0) {
         return ::new (v0) NiPSysGravityModifier;
     }
-    else {
-        return nullptr;
-    }
+
+    return nullptr;
 }

@@ -2621,9 +2621,8 @@ BSRenderedTexture* ImageSpaceTexture::GetRenderedTexture() {
     if (bIsRenderedTexture) {
         return static_cast<BSRenderedTexture*>(spTexture);
     }
-    else {
-        return nullptr;
-    }
+
+    return nullptr;
 }
 
 void ImageSpaceTexture::SetupTexture(NiD3DTextureStage* a2) {

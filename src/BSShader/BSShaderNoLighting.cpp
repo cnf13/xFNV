@@ -247,10 +247,8 @@ void BSShaderNoLighting::SetupGeometryConstants(const NiPropertyState* apState) 
         BSRenderState::SetZEnable(false, BSRS_NOLOCK);
     }
     NiStencilProperty* pStencil = static_cast<NiStencilProperty*>(apState->m_aspProps[4].m_pObject);
-    if (pStencil) {
-        if ((pStencil->m_uFlags & 1) != 0) {
-            m_pkD3DRenderState->ApplyStencil(pStencil);
-        }
+    if ((pStencil) && ((pStencil->m_uFlags & 1) != 0)) {
+        m_pkD3DRenderState->ApplyStencil(pStencil);
     }
 }
 
@@ -272,11 +270,10 @@ void BSShaderNoLighting::SetupGeometryAlphaBlending(const NiPropertyState* apSta
 
 void BSShaderNoLighting::PostGeometry(const NiPropertyState* apState) {
     BSShaderProperty* pShaderProp = static_cast<BSShaderProperty*>(apState->m_aspProps[3].m_pObject);
-    if (pShaderProp) {
-        if ((pShaderProp->ulFlags[1] & BSS2_Wireframe) != 0) {
-            BSRenderState::SetWireframeEnable(false, BSRS_NOLOCK);
-        }
+    if ((pShaderProp) && ((pShaderProp->ulFlags[1] & BSS2_Wireframe) != 0)) {
+        BSRenderState::SetWireframeEnable(false, BSRS_NOLOCK);
     }
+
     // The property is tested for null only around the wireframe flag, and its flags below are read unguarded, as the
     // game does.
     if ((pShaderProp->ulFlags[1] & BSS2_ZBuffer_Write) == 0) {
@@ -286,10 +283,8 @@ void BSShaderNoLighting::PostGeometry(const NiPropertyState* apState) {
         BSRenderState::SetZEnable(true, BSRS_NOLOCK);
     }
     NiStencilProperty* pStencil = static_cast<NiStencilProperty*>(apState->m_aspProps[4].m_pObject);
-    if (pStencil) {
-        if ((pStencil->m_uFlags & NiStencilProperty::ENABLE_MASK) != 0) {
-            BSRenderState::SetStencilEnable(false, BSRS_NOLOCK);
-        }
+    if ((pStencil) && ((pStencil->m_uFlags & NiStencilProperty::ENABLE_MASK) != 0)) {
+        BSRenderState::SetStencilEnable(false, BSRS_NOLOCK);
     }
 }
 
@@ -535,56 +530,45 @@ NiD3DShaderDeclaration* BSShaderNoLighting::GetShaderDecl(NiGeometry* apGeometry
                 if ((v3 & 2) != 0) {
                     return spSkinDeclTexVcN;
                 }
-                else {
-                    return spDeclTexVcN;
-                }
+
+                return spDeclTexVcN;
             }
-            else {
-                if ((v3 & 2) != 0) {
-                    return spSkinDeclVcN;
-                }
-                else {
-                    return spDeclVcN;
-                }
-            }
-        }
-        else {
+
             if ((v3 & 2) != 0) {
-                return spSkinDeclN;
+                return spSkinDeclVcN;
             }
-            else {
-                return spDeclN;
-            }
+
+            return spDeclVcN;
         }
+
+        if ((v3 & 2) != 0) {
+            return spSkinDeclN;
+        }
+
+        return spDeclN;
     }
-    else {
-        if ((apProperty->ulFlags[1] & 32) != 0) {
-            if (pNoLightingProp->spBaseMap.m_pObject) {
-                if ((v3 & 2) != 0) {
-                    return spSkinDeclTexVc;
-                }
-                else {
-                    return spDeclTexVc;
-                }
-            }
-            else {
-                if ((v3 & 2) != 0) {
-                    return spSkinDeclVc;
-                }
-                else {
-                    return spDeclVc;
-                }
-            }
-        }
-        else {
+
+    if ((apProperty->ulFlags[1] & 32) != 0) {
+        if (pNoLightingProp->spBaseMap.m_pObject) {
             if ((v3 & 2) != 0) {
-                return spSkinDecl;
+                return spSkinDeclTexVc;
             }
-            else {
-                return spDecl;
-            }
+
+            return spDeclTexVc;
         }
+
+        if ((v3 & 2) != 0) {
+            return spSkinDeclVc;
+        }
+
+        return spDeclVc;
     }
+
+    if ((v3 & 2) != 0) {
+        return spSkinDecl;
+    }
+
+    return spDecl;
 }
 
 // Creates the pixel map (material colour and alpha, fog colour, water fog) and the vertex map (transforms, texture

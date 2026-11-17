@@ -178,19 +178,17 @@ NiAVObject* BSUtilities::GetObjectByName(NiAVObject* apScene, const char* apName
         NiGlobalStringTable::ReleaseHandle(name.GetHandle());
         return pres;
     }
-    else {
-        if (bTestScenegraph) {
-            NiAVObject* v4 = apScene->GetObjectByName(name);
-            // EXE-INLINED none: NiGlobalStringTable::ReleaseHandle
-            NiGlobalStringTable::ReleaseHandle(name.GetHandle());
-            return v4;
-        }
-        else {
-            // EXE-INLINED none: NiGlobalStringTable::ReleaseHandle
-            NiGlobalStringTable::ReleaseHandle(name.GetHandle());
-            return nullptr;
-        }
+
+    if (bTestScenegraph) {
+        NiAVObject* v4 = apScene->GetObjectByName(name);
+        // EXE-INLINED none: NiGlobalStringTable::ReleaseHandle
+        NiGlobalStringTable::ReleaseHandle(name.GetHandle());
+        return v4;
     }
+
+    // EXE-INLINED none: NiGlobalStringTable::ReleaseHandle
+    NiGlobalStringTable::ReleaseHandle(name.GetHandle());
+    return nullptr;
 }
 
 NiAVObject* BSUtilities::GetObjectByName(NiAVObject* apScene, const char* apName) {
@@ -233,15 +231,14 @@ bool BSUtilities::GetExternalEmittanceRecurse(NiAVObject* apObj) {
         if (property && property->BSShaderProperty::GetFlag(BSShaderProperty::BSSP_FLAG_EXTERNAL_EMITTANCE)) {
             return true;
         }
-        else {
-            v6 = apObj->IsNode();
-            if (v6) {
-                arrayCount = v6->GetArrayCount();
-                for (a1 = 0; a1 < arrayCount; ++a1) {
-                    v2 = v6->GetAt(a1);
-                    if (BSUtilities::GetExternalEmittanceRecurse(v2)) {
-                        return true;
-                    }
+
+        v6 = apObj->IsNode();
+        if (v6) {
+            arrayCount = v6->GetArrayCount();
+            for (a1 = 0; a1 < arrayCount; ++a1) {
+                v2 = v6->GetAt(a1);
+                if (BSUtilities::GetExternalEmittanceRecurse(v2)) {
+                    return true;
                 }
             }
         }

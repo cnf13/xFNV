@@ -280,61 +280,57 @@ void BGSDistantObjectBlock::Prepare() {
     bool bUseNormalLOD = !bPrepared || (spMesh.m_pObject && (spOldMesh.m_pObject && spMesh.operator!=(spOldMesh)));
     bool bUseStinger = !bPrepared ||
         (spNodeStinger.m_pObject && (spNodeStingerOld.m_pObject && spNodeStinger.operator!=(spNodeStingerOld)));
-    if (bUseNormalLOD) {
-        if (spMesh.m_pObject) {
-            NiAlphaProperty* palpha;
-            spMesh.m_pObject->RemoveProperty(NiAlphaProperty::GetType());
-            NiAlphaProperty* apMemory =
-                static_cast<NiAlphaProperty*>(NiMemObject::operator new(sizeof(NiAlphaProperty)));
-            if (apMemory) {
-                palpha = ::new (apMemory) NiAlphaProperty;
-            }
-            else {
-                palpha = nullptr;
-            }
-            palpha->SetAlphaTesting(true);
-            palpha->SetAlphaBlending(false);
-            palpha->SetTestRef(128);
-            palpha->SetTestMode(NiAlphaProperty::TEST_GREATER);
-            spMesh.m_pObject->AttachProperty(palpha);
-            int32_t Type = NiShadeProperty::GetType();
-            BSShaderProperty* pshadeProp = static_cast<BSShaderProperty*>(spMesh.m_pObject->GetProperty(Type));
-            pshadeProp->SetFlag(34u, 1);
-            pshadeProp->SetFlag(33u, 0);
-            pshadeProp->SetFlag(0, 0);
-            BSShaderProperty* pshadeProp_2 = pshadeProp->ClarifyShader(spMesh.m_pObject, false, true);
-            if (pshadeProp_2) {
-                spMesh.m_pObject->RemoveProperty(3);
-                pshadeProp = pshadeProp_2;
-                spMesh.m_pObject->AttachProperty(pshadeProp_2);
-            }
-            int32_t NumberOfItemsActivated = pshadeProp->iShader;
-            BSShader* Shader = BSShaderManager::GetShader(NumberOfItemsActivated);
-            spMesh.m_pObject->SetShader(Shader);
-            NiUpdateData foo(0.0f, false, false);
-            spMesh.m_pObject->UpdateProperties();
-            spMesh.m_pObject->Update(foo);
-            pNode->UpdateBlockVisibility(false);
-            spMesh.m_pObject->GetModelData()->m_ucKeepFlags = 0;
-            spMesh.m_pObject->GetModelData()->SetConsistency(NiGeometryData::STATIC);
-            spMesh.m_pObject->GetModelData()->SetCompressFlags(1u);
-            BSShader* pShader = spMesh.m_pObject->GetShader();
-            // The renderer is the platform one; its PrecacheGeometry and PerformPrecache are called.
-            NiDX9Renderer* pRenderer = static_cast<NiDX9Renderer*>(NiRenderer::GetRenderer());
-            NiD3DShaderDeclaration* v4 = pShader->GetShaderDecl(spMesh.m_pObject, pshadeProp);
-            pRenderer->PrecacheGeometry(spMesh.m_pObject, 0, 0, v4);
-            NiDX9Renderer* Renderer_ = static_cast<NiDX9Renderer*>(NiRenderer::GetRenderer());
-            Renderer_->PerformPrecache();
-            bPrepared = true;
+    if ((bUseNormalLOD) && (spMesh.m_pObject)) {
+        NiAlphaProperty* palpha;
+        spMesh.m_pObject->RemoveProperty(NiAlphaProperty::GetType());
+        NiAlphaProperty* apMemory = static_cast<NiAlphaProperty*>(NiMemObject::operator new(sizeof(NiAlphaProperty)));
+        if (apMemory) {
+            palpha = ::new (apMemory) NiAlphaProperty;
         }
+        else {
+            palpha = nullptr;
+        }
+        palpha->SetAlphaTesting(true);
+        palpha->SetAlphaBlending(false);
+        palpha->SetTestRef(128);
+        palpha->SetTestMode(NiAlphaProperty::TEST_GREATER);
+        spMesh.m_pObject->AttachProperty(palpha);
+        int32_t Type = NiShadeProperty::GetType();
+        BSShaderProperty* pshadeProp = static_cast<BSShaderProperty*>(spMesh.m_pObject->GetProperty(Type));
+        pshadeProp->SetFlag(34u, 1);
+        pshadeProp->SetFlag(33u, 0);
+        pshadeProp->SetFlag(0, 0);
+        BSShaderProperty* pshadeProp_2 = pshadeProp->ClarifyShader(spMesh.m_pObject, false, true);
+        if (pshadeProp_2) {
+            spMesh.m_pObject->RemoveProperty(3);
+            pshadeProp = pshadeProp_2;
+            spMesh.m_pObject->AttachProperty(pshadeProp_2);
+        }
+        int32_t NumberOfItemsActivated = pshadeProp->iShader;
+        BSShader* Shader = BSShaderManager::GetShader(NumberOfItemsActivated);
+        spMesh.m_pObject->SetShader(Shader);
+        NiUpdateData foo(0.0f, false, false);
+        spMesh.m_pObject->UpdateProperties();
+        spMesh.m_pObject->Update(foo);
+        pNode->UpdateBlockVisibility(false);
+        spMesh.m_pObject->GetModelData()->m_ucKeepFlags = 0;
+        spMesh.m_pObject->GetModelData()->SetConsistency(NiGeometryData::STATIC);
+        spMesh.m_pObject->GetModelData()->SetCompressFlags(1u);
+        BSShader* pShader = spMesh.m_pObject->GetShader();
+        // The renderer is the platform one; its PrecacheGeometry and PerformPrecache are called.
+        NiDX9Renderer* pRenderer = static_cast<NiDX9Renderer*>(NiRenderer::GetRenderer());
+        NiD3DShaderDeclaration* v4 = pShader->GetShaderDecl(spMesh.m_pObject, pshadeProp);
+        pRenderer->PrecacheGeometry(spMesh.m_pObject, 0, 0, v4);
+        NiDX9Renderer* Renderer_ = static_cast<NiDX9Renderer*>(NiRenderer::GetRenderer());
+        Renderer_->PerformPrecache();
+        bPrepared = true;
     }
-    if (bUseStinger) {
-        if (spNodeStinger.m_pObject) {
-            PrepareStingerObject(spNodeStinger.m_pObject);
-            NiDX9Renderer* v6 = static_cast<NiDX9Renderer*>(NiRenderer::GetRenderer());
-            v6->PerformPrecache();
-            bPrepared = true;
-        }
+
+    if ((bUseStinger) && (spNodeStinger.m_pObject)) {
+        PrepareStingerObject(spNodeStinger.m_pObject);
+        NiDX9Renderer* v6 = static_cast<NiDX9Renderer*>(NiRenderer::GetRenderer());
+        v6->PerformPrecache();
+        bPrepared = true;
     }
 }
 
@@ -569,27 +565,24 @@ void BGSDistantObjectBlock::SwitchToLow(
 }
 
 void BGSDistantObjectBlock::LoadFromTask(eBool abLoadData) {
-    if (spLoadTask.m_pObject) {
-        if (spLoadTask.m_pObject->IsTaskFinished()) {
-            if (abLoadData) {
-                spLoadTask.m_pObject->GetMesh(spMesh);
-                spLoadTask.m_pObject->GetNode(spNode);
-            }
-            spLoadTask.operator=(static_cast<BGSDistantObjectBlockLoadTask*>(nullptr));
-            if (!spLoadTaskStinger.m_pObject) {
-                bDoneLoading = true;
-            }
+    if ((spLoadTask.m_pObject) && (spLoadTask.m_pObject->IsTaskFinished())) {
+        if (abLoadData) {
+            spLoadTask.m_pObject->GetMesh(spMesh);
+            spLoadTask.m_pObject->GetNode(spNode);
+        }
+        spLoadTask.operator=(static_cast<BGSDistantObjectBlockLoadTask*>(nullptr));
+        if (!spLoadTaskStinger.m_pObject) {
+            bDoneLoading = true;
         }
     }
-    if (spLoadTaskStinger.m_pObject) {
-        if (spLoadTaskStinger.m_pObject->IsTaskFinished()) {
-            if (abLoadData) {
-                spLoadTaskStinger.m_pObject->GetNode(spNodeStinger);
-            }
-            spLoadTaskStinger.operator=(static_cast<BGSDistantObjectBlockLoadTask*>(nullptr));
-            if (!spLoadTask.m_pObject) {
-                bDoneLoading = true;
-            }
+
+    if ((spLoadTaskStinger.m_pObject) && (spLoadTaskStinger.m_pObject->IsTaskFinished())) {
+        if (abLoadData) {
+            spLoadTaskStinger.m_pObject->GetNode(spNodeStinger);
+        }
+        spLoadTaskStinger.operator=(static_cast<BGSDistantObjectBlockLoadTask*>(nullptr));
+        if (!spLoadTask.m_pObject) {
+            bDoneLoading = true;
         }
     }
 }
@@ -684,16 +677,14 @@ void BGSDistantObjectBlock::operator delete(void* apMemory) {
 
 void BGSDistantObjectBlock::ResetCullResults() {
     for (BGSDistantObjectBlock* m_item : BGSDistantObjectBlock::BlocksLoaded) {
-        if (m_item) {
-            if (!m_item->CheckDetach()) {
-                BSMultiBoundNode* Node = m_item->GetNode(false);
-                if (Node) {
-                    Node->QMultiBound()->QShape()->ResetCullResult();
-                }
-                BSMultiBoundNode* v1 = m_item->GetNode(true);
-                if (v1) {
-                    v1->QMultiBound()->QShape()->ResetCullResult();
-                }
+        if ((m_item) && (!m_item->CheckDetach())) {
+            BSMultiBoundNode* Node = m_item->GetNode(false);
+            if (Node) {
+                Node->QMultiBound()->QShape()->ResetCullResult();
+            }
+            BSMultiBoundNode* v1 = m_item->GetNode(true);
+            if (v1) {
+                v1->QMultiBound()->QShape()->ResetCullResult();
             }
         }
     }
@@ -783,10 +774,8 @@ void BGSDistantObjectBlockLoadTask::Finish() {
         }
     }
     else {
-        if (!bCanceled) {
-            if (pBlock) {
-                pBlock->LoadFromTask(eFalse);
-            }
+        if ((!bCanceled) && (pBlock)) {
+            pBlock->LoadFromTask(eFalse);
         }
     }
 }

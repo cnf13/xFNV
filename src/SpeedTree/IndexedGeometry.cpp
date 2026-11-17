@@ -376,17 +376,15 @@ void CIndexedGeometry::Transform(const CTransform& cTransform) {
         cCoord.m_afData[2] = v6;
         cCoord = cCoord * cTransform;
         rt::memcpy(const_cast<float*>(pCoord), cCoord.m_afData, 3 * sizeof(float));
-        if (m_bVertexWeighting) {
-            if (m_vOrigCoords.size()) {
-                const float* pOrigCoord = GetOrigVertexCoord(static_cast<uint32_t>(i));
-                float v3 = pOrigCoord[1];
-                float v4 = pOrigCoord[2];
-                cCoord.m_afData[0] = *pOrigCoord;
-                cCoord.m_afData[1] = v3;
-                cCoord.m_afData[2] = v4;
-                cCoord = cCoord * cTransform;
-                rt::memcpy(const_cast<float*>(pOrigCoord), cCoord.m_afData, 3 * sizeof(float));
-            }
+        if ((m_bVertexWeighting) && (m_vOrigCoords.size())) {
+            const float* pOrigCoord = GetOrigVertexCoord(static_cast<uint32_t>(i));
+            float v3 = pOrigCoord[1];
+            float v4 = pOrigCoord[2];
+            cCoord.m_afData[0] = *pOrigCoord;
+            cCoord.m_afData[1] = v3;
+            cCoord.m_afData[2] = v4;
+            cCoord = cCoord * cTransform;
+            rt::memcpy(const_cast<float*>(pOrigCoord), cCoord.m_afData, 3 * sizeof(float));
         }
     }
 }

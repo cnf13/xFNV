@@ -145,13 +145,11 @@ void TESReactionForm::SetReaction(TESForm* apForm, int32_t aiReaction) {
                 break;
             }
         }
-        if (!foundit) {
-            if (aiReaction) {
-                GROUP_REACTION* fr_2 = static_cast<GROUP_REACTION*>(ourMalloc(sizeof(GROUP_REACTION)));
-                fr_2->pForm = apForm;
-                fr_2->iReaction = aiReaction;
-                (&m_reactionList)->AddTail(fr_2);
-            }
+        if ((!foundit) && (aiReaction)) {
+            GROUP_REACTION* fr_2 = static_cast<GROUP_REACTION*>(ourMalloc(sizeof(GROUP_REACTION)));
+            fr_2->pForm = apForm;
+            fr_2->iReaction = aiReaction;
+            (&m_reactionList)->AddTail(fr_2);
         }
     }
 }
@@ -217,15 +215,13 @@ void TESReactionForm::SetFightReaction(TESForm* apForm, int32_t aiReaction) {
                 break;
             }
         }
-        if (!v7) {
-            if (aiReaction) {
-                GROUP_REACTION* a2 = static_cast<GROUP_REACTION*>(ourMalloc(sizeof(GROUP_REACTION)));
-                a2->pForm = apForm;
-                a2->iReaction = 0;
-                a2->iFightReaction = aiReaction;
-                BSSimpleList<GROUP_REACTION*>* ActorPackageThatIsRunning = QReactionList();
-                ActorPackageThatIsRunning->AddTail(a2);
-            }
+        if ((!v7) && (aiReaction)) {
+            GROUP_REACTION* a2 = static_cast<GROUP_REACTION*>(ourMalloc(sizeof(GROUP_REACTION)));
+            a2->pForm = apForm;
+            a2->iReaction = 0;
+            a2->iFightReaction = aiReaction;
+            BSSimpleList<GROUP_REACTION*>* ActorPackageThatIsRunning = QReactionList();
+            ActorPackageThatIsRunning->AddTail(a2);
         }
     }
 }

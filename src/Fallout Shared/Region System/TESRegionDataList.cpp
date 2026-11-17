@@ -67,10 +67,8 @@ TESRegionDataList* TESRegionDataList::Copy(TESRegionDataList* apCopyIntoList) {
         if (pcopy->bOwnsDataMemory) {
             TESRegionData* m_item = pcurrent->m_item;
             TESRegionData* pdataCopy = m_item->Copy();
-            if (!pcopy->Add(pdataCopy)) {
-                if (pdataCopy) {
-                    delete pdataCopy;
-                }
+            if ((!pcopy->Add(pdataCopy)) && (pdataCopy)) {
+                delete pdataCopy;
             }
         }
         else {
@@ -85,10 +83,8 @@ void TESRegionDataList::Clear() {
     while (ItemsInList()) {
         TESRegionData* m_item = this->m_item;
         RemoveHead();
-        if (bOwnsDataMemory) {
-            if (m_item) {
-                delete m_item;
-            }
+        if ((bOwnsDataMemory) && (m_item)) {
+            delete m_item;
         }
     }
 }

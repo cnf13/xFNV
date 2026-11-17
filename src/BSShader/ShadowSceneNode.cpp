@@ -107,11 +107,10 @@ ShadowSceneNode::~ShadowSceneNode() {
     if (BSShaderManager::pShadowSceneNode[cSceneGraphIndex] == this) {
         BSShaderManager::SetShadowSceneNode(cSceneGraphIndex, nullptr);
     }
-    if (BSShaderManager::GetAccumulator()) {
-        if (BSShaderManager::GetAccumulator()->pActiveShadowSceneNode == this) {
-            BSShaderManager::GetAccumulator()->pActiveShadowSceneNode = nullptr;
-        }
+    if ((BSShaderManager::GetAccumulator()) && (BSShaderManager::GetAccumulator()->pActiveShadowSceneNode == this)) {
+        BSShaderManager::GetAccumulator()->pActiveShadowSceneNode = nullptr;
     }
+
     RemoveAllLights();
     kShadowLightActiveFenceObject = nullptr;
     kShadowLightFadingInFenceObject = nullptr;
@@ -409,11 +408,10 @@ ShadowSceneLight* ShadowSceneNode::GetLight(NiLight* apLight) {
     while (true) {
         result = m_pkHead->m_element.m_pObject;
         m_pkHead = m_pkHead->m_pkNext;
-        if (result) {
-            if (result->spLight.m_pObject == apLight) {
-                break;
-            }
+        if ((result) && (result->spLight.m_pObject == apLight)) {
+            break;
         }
+
         if (!m_pkHead) {
             return nullptr;
         }
@@ -790,13 +788,11 @@ void ShadowSceneNode::RemoveLight(NiLight* apLight) {
 }
 
 void ShadowSceneNode::RemoveLight(const NiPointer<ShadowSceneLight>& apSSLight) {
-    if ((&apSSLight)->m_pObject) {
-        if (bAllowLightRemoveQueues) {
-            (&ShadowSceneNode::SSNLightQueueCrit)->Lock(nullptr);
-            (&lLightQueueRemove)->AddTail(apSSLight);
-            if (!(--ShadowSceneNode::SSNLightQueueCrit.uiLockCount)) {
-                ShadowSceneNode::SSNLightQueueCrit.uiOwningThread = (uint32_t)0;
-            }
+    if (((&apSSLight)->m_pObject) && (bAllowLightRemoveQueues)) {
+        (&ShadowSceneNode::SSNLightQueueCrit)->Lock(nullptr);
+        (&lLightQueueRemove)->AddTail(apSSLight);
+        if (!(--ShadowSceneNode::SSNLightQueueCrit.uiLockCount)) {
+            ShadowSceneNode::SSNLightQueueCrit.uiOwningThread = (uint32_t)0;
         }
     }
 }
@@ -958,24 +954,23 @@ void ShadowSceneNode::UpdateMultiboundVisibility(
     if (akCuller.GetRTTI() == &BSCullingProcess::ms_RTTI) {
         eCullMode = static_cast<BSCullingProcess&>(akCuller).kCullMode;
     }
-    if (eCullMode != BSCullingProcess::BSCP_CULL_ALLPASS &&
-        eCullMode != BSCullingProcess::BSCP_CULL_IGNOREMULTIBOUNDS &&
-        pShape->kCullResult == BSMultiBoundShape::BS_CULL_UNTESTED) {
-        if (apMultibound->m_kChildren.m_usESize) {
-            bool bshapewithinfrustum = pShape->WithinFrustum(akCuller.m_kPlanes);
-            apMultibound->spMultiBound.m_pObject->spShape.m_pObject->kCullResult =
-                static_cast<BSMultiBoundShape::BSMBCullResult>(!bshapewithinfrustum + 1);
-            if (bshapewithinfrustum) {
-                BSPortalGraph* pBSPortalGraph = this->pBSPortalGraph;
-                if (pBSPortalGraph) {
-                    NiTListItem<BSOcclusionPlane*>* pItem = pBSPortalGraph->lOccluderList.m_pkHead;
-                    while (pItem) {
-                        BSOcclusionPlane* pOccluder = pItem->m_element;
-                        pItem = pItem->m_pkNext;
-                        if (pOccluder && pOccluder->kCullResult == BSMultiBoundShape::BS_CULL_VISIBLE &&
-                            !apMultibound->VisibleAgainstActiveOccluders(akViewPoint, akCuller, pOccluder)) {
-                            break;
-                        }
+    if ((eCullMode != BSCullingProcess::BSCP_CULL_ALLPASS &&
+         eCullMode != BSCullingProcess::BSCP_CULL_IGNOREMULTIBOUNDS &&
+         pShape->kCullResult == BSMultiBoundShape::BS_CULL_UNTESTED) &&
+        (apMultibound->m_kChildren.m_usESize)) {
+        bool bshapewithinfrustum = pShape->WithinFrustum(akCuller.m_kPlanes);
+        apMultibound->spMultiBound.m_pObject->spShape.m_pObject->kCullResult =
+            static_cast<BSMultiBoundShape::BSMBCullResult>(!bshapewithinfrustum + 1);
+        if (bshapewithinfrustum) {
+            BSPortalGraph* pBSPortalGraph = this->pBSPortalGraph;
+            if (pBSPortalGraph) {
+                NiTListItem<BSOcclusionPlane*>* pItem = pBSPortalGraph->lOccluderList.m_pkHead;
+                while (pItem) {
+                    BSOcclusionPlane* pOccluder = pItem->m_element;
+                    pItem = pItem->m_pkNext;
+                    if (pOccluder && pOccluder->kCullResult == BSMultiBoundShape::BS_CULL_VISIBLE &&
+                        !apMultibound->VisibleAgainstActiveOccluders(akViewPoint, akCuller, pOccluder)) {
+                        break;
                     }
                 }
             }
@@ -1558,11 +1553,10 @@ void ShadowSceneNode::UpdateLight_0(NiLight* apLight) {
         while (true) {
             apSSLight = m_pkHead->m_element.m_pObject;
             m_pkHead = m_pkHead->m_pkNext;
-            if (apSSLight) {
-                if (apSSLight->spLight.m_pObject == apLight) {
-                    break;
-                }
+            if ((apSSLight) && (apSSLight->spLight.m_pObject == apLight)) {
+                break;
             }
+
             if (!m_pkHead) {
                 return;
             }
@@ -2044,10 +2038,8 @@ uint16_t ShadowSceneNode::GetActiveLightCount() {
     while (m_pkHead) {
         ShadowSceneLight* m_pObject = m_pkHead->m_element.m_pObject;
         m_pkHead = m_pkHead->m_pkNext;
-        if (m_pObject) {
-            if (m_pObject->usFrustumCull != 255) {
-                ++result;
-            }
+        if ((m_pObject) && (m_pObject->usFrustumCull != 255)) {
+            ++result;
         }
     }
     return result;
@@ -2097,13 +2089,11 @@ void ShadowSceneNode::DisableAllShadowLights() {
     while (m_pkHead) {
         ShadowSceneLight* pscenelight = m_pkHead->m_element.m_pObject;
         m_pkHead = m_pkHead->m_pkNext;
-        if (pscenelight) {
-            if (pscenelight->spLight.m_pObject) {
-                BSShaderManager::pTextureManager->ReturnFrustumShadowTexture(pscenelight->spDynamicShadowMap.m_pObject);
-                pscenelight->spDynamicShadowMap = nullptr;
-                pscenelight->spLight.m_pObject->m_uFlags |= 1u;
-                pscenelight->ClearRenderPasses();
-            }
+        if ((pscenelight) && (pscenelight->spLight.m_pObject)) {
+            BSShaderManager::pTextureManager->ReturnFrustumShadowTexture(pscenelight->spDynamicShadowMap.m_pObject);
+            pscenelight->spDynamicShadowMap = nullptr;
+            pscenelight->spLight.m_pObject->m_uFlags |= 1u;
+            pscenelight->ClearRenderPasses();
         }
     }
 }

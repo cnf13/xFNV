@@ -215,7 +215,7 @@ using BSSimpleArrayOffsetData = BSSimpleArray<OffsetData, 1024>;
 class BGSOffsetDataArray : public BSScrapArray<OffsetData, 1024> {
 public:
     BGSOffsetDataArray();
-    ~BGSOffsetDataArray();
+    ~BGSOffsetDataArray() override;
 
     // Appends an entry for aiOffset and apFormsMap.
     void AddOffset(uint32_t aiOffset, BGSReconstructFormsMap* apFormsMap);

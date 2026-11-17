@@ -442,14 +442,12 @@ void hkpMoppDefaultAssembler::getScaleInfo(hkpMoppTreeNode* a1, hkpMoppCode::Cod
 
 // Hands a non-terminal node's two branches back to the node manager when nodes are built interleaved.
 void hkpMoppDefaultAssembler::releaseNode(hkpMoppTreeNode* node) {
-    if (!node->m_isTerminal.m_bool) {
-        if (m_params.m_interleavedBuildingEnabled.m_bool) {
-            hkpMoppTreeInternalNode* internalNode = static_cast<hkpMoppTreeInternalNode*>(node);
-            m_nodeMgr->releaseNode(internalNode->m_leftBranch);
-            m_nodeMgr->releaseNode(internalNode->m_rightBranch);
-            internalNode->m_leftBranch = nullptr;
-            internalNode->m_rightBranch = nullptr;
-        }
+    if ((!node->m_isTerminal.m_bool) && (m_params.m_interleavedBuildingEnabled.m_bool)) {
+        hkpMoppTreeInternalNode* internalNode = static_cast<hkpMoppTreeInternalNode*>(node);
+        m_nodeMgr->releaseNode(internalNode->m_leftBranch);
+        m_nodeMgr->releaseNode(internalNode->m_rightBranch);
+        internalNode->m_leftBranch = nullptr;
+        internalNode->m_rightBranch = nullptr;
     }
 }
 
@@ -621,10 +619,8 @@ void hkpMoppDefaultAssembler::checkAndAddProperties(
     hkpMoppAssemblerNodeInfo& a3
 ) {
     if (a1->m_parent) {
-        if (!a3.m_propertiesSpread[0]) {
-            if (a2.m_propertiesSpread[0]) {
-                addProperty(0, a3.m_propertiesOffset[0]);
-            }
+        if ((!a3.m_propertiesSpread[0]) && (a2.m_propertiesSpread[0])) {
+            addProperty(0, a3.m_propertiesOffset[0]);
         }
     }
     else {
@@ -862,12 +858,11 @@ int32_t hkpMoppDefaultAssembler::preCalcScale(
                 child->m_assemblerData.m_rescaleCommandType.m_storage = hkpMoppAssemblerData::HK_MOPP_RESCALE;
             }
         }
-        else if (!child->m_assemblerData.m_scaleIsValid.m_bool) {
-            if (childBits[i] < result) {
-                // EXE-INLINED none: hkEnum<E, S>::operator=
-                child->m_assemblerData.m_rescaleCommandType.m_storage = hkpMoppAssemblerData::HK_MOPP_RESCALE;
-            }
+        else if ((!child->m_assemblerData.m_scaleIsValid.m_bool) && (childBits[i] < result)) {
+            // EXE-INLINED none: hkEnum<E, S>::operator=
+            child->m_assemblerData.m_rescaleCommandType.m_storage = hkpMoppAssemblerData::HK_MOPP_RESCALE;
         }
+
         if (child->m_assemblerData.m_rescaleCommandType.m_storage == hkpMoppAssemblerData::HK_MOPP_NO_RESCALE &&
             result >= childBits[i]) {
             result = childBits[i];
@@ -1114,14 +1109,16 @@ void hkpMoppDefaultAssembler::preCalcCutPositions(
                     childData.m_cutCommandType[axis].m_storage = hkpMoppAssemblerData::HK_MOPP_NO_CUT;
                 }
             }
-            else if (childCut == hkpMoppAssemblerData::HK_MOPP_CUT24) {
-                if (childData.m_minCutPlanePosition[axis] <= currentInfo.m_extents[axis][0] &&
-                    childData.m_maxCutPlanePosition[axis] >= currentInfo.m_extents[axis][1]) {
-                    // EXE-INLINED none: hkEnum<E, S>::operator=
-                    data.m_cutCommandType[axis].m_storage = hkpMoppAssemblerData::HK_MOPP_CUT24;
-                    childData.m_cutCommandType[axis].m_storage = hkpMoppAssemblerData::HK_MOPP_NO_CUT;
-                }
+            else if (
+                (childCut == hkpMoppAssemblerData::HK_MOPP_CUT24) &&
+                (childData.m_minCutPlanePosition[axis] <= currentInfo.m_extents[axis][0] &&
+                 childData.m_maxCutPlanePosition[axis] >= currentInfo.m_extents[axis][1])
+            ) {
+                // EXE-INLINED none: hkEnum<E, S>::operator=
+                data.m_cutCommandType[axis].m_storage = hkpMoppAssemblerData::HK_MOPP_CUT24;
+                childData.m_cutCommandType[axis].m_storage = hkpMoppAssemblerData::HK_MOPP_NO_CUT;
             }
+
             // Without a cut of its own, the child's cut positions narrow this node's.
             if (childData.m_cutCommandType[axis].m_storage == hkpMoppAssemblerData::HK_MOPP_NO_CUT) {
                 int32_t minPos = childData.m_minCutPlanePosition[axis];
@@ -1639,14 +1636,13 @@ int32_t hkpMoppDefaultAssembler::getSplitCode(const float* a1) {
         if (!(a1[1] > 0.10000000149011612)) {
             return 2;
         }
-        else {
-            v1 = 1;
-            if (a1[2] > 0.10000000149011612) {
-                return 3;
-            }
-            if (a1[2] < -0.10000000149011612) {
-                return 4;
-            }
+
+        v1 = 1;
+        if (a1[2] > 0.10000000149011612) {
+            return 3;
+        }
+        if (a1[2] < -0.10000000149011612) {
+            return 4;
         }
     }
     else {

@@ -190,12 +190,10 @@ bool NiDX9Renderer::Do_EndUsingRenderTargetGroup() {
 			// filter 0: D3DTEXF_NONE
 			m_pkD3DDevice9->StretchRect(pkBuffData->m_pkSurface2, nullptr, pkBuffData->m_pkSurface, nullptr, 0);
 		}
-		if (pkBuffData->CanDisplayFrame()) {
-			if (!m_kBuffersToUseAtDisplayFrame.FindPos(pkBuffData)) {
-				m_kBuffersToUseAtDisplayFrame.AddTail(pkBuffData);
-			}
-		}
-	}
+        if ((pkBuffData->CanDisplayFrame()) && (!m_kBuffersToUseAtDisplayFrame.FindPos(pkBuffData))) {
+            m_kBuffersToUseAtDisplayFrame.AddTail(pkBuffData);
+        }
+    }
 
 	m_pkCurrRenderTargetGroup = nullptr;
 	m_pkCurrOnscreenRenderTargetGroup = nullptr;

@@ -68,20 +68,16 @@ void TESEnchantableForm::InitItem(TESForm* apOwner) {
                 Warning("MASTERFILE: Unable to find enchanting (%08X) on unknown owner.", tempint);
             }
         }
-        if (pFormEnchanting) {
-            if (apOwner) {
-                if (!pFormEnchanting->IsValidEnchantForObject(apOwner)) {
-                    const char* v8 = apOwner->GetFormEditorID();
-                    int32_t v5 = apOwner->iFormID;
-                    const char* v4 = pFormEnchanting->GetFormEditorID();
-                    Warning(
-                        "MASTERFILE: Enchanting (%08X) '%s' has invalid effect trigger type or effect for object "
-                        "(%08X) '%s'.",
-                        pFormEnchanting->iFormID, v4, v5, v8
-                    );
-                    pFormEnchanting = nullptr;
-                }
-            }
+        if ((pFormEnchanting) && (apOwner) && (!pFormEnchanting->IsValidEnchantForObject(apOwner))) {
+            const char* v8 = apOwner->GetFormEditorID();
+            int32_t v5 = apOwner->iFormID;
+            const char* v4 = pFormEnchanting->GetFormEditorID();
+            Warning(
+                "MASTERFILE: Enchanting (%08X) '%s' has invalid effect trigger type or effect for object "
+                "(%08X) '%s'.",
+                pFormEnchanting->iFormID, v4, v5, v8
+            );
+            pFormEnchanting = nullptr;
         }
     }
 }

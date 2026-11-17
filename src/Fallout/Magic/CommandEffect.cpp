@@ -52,14 +52,12 @@ void CommandEffect::Update(float afSecondsElapsed) {
     else {
         casterAsActor = nullptr;
     }
-    if (targetAsActor) {
-        if (casterAsActor) {
-            if (targetAsActor->IsDead(false) || targetAsActor->IsDying()) {
-                ActiveEffect::Dispel(false);
-            }
-            else {
-                CommandEffect::UpdateCommandedActor(targetAsActor, casterAsActor);
-            }
+    if ((targetAsActor) && (casterAsActor)) {
+        if (targetAsActor->IsDead(false) || targetAsActor->IsDying()) {
+            ActiveEffect::Dispel(false);
+        }
+        else {
+            CommandEffect::UpdateCommandedActor(targetAsActor, casterAsActor);
         }
     }
 }
@@ -95,10 +93,8 @@ void CommandEffect::Start() {
     else {
         pCasterActor = nullptr;
     }
-    if (pTargetActor) {
-        if (pCasterActor) {
-            CommandEffect::InitCommandedActor(pTargetActor, pCasterActor);
-        }
+    if ((pTargetActor) && (pCasterActor)) {
+        CommandEffect::InitCommandedActor(pTargetActor, pCasterActor);
     }
 }
 
@@ -119,10 +115,8 @@ void CommandEffect::Finish() {
     else {
         CasterAsActor = nullptr;
     }
-    if (TargetAsActor) {
-        if (CasterAsActor) {
-            CommandEffect::CleanupCommandedActor(TargetAsActor, CasterAsActor, true);
-        }
+    if ((TargetAsActor) && (CasterAsActor)) {
+        CommandEffect::CleanupCommandedActor(TargetAsActor, CasterAsActor, true);
     }
 }
 
@@ -168,12 +162,11 @@ void CommandEffect::UpdateCommandedActor(Actor* apTarget, Actor* apCaster) {
 
 void CommandEffect::CleanupCommandedActor(Actor* apTarget, Actor* apCaster, bool abClearCommandingActor) {
     BaseProcess* currentAIProcess;
-    if (apTarget->MobileObject::GetCurrentAIProcess()) {
-        if (abClearCommandingActor) {
-            currentAIProcess = apTarget->MobileObject::GetCurrentAIProcess();
-            currentAIProcess->SetCommandingActor(nullptr);
-        }
+    if ((apTarget->MobileObject::GetCurrentAIProcess()) && (abClearCommandingActor)) {
+        currentAIProcess = apTarget->MobileObject::GetCurrentAIProcess();
+        currentAIProcess->SetCommandingActor(nullptr);
     }
+
     apTarget->ModifyDispositionTowardActor(apCaster, (-100.0f));
     apTarget->TempModActorValue(ActorValue::CONFIDENCE, (-100), nullptr);
 }

@@ -113,7 +113,6 @@ ActiveEffect* NightEyeEffect::Create(MagicCaster* apCaster, MagicItem* apSpell, 
     if (v5) {
         return ::new (v5) NightEyeEffect(apCaster, apSpell, apEffect);
     }
-    else {
-        return nullptr;
-    }
+
+    return nullptr;
 }

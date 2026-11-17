@@ -207,9 +207,8 @@ uint32_t XGamerProfile::GetContentBit(const char* cCode) {
     if (i == 4) {
         return 0;
     }
-    else {
-        return 1 << i;
-    }
+
+    return 1 << i;
 }
 
 bool XGamerProfile::GetPlayerSignedIn(int32_t a1) {
@@ -217,26 +216,18 @@ bool XGamerProfile::GetPlayerSignedIn(int32_t a1) {
 }
 
 void XGamerProfile::AddSignedInEntry(void* apEntry) {
-    if (return_1_3()) {
-        if (apEntry) {
-            unk28[unk50].pEntry = apEntry;
-            unk28[unk50].uiIndex = m_PlayerIndex;
-            ++unk50;
-        }
+    if ((return_1_3()) && (apEntry)) {
+        unk28[unk50].pEntry = apEntry;
+        unk28[unk50].uiIndex = m_PlayerIndex;
+        ++unk50;
     }
 }
 
 void XGamerProfile::UpdatePresence() {
-    if (m_bSignedIn[m_PlayerIndex]) {
-        if (unk4) {
-            if (return_1_3()) {
-                if (!bForcePresenceUpdate) {
-                    Setting::Info* p_uValue;
-                    p_uValue = &gs_uXenonPresenceUpdateInterval_Online.uValue;
-                    (void)p_uValue->uint;
-                }
-            }
-        }
+    if ((m_bSignedIn[m_PlayerIndex]) && (unk4) && (return_1_3()) && (!bForcePresenceUpdate)) {
+        Setting::Info* p_uValue;
+        p_uValue = &gs_uXenonPresenceUpdateInterval_Online.uValue;
+        (void)p_uValue->uint;
     }
 }
 

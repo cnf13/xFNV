@@ -31,10 +31,8 @@ uint32_t CExpression::GetNextToken(
     aeOperator = EXP_COUNT;
     while (*tmp && *tmp < 33) {
         ++tmp;
-        if (abEndian) {
-            if (apScriptData) {
-                ++*apScriptData;
-            }
+        if ((abEndian) && (apScriptData)) {
+            ++*apScriptData;
         }
     }
     while (*tmp) {
@@ -588,9 +586,8 @@ double CExpression::Eval(
     if (eo.Type) {
         return eo.eoDouble;
     }
-    else {
-        return static_cast<double>(eo.eoLong);
-    }
+
+    return static_cast<double>(eo.eoLong);
 }
 
 // Stores the error, then logs its text through the start-up log (an empty function in this build).

@@ -582,12 +582,11 @@ int32_t NiOBBNode::CollisionCallback(NiCollisionGroup::Intersect& intr) {
     if (ret0 == NiCollisionGroup::CONTINUE_COLLISIONS && ret1 == NiCollisionGroup::CONTINUE_COLLISIONS) {
         return NiCollisionGroup::CONTINUE_COLLISIONS;
     }
-    else if (ret0 == NiCollisionGroup::BREAKOUT_COLLISIONS || ret1 == NiCollisionGroup::BREAKOUT_COLLISIONS) {
+    if (ret0 == NiCollisionGroup::BREAKOUT_COLLISIONS || ret1 == NiCollisionGroup::BREAKOUT_COLLISIONS) {
         return NiCollisionGroup::BREAKOUT_COLLISIONS;
     }
-    else {
-        return NiCollisionGroup::TERMINATE_COLLISIONS;
-    }
+
+    return NiCollisionGroup::TERMINATE_COLLISIONS;
 }
 
 void NiOBBNode::DivideTriangles(

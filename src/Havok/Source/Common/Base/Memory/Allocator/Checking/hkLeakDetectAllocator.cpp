@@ -362,10 +362,10 @@ void hkLeakDetectAllocatorMap::remove(Iterator it) {
         if (i >= lo && hash > empty) {
             continue;
         }
-        else if (i < empty && (hash > empty || hash <= i)) {
+        if (i < empty && (hash > empty || hash <= i)) {
             continue;
         }
-        else if (hash > empty && hash < lo) {
+        if (hash > empty && hash < lo) {
             continue;
         }
         m_elem[empty].key = m_elem[i].key;

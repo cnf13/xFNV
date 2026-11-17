@@ -225,9 +225,8 @@ hkProcess* hkpConstraintViewer::create(const hkArray<hkProcessContext*, hkContai
     if (v3) {
         return &static_cast<hkProcess&>(static_cast<hkpWorldViewerBase&>(*v3));
     }
-    else {
-        return nullptr;
-    }
+
+    return nullptr;
 }
 
 void hkpConstraintViewer::registerViewer() {

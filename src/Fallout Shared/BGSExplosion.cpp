@@ -329,12 +329,10 @@ void BGSExplosion::QueueFiles(IO_TASK_PRIORITY aePriority, QueuedFile* apParent)
     if (Data.pImpactDataSet) {
         Data.pImpactDataSet->QueueFiles(aePriority, apParent);
     }
-    if (pWaterExplosion) {
-        if (pWaterExplosion->GetModelLength()) {
-            TESModel* v5 = pWaterExplosion;
-            ENUM_LOD_MULT v4 = TES::GetLODMult(this);
-            pModelLoader->QueueModel(v5, aePriority, apParent, v4, true, false, false);
-        }
+    if ((pWaterExplosion) && (pWaterExplosion->GetModelLength())) {
+        TESModel* v5 = pWaterExplosion;
+        ENUM_LOD_MULT v4 = TES::GetLODMult(this);
+        pModelLoader->QueueModel(v5, aePriority, apParent, v4, true, false, false);
     }
 }
 
@@ -342,9 +340,8 @@ float BGSExplosion::GetRadiusBSUnits() {
     if (GetFlag(1)) {
         return Data.fRadius;
     }
-    else {
-        return (Data.fRadius * (&fBSUnitsPerFoot)->Float());
-    }
+
+    return (Data.fRadius * (&fBSUnitsPerFoot)->Float());
 }
 
 bool BGSExplosion::GetFlag(int32_t aiFlag) {
@@ -359,18 +356,16 @@ double BGSExplosion::GetISRadius() {
     if (GetFlag(1)) {
         return Data.fImageSpaceRadius;
     }
-    else {
-        return (Data.fImageSpaceRadius * (&fBSUnitsPerFoot)->Float());
-    }
+
+    return (Data.fImageSpaceRadius * (&fBSUnitsPerFoot)->Float());
 }
 
 double BGSExplosion::GetRADRadius() {
     if (GetFlag(1)) {
         return Data.fRadiationRadius;
     }
-    else {
-        return (Data.fRadiationRadius * (&fBSUnitsPerFoot)->Float());
-    }
+
+    return (Data.fRadiationRadius * (&fBSUnitsPerFoot)->Float());
 }
 
 BGSExplosionData* BGSExplosion::GetData() {

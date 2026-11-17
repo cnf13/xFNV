@@ -168,9 +168,8 @@ float Creature::GetArmorRating() {
         fArmorRating = GetDamageModifier(edamageResist) + v4;
         return fArmorRating;
     }
-    else {
-        return fArmorRating;
-    }
+
+    return fArmorRating;
 }
 
 float Creature::GetArmorThreshold() {
@@ -188,9 +187,8 @@ float Creature::GetArmorThreshold() {
         fArmorThreshold = GetDamageModifier(edamageThreshold) + v5;
         return fArmorThreshold;
     }
-    else {
-        return fArmorThreshold;
-    }
+
+    return fArmorThreshold;
 }
 
 int32_t Creature::GetAttackDamage() {
@@ -224,9 +222,8 @@ float Creature::GetWeaponSkill() {
     if (dynamic_cast<TESCreature*>(actorBase)) {
         return (float)static_cast<ActorValueOwner*>(this)->GetActorValue(ActorValue::UNARMED);
     }
-    else {
-        return (float)0;
-    }
+
+    return (float)0;
 }
 
 ActorValue::Index Creature::MapActorValue(ActorValue::Index aiWhich) {
@@ -260,25 +257,23 @@ void Creature::CheckMissingLimbs() {
     TESCreature* pcrea = dynamic_cast<TESCreature*>(GetActorBase());
     if (pcrea) {
         Animation* panim = GetAnimation();
-        if (panim) {
-            if (panim->GetControllerManager()) {
-                NiControllerManager* ControllerManager = panim->GetControllerManager();
-                NiAVObjectPalette* ppalette = ControllerManager->GetObjectPalette();
-                if (pcrea->GetNoLeftArm()) {
-                    NiFixedString* Bip01_L_UpperArm = FixedStrings::QBip01LUpperArm();
-                    NiAVObject* pobj = ppalette->GetAVObject(*Bip01_L_UpperArm);
-                    TESHavokUtilities::RemoveHavokFromSceneGraph(pobj);
-                }
-                if (pcrea->GetNoRightArm()) {
-                    NiFixedString* Bip01_R_UpperArm = FixedStrings::QBip01RUpperArm();
-                    NiAVObject* pobj_2 = ppalette->GetAVObject(*Bip01_R_UpperArm);
-                    TESHavokUtilities::RemoveHavokFromSceneGraph(pobj_2);
-                }
-                if (pcrea->GetNoHead()) {
-                    NiFixedString* Bip01_Head = FixedStrings::GetBip01_Head();
-                    NiAVObject* pobj_3 = ppalette->GetAVObject(*Bip01_Head);
-                    TESHavokUtilities::RemoveHavokFromSceneGraph(pobj_3);
-                }
+        if ((panim) && (panim->GetControllerManager())) {
+            NiControllerManager* ControllerManager = panim->GetControllerManager();
+            NiAVObjectPalette* ppalette = ControllerManager->GetObjectPalette();
+            if (pcrea->GetNoLeftArm()) {
+                NiFixedString* Bip01_L_UpperArm = FixedStrings::QBip01LUpperArm();
+                NiAVObject* pobj = ppalette->GetAVObject(*Bip01_L_UpperArm);
+                TESHavokUtilities::RemoveHavokFromSceneGraph(pobj);
+            }
+            if (pcrea->GetNoRightArm()) {
+                NiFixedString* Bip01_R_UpperArm = FixedStrings::QBip01RUpperArm();
+                NiAVObject* pobj_2 = ppalette->GetAVObject(*Bip01_R_UpperArm);
+                TESHavokUtilities::RemoveHavokFromSceneGraph(pobj_2);
+            }
+            if (pcrea->GetNoHead()) {
+                NiFixedString* Bip01_Head = FixedStrings::GetBip01_Head();
+                NiAVObject* pobj_3 = ppalette->GetAVObject(*Bip01_Head);
+                TESHavokUtilities::RemoveHavokFromSceneGraph(pobj_3);
             }
         }
     }

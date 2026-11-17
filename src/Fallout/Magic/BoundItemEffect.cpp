@@ -55,37 +55,31 @@ BoundItemEffect::BoundItemEffect(MagicCaster* apCaster, MagicItem* apSpell, Effe
     bItemSummoned(false), bSpellModelCached(false), bWeaponCached(false), bWornCached(false), bSetupItem(false) {}
 
 BoundItemEffect::~BoundItemEffect() {
-    if (pDisplacedWeapon) {
-        if (bWeaponCached) {
-            TESObjectWEAP* pweapon = dynamic_cast<TESObjectWEAP*>(pDisplacedWeapon->pContainerObj);
-            if (pweapon) {
-                if (pweapon->GetModelLength()) {
-                    const char* v1 = pweapon->GetModel();
-                    pModelLoader->ReleaseModel(v1, false, 1u);
-                }
-            }
+    if ((pDisplacedWeapon) && (bWeaponCached)) {
+        TESObjectWEAP* pweapon = dynamic_cast<TESObjectWEAP*>(pDisplacedWeapon->pContainerObj);
+        if ((pweapon) && (pweapon->GetModelLength())) {
+            const char* v1 = pweapon->GetModel();
+            pModelLoader->ReleaseModel(v1, false, 1u);
         }
     }
+
     if (bWornCached) {
         TESActorBase::SEX esex = TESActorBase::SEX_MALE;
-        if (pTarget) {
-            if (pTarget->GetTargetStatsObject()) {
-                TESObjectREFR* v2 = pTarget->GetTargetStatsObject();
-                TESNPC* pnpc = dynamic_cast<TESNPC*>(v2->GetObjectReference());
-                if (pnpc) {
-                    esex = pnpc->GetSex();
-                }
+        if ((pTarget) && (pTarget->GetTargetStatsObject())) {
+            TESObjectREFR* v2 = pTarget->GetTargetStatsObject();
+            TESNPC* pnpc = dynamic_cast<TESNPC*>(v2->GetObjectReference());
+            if (pnpc) {
+                esex = pnpc->GetSex();
             }
         }
+
         for (int32_t i = 0; i < 20; ++i) {
-            if (pDisplacedItems[i]) {
-                if (pDisplacedItems[i]->pContainerObj) {
-                    TESBipedModelForm* pbipModel = dynamic_cast<TESBipedModelForm*>(pDisplacedItems[i]->pContainerObj);
-                    if (pbipModel) {
-                        bWornCached = true;
-                        const char* BipedModel = pbipModel->GetBipedModel(esex);
-                        pModelLoader->ReleaseModel(BipedModel, false, 1u);
-                    }
+            if ((pDisplacedItems[i]) && (pDisplacedItems[i]->pContainerObj)) {
+                TESBipedModelForm* pbipModel = dynamic_cast<TESBipedModelForm*>(pDisplacedItems[i]->pContainerObj);
+                if (pbipModel) {
+                    bWornCached = true;
+                    const char* BipedModel = pbipModel->GetBipedModel(esex);
+                    pModelLoader->ReleaseModel(BipedModel, false, 1u);
                 }
             }
         }
@@ -120,21 +114,16 @@ BoundItemEffect::~BoundItemEffect() {
             delete pDisplacedItems[ebip];
         }
     }
-    if (bSpellModelCached) {
-        if (pSpell) {
-            if (pEffect) {
-                EffectSetting* pavEffect = pSpell->GetAVEffect(MagicSystem::SELF);
-                MagicSystem::Range CastingType = pEffect->data.iRange;
-                EffectItem* pdominantEffect = pSpell->GetCostliestEffect(CastingType, false);
-                if (pavEffect->GetModelLength()) {
-                    if (pEffect == pdominantEffect) {
-                        const char* v5 = pavEffect->GetModel();
-                        pModelLoader->ReleaseModel(v5, false, 1u);
-                    }
-                }
-                bSpellModelCached = false;
-            }
+    if ((bSpellModelCached) && (pSpell) && (pEffect)) {
+        EffectSetting* pavEffect = pSpell->GetAVEffect(MagicSystem::SELF);
+        MagicSystem::Range CastingType = pEffect->data.iRange;
+        EffectItem* pdominantEffect = pSpell->GetCostliestEffect(CastingType, false);
+        if ((pavEffect->GetModelLength()) && (pEffect == pdominantEffect)) {
+            const char* v5 = pavEffect->GetModel();
+            pModelLoader->ReleaseModel(v5, false, 1u);
         }
+
+        bSpellModelCached = false;
     }
 }
 
@@ -172,21 +161,17 @@ ActiveEffect* BoundItemEffect::Copy() {
             presult->pDisplacedItems[ebip] = v7;
         }
     }
-    if (pDisplacedWeapon) {
-        if (bWeaponCached) {
-            TESObjectWEAP* pweapon = dynamic_cast<TESObjectWEAP*>(pDisplacedWeapon->pContainerObj);
-            if (pweapon) {
-                if (pweapon->GetModelLength()) {
-                    presult->bWeaponCached = true;
-                    const char* v1 = pweapon->GetModel();
-                    pModelLoader->QueueModel(
-                        v1, IO_TASK_PRIORITY_CRITICAL, static_cast<QueuedFile*>(nullptr), LOD_MULT_NONE, true, true,
-                        false
-                    );
-                }
-            }
+    if ((pDisplacedWeapon) && (bWeaponCached)) {
+        TESObjectWEAP* pweapon = dynamic_cast<TESObjectWEAP*>(pDisplacedWeapon->pContainerObj);
+        if ((pweapon) && (pweapon->GetModelLength())) {
+            presult->bWeaponCached = true;
+            const char* v1 = pweapon->GetModel();
+            pModelLoader->QueueModel(
+                v1, IO_TASK_PRIORITY_CRITICAL, static_cast<QueuedFile*>(nullptr), LOD_MULT_NONE, true, true, false
+            );
         }
     }
+
     if (bWornCached) {
         TESActorBase::SEX esex = TESActorBase::SEX_MALE;
         MagicTarget* Target = pTarget;
@@ -199,17 +184,15 @@ ActiveEffect* BoundItemEffect::Copy() {
             }
         }
         for (int32_t i = 0; i < 20; ++i) {
-            if (pDisplacedItems[i]) {
-                if (pDisplacedItems[i]->pContainerObj) {
-                    TESBipedModelForm* pbipModel = dynamic_cast<TESBipedModelForm*>(pDisplacedItems[i]->pContainerObj);
-                    if (pbipModel) {
-                        presult->bWornCached = true;
-                        const char* BipedModel = pbipModel->GetBipedModel(esex);
-                        pModelLoader->QueueModel(
-                            BipedModel, IO_TASK_PRIORITY_CRITICAL, static_cast<QueuedFile*>(nullptr), LOD_MULT_NONE,
-                            true, true, false
-                        );
-                    }
+            if ((pDisplacedItems[i]) && (pDisplacedItems[i]->pContainerObj)) {
+                TESBipedModelForm* pbipModel = dynamic_cast<TESBipedModelForm*>(pDisplacedItems[i]->pContainerObj);
+                if (pbipModel) {
+                    presult->bWornCached = true;
+                    const char* BipedModel = pbipModel->GetBipedModel(esex);
+                    pModelLoader->QueueModel(
+                        BipedModel, IO_TASK_PRIORITY_CRITICAL, static_cast<QueuedFile*>(nullptr), LOD_MULT_NONE, true,
+                        true, false
+                    );
                 }
             }
         }
@@ -236,12 +219,10 @@ void BoundItemEffect::Update(float a1) {
                 if (v5->GetCurrentWeapon()) {
                     BaseProcess* v4 = pactor->pCurrentProcess;
                     ItemChange* pitem = v4->GetCurrentWeapon();
-                    if (pboundWeapon == pitem->pContainerObj) {
-                        if (pitem->pExtraObjectList) {
-                            bSetupItem = false;
-                            ExtraDataList** v2 = &pitem->pExtraObjectList->m_item;
-                            (*v2)->SetCanNotWear(true);
-                        }
+                    if ((pboundWeapon == pitem->pContainerObj) && (pitem->pExtraObjectList)) {
+                        bSetupItem = false;
+                        ExtraDataList** v2 = &pitem->pExtraObjectList->m_item;
+                        (*v2)->SetCanNotWear(true);
                     }
                 }
             }
@@ -530,15 +511,12 @@ void BoundItemEffect::InitLoadGame(Actor* a1) {
     if (bItemSummoned) {
         if (pDisplacedWeapon) {
             TESObjectWEAP* pweapon = dynamic_cast<TESObjectWEAP*>(pDisplacedWeapon->pContainerObj);
-            if (pweapon) {
-                if (pweapon->GetModelLength()) {
-                    bWeaponCached = true;
-                    const char* v2 = pweapon->GetModel();
-                    pModelLoader->QueueModel(
-                        v2, IO_TASK_PRIORITY_CRITICAL, static_cast<QueuedFile*>(nullptr), LOD_MULT_NONE, true, false,
-                        false
-                    );
-                }
+            if ((pweapon) && (pweapon->GetModelLength())) {
+                bWeaponCached = true;
+                const char* v2 = pweapon->GetModel();
+                pModelLoader->QueueModel(
+                    v2, IO_TASK_PRIORITY_CRITICAL, static_cast<QueuedFile*>(nullptr), LOD_MULT_NONE, true, false, false
+                );
             }
         }
         TESActorBase::SEX esex = TESActorBase::SEX_MALE;
@@ -549,17 +527,15 @@ void BoundItemEffect::InitLoadGame(Actor* a1) {
             }
         }
         for (int32_t i = 0; i < 20; ++i) {
-            if (pDisplacedItems[i]) {
-                if (pDisplacedItems[i]->pContainerObj) {
-                    TESBipedModelForm* pbipModel = dynamic_cast<TESBipedModelForm*>(pDisplacedItems[i]->pContainerObj);
-                    if (pbipModel) {
-                        bWornCached = true;
-                        const char* BipedModel = pbipModel->GetBipedModel(esex);
-                        pModelLoader->QueueModel(
-                            BipedModel, IO_TASK_PRIORITY_CRITICAL, static_cast<QueuedFile*>(nullptr), LOD_MULT_NONE,
-                            true, true, false
-                        );
-                    }
+            if ((pDisplacedItems[i]) && (pDisplacedItems[i]->pContainerObj)) {
+                TESBipedModelForm* pbipModel = dynamic_cast<TESBipedModelForm*>(pDisplacedItems[i]->pContainerObj);
+                if (pbipModel) {
+                    bWornCached = true;
+                    const char* BipedModel = pbipModel->GetBipedModel(esex);
+                    pModelLoader->QueueModel(
+                        BipedModel, IO_TASK_PRIORITY_CRITICAL, static_cast<QueuedFile*>(nullptr), LOD_MULT_NONE, true,
+                        true, false
+                    );
                 }
             }
         }
@@ -605,11 +581,9 @@ void BoundItemEffect::InitLoadGame(Actor* a1) {
     if (bItemSummoned) {
         InventoryChanges* pinventory = (&pactor->m_Extra)->GetContainerChanges();
         TESBoundObject* pbound = dynamic_cast<TESBoundObject*>(pAssociatedItem);
-        if (pinventory) {
-            if (!pinventory->GetObjectCount(pbound)) {
-                pactor->AddObjecttoContainer(pbound, nullptr, 1);
-                pactor->QueueEquipObject(pbound, 1, nullptr, true, false, true);
-            }
+        if ((pinventory) && (!pinventory->GetObjectCount(pbound))) {
+            pactor->AddObjecttoContainer(pbound, nullptr, 1);
+            pactor->QueueEquipObject(pbound, 1, nullptr, true, false, true);
         }
     }
 }
@@ -627,27 +601,25 @@ void BoundItemEffect::Start() {
         pactor = nullptr;
     }
     if (pAssociatedItem && pactor) {
-        if (pSpell) {
-            if (pEffect) {
-                EffectSetting* pavEffect = pSpell->GetAVEffect(MagicSystem::SELF);
-                MagicSystem::Range CastingType = pEffect->data.iRange;
-                EffectItem* pdominantEffect = pSpell->GetCostliestEffect(CastingType, false);
-                if (pavEffect->GetModelLength()) {
-                    const char* v2 = pavEffect->GetModel();
-                    NiAVObject* peffectModel = pModelLoader->LoadFile(v2, LOD_MULT_NONE, true, false, false, false);
-                    MagicItem* Spell = pSpell;
-                    if (Spell->GetSpellType() == MagicSystem::ABILITY) {
-                        fAppearTime = 0.0f;
+        if ((pSpell) && (pEffect)) {
+            EffectSetting* pavEffect = pSpell->GetAVEffect(MagicSystem::SELF);
+            MagicSystem::Range CastingType = pEffect->data.iRange;
+            EffectItem* pdominantEffect = pSpell->GetCostliestEffect(CastingType, false);
+            if (pavEffect->GetModelLength()) {
+                const char* v2 = pavEffect->GetModel();
+                NiAVObject* peffectModel = pModelLoader->LoadFile(v2, LOD_MULT_NONE, true, false, false, false);
+                MagicItem* Spell = pSpell;
+                if (Spell->GetSpellType() == MagicSystem::ABILITY) {
+                    fAppearTime = 0.0f;
+                }
+                else {
+                    if (peffectModel) {
+                        fAppearTime = FindTimeForNoteKey(peffectModel, "SpecialIdle_HitEffect", "Hit");
                     }
-                    else {
-                        if (peffectModel) {
-                            fAppearTime = FindTimeForNoteKey(peffectModel, "SpecialIdle_HitEffect", "Hit");
-                        }
-                    }
-                    if (pEffect != pdominantEffect) {
-                        const char* v3 = pavEffect->GetModel();
-                        pModelLoader->ReleaseModel(v3, false, 1u);
-                    }
+                }
+                if (pEffect != pdominantEffect) {
+                    const char* v3 = pavEffect->GetModel();
+                    pModelLoader->ReleaseModel(v3, false, 1u);
                 }
             }
         }
@@ -666,176 +638,159 @@ void BoundItemEffect::Finish() {
     else {
         pactor = nullptr;
     }
-    if (bItemSummoned) {
-        if (pactor) {
-            TESObjectWEAP* pboundWeapon = dynamic_cast<TESObjectWEAP*>(pAssociatedItem);
-            TESObjectARMO* pboundArmor = dynamic_cast<TESObjectARMO*>(pAssociatedItem);
-            if (pboundWeapon) {
-                InventoryChanges* pchanges = InventoryChanges::GetInventoryChanges(pactor);
-                ExtraDataList* pextra_2 = pchanges->WearingObject(pboundWeapon, false);
-                if (pextra_2) {
-                    pextra_2->RemoveCannotWearExtra();
+    if ((bItemSummoned) && (pactor)) {
+        TESObjectWEAP* pboundWeapon = dynamic_cast<TESObjectWEAP*>(pAssociatedItem);
+        TESObjectARMO* pboundArmor = dynamic_cast<TESObjectARMO*>(pAssociatedItem);
+        if (pboundWeapon) {
+            InventoryChanges* pchanges = InventoryChanges::GetInventoryChanges(pactor);
+            ExtraDataList* pextra_2 = pchanges->WearingObject(pboundWeapon, false);
+            if (pextra_2) {
+                pextra_2->RemoveCannotWearExtra();
+            }
+            pactor->QueueUnEquipObject(pboundWeapon, 1, nullptr, false, false, true);
+            pactor->RemoveItem(pboundWeapon, nullptr, 1, false, false, nullptr, nullptr, nullptr, true, false);
+            if (this->pDisplacedWeapon) {
+                ExtraDataList* pextra;
+                bool bsuccess = false;
+                if (this->pDisplacedWeapon->pExtraObjectList) {
+                    pextra = this->pDisplacedWeapon->pExtraObjectList->m_item;
                 }
-                pactor->QueueUnEquipObject(pboundWeapon, 1, nullptr, false, false, true);
-                pactor->RemoveItem(pboundWeapon, nullptr, 1, false, false, nullptr, nullptr, nullptr, true, false);
-                if (this->pDisplacedWeapon) {
-                    ExtraDataList* pextra;
-                    bool bsuccess = false;
-                    if (this->pDisplacedWeapon->pExtraObjectList) {
-                        pextra = this->pDisplacedWeapon->pExtraObjectList->m_item;
+                else {
+                    pextra = nullptr;
+                }
+                if (pactor->GetInventoryObjectCount(this->pDisplacedWeapon->pContainerObj) >= 1) {
+                    bsuccess = true;
+                    pactor->QueueEquipObject(this->pDisplacedWeapon->pContainerObj, 1, nullptr, true, false, true);
+                }
+                if (bWeaponCached) {
+                    TESBoundObject* pobject = this->pDisplacedWeapon->pContainerObj;
+                    TESObjectWEAP* pweapon = dynamic_cast<TESObjectWEAP*>(pobject);
+                    if ((pweapon) && (pweapon->GetModelLength())) {
+                        const char* v1 = pweapon->GetModel();
+                        pModelLoader->ReleaseModel(v1, false, 1u);
+                    }
+
+                    bWeaponCached = false;
+                }
+                if (pextra) {
+                    pextra->ClearScriptLocals();
+                }
+                this->pDisplacedWeapon->DeleteAllExtra();
+                ItemChange* pDisplacedWeapon = this->pDisplacedWeapon;
+                if (pDisplacedWeapon) {
+                    delete pDisplacedWeapon;
+                }
+                this->pDisplacedWeapon = nullptr;
+                BaseProcess* CurrentAIProcess = pactor->pCurrentProcess;
+                CurrentAIProcess->SetWantWeaponDrawn(true);
+            }
+        }
+        else {
+            if (pboundArmor) {
+                TESActorBase::SEX esex = TESActorBase::SEX_MALE;
+                TESNPC* pnpc = dynamic_cast<TESNPC*>(pactor->GetObjectReference());
+                if (pnpc) {
+                    esex = pnpc->GetSex();
+                }
+                InventoryChanges* pchanges_2 = InventoryChanges::GetInventoryChanges(pactor);
+                ExtraDataList* pextra_4 = pchanges_2->WearingObject(pboundArmor, false);
+                if (pextra_4) {
+                    pextra_4->RemoveCannotWearExtra();
+                }
+                pactor->QueueUnEquipObject(pboundArmor, 1, nullptr, false, false, true);
+                pactor->RemoveItem(pboundArmor, nullptr, 1, false, false, nullptr, nullptr, nullptr, true, false);
+                for (BIPED_OBJECT ebip = BO_HEAD; ebip < BIPED_OBJECT_COUNT;
+                     ebip = static_cast<BIPED_OBJECT>(ebip + 1)) {
+                    if ((pboundArmor->FillsBipedSlot(ebip, false, nullptr)) && (pDisplacedItems[ebip])) {
+                        ItemChange* pitem = pDisplacedItems[ebip];
+                        ExtraDataList* pextra_5 = nullptr;
+                        if (pitem->pExtraObjectList) {
+                            pextra_5 = pitem->pExtraObjectList->m_item;
+                        }
+                        if (pitem) {
+                            bool bmoved = false;
+                            bool bsuccess_2 = false;
+                            if (pactor->GetInventoryObjectCount(pitem->pContainerObj) >= 1) {
+                                TESBoundObject* FormFlags;
+                                pactor->QueueEquipObject(pitem->pContainerObj, 1, nullptr, true, false, true);
+                                InventoryChanges* ContainerChanges = (&pactor->m_Extra)->GetContainerChanges();
+                                ItemChange* pcurrentItem = ContainerChanges->GetWornItem(ebip, false);
+                                if (!pcurrentItem ||
+                                    (FormFlags = pcurrentItem->pContainerObj, FormFlags != pitem->pContainerObj)) {
+                                    bmoved = MoveItemToOtherBoundEffect(pactor, pitem, this);
+                                }
+                                ItemChange* pcurrentItem_2 = pcurrentItem;
+                                ItemChange* pcurrentItem_3 = pcurrentItem;
+                                if (pcurrentItem) {
+                                    delete pcurrentItem_3;
+                                }
+                                bsuccess_2 = true;
+                            }
+                            if ((bWornCached) && (pitem->pContainerObj) && (!bmoved)) {
+                                TESBipedModelForm* pbipModel = dynamic_cast<TESBipedModelForm*>(pitem->pContainerObj);
+                                if (pbipModel) {
+                                    const char* BipedModel = pbipModel->GetBipedModel(esex);
+                                    pModelLoader->ReleaseModel(BipedModel, false, 1u);
+                                }
+                            }
+
+                            if (pextra_5) {
+                                pextra_5->ClearScriptLocals();
+                            }
+                            pitem->DeleteAllExtra();
+                            ItemChange* v18 = pitem;
+                            ItemChange* v19 = pitem;
+                            delete pitem;
+                            pitem = nullptr;
+                        }
+                        pDisplacedItems[ebip] = nullptr;
+                    }
+                }
+                bWornCached = false;
+            }
+        }
+        if ((pactor->Get3D()) && (pactor->pCurrentProcess) && (!pactor->pCurrentProcess->eLevel) && (pSpell) &&
+            (pEffect)) {
+            EffectSetting* pavEffect = pSpell->GetAVEffect(MagicSystem::SELF);
+            MagicSystem::Range CastingType = pEffect->data.iRange;
+            EffectItem* pdominantEffect = pSpell->GetCostliestEffect(CastingType, false);
+            if (pEffect == pdominantEffect) {
+                if (GetEffectSetting()->GetModelLength()) {
+                    MagicHitEffect* peffect;
+                    BSTempEffect* apEffect = nullptr;
+                    void* apMemory = NiMemObject::operator new(sizeof(MagicModelHitEffect));
+                    if (apMemory) {
+                        const char* v6 = pavEffect->GetModel();
+                        peffect = (MagicHitEffect*)::new (apMemory) MagicModelHitEffect(pactor, v6, -1.0f);
                     }
                     else {
-                        pextra = nullptr;
+                        peffect = nullptr;
                     }
-                    if (pactor->GetInventoryObjectCount(this->pDisplacedWeapon->pContainerObj) >= 1) {
-                        bsuccess = true;
-                        pactor->QueueEquipObject(this->pDisplacedWeapon->pContainerObj, 1, nullptr, true, false, true);
+                    if (peffect->Init()) {
+                        ReferenceProcessLists.AddTempEffect(peffect);
                     }
-                    if (bWeaponCached) {
-                        TESBoundObject* pobject = this->pDisplacedWeapon->pContainerObj;
-                        TESObjectWEAP* pweapon = dynamic_cast<TESObjectWEAP*>(pobject);
-                        if (pweapon) {
-                            if (pweapon->GetModelLength()) {
-                                const char* v1 = pweapon->GetModel();
-                                pModelLoader->ReleaseModel(v1, false, 1u);
-                            }
-                        }
-                        bWeaponCached = false;
-                    }
-                    if (pextra) {
-                        pextra->ClearScriptLocals();
-                    }
-                    this->pDisplacedWeapon->DeleteAllExtra();
-                    ItemChange* pDisplacedWeapon = this->pDisplacedWeapon;
-                    if (pDisplacedWeapon) {
-                        delete pDisplacedWeapon;
-                    }
-                    this->pDisplacedWeapon = nullptr;
-                    BaseProcess* CurrentAIProcess = pactor->pCurrentProcess;
-                    CurrentAIProcess->SetWantWeaponDrawn(true);
-                }
-            }
-            else {
-                if (pboundArmor) {
-                    TESActorBase::SEX esex = TESActorBase::SEX_MALE;
-                    TESNPC* pnpc = dynamic_cast<TESNPC*>(pactor->GetObjectReference());
-                    if (pnpc) {
-                        esex = pnpc->GetSex();
-                    }
-                    InventoryChanges* pchanges_2 = InventoryChanges::GetInventoryChanges(pactor);
-                    ExtraDataList* pextra_4 = pchanges_2->WearingObject(pboundArmor, false);
-                    if (pextra_4) {
-                        pextra_4->RemoveCannotWearExtra();
-                    }
-                    pactor->QueueUnEquipObject(pboundArmor, 1, nullptr, false, false, true);
-                    pactor->RemoveItem(pboundArmor, nullptr, 1, false, false, nullptr, nullptr, nullptr, true, false);
-                    for (BIPED_OBJECT ebip = BO_HEAD; ebip < BIPED_OBJECT_COUNT;
-                         ebip = static_cast<BIPED_OBJECT>(ebip + 1)) {
-                        if (pboundArmor->FillsBipedSlot(ebip, false, nullptr)) {
-                            if (pDisplacedItems[ebip]) {
-                                ItemChange* pitem = pDisplacedItems[ebip];
-                                ExtraDataList* pextra_5 = nullptr;
-                                if (pitem->pExtraObjectList) {
-                                    pextra_5 = pitem->pExtraObjectList->m_item;
-                                }
-                                if (pitem) {
-                                    bool bmoved = false;
-                                    bool bsuccess_2 = false;
-                                    if (pactor->GetInventoryObjectCount(pitem->pContainerObj) >= 1) {
-                                        TESBoundObject* FormFlags;
-                                        pactor->QueueEquipObject(pitem->pContainerObj, 1, nullptr, true, false, true);
-                                        InventoryChanges* ContainerChanges = (&pactor->m_Extra)->GetContainerChanges();
-                                        ItemChange* pcurrentItem = ContainerChanges->GetWornItem(ebip, false);
-                                        if (!pcurrentItem ||
-                                            (FormFlags = pcurrentItem->pContainerObj,
-                                             FormFlags != pitem->pContainerObj)) {
-                                            bmoved = MoveItemToOtherBoundEffect(pactor, pitem, this);
-                                        }
-                                        ItemChange* pcurrentItem_2 = pcurrentItem;
-                                        ItemChange* pcurrentItem_3 = pcurrentItem;
-                                        if (pcurrentItem) {
-                                            delete pcurrentItem_3;
-                                        }
-                                        bsuccess_2 = true;
-                                    }
-                                    if (bWornCached) {
-                                        if (pitem->pContainerObj) {
-                                            if (!bmoved) {
-                                                TESBipedModelForm* pbipModel =
-                                                    dynamic_cast<TESBipedModelForm*>(pitem->pContainerObj);
-                                                if (pbipModel) {
-                                                    const char* BipedModel = pbipModel->GetBipedModel(esex);
-                                                    pModelLoader->ReleaseModel(BipedModel, false, 1u);
-                                                }
-                                            }
-                                        }
-                                    }
-                                    if (pextra_5) {
-                                        pextra_5->ClearScriptLocals();
-                                    }
-                                    pitem->DeleteAllExtra();
-                                    ItemChange* v18 = pitem;
-                                    ItemChange* v19 = pitem;
-                                    delete pitem;
-                                    pitem = nullptr;
-                                }
-                                pDisplacedItems[ebip] = nullptr;
-                            }
+                    else {
+                        if (peffect) {
+                            delete peffect;
                         }
                     }
-                    bWornCached = false;
-                }
-            }
-            if (pactor->Get3D()) {
-                if (pactor->pCurrentProcess) {
-                    if (!pactor->pCurrentProcess->eLevel) {
-                        if (pSpell) {
-                            if (pEffect) {
-                                EffectSetting* pavEffect = pSpell->GetAVEffect(MagicSystem::SELF);
-                                MagicSystem::Range CastingType = pEffect->data.iRange;
-                                EffectItem* pdominantEffect = pSpell->GetCostliestEffect(CastingType, false);
-                                if (pEffect == pdominantEffect) {
-                                    if (GetEffectSetting()->GetModelLength()) {
-                                        MagicHitEffect* peffect;
-                                        BSTempEffect* apEffect = nullptr;
-                                        void* apMemory = NiMemObject::operator new(sizeof(MagicModelHitEffect));
-                                        if (apMemory) {
-                                            const char* v6 = pavEffect->GetModel();
-                                            peffect = (MagicHitEffect*)::new (apMemory)
-                                                MagicModelHitEffect(pactor, v6, -1.0f);
-                                        }
-                                        else {
-                                            peffect = nullptr;
-                                        }
-                                        if (peffect->Init()) {
-                                            ReferenceProcessLists.AddTempEffect(peffect);
-                                        }
-                                        else {
-                                            if (peffect) {
-                                                delete peffect;
-                                            }
-                                        }
-                                        if (bSpellModelCached) {
-                                            const char* v7 = pavEffect->GetModel();
-                                            pModelLoader->ReleaseModel(v7, false, 1u);
-                                            bSpellModelCached = false;
-                                        }
-                                    }
-                                    pactor->PlaySoundByEditorName(
-                                        &dst, "ITMBoundDisappear", false,
-                                        BSGameSound::SOUND_FLAG_IS_3D | BSGameSound::SOUND_FLAG_ONE_SHOT |
-                                            BSGameSound::SOUND_FLAG_ANIMATION_DRIVEN,
-                                        true
-                                    );
-                                }
-                            }
-                        }
+                    if (bSpellModelCached) {
+                        const char* v7 = pavEffect->GetModel();
+                        pModelLoader->ReleaseModel(v7, false, 1u);
+                        bSpellModelCached = false;
                     }
                 }
+                pactor->PlaySoundByEditorName(
+                    &dst, "ITMBoundDisappear", false,
+                    BSGameSound::SOUND_FLAG_IS_3D | BSGameSound::SOUND_FLAG_ONE_SHOT |
+                        BSGameSound::SOUND_FLAG_ANIMATION_DRIVEN,
+                    true
+                );
             }
-            pTarget = nullptr;
-            bItemSummoned = false;
         }
+
+        pTarget = nullptr;
+        bItemSummoned = false;
     }
 }
 
@@ -866,18 +821,15 @@ void BoundItemEffect::DoSummon() {
             }
             BaseProcess* v22 = pactor->pCurrentProcess;
             TESBoundObject* pobject = v22->GetCurrentWeapon()->pContainerObj;
-            if (pobject) {
-                if (!bWeaponCached) {
-                    TESObjectWEAP* pweapon = dynamic_cast<TESObjectWEAP*>(pobject);
-                    if (pweapon) {
-                        if (pweapon->GetModelLength()) {
-                            const char* v2 = pweapon->GetModel();
-                            pModelLoader->LoadFile(v2, LOD_MULT_NONE, true, false, false, false);
-                            bWeaponCached = true;
-                        }
-                    }
+            if ((pobject) && (!bWeaponCached)) {
+                TESObjectWEAP* pweapon = dynamic_cast<TESObjectWEAP*>(pobject);
+                if ((pweapon) && (pweapon->GetModelLength())) {
+                    const char* v2 = pweapon->GetModel();
+                    pModelLoader->LoadFile(v2, LOD_MULT_NONE, true, false, false, false);
+                    bWeaponCached = true;
                 }
             }
+
             BaseProcess* v21 = pactor->pCurrentProcess;
             BaseProcess* v20 = pactor->pCurrentProcess;
             ItemChange* v3 = v21->GetCurrentWeapon();
@@ -950,16 +902,15 @@ void BoundItemEffect::DoSummon() {
                 }
                 if (pitem) {
                     ItemChange* v10;
-                    if (pitem->pContainerObj) {
-                        if (!balreadyCached) {
-                            TESBipedModelForm* pbipModel = dynamic_cast<TESBipedModelForm*>(pitem->pContainerObj);
-                            if (pbipModel) {
-                                const char* BipedModel = pbipModel->GetBipedModel(esex);
-                                pModelLoader->LoadFile(BipedModel, LOD_MULT_NONE, true, false, false, false);
-                                bWornCached = true;
-                            }
+                    if ((pitem->pContainerObj) && (!balreadyCached)) {
+                        TESBipedModelForm* pbipModel = dynamic_cast<TESBipedModelForm*>(pitem->pContainerObj);
+                        if (pbipModel) {
+                            const char* BipedModel = pbipModel->GetBipedModel(esex);
+                            pModelLoader->LoadFile(BipedModel, LOD_MULT_NONE, true, false, false, false);
+                            bWornCached = true;
                         }
                     }
+
                     ExtraDataList* pextra_3 = pitem->pExtraObjectList->m_item;
                     if (pextra_3) {
                         pextra_3->RemoveWorn(false);
@@ -1009,9 +960,8 @@ ActiveEffect* BoundItemEffect::Instantiate(MagicCaster* apCaster, MagicItem* apS
     if (v5) {
         return ::new (v5) BoundItemEffect(apCaster, apSpell, apEffect);
     }
-    else {
-        return nullptr;
-    }
+
+    return nullptr;
 }
 
 bool MoveItemToOtherBoundEffect(Actor* apActor, ItemChange* apItem, BoundItemEffect* apEffect) {
@@ -1029,26 +979,23 @@ bool MoveItemToOtherBoundEffect(Actor* apActor, ItemChange* apItem, BoundItemEff
     for (BSSimpleList<ActiveEffect*>* plist = ptarget->GetActiveEffectList(); plist && !plist->IsEmpty();
          plist = plist->m_pkNext) {
         BoundItemEffect* pboundEffect = dynamic_cast<BoundItemEffect*>(plist->m_item);
-        if (pboundEffect) {
-            if (pboundEffect != apEffect) {
-                TESObjectARMO* pboundArmor = dynamic_cast<TESObjectARMO*>(pboundEffect->pAssociatedItem);
-                if (pboundArmor) {
-                    for (BIPED_OBJECT ebip = BO_HEAD; ebip < BIPED_OBJECT_COUNT;
-                         ebip = static_cast<BIPED_OBJECT>(ebip + 1)) {
-                        if (pmodel->FillsBipedSlot(ebip, false, nullptr) &&
-                            (pboundArmor->FillsBipedSlot(ebip, false, nullptr) &&
-                             !pboundEffect->pDisplacedItems[ebip])) {
-                            ItemChange* v5;
-                            void* apMemory = ourMalloc(sizeof(ItemChange));
-                            if (apMemory) {
-                                v5 = ::new (apMemory) ItemChange(apItem);
-                            }
-                            else {
-                                v5 = nullptr;
-                            }
-                            pboundEffect->pDisplacedItems[ebip] = v5;
-                            return true;
+        if ((pboundEffect) && (pboundEffect != apEffect)) {
+            TESObjectARMO* pboundArmor = dynamic_cast<TESObjectARMO*>(pboundEffect->pAssociatedItem);
+            if (pboundArmor) {
+                for (BIPED_OBJECT ebip = BO_HEAD; ebip < BIPED_OBJECT_COUNT;
+                     ebip = static_cast<BIPED_OBJECT>(ebip + 1)) {
+                    if (pmodel->FillsBipedSlot(ebip, false, nullptr) &&
+                        (pboundArmor->FillsBipedSlot(ebip, false, nullptr) && !pboundEffect->pDisplacedItems[ebip])) {
+                        ItemChange* v5;
+                        void* apMemory = ourMalloc(sizeof(ItemChange));
+                        if (apMemory) {
+                            v5 = ::new (apMemory) ItemChange(apItem);
                         }
+                        else {
+                            v5 = nullptr;
+                        }
+                        pboundEffect->pDisplacedItems[ebip] = v5;
+                        return true;
                     }
                 }
             }

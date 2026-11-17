@@ -84,28 +84,25 @@ const hkpShape* getUserShape(char a1, uint8_t* arg4, hkpEntity* r_eax) {
             if (v6) {
                 return v6;
             }
-            else {
-                *arg4 = 1;
-                return nullptr;
+
+            *arg4 = 1;
+            return nullptr;
+        }
+
+        hkpProperty* v12 = r_eax->m_properties.begin();
+        while (v12->m_key != 0x1235) {
+            ++v11;
+            ++v12;
+            if (v11 >= m_size) {
+                goto LABEL_10;
             }
         }
-        else {
-            hkpProperty* v12 = r_eax->m_properties.begin();
-            while (v12->m_key != 0x1235) {
-                ++v11;
-                ++v12;
-                if (v11 >= m_size) {
-                    goto LABEL_10;
-                }
-            }
-            if (m_data) {
-                return m_data;
-            }
-            else {
-                *arg4 = 1;
-                return nullptr;
-            }
+        if (m_data) {
+            return m_data;
         }
+
+        *arg4 = 1;
+        return nullptr;
     }
     return v5;
 }
@@ -559,9 +556,8 @@ hkProcess* hkpShapeDisplayViewer::create(const hkArray<hkProcessContext*, hkCont
     if (v3) {
         return &static_cast<hkProcess&>(static_cast<hkpWorldViewerBase&>(*v3));
     }
-    else {
-        return nullptr;
-    }
+
+    return nullptr;
 }
 
 void hkpShapeDisplayViewer::registerViewer() {

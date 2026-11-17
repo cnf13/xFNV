@@ -33,10 +33,9 @@ NiObject* NiBackToFrontAccumulator::CreateClone(NiCloningProcess& kCloning) {
         NiAccumulator::CopyMembers(pkObject, kCloning);
         return pkObject;
     }
-    else {
-        NiAccumulator::CopyMembers(nullptr, kCloning);
-        return nullptr;
-    }
+
+    NiAccumulator::CopyMembers(nullptr, kCloning);
+    return nullptr;
 }
 
 void NiBackToFrontAccumulator::LoadBinary(NiStream& kStream) {

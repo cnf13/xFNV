@@ -627,151 +627,149 @@ void BGSAutoWater::GeneratePlaceableWater(TESObjectCELL* apCell) {
             NiTListItem<BSPolygon2D*>* next = BGSAutoWater::pPolygonList->GetNextPos(pos);
             if (pos) {
                 BSPolygon2D* ppoly = BGSAutoWater::pPolygonList->Get(pos);
-                if (ppoly->GetRootNode()) {
-                    if (ppoly->Get3D()) {
-                        BSMultiBoundNode* pmbnode;
-                        BSMultiBound* pmb;
-                        BSMultiBoundAABB* pmbshape;
-                        BSFadeNode* pfadenode;
-                        NiStencilProperty* pstencilprop;
-                        WaterShaderProperty* pwatershadprop;
-                        TESObjectREFR* pwaterRef;
-                        ::new (static_cast<void*>(&kNodeName)) NiFixedString("AutoWaterNode");
-                        ppoly->GetRootNode()->SetName(kNodeName);
-                        kNodeName.~NiFixedString();
-                        ::new (static_cast<void*>(&kWaterName)) NiFixedString("AutoWater");
-                        ppoly->Get3D()->SetName(kWaterName);
-                        kWaterName.~NiFixedString();
-                        TESObjectREFR* v41 = static_cast<TESObjectREFR*>(ourMalloc(sizeof(TESObjectREFR)));
-                        if (v41) {
-                            pwaterRef = ::new (v41) TESObjectREFR;
-                        }
-                        else {
-                            pwaterRef = nullptr;
-                        }
-                        WaterShaderProperty* v40 =
-                            static_cast<WaterShaderProperty*>(NiMemObject::operator new(sizeof(WaterShaderProperty)));
-                        if (v40) {
-                            pwatershadprop = ::new (v40) WaterShaderProperty;
-                        }
-                        else {
-                            pwatershadprop = nullptr;
-                        }
-                        ppoly->Get3D()->AttachProperty(pwatershadprop);
-                        BSShaderManager::PrepareObject(ppoly->GetRootNode(), 0, 0);
-                        NiStencilProperty* v39 =
-                            static_cast<NiStencilProperty*>(NiMemObject::operator new(sizeof(NiStencilProperty)));
-                        if (v39) {
-                            pstencilprop = ::new (v39) NiStencilProperty;
-                        }
-                        else {
-                            pstencilprop = nullptr;
-                        }
-                        pstencilprop->SetDrawMode(NiStencilProperty::DRAW_BOTH);
-                        ppoly->Get3D()->AttachProperty(pstencilprop);
-                        TESWaterForm* WaterType = apCell->GetWaterType();
-                        BGSPlaceableWater* PlaceableAutoWater = WaterType->GetPlaceableAutoWater();
-                        pwaterRef->SetObjectReference(PlaceableAutoWater);
-                        BSFadeNode* v38 = static_cast<BSFadeNode*>(NiMemObject::operator new(sizeof(BSFadeNode)));
-                        if (v38) {
-                            pfadenode = ::new (v38) BSFadeNode;
-                        }
-                        else {
-                            pfadenode = nullptr;
-                        }
-                        pfadenode->SetIgnoreFade(true);
-                        pwaterRef->Set3D(pfadenode, true);
-                        pfadenode->SetTranslate(worldtranslate);
-                        pwaterRef->SetLocationOnReferenceSimple(worldtranslate);
-                        BSMultiBoundAABB* v37 =
-                            static_cast<BSMultiBoundAABB*>(NiMemObject::operator new(sizeof(BSMultiBoundAABB)));
-                        if (v37) {
-                            pmbshape = ::new (v37) BSMultiBoundAABB;
-                        }
-                        else {
-                            pmbshape = nullptr;
-                        }
-                        float minx = 0.0f;
-                        float miny = 0.0f;
-                        float minz = 0.0f;
-                        float maxx = 0.0f;
-                        float maxy = 0.0f;
-                        float maxz = 0.0f;
-                        NiTriShape* ptristrips = ppoly->Get3D();
-                        const NiPoint3* pvertices = ptristrips->GetVertices();
-                        for (int32_t i = 0;; ++i) {
-                            uint16_t VertexCount = ptristrips->GetVertexCount();
-                            if (i >= VertexCount) {
-                                break;
-                            }
-                            const NiPoint3* v12 = &pvertices[i];
-                            float v46 = v12->x;
-                            float y = v12->y;
-                            float v48 = v12->z;
-                            if (i <= 0) {
-                                maxx = v46;
-                                minx = v46;
-                                maxy = y;
-                                miny = y;
-                                maxz = v48;
-                                minz = v48;
-                            }
-                            else {
-                                minx = BSMIN(minx, v46);
-                                miny = BSMIN(miny, y);
-                                minz = BSMIN(minz, v48);
-                                maxx = BSMAX(maxx, v46);
-                                maxy = BSMAX(maxy, y);
-                                maxz = BSMAX(maxz, v48);
-                            }
-                        }
-                        float v27 = (maxz - minz) / 2.0;
-                        float za = std::fabs(v27);
-                        float v26 = (maxy - miny) / 2.0;
-                        float a1a = std::fabs(v26);
-                        float v25 = (maxx - minx) / 2.0;
-                        float x = std::fabs(v25);
-                        NiPoint3 halfextents(x, a1a, za);
-                        float v24 = maxz - halfextents.z;
-                        float v23 = maxy - halfextents.y;
-                        float v22 = maxx - halfextents.x;
-                        NiPoint3 center(v22, v23, v24);
-                        center.operator+=(worldtranslate);
-                        pmbshape->SetCenter(center);
-                        pmbshape->SetHalfExtents(halfextents);
-                        BSMultiBound* v36 = static_cast<BSMultiBound*>(NiMemObject::operator new(sizeof(BSMultiBound)));
-                        if (v36) {
-                            pmb = ::new (v36) BSMultiBound;
-                        }
-                        else {
-                            pmb = nullptr;
-                        }
-                        pmb->SetShape(pmbshape);
-                        BSMultiBoundNode* v35 =
-                            static_cast<BSMultiBoundNode*>(NiMemObject::operator new(sizeof(BSMultiBoundNode)));
-                        if (v35) {
-                            pmbnode = ::new (v35) BSMultiBoundNode;
-                        }
-                        else {
-                            pmbnode = nullptr;
-                        }
-                        pmbnode->SetMultiBound(pmb);
-                        pfadenode->AttachChild(pmbnode, 1);
-                        pmbnode->AttachChild(ppoly->GetRootNode(), 1);
-                        NiUpdateData tmp(0.0f, false, false);
-                        pfadenode->Update(tmp);
-                        apCell->AddReference(pwaterRef, false);
-                        pwaterRef->SetTemporary();
-                        if (bAutoWaterUsesHavokShapes.Bool() && !bcreatedHavok) {
-                            pwaterRef->InitHavokForPlaceableWater();
-                            bcreatedHavok = true;
-                        }
-                        if (ppoly) {
-                            delete ppoly;
-                        }
-                        ppoly = nullptr;
-                        BGSAutoWater::pPolygonList->RemovePos(pos);
+                if ((ppoly->GetRootNode()) && (ppoly->Get3D())) {
+                    BSMultiBoundNode* pmbnode;
+                    BSMultiBound* pmb;
+                    BSMultiBoundAABB* pmbshape;
+                    BSFadeNode* pfadenode;
+                    NiStencilProperty* pstencilprop;
+                    WaterShaderProperty* pwatershadprop;
+                    TESObjectREFR* pwaterRef;
+                    ::new (static_cast<void*>(&kNodeName)) NiFixedString("AutoWaterNode");
+                    ppoly->GetRootNode()->SetName(kNodeName);
+                    kNodeName.~NiFixedString();
+                    ::new (static_cast<void*>(&kWaterName)) NiFixedString("AutoWater");
+                    ppoly->Get3D()->SetName(kWaterName);
+                    kWaterName.~NiFixedString();
+                    TESObjectREFR* v41 = static_cast<TESObjectREFR*>(ourMalloc(sizeof(TESObjectREFR)));
+                    if (v41) {
+                        pwaterRef = ::new (v41) TESObjectREFR;
                     }
+                    else {
+                        pwaterRef = nullptr;
+                    }
+                    WaterShaderProperty* v40 =
+                        static_cast<WaterShaderProperty*>(NiMemObject::operator new(sizeof(WaterShaderProperty)));
+                    if (v40) {
+                        pwatershadprop = ::new (v40) WaterShaderProperty;
+                    }
+                    else {
+                        pwatershadprop = nullptr;
+                    }
+                    ppoly->Get3D()->AttachProperty(pwatershadprop);
+                    BSShaderManager::PrepareObject(ppoly->GetRootNode(), 0, 0);
+                    NiStencilProperty* v39 =
+                        static_cast<NiStencilProperty*>(NiMemObject::operator new(sizeof(NiStencilProperty)));
+                    if (v39) {
+                        pstencilprop = ::new (v39) NiStencilProperty;
+                    }
+                    else {
+                        pstencilprop = nullptr;
+                    }
+                    pstencilprop->SetDrawMode(NiStencilProperty::DRAW_BOTH);
+                    ppoly->Get3D()->AttachProperty(pstencilprop);
+                    TESWaterForm* WaterType = apCell->GetWaterType();
+                    BGSPlaceableWater* PlaceableAutoWater = WaterType->GetPlaceableAutoWater();
+                    pwaterRef->SetObjectReference(PlaceableAutoWater);
+                    BSFadeNode* v38 = static_cast<BSFadeNode*>(NiMemObject::operator new(sizeof(BSFadeNode)));
+                    if (v38) {
+                        pfadenode = ::new (v38) BSFadeNode;
+                    }
+                    else {
+                        pfadenode = nullptr;
+                    }
+                    pfadenode->SetIgnoreFade(true);
+                    pwaterRef->Set3D(pfadenode, true);
+                    pfadenode->SetTranslate(worldtranslate);
+                    pwaterRef->SetLocationOnReferenceSimple(worldtranslate);
+                    BSMultiBoundAABB* v37 =
+                        static_cast<BSMultiBoundAABB*>(NiMemObject::operator new(sizeof(BSMultiBoundAABB)));
+                    if (v37) {
+                        pmbshape = ::new (v37) BSMultiBoundAABB;
+                    }
+                    else {
+                        pmbshape = nullptr;
+                    }
+                    float minx = 0.0f;
+                    float miny = 0.0f;
+                    float minz = 0.0f;
+                    float maxx = 0.0f;
+                    float maxy = 0.0f;
+                    float maxz = 0.0f;
+                    NiTriShape* ptristrips = ppoly->Get3D();
+                    const NiPoint3* pvertices = ptristrips->GetVertices();
+                    for (int32_t i = 0;; ++i) {
+                        uint16_t VertexCount = ptristrips->GetVertexCount();
+                        if (i >= VertexCount) {
+                            break;
+                        }
+                        const NiPoint3* v12 = &pvertices[i];
+                        float v46 = v12->x;
+                        float y = v12->y;
+                        float v48 = v12->z;
+                        if (i <= 0) {
+                            maxx = v46;
+                            minx = v46;
+                            maxy = y;
+                            miny = y;
+                            maxz = v48;
+                            minz = v48;
+                        }
+                        else {
+                            minx = BSMIN(minx, v46);
+                            miny = BSMIN(miny, y);
+                            minz = BSMIN(minz, v48);
+                            maxx = BSMAX(maxx, v46);
+                            maxy = BSMAX(maxy, y);
+                            maxz = BSMAX(maxz, v48);
+                        }
+                    }
+                    float v27 = (maxz - minz) / 2.0;
+                    float za = std::fabs(v27);
+                    float v26 = (maxy - miny) / 2.0;
+                    float a1a = std::fabs(v26);
+                    float v25 = (maxx - minx) / 2.0;
+                    float x = std::fabs(v25);
+                    NiPoint3 halfextents(x, a1a, za);
+                    float v24 = maxz - halfextents.z;
+                    float v23 = maxy - halfextents.y;
+                    float v22 = maxx - halfextents.x;
+                    NiPoint3 center(v22, v23, v24);
+                    center.operator+=(worldtranslate);
+                    pmbshape->SetCenter(center);
+                    pmbshape->SetHalfExtents(halfextents);
+                    BSMultiBound* v36 = static_cast<BSMultiBound*>(NiMemObject::operator new(sizeof(BSMultiBound)));
+                    if (v36) {
+                        pmb = ::new (v36) BSMultiBound;
+                    }
+                    else {
+                        pmb = nullptr;
+                    }
+                    pmb->SetShape(pmbshape);
+                    BSMultiBoundNode* v35 =
+                        static_cast<BSMultiBoundNode*>(NiMemObject::operator new(sizeof(BSMultiBoundNode)));
+                    if (v35) {
+                        pmbnode = ::new (v35) BSMultiBoundNode;
+                    }
+                    else {
+                        pmbnode = nullptr;
+                    }
+                    pmbnode->SetMultiBound(pmb);
+                    pfadenode->AttachChild(pmbnode, 1);
+                    pmbnode->AttachChild(ppoly->GetRootNode(), 1);
+                    NiUpdateData tmp(0.0f, false, false);
+                    pfadenode->Update(tmp);
+                    apCell->AddReference(pwaterRef, false);
+                    pwaterRef->SetTemporary();
+                    if (bAutoWaterUsesHavokShapes.Bool() && !bcreatedHavok) {
+                        pwaterRef->InitHavokForPlaceableWater();
+                        bcreatedHavok = true;
+                    }
+                    if (ppoly) {
+                        delete ppoly;
+                    }
+                    ppoly = nullptr;
+                    BGSAutoWater::pPolygonList->RemovePos(pos);
                 }
             }
             pos = next;
@@ -856,9 +854,8 @@ NiPoint3** TESObjectLAND::GetVertexArray() {
     if (pLoadedData) {
         return pLoadedData->ppVertices;
     }
-    else {
-        return nullptr;
-    }
+
+    return nullptr;
 }
 
 NiStencilProperty::~NiStencilProperty() {}

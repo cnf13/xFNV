@@ -634,20 +634,18 @@ void TESQuest::LoadGame(BGSLoadFormBuffer* apLoadGameBuffer) {
                 if (bhasDate) {
                     apLoadGameBuffer->LoadData(&date, 4u);
                 }
-                if (bhasDate) {
-                    if (pstage) {
-                        TESQuestStageItem* pstageItem = pstage->GetStageItem(cindex2);
-                        if (pstageItem) {
-                            Date* pDate;
-                            void* pMemory = ourMalloc(sizeof(Date));
-                            if (pMemory) {
-                                pDate = ::new (pMemory) Date(date);
-                            }
-                            else {
-                                pDate = nullptr;
-                            }
-                            pstageItem->SetLogDate(pDate);
+                if ((bhasDate) && (pstage)) {
+                    TESQuestStageItem* pstageItem = pstage->GetStageItem(cindex2);
+                    if (pstageItem) {
+                        Date* pDate;
+                        void* pMemory = ourMalloc(sizeof(Date));
+                        if (pMemory) {
+                            pDate = ::new (pMemory) Date(date);
                         }
+                        else {
+                            pDate = nullptr;
+                        }
+                        pstageItem->SetLogDate(pDate);
                     }
                 }
             }
@@ -701,10 +699,8 @@ void TESQuest::Revert(uint32_t aiFlags) {
         }
         cCurrentStage = 0;
     }
-    if ((aiFlags & CHANGE_QUEST_SCRIPT) != 0) {
-        if (pScriptLocals) {
-            pScriptLocals->Revert_0();
-        }
+    if (((aiFlags & CHANGE_QUEST_SCRIPT) != 0) && (pScriptLocals)) {
+        pScriptLocals->Revert_0();
     }
 }
 
@@ -716,25 +712,22 @@ void TESQuest::Revert(BGSLoadFormBuffer* apLoadGameBuffer) {
                 for (BSSimpleList<TESQuestStageItem*>* plist_2 = &pstage->listStageItems; plist_2;
                      plist_2 = plist_2->m_pkNext) {
                     TESQuestStageItem* pstageItem = plist_2->m_item;
-                    if (pstageItem) {
-                        if (pstageItem->m_pLogDate) {
-                            Date* pdate = pstageItem->m_pLogDate;
-                            if (pdate) {
-                                delete pdate;
-                            }
-                            pstageItem->m_pLogDate = nullptr;
+                    if ((pstageItem) && (pstageItem->m_pLogDate)) {
+                        Date* pdate = pstageItem->m_pLogDate;
+                        if (pdate) {
+                            delete pdate;
                         }
+                        pstageItem->m_pLogDate = nullptr;
                     }
                 }
             }
         }
         cCurrentStage = 0;
     }
-    if (apLoadGameBuffer->GetOldChangeFlags().CheckFlags(CHANGE_QUEST_SCRIPT)) {
-        if (pScriptLocals) {
-            pScriptLocals->Revert(apLoadGameBuffer);
-        }
+    if ((apLoadGameBuffer->GetOldChangeFlags().CheckFlags(CHANGE_QUEST_SCRIPT)) && (pScriptLocals)) {
+        pScriptLocals->Revert(apLoadGameBuffer);
     }
+
     if (apLoadGameBuffer->GetOldChangeFlags().CheckFlags(CHANGE_QUEST_OBJECTIVES)) {
         for (BGSQuestObjective* pobjective : m_listObjectives) {
             if (pobjective) {
@@ -798,9 +791,8 @@ const char* TESQuest::GetEditorName() {
     if (strEditorID.pString) {
         return strEditorID.pString;
     }
-    else {
-        return "";
-    }
+
+    return "";
 }
 
 void TESQuest::SetAllObjectivesComplete(int32_t aiState) {
@@ -1135,16 +1127,12 @@ void TESQuest::GetQuestLog(
                         foundList.AddHead(a2_4);
                     }
                 }
-                if (v7) {
-                    if (a2->m_pLogDate) {
-                        if (a2->GetLogEntry(a2_4)) {
-                            if (abNewestFirst) {
-                                apListToFill->AddTail(a2);
-                            }
-                            else {
-                                apListToFill->AddHead(a2);
-                            }
-                        }
+                if ((v7) && (a2->m_pLogDate) && (a2->GetLogEntry(a2_4))) {
+                    if (abNewestFirst) {
+                        apListToFill->AddTail(a2);
+                    }
+                    else {
+                        apListToFill->AddHead(a2);
                     }
                 }
             }

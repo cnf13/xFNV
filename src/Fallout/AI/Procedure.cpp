@@ -181,7 +181,6 @@ int32_t Procedure::GetProcedureCount(PACKAGE_PROCEDURE_TYPE aetype) {
     if (((uint32_t)aetype) > 48) {
         return (-1);
     }
-    else {
-        return (int32_t)ProcedureCount[(int32_t)aetype];
-    }
+
+    return (int32_t)ProcedureCount[(int32_t)aetype];
 }

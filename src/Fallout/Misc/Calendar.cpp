@@ -52,9 +52,8 @@ float Calendar::GetHour() {
     if (pGameHour) {
         return pGameHour->TESGlobal::GetValue();
     }
-    else {
-        return 12.0f;
-    }
+
+    return 12.0f;
 }
 
 DAYS_OF_THE_WEEK Calendar::GetDayOfTheWeek() {
@@ -73,9 +72,8 @@ uint32_t Calendar::GetYear() {
     if (pGameYear) {
         return (uint32_t)((int32_t)pGameYear->TESGlobal::GetValue());
     }
-    else {
-        return (uint32_t)((int32_t)77.0f);
-    }
+
+    return (uint32_t)((int32_t)77.0f);
 }
 
 // The value is truncated to an integer and its low byte is sign-extended.
@@ -83,18 +81,16 @@ CALENDAR_MONTH Calendar::GetMonth() {
     if (pGameMonth) {
         return static_cast<CALENDAR_MONTH>((int8_t)((int32_t)pGameMonth->TESGlobal::GetValue()));
     }
-    else {
-        return MONTH_AUGUST;
-    }
+
+    return MONTH_AUGUST;
 }
 
 char Calendar::GetDay() {
     if (pGameDay) {
         return (int8_t)((int32_t)pGameDay->TESGlobal::GetValue());
     }
-    else {
-        return (int8_t)((int32_t)17.0f);
-    }
+
+    return (int8_t)((int32_t)17.0f);
 }
 
 // Truncates through a 64-bit integer conversion.
@@ -221,7 +217,6 @@ const char* Calendar::GetDayOfWeekString() {
     if (DayOfTheWeek == DAY_NONE || DayOfTheWeek >= DAY_COUNT) {
         return "Bad Day";
     }
-    else {
-        return pGSDay[DayOfTheWeek]->String();
-    }
+
+    return pGSDay[DayOfTheWeek]->String();
 }

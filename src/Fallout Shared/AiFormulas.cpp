@@ -405,9 +405,8 @@ bool FollowerDist::operator>(const FollowerDist& aFollowerDist) const {
     if (aFollowerDist.fPackDesiredDist == fPackDesiredDist) {
         return aFollowerDist.fActualDistSqr < static_cast<double>(fActualDistSqr);
     }
-    else {
-        return aFollowerDist.fPackDesiredDist < static_cast<double>(fPackDesiredDist);
-    }
+
+    return aFollowerDist.fPackDesiredDist < static_cast<double>(fPackDesiredDist);
 }
 
 PerActivitySettings::PerActivitySettings(
@@ -510,11 +509,9 @@ float AiFormulas::CalculateDerivedHealth(ActorValueOwner* apActor, float afEndur
         fresult = static_cast<float>(static_cast<uint32_t>(pactor->GetActorBase()->CalculateHealth(0)));
     }
     else {
-        if (bpc) {
-            if (pactor->GetActorLevel()) {
-                double v4 = static_cast<double>(pactor->GetActorLevel() - 1);
-                fresult = fAVDHealthLevelMult.Float() * v4 + fresult;
-            }
+        if ((bpc) && (pactor->GetActorLevel())) {
+            double v4 = static_cast<double>(pactor->GetActorLevel() - 1);
+            fresult = fAVDHealthLevelMult.Float() * v4 + fresult;
         }
     }
     return fresult;
@@ -534,9 +531,8 @@ float AiFormulas::RandomHour(float afMin, float afMax) {
     if (!(v8 >= 0.0)) {
         return v6;
     }
-    else {
-        return v6 - 24.0;
-    }
+
+    return v6 - 24.0;
 }
 
 float AiFormulas::CalculateDerivedFatigue(ActorValueOwner* apActor, float afEndurance) {
@@ -565,11 +561,9 @@ float AiFormulas::CalculateDerivedFatigue(ActorValueOwner* apActor, float afEndu
         fresult = static_cast<float>(static_cast<TESNPC*>(pactor->GetActorBase())->GetFormFatigueLeveled(true));
     }
     else {
-        if (bpc) {
-            if (pactor->GetActorLevel()) {
-                double v6 = static_cast<double>(pactor->GetActorLevel() - 1);
-                fresult = fAVDFatigueLevelMult.Float() * v6 + fresult;
-            }
+        if ((bpc) && (pactor->GetActorLevel())) {
+            double v6 = static_cast<double>(pactor->GetActorLevel() - 1);
+            fresult = fAVDFatigueLevelMult.Float() * v6 + fresult;
         }
     }
     return fresult;
@@ -602,14 +596,13 @@ float AiFormulas::AVDeriveSkill(ActorValueOwner* apActor, ActorValue::Index aiWh
         }
     }
     TESForm* pForm = apActor->GetAsForm();
-    if (pForm && pForm->IsReference()) {
-        if (pForm->IsActor()) {
-            Actor* pActor = static_cast<Actor*>(pForm);
-            if (pActor->GetClass() && pActor->GetClass()->IsTagSkill(aiWhich)) {
-                fValue = fValue + fAVDTagSkillBonus.Float();
-            }
+    if ((pForm && pForm->IsReference()) && (pForm->IsActor())) {
+        Actor* pActor = static_cast<Actor*>(pForm);
+        if (pActor->GetClass() && pActor->GetClass()->IsTagSkill(aiWhich)) {
+            fValue = fValue + fAVDTagSkillBonus.Float();
         }
     }
+
     return fValue;
 }
 
@@ -727,9 +720,8 @@ int32_t AiFormulas::GetActorDetectedTarget(
     if (!(fcalvalue_2 < 1.0) || !(fcalvalue_2 > 0.0)) {
         return static_cast<int32_t>(fcalvalue_2);
     }
-    else {
-        return 1;
-    }
+
+    return 1;
 }
 
 int32_t AiFormulas::GetActorDispositiontoTarget(
@@ -821,9 +813,8 @@ int32_t AiFormulas::GetDetectedEvent(
     if (!(fcalvalue_2 < 1.0) || !(fcalvalue_2 > 0.0)) {
         return static_cast<int32_t>(fcalvalue_2);
     }
-    else {
-        return 1;
-    }
+
+    return 1;
 }
 
 float AiFormulas::GetFollowRadiusStop(float afbasePackRadius) {
@@ -919,10 +910,8 @@ float AiFormulas::GetFollowRadiusFudgeForMultipleFollowers(Actor* apActor, Actor
         if (!pfollowerExtra->pActorlist->IsEmpty()) {
             for (Actor* pfollower : *pfollowerExtra->pActorlist) {
                 TESPackage* ppack = pfollower->GetCurrentPackage();
-                if (ppack) {
-                    if (ppack->GetPackType() == PACKAGE_TYPE_FOLLOW) {
-                        ++inumActualFollowers;
-                    }
+                if ((ppack) && (ppack->GetPackType() == PACKAGE_TYPE_FOLLOW)) {
+                    ++inumActualFollowers;
                 }
             }
         }
@@ -931,23 +920,20 @@ float AiFormulas::GetFollowRadiusFudgeForMultipleFollowers(Actor* apActor, Actor
             uint32_t i = 0;
             for (Actor* pfollower_2 : *pfollowerExtra->pActorlist) {
                 TESPackage* ppack_2 = pfollower_2->GetCurrentPackage();
-                if (ppack_2) {
-                    if (ppack_2->GetPackType() == PACKAGE_TYPE_FOLLOW) {
-                        FollowerDist* followerInfo = &followerDists.GetAt(static_cast<int32_t>(i));
-                        followerInfo->pActor = pfollower_2;
-                        const NiPoint3* a2 = &pfollower_2->GetLocationOnReference();
-                        const NiPoint3* v2 = &apFollowTarget->GetLocationOnReference();
-                        double v4 = (*v2 - *a2).SqrLength();
-                        followerInfo->fActualDistSqr = v4;
-                        double v5 = static_cast<double>(iAIDistanceRadiusMinLocation.Int());
-                        followerInfo->fPackDesiredDist = v5;
-                        double Radius = pfollower_2->GetRadius();
-                        followerInfo->fActorRadius = Radius;
-                        double PackageRadiusActorToRefTarget =
-                            ppack_2->GetPackageRadiusActorToRefTarget(apActor, false);
-                        followerInfo->fPackDesiredDist = PackageRadiusActorToRefTarget;
-                        ++i;
-                    }
+                if ((ppack_2) && (ppack_2->GetPackType() == PACKAGE_TYPE_FOLLOW)) {
+                    FollowerDist* followerInfo = &followerDists.GetAt(static_cast<int32_t>(i));
+                    followerInfo->pActor = pfollower_2;
+                    const NiPoint3* a2 = &pfollower_2->GetLocationOnReference();
+                    const NiPoint3* v2 = &apFollowTarget->GetLocationOnReference();
+                    double v4 = (*v2 - *a2).SqrLength();
+                    followerInfo->fActualDistSqr = v4;
+                    double v5 = static_cast<double>(iAIDistanceRadiusMinLocation.Int());
+                    followerInfo->fPackDesiredDist = v5;
+                    double Radius = pfollower_2->GetRadius();
+                    followerInfo->fActorRadius = Radius;
+                    double PackageRadiusActorToRefTarget = ppack_2->GetPackageRadiusActorToRefTarget(apActor, false);
+                    followerInfo->fPackDesiredDist = PackageRadiusActorToRefTarget;
+                    ++i;
                 }
             }
             followerDists.Sort(&CompareFollowerDist);

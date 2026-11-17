@@ -106,20 +106,18 @@ SettingT<INISettingCollection> bRenderLocalMapContinually("bRenderLocalMapContin
 using NoteListBox = ListBox<BGSNote*>;
 
 void MapMenu_RequestPlayerPositionAsSelectedMarker() {
-    if (MapMenu::pMe) {
-        if (MapMenu::pMe->pFastTravelMarker) {
-            PLAYER_TARGET_LOC* v0;
-            PLAYER_TARGET_LOC* apMemory = static_cast<PLAYER_TARGET_LOC*>(ourMalloc(sizeof(PLAYER_TARGET_LOC)));
-            if (apMemory) {
-                v0 = ::new (apMemory) PLAYER_TARGET_LOC;
-            }
-            else {
-                v0 = nullptr;
-            }
-            v0->pFastTravelMarker = MapMenu::pMe->pFastTravelMarker;
-            pPlayer->RequestPositionPlayer(v0);
-            MapMenu::pMe->pFastTravelMarker = nullptr;
+    if ((MapMenu::pMe) && (MapMenu::pMe->pFastTravelMarker)) {
+        PLAYER_TARGET_LOC* v0;
+        PLAYER_TARGET_LOC* apMemory = static_cast<PLAYER_TARGET_LOC*>(ourMalloc(sizeof(PLAYER_TARGET_LOC)));
+        if (apMemory) {
+            v0 = ::new (apMemory) PLAYER_TARGET_LOC;
         }
+        else {
+            v0 = nullptr;
+        }
+        v0->pFastTravelMarker = MapMenu::pMe->pFastTravelMarker;
+        pPlayer->RequestPositionPlayer(v0);
+        MapMenu::pMe->pFastTravelMarker = nullptr;
     }
 }
 
@@ -263,20 +261,18 @@ void MapMenu::DoClick(int32_t aiID, Tile* apTarget) {
                         TeleportPath* y_4b = pDisplayedQuestTarget->QTargetPath();
                         TESObjectREFR* Reference = pDisplayedQuestTarget->GetReference(true);
                         TESObjectREFR* ptargetRef = GetWorldMapTrackingRef(Reference, y_4b);
-                        if (ptargetRef) {
-                            if (pMapTile) {
-                                TESWorldSpace* y_4c = ptargetRef->GetWorldSpace();
-                                NiPoint3 afMenuWidthOverridec = ptargetRef->GetLocationOnReference();
-                                NiPoint3 centerPoint = WorldToMapCoord(afMenuWidthOverridec, y_4c);
-                                double v51 = pMapTile->pParent->GetFloat(4017) / 2.0;
-                                double Float = pMapTile->GetFloat(4017);
-                                float v50 = v51 - Float * centerPoint.x;
-                                pMapTile->Set(4001, v50, false);
-                                double v49 = pMapTile->pParent->GetFloat(4016) / 2.0;
-                                double v17 = pMapTile->GetFloat(4016);
-                                float v48 = v49 - v17 * centerPoint.y;
-                                pMapTile->Set(4002, v48, false);
-                            }
+                        if ((ptargetRef) && (pMapTile)) {
+                            TESWorldSpace* y_4c = ptargetRef->GetWorldSpace();
+                            NiPoint3 afMenuWidthOverridec = ptargetRef->GetLocationOnReference();
+                            NiPoint3 centerPoint = WorldToMapCoord(afMenuWidthOverridec, y_4c);
+                            double v51 = pMapTile->pParent->GetFloat(4017) / 2.0;
+                            double Float = pMapTile->GetFloat(4017);
+                            float v50 = v51 - Float * centerPoint.x;
+                            pMapTile->Set(4001, v50, false);
+                            double v49 = pMapTile->pParent->GetFloat(4016) / 2.0;
+                            double v17 = pMapTile->GetFloat(4016);
+                            float v48 = v49 - v17 * centerPoint.y;
+                            pMapTile->Set(4002, v48, false);
                         }
                     }
                     break;
@@ -315,14 +311,13 @@ void MapMenu::DoClick(int32_t aiID, Tile* apTarget) {
             break;
         }
         case 23: {
-            if (lbQuestsList.GetHighlightedData()) {
-                if (!lbQuestsList.GetHighlightedData()->GetCompleted()) {
-                    TESQuest* y_4 = lbQuestsList.GetHighlightedData();
-                    pPlayer->SetActiveQuest(y_4);
-                    Interface::PlayMenuSound(3);
-                    UpdateCurrentPage();
-                }
+            if ((lbQuestsList.GetHighlightedData()) && (!lbQuestsList.GetHighlightedData()->GetCompleted())) {
+                TESQuest* y_4 = lbQuestsList.GetHighlightedData();
+                pPlayer->SetActiveQuest(y_4);
+                Interface::PlayMenuSound(3);
+                UpdateCurrentPage();
             }
+
             break;
         }
         case 24: {
@@ -330,114 +325,105 @@ void MapMenu::DoClick(int32_t aiID, Tile* apTarget) {
                 BSSoundHandle hsndHandle;
                 BGSNote* pnote = lbNotesList.GetDataFor(apTarget);
                 bool v63 = pnote->GetNoteType() == NT_SOUND || pnote->GetNoteType() == NT_VOICE;
-                if (pnote) {
-                    if (!InterfaceManager::Has360Controller() || v63) {
-                        bool bnoteMatch = pnote == pSelectedNote;
-                        bool bsoundStopped = false;
-                        Tile* poldSelectedTile = lbNotesList.GetTileFor(pSelectedNote);
-                        if (poldSelectedTile) {
-                            poldSelectedTile->Set(MapMenu::iUT_Selected, 0);
-                        }
-                        if (bnoteMatch && (!v63 || pCurrentSound)) {
-                            pSelectedNote = nullptr;
-                            pTiles[13]->Set(Tile::kTileValue_User0, 0);
-                        }
-                        else {
-                            LoadNote(pnote);
-                            apTarget->Set(MapMenu::iUT_Selected, 1);
-                            pSelectedNote = pnote;
-                            pTiles[13]->Set(Tile::kTileValue_User0, 1);
-                        }
-                        if (pCurrentSound) {
-                            StopNoteSound();
-                            bsoundStopped = true;
-                        }
-                        if (v63 && !pnote->QHasBeenRead()) {
-                            apTarget->Set(MapMenu::iUT_TextAlpha, 128.0f, true);
-                            pnote->SetHasBeenRead(true);
-                        }
-                        if (v63 && (!bnoteMatch || !bsoundStopped)) {
-                            if (pnote->GetNoteType() || !pnote->GetNoteSound()) {
-                                if (pnote->GetNoteType() == NT_VOICE) {
-                                    if (pnote->GetNoteTopic()) {
-                                        if (pnote->GetNoteSpeaker()) {
-                                            Conversation* pVoiceNoteConvo_2;
-                                            Character* pVoiceNoteNPC;
-                                            void* apMemory = ourMalloc(sizeof(Character));
-                                            if (apMemory) {
-                                                pVoiceNoteNPC = ::new (apMemory) Character(false);
-                                            }
-                                            else {
-                                                pVoiceNoteNPC = nullptr;
-                                            }
-                                            pVoiceNoteNPC->SetTemporary();
-                                            DialogueItem* v91 = nullptr;
-                                            TESActorBase* NoteSpeaker = pnote->GetNoteSpeaker();
-                                            pVoiceNoteNPC->SetObjectReference(NoteSpeaker);
-                                            Conversation* v78 =
-                                                static_cast<Conversation*>(ourMalloc(sizeof(Conversation)));
-                                            if (v78) {
-                                                TESTopic* NoteTopic = pnote->GetNoteTopic();
-                                                pVoiceNoteConvo_2 =
-                                                    ::new (v78) Conversation(pVoiceNoteNPC, pPlayer, NoteTopic);
-                                            }
-                                            else {
-                                                pVoiceNoteConvo_2 = nullptr;
-                                            }
-                                            pVoiceNoteConvo_2->FirstItem();
-                                            if (pVoiceNoteConvo_2->GetCurrentItem()) {
-                                                if (pVoiceNoteConvo_2->GetCurrentItem()->FirstResponse()) {
-                                                    do {
-                                                        SubtitlesToShow.Add(pVoiceNoteConvo_2->GetCurrentItem()
-                                                                                ->GetCurrentResponse()
-                                                                                ->cText);
-                                                        pVoiceNoteConvo_2->GetCurrentItem()->pInfo->RunResult(
-                                                            TIRS_BEGIN, pVoiceNoteNPC
-                                                        );
-                                                        char* x = pVoiceNoteConvo_2->GetCurrentItem()
-                                                                      ->GetCurrentResponse()
-                                                                      ->GetVoice()
-                                                                      ->pString;
-                                                        BSAudio* v7 = &BSAudio::QInstance();
-                                                        BSSoundHandle* SoundHandleByFilename =
-                                                            v7->GetSoundHandleByFilename(&out, x, 261u, nullptr);
-                                                        hsndHandle.operator=(*SoundHandleByFilename);
-                                                        hsndHandle.SetVolume(0.9f);
-                                                        SoundsToPlay.AddTail(hsndHandle);
-                                                        pVoiceNoteConvo_2->GetCurrentItem()->pInfo->RunResult(
-                                                            TIRS_END, pVoiceNoteNPC
-                                                        );
-                                                        bSoundsLoading = true;
-                                                    }
-                                                    while (pVoiceNoteConvo_2->GetCurrentItem()->NextResponse());
-                                                }
-                                            }
-                                            if (pVoiceNoteConvo_2) {
-                                                delete pVoiceNoteConvo_2;
-                                            }
-                                            if (pVoiceNoteNPC) {
-                                                delete pVoiceNoteNPC;
-                                            }
-                                        }
+                if ((pnote) && (!InterfaceManager::Has360Controller() || v63)) {
+                    bool bnoteMatch = pnote == pSelectedNote;
+                    bool bsoundStopped = false;
+                    Tile* poldSelectedTile = lbNotesList.GetTileFor(pSelectedNote);
+                    if (poldSelectedTile) {
+                        poldSelectedTile->Set(MapMenu::iUT_Selected, 0);
+                    }
+                    if (bnoteMatch && (!v63 || pCurrentSound)) {
+                        pSelectedNote = nullptr;
+                        pTiles[13]->Set(Tile::kTileValue_User0, 0);
+                    }
+                    else {
+                        LoadNote(pnote);
+                        apTarget->Set(MapMenu::iUT_Selected, 1);
+                        pSelectedNote = pnote;
+                        pTiles[13]->Set(Tile::kTileValue_User0, 1);
+                    }
+                    if (pCurrentSound) {
+                        StopNoteSound();
+                        bsoundStopped = true;
+                    }
+                    if (v63 && !pnote->QHasBeenRead()) {
+                        apTarget->Set(MapMenu::iUT_TextAlpha, 128.0f, true);
+                        pnote->SetHasBeenRead(true);
+                    }
+                    if (v63 && (!bnoteMatch || !bsoundStopped)) {
+                        if (pnote->GetNoteType() || !pnote->GetNoteSound()) {
+                            if ((pnote->GetNoteType() == NT_VOICE) && (pnote->GetNoteTopic()) &&
+                                (pnote->GetNoteSpeaker())) {
+                                Conversation* pVoiceNoteConvo_2;
+                                Character* pVoiceNoteNPC;
+                                void* apMemory = ourMalloc(sizeof(Character));
+                                if (apMemory) {
+                                    pVoiceNoteNPC = ::new (apMemory) Character(false);
+                                }
+                                else {
+                                    pVoiceNoteNPC = nullptr;
+                                }
+                                pVoiceNoteNPC->SetTemporary();
+                                DialogueItem* v91 = nullptr;
+                                TESActorBase* NoteSpeaker = pnote->GetNoteSpeaker();
+                                pVoiceNoteNPC->SetObjectReference(NoteSpeaker);
+                                Conversation* v78 = static_cast<Conversation*>(ourMalloc(sizeof(Conversation)));
+                                if (v78) {
+                                    TESTopic* NoteTopic = pnote->GetNoteTopic();
+                                    pVoiceNoteConvo_2 = ::new (v78) Conversation(pVoiceNoteNPC, pPlayer, NoteTopic);
+                                }
+                                else {
+                                    pVoiceNoteConvo_2 = nullptr;
+                                }
+                                pVoiceNoteConvo_2->FirstItem();
+                                if ((pVoiceNoteConvo_2->GetCurrentItem()) &&
+                                    (pVoiceNoteConvo_2->GetCurrentItem()->FirstResponse())) {
+                                    do {
+                                        SubtitlesToShow.Add(
+                                            pVoiceNoteConvo_2->GetCurrentItem()->GetCurrentResponse()->cText
+                                        );
+                                        pVoiceNoteConvo_2->GetCurrentItem()->pInfo->RunResult(
+                                            TIRS_BEGIN, pVoiceNoteNPC
+                                        );
+                                        char* x = pVoiceNoteConvo_2->GetCurrentItem()
+                                                      ->GetCurrentResponse()
+                                                      ->GetVoice()
+                                                      ->pString;
+                                        BSAudio* v7 = &BSAudio::QInstance();
+                                        BSSoundHandle* SoundHandleByFilename =
+                                            v7->GetSoundHandleByFilename(&out, x, 261u, nullptr);
+                                        hsndHandle.operator=(*SoundHandleByFilename);
+                                        hsndHandle.SetVolume(0.9f);
+                                        SoundsToPlay.AddTail(hsndHandle);
+                                        pVoiceNoteConvo_2->GetCurrentItem()->pInfo->RunResult(TIRS_END, pVoiceNoteNPC);
+                                        bSoundsLoading = true;
                                     }
+                                    while (pVoiceNoteConvo_2->GetCurrentItem()->NextResponse());
+                                }
+
+                                if (pVoiceNoteConvo_2) {
+                                    delete pVoiceNoteConvo_2;
+                                }
+                                if (pVoiceNoteNPC) {
+                                    delete pVoiceNoteNPC;
                                 }
                             }
-                            else {
-                                TESSound* NoteSound = pnote->GetNoteSound();
-                                uint32_t y = NoteSound->iFormID;
-                                BSAudio* v4 = &BSAudio::QInstance();
-                                BSSoundHandle* a2 = v4->GetSoundHandleByNumericID(&apHandle, y, 257u);
-                                SoundsToPlay.AddTail(*a2);
-                                bSoundsLoading = true;
-                            }
-                            if (bSoundsLoading) {
-                                BSAudio* v8 = &BSAudio::QInstance();
-                                BSSoundHandle* v58 = v8->GetSoundHandleByName(&arHandle, "UIPipBoyHolotapeStart", 289u);
-                                v58->Play(false);
-                                FalloutAudio::MuteRadio();
-                                BSAudio* v9 = &BSAudio::QInstance();
-                                v9->EnterDialogue();
-                            }
+                        }
+                        else {
+                            TESSound* NoteSound = pnote->GetNoteSound();
+                            uint32_t y = NoteSound->iFormID;
+                            BSAudio* v4 = &BSAudio::QInstance();
+                            BSSoundHandle* a2 = v4->GetSoundHandleByNumericID(&apHandle, y, 257u);
+                            SoundsToPlay.AddTail(*a2);
+                            bSoundsLoading = true;
+                        }
+                        if (bSoundsLoading) {
+                            BSAudio* v8 = &BSAudio::QInstance();
+                            BSSoundHandle* v58 = v8->GetSoundHandleByName(&arHandle, "UIPipBoyHolotapeStart", 289u);
+                            v58->Play(false);
+                            FalloutAudio::MuteRadio();
+                            BSAudio* v9 = &BSAudio::QInstance();
+                            v9->EnterDialogue();
                         }
                     }
                 }
@@ -873,33 +859,30 @@ bool MapMenu::DoGamepad(int32_t aiButton, float afValue) {
                     else {
                         pscrollbar = pTiles[13]->GetChildByName("MM_TextScrollbar");
                     }
-                    if (pscrollbar) {
-                        if (pscrollbar->GetFloat(4003) != 0.0) {
-                            int32_t v24 = 0;
-                            if (ControllerValue) {
-                                v24 = 2 * (ControllerValue < 0) - 1;
-                            }
-                            if (v24) {
-                                double v15;
-                                if (!g_lastMapMenuScrollTime ||
-                                    (v15 = static_cast<double>(appTimer.iLastTime - g_lastMapMenuScrollTime),
-                                     fKeyRepeatInterval.Float() < v15)) {
-                                    int32_t icurrentValueTrait = Tile::TextToTrait("_current_value");
-                                    // Truncates the scroll bar's value to an int.
-                                    int32_t icurrentValue =
-                                        static_cast<int32_t>(pscrollbar->GetFloat(icurrentValueTrait));
-                                    pscrollbar->Set(icurrentValueTrait, static_cast<float>(icurrentValue + v24), false);
-                                    if (static_cast<double>(icurrentValue) !=
-                                        pscrollbar->GetFloat(icurrentValueTrait)) {
-                                        int32_t v8 = Tile::TextToTrait("_SetInCode");
-                                        pscrollbar->Poke(v8, 1.0f);
-                                    }
-                                    g_lastMapMenuScrollTime = appTimer.iLastTime;
-                                    bresult = true;
+                    if ((pscrollbar) && (pscrollbar->GetFloat(4003) != 0.0)) {
+                        int32_t v24 = 0;
+                        if (ControllerValue) {
+                            v24 = 2 * (ControllerValue < 0) - 1;
+                        }
+                        if (v24) {
+                            double v15;
+                            if (!g_lastMapMenuScrollTime ||
+                                (v15 = static_cast<double>(appTimer.iLastTime - g_lastMapMenuScrollTime),
+                                 fKeyRepeatInterval.Float() < v15)) {
+                                int32_t icurrentValueTrait = Tile::TextToTrait("_current_value");
+                                // Truncates the scroll bar's value to an int.
+                                int32_t icurrentValue = static_cast<int32_t>(pscrollbar->GetFloat(icurrentValueTrait));
+                                pscrollbar->Set(icurrentValueTrait, static_cast<float>(icurrentValue + v24), false);
+                                if (static_cast<double>(icurrentValue) != pscrollbar->GetFloat(icurrentValueTrait)) {
+                                    int32_t v8 = Tile::TextToTrait("_SetInCode");
+                                    pscrollbar->Poke(v8, 1.0f);
                                 }
+                                g_lastMapMenuScrollTime = appTimer.iLastTime;
+                                bresult = true;
                             }
                         }
                     }
+
                     break;
                 }
                 default: {
@@ -981,121 +964,119 @@ void MapMenu::DoControllerSwitch(bool abHas360Controller) {
 }
 
 void MapMenu::ZoomMap(bool abZoomIn, float afZoomDelta) {
-    if (pMapTile) {
-        if (iCurrentPage != 32 || !MapMenu::ShouldRenderLocalMap()) {
-            double v56;
-            bool bmagnificationChange = true;
-            if (abZoomIn) {
-                v56 = afZoomDelta;
-            }
-            else {
-                v56 = 1.0 / afZoomDelta;
-            }
-            float fnewMagnification = pMapTile->GetFloat(MapMenu::iUT_Magnification) * v56;
-            double v55 = pMapTile->pParent->GetFloat(4016) / 2.0;
-            float v54 = v55 - pMapTile->GetFloat(4002);
-            double v53 = pMapTile->pParent->GetFloat(4017) / 2.0;
-            float v52 = v53 - pMapTile->GetFloat(4001);
-            NiPoint2 MapCenter(v52, v54);
-            if (iCurrentPage == 32) {
-                float fmagnificationRatio = 0.0f;
-                float a2 = fLocalMapMinZoom.Float();
-                float* v3 = &fLocalMapMaxZoom.Float();
-                float a1 = BSMIN(fnewMagnification, *v3);
-                fnewMagnification = BSMAX(a1, a2);
-                float* v4 = &fLocalMapMinZoom.Float();
-                double v51 = fnewMagnification - *v4;
-                float* v5 = &fLocalMapMaxZoom.Float();
-                fmagnificationRatio = v51 / (*v5 - fLocalMapMinZoom.Float());
-                double v50 = fLocalMapMarkerMinSize.Float();
-                double v49 = fLocalMapMarkerMaxSize.Float();
-                float v48 = (v49 - fLocalMapMarkerMinSize.Float()) * fmagnificationRatio + v50;
-                pMapTile->Set(Tile::kTileValue_User0, v48, true);
-                double v47 = fLocalQuestMarkerMinSize.Float();
-                double v46 = fLocalQuestMarkerMaxSize.Float();
-                float v45 = (v46 - fLocalQuestMarkerMinSize.Float()) * fmagnificationRatio + v47;
-                pMapTile->Set(Tile::kTileValue_User1, v45, true);
-                double v44 = gs_fLocalfPlayerCursorMinSize.Float();
-                double v43 = fLocalPlayerCursorMaxSize.Float();
-                float v42 = (v43 - gs_fLocalfPlayerCursorMinSize.Float()) * fmagnificationRatio + v44;
-                pMapTile->Set(Tile::kTileValue_User2, v42, true);
-            }
-            else {
-                float fmagnificationRatio_2 = 0.0f;
-                float a2a = fWorldMapMinZoom.Float();
-                float* v6 = &fWorldMapMaxZoom.Float();
-                float a1a = BSMIN(fnewMagnification, *v6);
-                fnewMagnification = BSMAX(a1a, a2a);
-                float* v7 = &fWorldMapMinZoom.Float();
-                double v41 = fnewMagnification - *v7;
-                float* v8 = &fWorldMapMaxZoom.Float();
-                fmagnificationRatio_2 = v41 / (*v8 - fWorldMapMinZoom.Float());
-                double v40 = fWorldMapMarkerMinSize.Float();
-                double v39 = fWorldMapMarkerMaxSize.Float();
-                float v38 = (v39 - fWorldMapMarkerMinSize.Float()) * fmagnificationRatio_2 + v40;
-                pMapTile->Set(Tile::kTileValue_User0, v38, true);
-                double v37 = fWorldQuestMarkerMinSize.Float();
-                double v36 = fWorldQuestMarkerMaxSize.Float();
-                float v35 = (v36 - fWorldQuestMarkerMinSize.Float()) * fmagnificationRatio_2 + v37;
-                pMapTile->Set(Tile::kTileValue_User1, v35, true);
-                double v34 = gs_fWorldfPlayerCursorMinSize.Float();
-                double v33 = fWorldPlayerCursorMaxSize.Float();
-                float v32 = (v33 - gs_fWorldfPlayerCursorMinSize.Float()) * fmagnificationRatio_2 + v34;
-                pMapTile->Set(Tile::kTileValue_User2, v32, true);
-            }
-            double Float = pMapTile->GetFloat(MapMenu::iUT_Magnification);
-            bmagnificationChange = fnewMagnification != Float;
-            double v10 = pMapTile->GetFloat(4045);
-            double v31 = v10 * fnewMagnification;
-            float v30 = v31 / pMapTile->GetFloat(4017);
-            MapCenter.operator*=(v30);
-            pMapTile->Set(MapMenu::iUT_Magnification, fnewMagnification, true);
-            if (iCurrentPage == 32) {
-                NiNode* pmapModel = pMapTile->GetModel();
-                uint32_t uimapside = uGridsToLoad.UInt();
-                for (int32_t isubmapCt = 0; pmapModel && isubmapCt < uimapside * uimapside; ++isubmapCt) {
-                    NiTriShape* ptri = static_cast<NiTriShape*>(pmapModel->GetAt(isubmapCt));
-                    if (ptri) {
-                        int32_t v29 = TES::pInstance->pInteriorCell != nullptr ? 2048 : 1024;
-                        float fnewTrisize = static_cast<double>(v29) * fnewMagnification;
-                        float fnewTilesize = fnewTrisize / 16.0;
-                        ptri->SetScale(fnewMagnification);
-                        float v28 = static_cast<double>(isubmapCt / uimapside) * fnewTrisize + fnewTrisize / 2.0 -
-                            static_cast<double>(uimapside) * fnewTrisize;
-                        float v27 = static_cast<double>(isubmapCt % uimapside) * fnewTrisize + fnewTrisize / 2.0;
-                        ptri->SetTranslate(v27, 0.0f, v28);
-                        NiUpdateData upd(0.0f, false, false);
-                        ptri->Update(upd);
-                        ptri->GetModelData()->SetConsistency(NiGeometryData::STATIC);
-                    }
-                }
-            }
-            double v11 = pMapTile->pParent->GetFloat(4017);
-            double v26 = v11 / 2.0 - MapCenter.x;
-            float v25 = v26 - pMapTile->GetFloat(4078);
-            pMapTile->Set(4001, v25, false);
-            double v12 = pMapTile->pParent->GetFloat(4016);
-            double v24 = v12 / 2.0 - MapCenter.y;
-            float v23 = v24 - pMapTile->GetFloat(4079);
-            pMapTile->Set(4002, v23, false);
-            if (bmagnificationChange) {
-                double v22;
-                float fzoomRateRatio = (afZoomDelta - 1.0) / 0.14300000667572021;
-                if (abZoomIn) {
-                    v22 = -fScrollKnobIncrement.Float() * fzoomRateRatio;
-                }
-                else {
-                    v22 = fScrollKnobIncrement.Float() * fzoomRateRatio;
-                }
-                float* v13 = &fScrollKnobRate.Float();
-                float v21 = *v13 + *v13;
-                float v20 = v22;
-                InterfaceManager* v14 = InterfaceManager::Instance();
-                FOPipboyManager* Pipboy = v14->GetPipboy();
-                Pipboy->MoveKnob(FOPipboyManager::KNOB_SCROLL, v20, v21, true);
-            }
-            Zoom_RefreshCompanions();
+    if ((pMapTile) && (iCurrentPage != 32 || !MapMenu::ShouldRenderLocalMap())) {
+        double v56;
+        bool bmagnificationChange = true;
+        if (abZoomIn) {
+            v56 = afZoomDelta;
         }
+        else {
+            v56 = 1.0 / afZoomDelta;
+        }
+        float fnewMagnification = pMapTile->GetFloat(MapMenu::iUT_Magnification) * v56;
+        double v55 = pMapTile->pParent->GetFloat(4016) / 2.0;
+        float v54 = v55 - pMapTile->GetFloat(4002);
+        double v53 = pMapTile->pParent->GetFloat(4017) / 2.0;
+        float v52 = v53 - pMapTile->GetFloat(4001);
+        NiPoint2 MapCenter(v52, v54);
+        if (iCurrentPage == 32) {
+            float fmagnificationRatio = 0.0f;
+            float a2 = fLocalMapMinZoom.Float();
+            float* v3 = &fLocalMapMaxZoom.Float();
+            float a1 = BSMIN(fnewMagnification, *v3);
+            fnewMagnification = BSMAX(a1, a2);
+            float* v4 = &fLocalMapMinZoom.Float();
+            double v51 = fnewMagnification - *v4;
+            float* v5 = &fLocalMapMaxZoom.Float();
+            fmagnificationRatio = v51 / (*v5 - fLocalMapMinZoom.Float());
+            double v50 = fLocalMapMarkerMinSize.Float();
+            double v49 = fLocalMapMarkerMaxSize.Float();
+            float v48 = (v49 - fLocalMapMarkerMinSize.Float()) * fmagnificationRatio + v50;
+            pMapTile->Set(Tile::kTileValue_User0, v48, true);
+            double v47 = fLocalQuestMarkerMinSize.Float();
+            double v46 = fLocalQuestMarkerMaxSize.Float();
+            float v45 = (v46 - fLocalQuestMarkerMinSize.Float()) * fmagnificationRatio + v47;
+            pMapTile->Set(Tile::kTileValue_User1, v45, true);
+            double v44 = gs_fLocalfPlayerCursorMinSize.Float();
+            double v43 = fLocalPlayerCursorMaxSize.Float();
+            float v42 = (v43 - gs_fLocalfPlayerCursorMinSize.Float()) * fmagnificationRatio + v44;
+            pMapTile->Set(Tile::kTileValue_User2, v42, true);
+        }
+        else {
+            float fmagnificationRatio_2 = 0.0f;
+            float a2a = fWorldMapMinZoom.Float();
+            float* v6 = &fWorldMapMaxZoom.Float();
+            float a1a = BSMIN(fnewMagnification, *v6);
+            fnewMagnification = BSMAX(a1a, a2a);
+            float* v7 = &fWorldMapMinZoom.Float();
+            double v41 = fnewMagnification - *v7;
+            float* v8 = &fWorldMapMaxZoom.Float();
+            fmagnificationRatio_2 = v41 / (*v8 - fWorldMapMinZoom.Float());
+            double v40 = fWorldMapMarkerMinSize.Float();
+            double v39 = fWorldMapMarkerMaxSize.Float();
+            float v38 = (v39 - fWorldMapMarkerMinSize.Float()) * fmagnificationRatio_2 + v40;
+            pMapTile->Set(Tile::kTileValue_User0, v38, true);
+            double v37 = fWorldQuestMarkerMinSize.Float();
+            double v36 = fWorldQuestMarkerMaxSize.Float();
+            float v35 = (v36 - fWorldQuestMarkerMinSize.Float()) * fmagnificationRatio_2 + v37;
+            pMapTile->Set(Tile::kTileValue_User1, v35, true);
+            double v34 = gs_fWorldfPlayerCursorMinSize.Float();
+            double v33 = fWorldPlayerCursorMaxSize.Float();
+            float v32 = (v33 - gs_fWorldfPlayerCursorMinSize.Float()) * fmagnificationRatio_2 + v34;
+            pMapTile->Set(Tile::kTileValue_User2, v32, true);
+        }
+        double Float = pMapTile->GetFloat(MapMenu::iUT_Magnification);
+        bmagnificationChange = fnewMagnification != Float;
+        double v10 = pMapTile->GetFloat(4045);
+        double v31 = v10 * fnewMagnification;
+        float v30 = v31 / pMapTile->GetFloat(4017);
+        MapCenter.operator*=(v30);
+        pMapTile->Set(MapMenu::iUT_Magnification, fnewMagnification, true);
+        if (iCurrentPage == 32) {
+            NiNode* pmapModel = pMapTile->GetModel();
+            uint32_t uimapside = uGridsToLoad.UInt();
+            for (int32_t isubmapCt = 0; pmapModel && isubmapCt < uimapside * uimapside; ++isubmapCt) {
+                NiTriShape* ptri = static_cast<NiTriShape*>(pmapModel->GetAt(isubmapCt));
+                if (ptri) {
+                    int32_t v29 = TES::pInstance->pInteriorCell != nullptr ? 2048 : 1024;
+                    float fnewTrisize = static_cast<double>(v29) * fnewMagnification;
+                    float fnewTilesize = fnewTrisize / 16.0;
+                    ptri->SetScale(fnewMagnification);
+                    float v28 = static_cast<double>(isubmapCt / uimapside) * fnewTrisize + fnewTrisize / 2.0 -
+                        static_cast<double>(uimapside) * fnewTrisize;
+                    float v27 = static_cast<double>(isubmapCt % uimapside) * fnewTrisize + fnewTrisize / 2.0;
+                    ptri->SetTranslate(v27, 0.0f, v28);
+                    NiUpdateData upd(0.0f, false, false);
+                    ptri->Update(upd);
+                    ptri->GetModelData()->SetConsistency(NiGeometryData::STATIC);
+                }
+            }
+        }
+        double v11 = pMapTile->pParent->GetFloat(4017);
+        double v26 = v11 / 2.0 - MapCenter.x;
+        float v25 = v26 - pMapTile->GetFloat(4078);
+        pMapTile->Set(4001, v25, false);
+        double v12 = pMapTile->pParent->GetFloat(4016);
+        double v24 = v12 / 2.0 - MapCenter.y;
+        float v23 = v24 - pMapTile->GetFloat(4079);
+        pMapTile->Set(4002, v23, false);
+        if (bmagnificationChange) {
+            double v22;
+            float fzoomRateRatio = (afZoomDelta - 1.0) / 0.14300000667572021;
+            if (abZoomIn) {
+                v22 = -fScrollKnobIncrement.Float() * fzoomRateRatio;
+            }
+            else {
+                v22 = fScrollKnobIncrement.Float() * fzoomRateRatio;
+            }
+            float* v13 = &fScrollKnobRate.Float();
+            float v21 = *v13 + *v13;
+            float v20 = v22;
+            InterfaceManager* v14 = InterfaceManager::Instance();
+            FOPipboyManager* Pipboy = v14->GetPipboy();
+            Pipboy->MoveKnob(FOPipboyManager::KNOB_SCROLL, v20, v21, true);
+        }
+        Zoom_RefreshCompanions();
     }
 }
 
@@ -1135,23 +1116,21 @@ void MapMenu::HighlightCenterMarker() {
         highlightCenter.y = highlightCenter.y - v2;
         while (pos) {
             Tile* pcurrTile = pMapTile->xChildren.GetNext(pos);
-            if (pcurrTile->GetFloat(4010) == 26.0) {
-                if (!std::strstr(pcurrTile->GetName(), " Marker")) {
-                    float y = pcurrTile->GetFloat(MapMenu::iUT_Y);
-                    float x = pcurrTile->GetFloat(MapMenu::iUT_X);
-                    NiPoint2 currPoint(x, y);
-                    float fcurrDist = 0.0f;
-                    currPoint.operator*=(pMapTile->GetFloat(4017));
-                    fcurrDist = (highlightCenter - currPoint).Length();
-                    if (fshortestDist > static_cast<double>(fcurrDist)) {
-                        double v5 = pTiles[6]->GetFloat(4016);
-                        if (fcurrDist < v5 / 2.0) {
-                            fshortestDist = fcurrDist;
-                            pclosestTile = pcurrTile;
-                        }
+            if ((pcurrTile->GetFloat(4010) == 26.0) && (!std::strstr(pcurrTile->GetName(), " Marker"))) {
+                float y = pcurrTile->GetFloat(MapMenu::iUT_Y);
+                float x = pcurrTile->GetFloat(MapMenu::iUT_X);
+                NiPoint2 currPoint(x, y);
+                float fcurrDist = 0.0f;
+                currPoint.operator*=(pMapTile->GetFloat(4017));
+                fcurrDist = (highlightCenter - currPoint).Length();
+                if (fshortestDist > static_cast<double>(fcurrDist)) {
+                    double v5 = pTiles[6]->GetFloat(4016);
+                    if (fcurrDist < v5 / 2.0) {
+                        fshortestDist = fcurrDist;
+                        pclosestTile = pcurrTile;
                     }
-                    pcurrTile->Set(MapMenu::iUT_Selected, 0);
                 }
+                pcurrTile->Set(MapMenu::iUT_Selected, 0);
             }
         }
         if (pclosestTile) {
@@ -1235,29 +1214,27 @@ void MapMenu::UpdatePlayingSounds() {
         float fcompletion = felapsedMillis / this->fSoundDurationMillis;
         this->pTiles[13]->Set(Tile::TextToTrait("_AudioFileCompletion"), fcompletion, true);
     }
-    if (this->pCurrentSound) {
-        if (!this->pCurrentSound->m_item.IsValid()) {
-            if (!ispeechEndTime) {
-                ispeechEndTime = appTimer.iLastTime;
-            }
-            if (this->pCurrentSound->m_pkNext && appTimer.iLastTime - ispeechEndTime > 500) {
-                this->pCurrentSound = this->pCurrentSound->m_pkNext;
-                this->pCurrentSound->m_item.Play(false);
-                ispeechEndTime = 0;
-                // Copies the location, then builds the by-value handle with operator=, then reads the text.
-                NiPoint3 kSpeakerLoc = pPlayer->GetLocationOnReference();
-                FNVD_INLINED_LOCAL(BSSoundHandle, kHandle, std::nullopt, std::nullopt);
-                kHandle = this->pCurrentSound->m_item;
-                Interface::ShowSubtitle(this->SubtitlesToShow.GetAt(0).pString, kHandle, kSpeakerLoc, pPlayer, true);
-                this->SubtitlesToShow.Remove(0, true);
-            }
-            else if (!this->pCurrentSound->m_pkNext) {
-                BSsprintf(Src, 64, "00:00:0 %s", sRemaining.String());
-                this->pTiles[13]->Set(Tile::TextToTrait("_ItemStringInfo"), Src, true);
-                this->pTiles[13]->Set(Tile::TextToTrait("_AudioFileCompletion"), 1.0f, true);
-                this->pTiles[13]->Set(4100, 0);
-                this->StopNoteSound();
-            }
+    if ((this->pCurrentSound) && (!this->pCurrentSound->m_item.IsValid())) {
+        if (!ispeechEndTime) {
+            ispeechEndTime = appTimer.iLastTime;
+        }
+        if (this->pCurrentSound->m_pkNext && appTimer.iLastTime - ispeechEndTime > 500) {
+            this->pCurrentSound = this->pCurrentSound->m_pkNext;
+            this->pCurrentSound->m_item.Play(false);
+            ispeechEndTime = 0;
+            // Copies the location, then builds the by-value handle with operator=, then reads the text.
+            NiPoint3 kSpeakerLoc = pPlayer->GetLocationOnReference();
+            FNVD_INLINED_LOCAL(BSSoundHandle, kHandle, std::nullopt, std::nullopt);
+            kHandle = this->pCurrentSound->m_item;
+            Interface::ShowSubtitle(this->SubtitlesToShow.GetAt(0).pString, kHandle, kSpeakerLoc, pPlayer, true);
+            this->SubtitlesToShow.Remove(0, true);
+        }
+        else if (!this->pCurrentSound->m_pkNext) {
+            BSsprintf(Src, 64, "00:00:0 %s", sRemaining.String());
+            this->pTiles[13]->Set(Tile::TextToTrait("_ItemStringInfo"), Src, true);
+            this->pTiles[13]->Set(Tile::TextToTrait("_AudioFileCompletion"), 1.0f, true);
+            this->pTiles[13]->Set(4100, 0);
+            this->StopNoteSound();
         }
     }
 }
@@ -1295,15 +1272,14 @@ void MapMenu::UpdateCurrentPage() {
             if (!MapMenu::bNotesChallengeMode) {
                 MapMenu::pMe->lbNotesList.SaveListState();
                 MapMenu::pMe->UpdateNotes();
-                if (pSelectedNote) {
-                    if (!MapMenu::bNotesChallengeMode) {
-                        Tile* pselectedTile = lbNotesList.GetTileFor(pSelectedNote);
-                        LoadNote(pSelectedNote);
-                        if (pselectedTile) {
-                            pselectedTile->Set(MapMenu::iUT_Selected, 1);
-                        }
+                if ((pSelectedNote) && (!MapMenu::bNotesChallengeMode)) {
+                    Tile* pselectedTile = lbNotesList.GetTileFor(pSelectedNote);
+                    LoadNote(pSelectedNote);
+                    if (pselectedTile) {
+                        pselectedTile->Set(MapMenu::iUT_Selected, 1);
                     }
                 }
+
                 MapMenu::pMe->lbNotesList.RestoreListState(true);
             }
             MapMenu::pMe->UpdateChallenges();
@@ -1570,12 +1546,14 @@ void MapMenu::AddQuestMarkers() {
                 CreateWaypointPath(pMapPlayerRef, pTarget, pIter->GetItem()->QTargetPath(), TI_QUEST_WAYPOINT);
             }
         }
-        else if (pReference) {
-            if ((iCurrentPage == TI_TAB_WORLDMAP && !pReference->GetInterior()) ||
-                (iCurrentPage == TI_TAB_LOCALMAP && pReference->GetParentCell() == pPlayer->GetParentCell())) {
-                pTarget = pIter->GetItem()->GetReference(true);
-            }
+        else if (
+            (pReference) &&
+            ((iCurrentPage == TI_TAB_WORLDMAP && !pReference->GetInterior()) ||
+             (iCurrentPage == TI_TAB_LOCALMAP && pReference->GetParentCell() == pPlayer->GetParentCell()))
+        ) {
+            pTarget = pIter->GetItem()->GetReference(true);
         }
+
         if (!pTarget) {
             continue;
         }
@@ -1679,36 +1657,32 @@ void MapMenu::UpdateLocalMap() {
                 }
                 TESObjectDOOR* pcurrDoor_3 = pcurrDoor_2;
                 NiPoint3 markerPos = pcurrMarker->GetLocationOnReference();
-                if (!pcurrMarker->GetDestroyed() && !pcurrMarker->GetIsHiddenDoor()) {
-                    if (pcurrDoor_3) {
-                        if (!pcurrDoor_3->IsHidden()) {
-                            if (pAdjustNorthRotationCell) {
-                                pAdjustNorthRotationCell->AdjustCoordForNorthRotation(markerPos, markerPos, true);
-                            }
-                            float falpha = 255.0f;
-                            NiPoint3 markerTilePos = WorldToMapCoord(markerPos, nullptr);
-                            if (bFogOfWarEnabled) {
-                                int32_t SeenValue = TESObjectCELL::GetSeenValue(markerPos);
-                                falpha = static_cast<double>(SeenValue) / 4.0 * falpha;
-                            }
-                            if (falpha > 0.0 && markerTilePos.x >= 0.0 && markerTilePos.x <= 1.0 &&
-                                markerTilePos.y >= 0.0 && markerTilePos.y <= 1.0) {
-                                Tile* pmarkerTile =
-                                    MapMenu::pMe->RenderTemplate(pTiles[2], "MapMarkerTemplate", nullptr);
-                                DoorTeleportData* pteleportData = pcurrMarker->GetTeleport();
-                                pmarkerTile->Set(4010, 26);
-                                pmarkerTile->Set(MapMenu::iUT_X, markerTilePos.x, true);
-                                pmarkerTile->Set(MapMenu::iUT_Y, markerTilePos.y, true);
-                                pmarkerTile->Set(4009, falpha, true);
-                                pmarkerTile->Set(4044, "Interface\\Icons\\Local Map\\icon_local_door.dds", true);
-                                if (pteleportData) {
-                                    BSStringT<char> strDoorDestinationName;
-                                    pteleportData->GetTeleportCellMapName(strDoorDestinationName);
-                                    char* yd = strDoorDestinationName.pString;
-                                    int32_t v15 = Tile::AddUserTrait("_LocationName", -1);
-                                    pmarkerTile->Set(v15, yd, true);
-                                }
-                            }
+                if ((!pcurrMarker->GetDestroyed() && !pcurrMarker->GetIsHiddenDoor()) && (pcurrDoor_3) &&
+                    (!pcurrDoor_3->IsHidden())) {
+                    if (pAdjustNorthRotationCell) {
+                        pAdjustNorthRotationCell->AdjustCoordForNorthRotation(markerPos, markerPos, true);
+                    }
+                    float falpha = 255.0f;
+                    NiPoint3 markerTilePos = WorldToMapCoord(markerPos, nullptr);
+                    if (bFogOfWarEnabled) {
+                        int32_t SeenValue = TESObjectCELL::GetSeenValue(markerPos);
+                        falpha = static_cast<double>(SeenValue) / 4.0 * falpha;
+                    }
+                    if (falpha > 0.0 && markerTilePos.x >= 0.0 && markerTilePos.x <= 1.0 && markerTilePos.y >= 0.0 &&
+                        markerTilePos.y <= 1.0) {
+                        Tile* pmarkerTile = MapMenu::pMe->RenderTemplate(pTiles[2], "MapMarkerTemplate", nullptr);
+                        DoorTeleportData* pteleportData = pcurrMarker->GetTeleport();
+                        pmarkerTile->Set(4010, 26);
+                        pmarkerTile->Set(MapMenu::iUT_X, markerTilePos.x, true);
+                        pmarkerTile->Set(MapMenu::iUT_Y, markerTilePos.y, true);
+                        pmarkerTile->Set(4009, falpha, true);
+                        pmarkerTile->Set(4044, "Interface\\Icons\\Local Map\\icon_local_door.dds", true);
+                        if (pteleportData) {
+                            BSStringT<char> strDoorDestinationName;
+                            pteleportData->GetTeleportCellMapName(strDoorDestinationName);
+                            char* yd = strDoorDestinationName.pString;
+                            int32_t v15 = Tile::AddUserTrait("_LocationName", -1);
+                            pmarkerTile->Set(v15, yd, true);
                         }
                     }
                 }
@@ -1845,113 +1819,112 @@ void MapMenu::AddCompanionMarkers() {
         else {
             pTarget = a1;
         }
-        if (pTarget) {
-            if (!pTarget->IsDead(false)) {
-                TESObjectCELL* v1;
-                TESWorldSpace* v2;
-                if (iCurrentPage != 32 ||
-                    ((v1 = a1->GetParentCell(), v1 == pPlayer->GetParentCell()) ||
-                     (v2 = a1->GetWorldSpace(), v2 == pPlayer->GetWorldSpace()))) {
-                    float DistanceFromReference = a1->GetDistanceFromReference(pPlayer, false, false);
-                    if (!(DistanceFromReference < 2048.0) || iCurrentPage != 33) {
-                        if (a1) {
-                            TESObjectCELL* ParentCell;
-                            if ((iCurrentPage == 33 && !a1->GetInterior()) ||
-                                (iCurrentPage == 32 &&
-                                 (ParentCell = a1->GetParentCell(), ParentCell == pPlayer->GetParentCell()))) {
-                                pTarget = a1;
-                            }
+        if ((pTarget) && (!pTarget->IsDead(false))) {
+            TESObjectCELL* v1;
+            TESWorldSpace* v2;
+            if (iCurrentPage != 32 ||
+                ((v1 = a1->GetParentCell(), v1 == pPlayer->GetParentCell()) ||
+                 (v2 = a1->GetWorldSpace(), v2 == pPlayer->GetWorldSpace()))) {
+                float DistanceFromReference = a1->GetDistanceFromReference(pPlayer, false, false);
+                if (!(DistanceFromReference < 2048.0) || iCurrentPage != 33) {
+                    if (a1) {
+                        TESObjectCELL* ParentCell;
+                        if ((iCurrentPage == 33 && !a1->GetInterior()) ||
+                            (iCurrentPage == 32 &&
+                             (ParentCell = a1->GetParentCell(), ParentCell == pPlayer->GetParentCell()))) {
+                            pTarget = a1;
                         }
-                        if (pTarget) {
-                            double v4;
-                            Tile* v12;
-                            char apName[64];
-                            NiPoint3 out = pTarget->GetLocationOnReference();
-                            NiPoint3 v31 = out;
-                            if (iCurrentPage == 33) {
-                                v4 = v31.y - 1024.0;
-                            }
-                            else {
-                                v4 = v31.y - 128.0;
-                            }
-                            v31.y = v4;
-                            if (pAdjustNorthRotationCell) {
-                                pAdjustNorthRotationCell->AdjustCoordForNorthRotation(out, out, true);
-                            }
-                            TESWorldSpace* WorldSpace = pTarget->GetWorldSpace();
-                            kMapPos = WorldToMapCoord(out, WorldSpace);
-                            TESWorldSpace* v6 = pTarget->GetWorldSpace();
-                            NiPoint3 in = WorldToMapCoord(v31, v6);
-                            if (iCurrentPage == 33) {
-                                v12 = pTiles[5];
-                            }
-                            else {
-                                v12 = pTiles[3];
-                            }
-                            Tile* apSourceTile = v12;
-                            Tile* v25 = nullptr;
-                            Tile* v29 = nullptr;
-                            if (iCurrentPage == 33) {
-                                v25 = MapMenu::pMe->RenderTemplate(pMapTile, "WorldMapQuestMarkerTemplate", nullptr);
-                            }
-                            else {
-                                v25 = MapMenu::pMe->RenderTemplate(pMapTile, "LocalMapQuestMarkerTemplate", nullptr);
-                            }
-                            v25->Set(MapMenu::iUT_X, kMapPos.x, true);
-                            v25->Set(MapMenu::iUT_Y, kMapPos.y, true);
-                            const char* FullName = pTarget->GetFullName();
-                            std::sprintf(apName, "%s Marker", FullName);
-                            v25->SetName(static_cast<const char*>(apName));
-                            v25->Set(Tile::kTileValue_Filename, "glow_hud_compass_landmark.dds", true);
-                            v25->Set(Tile::kTileValue_ID, 26);
-                            v25->Set(Tile::kTileValue_Depth, 5.0f, true);
-                            int32_t v8 = Tile::AddUserTrait("_LocationName", -1);
-                            v25->Set(v8, "Companion", true);
-                            Tile::Value* ValueQ = v25->GetValueQ(Tile::kTileValue_Brightness);
-                            ValueQ->ClearActions();
-                            ValueQ->AddAction(Tile::kTileValue_Copy, apSourceTile, Tile::kTileValue_Brightness);
-                            ValueQ->CalculateValue(false);
-                            float Float = pMapTile->GetFloat(Tile::kTileValue_Width);
-                            float v23 = pMapTile->GetFloat(Tile::kTileValue_Height);
-                            Float = Float * in.x;
-                            v23 = v23 * in.y;
-                            v29 = Tile::BuildTile(903);
-                            const char* v9 = a1->GetFullName();
-                            v29->Init(pMapTile, v9, nullptr);
-                            v29->Set(MapMenu::iUT_X, in.x, true);
-                            v29->Set(MapMenu::iUT_Y, in.y, true);
-                            const char* v10 = pTarget->GetFullName();
-                            v29->SetName(v10);
-                            v29->Set(Tile::kTileValue_X, Float, true);
-                            v29->Set(Tile::kTileValue_Y, v23, true);
-                            const char* v11 = a1->GetFullName();
-                            v29->Set(Tile::kTileValue_String, v11, true);
-                            v29->Set(Tile::kTileValue_WrapWidth, 200.0f, true);
-                            v29->Set(Tile::kTileValue_ID, 38);
-                            v29->Set(Tile::kTileValue_Depth, 2.0f, true);
-                            v29->Set(Tile::kTileValue_Visible, 1);
-                            v29->Set(Tile::kTileValue_Justify, 2);
-                            v29->Set(Tile::kTileValue_Font, 2);
-                            v29->Set(Tile::kTileValue_Height, 60.0f, true);
-                            v29->AddNeedsUpdate(Tile::CHANGE_CREATE);
-                            Tile::Value* v27 = v29->GetValueQ(Tile::kTileValue_X);
-                            Tile::Value* v26 = v29->GetValueQ(Tile::kTileValue_Y);
-                            v27->ClearActions();
-                            v27->AddAction(Tile::kTileValue_Copy, v25, Tile::kTileValue_X);
-                            v27->CalculateValue(false);
-                            v26->ClearActions();
-                            v26->AddAction(Tile::kTileValue_Copy, v25, Tile::kTileValue_Y);
-                            v26->AddAction(Tile::kTileValue_Add, 60.0f);
-                            v26->CalculateValue(false);
-                            Tile::Value* v22 = v29->GetValueQ(Tile::kTileValue_Brightness);
-                            v22->ClearActions();
-                            v22->AddAction(Tile::kTileValue_Copy, apSourceTile, Tile::kTileValue_Brightness);
-                            v22->CalculateValue(false);
+                    }
+                    if (pTarget) {
+                        double v4;
+                        Tile* v12;
+                        char apName[64];
+                        NiPoint3 out = pTarget->GetLocationOnReference();
+                        NiPoint3 v31 = out;
+                        if (iCurrentPage == 33) {
+                            v4 = v31.y - 1024.0;
                         }
+                        else {
+                            v4 = v31.y - 128.0;
+                        }
+                        v31.y = v4;
+                        if (pAdjustNorthRotationCell) {
+                            pAdjustNorthRotationCell->AdjustCoordForNorthRotation(out, out, true);
+                        }
+                        TESWorldSpace* WorldSpace = pTarget->GetWorldSpace();
+                        kMapPos = WorldToMapCoord(out, WorldSpace);
+                        TESWorldSpace* v6 = pTarget->GetWorldSpace();
+                        NiPoint3 in = WorldToMapCoord(v31, v6);
+                        if (iCurrentPage == 33) {
+                            v12 = pTiles[5];
+                        }
+                        else {
+                            v12 = pTiles[3];
+                        }
+                        Tile* apSourceTile = v12;
+                        Tile* v25 = nullptr;
+                        Tile* v29 = nullptr;
+                        if (iCurrentPage == 33) {
+                            v25 = MapMenu::pMe->RenderTemplate(pMapTile, "WorldMapQuestMarkerTemplate", nullptr);
+                        }
+                        else {
+                            v25 = MapMenu::pMe->RenderTemplate(pMapTile, "LocalMapQuestMarkerTemplate", nullptr);
+                        }
+                        v25->Set(MapMenu::iUT_X, kMapPos.x, true);
+                        v25->Set(MapMenu::iUT_Y, kMapPos.y, true);
+                        const char* FullName = pTarget->GetFullName();
+                        std::sprintf(apName, "%s Marker", FullName);
+                        v25->SetName(static_cast<const char*>(apName));
+                        v25->Set(Tile::kTileValue_Filename, "glow_hud_compass_landmark.dds", true);
+                        v25->Set(Tile::kTileValue_ID, 26);
+                        v25->Set(Tile::kTileValue_Depth, 5.0f, true);
+                        int32_t v8 = Tile::AddUserTrait("_LocationName", -1);
+                        v25->Set(v8, "Companion", true);
+                        Tile::Value* ValueQ = v25->GetValueQ(Tile::kTileValue_Brightness);
+                        ValueQ->ClearActions();
+                        ValueQ->AddAction(Tile::kTileValue_Copy, apSourceTile, Tile::kTileValue_Brightness);
+                        ValueQ->CalculateValue(false);
+                        float Float = pMapTile->GetFloat(Tile::kTileValue_Width);
+                        float v23 = pMapTile->GetFloat(Tile::kTileValue_Height);
+                        Float = Float * in.x;
+                        v23 = v23 * in.y;
+                        v29 = Tile::BuildTile(903);
+                        const char* v9 = a1->GetFullName();
+                        v29->Init(pMapTile, v9, nullptr);
+                        v29->Set(MapMenu::iUT_X, in.x, true);
+                        v29->Set(MapMenu::iUT_Y, in.y, true);
+                        const char* v10 = pTarget->GetFullName();
+                        v29->SetName(v10);
+                        v29->Set(Tile::kTileValue_X, Float, true);
+                        v29->Set(Tile::kTileValue_Y, v23, true);
+                        const char* v11 = a1->GetFullName();
+                        v29->Set(Tile::kTileValue_String, v11, true);
+                        v29->Set(Tile::kTileValue_WrapWidth, 200.0f, true);
+                        v29->Set(Tile::kTileValue_ID, 38);
+                        v29->Set(Tile::kTileValue_Depth, 2.0f, true);
+                        v29->Set(Tile::kTileValue_Visible, 1);
+                        v29->Set(Tile::kTileValue_Justify, 2);
+                        v29->Set(Tile::kTileValue_Font, 2);
+                        v29->Set(Tile::kTileValue_Height, 60.0f, true);
+                        v29->AddNeedsUpdate(Tile::CHANGE_CREATE);
+                        Tile::Value* v27 = v29->GetValueQ(Tile::kTileValue_X);
+                        Tile::Value* v26 = v29->GetValueQ(Tile::kTileValue_Y);
+                        v27->ClearActions();
+                        v27->AddAction(Tile::kTileValue_Copy, v25, Tile::kTileValue_X);
+                        v27->CalculateValue(false);
+                        v26->ClearActions();
+                        v26->AddAction(Tile::kTileValue_Copy, v25, Tile::kTileValue_Y);
+                        v26->AddAction(Tile::kTileValue_Add, 60.0f);
+                        v26->CalculateValue(false);
+                        Tile::Value* v22 = v29->GetValueQ(Tile::kTileValue_Brightness);
+                        v22->ClearActions();
+                        v22->AddAction(Tile::kTileValue_Copy, apSourceTile, Tile::kTileValue_Brightness);
+                        v22->CalculateValue(false);
                     }
                 }
             }
         }
+
         pcurrTeammate = pcurrTeammate->GetNext();
     }
 }
@@ -2052,29 +2025,23 @@ TESWorldSpace* MapMenu::CalculatePlayerMarkerSpace(NiPoint3 aWorldPos) {
         const char* strName = pcurrWorld->GetFullName();
         adjustedCoord = aWorldPos;
         PathingLocation destination;
-        if (strName) {
-            if (*strName) {
-                const char* v2 = BSstristr(strName, "test");
-                if (v2 != strName && !pcurrWorld->CantTravelFrom()) {
-                    pcurrWorld->AdjustMapMarkerCoord(adjustedCoord, true);
-                    PathingLocation* aLoc = ::new (&destination_2) PathingLocation(&adjustedCoord, pcurrWorld);
-                    destination.operator=(*aLoc);
-                    destination_2.~PathingLocation();
-                    if (destination.ResolveNavMeshInfoOnly()) {
-                        if (pRootMapSpace) {
-                            if (pcurrWorld) {
-                                const char* WorldMapTextureName = pRootMapSpace->GetWorldMapTextureName();
-                                if (BSstrlen(WorldMapTextureName) >= 31) {
-                                    const char* v4 = pcurrWorld->GetWorldMapTextureName();
-                                    if (BSstrlen(v4) >= 31) {
-                                        const char* v7 = pcurrWorld->GetWorldMapTextureName() + 29;
-                                        const char* v5 = pRootMapSpace->GetWorldMapTextureName();
-                                        if (!BSstrnicmp(v5 + 29, v7, 3u)) {
-                                            presult = pcurrWorld;
-                                            break;
-                                        }
-                                    }
-                                }
+        if ((strName) && (*strName)) {
+            const char* v2 = BSstristr(strName, "test");
+            if (v2 != strName && !pcurrWorld->CantTravelFrom()) {
+                pcurrWorld->AdjustMapMarkerCoord(adjustedCoord, true);
+                PathingLocation* aLoc = ::new (&destination_2) PathingLocation(&adjustedCoord, pcurrWorld);
+                destination.operator=(*aLoc);
+                destination_2.~PathingLocation();
+                if ((destination.ResolveNavMeshInfoOnly()) && (pRootMapSpace) && (pcurrWorld)) {
+                    const char* WorldMapTextureName = pRootMapSpace->GetWorldMapTextureName();
+                    if (BSstrlen(WorldMapTextureName) >= 31) {
+                        const char* v4 = pcurrWorld->GetWorldMapTextureName();
+                        if (BSstrlen(v4) >= 31) {
+                            const char* v7 = pcurrWorld->GetWorldMapTextureName() + 29;
+                            const char* v5 = pRootMapSpace->GetWorldMapTextureName();
+                            if (!BSstrnicmp(v5 + 29, v7, 3u)) {
+                                presult = pcurrWorld;
+                                break;
                             }
                         }
                     }
@@ -2265,16 +2232,14 @@ void MapMenu::UpdateChallenges() {
     // calls would be devirtualised.
     static_cast<ListBox<TESChallenge*>*>(&lbChallengeList)->RemoveAll();
     for (TESChallenge* pItem : *pDataHandler->GetChallengeList()) {
-        if (pItem) {
-            if (!pItem->GetStartsLocked() || pItem->GetUnlocked()) {
-                Tile* pnewTile = lbChallengeList.AddItem(pItem, pItem->GetFullName(), nullptr, nullptr);
-                pnewTile->Set(4010, 24);
-                if (pItem->GetCompleted()) {
-                    pnewTile->Set(MapMenu::iUT_TextAlpha, 128.0f, true);
-                }
-                else {
-                    pnewTile->Set(MapMenu::iUT_TextAlpha, 255.0f, true);
-                }
+        if ((pItem) && (!pItem->GetStartsLocked() || pItem->GetUnlocked())) {
+            Tile* pnewTile = lbChallengeList.AddItem(pItem, pItem->GetFullName(), nullptr, nullptr);
+            pnewTile->Set(4010, 24);
+            if (pItem->GetCompleted()) {
+                pnewTile->Set(MapMenu::iUT_TextAlpha, 128.0f, true);
+            }
+            else {
+                pnewTile->Set(MapMenu::iUT_TextAlpha, 255.0f, true);
             }
         }
     }
@@ -2391,11 +2356,10 @@ NiPoint3* MapMenu::MapToWorldCoord(NiPoint3* apResult, NiPoint3 aMapCoord, TESWo
     ecx0.x = (MapSECorner.x - MapNWCorner.x) * x + MapNWCorner.x;
     ecx0.y = (MapSECorner.y - MapNWCorner.y) * y + MapNWCorner.y;
     ecx0.z = 0.0;
-    if (apWorldspace) {
-        if (iCurrentPage == 33) {
-            apWorldspace->AdjustMapMarkerCoord(ecx0, true);
-        }
+    if ((apWorldspace) && (iCurrentPage == 33)) {
+        apWorldspace->AdjustMapMarkerCoord(ecx0, true);
     }
+
     *apResult = ecx0;
     return apResult;
 }
@@ -2440,98 +2404,96 @@ void MapMenu::UpdateWorldMap() {
     }
     pMapSpace = (TESForm*)pRootMapSpace;
     pAdjustNorthRotationCell = nullptr;
-    if (pRootMapSpace) {
-        if (prootWorldData_2) {
-            if (MapMenu::bWorldMapTextureCleared || bRootSpaceChanged) {
-                const char* WorldMapTextureName = pRootMapSpace->GetWorldMapTextureName();
-                pTiles[4]->Set(4044, WorldMapTextureName, true);
-                pTiles[4]->Set(4045, prootWorldData_2->iUsableWidth);
-                pTiles[4]->Set(4046, prootWorldData_2->iUsableHeight);
-                MapMenu::bWorldMapTextureCleared = false;
-                bRootSpaceChanged = false;
-            }
-            ZoomMap(true, 1.0f);
-            NiPoint2* v3 = ::new (&v32) NiPoint2(
-                static_cast<float>(prootWorldData_2->sNorthWestCellX << 12),
-                static_cast<float>((prootWorldData_2->sNorthWestCellY << 12) + 4096)
-            );
-            float y = v3->y;
-            MapNWCorner.x = v3->x;
-            MapNWCorner.y = y;
-            NiPoint2* v5 = ::new (&v31) NiPoint2(
-                static_cast<float>((prootWorldData_2->sSouthEastCellX << 12) + 4096),
-                static_cast<float>(prootWorldData_2->sSouthEastCellY << 12)
-            );
-            float x = v5->x;
-            float v7 = v5->y;
-            MapSECorner.x = x;
-            MapSECorner.y = v7;
-            if (!pTiles[4]->GetChildByID(26)) {
-                BSSimpleList<TESObjectREFR*>* pfullMarkerList = pRootMapSpace->BuildMapMarkerList(false);
-                mapMarkerIndex = 0;
-                for (BSSimpleList<TESObjectREFR*>* pcurrMarkerObj = pfullMarkerList;
-                     pcurrMarkerObj && pcurrMarkerObj->m_item; pcurrMarkerObj = pcurrMarkerObj->m_pkNext) {
-                    TESWorldSpace* pmarkerRootWorldspace;
-                    TESObjectREFR* pcurrMarker = pcurrMarkerObj->m_item;
-                    NiPoint3 markerPos = pcurrMarker->GetLocationOnReference();
-                    for (pmarkerRootWorldspace = pcurrMarker->GetWorldSpace();
-                         pmarkerRootWorldspace && pmarkerRootWorldspace->GetParentWorldSimple();
-                         pmarkerRootWorldspace = pmarkerRootWorldspace->GetParentWorldSimple()) {
-                        ;
-                    }
-                    MapMarkerData* MapMarkerData_ = pcurrMarker->GetMapMarkerData();
-                    if (MapMarkerData_->GetVisible() && !pcurrMarker->GetDisabled() &&
-                        pmarkerRootWorldspace == pRootMapSpace) {
-                        Tile* pmarkerTile = MapMenu::pMe->RenderTemplate(pTiles[4], "MapMarkerTemplate", nullptr);
-                        if (pmarkerTile) {
-                            TESWorldSpace* pmarkerRootWorldspace_2 = pcurrMarker->GetWorldSpace();
-                            NiPoint3 markerTilePos = WorldToMapCoord(markerPos, pmarkerRootWorldspace_2);
-                            TESReputation* pRep = pcurrMarker->GetMapMarkerData()->pReputation;
-                            if (pRep) {
-                                char Src[256];
-                                const char* a3b = pRep->GetReputationTitle();
-                                MapMarkerData* v10 = pcurrMarker->GetMapMarkerData();
-                                BSsprintf(Src, 256, "%s\n(%s)", v10->GetLocationName(), a3b);
-                                int32_t v11 = Tile::AddUserTrait("_LocationName", -1);
-                                pmarkerTile->Set(v11, Src, true);
-                            }
-                            else {
-                                MapMarkerData* v12 = pcurrMarker->GetMapMarkerData();
-                                const char* afValueb = v12->GetLocationName();
-                                int32_t v13 = Tile::AddUserTrait("_LocationName", -1);
-                                pmarkerTile->Set(v13, afValueb, true);
-                            }
-                            MapMarkerData* v14 = pcurrMarker->GetMapMarkerData();
-                            const char* LocationName = v14->GetLocationName();
-                            pmarkerTile->SetName(LocationName);
-                            pmarkerTile->Set(4010, 26);
-                            pmarkerTile->Set(MapMenu::iUT_X, markerTilePos.x, true);
-                            pmarkerTile->Set(MapMenu::iUT_Y, markerTilePos.y, true);
-                            MapMarkerData* v16 = pcurrMarker->GetMapMarkerData();
-                            if (v16->GetTravelLoc()) {
-                                MapMarkerData* v17 = pcurrMarker->GetMapMarkerData();
-                                int32_t Type = v17->GetType();
-                                pmarkerTile->Set(4044, pcMarkerIconFilenamesA[Type - 1], true);
-                            }
-                            else {
-                                pmarkerTile->Set(4044, "Interface\\Icons\\World Map\\icon_map_undiscovered.dds", true);
-                                pmarkerTile->Set(4100, 0);
-                            }
-                            int32_t a3c = mapMarkerIndex;
-                            int32_t v19 = Tile::AddUserTrait("_MarkerIndex", -1);
-                            pmarkerTile->Set(v19, a3c);
-                            WorldMapMarkerList.AddTail(pcurrMarker);
-                            ++mapMarkerIndex;
-                        }
-                    }
-                }
-                pfullMarkerList->RemoveAll();
-                if (pfullMarkerList) {
-                    delete pfullMarkerList;
-                }
-            }
-            AddMapIcons();
+    if ((pRootMapSpace) && (prootWorldData_2)) {
+        if (MapMenu::bWorldMapTextureCleared || bRootSpaceChanged) {
+            const char* WorldMapTextureName = pRootMapSpace->GetWorldMapTextureName();
+            pTiles[4]->Set(4044, WorldMapTextureName, true);
+            pTiles[4]->Set(4045, prootWorldData_2->iUsableWidth);
+            pTiles[4]->Set(4046, prootWorldData_2->iUsableHeight);
+            MapMenu::bWorldMapTextureCleared = false;
+            bRootSpaceChanged = false;
         }
+        ZoomMap(true, 1.0f);
+        NiPoint2* v3 = ::new (&v32) NiPoint2(
+            static_cast<float>(prootWorldData_2->sNorthWestCellX << 12),
+            static_cast<float>((prootWorldData_2->sNorthWestCellY << 12) + 4096)
+        );
+        float y = v3->y;
+        MapNWCorner.x = v3->x;
+        MapNWCorner.y = y;
+        NiPoint2* v5 = ::new (&v31) NiPoint2(
+            static_cast<float>((prootWorldData_2->sSouthEastCellX << 12) + 4096),
+            static_cast<float>(prootWorldData_2->sSouthEastCellY << 12)
+        );
+        float x = v5->x;
+        float v7 = v5->y;
+        MapSECorner.x = x;
+        MapSECorner.y = v7;
+        if (!pTiles[4]->GetChildByID(26)) {
+            BSSimpleList<TESObjectREFR*>* pfullMarkerList = pRootMapSpace->BuildMapMarkerList(false);
+            mapMarkerIndex = 0;
+            for (BSSimpleList<TESObjectREFR*>* pcurrMarkerObj = pfullMarkerList;
+                 pcurrMarkerObj && pcurrMarkerObj->m_item; pcurrMarkerObj = pcurrMarkerObj->m_pkNext) {
+                TESWorldSpace* pmarkerRootWorldspace;
+                TESObjectREFR* pcurrMarker = pcurrMarkerObj->m_item;
+                NiPoint3 markerPos = pcurrMarker->GetLocationOnReference();
+                for (pmarkerRootWorldspace = pcurrMarker->GetWorldSpace();
+                     pmarkerRootWorldspace && pmarkerRootWorldspace->GetParentWorldSimple();
+                     pmarkerRootWorldspace = pmarkerRootWorldspace->GetParentWorldSimple()) {
+                    ;
+                }
+                MapMarkerData* MapMarkerData_ = pcurrMarker->GetMapMarkerData();
+                if (MapMarkerData_->GetVisible() && !pcurrMarker->GetDisabled() &&
+                    pmarkerRootWorldspace == pRootMapSpace) {
+                    Tile* pmarkerTile = MapMenu::pMe->RenderTemplate(pTiles[4], "MapMarkerTemplate", nullptr);
+                    if (pmarkerTile) {
+                        TESWorldSpace* pmarkerRootWorldspace_2 = pcurrMarker->GetWorldSpace();
+                        NiPoint3 markerTilePos = WorldToMapCoord(markerPos, pmarkerRootWorldspace_2);
+                        TESReputation* pRep = pcurrMarker->GetMapMarkerData()->pReputation;
+                        if (pRep) {
+                            char Src[256];
+                            const char* a3b = pRep->GetReputationTitle();
+                            MapMarkerData* v10 = pcurrMarker->GetMapMarkerData();
+                            BSsprintf(Src, 256, "%s\n(%s)", v10->GetLocationName(), a3b);
+                            int32_t v11 = Tile::AddUserTrait("_LocationName", -1);
+                            pmarkerTile->Set(v11, Src, true);
+                        }
+                        else {
+                            MapMarkerData* v12 = pcurrMarker->GetMapMarkerData();
+                            const char* afValueb = v12->GetLocationName();
+                            int32_t v13 = Tile::AddUserTrait("_LocationName", -1);
+                            pmarkerTile->Set(v13, afValueb, true);
+                        }
+                        MapMarkerData* v14 = pcurrMarker->GetMapMarkerData();
+                        const char* LocationName = v14->GetLocationName();
+                        pmarkerTile->SetName(LocationName);
+                        pmarkerTile->Set(4010, 26);
+                        pmarkerTile->Set(MapMenu::iUT_X, markerTilePos.x, true);
+                        pmarkerTile->Set(MapMenu::iUT_Y, markerTilePos.y, true);
+                        MapMarkerData* v16 = pcurrMarker->GetMapMarkerData();
+                        if (v16->GetTravelLoc()) {
+                            MapMarkerData* v17 = pcurrMarker->GetMapMarkerData();
+                            int32_t Type = v17->GetType();
+                            pmarkerTile->Set(4044, pcMarkerIconFilenamesA[Type - 1], true);
+                        }
+                        else {
+                            pmarkerTile->Set(4044, "Interface\\Icons\\World Map\\icon_map_undiscovered.dds", true);
+                            pmarkerTile->Set(4100, 0);
+                        }
+                        int32_t a3c = mapMarkerIndex;
+                        int32_t v19 = Tile::AddUserTrait("_MarkerIndex", -1);
+                        pmarkerTile->Set(v19, a3c);
+                        WorldMapMarkerList.AddTail(pcurrMarker);
+                        ++mapMarkerIndex;
+                    }
+                }
+            }
+            pfullMarkerList->RemoveAll();
+            if (pfullMarkerList) {
+                delete pfullMarkerList;
+            }
+        }
+        AddMapIcons();
     }
 }
 
@@ -2560,82 +2522,81 @@ void MapMenu::Zoom_RefreshCompanions() {
             ChildByName = nullptr;
         }
         Tile* v28 = ChildByName;
-        if (ChildByName) {
-            if (v28->GetString(4036)) {
-                const char* afActionVal = v28->GetString(4036);
-                const char* v2 = a1->GetFullName();
-                if (!BSstricmp(v2, afActionVal)) {
-                    double v3;
-                    Tile* v8;
-                    const char* v9;
-                    FNVD_INLINED_LOCAL(NiPlane, afValue, std::nullopt, std::nullopt);
-                    FNVD_INLINED_LOCAL(NiPlane, v23, std::nullopt, std::nullopt);
-                    char apName[68];
-                    if (v25) {
-                        v9 = v25->GetFullName();
-                    }
-                    else {
-                        v9 = nullptr;
-                    }
-                    std::sprintf(apName, "%s Marker", v9);
-                    if (v25) {
-                        v8 = pMapTile->GetChildByName(apName);
-                    }
-                    else {
-                        v8 = nullptr;
-                    }
-                    Tile* apSourceTile = v8;
-                    NiPoint3 a2 = v25->GetLocationOnReference();
-                    NiPoint3 v17 = a2;
-                    if (iCurrentPage == 33) {
-                        v3 = v17.y - 1024.0;
-                    }
-                    else {
-                        v3 = v17.y - 128.0;
-                    }
-                    v17.y = v3;
-                    if (pAdjustNorthRotationCell) {
-                        pAdjustNorthRotationCell->AdjustCoordForNorthRotation(a2, a2, true);
-                    }
-                    TESWorldSpace* WorldSpace = v25->GetWorldSpace();
-                    v23.m_kNormal = WorldToMapCoord(a2, WorldSpace);
-                    TESWorldSpace* v5 = v25->GetWorldSpace();
-                    afValue.m_kNormal = WorldToMapCoord(v17, v5);
-                    float Float = pMapTile->GetFloat(4017);
-                    afValue.m_fConstant = pMapTile->GetFloat(4016);
-                    Float = Float * afValue.m_kNormal.x;
-                    afValue.m_fConstant = afValue.m_fConstant * afValue.m_kNormal.y;
-                    v23.m_fConstant = Float;
-                    float m_fConstant = afValue.m_fConstant;
-                    v28->Set(MapMenu::iUT_X, afValue.m_kNormal.x, true);
-                    v28->Set(MapMenu::iUT_Y, afValue.m_kNormal.y, true);
-                    v28->Set(4001, v23.m_fConstant, true);
-                    v28->Set(4002, m_fConstant, true);
-                    const char* v6 = a1->GetFullName();
-                    v28->Set(4036, v6, true);
-                    v28->Set(4026, 200.0f, true);
-                    v28->Set(4010, 38);
-                    v28->Set(4013, 2.0f, true);
-                    v28->Set(4003, 1);
-                    v28->Set(4014, 1);
-                    v28->Set(4023, 2);
-                    v28->Set(4025, 2);
-                    v28->Set(4016, 60.0f, true);
-                    if (apSourceTile) {
-                        Tile::Value* ValueQ = v28->GetValueQ(4001);
-                        Tile::Value* v15 = v28->GetValueQ(4002);
-                        ValueQ->ClearActions();
-                        ValueQ->AddAction(2000, apSourceTile, 4001);
-                        ValueQ->CalculateValue(false);
-                        v15->ClearActions();
-                        v15->AddAction(2000, apSourceTile, 4002);
-                        v15->AddAction(2001, 60.0f);
-                        v15->CalculateValue(false);
-                    }
-                    v28->AddNeedsUpdate(1023);
+        if ((ChildByName) && (v28->GetString(4036))) {
+            const char* afActionVal = v28->GetString(4036);
+            const char* v2 = a1->GetFullName();
+            if (!BSstricmp(v2, afActionVal)) {
+                double v3;
+                Tile* v8;
+                const char* v9;
+                FNVD_INLINED_LOCAL(NiPlane, afValue, std::nullopt, std::nullopt);
+                FNVD_INLINED_LOCAL(NiPlane, v23, std::nullopt, std::nullopt);
+                char apName[68];
+                if (v25) {
+                    v9 = v25->GetFullName();
                 }
+                else {
+                    v9 = nullptr;
+                }
+                std::sprintf(apName, "%s Marker", v9);
+                if (v25) {
+                    v8 = pMapTile->GetChildByName(apName);
+                }
+                else {
+                    v8 = nullptr;
+                }
+                Tile* apSourceTile = v8;
+                NiPoint3 a2 = v25->GetLocationOnReference();
+                NiPoint3 v17 = a2;
+                if (iCurrentPage == 33) {
+                    v3 = v17.y - 1024.0;
+                }
+                else {
+                    v3 = v17.y - 128.0;
+                }
+                v17.y = v3;
+                if (pAdjustNorthRotationCell) {
+                    pAdjustNorthRotationCell->AdjustCoordForNorthRotation(a2, a2, true);
+                }
+                TESWorldSpace* WorldSpace = v25->GetWorldSpace();
+                v23.m_kNormal = WorldToMapCoord(a2, WorldSpace);
+                TESWorldSpace* v5 = v25->GetWorldSpace();
+                afValue.m_kNormal = WorldToMapCoord(v17, v5);
+                float Float = pMapTile->GetFloat(4017);
+                afValue.m_fConstant = pMapTile->GetFloat(4016);
+                Float = Float * afValue.m_kNormal.x;
+                afValue.m_fConstant = afValue.m_fConstant * afValue.m_kNormal.y;
+                v23.m_fConstant = Float;
+                float m_fConstant = afValue.m_fConstant;
+                v28->Set(MapMenu::iUT_X, afValue.m_kNormal.x, true);
+                v28->Set(MapMenu::iUT_Y, afValue.m_kNormal.y, true);
+                v28->Set(4001, v23.m_fConstant, true);
+                v28->Set(4002, m_fConstant, true);
+                const char* v6 = a1->GetFullName();
+                v28->Set(4036, v6, true);
+                v28->Set(4026, 200.0f, true);
+                v28->Set(4010, 38);
+                v28->Set(4013, 2.0f, true);
+                v28->Set(4003, 1);
+                v28->Set(4014, 1);
+                v28->Set(4023, 2);
+                v28->Set(4025, 2);
+                v28->Set(4016, 60.0f, true);
+                if (apSourceTile) {
+                    Tile::Value* ValueQ = v28->GetValueQ(4001);
+                    Tile::Value* v15 = v28->GetValueQ(4002);
+                    ValueQ->ClearActions();
+                    ValueQ->AddAction(2000, apSourceTile, 4001);
+                    ValueQ->CalculateValue(false);
+                    v15->ClearActions();
+                    v15->AddAction(2000, apSourceTile, 4002);
+                    v15->AddAction(2001, 60.0f);
+                    v15->CalculateValue(false);
+                }
+                v28->AddNeedsUpdate(1023);
             }
         }
+
         pcurrTeammate = pcurrTeammate->m_pkNext;
     }
 }
@@ -2673,336 +2634,322 @@ void MapMenu::RenderLocalMapGrid(bool abSaveToDisk) {
     NiPoint3 v75;
     NiPoint3 v88;
     NiPoint3 dst;
-    if (MapMenu::pMe) {
-        if (MapMenu::pMe->pTiles[2]->GetModel()) {
-            if (MapMenu::ShouldRenderLocalMap()) {
-                FNVD_INLINED_LOCAL(NiColorA, oldSunColor, std::nullopt, std::nullopt);
-                NiPoint3 playerLoc;
-                const NiPoint3* v1 = &pPlayer->GetLocationOnReference();
-                playerLoc.x = v1->x;
-                playerLoc.y = v1->y;
-                playerLoc.z = v1->z + 10.0;
-                bool bisInInterior = pPlayer->GetInterior();
-                int32_t igridSize = bisInInterior ? 2048 : 1024;
-                int32_t inumSubgridsPerSide = 16;
-                int32_t inumSubgrids = 256;
-                int32_t isubgridSize = igridSize / 16;
-                int32_t ivertsPerSide = 17;
-                uint32_t inumVerts = 289;
-                int32_t itilesPerSide = uGridsToLoad.Int();
-                int32_t inumTiles = itilesPerSide * itilesPerSide;
-                int32_t imapSize = itilesPerSide * igridSize;
-                float fpossize = SeenData::GetSeenPosSize();
-                oldSunColor = WaterShader::pSunColor;
-                WaterShader::pSunColor = NiColorA_BLACK;
-                bool boldReflection = WaterShader::bNoReflections;
-                WaterShader::bNoReflections = true;
-                NiColorA tintColor(0.0f, 0.0f, 0.0f, 0.0f);
-                SystemColorManager* Instance = SystemColorManager::GetInstance();
-                Instance->GetColor(4, tintColor);
-                bool bwaterCulled = true;
-                if (pPlayer->GetWorldSpace()) {
-                    TESWorldSpace* WorldSpace = pPlayer->GetWorldSpace();
-                    if (WorldSpace->GetTerrainManager()->GetWaterLODRoot()) {
-                        TESWorldSpace* v4 = pPlayer->GetWorldSpace();
-                        BGSTerrainManager* TerrainManager = v4->GetTerrainManager();
-                        bwaterCulled = TerrainManager->GetWaterLODRoot()->GetAppCulled();
-                        TESWorldSpace* v6 = pPlayer->GetWorldSpace();
-                        BGSTerrainManager* v7 = v6->GetTerrainManager();
-                        v7->GetWaterLODRoot()->SetAppCulled(true);
-                    }
+    if ((MapMenu::pMe) && (MapMenu::pMe->pTiles[2]->GetModel()) && (MapMenu::ShouldRenderLocalMap())) {
+        FNVD_INLINED_LOCAL(NiColorA, oldSunColor, std::nullopt, std::nullopt);
+        NiPoint3 playerLoc;
+        const NiPoint3* v1 = &pPlayer->GetLocationOnReference();
+        playerLoc.x = v1->x;
+        playerLoc.y = v1->y;
+        playerLoc.z = v1->z + 10.0;
+        bool bisInInterior = pPlayer->GetInterior();
+        int32_t igridSize = bisInInterior ? 2048 : 1024;
+        int32_t inumSubgridsPerSide = 16;
+        int32_t inumSubgrids = 256;
+        int32_t isubgridSize = igridSize / 16;
+        int32_t ivertsPerSide = 17;
+        uint32_t inumVerts = 289;
+        int32_t itilesPerSide = uGridsToLoad.Int();
+        int32_t inumTiles = itilesPerSide * itilesPerSide;
+        int32_t imapSize = itilesPerSide * igridSize;
+        float fpossize = SeenData::GetSeenPosSize();
+        oldSunColor = WaterShader::pSunColor;
+        WaterShader::pSunColor = NiColorA_BLACK;
+        bool boldReflection = WaterShader::bNoReflections;
+        WaterShader::bNoReflections = true;
+        NiColorA tintColor(0.0f, 0.0f, 0.0f, 0.0f);
+        SystemColorManager* Instance = SystemColorManager::GetInstance();
+        Instance->GetColor(4, tintColor);
+        bool bwaterCulled = true;
+        if (pPlayer->GetWorldSpace()) {
+            TESWorldSpace* WorldSpace = pPlayer->GetWorldSpace();
+            if (WorldSpace->GetTerrainManager()->GetWaterLODRoot()) {
+                TESWorldSpace* v4 = pPlayer->GetWorldSpace();
+                BGSTerrainManager* TerrainManager = v4->GetTerrainManager();
+                bwaterCulled = TerrainManager->GetWaterLODRoot()->GetAppCulled();
+                TESWorldSpace* v6 = pPlayer->GetWorldSpace();
+                BGSTerrainManager* v7 = v6->GetTerrainManager();
+                v7->GetWaterLODRoot()->SetAppCulled(true);
+            }
+        }
+        NiNode* plandlod_2 = Main::LandLODNode();
+        bool blandCulled = plandlod_2->GetAppCulled();
+        if (!blandCulled) {
+            plandlod_2->SetAppCulled(true);
+        }
+        int32_t* v8 = &uGridsToLoad.Int();
+        int32_t isectx = MapMenu::pMe->uiNextLocalMapGrid % *v8;
+        int32_t* v9 = &uGridsToLoad.Int();
+        int32_t isecty = MapMenu::pMe->uiNextLocalMapGrid / *v9;
+        NiPointer<NiTexture> spmaptex(static_cast<NiTexture*>(nullptr));
+        TESObjectCELL* pseencell = nullptr;
+        NiPoint3 sectoffset = NiPoint3_ZERO;
+        if (pPlayer->GetInterior()) {
+            pseencell = pPlayer->GetParentCell();
+            if (pseencell) {
+                NiPoint3 playerIntLoc = playerLoc;
+                pseencell->AdjustCoordForNorthRotation(playerLoc, playerIntLoc, true);
+                int32_t iseenx = (FloatToInt(playerIntLoc.x) - 2048) >> 12;
+                int32_t iseeny = (FloatToInt(playerIntLoc.y) - 2048) >> 12;
+                int32_t iintsectionx = isectx + iseenx - (itilesPerSide >> 1);
+                int32_t iintsectiony = isecty + iseeny - (itilesPerSide >> 1);
+                sectoffset = *::new (&dst) NiPoint3(
+                    static_cast<float>((iintsectionx << 12) + 2048), static_cast<float>((iintsectiony << 12) + 2048),
+                    0.0f
+                );
+                pseencell->GetIntSeenSection(iintsectionx, iintsectiony, false);
+                NiDX9Renderer* Renderer_ = static_cast<NiDX9Renderer*>(NiRenderer::GetRenderer());
+                Renderer_->LockRenderer();
+                pseencell->GetInteriorLocalMapTexture(iintsectionx, iintsectiony, spmaptex);
+                NiDX9Renderer* v11 = static_cast<NiDX9Renderer*>(NiRenderer::GetRenderer());
+                v11->UnlockRenderer();
+                if (!isectx && !isecty) {
+                    pseencell->BuildLocalMapDoorList(&MapMenu::pMe->LocalMapMarkerList);
                 }
-                NiNode* plandlod_2 = Main::LandLODNode();
-                bool blandCulled = plandlod_2->GetAppCulled();
-                if (!blandCulled) {
-                    plandlod_2->SetAppCulled(true);
+            }
+        }
+        else {
+            TESWorldSpace* pworld = pPlayer->GetWorldSpace();
+            int32_t icellx = FloatToInt(playerLoc.x) >> 12;
+            int32_t icelly = FloatToInt(playerLoc.y) >> 12;
+            int32_t icellsectionx = isectx + icellx - (itilesPerSide >> 1);
+            int32_t icellsectiony = isecty + icelly - (itilesPerSide >> 1);
+            sectoffset =
+                *::new (&v88)
+                    NiPoint3(static_cast<float>(icellsectionx << 12), static_cast<float>(icellsectiony << 12), 0.0f);
+            if (pworld) {
+                pseencell = pworld->GetCellFromCellCoord(icellsectionx, icellsectiony);
+            }
+            if (pseencell) {
+                pseencell->GetSeenData();
+                NiDX9Renderer* v12 = static_cast<NiDX9Renderer*>(NiRenderer::GetRenderer());
+                v12->LockRenderer();
+                pseencell->GetExteriorLocalMapTexture(spmaptex);
+                NiDX9Renderer* v13 = static_cast<NiDX9Renderer*>(NiRenderer::GetRenderer());
+                v13->UnlockRenderer();
+                pseencell->BuildLocalMapDoorList(&MapMenu::pMe->LocalMapMarkerList);
+            }
+        }
+        if (abSaveToDisk) {
+            char apDest[268];
+            char PathName[264];
+            std::error_code kError;
+            std::filesystem::create_directory(platform::NativePath("(LocalMaps)"), kError);
+            std::filesystem::create_directory(platform::NativePath("(LocalMaps)\\Interiors"), kError);
+            std::filesystem::create_directory(platform::NativePath("(LocalMaps)\\Exteriors"), kError);
+            if (TES::pInstance->pInteriorCell) {
+                TESObjectCELL* Interior = TES::pInstance->pInteriorCell;
+                BSsprintf(PathName, 260, "(LocalMaps)\\Interiors\\%s", Interior->GetFormEditorID());
+                std::filesystem::create_directory(platform::NativePath(PathName), kError);
+                TESObjectCELL* v67 = TES::pInstance->pInteriorCell;
+                TESObjectCELL* v66 = TES::pInstance->pInteriorCell;
+                const char* xb = v67->GetFormEditorID();
+                BSsprintf(
+                    apDest, 260, "(LocalMaps)\\Interiors\\%s\\%s.%i.%i.png", v66->GetFormEditorID(), xb, isectx, isecty
+                );
+            }
+            else {
+                TESWorldSpace* v65 = TES::pInstance->pWorldSpace;
+                BSsprintf(PathName, 260, "(LocalMaps)\\Exteriors\\%s", v65->GetFormEditorID());
+                std::filesystem::create_directory(platform::NativePath(PathName), kError);
+                TESWorldSpace* v64 = TES::pInstance->pWorldSpace;
+                TESWorldSpace* v63 = TES::pInstance->pWorldSpace;
+                int32_t v14 = FloatToInt(playerLoc.y);
+                int32_t za = isecty + (v14 >> 12);
+                int32_t v15 = FloatToInt(playerLoc.x);
+                int32_t yc = isectx + (v15 >> 12);
+                const char* xc = v64->GetFormEditorID();
+                BSsprintf(apDest, 260, "(LocalMaps)\\Exteriors\\%s\\%s.%i.%i.png", v63->GetFormEditorID(), xc, yc, za);
+            }
+            // Casts the renderer data to NiObject's RTTI and calls GetD3DTexture.
+            NiObject* v95 = NiObject::DynamicCastStatic(&NiObject::ms_RTTI, spmaptex.m_pObject->m_pkRendererData);
+            IDirect3DBaseTexture9* v16 = static_cast<NiDX9TextureData*>(v95)->GetD3DTexture();
+            // 3 is D3DXIFF_PNG.
+            D3DXSaveTextureToFileA_Thunk(apDest, 3u, v16, nullptr);
+            ++MapMenu::pMe->uiNextLocalMapGrid;
+        }
+        else {
+            NiAlphaProperty* palpha;
+            TileShaderProperty* ptsp;
+            BSScissorTriShape* pnewGrid;
+            NiColorA* pcolor;
+            NiPoint2* ptex;
+            NiPoint3* pnorm;
+            NiPoint3* pverts;
+            int32_t x_2;
+            int32_t y_2;
+            int32_t inumVerts_2 = inumVerts;
+            void* ptr = ourMalloc(inumVerts <= SIZE_MAX / sizeof(NiPoint3) ? sizeof(NiPoint3) * inumVerts : SIZE_MAX);
+            if (ptr) {
+                rt::eh_vector_constructor_iterator(ptr, sizeof(NiPoint3), inumVerts_2, &emptyPointConstructor);
+                pverts = static_cast<NiPoint3*>(ptr);
+            }
+            else {
+                pverts = nullptr;
+            }
+            int32_t inumVerts_3 = inumVerts;
+            void* v82 = ourMalloc(inumVerts <= SIZE_MAX / sizeof(NiPoint3) ? sizeof(NiPoint3) * inumVerts : SIZE_MAX);
+            if (v82) {
+                rt::eh_vector_constructor_iterator(v82, sizeof(NiPoint3), inumVerts_3, &emptyPointConstructor);
+                pnorm = static_cast<NiPoint3*>(v82);
+            }
+            else {
+                pnorm = nullptr;
+            }
+            int32_t inumVerts_4 = inumVerts;
+            void* v79 = ourMalloc(inumVerts <= SIZE_MAX / sizeof(NiPoint2) ? sizeof(NiPoint2) * inumVerts : SIZE_MAX);
+            if (v79) {
+                rt::eh_vector_constructor_iterator(v79, sizeof(NiPoint2), inumVerts_4, &emptyPointConstructor);
+                ptex = static_cast<NiPoint2*>(v79);
+            }
+            else {
+                ptex = nullptr;
+            }
+            int32_t inumVerts_5 = inumVerts;
+            void* v76 = ourMalloc(inumVerts <= SIZE_MAX / sizeof(NiColorA) ? sizeof(NiColorA) * inumVerts : SIZE_MAX);
+            if (v76) {
+                rt::eh_vector_constructor_iterator(
+                    v76, sizeof(NiColorA), inumVerts_5, &fnvd::constructElement<NiColorA>
+                );
+                pcolor = static_cast<NiColorA*>(v76);
+            }
+            else {
+                pcolor = nullptr;
+            }
+            uint16_t* ptrilist = static_cast<uint16_t*>(_NiMalloc(6 * sizeof(uint16_t) * inumSubgrids));
+            int32_t index = 0;
+            for (y_2 = 0; y_2 < ivertsPerSide; ++y_2) {
+                for (x_2 = 0; x_2 < ivertsPerSide; ++x_2) {
+                    float v58 = static_cast<double>(isubgridSize * y_2) - static_cast<double>(igridSize) / 2.0;
+                    float v57 = static_cast<double>(isubgridSize * x_2) - static_cast<double>(igridSize) / 2.0;
+                    NiPoint3* v17 = ::new (&v75) NiPoint3(v57, 0.0f, v58);
+                    pverts[index++] = *v17;
                 }
-                int32_t* v8 = &uGridsToLoad.Int();
-                int32_t isectx = MapMenu::pMe->uiNextLocalMapGrid % *v8;
-                int32_t* v9 = &uGridsToLoad.Int();
-                int32_t isecty = MapMenu::pMe->uiNextLocalMapGrid / *v9;
-                NiPointer<NiTexture> spmaptex(static_cast<NiTexture*>(nullptr));
-                TESObjectCELL* pseencell = nullptr;
-                NiPoint3 sectoffset = NiPoint3_ZERO;
-                if (pPlayer->GetInterior()) {
-                    pseencell = pPlayer->GetParentCell();
-                    if (pseencell) {
-                        NiPoint3 playerIntLoc = playerLoc;
-                        pseencell->AdjustCoordForNorthRotation(playerLoc, playerIntLoc, true);
-                        int32_t iseenx = (FloatToInt(playerIntLoc.x) - 2048) >> 12;
-                        int32_t iseeny = (FloatToInt(playerIntLoc.y) - 2048) >> 12;
-                        int32_t iintsectionx = isectx + iseenx - (itilesPerSide >> 1);
-                        int32_t iintsectiony = isecty + iseeny - (itilesPerSide >> 1);
-                        sectoffset = *::new (&dst) NiPoint3(
-                            static_cast<float>((iintsectionx << 12) + 2048),
-                            static_cast<float>((iintsectiony << 12) + 2048), 0.0f
-                        );
-                        pseencell->GetIntSeenSection(iintsectionx, iintsectiony, false);
-                        NiDX9Renderer* Renderer_ = static_cast<NiDX9Renderer*>(NiRenderer::GetRenderer());
-                        Renderer_->LockRenderer();
-                        pseencell->GetInteriorLocalMapTexture(iintsectionx, iintsectiony, spmaptex);
-                        NiDX9Renderer* v11 = static_cast<NiDX9Renderer*>(NiRenderer::GetRenderer());
-                        v11->UnlockRenderer();
-                        if (!isectx && !isecty) {
-                            pseencell->BuildLocalMapDoorList(&MapMenu::pMe->LocalMapMarkerList);
-                        }
+            }
+            index = 0;
+            for (y_2 = 0; y_2 < ivertsPerSide; ++y_2) {
+                for (x_2 = 0; x_2 < ivertsPerSide; ++x_2) {
+                    NiPoint3* v18 = ::new (&v74) NiPoint3(0.0f, 1.0f, 0.0f);
+                    pnorm[index] = *v18;
+                    float v56 = 1.0 - static_cast<double>(y_2) / static_cast<double>(ivertsPerSide);
+                    float v55 = static_cast<double>(x_2) / static_cast<double>(ivertsPerSide);
+                    NiPoint2* v19 = ::new (&v73) NiPoint2(v55, v56);
+                    float v20 = v19->x;
+                    float v21 = v19->y;
+                    int32_t v22 = index;
+                    ptex[index].x = v20;
+                    ptex[v22].y = v21;
+                    float v54 = static_cast<double>(y_2) * fpossize;
+                    float v53 = static_cast<double>(x_2) * fpossize;
+                    NiPoint3 worldcoord(v53, v54, 0.0f);
+                    worldcoord.operator+=(sectoffset);
+                    float fseenval = 4.0f;
+                    if (MapMenu::pMe->bFogOfWarEnabled) {
+                        fseenval = static_cast<float>(TESObjectCELL::GetSeenValue(worldcoord));
                     }
+                    float v52 = fseenval / 4.0;
+                    NiColorA kSeenColor(1.0f, 1.0f, 1.0f, v52);
+                    pcolor[index] = kSeenColor;
+                    ++index;
                 }
-                else {
-                    TESWorldSpace* pworld = pPlayer->GetWorldSpace();
-                    int32_t icellx = FloatToInt(playerLoc.x) >> 12;
-                    int32_t icelly = FloatToInt(playerLoc.y) >> 12;
-                    int32_t icellsectionx = isectx + icellx - (itilesPerSide >> 1);
-                    int32_t icellsectiony = isecty + icelly - (itilesPerSide >> 1);
-                    sectoffset = *::new (&v88) NiPoint3(
-                        static_cast<float>(icellsectionx << 12), static_cast<float>(icellsectiony << 12), 0.0f
-                    );
-                    if (pworld) {
-                        pseencell = pworld->GetCellFromCellCoord(icellsectionx, icellsectiony);
+            }
+            index = 0;
+            for (y_2 = 0; y_2 < inumSubgridsPerSide; ++y_2) {
+                for (x_2 = 0; x_2 < inumSubgridsPerSide; ++x_2) {
+                    uint16_t v26;
+                    if (x_2 % 2 != y_2 % 2) {
+                        ptrilist[index++] = x_2 + ivertsPerSide * (y_2 + 1);
+                        ptrilist[index++] = x_2 + ivertsPerSide * y_2;
+                        ptrilist[index++] = ivertsPerSide * y_2 + x_2 + 1;
+                        ptrilist[index++] = ivertsPerSide * y_2 + x_2 + 1;
+                        ptrilist[index++] = ivertsPerSide * (y_2 + 1) + x_2 + 1;
+                        uint16_t ival = x_2 + ivertsPerSide * (y_2 + 1);
+                        v26 = ival;
                     }
-                    if (pseencell) {
-                        pseencell->GetSeenData();
-                        NiDX9Renderer* v12 = static_cast<NiDX9Renderer*>(NiRenderer::GetRenderer());
-                        v12->LockRenderer();
-                        pseencell->GetExteriorLocalMapTexture(spmaptex);
-                        NiDX9Renderer* v13 = static_cast<NiDX9Renderer*>(NiRenderer::GetRenderer());
-                        v13->UnlockRenderer();
-                        pseencell->BuildLocalMapDoorList(&MapMenu::pMe->LocalMapMarkerList);
+                    else {
+                        ptrilist[index++] = ivertsPerSide * (y_2 + 1) + x_2 + 1;
+                        ptrilist[index++] = x_2 + ivertsPerSide * (y_2 + 1);
+                        ptrilist[index++] = x_2 + ivertsPerSide * y_2;
+                        ptrilist[index++] = x_2 + ivertsPerSide * y_2;
+                        ptrilist[index++] = ivertsPerSide * y_2 + x_2 + 1;
+                        uint16_t ival_2 = ivertsPerSide * (y_2 + 1) + x_2 + 1;
+                        v26 = ival_2;
                     }
+                    ptrilist[index++] = v26;
                 }
-                if (abSaveToDisk) {
-                    char apDest[268];
-                    char PathName[264];
-                    std::error_code kError;
-                    std::filesystem::create_directory(platform::NativePath("(LocalMaps)"), kError);
-                    std::filesystem::create_directory(platform::NativePath("(LocalMaps)\\Interiors"), kError);
-                    std::filesystem::create_directory(platform::NativePath("(LocalMaps)\\Exteriors"), kError);
-                    if (TES::pInstance->pInteriorCell) {
-                        TESObjectCELL* Interior = TES::pInstance->pInteriorCell;
-                        BSsprintf(PathName, 260, "(LocalMaps)\\Interiors\\%s", Interior->GetFormEditorID());
-                        std::filesystem::create_directory(platform::NativePath(PathName), kError);
-                        TESObjectCELL* v67 = TES::pInstance->pInteriorCell;
-                        TESObjectCELL* v66 = TES::pInstance->pInteriorCell;
-                        const char* xb = v67->GetFormEditorID();
-                        BSsprintf(
-                            apDest, 260, "(LocalMaps)\\Interiors\\%s\\%s.%i.%i.png", v66->GetFormEditorID(), xb, isectx,
-                            isecty
-                        );
-                    }
-                    else {
-                        TESWorldSpace* v65 = TES::pInstance->pWorldSpace;
-                        BSsprintf(PathName, 260, "(LocalMaps)\\Exteriors\\%s", v65->GetFormEditorID());
-                        std::filesystem::create_directory(platform::NativePath(PathName), kError);
-                        TESWorldSpace* v64 = TES::pInstance->pWorldSpace;
-                        TESWorldSpace* v63 = TES::pInstance->pWorldSpace;
-                        int32_t v14 = FloatToInt(playerLoc.y);
-                        int32_t za = isecty + (v14 >> 12);
-                        int32_t v15 = FloatToInt(playerLoc.x);
-                        int32_t yc = isectx + (v15 >> 12);
-                        const char* xc = v64->GetFormEditorID();
-                        BSsprintf(
-                            apDest, 260, "(LocalMaps)\\Exteriors\\%s\\%s.%i.%i.png", v63->GetFormEditorID(), xc, yc, za
-                        );
-                    }
-                    // Casts the renderer data to NiObject's RTTI and calls GetD3DTexture.
-                    NiObject* v95 =
-                        NiObject::DynamicCastStatic(&NiObject::ms_RTTI, spmaptex.m_pObject->m_pkRendererData);
-                    IDirect3DBaseTexture9* v16 = static_cast<NiDX9TextureData*>(v95)->GetD3DTexture();
-                    // 3 is D3DXIFF_PNG.
-                    D3DXSaveTextureToFileA_Thunk(apDest, 3u, v16, nullptr);
-                    ++MapMenu::pMe->uiNextLocalMapGrid;
-                }
-                else {
-                    NiAlphaProperty* palpha;
-                    TileShaderProperty* ptsp;
-                    BSScissorTriShape* pnewGrid;
-                    NiColorA* pcolor;
-                    NiPoint2* ptex;
-                    NiPoint3* pnorm;
-                    NiPoint3* pverts;
-                    int32_t x_2;
-                    int32_t y_2;
-                    int32_t inumVerts_2 = inumVerts;
-                    void* ptr =
-                        ourMalloc(inumVerts <= SIZE_MAX / sizeof(NiPoint3) ? sizeof(NiPoint3) * inumVerts : SIZE_MAX);
-                    if (ptr) {
-                        rt::eh_vector_constructor_iterator(ptr, sizeof(NiPoint3), inumVerts_2, &emptyPointConstructor);
-                        pverts = static_cast<NiPoint3*>(ptr);
-                    }
-                    else {
-                        pverts = nullptr;
-                    }
-                    int32_t inumVerts_3 = inumVerts;
-                    void* v82 =
-                        ourMalloc(inumVerts <= SIZE_MAX / sizeof(NiPoint3) ? sizeof(NiPoint3) * inumVerts : SIZE_MAX);
-                    if (v82) {
-                        rt::eh_vector_constructor_iterator(v82, sizeof(NiPoint3), inumVerts_3, &emptyPointConstructor);
-                        pnorm = static_cast<NiPoint3*>(v82);
-                    }
-                    else {
-                        pnorm = nullptr;
-                    }
-                    int32_t inumVerts_4 = inumVerts;
-                    void* v79 =
-                        ourMalloc(inumVerts <= SIZE_MAX / sizeof(NiPoint2) ? sizeof(NiPoint2) * inumVerts : SIZE_MAX);
-                    if (v79) {
-                        rt::eh_vector_constructor_iterator(v79, sizeof(NiPoint2), inumVerts_4, &emptyPointConstructor);
-                        ptex = static_cast<NiPoint2*>(v79);
-                    }
-                    else {
-                        ptex = nullptr;
-                    }
-                    int32_t inumVerts_5 = inumVerts;
-                    void* v76 =
-                        ourMalloc(inumVerts <= SIZE_MAX / sizeof(NiColorA) ? sizeof(NiColorA) * inumVerts : SIZE_MAX);
-                    if (v76) {
-                        rt::eh_vector_constructor_iterator(
-                            v76, sizeof(NiColorA), inumVerts_5, &fnvd::constructElement<NiColorA>
-                        );
-                        pcolor = static_cast<NiColorA*>(v76);
-                    }
-                    else {
-                        pcolor = nullptr;
-                    }
-                    uint16_t* ptrilist = static_cast<uint16_t*>(_NiMalloc(6 * sizeof(uint16_t) * inumSubgrids));
-                    int32_t index = 0;
-                    for (y_2 = 0; y_2 < ivertsPerSide; ++y_2) {
-                        for (x_2 = 0; x_2 < ivertsPerSide; ++x_2) {
-                            float v58 = static_cast<double>(isubgridSize * y_2) - static_cast<double>(igridSize) / 2.0;
-                            float v57 = static_cast<double>(isubgridSize * x_2) - static_cast<double>(igridSize) / 2.0;
-                            NiPoint3* v17 = ::new (&v75) NiPoint3(v57, 0.0f, v58);
-                            pverts[index++] = *v17;
-                        }
-                    }
-                    index = 0;
-                    for (y_2 = 0; y_2 < ivertsPerSide; ++y_2) {
-                        for (x_2 = 0; x_2 < ivertsPerSide; ++x_2) {
-                            NiPoint3* v18 = ::new (&v74) NiPoint3(0.0f, 1.0f, 0.0f);
-                            pnorm[index] = *v18;
-                            float v56 = 1.0 - static_cast<double>(y_2) / static_cast<double>(ivertsPerSide);
-                            float v55 = static_cast<double>(x_2) / static_cast<double>(ivertsPerSide);
-                            NiPoint2* v19 = ::new (&v73) NiPoint2(v55, v56);
-                            float v20 = v19->x;
-                            float v21 = v19->y;
-                            int32_t v22 = index;
-                            ptex[index].x = v20;
-                            ptex[v22].y = v21;
-                            float v54 = static_cast<double>(y_2) * fpossize;
-                            float v53 = static_cast<double>(x_2) * fpossize;
-                            NiPoint3 worldcoord(v53, v54, 0.0f);
-                            worldcoord.operator+=(sectoffset);
-                            float fseenval = 4.0f;
-                            if (MapMenu::pMe->bFogOfWarEnabled) {
-                                fseenval = static_cast<float>(TESObjectCELL::GetSeenValue(worldcoord));
-                            }
-                            float v52 = fseenval / 4.0;
-                            NiColorA kSeenColor(1.0f, 1.0f, 1.0f, v52);
-                            pcolor[index] = kSeenColor;
-                            ++index;
-                        }
-                    }
-                    index = 0;
-                    for (y_2 = 0; y_2 < inumSubgridsPerSide; ++y_2) {
-                        for (x_2 = 0; x_2 < inumSubgridsPerSide; ++x_2) {
-                            uint16_t v26;
-                            if (x_2 % 2 != y_2 % 2) {
-                                ptrilist[index++] = x_2 + ivertsPerSide * (y_2 + 1);
-                                ptrilist[index++] = x_2 + ivertsPerSide * y_2;
-                                ptrilist[index++] = ivertsPerSide * y_2 + x_2 + 1;
-                                ptrilist[index++] = ivertsPerSide * y_2 + x_2 + 1;
-                                ptrilist[index++] = ivertsPerSide * (y_2 + 1) + x_2 + 1;
-                                uint16_t ival = x_2 + ivertsPerSide * (y_2 + 1);
-                                v26 = ival;
-                            }
-                            else {
-                                ptrilist[index++] = ivertsPerSide * (y_2 + 1) + x_2 + 1;
-                                ptrilist[index++] = x_2 + ivertsPerSide * (y_2 + 1);
-                                ptrilist[index++] = x_2 + ivertsPerSide * y_2;
-                                ptrilist[index++] = x_2 + ivertsPerSide * y_2;
-                                ptrilist[index++] = ivertsPerSide * y_2 + x_2 + 1;
-                                uint16_t ival_2 = ivertsPerSide * (y_2 + 1) + x_2 + 1;
-                                v26 = ival_2;
-                            }
-                            ptrilist[index++] = v26;
-                        }
-                    }
-                    BSScissorTriShape* apMemory =
-                        static_cast<BSScissorTriShape*>(NiMemObject::operator new(sizeof(BSScissorTriShape)));
-                    if (apMemory) {
-                        int32_t zb = static_cast<int32_t>(InterfaceManager::GetScreenHeight());
-                        double ScreenWidth = InterfaceManager::GetScreenWidth();
-                        pnewGrid = ::new (apMemory) BSScissorTriShape(
-                            inumVerts, pverts, pnorm, pcolor, ptex, 1, NiGeometryData::NBT_METHOD_NONE,
-                            2 * inumSubgrids, ptrilist, 0, 0, static_cast<int32_t>(ScreenWidth), zb
-                        );
-                    }
-                    else {
-                        pnewGrid = nullptr;
-                    }
-                    TileShaderProperty* v70 =
-                        static_cast<TileShaderProperty*>(NiMemObject::operator new(sizeof(TileShaderProperty)));
-                    if (v70) {
-                        ptsp = ::new (v70) TileShaderProperty(false);
-                    }
-                    else {
-                        ptsp = nullptr;
-                    }
-                    NiTexture* zc = spmaptex.m_pObject;
-                    ptsp->SetTileTexture(zc);
-                    ptsp->TexClampMode = NiTexturingProperty::CLAMP_S_CLAMP_T;
-                    ptsp->SetTintColor(tintColor);
-                    ptsp->SetUseVertexColors(true);
-                    spmaptex.operator=(static_cast<NiTexture*>(nullptr));
-                    pnewGrid->AttachProperty(ptsp);
-                    NiAlphaProperty* v69 =
-                        static_cast<NiAlphaProperty*>(NiMemObject::operator new(sizeof(NiAlphaProperty)));
-                    if (v69) {
-                        palpha = ::new (v69) NiAlphaProperty;
-                    }
-                    else {
-                        palpha = nullptr;
-                    }
-                    palpha->SetSrcBlendMode(NiAlphaProperty::ALPHA_SRCALPHA);
-                    palpha->SetDestBlendMode(NiAlphaProperty::ALPHA_ONE);
-                    palpha->SetAlphaBlending(true);
-                    pnewGrid->AttachProperty(palpha);
-                    BSShaderManager::PrepareObject(pnewGrid, 0, 0);
-                    float v48 = static_cast<double>(isecty * igridSize) + static_cast<double>(igridSize) / 2.0 -
-                        static_cast<double>(imapSize);
-                    float v47 = static_cast<double>(isectx * igridSize) + static_cast<double>(igridSize) / 2.0;
-                    pnewGrid->SetTranslate(v47, 0.0f, v48);
-                    pnewGrid->UpdateProperties();
-                    NiNode* Model_ = MapMenu::pMe->pTiles[2]->GetModel();
-                    Model_->AttachChild(pnewGrid, 1);
-                    MapMenu::pMe->pTiles[2]->ClearNeedsUpdate(Tile::CHANGE_TEXTURE);
-                    WaterShader::pSunColor = oldSunColor;
-                    WaterShader::bNoReflections = boldReflection;
-                    if (!bwaterCulled) {
-                        if (pPlayer->GetWorldSpace()) {
-                            TESWorldSpace* v28 = pPlayer->GetWorldSpace();
-                            BGSTerrainManager* v29 = v28->GetTerrainManager();
-                            v29->GetWaterLODRoot()->SetAppCulled(bwaterCulled);
-                        }
-                    }
-                    if (!blandCulled) {
-                        plandlod_2->SetAppCulled(false);
-                    }
-                    MapMenu::pMe->pTiles[2]->AddNeedsUpdate(Tile::CHANGE_SCISSOR | Tile::CHANGE_COLOR);
-                    MapMenu::pMe->pTiles[2]->Set(Tile::kTileValue_FileWidth, itilesPerSide * igridSize);
-                    MapMenu::pMe->pTiles[2]->Set(Tile::kTileValue_FileHeight, itilesPerSide * igridSize);
-                    float v45 = tintColor.r * 255.0;
-                    MapMenu::pMe->pTiles[2]->Set(Tile::kTileValue_Red, v45, true);
-                    float v44 = tintColor.g * 255.0;
-                    MapMenu::pMe->pTiles[2]->Set(Tile::kTileValue_Green, v44, true);
-                    float v43 = tintColor.b * 255.0;
-                    MapMenu::pMe->pTiles[2]->Set(Tile::kTileValue_Blue, v43, true);
-                    NiUpdateData UpdateData(0.0f, false, false);
-                    MapMenu::pMe->pTiles[2]->GetModel()->Update(UpdateData);
-                    ++MapMenu::pMe->uiNextLocalMapGrid;
-                    if (!MapMenu::ShouldRenderLocalMap() && MapMenu::pMe->pMapTile == MapMenu::pMe->pTiles[2]) {
-                        MapMenu::pMe->UpdateLocalMap();
-                    }
-                }
+            }
+            BSScissorTriShape* apMemory =
+                static_cast<BSScissorTriShape*>(NiMemObject::operator new(sizeof(BSScissorTriShape)));
+            if (apMemory) {
+                int32_t zb = static_cast<int32_t>(InterfaceManager::GetScreenHeight());
+                double ScreenWidth = InterfaceManager::GetScreenWidth();
+                pnewGrid = ::new (apMemory) BSScissorTriShape(
+                    inumVerts, pverts, pnorm, pcolor, ptex, 1, NiGeometryData::NBT_METHOD_NONE, 2 * inumSubgrids,
+                    ptrilist, 0, 0, static_cast<int32_t>(ScreenWidth), zb
+                );
+            }
+            else {
+                pnewGrid = nullptr;
+            }
+            TileShaderProperty* v70 =
+                static_cast<TileShaderProperty*>(NiMemObject::operator new(sizeof(TileShaderProperty)));
+            if (v70) {
+                ptsp = ::new (v70) TileShaderProperty(false);
+            }
+            else {
+                ptsp = nullptr;
+            }
+            NiTexture* zc = spmaptex.m_pObject;
+            ptsp->SetTileTexture(zc);
+            ptsp->TexClampMode = NiTexturingProperty::CLAMP_S_CLAMP_T;
+            ptsp->SetTintColor(tintColor);
+            ptsp->SetUseVertexColors(true);
+            spmaptex.operator=(static_cast<NiTexture*>(nullptr));
+            pnewGrid->AttachProperty(ptsp);
+            NiAlphaProperty* v69 = static_cast<NiAlphaProperty*>(NiMemObject::operator new(sizeof(NiAlphaProperty)));
+            if (v69) {
+                palpha = ::new (v69) NiAlphaProperty;
+            }
+            else {
+                palpha = nullptr;
+            }
+            palpha->SetSrcBlendMode(NiAlphaProperty::ALPHA_SRCALPHA);
+            palpha->SetDestBlendMode(NiAlphaProperty::ALPHA_ONE);
+            palpha->SetAlphaBlending(true);
+            pnewGrid->AttachProperty(palpha);
+            BSShaderManager::PrepareObject(pnewGrid, 0, 0);
+            float v48 = static_cast<double>(isecty * igridSize) + static_cast<double>(igridSize) / 2.0 -
+                static_cast<double>(imapSize);
+            float v47 = static_cast<double>(isectx * igridSize) + static_cast<double>(igridSize) / 2.0;
+            pnewGrid->SetTranslate(v47, 0.0f, v48);
+            pnewGrid->UpdateProperties();
+            NiNode* Model_ = MapMenu::pMe->pTiles[2]->GetModel();
+            Model_->AttachChild(pnewGrid, 1);
+            MapMenu::pMe->pTiles[2]->ClearNeedsUpdate(Tile::CHANGE_TEXTURE);
+            WaterShader::pSunColor = oldSunColor;
+            WaterShader::bNoReflections = boldReflection;
+            if ((!bwaterCulled) && (pPlayer->GetWorldSpace())) {
+                TESWorldSpace* v28 = pPlayer->GetWorldSpace();
+                BGSTerrainManager* v29 = v28->GetTerrainManager();
+                v29->GetWaterLODRoot()->SetAppCulled(bwaterCulled);
+            }
+
+            if (!blandCulled) {
+                plandlod_2->SetAppCulled(false);
+            }
+            MapMenu::pMe->pTiles[2]->AddNeedsUpdate(Tile::CHANGE_SCISSOR | Tile::CHANGE_COLOR);
+            MapMenu::pMe->pTiles[2]->Set(Tile::kTileValue_FileWidth, itilesPerSide * igridSize);
+            MapMenu::pMe->pTiles[2]->Set(Tile::kTileValue_FileHeight, itilesPerSide * igridSize);
+            float v45 = tintColor.r * 255.0;
+            MapMenu::pMe->pTiles[2]->Set(Tile::kTileValue_Red, v45, true);
+            float v44 = tintColor.g * 255.0;
+            MapMenu::pMe->pTiles[2]->Set(Tile::kTileValue_Green, v44, true);
+            float v43 = tintColor.b * 255.0;
+            MapMenu::pMe->pTiles[2]->Set(Tile::kTileValue_Blue, v43, true);
+            NiUpdateData UpdateData(0.0f, false, false);
+            MapMenu::pMe->pTiles[2]->GetModel()->Update(UpdateData);
+            ++MapMenu::pMe->uiNextLocalMapGrid;
+            if (!MapMenu::ShouldRenderLocalMap() && MapMenu::pMe->pMapTile == MapMenu::pMe->pTiles[2]) {
+                MapMenu::pMe->UpdateLocalMap();
             }
         }
     }
@@ -3323,16 +3270,14 @@ void MapMenu::SetWorldMapMagnification(float afMagnification) {
 }
 
 void MapMenu::SetPlayerMarker() {
-    if (MapMenu::pMe) {
-        if (pPlayer->QPlayerMapMarker()) {
-            TESObjectREFR* PlayerMapMarker = pPlayer->QPlayerMapMarker();
-            MapMenu::pMe->PlayerMarkerPos = PlayerMapMarker->GetLocationOnReference();
-            TESObjectREFR* v0 = pPlayer->QPlayerMapMarker();
-            MapMenu::pMe->PlayerMarkerSpace = v0->GetWorldSpace();
-            if (!MapMenu::pMe->PlayerMarkerSpace) {
-                TESObjectREFR* v1 = pPlayer->QPlayerMapMarker();
-                MapMenu::pMe->PlayerMarkerSpace = v1->GetParentCell();
-            }
+    if ((MapMenu::pMe) && (pPlayer->QPlayerMapMarker())) {
+        TESObjectREFR* PlayerMapMarker = pPlayer->QPlayerMapMarker();
+        MapMenu::pMe->PlayerMarkerPos = PlayerMapMarker->GetLocationOnReference();
+        TESObjectREFR* v0 = pPlayer->QPlayerMapMarker();
+        MapMenu::pMe->PlayerMarkerSpace = v0->GetWorldSpace();
+        if (!MapMenu::pMe->PlayerMarkerSpace) {
+            TESObjectREFR* v1 = pPlayer->QPlayerMapMarker();
+            MapMenu::pMe->PlayerMarkerSpace = v1->GetParentCell();
         }
     }
 }
@@ -3356,10 +3301,8 @@ bool MapMenu::NotesFilterFunc(BGSNote* pcurrNote) {
     BSSimpleList<TESQuest*>* ecx0;
     int8_t v4 = 1;
     if ((!MapMenu::pMe) || MapMenu::pMe->bShowingAllNotes) {
-        if (MapMenu::pMe) {
-            if (MapMenu::pMe->bShowingAllNotes) {
-                return false;
-            }
+        if ((MapMenu::pMe) && (MapMenu::pMe->bShowingAllNotes)) {
+            return false;
         }
     }
     else {
@@ -3374,10 +3317,8 @@ bool MapMenu::NotesFilterFunc(BGSNote* pcurrNote) {
 }
 
 void MapMenu::ResetCurrentNoteIfEqualTo(BGSNote* a1) {
-    if (MapMenu::pMe) {
-        if (MapMenu::pMe->pSelectedNote == a1) {
-            MapMenu::pMe->pSelectedNote = nullptr;
-        }
+    if ((MapMenu::pMe) && (MapMenu::pMe->pSelectedNote == a1)) {
+        MapMenu::pMe->pSelectedNote = nullptr;
     }
 }
 
@@ -3460,18 +3401,14 @@ void MapMenu::ClearAudioLogSubtites() {
 }
 
 void MapMenu::FindQuestObjectiveTargetFunc(Tile* apTile, BGSQuestObjective* apObjective) {
-    if (!MapMenu::pMe->pDisplayedQuestTarget) {
-        if (apObjective) {
-            if (!apObjective->GetCompleted()) {
-                for (BSSimpleList<TESQuestTarget*>* ptargetObj = &apObjective->ListTargets;
-                     !MapMenu::pMe->pDisplayedQuestTarget && (ptargetObj && ptargetObj->m_item);
-                     ptargetObj = ptargetObj->m_pkNext) {
-                    TESQuestTarget* ptarget = ptargetObj->m_item;
-                    TESObjectREFR* Reference = ptarget->GetReference(false);
-                    if ((&ptarget->objConditions)->IsTrue(Reference, nullptr)) {
-                        MapMenu::pMe->pDisplayedQuestTarget = ptarget;
-                    }
-                }
+    if ((!MapMenu::pMe->pDisplayedQuestTarget) && (apObjective) && (!apObjective->GetCompleted())) {
+        for (BSSimpleList<TESQuestTarget*>* ptargetObj = &apObjective->ListTargets;
+             !MapMenu::pMe->pDisplayedQuestTarget && (ptargetObj && ptargetObj->m_item);
+             ptargetObj = ptargetObj->m_pkNext) {
+            TESQuestTarget* ptarget = ptargetObj->m_item;
+            TESObjectREFR* Reference = ptarget->GetReference(false);
+            if ((&ptarget->objConditions)->IsTrue(Reference, nullptr)) {
+                MapMenu::pMe->pDisplayedQuestTarget = ptarget;
             }
         }
     }
@@ -3516,18 +3453,16 @@ float MapMenu::GetLocalMapMagnification() {
     if (MapMenu::pMe) {
         return MapMenu::pMe->pTiles[2]->GetFloat(MapMenu::iUT_Magnification);
     }
-    else {
-        return 1.0;
-    }
+
+    return 1.0;
 }
 
 float MapMenu::GetWorldMapMagnification() {
     if (MapMenu::pMe) {
         return MapMenu::pMe->pTiles[4]->GetFloat(MapMenu::iUT_Magnification);
     }
-    else {
-        return 1.0;
-    }
+
+    return 1.0;
 }
 
 void Tile::ClearNeedsUpdate(int32_t aiFlag) {

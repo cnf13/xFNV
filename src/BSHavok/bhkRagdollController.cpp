@@ -1159,13 +1159,11 @@ void bhkRagdollController::DisableRagdollAnim(bool abUpdateConstraints) {
             hkpRigidBody** v12 = pRagdollInstance->m_rigidBodies.begin();
             if (*v12) {
                 ahkpWorld* m_world = static_cast<ahkpWorld*>((*v12)->m_world);
-                if (m_world) {
-                    if (!m_owner) {
-                        bhkWorld* m_userData = static_cast<bhkWorld*>(m_world->m_userData);
-                        for (int32_t j = 0; j < pRagdollInstance->m_constraints.m_size; ++j) {
-                            if (!pRagdollInstance->m_constraints.m_data[j]->getOwner()) {
-                                m_userData->Add(pRagdollInstance->m_constraints.m_data[j]);
-                            }
+                if ((m_world) && (!m_owner)) {
+                    bhkWorld* m_userData = static_cast<bhkWorld*>(m_world->m_userData);
+                    for (int32_t j = 0; j < pRagdollInstance->m_constraints.m_size; ++j) {
+                        if (!pRagdollInstance->m_constraints.m_data[j]->getOwner()) {
+                            m_userData->Add(pRagdollInstance->m_constraints.m_data[j]);
                         }
                     }
                 }
@@ -1258,9 +1256,8 @@ bhkWorld* bhkRagdollController::GetWorld() const {
          ((m_world = static_cast<ahkpWorld*>(v2->m_world)) != nullptr))) {
         return static_cast<bhkWorld*>(m_world->m_userData);
     }
-    else {
-        return nullptr;
-    }
+
+    return nullptr;
 }
 
 void bhkRagdollController::SetFootIKActive(bool abActive) {
@@ -2927,13 +2924,11 @@ void bhkRagdollController::EnableRagdollAnim() {
         hkpRigidBody** v9 = pRagdollInstance->m_rigidBodies.begin();
         if (*v9) {
             ahkpWorld* m_world = static_cast<ahkpWorld*>((*v9)->m_world);
-            if (m_world) {
-                if (m_owner) {
-                    bhkWorld* m_userData = static_cast<bhkWorld*>(m_world->m_userData);
-                    for (int32_t i = 0; i < pRagdollInstance->m_constraints.m_size; ++i) {
-                        if (pRagdollInstance->m_constraints.m_data[i]->getOwner()) {
-                            m_userData->RemoveConstraint(pRagdollInstance->m_constraints.m_data[i]);
-                        }
+            if ((m_world) && (m_owner)) {
+                bhkWorld* m_userData = static_cast<bhkWorld*>(m_world->m_userData);
+                for (int32_t i = 0; i < pRagdollInstance->m_constraints.m_size; ++i) {
+                    if (pRagdollInstance->m_constraints.m_data[i]->getOwner()) {
+                        m_userData->RemoveConstraint(pRagdollInstance->m_constraints.m_data[i]);
                     }
                 }
             }
@@ -3689,18 +3684,16 @@ void bhkRagdollController::CopyPoseTo3D(
     if (arePrevMotion != hkpMotion::MOTION_KEYFRAMED) {
         bhkWorld::SetMotion(apSkeleton, hkpMotion::MOTION_KEYFRAMED, true, false, true);
     }
-    if (apSkeleton) {
-        if (apPose) {
-            NiUpdateData data;
-            CopyPoseTo3DRec(apSkeleton, apPose, arPoseA);
-            data.fTime = 0.0f;
-            data.bUpdateControllers = false;
-            data.bParallelUpdate = false;
-            data.bFoundParticles = false;
-            data.bFoundMorphController = false;
-            data.bSceneGraphChange = false;
-            apSkeleton->Update(data);
-        }
+    if ((apSkeleton) && (apPose)) {
+        NiUpdateData data;
+        CopyPoseTo3DRec(apSkeleton, apPose, arPoseA);
+        data.fTime = 0.0f;
+        data.bUpdateControllers = false;
+        data.bParallelUpdate = false;
+        data.bFoundParticles = false;
+        data.bFoundMorphController = false;
+        data.bSceneGraphChange = false;
+        apSkeleton->Update(data);
     }
 }
 
@@ -4013,12 +4006,11 @@ float hkMath::acos(float r) {
     if (!(ra >= 1.0f)) {
         return std::acos(v1);
     }
-    else {
-        bool v2 = v1 > 0.0;
-        double v3 = 0.0;
-        if (!v2) {
-            return 3.1415927f;
-        }
-        return v3;
+
+    bool v2 = v1 > 0.0;
+    double v3 = 0.0;
+    if (!v2) {
+        return 3.1415927f;
     }
+    return v3;
 }

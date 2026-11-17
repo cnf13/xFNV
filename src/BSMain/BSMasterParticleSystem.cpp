@@ -159,10 +159,7 @@ bool BSMasterParticleSystem::IsEqual(NiObject* pkObject) {
         }
     }
 
-    if (pkPos || pkOtherPos) {
-        return false;
-    }
-    return true;
+    return !(pkPos || pkOtherPos);
 }
 
 // One line per emitter object: its name, or "No Name", and its address.
@@ -406,9 +403,8 @@ NiObject* BSMasterParticleSystem::CreateObject() {
     if (v2) {
         return ::new (v2) BSMasterParticleSystem;
     }
-    else {
-        return nullptr;
-    }
+
+    return nullptr;
 }
 
 bool BSMasterParticleSystem::IsMasterParticleSystem(NiParticles* apSystem) {

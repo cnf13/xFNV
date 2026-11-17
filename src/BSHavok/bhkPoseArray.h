@@ -30,7 +30,7 @@ public:
     void LoadBinary(NiStream& arStream) override;
     bool RegisterStreamables(NiStream& arStream) override;
     void SaveBinary(NiStream& arStream) override;
-    virtual ~bhkPoseArray();
+    ~bhkPoseArray() override;
 
     // Whether every bone of apSkel has its name in this array.
     bool BoneMatch(const hkaSkeleton* apSkel);

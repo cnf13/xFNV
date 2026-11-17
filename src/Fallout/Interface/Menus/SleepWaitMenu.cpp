@@ -136,32 +136,29 @@ bool SleepWaitMenu::UpdateSleep() {
         DoClick(5, nullptr);
         return false;
     }
-    else {
-        if (bRestingActive) {
-            fElapsedSecs = appTimer.fDelta + fElapsedSecs;
-            if (!(fElapsedSecs >= 1.0)) {
-                return false;
-            }
-            else {
-                fElapsedSecs = 0.0f;
-                TES::pInstance->RunScripts();
-                if (pPlayer->IsHardcore()) {
-                    pPlayer->UpdateHardcoreMode();
-                }
-                pPlayer->PlayerSleep();
-                int32_t afValue = pPlayer->GetSleepHours() - 1;
-                int32_t v4 = Tile::TextToTrait("_current_value");
-                pTiles[1]->Set(v4, afValue);
-                int32_t v5 = Tile::TextToTrait("_SetInCode");
-                pTiles[1]->Poke(v5, 1.0f);
-                SetCurrentTime();
-                return true;
-            }
-        }
-        else {
+
+    if (bRestingActive) {
+        fElapsedSecs = appTimer.fDelta + fElapsedSecs;
+        if (!(fElapsedSecs >= 1.0)) {
             return false;
         }
+
+        fElapsedSecs = 0.0f;
+        TES::pInstance->RunScripts();
+        if (pPlayer->IsHardcore()) {
+            pPlayer->UpdateHardcoreMode();
+        }
+        pPlayer->PlayerSleep();
+        int32_t afValue = pPlayer->GetSleepHours() - 1;
+        int32_t v4 = Tile::TextToTrait("_current_value");
+        pTiles[1]->Set(v4, afValue);
+        int32_t v5 = Tile::TextToTrait("_SetInCode");
+        pTiles[1]->Poke(v5, 1.0f);
+        SetCurrentTime();
+        return true;
     }
+
+    return false;
 }
 
 bool SleepWaitMenu::UpdateSleeping() {
@@ -290,19 +287,14 @@ Tile* SleepWaitMenu::Create(bool abSleep) {
             SleepWaitMenu::pMe->PrepForVisibility(false);
             return ptile;
         }
-        else {
-            Warning("MENUS: Sleep Wait Menu Creation Failed... Are your menu and art resources up to date?");
-            return nullptr;
-        }
-    }
-    else {
-        if (SleepWaitMenu::pMe) {
-            if (SleepWaitMenu::pMe->pMenu) {
-                if (SleepWaitMenu::pMe) {
-                    delete SleepWaitMenu::pMe;
-                }
-            }
-        }
+
+        Warning("MENUS: Sleep Wait Menu Creation Failed... Are your menu and art resources up to date?");
         return nullptr;
     }
+
+    if ((SleepWaitMenu::pMe) && (SleepWaitMenu::pMe->pMenu) && (SleepWaitMenu::pMe)) {
+        delete SleepWaitMenu::pMe;
+    }
+
+    return nullptr;
 }

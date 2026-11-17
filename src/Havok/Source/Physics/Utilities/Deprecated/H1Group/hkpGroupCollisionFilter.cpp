@@ -408,15 +408,13 @@ hkBool* hkpGroupCollisionFilter::isCollisionEnabled(hkBool* apResult, uint32_t i
             apResult->m_bool = ((m_collisionGroups[31] | v4) & infoB) != 0;
             return apResult;
         }
-        else {
-            apResult->m_bool = (v4 & infoB) != 0;
-            return apResult;
-        }
-    }
-    else {
-        apResult->m_bool = m_noGroupCollisionEnabled.m_bool;
+
+        apResult->m_bool = (v4 & infoB) != 0;
         return apResult;
     }
+
+    apResult->m_bool = m_noGroupCollisionEnabled.m_bool;
+    return apResult;
 }
 
 const hkClass& hkpGroupCollisionFilter::staticClass() {

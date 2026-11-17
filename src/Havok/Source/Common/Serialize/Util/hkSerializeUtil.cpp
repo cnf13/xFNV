@@ -728,10 +728,9 @@ uint8_t* hkBinaryTagfile::isBinaryMagic(uint8_t* a1, int32_t a2, int32_t a3) {
         *a1 = 1;
         return a1;
     }
-    else {
-        *a1 = 0;
-        return a1;
-    }
+
+    *a1 = 0;
+    return a1;
 }
 
 hkBool* hkStructureLayout::LayoutRules::IsEqual(hkBool* apResult, const hkStructureLayout::LayoutRules& other) const {
@@ -742,8 +741,7 @@ hkBool* hkStructureLayout::LayoutRules::IsEqual(hkBool* apResult, const hkStruct
         apResult->m_bool = 1;
         return apResult;
     }
-    else {
-        apResult->m_bool = 0;
-        return apResult;
-    }
+
+    apResult->m_bool = 0;
+    return apResult;
 }

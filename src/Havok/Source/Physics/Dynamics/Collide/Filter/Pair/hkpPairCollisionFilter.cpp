@@ -92,10 +92,9 @@ hkBool hkpPairCollisionFilter::isCollisionEnabled(
         result.m_bool = 1;
         return result;
     }
-    else {
-        result.m_bool = 0;
-        return result;
-    }
+
+    result.m_bool = 0;
+    return result;
 }
 
 hkBool hkpPairCollisionFilter::isCollisionEnabled(
@@ -117,10 +116,9 @@ hkBool hkpPairCollisionFilter::isCollisionEnabled(
         result.m_bool = 1;
         return result;
     }
-    else {
-        result.m_bool = 0;
-        return result;
-    }
+
+    result.m_bool = 0;
+    return result;
 }
 
 hkBool hkpPairCollisionFilter::isCollisionEnabled(
@@ -136,10 +134,9 @@ hkBool hkpPairCollisionFilter::isCollisionEnabled(
         result.m_bool = 1;
         return result;
     }
-    else {
-        result.m_bool = 0;
-        return result;
-    }
+
+    result.m_bool = 0;
+    return result;
 }
 
 hkBool
@@ -149,10 +146,9 @@ hkpPairCollisionFilter::isCollisionEnabled(const hkpWorldRayCastInput& inputA, c
         result.m_bool = 1;
         return result;
     }
-    else {
-        result.m_bool = 0;
-        return result;
-    }
+
+    result.m_bool = 0;
+    return result;
 }
 
 // The SDK's constructor: the map starts empty through its own constructor; the child filter is referenced.

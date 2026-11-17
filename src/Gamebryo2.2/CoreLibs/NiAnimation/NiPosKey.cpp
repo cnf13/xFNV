@@ -130,7 +130,8 @@ void NiPosKey::CoordinateFrame(
     InterpFunction d1Func = GetInterpD1Function(eType);
     InterpFunction d2Func = GetInterpD2Function(eType);
 
-    NiPoint3 d1, d2;
+    NiPoint3 d1;
+    NiPoint3 d2;
     d1Func(fTime, pKey0, pKey1, &d1);
     d2Func(fTime, pKey0, pKey1, &d2);
 

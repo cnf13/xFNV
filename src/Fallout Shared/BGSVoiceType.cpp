@@ -74,9 +74,8 @@ const char* BGSVoiceType::GetFormEditorID() {
     if (strEditorID.pString) {
         return strEditorID.pString;
     }
-    else {
-        return "";
-    }
+
+    return "";
 }
 
 bool BGSVoiceType::SetFormEditorID(const char* apEditorID) {

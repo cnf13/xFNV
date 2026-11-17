@@ -115,10 +115,8 @@ void IOManager::LoadQueuedPriority(IO_TASK_PRIORITY aePriority) {
 using BSTaskMapIterator = LockFreeMap<int64_t, NiPointer<BSTask<int64_t>>>::LockFreeMapIterator;
 
 void IOManager::Pause() {
-    if (DoSleep()) {
-        if (pPauseCallback) {
-            pPauseCallback();
-        }
+    if ((DoSleep()) && (pPauseCallback)) {
+        pPauseCallback();
     }
 }
 
@@ -183,7 +181,7 @@ bool IOManager::DoSleep() {
 // one it can claim (QUEUED to RUNNING), between waits on the pause semaphore; a pause restarts the walk at bucket 0.
 void BSTaskManagerThread::ThreadUpdate() {
     using Iterator = BSTaskManagerIterator<int64_t>;
-    while (pOwner->bExit != true) {
+    while (!pOwner->bExit) {
         Semaphore.hSemaphore->Wait();
         NiAtomicDecrement(Semaphore.iCount);
         Iterator kIterator;
@@ -470,10 +468,8 @@ void IOManager::RequeuePrioritiesToNewPriority(IO_TASK_PRIORITY aeOldPriority, I
 }
 
 void IOManager::Resume() {
-    if (BSTaskManager<int64_t>::Resume()) {
-        if (pResumeCallback) {
-            pResumeCallback();
-        }
+    if ((BSTaskManager<int64_t>::Resume()) && (pResumeCallback)) {
+        pResumeCallback();
     }
 }
 bool IOManager::RequeueTask(IOTask* apTask, IO_TASK_PRIORITY aeNewPriority) {

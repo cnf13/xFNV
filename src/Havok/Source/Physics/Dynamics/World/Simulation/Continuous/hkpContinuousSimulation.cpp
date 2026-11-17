@@ -214,15 +214,13 @@ void hkLs_doSimpleCollisionResponse(
             return;
         }
     }
-    else if (fVelocityA >= 0.0f) {
-        if (fVelocityB < 0.0f) {
-            hkBool bFixedOrKeyframed;
-            hkpEntity* pActivate = pEntityB->isFixedOrKeyframed(&bFixedOrKeyframed)->m_bool ? pEntityA : pEntityB;
-            // EXE-INLINED none: hkArray::pushBackUnchecked
-            toBeActivated.m_data[toBeActivated.m_size] = pActivate;
-            toBeActivated.m_size++;
-            return;
-        }
+    else if ((fVelocityA >= 0.0f) && (fVelocityB < 0.0f)) {
+        hkBool bFixedOrKeyframed;
+        hkpEntity* pActivate = pEntityB->isFixedOrKeyframed(&bFixedOrKeyframed)->m_bool ? pEntityA : pEntityB;
+        // EXE-INLINED none: hkArray::pushBackUnchecked
+        toBeActivated.m_data[toBeActivated.m_size] = pActivate;
+        toBeActivated.m_size++;
+        return;
     }
 
     // A velocity is NaN, or both are at least zero: the moving body, else the slower one (B when strictly slower).
@@ -588,11 +586,11 @@ void hkLs_toiActivateEntitiesAndCheckConstraints(
                 continue;
             }
             hkpEntity* otherEntity = ci->getOtherEntity(entity);
-            if (otherEntity->m_motion.m_type.m_storage != hkpMotion::MOTION_FIXED) {
-                if (entityState.m_data.m_storage[otherEntity->m_storageIndex] == HK_TOI_ENTITY_STATE_ACTIVE) {
-                    continue;
-                }
+            if ((otherEntity->m_motion.m_type.m_storage != hkpMotion::MOTION_FIXED) &&
+                (entityState.m_data.m_storage[otherEntity->m_storageIndex] == HK_TOI_ENTITY_STATE_ACTIVE)) {
+                continue;
             }
+
             {
                 // EXE-INLINED none: hkArray<hkpConstraintInstance*>::pushBack
                 hkMemoryRouter& router = hkMemoryRouter::getInstance();
@@ -641,11 +639,11 @@ void hkLs_toiActivateEntitiesAndCheckConstraints(
                 continue;
             }
             hkpEntity* otherEntity = ci->getOtherEntity(entity);
-            if (otherEntity->m_motion.m_type.m_storage != hkpMotion::MOTION_FIXED) {
-                if (entityState.m_data.m_storage[otherEntity->m_storageIndex] == HK_TOI_ENTITY_STATE_ACTIVE) {
-                    continue;
-                }
+            if ((otherEntity->m_motion.m_type.m_storage != hkpMotion::MOTION_FIXED) &&
+                (entityState.m_data.m_storage[otherEntity->m_storageIndex] == HK_TOI_ENTITY_STATE_ACTIVE)) {
+                continue;
             }
+
             {
                 // EXE-INLINED none: hkArray<hkpConstraintInstance*>::pushBack
                 hkMemoryRouter& router = hkMemoryRouter::getInstance();

@@ -135,10 +135,9 @@ bool hkMultiThreadCheck::isMarkedForWriteImpl() {
         LeaveCriticalSection(v3);
         return true;
     }
-    else {
-        LeaveCriticalSection(v3);
-        return false;
-    }
+
+    LeaveCriticalSection(v3);
+    return false;
 }
 
 void hkMultiThreadCheck::unmarkForReadImpl() {

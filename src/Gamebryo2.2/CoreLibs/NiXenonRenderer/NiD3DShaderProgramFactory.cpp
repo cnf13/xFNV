@@ -179,21 +179,17 @@ const char* NiD3DShaderProgramFactory::GetFirstProgramDirectory(NiTListIterator&
 
 void NiD3DShaderProgramFactory::InsertVertexShaderIntoMap(NiD3DVertexShader* pkShader) {
     const char* v3;
-    if (pkShader) {
-        if (m_pkVertexShaderMap) {
-            v3 = pkShader->GetName();
-            m_pkVertexShaderMap->SetAt(v3, pkShader);
-        }
+    if ((pkShader) && (m_pkVertexShaderMap)) {
+        v3 = pkShader->GetName();
+        m_pkVertexShaderMap->SetAt(v3, pkShader);
     }
 }
 
 void NiD3DShaderProgramFactory::InsertPixelShaderIntoMap(NiD3DPixelShader* pkShader) {
     const char* v3;
-    if (pkShader) {
-        if (m_pkPixelShaderMap) {
-            v3 = pkShader->GetName();
-            m_pkPixelShaderMap->SetAt(v3, pkShader);
-        }
+    if ((pkShader) && (m_pkPixelShaderMap)) {
+        v3 = pkShader->GetName();
+        m_pkPixelShaderMap->SetAt(v3, pkShader);
     }
 }
 

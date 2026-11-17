@@ -11,7 +11,7 @@ public:
     bhkBoxShape();
     bhkBoxShape(const hkVector4& arExt);
     bhkBoxShape(const NiPoint3& arExt);
-    virtual ~bhkBoxShape();
+    ~bhkBoxShape() override;
 
     const NiRTTI* GetRTTI() const override;
     NiObject* CreateClone(NiCloningProcess& arCloneData) override;

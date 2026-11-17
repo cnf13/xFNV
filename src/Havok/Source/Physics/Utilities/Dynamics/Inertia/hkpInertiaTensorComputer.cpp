@@ -1060,39 +1060,38 @@ hkResult hkpInertiaTensorComputer::computeConvexHullMassProperties(
     if (apMemory.getDimensions() == -1) {
         return HK_FAILURE;
     }
-    else {
-        float v6 = hkConvexShapeDefaultRadius / 5.0;
-        float v7 = 0.0f;
+
+    float v6 = hkConvexShapeDefaultRadius / 5.0;
+    float v7 = 0.0f;
+    if (apMemory.getDimensions() == 3) {
+        apMemory.buildMassProperties();
+        if (radius > 0.0f) {
+            float v8 = apMemory.getSurfaceArea() * radius;
+            v7 = v8 + radius * (radius * 12.566370964050293 * radius) / 3.0;
+        }
+    }
+    while (apMemory.getDimensions() != 3 || apMemory.getVolume() < 1.1920928955078125e-05) {
+        apMemory.build(vertices, arg4);
+        apMemory.expandByPlanarMargin(v6);
         if (apMemory.getDimensions() == 3) {
             apMemory.buildMassProperties();
-            if (radius > 0.0f) {
-                float v8 = apMemory.getSurfaceArea() * radius;
-                v7 = v8 + radius * (radius * 12.566370964050293 * radius) / 3.0;
-            }
         }
-        while (apMemory.getDimensions() != 3 || apMemory.getVolume() < 1.1920928955078125e-05) {
-            apMemory.build(vertices, arg4);
-            apMemory.expandByPlanarMargin(v6);
-            if (apMemory.getDimensions() == 3) {
-                apMemory.buildMassProperties();
-            }
-            v6 = v6 + v6;
-        }
-        result.m_centerOfMass.m_quad = (&apMemory.getCenterOfMass())->m_quad;
-        result.m_inertiaTensor = apMemory.getWorldInertia();
-        double v3 = apMemory.getVolume() + v7;
-        double v4 = v7;
-        float v9 = v3;
-        result.m_volume = v9;
-        result.m_mass = 1.0f;
-        if (v9 > 0.0f && v4 > 0.0) {
-            hkSimdReal v12;
-            *reinterpret_cast<float*>(&v10) = v4 / v9 + 1.0;
-            v12.m_real = _mm_set_ss(std::bit_cast<float>(v10));
-            result.m_inertiaTensor.mul(v12);
-        }
-        return HK_SUCCESS;
+        v6 = v6 + v6;
     }
+    result.m_centerOfMass.m_quad = (&apMemory.getCenterOfMass())->m_quad;
+    result.m_inertiaTensor = apMemory.getWorldInertia();
+    double v3 = apMemory.getVolume() + v7;
+    double v4 = v7;
+    float v9 = v3;
+    result.m_volume = v9;
+    result.m_mass = 1.0f;
+    if (v9 > 0.0f && v4 > 0.0) {
+        hkSimdReal v12;
+        *reinterpret_cast<float*>(&v10) = v4 / v9 + 1.0;
+        v12.m_real = _mm_set_ss(std::bit_cast<float>(v10));
+        result.m_inertiaTensor.mul(v12);
+    }
+    return HK_SUCCESS;
 }
 
 // On the thin-surface and the degenerate-triangle paths only the nine components of the local hkMatrix3 are written

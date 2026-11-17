@@ -67,14 +67,11 @@ void CellUpdateParallelArrayTaskFunc(void* apData, uint32_t aiIndex) {
 void ActorHavokSyncParallelArrayTaskFunc(void* apData, uint32_t aiIndex) {
     BSSimpleArray<ActorHavokSyncData, 1024>* parray = static_cast<BSSimpleArray<ActorHavokSyncData, 1024>*>(apData);
     ActorHavokSyncData& actorHavokSyncData = (*parray)[aiIndex];
-    if (actorHavokSyncData.pActor) {
-        if (actorHavokSyncData.pActor->pRagdollController) {
-            if (actorHavokSyncData.pActor->pRagdollController->GetRagdollAnimEnable() &&
-                !static_cast<uint8_t>(actorHavokSyncData.pObj->GetNotVisible()) &&
-                !actorHavokSyncData.pActor->IsInDialoguewithPlayer()) {
-                bhkNiCollisionObject::Synchronize(actorHavokSyncData.pObj, bhkNiCollisionObject::SYNC_FROMHAVOK);
-            }
-        }
+    if ((actorHavokSyncData.pActor) && (actorHavokSyncData.pActor->pRagdollController) &&
+        (actorHavokSyncData.pActor->pRagdollController->GetRagdollAnimEnable() &&
+         !static_cast<uint8_t>(actorHavokSyncData.pObj->GetNotVisible()) &&
+         !actorHavokSyncData.pActor->IsInDialoguewithPlayer())) {
+        bhkNiCollisionObject::Synchronize(actorHavokSyncData.pObj, bhkNiCollisionObject::SYNC_FROMHAVOK);
     }
 }
 
@@ -511,13 +508,11 @@ void TaskQueueInterface::QueueWeaponFire(TESObjectWEAP* apWeapon, TESObjectREFR*
 }
 
 void TaskQueueInterface::QueueMobileObjectInitialize(MobileObject* apTarget) {
-    if (apTarget) {
-        if (apTarget->IsExplosion()) {
-            BSPackedTask task;
-            task.pTaskDataA[0].iData = 12;
-            task.pTaskDataA[1].pData = apTarget;
-            QueueIfActive(task);
-        }
+    if ((apTarget) && (apTarget->IsExplosion())) {
+        BSPackedTask task;
+        task.pTaskDataA[0].iData = 12;
+        task.pTaskDataA[1].pData = apTarget;
+        QueueIfActive(task);
     }
 }
 
@@ -849,11 +844,10 @@ void TaskQueueInterface::TaskUnpackFunc(const BSPackedTask& arTask) {
             Actor* pactor_4 = static_cast<Actor*>(arTask.pTaskDataA[1].pData);
             NiPoint3 sourceLocation(arTask.pTaskDataA[2].fData, arTask.pTaskDataA[3].fData, arTask.pTaskDataA[4].fData);
             float fmagnitude = arTask.pTaskDataA[5].fData;
-            if (pactor_4) {
-                if (pactor_4->pCurrentProcess) {
-                    pactor_4->pCurrentProcess->KnockExplosion(pactor_4, sourceLocation, fmagnitude);
-                }
+            if ((pactor_4) && (pactor_4->pCurrentProcess)) {
+                pactor_4->pCurrentProcess->KnockExplosion(pactor_4, sourceLocation, fmagnitude);
             }
+
             return;
         }
         case 17: {
@@ -1132,11 +1126,10 @@ void TaskQueueInterface::TaskUnpackFunc(const BSPackedTask& arTask) {
             TESObjectREFR* pform__pref = static_cast<TESObjectREFR*>(
                 TESForm::GetFormByNumericID(static_cast<uint32_t>(arTask.pTaskDataA[1].iData))
             );
-            if (pform__pref) {
-                if (pform__pref->IsReference()) {
-                    pform__pref->DetachHavok();
-                }
+            if ((pform__pref) && (pform__pref->IsReference())) {
+                pform__pref->DetachHavok();
             }
+
             return;
         }
         case 44: {

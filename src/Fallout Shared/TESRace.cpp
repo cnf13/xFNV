@@ -973,10 +973,9 @@ bool TESRace::Compare(TESForm* apCompare) {
         sFaceCoordNum = Random();
         return true;
     }
-    else {
-        int32_t FaceCoordNum = GetFaceCoordNum();
-        return FaceCoordNum != prace->GetFaceCoordNum();
-    }
+
+    int32_t FaceCoordNum = GetFaceCoordNum();
+    return FaceCoordNum != prace->GetFaceCoordNum();
 }
 
 const char* TESRace::GetFormEditorID() {
@@ -1405,33 +1404,30 @@ void TESRace::GetFaceGenData(TESNPC* apNPC, FaceGenNpcData& arNpcData, TESActorB
         arNpcData.pTexture.Add(pFaceTexture);
         const char* pNodeName = TESRace::GetHeadPartNodeName(epart);
         arNpcData.pHeadPartNodeName.Add(pNodeName);
-        if (apNPC) {
-            if (TESRace::bFaceGenTexturing.Bool() && !abNoModTextures) {
-                NiPointer<NiTexture> spTempTexture(static_cast<NiTexture*>(nullptr));
-                apNPC->GetHeadPartModTexture(epart, spTempTexture);
-                arNpcData.spTexBaseMod.Add(spTempTexture);
-            }
+        if ((apNPC) && (TESRace::bFaceGenTexturing.Bool() && !abNoModTextures)) {
+            NiPointer<NiTexture> spTempTexture(static_cast<NiTexture*>(nullptr));
+            apNPC->GetHeadPartModTexture(epart, spTempTexture);
+            arNpcData.spTexBaseMod.Add(spTempTexture);
         }
     }
     arNpcData.bFaceGenTexturing = TESRace::bFaceGenTexturing.Bool();
     arNpcData.eLod = BSFaceGenManager::GetForcedLod();
-    if (apNPC) {
-        if (!byoungplayer) {
-            // TESNPC::listHeadParts holds void* items; they are BGSHeadPart pointers.
-            BSSimpleList<void*>* plist = apNPC->GetHeadParts();
-            while (plist && !plist->IsEmpty()) {
-                BGSHeadPart* ppart = static_cast<BGSHeadPart*>(plist->m_item);
-                plist = plist->m_pkNext;
-                arNpcData.Accessories.AddHead(ppart);
-                BSSimpleList<BGSHeadPart*>* pextralist = &ppart->ExtraParts;
-                while (pextralist && !pextralist->IsEmpty()) {
-                    BGSHeadPart* pextra = pextralist->m_item;
-                    pextralist = pextralist->m_pkNext;
-                    arNpcData.Accessories.AddHead(pextra);
-                }
+    if ((apNPC) && (!byoungplayer)) {
+        // TESNPC::listHeadParts holds void* items; they are BGSHeadPart pointers.
+        BSSimpleList<void*>* plist = apNPC->GetHeadParts();
+        while (plist && !plist->IsEmpty()) {
+            BGSHeadPart* ppart = static_cast<BGSHeadPart*>(plist->m_item);
+            plist = plist->m_pkNext;
+            arNpcData.Accessories.AddHead(ppart);
+            BSSimpleList<BGSHeadPart*>* pextralist = &ppart->ExtraParts;
+            while (pextralist && !pextralist->IsEmpty()) {
+                BGSHeadPart* pextra = pextralist->m_item;
+                pextralist = pextralist->m_pkNext;
+                arNpcData.Accessories.AddHead(pextra);
             }
         }
     }
+
     arNpcData.pLeftEye = GetHeadPartModel(aeSex, RHP_EYE_LEFT);
     arNpcData.pRightEye = GetHeadPartModel(aeSex, RHP_EYE_RIGHT);
     if (!arNpcData.pEyes) {
@@ -1465,9 +1461,8 @@ TESTexture* TESRace::GetBodyPartTexture(TESActorBase::SEX aeSex, RACE_BODY_PART 
         aePart < RACE_BODY_PART_COUNT) {
         return &ppBodyTextureFiles[aeSex][aePart];
     }
-    else {
-        return nullptr;
-    }
+
+    return nullptr;
 }
 
 void TESRace::SetHeadPartModel(TESActorBase::SEX aeSex, RACE_HEAD_PART aePart, const char* apFilename) {
@@ -1569,12 +1564,11 @@ bool TESRace::CreateHead(
         BSFaceGenManager::PrepareHeadForShaders(apOutNodeBiped, npcData);
         BSFaceGenManager::PrepareHeadForShaders(apOutNodeSkinned, npcData);
     }
-    if (apNPC) {
-        if (apNPC->iFormID == 7) {
-            apOutNodeBiped->SetIAmPlayerCharacter(true);
-            apOutNodeSkinned->SetIAmPlayerCharacter(true);
-        }
+    if ((apNPC) && (apNPC->iFormID == 7)) {
+        apOutNodeBiped->SetIAmPlayerCharacter(true);
+        apOutNodeSkinned->SetIAmPlayerCharacter(true);
     }
+
     return true;
 }
 
@@ -1582,9 +1576,8 @@ RACE_BODY_PART TESRace::BodyPartToRaceBodyPart(BIPED_OBJECT aePart) {
     if (((uint32_t)(((int32_t)aePart) - 2)) <= 2) {
         return (RACE_BODY_PART)(((int32_t)aePart) - 2);
     }
-    else {
-        return (RACE_BODY_PART)(-1);
-    }
+
+    return (RACE_BODY_PART)(-1);
 }
 
 BGSTextureModel::~BGSTextureModel() {}

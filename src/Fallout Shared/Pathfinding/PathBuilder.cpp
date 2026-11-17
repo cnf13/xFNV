@@ -150,15 +150,13 @@ PathBuilder::UpdateDetailedPath(uint32_t aiCurrentVirtualNodeIndex, const NiPoin
         }
         return Pathing::CREATED_DETAILED_PATH;
     }
-    else {
-        if (pSolution.m_pObject->GetNodeCount()) {
-            pSolution.m_pObject->ClearCurrentDetailedPath();
-            return Pathing::CLEARED_DETAILED_PATH;
-        }
-        else {
-            return Pathing::NO_CHANGE;
-        }
+
+    if (pSolution.m_pObject->GetNodeCount()) {
+        pSolution.m_pObject->ClearCurrentDetailedPath();
+        return Pathing::CLEARED_DETAILED_PATH;
     }
+
+    return Pathing::NO_CHANGE;
 }
 
 Pathing::UPDATE_DETAILED_PATH_RESULT PathBuilder::UpdatePathMoveToLow() {
@@ -185,9 +183,8 @@ Pathing::UPDATE_DETAILED_PATH_RESULT PathBuilder::UpdatePathMoveToHigh(uint32_t 
     if (BuildDetailedPath(nullptr, aiCurrentVirtualNodeIndex)) {
         return Pathing::CREATED_DETAILED_PATH;
     }
-    else {
-        return Pathing::FAILED;
-    }
+
+    return Pathing::FAILED;
 }
 
 // BuildDetailedPath is passed a null actor local and 0 as the first high-level node, as the game does.
@@ -297,22 +294,20 @@ RAYCASTPATH_RESULT PathBuilder::BuildStraightPathUsingRayCasts(
         PathManager* v5 = PathManager::QInstance();
         return v5->GetRayCastPath(m_pObject, aStartLocation, aGoalLocation, aRetPath);
     }
-    else {
-        RayCastPathRequest aRequest;
-        aRequest.StartLocation.operator=(aStartLocation);
-        aRequest.GoalLocation.operator=(aGoalLocation);
-        aRequest.eType = RCRT_NOMESH;
-        aRequest.pInitialPathRequest = pRequest.m_pObject;
-        RayCastPath v10;
-        PathingSearchRayCast apMemory;
-        if (apMemory.BuildPath(aRequest, v10) == RCP_SUCCESS) {
-            v10.Nodes.CopyTo(&aRetPath);
-            return RCP_SUCCESS;
-        }
-        else {
-            return RCP_FAILED;
-        }
+
+    RayCastPathRequest aRequest;
+    aRequest.StartLocation.operator=(aStartLocation);
+    aRequest.GoalLocation.operator=(aGoalLocation);
+    aRequest.eType = RCRT_NOMESH;
+    aRequest.pInitialPathRequest = pRequest.m_pObject;
+    RayCastPath v10;
+    PathingSearchRayCast apMemory;
+    if (apMemory.BuildPath(aRequest, v10) == RCP_SUCCESS) {
+        v10.Nodes.CopyTo(&aRetPath);
+        return RCP_SUCCESS;
     }
+
+    return RCP_FAILED;
 }
 
 bool PathBuilder::BuildNavMeshPathForVirtualNodes(uint32_t aiFirstVirtualNodeIndex, uint32_t aiLastVirtualNodeIndex) {
@@ -367,17 +362,16 @@ bool PathBuilder::BuildNavMeshPathForVirtualNodes(uint32_t aiFirstVirtualNodeInd
                 pLastPathNode->SetTeleportDoor(pDoorRef);
             }
             else {
-                if (plastVirtualNode->Location.pWorldSpace) {
-                    if (pSolution.m_pObject->GetVirtualNodeCount() > aiLastVirtualNodeIndex + 1) {
-                        TESWorldSpace* pNextWorldSpace =
-                            pSolution.m_pObject->GetVirtualNode(aiLastVirtualNodeIndex + 1)->Location.pWorldSpace;
-                        if (pNextWorldSpace == plastVirtualNode->Location.pWorldSpace) {
-                            PathingLocation* pNextLoc =
-                                &pSolution.m_pObject->GetVirtualNode(aiLastVirtualNodeIndex + 1)->Location;
-                            pSolution.m_pObject->AddPathingNode(*pNextLoc, NiPoint3_ZERO);
-                            PathingNode* pLastPathNode = pSolution.m_pObject->GetLastNode();
-                            pLastPathNode->SetTransitionFlag(true);
-                        }
+                if ((plastVirtualNode->Location.pWorldSpace) &&
+                    (pSolution.m_pObject->GetVirtualNodeCount() > aiLastVirtualNodeIndex + 1)) {
+                    TESWorldSpace* pNextWorldSpace =
+                        pSolution.m_pObject->GetVirtualNode(aiLastVirtualNodeIndex + 1)->Location.pWorldSpace;
+                    if (pNextWorldSpace == plastVirtualNode->Location.pWorldSpace) {
+                        PathingLocation* pNextLoc =
+                            &pSolution.m_pObject->GetVirtualNode(aiLastVirtualNodeIndex + 1)->Location;
+                        pSolution.m_pObject->AddPathingNode(*pNextLoc, NiPoint3_ZERO);
+                        PathingNode* pLastPathNode = pSolution.m_pObject->GetLastNode();
+                        pLastPathNode->SetTransitionFlag(true);
                     }
                 }
             }
@@ -453,17 +447,15 @@ bool PathBuilder::BuildNavMeshPathForVirtualNodes(uint32_t aiFirstVirtualNodeInd
         pLastPathNode->SetTeleportDoor(pDoorRef);
     }
     else {
-        if (plastVirtualNode_2->Location.pWorldSpace) {
-            if (pSolution.m_pObject->GetVirtualNodeCount() > aiLastVirtualNodeIndex + 1) {
-                TESWorldSpace* pNextWorldSpace =
-                    pSolution.m_pObject->GetVirtualNode(aiLastVirtualNodeIndex + 1)->Location.pWorldSpace;
-                if (pNextWorldSpace == plastVirtualNode_2->Location.pWorldSpace) {
-                    PathingLocation* pNextLoc =
-                        &pSolution.m_pObject->GetVirtualNode(aiLastVirtualNodeIndex + 1)->Location;
-                    pSolution.m_pObject->AddPathingNode(*pNextLoc, NiPoint3_ZERO);
-                    PathingNode* pLastPathNode = pSolution.m_pObject->GetLastNode();
-                    pLastPathNode->SetTransitionFlag(true);
-                }
+        if ((plastVirtualNode_2->Location.pWorldSpace) &&
+            (pSolution.m_pObject->GetVirtualNodeCount() > aiLastVirtualNodeIndex + 1)) {
+            TESWorldSpace* pNextWorldSpace =
+                pSolution.m_pObject->GetVirtualNode(aiLastVirtualNodeIndex + 1)->Location.pWorldSpace;
+            if (pNextWorldSpace == plastVirtualNode_2->Location.pWorldSpace) {
+                PathingLocation* pNextLoc = &pSolution.m_pObject->GetVirtualNode(aiLastVirtualNodeIndex + 1)->Location;
+                pSolution.m_pObject->AddPathingNode(*pNextLoc, NiPoint3_ZERO);
+                PathingNode* pLastPathNode = pSolution.m_pObject->GetLastNode();
+                pLastPathNode->SetTransitionFlag(true);
             }
         }
     }
@@ -641,28 +633,26 @@ PathBuilder::ADD_NODES_FROM_NAVMESH_RESULT PathBuilder::AddNodesFromNavMesh(
         if (bAddNodesFromNavMeshIncomplete) {
             return PathBuilder::ADD_NODES_FROM_NAVMESH_RESULT_INCOMPLETE;
         }
-        else {
-            return PathBuilder::ADD_NODES_FROM_NAVMESH_RESULT_OK;
-        }
+
+        return PathBuilder::ADD_NODES_FROM_NAVMESH_RESULT_OK;
     }
     plastNode = pSolution.m_pObject->GetLastNode();
-    if (plastNode) {
-        if (pSolution.m_pObject->iLastLoadedVirtualNodeIndex == aiLastVirtualNodeIndex) {
-            float ftargetRadius_2;
-            VirtualPathingNode* plastVirtualNode_2 = pSolution.m_pObject->GetVirtualNode(aiLastVirtualNodeIndex);
-            NiPoint3* a1c = ::new (&v24) NiPoint3((&plastVirtualNode_2->Location)->GetLocation());
-            NiPoint3 delta_2 = (&plastNode->Location)->GetLocation() - *a1c;
-            if (plastVirtualNode_2->IsTransitionNode()) {
-                ftargetRadius_2 = 80.0f;
-            }
-            else {
-                ftargetRadius_2 = pRequest.m_pObject->fTargetRadius;
-            }
-            if (ftargetRadius_2 * ftargetRadius_2 > delta_2.SqrXYLength() && std::fabs(delta_2.z) < 180.0) {
-                goto LABEL_72;
-            }
+    if ((plastNode) && (pSolution.m_pObject->iLastLoadedVirtualNodeIndex == aiLastVirtualNodeIndex)) {
+        float ftargetRadius_2;
+        VirtualPathingNode* plastVirtualNode_2 = pSolution.m_pObject->GetVirtualNode(aiLastVirtualNodeIndex);
+        NiPoint3* a1c = ::new (&v24) NiPoint3((&plastVirtualNode_2->Location)->GetLocation());
+        NiPoint3 delta_2 = (&plastNode->Location)->GetLocation() - *a1c;
+        if (plastVirtualNode_2->IsTransitionNode()) {
+            ftargetRadius_2 = 80.0f;
+        }
+        else {
+            ftargetRadius_2 = pRequest.m_pObject->fTargetRadius;
+        }
+        if (ftargetRadius_2 * ftargetRadius_2 > delta_2.SqrXYLength() && std::fabs(delta_2.z) < 180.0) {
+            goto LABEL_72;
         }
     }
+
     if (!BadNodes.IsEmpty() && pass != imaxPassCount - 1) {
         if (pass < imaxPassCount - 1) {
             while (true) {
@@ -875,43 +865,38 @@ bool PathBuilder::BuildDetailedPath(Actor* pActor, uint32_t aiFirstHighLevelNode
         pSolution.m_pObject->GetNodeCount() >= 2) {
         PathingNode* pnode0 = pSolution.m_pObject->GetNode(0);
         PathingNode* pnode1 = pSolution.m_pObject->GetNode(1u);
-        if (pnode0) {
-            if (pnode1) {
-                PathingLocation startLoc(*&pnode0->Location);
-                PathingLocation nextLoc(*&pnode1->Location);
-                NiPoint3* afRadius = &(result = startLoc.GetLocation());
-                if ((nextLoc.GetLocation() - *afRadius).SqrLength() > 4096.0) {
-                    float afRadiusa = pRequest.m_pObject->fActorRadius;
-                    float afHeading = pRequest.m_pObject->fInitialPathHeading;
-                    Pathing::ComputeInitialTangentForActor(&tangent, afHeading, startLoc, nextLoc, afRadiusa);
-                    pnode0->SetTangent(tangent);
+        if ((pnode0) && (pnode1)) {
+            PathingLocation startLoc(*&pnode0->Location);
+            PathingLocation nextLoc(*&pnode1->Location);
+            NiPoint3* afRadius = &(result = startLoc.GetLocation());
+            if ((nextLoc.GetLocation() - *afRadius).SqrLength() > 4096.0) {
+                float afRadiusa = pRequest.m_pObject->fActorRadius;
+                float afHeading = pRequest.m_pObject->fInitialPathHeading;
+                Pathing::ComputeInitialTangentForActor(&tangent, afHeading, startLoc, nextLoc, afRadiusa);
+                pnode0->SetTangent(tangent);
+            }
+        }
+    }
+    if ((bbuildDetailedPathRes) && (pRequest.m_pObject->bFaceTargetAtGoal)) {
+        int32_t ShaderPropertyType = pSolution.m_pObject->iLastLoadedVirtualNodeIndex;
+        if (ShaderPropertyType == pSolution.m_pObject->GetVirtualNodeCount() - 1) {
+            PathingNode* pnodeN = pSolution.m_pObject->GetNode(pSolution.m_pObject->GetNodeCount() - 1);
+            PathingNode* pnodeN1 = pSolution.m_pObject->GetNode(pSolution.m_pObject->GetNodeCount() - 2);
+            if ((pnodeN) && (pnodeN1)) {
+                PathingLocation endLoc(*&pnodeN->Location);
+                PathingLocation prevLoc(*&pnodeN1->Location);
+                NiPoint3* afRadiusb = &(v17 = prevLoc.GetLocation());
+                if ((endLoc.GetLocation() - *afRadiusb).SqrLength() > 4096.0) {
+                    PathingLocation goalLoc(*&pnodeN->Location);
+                    float afRadiusc = pRequest.m_pObject->fActorRadius;
+                    float Lifetime = pRequest.m_pObject->fGoalAngle;
+                    Pathing::ComputeFinalTangentForActor(&tangent_2, Lifetime, goalLoc, afRadiusc);
+                    pnodeN->SetTangent(tangent_2);
                 }
             }
         }
     }
-    if (bbuildDetailedPathRes) {
-        if (pRequest.m_pObject->bFaceTargetAtGoal) {
-            int32_t ShaderPropertyType = pSolution.m_pObject->iLastLoadedVirtualNodeIndex;
-            if (ShaderPropertyType == pSolution.m_pObject->GetVirtualNodeCount() - 1) {
-                PathingNode* pnodeN = pSolution.m_pObject->GetNode(pSolution.m_pObject->GetNodeCount() - 1);
-                PathingNode* pnodeN1 = pSolution.m_pObject->GetNode(pSolution.m_pObject->GetNodeCount() - 2);
-                if (pnodeN) {
-                    if (pnodeN1) {
-                        PathingLocation endLoc(*&pnodeN->Location);
-                        PathingLocation prevLoc(*&pnodeN1->Location);
-                        NiPoint3* afRadiusb = &(v17 = prevLoc.GetLocation());
-                        if ((endLoc.GetLocation() - *afRadiusb).SqrLength() > 4096.0) {
-                            PathingLocation goalLoc(*&pnodeN->Location);
-                            float afRadiusc = pRequest.m_pObject->fActorRadius;
-                            float Lifetime = pRequest.m_pObject->fGoalAngle;
-                            Pathing::ComputeFinalTangentForActor(&tangent_2, Lifetime, goalLoc, afRadiusc);
-                            pnodeN->SetTangent(tangent_2);
-                        }
-                    }
-                }
-            }
-        }
-    }
+
     return bbuildDetailedPathRes;
 }
 
@@ -1028,12 +1013,11 @@ bool PathBuilder::FindClosestOpenEdge(PathingLocation aStartLocation, PathingLoc
     if (v36 == -1) {
         return false;
     }
-    else {
-        PathingLocation* aLoc =
-            FNVD_RECONSTRUCT(PathingLocation)(&v15, arLocation, v32.GetAt(static_cast<int32_t>(v36)), v35);
-        aRetLocation.operator=(*aLoc);
-        return true;
-    }
+
+    PathingLocation* aLoc =
+        FNVD_RECONSTRUCT(PathingLocation)(&v15, arLocation, v32.GetAt(static_cast<int32_t>(v36)), v35);
+    aRetLocation.operator=(*aLoc);
+    return true;
 }
 
 bool PathBuilder::RunNavMeshSearch(
@@ -1501,23 +1485,20 @@ bool PathBuilder::RunNavMeshSearch_006CD670(
                 apMemory.~NiPointer<NavMesh>();
                 return true;
             }
-            else {
-                apThis.~NavMeshSearch();
-                v11.~NiPointer<NavMesh>();
-                apMemory.~NiPointer<NavMesh>();
-                return false;
-            }
-        }
-        else {
+
+            apThis.~NavMeshSearch();
             v11.~NiPointer<NavMesh>();
             apMemory.~NiPointer<NavMesh>();
             return false;
         }
-    }
-    else {
+
+        v11.~NiPointer<NavMesh>();
         apMemory.~NiPointer<NavMesh>();
         return false;
     }
+
+    apMemory.~NiPointer<NavMesh>();
+    return false;
 }
 
 bool PathBuilder::RunPathSmoother(
@@ -1551,28 +1532,24 @@ bool PathBuilder::RunPathSmoother(
             povSearch.BuildPath(aStartLocation, aGoalLocation, &kTriangles, pRequest.m_pObject, pSolution.m_pObject);
         return v25;
     }
-    else {
-        if (bUseOldPathSmoothing.Bool()) {
-            PathSmoother pathSmoother;
-            PathingSolution* m_pObject = pSolution.m_pObject;
-            NiPoint3* Location_ = ::new (&result) NiPoint3(aGoalLocation.GetLocation());
-            bool v24 = pathSmoother.SmoothPath(
-                pRequest.m_pObject, aNodes, aLinks, aStartLocation.GetLocation(), *Location_, m_pObject, &aBadNodes,
-                true
-            );
-            return v24;
-        }
-        else {
-            PathSmootherPOVSearch pathSmoother_2;
-            PathingSolution* v15 = pSolution.m_pObject;
-            NiPoint3* v13 = ::new (&v20) NiPoint3(aGoalLocation.GetLocation());
-            bool v21 = pathSmoother_2.SmoothPath(
-                pRequest.m_pObject, aNodes, aLinks, aStartLocation.GetLocation(), *v13, v15, &aBadNodes,
-                &DetailedPathInfos
-            );
-            return v21;
-        }
+
+    if (bUseOldPathSmoothing.Bool()) {
+        PathSmoother pathSmoother;
+        PathingSolution* m_pObject = pSolution.m_pObject;
+        NiPoint3* Location_ = ::new (&result) NiPoint3(aGoalLocation.GetLocation());
+        bool v24 = pathSmoother.SmoothPath(
+            pRequest.m_pObject, aNodes, aLinks, aStartLocation.GetLocation(), *Location_, m_pObject, &aBadNodes, true
+        );
+        return v24;
     }
+
+    PathSmootherPOVSearch pathSmoother_2;
+    PathingSolution* v15 = pSolution.m_pObject;
+    NiPoint3* v13 = ::new (&v20) NiPoint3(aGoalLocation.GetLocation());
+    bool v21 = pathSmoother_2.SmoothPath(
+        pRequest.m_pObject, aNodes, aLinks, aStartLocation.GetLocation(), *v13, v15, &aBadNodes, &DetailedPathInfos
+    );
+    return v21;
 }
 
 // The portal triangles are 32-bit values that are read as 16-bit where a triangle index is passed, as the game does.

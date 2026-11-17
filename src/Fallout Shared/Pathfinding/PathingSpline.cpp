@@ -125,22 +125,20 @@ bool PathingSpline::FindPointOnSpline(
             *apReturnPoint = pt;
             return true;
         }
-        else {
-            if (abForward) {
-                *apfReturnParameter = 1.0;
-                *apReturnPoint = Key2.Location;
-            }
-            else {
-                *apfReturnParameter = 0.0;
-                *apReturnPoint = Key1.Location;
-            }
-            return false;
+
+        if (abForward) {
+            *apfReturnParameter = 1.0;
+            *apReturnPoint = Key2.Location;
         }
+        else {
+            *apfReturnParameter = 0.0;
+            *apReturnPoint = Key1.Location;
+        }
+        return false;
     }
-    else {
-        NiPoint3* v7 = &(v15 = Interpolate(afStartParameter));
-        *apReturnPoint = *v7;
-        *apfReturnParameter = afStartParameter;
-        return true;
-    }
+
+    NiPoint3* v7 = &(v15 = Interpolate(afStartParameter));
+    *apReturnPoint = *v7;
+    *apfReturnParameter = afStartParameter;
+    return true;
 }

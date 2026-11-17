@@ -117,16 +117,15 @@ hkStringBuf& hkStringBuf::operator=(const char* s) {
         hkString::memCpy(m_string.begin(), s, v3);
         return *this;
     }
-    else {
-        hkMemoryAllocator* v10 = (&hkMemoryRouter::getInstance())->m_temp;
-        if ((m_string.m_capacityAndFlags & hkArrayBase<char>::CAPACITY_MASK) == 0) {
-            hkArrayUtil::_reserve(v10, &m_string, 1, sizeof(char));
-        }
-        char* v11 = m_string.begin();
-        m_string.m_size = 1;
-        *v11 = 0;
-        return *this;
+
+    hkMemoryAllocator* v10 = (&hkMemoryRouter::getInstance())->m_temp;
+    if ((m_string.m_capacityAndFlags & hkArrayBase<char>::CAPACITY_MASK) == 0) {
+        hkArrayUtil::_reserve(v10, &m_string, 1, sizeof(char));
     }
+    char* v11 = m_string.begin();
+    m_string.m_size = 1;
+    *v11 = 0;
+    return *this;
 }
 
 hkStringBuf& hkStringBuf::operator=(const hkStringBuf& s) {
@@ -488,9 +487,8 @@ int32_t hkStringBuf::indexOf(const char* a1, int32_t a2, int32_t a3) {
         return v5 -
             static_cast<hkArrayBase<char>&>(static_cast<hkArray<char, hkContainerTempAllocator>&>(m_string)).begin();
     }
-    else {
-        return -1;
-    }
+
+    return -1;
 }
 
 int32_t hkStringBuf::slice(int32_t a1, int32_t a2) {

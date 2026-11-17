@@ -21,9 +21,8 @@ BSSimpleArray<uint16_t, 1024>* NavMeshGrid::GetTrianglesForGridCell(uint32_t aiI
     if (aiIndex < iGridSize * iGridSize) {
         return &GridData[aiIndex];
     }
-    else {
-        return nullptr;
-    }
+
+    return nullptr;
 }
 
 bool NavMeshGrid::IsTriangleInGridCell(uint16_t aiTriangle, uint32_t aiIndex) {
@@ -168,10 +167,9 @@ bool NavMeshGrid::Load(const char* apBuffer, uint32_t aiBufferSize, TESFile* apF
         }
         return true;
     }
-    else {
-        GridData = nullptr;
-        return false;
-    }
+
+    GridData = nullptr;
+    return false;
 }
 
 void NavMeshGrid::Clear() {

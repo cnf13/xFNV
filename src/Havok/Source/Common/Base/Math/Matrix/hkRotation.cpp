@@ -72,27 +72,26 @@ hkBool* hkRotation::isOrthonormal(hkBool* a2, float a3) const {
         *a2 = false;
         return a2;
     }
-    else {
-        *a2 = (_mm_movemask_ps(_mm_cmple_ps(
-                   _mm_and_ps(
+
+    *a2 = (_mm_movemask_ps(_mm_cmple_ps(
+               _mm_and_ps(
+                   _mm_sub_ps(
                        _mm_sub_ps(
-                           _mm_sub_ps(
-                               _mm_mul_ps(
-                                   _mm_shuffle_ps(m_col1.m_quad, m_col1.m_quad, 210),
-                                   _mm_shuffle_ps(v3.m_quad, v3.m_quad, 201)
-                               ),
-                               _mm_mul_ps(
-                                   _mm_shuffle_ps(m_col1.m_quad, m_col1.m_quad, 201),
-                                   _mm_shuffle_ps(v3.m_quad, v3.m_quad, 210)
-                               )
+                           _mm_mul_ps(
+                               _mm_shuffle_ps(m_col1.m_quad, m_col1.m_quad, 210),
+                               _mm_shuffle_ps(v3.m_quad, v3.m_quad, 201)
                            ),
-                           m_col2.m_quad
+                           _mm_mul_ps(
+                               _mm_shuffle_ps(m_col1.m_quad, m_col1.m_quad, 201),
+                               _mm_shuffle_ps(v3.m_quad, v3.m_quad, 210)
+                           )
                        ),
-                       hkVector4_setAbs4_absMask
+                       m_col2.m_quad
                    ),
-                   _mm_shuffle_ps(_mm_set_ss(a3), _mm_set_ss(a3), 0)
-               )) &
-               7) == 7;
-        return a2;
-    }
+                   hkVector4_setAbs4_absMask
+               ),
+               _mm_shuffle_ps(_mm_set_ss(a3), _mm_set_ss(a3), 0)
+           )) &
+           7) == 7;
+    return a2;
 }

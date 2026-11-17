@@ -60,39 +60,32 @@ bool DoorLock::CanActorIgnoreDoorLock(Actor* apActor, bool abActivate, bool abMo
             if (pLockData && (!pLockData->IsLocked() && abMovement)) {
                 return true;
             }
+
+            TESObjectCELL* ParentCell;
+            TESObjectCELL* v5;
+            if (apActor != pPlayer &&
+                (apActor->GetParentCell() &&
+                 ((ParentCell = apActor->GetParentCell(), ParentCell->GetOwner()) &&
+                  (v5 = apActor->GetParentCell(), v5->IsActorCellOwner(apActor))))) {
+                if (!pTeleportDoorCell ||
+                    (!pTeleportDoorCell->GetOwner() || pTeleportDoorCell->IsActorCellOwner(apActor))) {
+                    return true;
+                }
+            }
             else {
-                TESObjectCELL* ParentCell;
-                TESObjectCELL* v5;
-                if (apActor != pPlayer &&
-                    (apActor->GetParentCell() &&
-                     ((ParentCell = apActor->GetParentCell(), ParentCell->GetOwner()) &&
-                      (v5 = apActor->GetParentCell(), v5->IsActorCellOwner(apActor))))) {
-                    if (!pTeleportDoorCell ||
-                        (!pTeleportDoorCell->GetOwner() || pTeleportDoorCell->IsActorCellOwner(apActor))) {
+                if (apActor == pPlayer || !IsActorAnOwner(apActor, true)) {
+                    if (apActor->IsActoraGuard() && apActor->IsAlarmed()) {
+                        return true;
+                    }
+
+                    if ((apActor == pPlayer && pPlayer->IsTresPassing()) && (pTeleportDoorCell) && (pLockData) &&
+                        (pLockData->cLockLevel != 100 &&
+                         (!pTeleportDoorCell->GetInterior() || pTeleportDoorCell->GetPublic()))) {
                         return true;
                     }
                 }
                 else {
-                    if (apActor == pPlayer || !IsActorAnOwner(apActor, true)) {
-                        if (apActor->IsActoraGuard() && apActor->IsAlarmed()) {
-                            return true;
-                        }
-                        else {
-                            if (apActor == pPlayer && pPlayer->IsTresPassing()) {
-                                if (pTeleportDoorCell) {
-                                    if (pLockData) {
-                                        if (pLockData->cLockLevel != 100 &&
-                                            (!pTeleportDoorCell->GetInterior() || pTeleportDoorCell->GetPublic())) {
-                                            return true;
-                                        }
-                                    }
-                                }
-                            }
-                        }
-                    }
-                    else {
-                        return true;
-                    }
+                    return true;
                 }
             }
         }
@@ -119,19 +112,14 @@ bool DoorLock::CanActorIgnoreDoorLock(const ActorLockData* apActorData, bool abN
                     if (IsAnOwner(apActorData, true)) {
                         return true;
                     }
-                    else {
-                        TESClass* pclass = nullptr;
+
+                    TESClass* pclass = nullptr;
+                    if ((apActorData->pActorBase) && (apActorData->pActorBase->GetFormType() == NPC__ID)) {
                         if (apActorData->pActorBase) {
-                            if (apActorData->pActorBase->GetFormType() == NPC__ID) {
-                                if (apActorData->pActorBase) {
-                                    pclass = static_cast<TESNPC*>(apActorData->pActorBase)->TESNPC::GetClass();
-                                }
-                                if (pclass) {
-                                    if (pclass->IsGuard() && apActorData->bIsAlarmed) {
-                                        return true;
-                                    }
-                                }
-                            }
+                            pclass = static_cast<TESNPC*>(apActorData->pActorBase)->TESNPC::GetClass();
+                        }
+                        if ((pclass) && (pclass->IsGuard() && apActorData->bIsAlarmed)) {
+                            return true;
                         }
                     }
                 }
@@ -160,31 +148,24 @@ bool DoorLock::CanActorUnlockDoorLock(
         if (CanActorIgnoreDoorLock(apActorLockData, false)) {
             return true;
         }
-        else {
-            if (pLockData->IsLocked()) {
-                if (pLockData->pKey &&
-                    (apActorLockData->pInventory &&
-                     apActorLockData->pInventory->ContainerHasObjects(
-                         pLockData->pKey, POTYPE_NONE, 1, aeMatchId, 0, nullptr
-                     ))) {
-                    return true;
-                }
-                else {
-                    if (pLockData->GetLockLevel(apDoorRef) != 5) {
-                        if (apActorLockData->pInventory) {
-                            if (apActorLockData->pInventory->ContainerHasObjects(
-                                    pLockpick, POTYPE_NONE, 1, aeMatchId, 0, nullptr
-                                )) {
-                                v7 = true;
-                                abOutMustPick = true;
-                            }
-                        }
-                    }
-                }
-            }
-            else {
+
+        if (pLockData->IsLocked()) {
+            if (pLockData->pKey &&
+                (apActorLockData->pInventory &&
+                 apActorLockData->pInventory->ContainerHasObjects(
+                     pLockData->pKey, POTYPE_NONE, 1, aeMatchId, 0, nullptr
+                 ))) {
                 return true;
             }
+
+            if ((pLockData->GetLockLevel(apDoorRef) != 5) && (apActorLockData->pInventory) &&
+                (apActorLockData->pInventory->ContainerHasObjects(pLockpick, POTYPE_NONE, 1, aeMatchId, 0, nullptr))) {
+                v7 = true;
+                abOutMustPick = true;
+            }
+        }
+        else {
+            return true;
         }
     }
     return v7;
@@ -192,29 +173,24 @@ bool DoorLock::CanActorUnlockDoorLock(
 
 bool DoorLock::IsAnOwner(const ActorLockData* apActorData, bool abUseFaction) {
     bool v6 = false;
-    if (pOwnershipForm) {
-        if (apActorData) {
-            v6 = true;
-            if (pOwnershipForm != apActorData->pActorBase) {
-                TESFaction* apFaction = nullptr;
-                if (pOwnershipForm) {
-                    if (pOwnershipForm->GetFormType() == 8) {
-                        apFaction = static_cast<TESFaction*>(pOwnershipForm);
-                    }
-                }
-                if ((!apFaction || !abUseFaction) && (!pOwnershipGlobal || pOwnershipGlobal->GetValue() == 0.0)) {
-                    v6 = false;
-                }
-                if (apFaction) {
-                    if (apActorData->pActorBase) {
-                        if (apActorData->pActorBase->GetFactionRank(apFaction, false) < iOwnershipRank) {
-                            return false;
-                        }
-                    }
-                }
+    if ((pOwnershipForm) && (apActorData)) {
+        v6 = true;
+        if (pOwnershipForm != apActorData->pActorBase) {
+            TESFaction* apFaction = nullptr;
+            if ((pOwnershipForm) && (pOwnershipForm->GetFormType() == 8)) {
+                apFaction = static_cast<TESFaction*>(pOwnershipForm);
+            }
+
+            if ((!apFaction || !abUseFaction) && (!pOwnershipGlobal || pOwnershipGlobal->GetValue() == 0.0)) {
+                v6 = false;
+            }
+            if ((apFaction) && (apActorData->pActorBase) &&
+                (apActorData->pActorBase->GetFactionRank(apFaction, false) < iOwnershipRank)) {
+                return false;
             }
         }
     }
+
     return v6;
 }
 
@@ -257,38 +233,32 @@ void DoorLock::SetFromDoorRef(TESObjectREFR* apDoorRef) {
 
 bool DoorLock::IsActorAnOwner(Actor* apActor, bool abUseFaction) {
     bool v9 = false;
-    if (pOwnershipForm) {
-        if (apActor) {
-            v9 = true;
-            TESBoundObject* ObjectReference = apActor->GetTemplateActorBase();
-            if (!ObjectReference) {
-                ObjectReference = apActor->GetObjectReference();
+    if ((pOwnershipForm) && (apActor)) {
+        v9 = true;
+        TESBoundObject* ObjectReference = apActor->GetTemplateActorBase();
+        if (!ObjectReference) {
+            ObjectReference = apActor->GetObjectReference();
+        }
+        TESActorBase* v8 = nullptr;
+        int32_t FormType = ObjectReference->GetFormType();
+        if (FormType >= 42 && FormType <= 43) {
+            v8 = dynamic_cast<TESActorBase*>(ObjectReference);
+        }
+        if (pOwnershipForm != ObjectReference) {
+            TESFaction* apFaction = nullptr;
+            if ((pOwnershipForm) && (pOwnershipForm->GetFormType() == 8)) {
+                apFaction = static_cast<TESFaction*>(pOwnershipForm);
             }
-            TESActorBase* v8 = nullptr;
-            int32_t FormType = ObjectReference->GetFormType();
-            if (FormType >= 42 && FormType <= 43) {
-                v8 = dynamic_cast<TESActorBase*>(ObjectReference);
+
+            if ((!apFaction || !abUseFaction) && (!pOwnershipGlobal || pOwnershipGlobal->GetValue() == 0.0)) {
+                v9 = false;
             }
-            if (pOwnershipForm != ObjectReference) {
-                TESFaction* apFaction = nullptr;
-                if (pOwnershipForm) {
-                    if (pOwnershipForm->GetFormType() == 8) {
-                        apFaction = static_cast<TESFaction*>(pOwnershipForm);
-                    }
-                }
-                if ((!apFaction || !abUseFaction) && (!pOwnershipGlobal || pOwnershipGlobal->GetValue() == 0.0)) {
-                    v9 = false;
-                }
-                if (apFaction) {
-                    if (v8) {
-                        if (v8->GetFactionRank(apFaction, apActor == pPlayer) < iOwnershipRank) {
-                            return false;
-                        }
-                    }
-                }
+            if ((apFaction) && (v8) && (v8->GetFactionRank(apFaction, apActor == pPlayer) < iOwnershipRank)) {
+                return false;
             }
         }
     }
+
     return v9;
 }
 

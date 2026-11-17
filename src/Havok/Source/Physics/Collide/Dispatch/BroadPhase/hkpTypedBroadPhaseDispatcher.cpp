@@ -31,11 +31,10 @@ void hkpTypedBroadPhaseDispatcher::removeDuplicates(
             int32_t iNew;
             for (iNew = 0; iNew < newPairs.getSize(); ++iNew) {
                 hkpBroadPhaseHandlePair& newPair = newPairs.m_data[iNew];
-                if (delPair.m_a == newPair.m_a) {
-                    if (delPair.m_b == newPair.m_b) {
-                        break;
-                    }
+                if ((delPair.m_a == newPair.m_a) && (delPair.m_b == newPair.m_b)) {
+                    break;
                 }
+
                 if (delPair.m_a == newPair.m_b && delPair.m_b == newPair.m_a) {
                     break;
                 }

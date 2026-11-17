@@ -22,8 +22,8 @@ void registerDefaultAddRayHitFunction();
 template <typename BOUNDING_VOLUME, typename hkIdxType>
 void hkAabbTreeRayCastUtil<BOUNDING_VOLUME, hkIdxType>::filterRays(
     const Tree* tree,
-    const typename Tree::Node* nodeSpu,
-    const typename Tree::Node* skipNode,
+    const Tree::Node* nodeSpu,
+    const Tree::Node* skipNode,
     const hkAabbTreeData::Ray* rays,
     hkCpuWorldRayCastCollector* collectors,
     hkpFixedBufferRayHitCollector* fixedBufferCollectors,
@@ -39,11 +39,11 @@ void hkAabbTreeRayCastUtil<BOUNDING_VOLUME, hkIdxType>::filterRays(
     int32_t* numRaysOut0,
     int32_t* raysIdxOut1,
     int32_t* numRaysOut1,
-    typename Tree::Node* child0Out,
-    typename Tree::Node* child1Out
+    Tree::Node* child0Out,
+    Tree::Node* child1Out
 ) {
     using QueryUtils = hkAabbTreeQueryUtils<BOUNDING_VOLUME, hkIdxType>;
-    using Collector = typename QueryUtils::Collector;
+    using Collector = QueryUtils::Collector;
 
     *numRaysOut1 = 0;
     *numRaysOut0 = 0;
@@ -152,7 +152,7 @@ void hkAabbTreeRayCastUtil<BOUNDING_VOLUME, hkIdxType>::castRayFiltering(
     int32_t numRays
 ) {
     using TreeTask = Task<BOUNDING_VOLUME, hkIdxType>;
-    using Node = typename Tree::Node;
+    using Node = Tree::Node;
     if (!tree) {
         return;
     }

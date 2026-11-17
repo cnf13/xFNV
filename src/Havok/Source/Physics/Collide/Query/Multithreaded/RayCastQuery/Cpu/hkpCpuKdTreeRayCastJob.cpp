@@ -60,12 +60,18 @@ void hkKdTreeCpuBroadphaseBundleCastCollector::addMidPhaseHit(hkPrimitiveId prim
         kTo[i]._setRotatedInverseDir(rTransform.m_rotation, kRelative);
     }
     // Coordinate c of the four ends in m_from[c] and m_to[c]; the w lanes are dropped.
-    hkQuadReal kFrom0 = kFrom[0].m_quad, kFrom1 = kFrom[1].m_quad, kFrom2 = kFrom[2].m_quad, kFrom3 = kFrom[3].m_quad;
+    hkQuadReal kFrom0 = kFrom[0].m_quad;
+    hkQuadReal kFrom1 = kFrom[1].m_quad;
+    hkQuadReal kFrom2 = kFrom[2].m_quad;
+    hkQuadReal kFrom3 = kFrom[3].m_quad;
     _MM_TRANSPOSE4_PS(kFrom0, kFrom1, kFrom2, kFrom3);
     m_workInput.m_from[0].m_quad = kFrom0;
     m_workInput.m_from[1].m_quad = kFrom1;
     m_workInput.m_from[2].m_quad = kFrom2;
-    hkQuadReal kTo0 = kTo[0].m_quad, kTo1 = kTo[1].m_quad, kTo2 = kTo[2].m_quad, kTo3 = kTo[3].m_quad;
+    hkQuadReal kTo0 = kTo[0].m_quad;
+    hkQuadReal kTo1 = kTo[1].m_quad;
+    hkQuadReal kTo2 = kTo[2].m_quad;
+    hkQuadReal kTo3 = kTo[3].m_quad;
     _MM_TRANSPOSE4_PS(kTo0, kTo1, kTo2, kTo3);
     m_workInput.m_to[0].m_quad = kTo0;
     m_workInput.m_to[1].m_quad = kTo1;

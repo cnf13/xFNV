@@ -94,16 +94,15 @@ bool ImageSpaceEffectRefraction::UpdateParams(ImageSpaceEffectParam* apParam) {
 BSRenderedTexture* ImageSpaceEffectRefraction::GetRefractionNormalsTexture(bool abCreate) {
     BSRenderedTexture* v3;
     ImageSpaceTexture* p_spRefractionNormalBuffer = &spRefractionNormalBuffer;
-    if (!(&spRefractionNormalBuffer)->GetTexture()) {
-        if (abCreate) {
-            bCreateDiscardable = (uint32_t)0;
-            v3 = BSShaderManager::pTextureManager->BorrowRenderedTexture(
-                static_cast<NiDX9Renderer*>(NiRenderer::ms_pkRenderer), BSTextureManager::TEX_REFRACTION_NORMALS,
-                (uint32_t)0, nullptr, (uint32_t)0
-            );
-            p_spRefractionNormalBuffer->SetTexture(v3);
-            bCreateDiscardable = (uint32_t)1;
-        }
+    if ((!(&spRefractionNormalBuffer)->GetTexture()) && (abCreate)) {
+        bCreateDiscardable = (uint32_t)0;
+        v3 = BSShaderManager::pTextureManager->BorrowRenderedTexture(
+            static_cast<NiDX9Renderer*>(NiRenderer::ms_pkRenderer), BSTextureManager::TEX_REFRACTION_NORMALS,
+            (uint32_t)0, nullptr, (uint32_t)0
+        );
+        p_spRefractionNormalBuffer->SetTexture(v3);
+        bCreateDiscardable = (uint32_t)1;
     }
+
     return p_spRefractionNormalBuffer->GetRenderedTexture();
 }

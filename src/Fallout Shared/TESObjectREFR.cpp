@@ -897,24 +897,20 @@ bool TESObjectREFR::SavesBefore(TESForm* apForm) {
 
 bool TESObjectREFR::SavesBefore(FORM* apGroupFORM) {
     bool bretval = false;
-    if (apGroupFORM) {
-        if (apGroupFORM->form == formEnumString[2].uiFormString) {
-            uint32_t iFormID = apGroupFORM->iFormID;
-            if (iFormID < 8 || iFormID > 9) {
-                TESObjectCELL* pcell_2 = GetSaveParentCell();
-                return pcell_2->SavesBefore(apGroupFORM);
-            }
-            else {
-                TESForm* FormByNumericID = TESForm::GetFormByNumericID(apGroupFORM->flags);
-                TESObjectCELL* pcell = dynamic_cast<TESObjectCELL*>(FormByNumericID);
-                if (pcell) {
-                    if (GetSaveParentCell() == pcell) {
-                        return GetRefPersists() && apGroupFORM->iFormID == 9;
-                    }
-                }
-            }
+    if ((apGroupFORM) && (apGroupFORM->form == formEnumString[2].uiFormString)) {
+        uint32_t iFormID = apGroupFORM->iFormID;
+        if (iFormID < 8 || iFormID > 9) {
+            TESObjectCELL* pcell_2 = GetSaveParentCell();
+            return pcell_2->SavesBefore(apGroupFORM);
+        }
+
+        TESForm* FormByNumericID = TESForm::GetFormByNumericID(apGroupFORM->flags);
+        TESObjectCELL* pcell = dynamic_cast<TESObjectCELL*>(FormByNumericID);
+        if ((pcell) && (GetSaveParentCell() == pcell)) {
+            return GetRefPersists() && apGroupFORM->iFormID == 9;
         }
     }
+
     return bretval;
 }
 
@@ -1034,149 +1030,129 @@ TESForm* TESObjectREFR::CreateDuplicateForm(bool abCreateEditorID, NiTPointerMap
 void TESObjectREFR::PostDuplicateProcess(NiTPointerMap<TESForm*, TESForm*>* apCopyMap) {
     if (apCopyMap) {
         TESForm* pcopy = nullptr;
-        if (apCopyMap->GetAt(this, pcopy)) {
-            if (pcopy) {
-                TESObjectREFR* pcopyref = dynamic_cast<TESObjectREFR*>(pcopy);
-                if (pcopyref) {
-                    int32_t i;
-                    TESForm* ptemp;
-                    TESObjectREFR* pesparent = GetEnableStateParent();
-                    if (pesparent) {
+        if ((apCopyMap->GetAt(this, pcopy)) && (pcopy)) {
+            TESObjectREFR* pcopyref = dynamic_cast<TESObjectREFR*>(pcopy);
+            if (pcopyref) {
+                int32_t i;
+                TESForm* ptemp;
+                TESObjectREFR* pesparent = GetEnableStateParent();
+                if (pesparent) {
+                    ptemp = nullptr;
+                    if ((apCopyMap->GetAt(pesparent, ptemp)) && (ptemp)) {
+                        TESObjectREFR* pcopyesparent = dynamic_cast<TESObjectREFR*>(ptemp);
+                        if (pcopyesparent) {
+                            pcopyref->SetEnableStateParent(pcopyesparent);
+                            bool EnableStateInverse = GetEnableStateInverse();
+                            pcopyref->SetEnableStateInverse(EnableStateInverse);
+                            (&pcopyesparent->m_Extra)->AddEnableStateChild(pcopyref);
+                        }
+                    }
+                }
+                TESObjectREFR* ptelmark = GetRandomTeleportMarker();
+                if (ptelmark) {
+                    ptemp = nullptr;
+                    if ((apCopyMap->GetAt(ptelmark, ptemp)) && (ptemp)) {
+                        TESObjectREFR* pcopytelmark = dynamic_cast<TESObjectREFR*>(ptemp);
+                        if (pcopytelmark) {
+                            pcopyref->SetRandomTeleportMarker(pcopytelmark);
+                        }
+                    }
+                }
+                TESObjectREFR* plinkedref = GetLinkedRef();
+                if (plinkedref) {
+                    ptemp = nullptr;
+                    if ((apCopyMap->GetAt(plinkedref, ptemp)) && (ptemp)) {
+                        TESObjectREFR* pcopylinkedref = dynamic_cast<TESObjectREFR*>(ptemp);
+                        if (pcopylinkedref) {
+                            pcopyref->SetLinkedRef(pcopylinkedref);
+                            (&pcopylinkedref->m_Extra)->AddLinkedRefChild(pcopyref);
+                        }
+                    }
+                }
+                for (i = 0; i < 2; ++i) {
+                    TESObjectREFR* proomref = (&m_Extra)->GetPortalLinkedRoomRef(i);
+                    if (proomref) {
                         ptemp = nullptr;
-                        if (apCopyMap->GetAt(pesparent, ptemp)) {
-                            if (ptemp) {
-                                TESObjectREFR* pcopyesparent = dynamic_cast<TESObjectREFR*>(ptemp);
-                                if (pcopyesparent) {
-                                    pcopyref->SetEnableStateParent(pcopyesparent);
-                                    bool EnableStateInverse = GetEnableStateInverse();
-                                    pcopyref->SetEnableStateInverse(EnableStateInverse);
-                                    (&pcopyesparent->m_Extra)->AddEnableStateChild(pcopyref);
-                                }
+                        if (apCopyMap->GetAt(proomref, ptemp) && ptemp) {
+                            TESObjectREFR* pcopyroomref = dynamic_cast<TESObjectREFR*>(ptemp);
+                            if (pcopyroomref) {
+                                (&pcopyref->m_Extra)->SetPortalLinkedRoomRef(i, pcopyroomref);
                             }
                         }
+                        else {
+                            (&pcopyref->m_Extra)->SetPortalLinkedRoomRef(i, proomref);
+                        }
                     }
-                    TESObjectREFR* ptelmark = GetRandomTeleportMarker();
-                    if (ptelmark) {
+                }
+                for (i = 0; i < 4; ++i) {
+                    TESObjectREFR* pplaneref = (&m_Extra)->GetLinkedPlaneRef(i);
+                    if (pplaneref) {
                         ptemp = nullptr;
-                        if (apCopyMap->GetAt(ptelmark, ptemp)) {
-                            if (ptemp) {
-                                TESObjectREFR* pcopytelmark = dynamic_cast<TESObjectREFR*>(ptemp);
-                                if (pcopytelmark) {
-                                    pcopyref->SetRandomTeleportMarker(pcopytelmark);
-                                }
+                        if ((apCopyMap->GetAt(pplaneref, ptemp)) && (ptemp)) {
+                            TESObjectREFR* pcopyPlaneref = dynamic_cast<TESObjectREFR*>(ptemp);
+                            if (pcopyPlaneref) {
+                                (&pcopyref->m_Extra)->SetLinkedPlaneRef(pcopyPlaneref, i);
                             }
                         }
                     }
-                    TESObjectREFR* plinkedref = GetLinkedRef();
-                    if (plinkedref) {
-                        ptemp = nullptr;
-                        if (apCopyMap->GetAt(plinkedref, ptemp)) {
-                            if (ptemp) {
-                                TESObjectREFR* pcopylinkedref = dynamic_cast<TESObjectREFR*>(ptemp);
-                                if (pcopylinkedref) {
-                                    pcopyref->SetLinkedRef(pcopylinkedref);
-                                    (&pcopylinkedref->m_Extra)->AddLinkedRefChild(pcopyref);
-                                }
-                            }
+                }
+                BSSimpleList<REF_ACTIVATE_DATA*>* pactlist = (&m_Extra)->GetActivateParentList();
+                bool baddedact = false;
+                while (pactlist && !pactlist->IsEmpty()) {
+                    REF_ACTIVATE_DATA* pdata = pactlist->m_item;
+                    pactlist = pactlist->m_pkNext;
+                    ptemp = nullptr;
+                    if ((apCopyMap->GetAt(pdata->pActivateRef, ptemp)) && (ptemp)) {
+                        TESObjectREFR* pcopyactivateref = dynamic_cast<TESObjectREFR*>(ptemp);
+                        if (pcopyactivateref) {
+                            (&pcopyref->m_Extra)->AddActivateParent(pcopyactivateref);
+                            (&pcopyref->m_Extra)->SetActivateDelay(pcopyactivateref, pdata->fActivateDelay);
+                            baddedact = true;
+                            (&pcopyactivateref->m_Extra)->AddActivateRefChild(pcopyref);
                         }
                     }
-                    for (i = 0; i < 2; ++i) {
-                        TESObjectREFR* proomref = (&m_Extra)->GetPortalLinkedRoomRef(i);
-                        if (proomref) {
-                            ptemp = nullptr;
-                            if (apCopyMap->GetAt(proomref, ptemp) && ptemp) {
-                                TESObjectREFR* pcopyroomref = dynamic_cast<TESObjectREFR*>(ptemp);
-                                if (pcopyroomref) {
-                                    (&pcopyref->m_Extra)->SetPortalLinkedRoomRef(i, pcopyroomref);
-                                }
-                            }
-                            else {
-                                (&pcopyref->m_Extra)->SetPortalLinkedRoomRef(i, proomref);
-                            }
+                }
+                if (baddedact) {
+                    bool IsActivateParentOnly = (&m_Extra)->IsActivateParentOnly();
+                    (&pcopyref->m_Extra)->SetActivateParentOnly(IsActivateParentOnly);
+                }
+                for (BSSimpleList<REF_DECAL_DATA*>* pdecallist = (&m_Extra)->GetDecalRefs();
+                     pdecallist && !pdecallist->IsEmpty(); pdecallist = pdecallist->m_pkNext) {
+                    REF_DECAL_DATA* pdata_2 = pdecallist->m_item;
+                    ptemp = nullptr;
+                    if ((apCopyMap->GetAt(pdata_2->pDecalRef, ptemp)) && (ptemp)) {
+                        TESObjectREFR* pcopydecal = dynamic_cast<TESObjectREFR*>(ptemp);
+                        if (pcopydecal) {
+                            pcopyref->AddDecalRef(pcopydecal, pdata_2->Intersect, pdata_2->Normal);
                         }
                     }
-                    for (i = 0; i < 4; ++i) {
-                        TESObjectREFR* pplaneref = (&m_Extra)->GetLinkedPlaneRef(i);
-                        if (pplaneref) {
-                            ptemp = nullptr;
-                            if (apCopyMap->GetAt(pplaneref, ptemp)) {
-                                if (ptemp) {
-                                    TESObjectREFR* pcopyPlaneref = dynamic_cast<TESObjectREFR*>(ptemp);
-                                    if (pcopyPlaneref) {
-                                        (&pcopyref->m_Extra)->SetLinkedPlaneRef(pcopyPlaneref, i);
-                                    }
-                                }
-                            }
+                }
+                TESObjectREFR* pmerchcont = GetMerchantContainer();
+                if (pmerchcont) {
+                    ptemp = nullptr;
+                    if ((apCopyMap->GetAt(pmerchcont, ptemp)) && (ptemp)) {
+                        TESObjectREFR* pcopymerchcont = dynamic_cast<TESObjectREFR*>(ptemp);
+                        if (pcopymerchcont) {
+                            pcopyref->SetMerchantContainer(pcopymerchcont);
                         }
                     }
-                    BSSimpleList<REF_ACTIVATE_DATA*>* pactlist = (&m_Extra)->GetActivateParentList();
-                    bool baddedact = false;
-                    while (pactlist && !pactlist->IsEmpty()) {
-                        REF_ACTIVATE_DATA* pdata = pactlist->m_item;
-                        pactlist = pactlist->m_pkNext;
-                        ptemp = nullptr;
-                        if (apCopyMap->GetAt(pdata->pActivateRef, ptemp)) {
-                            if (ptemp) {
-                                TESObjectREFR* pcopyactivateref = dynamic_cast<TESObjectREFR*>(ptemp);
-                                if (pcopyactivateref) {
-                                    (&pcopyref->m_Extra)->AddActivateParent(pcopyactivateref);
-                                    (&pcopyref->m_Extra)->SetActivateDelay(pcopyactivateref, pdata->fActivateDelay);
-                                    baddedact = true;
-                                    (&pcopyactivateref->m_Extra)->AddActivateRefChild(pcopyref);
-                                }
-                            }
-                        }
-                    }
-                    if (baddedact) {
-                        bool IsActivateParentOnly = (&m_Extra)->IsActivateParentOnly();
-                        (&pcopyref->m_Extra)->SetActivateParentOnly(IsActivateParentOnly);
-                    }
-                    for (BSSimpleList<REF_DECAL_DATA*>* pdecallist = (&m_Extra)->GetDecalRefs();
-                         pdecallist && !pdecallist->IsEmpty(); pdecallist = pdecallist->m_pkNext) {
-                        REF_DECAL_DATA* pdata_2 = pdecallist->m_item;
-                        ptemp = nullptr;
-                        if (apCopyMap->GetAt(pdata_2->pDecalRef, ptemp)) {
-                            if (ptemp) {
-                                TESObjectREFR* pcopydecal = dynamic_cast<TESObjectREFR*>(ptemp);
-                                if (pcopydecal) {
-                                    pcopyref->AddDecalRef(pcopydecal, pdata_2->Intersect, pdata_2->Normal);
-                                }
-                            }
-                        }
-                    }
-                    TESObjectREFR* pmerchcont = GetMerchantContainer();
-                    if (pmerchcont) {
-                        ptemp = nullptr;
-                        if (apCopyMap->GetAt(pmerchcont, ptemp)) {
-                            if (ptemp) {
-                                TESObjectREFR* pcopymerchcont = dynamic_cast<TESObjectREFR*>(ptemp);
-                                if (pcopymerchcont) {
-                                    pcopyref->SetMerchantContainer(pcopymerchcont);
-                                }
-                            }
-                        }
-                    }
-                    DoorTeleportData* ptel = GetTeleport();
-                    if (ptel) {
-                        if (ptel->pLinkedDoor) {
-                            ptemp = nullptr;
-                            if (apCopyMap->GetAt(ptel->pLinkedDoor, ptemp)) {
-                                if (ptemp) {
-                                    TESObjectREFR* pcopylinkeddoor = dynamic_cast<TESObjectREFR*>(ptemp);
-                                    if (pcopylinkeddoor) {
-                                        DoorTeleportData* pcopytel = pcopyref->AddTeleport();
-                                        pcopytel->pLinkedDoor = pcopylinkeddoor;
-                                        NiPoint3 telangle = *&ptel->rotation;
-                                        TESObjectREFR* LinkedDoor = ptel->pLinkedDoor;
-                                        const NiPoint3* v4 = &LinkedDoor->GetLocationOnReference();
-                                        NiPoint3 teloffset = *&ptel->position - *v4;
-                                        const NiPoint3* v5 = &pcopylinkeddoor->GetLocationOnReference();
-                                        NiPoint3 telpos = *v5 + teloffset;
-                                        pcopytel->SetTeleportPosition(telpos);
-                                        pcopytel->SetTeleportRotation(telangle);
-                                    }
-                                }
-                            }
+                }
+                DoorTeleportData* ptel = GetTeleport();
+                if ((ptel) && (ptel->pLinkedDoor)) {
+                    ptemp = nullptr;
+                    if ((apCopyMap->GetAt(ptel->pLinkedDoor, ptemp)) && (ptemp)) {
+                        TESObjectREFR* pcopylinkeddoor = dynamic_cast<TESObjectREFR*>(ptemp);
+                        if (pcopylinkeddoor) {
+                            DoorTeleportData* pcopytel = pcopyref->AddTeleport();
+                            pcopytel->pLinkedDoor = pcopylinkeddoor;
+                            NiPoint3 telangle = *&ptel->rotation;
+                            TESObjectREFR* LinkedDoor = ptel->pLinkedDoor;
+                            const NiPoint3* v4 = &LinkedDoor->GetLocationOnReference();
+                            NiPoint3 teloffset = *&ptel->position - *v4;
+                            const NiPoint3* v5 = &pcopylinkeddoor->GetLocationOnReference();
+                            NiPoint3 telpos = *v5 + teloffset;
+                            pcopytel->SetTeleportPosition(telpos);
+                            pcopytel->SetTeleportRotation(telangle);
                         }
                     }
                 }
@@ -1573,22 +1549,17 @@ void TESObjectREFR::LoadGame(BGSLoadFormBuffer* apLoadGameBuffer) {
             }
         }
     }
-    if (TESForm::GetDestructible()) {
-        if (pLoadedData) {
-            if ((&pLoadedData->m_spData3D)->m_pObject) {
-                v13 = TESObjectREFR::GetExtra();
-                if (v13->GetObjectHealth() != (-1.0)) {
-                    if (TESObjectREFR::GetObjectReference()) {
-                        objectReference = TESObjectREFR::GetObjectReference();
-                        destructionForm = BGSDestructibleObjectForm::GetDestructionForm(objectReference);
-                        if (destructionForm->UpdateCurrentDamageStage(this, false)) {
-                            UpdateAddonNodeSounds(false);
-                        }
-                    }
-                }
+    if ((TESForm::GetDestructible()) && (pLoadedData) && ((&pLoadedData->m_spData3D)->m_pObject)) {
+        v13 = TESObjectREFR::GetExtra();
+        if ((v13->GetObjectHealth() != (-1.0)) && (TESObjectREFR::GetObjectReference())) {
+            objectReference = TESObjectREFR::GetObjectReference();
+            destructionForm = BGSDestructibleObjectForm::GetDestructionForm(objectReference);
+            if (destructionForm->UpdateCurrentDamageStage(this, false)) {
+                UpdateAddonNodeSounds(false);
             }
         }
     }
+
     NiNode* v16 = Get3D();
     UpdateLODMultInvisibility(this, v16);
 }
@@ -1611,11 +1582,10 @@ void TESObjectREFR::InitLoadGame(uint32_t aiFlags, uint32_t aiCurrentFlags) {
     if (((aiFlags & 1) != 0 || pEnableStateParent != nullptr) && (GetDisabled() || GetDelete())) {
         Set3D(nullptr, true);
     }
-    if ((aiFlags & 0x20) != 0) {
-        if (HasContainer()) {
-            InventoryChanges::GetInventoryChanges(this)->InitLoadGameTES();
-        }
+    if (((aiFlags & 0x20) != 0) && (HasContainer())) {
+        InventoryChanges::GetInventoryChanges(this)->InitLoadGameTES();
     }
+
     // The result only guards the disabled/deleted Set3D block below, whose masks are 0; the call stays.
     if (IsMobileObject()) {}
     if (IsActor()) {
@@ -1647,12 +1617,10 @@ void TESObjectREFR::InitLoadGame(BGSLoadFormBuffer* apLoadGameBuffer) {
     if (apLoadGameBuffer->GetChangeFlags().CheckFlags(0x8000020)) {
         InventoryChanges::GetInventoryChanges(this)->InitLoadGame(apLoadGameBuffer);
     }
-    if (GetObjectReference()) {
-        if (GetObjectReference()->TESForm::GetHasSpokenFlag() && GetDisabled()) {
-            TESWorldSpace* pWorldSpace = GetWorldSpace();
-            if (pWorldSpace) {
-                pWorldSpace->GetTerrainManager()->HideTree(this, true);
-            }
+    if ((GetObjectReference()) && (GetObjectReference()->TESForm::GetHasSpokenFlag() && GetDisabled())) {
+        TESWorldSpace* pWorldSpace = GetWorldSpace();
+        if (pWorldSpace) {
+            pWorldSpace->GetTerrainManager()->HideTree(this, true);
         }
     }
 }
@@ -1662,11 +1630,10 @@ void TESObjectREFR::InitLoadGame(BGSLoadFormBuffer* apLoadGameBuffer) {
 void TESObjectREFR::FinishInitLoadGame(uint32_t aiFlags, uint32_t aiOldFlags) {
     NiNode* pNode;
     TESForm::InitLoadGame(aiFlags, aiOldFlags);
-    if ((aiFlags & 0x20) != 0) {
-        if (HasContainer()) {
-            InventoryChanges::GetInventoryChanges(this)->InitScripts();
-        }
+    if (((aiFlags & 0x20) != 0) && (HasContainer())) {
+        InventoryChanges::GetInventoryChanges(this)->InitScripts();
     }
+
     pNode = TESObjectREFR::Get3D();
     if (pNode) {
         pNode->SetTranslate(this->GetLocationOnReference());
@@ -1734,10 +1701,9 @@ void TESObjectREFR::Revert(uint32_t aiFlags) {
     }
     if (pSaveLoadGameOLD->IsUnk048Zero() && GetObjectReference()) {
         uint32_t eType = GetObjectReference()->GetFormType();
-        if (eType == ACTI_ID || eType == SOUN_ID || eType == DOOR_ID) {
-            if (GetDisabled() || GetDelete() || (eType == DOOR_ID && GetDestroyed())) {
-                AttachSound(false);
-            }
+        if ((eType == ACTI_ID || eType == SOUN_ID || eType == DOOR_ID) &&
+            (GetDisabled() || GetDelete() || (eType == DOOR_ID && GetDestroyed()))) {
+            AttachSound(false);
         }
     }
 }
@@ -1749,11 +1715,10 @@ void TESObjectREFR::Revert(BGSLoadFormBuffer* apLoadGameBuffer) {
         pLoadedData->fCachedRadius = -1.0f;
     }
     bool bactor = IsActor();
-    if (!bactor) {
-        if (apLoadGameBuffer->GetOldChangeFlags().CheckFlags(CHANGE_OBJECT_EMPTY)) {
-            SetEmpty(false);
-        }
+    if ((!bactor) && (apLoadGameBuffer->GetOldChangeFlags().CheckFlags(CHANGE_OBJECT_EMPTY))) {
+        SetEmpty(false);
     }
+
     bool v23 = (&m_Extra)->GetObjectHealth() != -1.0;
     uint32_t aiFlags = bactor ? 0xA4061840u
                               : CHANGE_REFR_EXTRA_OWNERSHIP | CHANGE_REFR_EXTRA_GAME_ONLY |
@@ -1763,17 +1728,14 @@ void TESObjectREFR::Revert(BGSLoadFormBuffer* apLoadGameBuffer) {
     if (apLoadGameBuffer->GetOldChangeFlags().CheckFlags(v13)) {
         (&m_Extra)->Revert_0042DAE0(apLoadGameBuffer);
     }
-    if (v23 && GetDestructible()) {
-        if (pLoadedData) {
-            if (pLoadedData->m_spData3D.m_pObject) {
-                BGSDestructibleObjectForm* DestructionForm =
-                    BGSDestructibleObjectForm::GetDestructionForm(GetObjectReference());
-                if (DestructionForm->UpdateCurrentDamageStage(this, true)) {
-                    UpdateAddonNodeSounds(false);
-                }
-            }
+    if ((v23 && GetDestructible()) && (pLoadedData) && (pLoadedData->m_spData3D.m_pObject)) {
+        BGSDestructibleObjectForm* DestructionForm =
+            BGSDestructibleObjectForm::GetDestructionForm(GetObjectReference());
+        if (DestructionForm->UpdateCurrentDamageStage(this, true)) {
+            UpdateAddonNodeSounds(false);
         }
     }
+
     BGSChangeFlags* v5 = ::new (&v19) BGSChangeFlags(apLoadGameBuffer->GetOldChangeFlags());
     if (v5->CheckFlags(CHANGE_REFR_ANIMATION) && !IsActor()) {
         ResetAnimation();
@@ -1810,11 +1772,10 @@ void TESObjectREFR::Revert(BGSLoadFormBuffer* apLoadGameBuffer) {
             RestoreRagDollData(nullptr);
         }
     }
-    if (pParentCell) {
-        if (apLoadGameBuffer->GetOldChangeFlags().CheckFlags(CHANGE_REFR_EXTRA_ACTIVATING_CHILDREN)) {
-            pParentCell->RemoveActivatingRef(this);
-        }
+    if ((pParentCell) && (apLoadGameBuffer->GetOldChangeFlags().CheckFlags(CHANGE_REFR_EXTRA_ACTIVATING_CHILDREN))) {
+        pParentCell->RemoveActivatingRef(this);
     }
+
     NiNode* v12 = Get3D();
     UpdateLODMultInvisibility(this, v12);
 }
@@ -1822,12 +1783,9 @@ void TESObjectREFR::Revert(BGSLoadFormBuffer* apLoadGameBuffer) {
 // Drops the animation change flag when the reference has a 3D but no save in progress and no playing animation.
 void TESObjectREFR::CheckSaveGame(BGSSaveFormBuffer* apSaveGameBuffer) {
     TESForm::CheckSaveGame(apSaveGameBuffer);
-    if (apSaveGameBuffer->GetChangeFlags().CheckFlags(0x10000000) && !IsActor()) {
-        if (TESObjectREFR::Get3D()) {
-            if (!pSaveLoadGame->GetSaveGameSaving() && !IsPlayingAnimation()) {
-                apSaveGameBuffer->RemoveChange(0x10000000);
-            }
-        }
+    if ((apSaveGameBuffer->GetChangeFlags().CheckFlags(0x10000000) && !IsActor()) && (TESObjectREFR::Get3D()) &&
+        (!pSaveLoadGame->GetSaveGameSaving() && !IsPlayingAnimation())) {
+        apSaveGameBuffer->RemoveChange(0x10000000);
     }
 }
 
@@ -1840,37 +1798,33 @@ void TESObjectREFR::FinishLoadGame(BGSLoadFormBuffer* apLoadGameBuffer) {
     if (apLoadGameBuffer->GetChangeFlags().CheckFlags(uiFlags)) {
         TESObjectREFR::GetExtra()->FinishLoadGame(apLoadGameBuffer);
     }
-    if (!IsActor()) {
-        if (apLoadGameBuffer->GetChangeFlags().CheckFlags(0x800000)) {
-            if (TESObjectREFR::GetOriginalOpenByDefaultState()) {
-                TESObjectREFR::ClearAction(OBJECT_ACTION_OPEN);
-                BGSOpenCloseForm::SnapHavokTo3D(this);
-                NavMeshObstacleManager::GetInstance()->OnDoorClose(this);
-            }
-            else {
-                TESObjectREFR::SetAction(OBJECT_ACTION_OPEN);
-                BGSOpenCloseForm::SnapHavokTo3D(this);
-                NavMeshObstacleManager::GetInstance()->OnDoorOpen(this);
-            }
+    if ((!IsActor()) && (apLoadGameBuffer->GetChangeFlags().CheckFlags(0x800000))) {
+        if (TESObjectREFR::GetOriginalOpenByDefaultState()) {
+            TESObjectREFR::ClearAction(OBJECT_ACTION_OPEN);
+            BGSOpenCloseForm::SnapHavokTo3D(this);
+            NavMeshObstacleManager::GetInstance()->OnDoorClose(this);
+        }
+        else {
+            TESObjectREFR::SetAction(OBJECT_ACTION_OPEN);
+            BGSOpenCloseForm::SnapHavokTo3D(this);
+            NavMeshObstacleManager::GetInstance()->OnDoorOpen(this);
         }
     }
-    if (pParentCell) {
-        if (apLoadGameBuffer->GetChangeFlags().CheckFlags(0x4000000)) {
-            pParentCell->AddActivatingRef(this);
-        }
+
+    if ((pParentCell) && (apLoadGameBuffer->GetChangeFlags().CheckFlags(0x4000000))) {
+        pParentCell->AddActivatingRef(this);
     }
+
     if (!pSaveLoadGame->GetSaveGameLoading()) {
         if (TESForm::GetDisabledOrDeleted()) {
             Set3D(nullptr, false);
         }
-        else if (!Get3D()) {
-            if (TESObjectREFR::GetParentCell()) {
-                TESObjectCELL* pCell = TESObjectREFR::GetParentCell();
-                if (pCell->GetAttached()) {
-                    TESObjectCELL* pPriorityCell = TESObjectREFR::GetParentCell();
-                    IO_TASK_PRIORITY ePriority = TES::pInstance->GetCellPriority(pPriorityCell, nullptr);
-                    pModelLoader->QueueReference(this, ePriority, true);
-                }
+        else if ((!Get3D()) && (TESObjectREFR::GetParentCell())) {
+            TESObjectCELL* pCell = TESObjectREFR::GetParentCell();
+            if (pCell->GetAttached()) {
+                TESObjectCELL* pPriorityCell = TESObjectREFR::GetParentCell();
+                IO_TASK_PRIORITY ePriority = TES::pInstance->GetCellPriority(pPriorityCell, nullptr);
+                pModelLoader->QueueReference(this, ePriority, true);
             }
         }
     }
@@ -2119,10 +2073,9 @@ ENUM_FORM_ID TESObjectREFR::GetSavedFormType() {
                 if (projFlags == 524288) {
                     return PFLA_ID;
                 }
-                else {
-                    if (projFlags == 1048576) {
-                        return PCBE_ID;
-                    }
+
+                if (projFlags == 1048576) {
+                    return PCBE_ID;
                 }
             }
             break;
@@ -2762,20 +2715,17 @@ void TESObjectREFR::UpdateSoundCallBack() {
     ExtraDataList* v3;
     ExtraDataList* extra = TESObjectREFR::GetExtra();
     ExtraSayToTopicInfo* sayToExtra = extra->GetSayToExtra();
-    if (sayToExtra) {
-        if (sayToExtra->bVoiceDone) {
-            if (sayToExtra->pInfo) {
-                if (!sayToExtra->pInfo->IsRunImmediately()) {
-                    sayToExtra->pInfo->RunResult(TIRS_END, this);
-                }
-            }
-            if (sayToExtra->pTopic) {
-                v2 = TESObjectREFR::GetExtra();
-                Script::SetActionFlag(sayToExtra->pTopic, v2, SCRIPT_ACTION_ONSAYTODONE);
-            }
-            v3 = TESObjectREFR::GetExtra();
-            v3->RemoveSayToInfoExtra();
+    if ((sayToExtra) && (sayToExtra->bVoiceDone)) {
+        if ((sayToExtra->pInfo) && (!sayToExtra->pInfo->IsRunImmediately())) {
+            sayToExtra->pInfo->RunResult(TIRS_END, this);
         }
+
+        if (sayToExtra->pTopic) {
+            v2 = TESObjectREFR::GetExtra();
+            Script::SetActionFlag(sayToExtra->pTopic, v2, SCRIPT_ACTION_ONSAYTODONE);
+        }
+        v3 = TESObjectREFR::GetExtra();
+        v3->RemoveSayToInfoExtra();
     }
 }
 
@@ -2883,9 +2833,8 @@ ActorCause* TESObjectREFR::GetActorCause() {
     if (pextra) {
         return pextra->GetActorCause();
     }
-    else {
-        return nullptr;
-    }
+
+    return nullptr;
 }
 
 NiPoint3 TESObjectREFR::GetStartingAngle() {
@@ -2955,11 +2904,10 @@ TESObjectREFR* TESObjectREFR::RemoveItem(
     }
     if (HasContainer()) {
         bool bcheck = false;
-        if (!IsActor()) {
-            if (GetParentCell()) {
-                bcheck = HasScript();
-            }
+        if ((!IsActor()) && (GetParentCell())) {
+            bcheck = HasScript();
         }
+
         Script::SetActionFlag(this, apExtra, SCRIPT_ACTION_ONDROP);
         InventoryChanges* pinventory = InventoryChanges::GetInventoryChanges(this);
         pdroppedref = pinventory->RemoveItem(
@@ -3100,9 +3048,8 @@ MagicCaster* TESObjectREFR::GetMagicCaster() {
     if (v9) {
         return static_cast<MagicCaster*>(v9);
     }
-    else {
-        return nullptr;
-    }
+
+    return nullptr;
 }
 
 MagicTarget* TESObjectREFR::GetMagicTarget() {
@@ -3127,9 +3074,8 @@ MagicTarget* TESObjectREFR::GetMagicTarget() {
     if (ptarget) {
         return static_cast<MagicTarget*>(ptarget);
     }
-    else {
-        return nullptr;
-    }
+
+    return nullptr;
 }
 
 BSFaceGenNiNode* TESObjectREFR::GetFaceNodeBiped(NiNode* apHeadNode) {
@@ -3332,11 +3278,10 @@ NiAVObject* TESObjectREFR::Load3D(bool abBackgroundLoading) {
                     kColor.a = 0.0f;
                     pPrimitive->SetColor(kColor);
                 }
-                if (GetObjectReference() != pCollisionMarker) {
-                    if (spNode.operator->()) {
-                        spNode.operator->()->SetAppCulled(true);
-                    }
+                if ((GetObjectReference() != pCollisionMarker) && (spNode.operator->())) {
+                    spNode.operator->()->SetAppCulled(true);
                 }
+
                 SetLoadedDataFlag(4, true);
             }
             else {
@@ -3361,31 +3306,29 @@ NiAVObject* TESObjectREFR::Load3D(bool abBackgroundLoading) {
                 static_cast<BSFadeNode*>(spNode.operator->())->TurnFadeNodeOn();
                 SetDisableFade(false);
             }
-            if (GetDestructible()) {
-                if (spNode.operator->()) {
-                    if (GetExtra()->GetObjectHealth() != 0.0) {
-                        TESBoundObject* pPreloadTarget = GetObjectReference();
-                        BGSDestructibleObjectForm::GetDestructionForm(GetObjectReference())
-                            ->PreloadReplacementModels(pPreloadTarget);
-                    }
-                    if (GetEmpty()) {
-                        if (BGSDestructibleObjectForm::HideSmallDebris(static_cast<NiNode*>(spNode.operator->()))) {
-                            GetExtra()->RemoveSavedHavokData();
-                        }
-                    }
-                    if (BGSDestructibleObjectForm::GetDestructionForm(GetObjectReference())
-                            ->UpdateCurrentDamageStage(this, false)) {
-                        UpdateAddonNodeSounds(false);
-                    }
+            if ((GetDestructible()) && (spNode.operator->())) {
+                if (GetExtra()->GetObjectHealth() != 0.0) {
+                    TESBoundObject* pPreloadTarget = GetObjectReference();
+                    BGSDestructibleObjectForm::GetDestructionForm(GetObjectReference())
+                        ->PreloadReplacementModels(pPreloadTarget);
+                }
+                if ((GetEmpty()) &&
+                    (BGSDestructibleObjectForm::HideSmallDebris(static_cast<NiNode*>(spNode.operator->())))) {
+                    GetExtra()->RemoveSavedHavokData();
+                }
+
+                if (BGSDestructibleObjectForm::GetDestructionForm(GetObjectReference())
+                        ->UpdateCurrentDamageStage(this, false)) {
+                    UpdateAddonNodeSounds(false);
                 }
             }
+
             TESModelTextureSwap* pModelSwap = dynamic_cast<TESModelTextureSwap*>(GetTESModel());
-            if (pModelSwap) {
-                if (spNode.operator->()) {
-                    NiNode* pSwapRoot = spNode.operator->()->IsNode();
-                    pModelSwap->SwapTextures(pSwapRoot);
-                }
+            if ((pModelSwap) && (spNode.operator->())) {
+                NiNode* pSwapRoot = spNode.operator->()->IsNode();
+                pModelSwap->SwapTextures(pSwapRoot);
             }
+
             if (GetObjectReference() && GetObjectReference()->GetHasPLSpecTex()) {
                 SwapPlatformLanguageTextures(spNode.operator->());
             }
@@ -3433,12 +3376,12 @@ NiAVObject* TESObjectREFR::Load3D(bool abBackgroundLoading) {
                 }
                 bhkNiCollisionObject::ResetSim(static_cast<NiNode*>(spNode.operator->()), true);
                 NiNode* pNode = spNode.operator->()->IsNode();
-                if (pNode) {
-                    // Tests IsFadeNode's result on pNode but stores through spNode's object, as the game does.
-                    if (pNode->IsFadeNode()) {
-                        static_cast<BSFadeNode*>(spNode.operator->())->SetUserData(this);
-                    }
+                if ((pNode) && (pNode->IsFadeNode()))
+                // Tests IsFadeNode's result on pNode but stores through spNode's object, as the game does.
+                {
+                    static_cast<BSFadeNode*>(spNode.operator->())->SetUserData(this);
                 }
+
                 BSShaderManager::SetObjectType(spNode.operator->());
                 if (data.pObjectReference == pDoorMarker || data.pObjectReference == pTravelMarker) {
                     spNode.operator->()->SetAppCulled(true);
@@ -3448,11 +3391,10 @@ NiAVObject* TESObjectREFR::Load3D(bool abBackgroundLoading) {
                 if (GetObjectReference() && GetObjectReference()->GetFormType() == NPC__ID) {
                     GetObjectReference();
                 }
-                if (GetTeleport()) {
-                    if (GetTeleport()->GetTeleportCell()) {
-                        GetTeleport()->GetTeleportCell()->SetLowestProcessToMiddleLow(true);
-                    }
+                if ((GetTeleport()) && (GetTeleport()->GetTeleportCell())) {
+                    GetTeleport()->GetTeleportCell()->SetLowestProcessToMiddleLow(true);
                 }
+
                 float fScale = GetScale();
                 spNode.operator->()->SetScale(fScale);
                 InitAnimation();
@@ -3468,11 +3410,11 @@ NiAVObject* TESObjectREFR::Load3D(bool abBackgroundLoading) {
                     Actor* pActor = static_cast<Actor*>(this);
                     HighProcess* pHighProcess = nullptr;
                     pActor->InitLightingPropertyPtr(spNode.operator->());
-                    if (pActor->GetCurrentAIProcess()) {
-                        if (pActor->GetCurrentAIProcess()->GetProcessLevel() == PROCESS_TYPE_HIGH) {
-                            pHighProcess = static_cast<HighProcess*>(pActor->GetCurrentAIProcess());
-                        }
+                    if ((pActor->GetCurrentAIProcess()) &&
+                        (pActor->GetCurrentAIProcess()->GetProcessLevel() == PROCESS_TYPE_HIGH)) {
+                        pHighProcess = static_cast<HighProcess*>(pActor->GetCurrentAIProcess());
                     }
+
                     if (pHighProcess) {
                         pHighProcess->InitBoneLOD(pActor);
                         pHighProcess->ClearFaceAnimationData();
@@ -3480,43 +3422,38 @@ NiAVObject* TESObjectREFR::Load3D(bool abBackgroundLoading) {
                     if (pCreature) {
                         pCreature->CheckMissingLimbs();
                     }
-                    if (!TES::pInstance->CellTestRunning() && IsDead(true)) {
-                        if (GetAnimation()) {
-                            if (GetAnimation()->GroupLoaded(ANIM_GROUP_DEATH) && !bLoadingSave) {
-                                Animation* pAnimation = GetAnimation();
-                                pAnimation->ForceSection(AGS_WHOLE_BODY, ANIM_GROUP_DEATH, AGA_NONE, 0.0f, -1);
-                                BSAnimGroupSequence* pSequence = pAnimation->GetCurrentSequence(AGS_MOVEMENT);
-                                if (pSequence) {
-                                    if (pActor->HasRagDoll()) {
-                                        if (!IsDead(false)) {
-                                            TESAnimGroup* pGroup = pSequence->GetAnimGroup();
-                                            float fTime = pGroup->GetTime(AGA_STOP);
-                                            pAnimation->Update(pActor, 0.0f, fTime);
-                                            pAnimation->UpdateMovement(this);
-                                            NiMatrix3 kRotation;
-                                            kRotation.~NiMatrix3();
-                                            ::new (&kRotation) NiMatrix3;
-                                            const NiPoint3& kAngle = GetAngleOnReference();
-                                            kRotation.MakeZRotation(kAngle.z);
-                                            NiPoint3 kDirection(0.0f, 1.0f, 0.0f);
-                                            kDirection = kRotation * kDirection;
-                                            if (pActor->pRagdollController) {
-                                                pActor->pRagdollController->DisableRagdollAnim(true);
-                                            }
-                                            bhkBlendController::DoKnockDown(
-                                                spNode.operator->(), kDirection, true, 0.0f, true
-                                            );
-                                            AddChange(CHANGE_REFR_HAVOK_MOVE);
-                                        }
+                    if ((!TES::pInstance->CellTestRunning() && IsDead(true)) && (GetAnimation()) &&
+                        (GetAnimation()->GroupLoaded(ANIM_GROUP_DEATH) && !bLoadingSave)) {
+                        Animation* pAnimation = GetAnimation();
+                        pAnimation->ForceSection(AGS_WHOLE_BODY, ANIM_GROUP_DEATH, AGA_NONE, 0.0f, -1);
+                        BSAnimGroupSequence* pSequence = pAnimation->GetCurrentSequence(AGS_MOVEMENT);
+                        if (pSequence) {
+                            if (pActor->HasRagDoll()) {
+                                if (!IsDead(false)) {
+                                    TESAnimGroup* pGroup = pSequence->GetAnimGroup();
+                                    float fTime = pGroup->GetTime(AGA_STOP);
+                                    pAnimation->Update(pActor, 0.0f, fTime);
+                                    pAnimation->UpdateMovement(this);
+                                    NiMatrix3 kRotation;
+                                    kRotation.~NiMatrix3();
+                                    ::new (&kRotation) NiMatrix3;
+                                    const NiPoint3& kAngle = GetAngleOnReference();
+                                    kRotation.MakeZRotation(kAngle.z);
+                                    NiPoint3 kDirection(0.0f, 1.0f, 0.0f);
+                                    kDirection = kRotation * kDirection;
+                                    if (pActor->pRagdollController) {
+                                        pActor->pRagdollController->DisableRagdollAnim(true);
                                     }
-                                    else {
-                                        float fEndTime = pSequence->GetEndKeyTime();
-                                        pSequence->SetOffset(fEndTime);
-                                        float fUpdateTime = pSequence->GetEndKeyTime();
-                                        pAnimation->Update(pActor, 0.0f, fUpdateTime);
-                                        pAnimation->UpdateMovement(this);
-                                    }
+                                    bhkBlendController::DoKnockDown(spNode.operator->(), kDirection, true, 0.0f, true);
+                                    AddChange(CHANGE_REFR_HAVOK_MOVE);
                                 }
+                            }
+                            else {
+                                float fEndTime = pSequence->GetEndKeyTime();
+                                pSequence->SetOffset(fEndTime);
+                                float fUpdateTime = pSequence->GetEndKeyTime();
+                                pAnimation->Update(pActor, 0.0f, fUpdateTime);
+                                pAnimation->UpdateMovement(this);
                             }
                         }
                     }
@@ -3548,114 +3485,100 @@ NiAVObject* TESObjectREFR::Load3D(bool abBackgroundLoading) {
             TESRegionDataImposter::SetImposterVisible(this, false, true);
         }
     }
-    if (GetObjectReference()) {
-        if (GetObjectReference()->GetFormType() == LIGH_ID) {
-            BSSoundHandle kSoundHandle;
-            GetExtra()->GetSound(kSoundHandle);
-            if (kSoundHandle.IsValid()) {
-                kSoundHandle.SetObjectToFollow(spNode.operator->());
-            }
-            BSSimpleList<TESObjectREFR*>* pLitWaterRefs = GetExtra()->GetLitWaterRefs();
-            LightRefData* pLightData = GetLight();
-            if (pLightData && pLightData->spLight.operator->()) {
-                if (!GetTemporary()) {
-                    for (; pLitWaterRefs && pLitWaterRefs->GetItem(); pLitWaterRefs = pLitWaterRefs->GetNext()) {
-                        TESObjectREFR* pWaterRef = pLitWaterRefs->GetItem();
-                        if (pWaterRef->Get3D()) {
-                            NiAVObject* pWaterGeometry = TES::pInstance->GetWaterSystem()->GetWaterGeometry(pWaterRef);
-                            BSShader* pShader = static_cast<NiGeometry*>(pWaterGeometry)->GetShader();
-                            if (pShader &&
-                                pShader->GetShaderType() ==
-                                    static_cast<uint32_t>(BSShaderManager::BSSM_SHADERTYPE_WATER)) {
-                                WaterShaderProperty* pProperty =
-                                    static_cast<WaterShaderProperty*>(pWaterGeometry->GetProperty(NiProperty::SHADE));
-                                NiLight* pFindLight = pLightData->spLight.operator->();
-                                if (!pProperty->LightList.FindPos(pFindLight, nullptr)) {
-                                    NiLight* pAddLight = pLightData->spLight.operator->();
-                                    pProperty->LightList.AddTail(pAddLight);
-                                    pProperty->bSpecularLighting = true;
-                                }
-                                NiLight* pRemoveLight = pLightData->spLight.operator->();
-                                BSShaderManager::GetShadowSceneNode(BSShaderManager::BSSM_SSN_WORLD)
-                                    ->RemoveLight(pRemoveLight);
-                            }
+    if ((GetObjectReference()) && (GetObjectReference()->GetFormType() == LIGH_ID)) {
+        BSSoundHandle kSoundHandle;
+        GetExtra()->GetSound(kSoundHandle);
+        if (kSoundHandle.IsValid()) {
+            kSoundHandle.SetObjectToFollow(spNode.operator->());
+        }
+        BSSimpleList<TESObjectREFR*>* pLitWaterRefs = GetExtra()->GetLitWaterRefs();
+        LightRefData* pLightData = GetLight();
+        if ((pLightData && pLightData->spLight.operator->()) && (!GetTemporary())) {
+            for (; pLitWaterRefs && pLitWaterRefs->GetItem(); pLitWaterRefs = pLitWaterRefs->GetNext()) {
+                TESObjectREFR* pWaterRef = pLitWaterRefs->GetItem();
+                if (pWaterRef->Get3D()) {
+                    NiAVObject* pWaterGeometry = TES::pInstance->GetWaterSystem()->GetWaterGeometry(pWaterRef);
+                    BSShader* pShader = static_cast<NiGeometry*>(pWaterGeometry)->GetShader();
+                    if (pShader &&
+                        pShader->GetShaderType() == static_cast<uint32_t>(BSShaderManager::BSSM_SHADERTYPE_WATER)) {
+                        WaterShaderProperty* pProperty =
+                            static_cast<WaterShaderProperty*>(pWaterGeometry->GetProperty(NiProperty::SHADE));
+                        NiLight* pFindLight = pLightData->spLight.operator->();
+                        if (!pProperty->LightList.FindPos(pFindLight, nullptr)) {
+                            NiLight* pAddLight = pLightData->spLight.operator->();
+                            pProperty->LightList.AddTail(pAddLight);
+                            pProperty->bSpecularLighting = true;
                         }
+                        NiLight* pRemoveLight = pLightData->spLight.operator->();
+                        BSShaderManager::GetShadowSceneNode(BSShaderManager::BSSM_SSN_WORLD)->RemoveLight(pRemoveLight);
                     }
                 }
             }
         }
     }
-    if (GetObjectReference()) {
-        if (GetObjectReference()->GetFormType() == PWAT_ID) {
-            BSSimpleList<TESObjectREFR*>* pWaterLightRefs = GetExtra()->GetWaterLightRefs();
-            for (; pWaterLightRefs && pWaterLightRefs->GetItem(); pWaterLightRefs = pWaterLightRefs->GetNext()) {
-                LightRefData* pLightData = static_cast<TESObjectREFR*>(pWaterLightRefs->GetItem())->GetLight();
-                if (pLightData && pLightData->spLight.operator->()) {
-                    if (!GetTemporary() && Get3D()) {
-                        NiAVObject* pWaterGeometry = TES::pInstance->GetWaterSystem()->GetWaterGeometry(this);
-                        BSShader* pShader = static_cast<NiGeometry*>(pWaterGeometry)->GetShader();
-                        if (pShader &&
-                            pShader->GetShaderType() == static_cast<uint32_t>(BSShaderManager::BSSM_SHADERTYPE_WATER)) {
-                            WaterShaderProperty* pProperty =
-                                static_cast<WaterShaderProperty*>(pWaterGeometry->GetProperty(NiProperty::SHADE));
-                            NiLight* pFindLight = pLightData->spLight.operator->();
-                            if (!pProperty->LightList.FindPos(pFindLight, nullptr)) {
-                                NiLight* pAddLight = pLightData->spLight.operator->();
-                                pProperty->LightList.AddTail(pAddLight);
-                                pProperty->bSpecularLighting = true;
-                            }
-                            NiLight* pRemoveLight = pLightData->spLight.operator->();
-                            BSShaderManager::GetShadowSceneNode(BSShaderManager::BSSM_SSN_WORLD)
-                                ->RemoveLight(pRemoveLight);
-                        }
+
+    if ((GetObjectReference()) && (GetObjectReference()->GetFormType() == PWAT_ID)) {
+        BSSimpleList<TESObjectREFR*>* pWaterLightRefs = GetExtra()->GetWaterLightRefs();
+        for (; pWaterLightRefs && pWaterLightRefs->GetItem(); pWaterLightRefs = pWaterLightRefs->GetNext()) {
+            LightRefData* pLightData = static_cast<TESObjectREFR*>(pWaterLightRefs->GetItem())->GetLight();
+            if ((pLightData && pLightData->spLight.operator->()) && (!GetTemporary() && Get3D())) {
+                NiAVObject* pWaterGeometry = TES::pInstance->GetWaterSystem()->GetWaterGeometry(this);
+                BSShader* pShader = static_cast<NiGeometry*>(pWaterGeometry)->GetShader();
+                if (pShader &&
+                    pShader->GetShaderType() == static_cast<uint32_t>(BSShaderManager::BSSM_SHADERTYPE_WATER)) {
+                    WaterShaderProperty* pProperty =
+                        static_cast<WaterShaderProperty*>(pWaterGeometry->GetProperty(NiProperty::SHADE));
+                    NiLight* pFindLight = pLightData->spLight.operator->();
+                    if (!pProperty->LightList.FindPos(pFindLight, nullptr)) {
+                        NiLight* pAddLight = pLightData->spLight.operator->();
+                        pProperty->LightList.AddTail(pAddLight);
+                        pProperty->bSpecularLighting = true;
                     }
+                    NiLight* pRemoveLight = pLightData->spLight.operator->();
+                    BSShaderManager::GetShadowSceneNode(BSShaderManager::BSSM_SSN_WORLD)->RemoveLight(pRemoveLight);
                 }
             }
         }
     }
-    if (bNoNode) {
-        if (!GetExtra()->GetRoomIsMaster()) {
-            TESObjectREFR* pMasterRoom = GetExtra()->GetMasterRoom();
-            if (pMasterRoom) {
-                alignas(NiPointer<BSMultiBound>) uint8_t aMultiBoundStorage[sizeof(NiPointer<BSMultiBound>)];
-                // SWEEP-INLINE 0x633C90
-                NiPointer<BSMultiBound>& spMultiBound =
-                    *::new (aMultiBoundStorage) NiPointer<BSMultiBound>(GetMultiBound());
-                bool bNotJoined =
-                    pMasterRoom->GetMultiBoundRoom()->QJoinedMultiBoundList().FindPos(spMultiBound, nullptr) == nullptr;
-                // SWEEP-INLINE 0x45CEC0
-                spMultiBound.~NiPointer<BSMultiBound>();
-                if (bNotJoined) {
-                    pMasterRoom->GetMultiBoundRoom()->AddJoinedMultibound(GetMultiBound());
-                }
+
+    if ((bNoNode) && (!GetExtra()->GetRoomIsMaster())) {
+        TESObjectREFR* pMasterRoom = GetExtra()->GetMasterRoom();
+        if (pMasterRoom) {
+            alignas(NiPointer<BSMultiBound>) uint8_t aMultiBoundStorage[sizeof(NiPointer<BSMultiBound>)];
+            // SWEEP-INLINE 0x633C90
+            NiPointer<BSMultiBound>& spMultiBound =
+                *::new (aMultiBoundStorage) NiPointer<BSMultiBound>(GetMultiBound());
+            bool bNotJoined =
+                pMasterRoom->GetMultiBoundRoom()->QJoinedMultiBoundList().FindPos(spMultiBound, nullptr) == nullptr;
+            // SWEEP-INLINE 0x45CEC0
+            spMultiBound.~NiPointer<BSMultiBound>();
+            if (bNotJoined) {
+                pMasterRoom->GetMultiBoundRoom()->AddJoinedMultibound(GetMultiBound());
             }
         }
     }
+
     if (abBackgroundLoading) {
         ClearBackgroundLoadingRef();
     }
-    if (bNoNode) {
-        if (GetObjectReference()) {
-            if (GetObjectReference()->GetFormType() == PWAT_ID) {
-                if (!static_cast<BGSPlaceableWater*>(GetObjectReference())->IsAutomaticWater()) {
-                    bool bUpdated = UpdateMultiboundShapeTransformsRecursive(spNode.operator->());
-                    spNode.operator->()->UpdateWorldBound();
-                    if (!bUpdated) {
-                        uint32_t uiFormID = GetFormID();
-                        const char* pEditorID = GetFormEditorID();
-                        char aDestination[256];
-                        BSsprintf(
-                            aDestination, 256,
-                            "WATER: Trying to load water object '%s' (%08X) without multibound data. Please "
-                            "have an artist re-export this object ASAP!",
-                            pEditorID, uiFormID
-                        );
-                        Warning("%s", aDestination);
-                    }
-                }
-            }
+    if ((bNoNode) && (GetObjectReference()) && (GetObjectReference()->GetFormType() == PWAT_ID) &&
+        (!static_cast<BGSPlaceableWater*>(GetObjectReference())->IsAutomaticWater())) {
+        bool bUpdated = UpdateMultiboundShapeTransformsRecursive(spNode.operator->());
+        spNode.operator->()->UpdateWorldBound();
+        if (!bUpdated) {
+            uint32_t uiFormID = GetFormID();
+            const char* pEditorID = GetFormEditorID();
+            char aDestination[256];
+            BSsprintf(
+                aDestination, 256,
+                "WATER: Trying to load water object '%s' (%08X) without multibound data. Please "
+                "have an artist re-export this object ASAP!",
+                pEditorID, uiFormID
+            );
+            Warning("%s", aDestination);
         }
     }
+
     BSExtraData* pSecuritronFace = GetExtraData(EXTRA_SECURITRON_FACE);
     if (pSecuritronFace) {
         static_cast<ExtraSecuritronFace*>(pSecuritronFace)->ApplyFace(spNode.operator->());
@@ -3973,28 +3896,24 @@ void TESObjectREFR::UpdateAnimation() {
             if (pc) {
                 NiControllerManager* pmanager = pc->IsNiControllerManager();
                 uint32_t iactive = 0;
-                if (pmanager) {
-                    if (pmanager->GetActive()) {
-                        for (uint32_t n = 0; n < pmanager->GetSequenceCount(); ++n) {
-                            NiControllerSequence* pseq = pmanager->GetSequenceAt(n);
-                            if (pseq) {
-                                if (pseq->GetState()) {
-                                    if (BSAnimGroupSequence::PlaySounds(pseq, this)) {
-                                        EndSequence(pseq);
-                                        pmanager->DeactivateSequence(pseq, 0.0f);
-                                        const char* HandleString = (&pseq->m_kName)->GetHandleString();
-                                        SetLastFinishedSequence(HandleString);
-                                        BGSOpenCloseForm::HandleAnimEnd(this, pseq);
-                                    }
-                                    else {
-                                        ++iactive;
-                                    }
-                                }
+                if ((pmanager) && (pmanager->GetActive())) {
+                    for (uint32_t n = 0; n < pmanager->GetSequenceCount(); ++n) {
+                        NiControllerSequence* pseq = pmanager->GetSequenceAt(n);
+                        if ((pseq) && (pseq->GetState())) {
+                            if (BSAnimGroupSequence::PlaySounds(pseq, this)) {
+                                EndSequence(pseq);
+                                pmanager->DeactivateSequence(pseq, 0.0f);
+                                const char* HandleString = (&pseq->m_kName)->GetHandleString();
+                                SetLastFinishedSequence(HandleString);
+                                BGSOpenCloseForm::HandleAnimEnd(this, pseq);
+                            }
+                            else {
+                                ++iactive;
                             }
                         }
-                        if (!iactive) {
-                            pmanager->SetActive(false);
-                        }
+                    }
+                    if (!iactive) {
+                        pmanager->SetActive(false);
                     }
                 }
             }
@@ -4154,9 +4073,8 @@ BSAnimNoteReceiver* TESObjectREFR::GetAnimNoteReceiever() {
     if (extraData) {
         return extraData->pReceiver;
     }
-    else {
-        return nullptr;
-    }
+
+    return nullptr;
 }
 
 bool TESObjectREFR::CanUseIdle(TESIdleForm* apIdle) {
@@ -4234,13 +4152,12 @@ void TESObjectREFR::LoadAnimation(BGSLoadGameBuffer* apLoadGameBuffer) {
     char Dst[268];
     NiControllerManager* apManager = nullptr;
     NiObjectNET* v7 = TESObjectREFR::Get3D();
-    if (v7) {
-        if (v7->GetControllers()) {
-            apManager = static_cast<NiControllerManager*>(
-                NiObject::DynamicCastStatic(&NiControllerManager::ms_RTTI, v7->GetControllers())
-            );
-        }
+    if ((v7) && (v7->GetControllers())) {
+        apManager = static_cast<NiControllerManager*>(
+            NiObject::DynamicCastStatic(&NiControllerManager::ms_RTTI, v7->GetControllers())
+        );
     }
+
     apLoadGameBuffer->LoadString(Dst);
     if (BSstrlen(Dst)) {
         (&m_Extra)->SetLastFinishedSequence(Dst);
@@ -4445,17 +4362,16 @@ void TESObjectREFR::LoadHavokData(uint16_t aiSaveSize) {
                     pobj3D->Update(UpdateData);
                 }
                 bhkWorld::DoObjectRec(pobj3D, recData, &TESObjectREFR::LoadHavokDataForCollisionObject);
-                if (pactor) {
-                    if (pactor->IsParalyzed()) {
-                        bhkRigidBody::SetFixed(pobj3D, 1, 1);
-                        bhkWorld::SetMotion(pobj3D, hkpMotion::MOTION_DYNAMIC, true, false, true);
-                        Animation* panim = pactor->GetAnimation();
-                        if (panim) {
-                            panim->ClearGroup(AGS_WHOLE_BODY, 0.0f);
-                            panim->ClearAccumRootTranslate();
-                        }
+                if ((pactor) && (pactor->IsParalyzed())) {
+                    bhkRigidBody::SetFixed(pobj3D, 1, 1);
+                    bhkWorld::SetMotion(pobj3D, hkpMotion::MOTION_DYNAMIC, true, false, true);
+                    Animation* panim = pactor->GetAnimation();
+                    if (panim) {
+                        panim->ClearGroup(AGS_WHOLE_BODY, 0.0f);
+                        panim->ClearAccumRootTranslate();
                     }
                 }
+
                 if (!IsActor()) {
                     NiUpdateData UpdateData_2(0.0f, false, false);
                     pobj3D->Update(UpdateData_2);
@@ -4554,19 +4470,17 @@ bool TESObjectREFR::GetMarkerUsed(uint32_t aiMarkerIndex, bool abIgnoreReservati
     ExtraUsedMarkers* ExtraData = static_cast<ExtraUsedMarkers*>(Extra->GetExtraData(18u));
     BaseExtraList* v4 = GetExtra();
     ExtraUsedMarkers* v9 = static_cast<ExtraUsedMarkers*>(v4->GetExtraData(130u));
-    if (ExtraData) {
-        if (GetObjectReference()) {
-            TESBoundObject* ObjectReference = GetObjectReference();
-            if (ObjectReference->GetFormType() == 39) {
-                MarkerUsed = ExtraData->GetMarkerUsed(aiMarkerIndex);
-            }
+    if ((ExtraData) && (GetObjectReference())) {
+        TESBoundObject* ObjectReference = GetObjectReference();
+        if (ObjectReference->GetFormType() == 39) {
+            MarkerUsed = ExtraData->GetMarkerUsed(aiMarkerIndex);
         }
     }
-    if (v9) {
-        if (!MarkerUsed && !abIgnoreReservations) {
-            return v9->GetMarkerUsed(aiMarkerIndex);
-        }
+
+    if ((v9) && (!MarkerUsed && !abIgnoreReservations)) {
+        return v9->GetMarkerUsed(aiMarkerIndex);
     }
+
     return MarkerUsed;
 }
 
@@ -4590,20 +4504,19 @@ bool TESObjectREFR::Activate(
         }
     }
     bScriptActivate = false;
-    if (apActionRef) {
-        if (apActionRef->IsActor()) {
-            Actor* pActionActor = static_cast<Actor*>(apActionRef);
-            if (pActionActor->GetCurrentAIProcess()) {
-                BaseProcess* CurrentAIProcess = pActionActor->GetCurrentAIProcess();
-                if (CurrentAIProcess->GetProcessLevel() == PROCESS_TYPE_HIGH) {
-                    BaseProcess* v9 = pActionActor->GetCurrentAIProcess();
-                    if (v9->GetFadeState() == BaseProcess::FADE_TELEPORT_OUT) {
-                        v22 = true;
-                    }
+    if ((apActionRef) && (apActionRef->IsActor())) {
+        Actor* pActionActor = static_cast<Actor*>(apActionRef);
+        if (pActionActor->GetCurrentAIProcess()) {
+            BaseProcess* CurrentAIProcess = pActionActor->GetCurrentAIProcess();
+            if (CurrentAIProcess->GetProcessLevel() == PROCESS_TYPE_HIGH) {
+                BaseProcess* v9 = pActionActor->GetCurrentAIProcess();
+                if (v9->GetFadeState() == BaseProcess::FADE_TELEPORT_OUT) {
+                    v22 = true;
                 }
             }
         }
     }
+
     if (apActionRef != pPlayer) {
         goto LABEL_71;
     }
@@ -4619,141 +4532,131 @@ bool TESObjectREFR::Activate(
         Interface::ShowMessage(v11, 0, nullptr, nullptr, 2.0f, false);
         return true;
     }
-    else {
-    LABEL_71:;
-        if (!GetDestroyed() || IsActor()) {
-            if (GetObjectReference() &&
-                (GetObjectReference()->GetFormType() == DOOR_ID &&
-                 (apActionRef && (apActionRef->IsActor() && !*GetFullName())))) {
+
+LABEL_71:;
+    if (!GetDestroyed() || IsActor()) {
+        if (GetObjectReference() &&
+            (GetObjectReference()->GetFormType() == DOOR_ID &&
+             (apActionRef && (apActionRef->IsActor() && !*GetFullName())))) {
+            return false;
+        }
+
+        if (apActionRef != pPlayer ||
+            (*GetFullName() ||
+             (GetObjectReference()->GetFormType() == PWAT_ID || GetObjectReference()->GetFormType() == TACT_ID))) {
+            if (GetInaccessible()) {
                 return false;
             }
-            else {
-                if (apActionRef != pPlayer ||
-                    (*GetFullName() ||
-                     (GetObjectReference()->GetFormType() == PWAT_ID ||
-                      GetObjectReference()->GetFormType() == TACT_ID))) {
-                    if (GetInaccessible()) {
-                        return false;
-                    }
-                    else {
-                        if (!(&m_Extra)->IsActivateParentOnly() || (&m_Extra)->GetActivateData(apActionRef)) {
-                            if (!apActionRef) {
-                                goto LABEL_52;
-                            }
-                            if (v22) {
-                                goto LABEL_52;
-                            }
-                            if (Interface::GetConsoleSelection() == this) {
-                                char Format[268];
-                                const char* FullName = TESFullName::GetFullName(GetObjectReference());
-                                const char* FormTypeString = GetObjectReference()->GetFormTypeString();
-                                const void* time = FormTypeString;
-                                std::sprintf(
-                                    Format, "'%s' activated %s '%s'",
-                                    TESFullName::GetFullName(apActionRef->GetObjectReference()), time, FullName
-                                );
-                                Interface::PrintLine(static_cast<const char*>(Format));
-                            }
-                            if (this == pPlayer || GetAction(OBJECT_ACTION_USE_DEFAULT)) {
-                            LABEL_52:;
-                                (&m_Extra)->NotifyGuardsAboutActivation(this, apActionRef);
-                                (&m_Extra)->RemoveExtra(124);
-                                if (GetObjectReference()) {
-                                    switch (GetObjectReference()->GetFormType()) {
-                                        case DOOR_ID: {
-                                            DoorTeleportData* pTel = GetTeleport();
-                                            if (pTel) {
-                                                if (apActionRef == pPlayer) {
-                                                    BaseProcess* v16 = pPlayer->pCurrentProcess;
-                                                    if (v16->GetFadeState() != BaseProcess::FADE_TELEPORT_OUT) {
-                                                        TESObjectCELL* pcell = pTel->GetTeleportCell();
-                                                        if (pcell) {
-                                                            if (pcell->GetInterior()) {
-                                                                pcell->ProcessActors();
-                                                            }
-                                                        }
-                                                    }
-                                                }
-                                            }
-                                            goto LABEL_62;
-                                        }
-                                        case STAT_ID:
-                                        case SCOL_ID:
-                                        case MSTT_ID:
-                                        case TREE_ID: {
-                                            goto LABEL_68;
-                                        }
-                                        case IDLM_ID: {
-                                            return true;
-                                        }
-                                        default: {
-                                        LABEL_62:;
-                                            InitChildActivates(apActionRef);
-                                            if (data.pObjectReference->Activate(
-                                                    this, apActionRef, abIdFlag, apObjecttoGet, aiCount
-                                                )) {
-                                                if (apActionRef) {
-                                                    if (apActionRef->IsActor()) {
-                                                        static_cast<Actor*>(apActionRef)
-                                                            ->Actor::ActivatedReference(
-                                                                this, apObjecttoGet, aiCount, false
-                                                            );
-                                                        if (apActionRef != pPlayer) {
-                                                            pPlayer->CheckForQuestTargetUpdate(apActionRef);
-                                                        }
-                                                    }
-                                                }
-                                                bScriptActivate = true;
-                                                result = true;
-                                            }
-                                            else {
-                                            LABEL_68:;
-                                                result = false;
-                                            }
-                                            break;
+
+            if (!(&m_Extra)->IsActivateParentOnly() || (&m_Extra)->GetActivateData(apActionRef)) {
+                if (!apActionRef) {
+                    goto LABEL_52;
+                }
+                if (v22) {
+                    goto LABEL_52;
+                }
+                if (Interface::GetConsoleSelection() == this) {
+                    char Format[268];
+                    const char* FullName = TESFullName::GetFullName(GetObjectReference());
+                    const char* FormTypeString = GetObjectReference()->GetFormTypeString();
+                    const void* time = FormTypeString;
+                    std::sprintf(
+                        Format, "'%s' activated %s '%s'", TESFullName::GetFullName(apActionRef->GetObjectReference()),
+                        time, FullName
+                    );
+                    Interface::PrintLine(static_cast<const char*>(Format));
+                }
+                if (this == pPlayer || GetAction(OBJECT_ACTION_USE_DEFAULT)) {
+                LABEL_52:;
+                    (&m_Extra)->NotifyGuardsAboutActivation(this, apActionRef);
+                    (&m_Extra)->RemoveExtra(124);
+                    if (GetObjectReference()) {
+                        switch (GetObjectReference()->GetFormType()) {
+                            case DOOR_ID: {
+                                DoorTeleportData* pTel = GetTeleport();
+                                if ((pTel) && (apActionRef == pPlayer)) {
+                                    BaseProcess* v16 = pPlayer->pCurrentProcess;
+                                    if (v16->GetFadeState() != BaseProcess::FADE_TELEPORT_OUT) {
+                                        TESObjectCELL* pcell = pTel->GetTeleportCell();
+                                        if ((pcell) && (pcell->GetInterior())) {
+                                            pcell->ProcessActors();
                                         }
                                     }
                                 }
+
+                                goto LABEL_62;
+                            }
+                            case STAT_ID:
+                            case SCOL_ID:
+                            case MSTT_ID:
+                            case TREE_ID: {
+                                goto LABEL_68;
+                            }
+                            case IDLM_ID: {
+                                return true;
+                            }
+                            default: {
+                            LABEL_62:;
+                                InitChildActivates(apActionRef);
+                                if (data.pObjectReference->Activate(
+                                        this, apActionRef, abIdFlag, apObjecttoGet, aiCount
+                                    )) {
+                                    if ((apActionRef) && (apActionRef->IsActor())) {
+                                        static_cast<Actor*>(apActionRef)
+                                            ->Actor::ActivatedReference(this, apObjecttoGet, aiCount, false);
+                                        if (apActionRef != pPlayer) {
+                                            pPlayer->CheckForQuestTargetUpdate(apActionRef);
+                                        }
+                                    }
+
+                                    bScriptActivate = true;
+                                    result = true;
+                                }
                                 else {
-                                    return false;
+                                LABEL_68:;
+                                    result = false;
                                 }
-                            }
-                            else {
-                                SetAction(OBJECT_ACTION_ACTIVATE);
-                                SetActionRef(apActionRef);
-                                if (iprocessingscripts < 5) {
-                                    ++iprocessingscripts;
-                                    RunScript();
-                                    --iprocessingscripts;
-                                }
-                                if (!bScriptActivate && apActionRef->IsActor()) {
-                                    static_cast<Actor*>(apActionRef)
-                                        ->Actor::ActivatedReference(this, apObjecttoGet, aiCount, true);
-                                }
-                                return bScriptActivate;
+                                break;
                             }
                         }
-                        else {
-                            if (apActionRef == pPlayer) {
-                                const char* v12 = sRemoteActivation.String();
-                                Interface::ShowMessage(
-                                    v12, 0, "Interface\\Icons\\Message Icons\\glow_message_vaultboy_thinking.dds",
-                                    nullptr, 2.0f, false
-                                );
-                            }
-                            return false;
-                        }
+                    }
+                    else {
+                        return false;
                     }
                 }
                 else {
-                    return false;
+                    SetAction(OBJECT_ACTION_ACTIVATE);
+                    SetActionRef(apActionRef);
+                    if (iprocessingscripts < 5) {
+                        ++iprocessingscripts;
+                        RunScript();
+                        --iprocessingscripts;
+                    }
+                    if (!bScriptActivate && apActionRef->IsActor()) {
+                        static_cast<Actor*>(apActionRef)->Actor::ActivatedReference(this, apObjecttoGet, aiCount, true);
+                    }
+                    return bScriptActivate;
                 }
+            }
+            else {
+                if (apActionRef == pPlayer) {
+                    const char* v12 = sRemoteActivation.String();
+                    Interface::ShowMessage(
+                        v12, 0, "Interface\\Icons\\Message Icons\\glow_message_vaultboy_thinking.dds", nullptr, 2.0f,
+                        false
+                    );
+                }
+                return false;
             }
         }
         else {
-            return true;
+            return false;
         }
     }
+    else {
+        return true;
+    }
+
     return result;
 }
 
@@ -4781,14 +4684,12 @@ void TESObjectREFR::SaveAttachedAnimation() {
 uint16_t TESObjectREFR::GetAttachedAnimationSaveSize() {
     NiControllerManager* pControllerManager = nullptr;
     NiNode* v4 = TESObjectREFR::Get3D();
-    if (v4) {
-        if (v4->GetControllers()) {
-            NiObject* pControllers = v4->GetControllers();
-            pControllerManager = static_cast<NiControllerManager*>(
-                NiObject::DynamicCastStatic(&NiControllerManager::ms_RTTI, pControllers)
-            );
-        }
+    if ((v4) && (v4->GetControllers())) {
+        NiObject* pControllers = v4->GetControllers();
+        pControllerManager =
+            static_cast<NiControllerManager*>(NiObject::DynamicCastStatic(&NiControllerManager::ms_RTTI, pControllers));
     }
+
     return TESObjectREFR::GetControllerManagerSaveSize(pControllerManager);
 }
 
@@ -4902,11 +4803,10 @@ const NiPoint3& TESObjectREFR::GetAngleOnReference() {
 
 void TESObjectREFR::GetMapNameForLocation(BSStringT<char>& aOutMapName) {
     TESObjectCELL* pint = GetParentCell();
-    if (pint) {
-        if (!pint->GetInterior()) {
-            pint = nullptr;
-        }
+    if ((pint) && (!pint->GetInterior())) {
+        pint = nullptr;
     }
+
     if (pint) {
         aOutMapName.Set(pint->GetFullName(), 0u);
     }
@@ -5143,20 +5043,18 @@ void TESObjectREFR::RemoveOwner() {
     v3->SetRank((-1));
     AddChange((int32_t)0x40u);
     DoorTeleportData* teleport = GetTeleport();
-    if (teleport) {
-        if (teleport->pLinkedDoor) {
-            v4 = teleport->pLinkedDoor;
-            v5 = v4->TESObjectREFR::GetExtra();
-            v5->SetOwnership(nullptr);
-            v6 = teleport->pLinkedDoor;
-            v7 = v6->TESObjectREFR::GetExtra();
-            v7->SetGlobal(nullptr);
-            v8 = teleport->pLinkedDoor;
-            v9 = v8->TESObjectREFR::GetExtra();
-            v9->SetRank((-1));
-            v10 = teleport->pLinkedDoor;
-            v10->AddChange(64);
-        }
+    if ((teleport) && (teleport->pLinkedDoor)) {
+        v4 = teleport->pLinkedDoor;
+        v5 = v4->TESObjectREFR::GetExtra();
+        v5->SetOwnership(nullptr);
+        v6 = teleport->pLinkedDoor;
+        v7 = v6->TESObjectREFR::GetExtra();
+        v7->SetGlobal(nullptr);
+        v8 = teleport->pLinkedDoor;
+        v9 = v8->TESObjectREFR::GetExtra();
+        v9->SetRank((-1));
+        v10 = teleport->pLinkedDoor;
+        v10->AddChange(64);
     }
 }
 
@@ -5553,11 +5451,10 @@ bool TESObjectREFR::Is3DHighPriority() {
     if (GetVisibleDistant()) {
         bResult = true;
     }
-    else if (!IsActor() && !IsMarker() && GetObjectReference()) {
-        if (GetObjectReference()->GetBoundSize() > 700.0) {
-            bResult = true;
-        }
+    else if ((!IsActor() && !IsMarker() && GetObjectReference()) && (GetObjectReference()->GetBoundSize() > 700.0)) {
+        bResult = true;
     }
+
     return bResult;
 }
 
@@ -6028,10 +5925,9 @@ void TESObjectREFR::PreCalcTriStripsShapeAabb(NiAVObject* ap3D) {
                             pstripshape = static_cast<hkNiTriStripsShape*>(pbhkshapecol->Gethk());
                         }
                         else {
-                            if (pbhkshapecol) {
-                                if (NiObject::IsKindOf_0(&bhkPackedNiTriStripsShape::ms_RTTI, pbhkshapecol)) {
-                                    ppackedStripShape = static_cast<hkPackedNiTriStripsShape*>(pbhkshapecol->Gethk());
-                                }
+                            if ((pbhkshapecol) &&
+                                (NiObject::IsKindOf_0(&bhkPackedNiTriStripsShape::ms_RTTI, pbhkshapecol))) {
+                                ppackedStripShape = static_cast<hkPackedNiTriStripsShape*>(pbhkshapecol->Gethk());
                             }
                         }
                     }
@@ -6336,11 +6232,11 @@ bool TESObjectREFR::HasScript() {
 
 bool TESObjectREFR::WearingObject(TESBoundObject* apObject) {
     bool bResult = false;
-    if (HasContainer() != nullptr) {
-        if (InventoryChanges::GetInventoryChanges(this)->WearingObject(apObject, false) != nullptr) {
-            bResult = true;
-        }
+    if ((HasContainer() != nullptr) &&
+        (InventoryChanges::GetInventoryChanges(this)->WearingObject(apObject, false) != nullptr)) {
+        bResult = true;
     }
+
     return bResult;
 }
 
@@ -6455,20 +6351,17 @@ void TESObjectREFR::AddLockChange() {
 
 void TESObjectREFR::Release3DRelatedData() {
     if (Get3D()) {
-        if (GetObjectReference()) {
-            if (GetObjectReference()->GetFormType() == PWAT_ID) {
-                TES::pInstance->DecrementPlaceableWaterCount();
-            }
+        if ((GetObjectReference()) && (GetObjectReference()->GetFormType() == PWAT_ID)) {
+            TES::pInstance->DecrementPlaceableWaterCount();
         }
+
         TESObjectREFR::RemoveRefFromMultiboundTestMap(this);
         RemoveFromAllWater(false);
         for (TESObjectREFR* plrref : (&m_Extra)->GetRoomLinkedRoomRefList()->ItemsUntilNull()) {
-            if (GetMultiBoundRoom()) {
-                if (plrref->GetMultiBoundRoom()) {
-                    NiPointer<BSMultiBound> spMultiBound = GetMultiBoundRoom()->QMultiBound();
-                    BSMultiBoundRoom* MultiBoundRoom = plrref->GetMultiBoundRoom();
-                    MultiBoundRoom->QJoinedMultiBoundList().Remove(spMultiBound);
-                }
+            if ((GetMultiBoundRoom()) && (plrref->GetMultiBoundRoom())) {
+                NiPointer<BSMultiBound> spMultiBound = GetMultiBoundRoom()->QMultiBound();
+                BSMultiBoundRoom* MultiBoundRoom = plrref->GetMultiBoundRoom();
+                MultiBoundRoom->QJoinedMultiBoundList().Remove(spMultiBound);
             }
         }
         TESObjectSTAT* ObjectReference = static_cast<TESObjectSTAT*>(GetObjectReference());
@@ -6486,54 +6379,43 @@ void TESObjectREFR::Release3DRelatedData() {
                 }
             }
         }
-        if (GetObjectReference()) {
-            if (GetObjectReference()->GetFormType() == LIGH_ID) {
-                BSSimpleList<TESObjectREFR*>* preflist = (&m_Extra)->GetLitWaterRefs();
-                LightRefData* prefrlight = GetLight();
-                while (preflist && preflist->m_item) {
-                    (&preflist->m_item->m_Extra)->SetWaterLightRef(this, false);
-                    if (prefrlight) {
-                        if (prefrlight->spLight.m_pObject) {
-                            TESObjectREFR* m_item = preflist->m_item;
-                            if (m_item->Get3D()) {
-                                if (TES::pInstance->GetWaterSystem()) {
-                                    TESObjectREFR* v9 = preflist->m_item;
-                                    NiTriBasedGeom* pgeom = static_cast<NiTriBasedGeom*>(
-                                        TES::pInstance->GetWaterSystem()->GetWaterGeometry(v9)
-                                    );
-                                    NiAVObject* pobj = (NiAVObject*)pgeom;
-                                    BSShader* pshader = pgeom->GetShader();
-                                    if (pshader) {
-                                        if (pshader->iShaderType == BSShaderManager::BSSM_SHADERTYPE_WATER) {
-                                            NiProperty* pprop = pgeom->GetProperty(3);
-                                            WaterShaderProperty* pwaterprop = static_cast<WaterShaderProperty*>(pprop);
-                                            NiLight* plight = prefrlight->spLight.m_pObject;
-                                            pwaterprop->LightList.Remove(plight);
-                                        }
-                                    }
-                                }
-                            }
+        if ((GetObjectReference()) && (GetObjectReference()->GetFormType() == LIGH_ID)) {
+            BSSimpleList<TESObjectREFR*>* preflist = (&m_Extra)->GetLitWaterRefs();
+            LightRefData* prefrlight = GetLight();
+            while (preflist && preflist->m_item) {
+                (&preflist->m_item->m_Extra)->SetWaterLightRef(this, false);
+                if ((prefrlight) && (prefrlight->spLight.m_pObject)) {
+                    TESObjectREFR* m_item = preflist->m_item;
+                    if ((m_item->Get3D()) && (TES::pInstance->GetWaterSystem())) {
+                        TESObjectREFR* v9 = preflist->m_item;
+                        NiTriBasedGeom* pgeom =
+                            static_cast<NiTriBasedGeom*>(TES::pInstance->GetWaterSystem()->GetWaterGeometry(v9));
+                        NiAVObject* pobj = (NiAVObject*)pgeom;
+                        BSShader* pshader = pgeom->GetShader();
+                        if ((pshader) && (pshader->iShaderType == BSShaderManager::BSSM_SHADERTYPE_WATER)) {
+                            NiProperty* pprop = pgeom->GetProperty(3);
+                            WaterShaderProperty* pwaterprop = static_cast<WaterShaderProperty*>(pprop);
+                            NiLight* plight = prefrlight->spLight.m_pObject;
+                            pwaterprop->LightList.Remove(plight);
                         }
                     }
-                    preflist = preflist->m_pkNext;
                 }
+
+                preflist = preflist->m_pkNext;
             }
         }
-        if (GetObjectReference()) {
-            if (GetObjectReference()->GetFormType() == ASPC_ID) {
-                if (GetParentCell()) {
-                    bhkWorld* v4 = GetParentCell()->GetbhkWorld();
-                    v4->pAcousticSpaceListener->BGSAcousticSpaceListener::DequeueRemoval(this, true);
-                }
-            }
+
+        if ((GetObjectReference()) && (GetObjectReference()->GetFormType() == ASPC_ID) && (GetParentCell())) {
+            bhkWorld* v4 = GetParentCell()->GetbhkWorld();
+            v4->pAcousticSpaceListener->BGSAcousticSpaceListener::DequeueRemoval(this, true);
         }
+
         if (pParentCell) {
             TESWaterListener* plistener;
-            if (GetObjectReference()) {
-                if (GetObjectReference()->GetFormType() == PWAT_ID) {
-                    TES::pInstance->GetWaterSystem()->RemoveWaterRefFromWaterSystem(this);
-                }
+            if ((GetObjectReference()) && (GetObjectReference()->GetFormType() == PWAT_ID)) {
+                TES::pInstance->GetWaterSystem()->RemoveWaterRefFromWaterSystem(this);
             }
+
             pParentCell->RemoveAnimatedRef(this);
             pParentCell->RemoveEmittanceRef(this);
             if (pParentCell && pParentCell->GetbhkWorld()) {
@@ -6545,64 +6427,61 @@ void TESObjectREFR::Release3DRelatedData() {
             if (plistener) {
                 plistener->HandleQueuedRemovals(this, false, true);
             }
-            if (GetObjectReference()) {
-                if (GetObjectReference()->GetFormType() == PWAT_ID) {
-                    pParentCell->RemoveWaterRef(this);
-                    plistener->RemoveWaterZoneForReference(this);
-                }
+            if ((GetObjectReference()) && (GetObjectReference()->GetFormType() == PWAT_ID)) {
+                pParentCell->RemoveWaterRef(this);
+                plistener->RemoveWaterZoneForReference(this);
             }
+
             BSPortalGraph* pgraph = pParentCell->GetPortalGraph();
-            if (pgraph) {
-                if (GetObjectReference()) {
-                    TESBoundObject* v5 = GetObjectReference();
-                    if (v5 == pRoomMarker) {
-                        BSMultiBoundRoom* proom = (&m_Extra)->GetRoom();
-                        if (proom) {
-                            pgraph->RemoveRoom(proom);
-                        }
+            if ((pgraph) && (GetObjectReference())) {
+                TESBoundObject* v5 = GetObjectReference();
+                if (v5 == pRoomMarker) {
+                    BSMultiBoundRoom* proom = (&m_Extra)->GetRoom();
+                    if (proom) {
+                        pgraph->RemoveRoom(proom);
                     }
-                    else {
-                        TESObjectSTAT* v6 = static_cast<TESObjectSTAT*>(GetObjectReference());
-                        if (v6 == pPlaneMarker) {
-                            BSOcclusionPlane* pplane = (&m_Extra)->GetOcclusionPlane();
-                            if (pplane) {
-                                if ((&m_Extra)->GetMultiBoundRef()) {
-                                    TESObjectREFR* MultiBoundRef = (&m_Extra)->GetMultiBoundRef();
-                                    BSMultiBoundRoom* proom_2 = (&MultiBoundRef->m_Extra)->GetRoom();
-                                    if (proom_2) {
-                                        proom_2->RemoveOccluder(pplane);
-                                    }
-                                    else {
-                                        pgraph->RemoveOccluder(pplane);
-                                    }
+                }
+                else {
+                    TESObjectSTAT* v6 = static_cast<TESObjectSTAT*>(GetObjectReference());
+                    if (v6 == pPlaneMarker) {
+                        BSOcclusionPlane* pplane = (&m_Extra)->GetOcclusionPlane();
+                        if (pplane) {
+                            if ((&m_Extra)->GetMultiBoundRef()) {
+                                TESObjectREFR* MultiBoundRef = (&m_Extra)->GetMultiBoundRef();
+                                BSMultiBoundRoom* proom_2 = (&MultiBoundRef->m_Extra)->GetRoom();
+                                if (proom_2) {
+                                    proom_2->RemoveOccluder(pplane);
                                 }
                                 else {
                                     pgraph->RemoveOccluder(pplane);
                                 }
                             }
+                            else {
+                                pgraph->RemoveOccluder(pplane);
+                            }
                         }
-                        else {
-                            TESObjectSTAT* v8 = static_cast<TESObjectSTAT*>(GetObjectReference());
-                            if (v8 == pPortalMarker) {
-                                BSPortal* pportal_2 = (&m_Extra)->GetPortal();
-                                if (pportal_2) {
-                                    for (int32_t i = 0; i < 2; ++i) {
-                                        PortalLinkedRefData* pdata = (&m_Extra)->GetPortalLinkedRefData();
-                                        if (pdata && pdata->pLinkedRefs[i]) {
-                                            if (pdata->pLinkedRefs[i]->GetMultiBoundRoom()) {
-                                                (&pdata->pLinkedRefs[i]->GetMultiBoundRoom()->QPortalList())
-                                                    ->Remove(pportal_2);
-                                                if (i) {
-                                                    pportal_2->SetMultiBoundRoomRight(nullptr);
-                                                }
-                                                else {
-                                                    pportal_2->SetMultiBoundRoomLeft(nullptr);
-                                                }
+                    }
+                    else {
+                        TESObjectSTAT* v8 = static_cast<TESObjectSTAT*>(GetObjectReference());
+                        if (v8 == pPortalMarker) {
+                            BSPortal* pportal_2 = (&m_Extra)->GetPortal();
+                            if (pportal_2) {
+                                for (int32_t i = 0; i < 2; ++i) {
+                                    PortalLinkedRefData* pdata = (&m_Extra)->GetPortalLinkedRefData();
+                                    if (pdata && pdata->pLinkedRefs[i]) {
+                                        if (pdata->pLinkedRefs[i]->GetMultiBoundRoom()) {
+                                            (&pdata->pLinkedRefs[i]->GetMultiBoundRoom()->QPortalList())
+                                                ->Remove(pportal_2);
+                                            if (i) {
+                                                pportal_2->SetMultiBoundRoomRight(nullptr);
+                                            }
+                                            else {
+                                                pportal_2->SetMultiBoundRoomLeft(nullptr);
                                             }
                                         }
-                                        else {
-                                            pgraph->RemovePortal(pportal_2);
-                                        }
+                                    }
+                                    else {
+                                        pgraph->RemovePortal(pportal_2);
                                     }
                                 }
                             }
@@ -6619,12 +6498,10 @@ void TESObjectREFR::FreeUpAllMarkers() {
     uint32_t i;
     if (TESObjectREFR::GetObjectReference()) {
         baseForm = TESObjectREFR::GetObjectReference();
-        if (((int32_t)baseForm->GetFormType()) == 39) {
-            if (TESObjectREFR::GetObjectReference()) {
-                for (i = 0; i < 30; ++i) {
-                    SetMarkerUsed(i, false);
-                    SetMarkerReserved(i, false);
-                }
+        if ((((int32_t)baseForm->GetFormType()) == 39) && (TESObjectREFR::GetObjectReference())) {
+            for (i = 0; i < 30; ++i) {
+                SetMarkerUsed(i, false);
+                SetMarkerReserved(i, false);
             }
         }
     }
@@ -6733,11 +6610,10 @@ void TESObjectREFR::AttachWeapon(TESObjectWEAP* apWeapon) {
     if (IsActor()) {
         pActor = static_cast<Actor*>(this);
     }
-    if (!pSaveLoadGame->GetSaveGameLoading()) {
-        if (pActor->GetCurrentAIProcess()->GetWeaponDrawn()) {
-            pActor->GetCurrentAIProcess()->SetWeaponDrawn(pActor, false);
-        }
+    if ((!pSaveLoadGame->GetSaveGameLoading()) && (pActor->GetCurrentAIProcess()->GetWeaponDrawn())) {
+        pActor->GetCurrentAIProcess()->SetWeaponDrawn(pActor, false);
     }
+
     BipedAnim* pBipedAnim;
     if (this == pPlayer) {
         pBipedAnim = pPlayer->GetBiped(true);
@@ -6828,11 +6704,10 @@ bool TESObjectREFR::IsCrimeToActivate() {
                             IsEvil = static_cast<TESFaction*>(Owner)->TESFaction::GetIsEvil();
                         }
                         else {
-                            if (Owner) {
-                                if (Owner->GetFormType() == NPC__ID &&
-                                    static_cast<TESNPC*>(Owner)->TESActorBaseData::IsInEvilFactionsOnly()) {
-                                    IsEvil = true;
-                                }
+                            if ((Owner) &&
+                                (Owner->GetFormType() == NPC__ID &&
+                                 static_cast<TESNPC*>(Owner)->TESActorBaseData::IsInEvilFactionsOnly())) {
+                                IsEvil = true;
                             }
                         }
                     }
@@ -6853,11 +6728,10 @@ bool TESObjectREFR::IsCrimeToActivate() {
                         v7 = static_cast<TESFaction*>(v4)->TESFaction::GetIsEvil();
                     }
                     else {
-                        if (v4) {
-                            if (v4->GetFormType() == NPC__ID &&
-                                static_cast<TESNPC*>(v4)->TESActorBaseData::IsInEvilFactionsOnly()) {
-                                v7 = true;
-                            }
+                        if ((v4) &&
+                            (v4->GetFormType() == NPC__ID &&
+                             static_cast<TESNPC*>(v4)->TESActorBaseData::IsInEvilFactionsOnly())) {
+                            v7 = true;
                         }
                     }
                 }
@@ -6881,20 +6755,17 @@ bool TESObjectREFR::IsCrimeToActivate() {
             else {
                 if (GetObjectReference()->GetFormType() == CREA_ID && pPlayer->IsSneaking()) {
                     TESCreature* v3 = dynamic_cast<TESCreature*>(GetObjectReference());
-                    if (v3) {
-                        if (v3->GetAllowPCDialogue() && !IsDead(false)) {
-                            v12 = true;
-                        }
+                    if ((v3) && (v3->GetAllowPCDialogue() && !IsDead(false))) {
+                        v12 = true;
                     }
                 }
             }
         }
     }
-    if (!v12 && GetObjectReference()->GetFormType() != CREA_ID) {
-        if (GetOwner()) {
-            return !IsAnOwner(pPlayer, true);
-        }
+    if ((!v12 && GetObjectReference()->GetFormType() != CREA_ID) && (GetOwner())) {
+        return !IsAnOwner(pPlayer, true);
     }
+
     return v12;
 }
 
@@ -7463,18 +7334,18 @@ void TESObjectREFR::InitAnimation() {
             pProcess->SetCurrentWeapon(pWeaponChange, Get3D(), false);
             Actor* pSelf = IsActor() ? static_cast<Actor*>(this) : nullptr;
             bool bIsLily = IsActor() && pSelf->IsPlayerTeammate() && std::strstr(pSelf->GetFullName(), "Lily");
-            if (IsActor() && (IsNpc() || bIsLily) && pWeapon) {
-                if (!pProcess->Get3DUpdateFlag(RESET_MODEL) && pWornItem) {
-                    if (AILinearTaskThreadManager::ShouldQueue3DTask() &&
-                        this != TESObjectREFR::GetBackgroundLoadingRef()) {
-                        TESObjectWEAP* pWornWeapon = static_cast<TESObjectWEAP*>(pWornItem->GetItemChangeObject());
-                        TaskQueueInterface::GetInstance()->QueueAttachWeapon(static_cast<Actor*>(this), pWornWeapon);
-                    }
-                    else if (!bIsLily) {
-                        AttachWeapon(static_cast<TESObjectWEAP*>(pWornItem->GetItemChangeObject()));
-                    }
+            if ((IsActor() && (IsNpc() || bIsLily) && pWeapon) &&
+                (!pProcess->Get3DUpdateFlag(RESET_MODEL) && pWornItem)) {
+                if (AILinearTaskThreadManager::ShouldQueue3DTask() &&
+                    this != TESObjectREFR::GetBackgroundLoadingRef()) {
+                    TESObjectWEAP* pWornWeapon = static_cast<TESObjectWEAP*>(pWornItem->GetItemChangeObject());
+                    TaskQueueInterface::GetInstance()->QueueAttachWeapon(static_cast<Actor*>(this), pWornWeapon);
+                }
+                else if (!bIsLily) {
+                    AttachWeapon(static_cast<TESObjectWEAP*>(pWornItem->GetItemChangeObject()));
                 }
             }
+
             if (pAnimation) {
                 NiNode* pSceneRoot;
                 pSceneRoot = pAnimation->GetSceneRoot();
@@ -8087,18 +7958,17 @@ BSSimpleList<const char*>* TESObjectREFR::BuildKFFileList(ANIM_GROUP_WEAPON_ENUM
                 eweaponType_2 = WEAPON_HAND_TO_HAND;
             }
             const char* v29 = animWeaponInfo[weaponToAnimGroupWeapon[eweaponType_2]];
-            if (v29) {
-                if (*v29) {
-                    std::sprintf(pslash_3, "\\%sHolster.KF", v29);
-                    BSSimpleList<const char*>* v20 = pfileList;
-                    const char* Model_ = GetModel();
-                    pModelLoader->BuildFileList(Str1, Model_, v20);
-                    std::sprintf(pslash_3, "\\PA%sHolster.KF", v29);
-                    BSSimpleList<const char*>* v21 = pfileList;
-                    const char* v14 = GetModel();
-                    pModelLoader->BuildFileList(Str1, v14, v21);
-                }
+            if ((v29) && (*v29)) {
+                std::sprintf(pslash_3, "\\%sHolster.KF", v29);
+                BSSimpleList<const char*>* v20 = pfileList;
+                const char* Model_ = GetModel();
+                pModelLoader->BuildFileList(Str1, Model_, v20);
+                std::sprintf(pslash_3, "\\PA%sHolster.KF", v29);
+                BSSimpleList<const char*>* v21 = pfileList;
+                const char* v14 = GetModel();
+                pModelLoader->BuildFileList(Str1, v14, v21);
             }
+
             BSstrcpy(pslash_3, 260 - (pslash_3 - Str1), "\\Death.KF");
             BSSimpleList<const char*>* v22 = pfileList;
             const char* v15 = GetModel();
@@ -8168,16 +8038,15 @@ BSSimpleList<const char*>* TESObjectREFR::BuildKFFileList(ANIM_GROUP_WEAPON_ENUM
                     eweaponType = WEAPON_HAND_TO_HAND;
                 }
                 const char* pweaponPrefix = animWeaponInfo[weaponToAnimGroupWeapon[eweaponType]];
-                if (pweaponPrefix) {
-                    if (*pweaponPrefix) {
-                        std::sprintf(pslash, "\\%sHolster.KF", pweaponPrefix);
-                        const char* v7 = GetModel();
-                        pModelLoader->BuildFileList(Dst, v7, pfileList);
-                        std::sprintf(pslash, "\\PA%sHolster.KF", pweaponPrefix);
-                        const char* v8 = GetModel();
-                        pModelLoader->BuildFileList(Dst, v8, pfileList);
-                    }
+                if ((pweaponPrefix) && (*pweaponPrefix)) {
+                    std::sprintf(pslash, "\\%sHolster.KF", pweaponPrefix);
+                    const char* v7 = GetModel();
+                    pModelLoader->BuildFileList(Dst, v7, pfileList);
+                    std::sprintf(pslash, "\\PA%sHolster.KF", pweaponPrefix);
+                    const char* v8 = GetModel();
+                    pModelLoader->BuildFileList(Dst, v8, pfileList);
                 }
+
                 BSstrcpy(pslash, 260 - (pslash - Dst), "\\Death.KF");
                 const char* v9 = GetModel();
                 pModelLoader->BuildFileList(Dst, v9, pfileList);
@@ -8204,20 +8073,16 @@ void TESObjectREFR::SetRefPersists(bool abVal) {
     iFormFlags = iflags_2;
     if (abVal) {
         AddChange(1);
-        if (pcell) {
-            if (!pcell->GetInterior() && !pcell->GetPersistentCell()) {
-                TESWorldSpace* pworld = pcell->GetWorldSpace();
-                pworld->AddPersistentRef(this);
-            }
+        if ((pcell) && (!pcell->GetInterior() && !pcell->GetPersistentCell())) {
+            TESWorldSpace* pworld = pcell->GetWorldSpace();
+            pworld->AddPersistentRef(this);
         }
     }
     else {
-        if (pcell) {
-            if (pcell->GetPersistentCell()) {
-                TESWorldSpace* pworld_2 = pcell->GetWorldSpace();
-                pworld_2->RemovePersistentRef(this);
-                SetAltered(true);
-            }
+        if ((pcell) && (pcell->GetPersistentCell())) {
+            TESWorldSpace* pworld_2 = pcell->GetWorldSpace();
+            pworld_2->RemovePersistentRef(this);
+            SetAltered(true);
         }
     }
 }
@@ -8479,10 +8344,8 @@ void TESObjectREFR::AttachSound(bool abAttach) {
 
 void TESObjectREFR::UpdateAddonNodeSounds(bool abDetachAll) {
     NiNode* arg0 = TESObjectREFR::Get3D();
-    if (arg0) {
-        if (GetLoadedDataFlag(2u)) {
-            UpdateAddonNodeSoundsRecursive(arg0, abDetachAll);
-        }
+    if ((arg0) && (GetLoadedDataFlag(2u))) {
+        UpdateAddonNodeSoundsRecursive(arg0, abDetachAll);
     }
 }
 
@@ -8496,49 +8359,47 @@ void TESObjectREFR::UpdateAddonNodeSoundsRecursive(NiAVObject* apRoot, bool abDe
             BSValueNode* pvalueNode = static_cast<BSValueNode*>(apRoot);
             uint32_t v3 = pvalueNode->QValue();
             BGSAddonNode* paddonNode = pDataHandler->GetAddonNode(v3);
-            if (paddonNode) {
-                if (paddonNode->pSound) {
-                    const NiFixedString* v4 = &BGSAddonNodeSoundHandleExtra::Tag();
-                    NiPointer<BGSAddonNodeSoundHandleExtra> spsoundHandleExtra(
-                        static_cast<BGSAddonNodeSoundHandleExtra*>(apRoot->GetExtraData(*v4))
-                    );
-                    if (abDetachAll) {
-                        if (spsoundHandleExtra.m_pObject) {
-                            const NiFixedString* v5 = &BGSAddonNodeSoundHandleExtra::Tag();
-                            apRoot->RemoveExtraData(*v5);
-                            spsoundHandleExtra.m_pObject->SoundHandle.Stop();
-                            spsoundHandleExtra.m_pObject->SoundHandle.Release();
-                        }
+            if ((paddonNode) && (paddonNode->pSound)) {
+                const NiFixedString* v4 = &BGSAddonNodeSoundHandleExtra::Tag();
+                NiPointer<BGSAddonNodeSoundHandleExtra> spsoundHandleExtra(
+                    static_cast<BGSAddonNodeSoundHandleExtra*>(apRoot->GetExtraData(*v4))
+                );
+                if (abDetachAll) {
+                    if (spsoundHandleExtra.m_pObject) {
+                        const NiFixedString* v5 = &BGSAddonNodeSoundHandleExtra::Tag();
+                        apRoot->RemoveExtraData(*v5);
+                        spsoundHandleExtra.m_pObject->SoundHandle.Stop();
+                        spsoundHandleExtra.m_pObject->SoundHandle.Release();
                     }
-                    else {
-                        if (!spsoundHandleExtra.m_pObject) {
-                            uint32_t isoundFlags;
-                            BGSAddonNodeSoundHandleExtra* v13;
-                            void* apMemory = NiMemObject::operator new(sizeof(BGSAddonNodeSoundHandleExtra));
-                            if (apMemory) {
-                                v13 = ::new (apMemory) BGSAddonNodeSoundHandleExtra;
-                            }
-                            else {
-                                v13 = nullptr;
-                            }
-                            spsoundHandleExtra.operator=(v13);
-                            if (TESSound::ConvertLoopFlag(paddonNode->pSound->GetData().iFlags)) {
-                                isoundFlags = TESSound::ConvertLoopFlag(paddonNode->pSound->GetData().iFlags) |
-                                    BSGameSound::SOUND_FLAG_IS_3D;
-                            }
-                            else {
-                                isoundFlags = BSGameSound::SOUND_FLAG_IS_3D | BSGameSound::SOUND_FLAG_ONE_SHOT;
-                            }
-                            uint32_t arPos_4 = paddonNode->pSound->iFormID;
-                            BSAudio* v8 = &BSAudio::QInstance();
-                            BSSoundHandle* arHandle = v8->GetSoundHandleByNumericID(&apHandle, arPos_4, isoundFlags);
-                            spsoundHandleExtra.m_pObject->SoundHandle.operator=(*arHandle);
-                            spsoundHandleExtra.m_pObject->SoundHandle.SetObjectToFollow(apRoot);
-                            NiPoint3 v22 = apRoot->GetWorldTranslate();
-                            spsoundHandleExtra.m_pObject->SoundHandle.SetPosition(v22.x, v22.y, v22.z);
-                            spsoundHandleExtra.m_pObject->SoundHandle.Play(false);
-                            apRoot->AddExtraData(spsoundHandleExtra.m_pObject);
+                }
+                else {
+                    if (!spsoundHandleExtra.m_pObject) {
+                        uint32_t isoundFlags;
+                        BGSAddonNodeSoundHandleExtra* v13;
+                        void* apMemory = NiMemObject::operator new(sizeof(BGSAddonNodeSoundHandleExtra));
+                        if (apMemory) {
+                            v13 = ::new (apMemory) BGSAddonNodeSoundHandleExtra;
                         }
+                        else {
+                            v13 = nullptr;
+                        }
+                        spsoundHandleExtra.operator=(v13);
+                        if (TESSound::ConvertLoopFlag(paddonNode->pSound->GetData().iFlags)) {
+                            isoundFlags = TESSound::ConvertLoopFlag(paddonNode->pSound->GetData().iFlags) |
+                                BSGameSound::SOUND_FLAG_IS_3D;
+                        }
+                        else {
+                            isoundFlags = BSGameSound::SOUND_FLAG_IS_3D | BSGameSound::SOUND_FLAG_ONE_SHOT;
+                        }
+                        uint32_t arPos_4 = paddonNode->pSound->iFormID;
+                        BSAudio* v8 = &BSAudio::QInstance();
+                        BSSoundHandle* arHandle = v8->GetSoundHandleByNumericID(&apHandle, arPos_4, isoundFlags);
+                        spsoundHandleExtra.m_pObject->SoundHandle.operator=(*arHandle);
+                        spsoundHandleExtra.m_pObject->SoundHandle.SetObjectToFollow(apRoot);
+                        NiPoint3 v22 = apRoot->GetWorldTranslate();
+                        spsoundHandleExtra.m_pObject->SoundHandle.SetPosition(v22.x, v22.y, v22.z);
+                        spsoundHandleExtra.m_pObject->SoundHandle.Play(false);
+                        apRoot->AddExtraData(spsoundHandleExtra.m_pObject);
                     }
                 }
             }
@@ -8595,12 +8456,10 @@ void TESObjectREFR::RemoveLight(bool abMagic) {
     else {
         spellEffectLight = extra->GetLight();
     }
-    if (spellEffectLight) {
-        if (spellEffectLight->spLight.m_pObject) {
-            v4 = spellEffectLight->spLight.m_pObject;
-            shadowSceneNode = BSShaderManager::GetShadowSceneNode(BSShaderManager::BSSM_SSN_WORLD);
-            shadowSceneNode->RemoveLight(v4);
-        }
+    if ((spellEffectLight) && (spellEffectLight->spLight.m_pObject)) {
+        v4 = spellEffectLight->spLight.m_pObject;
+        shadowSceneNode = BSShaderManager::GetShadowSceneNode(BSShaderManager::BSSM_SSN_WORLD);
+        shadowSceneNode->RemoveLight(v4);
     }
 }
 
@@ -9152,18 +9011,16 @@ void TESObjectREFR::CleanUpTraps() {
 }
 
 void TESObjectREFR::SetDroppedRef(bool abVal) {
-    if (GetObjectReference()) {
-        if (GetObjectReference()->GetFormType() != DOOR_ID) {
-            int32_t iflags_2;
-            int32_t iflags = iFormFlags;
-            if (abVal) {
-                iflags_2 = iflags | 256;
-            }
-            else {
-                iflags_2 = iflags & ~256u;
-            }
-            iFormFlags = iflags_2;
+    if ((GetObjectReference()) && (GetObjectReference()->GetFormType() != DOOR_ID)) {
+        int32_t iflags_2;
+        int32_t iflags = iFormFlags;
+        if (abVal) {
+            iflags_2 = iflags | 256;
         }
+        else {
+            iflags_2 = iflags & ~256u;
+        }
+        iFormFlags = iflags_2;
     }
 }
 
@@ -9300,125 +9157,122 @@ void TESObjectREFR::InitHavokForCollisionObject() {
     else {
         pw = nullptr;
     }
-    if (pw) {
-        if (pprim) {
-            bhkCollisionObject* pcoll;
-            alignas(16) NiQuaternion nirot;
-            hkVector4 hkpos;
-            bhkRigidBody* prb;
-            BSXFlags* pflags;
-            COL_LAYER elayer;
-            bhkShape* pshape = nullptr;
-            hkTransform transform;
-            this->SetScale(1.0f);
-            NiNode* v1 = this->Get3D();
-            v1->SetScale(1.0f);
-            NiUpdateData UpdateData(0.0f, false, false);
-            NiNode* v2 = this->Get3D();
-            v2->Update(UpdateData);
-            alignas(16) NiTransform trn;
-            trn.m_Rotate = *::new (&v42) NiMatrix3(this->GetOrientation());
-            trn.m_Translate = this->GetLocationOnReference();
-            trn.m_fScale = 1.0f;
-            uint32_t FormHealth_0 = pprim->eType;
-            switch (FormHealth_0) {
-                case 1u: {
-                    bhkShape* pshape_3;
-                    NiPoint3* Radii = ::new (&v36) NiPoint3(pprim->GetRadii());
-                    NI2HK(hkvec, *Radii);
-                    bhkBoxShape* v35 = static_cast<bhkBoxShape*>(NiMemObject::operator new(sizeof(bhkBoxShape)));
-                    if (v35) {
-                        pshape_3 = ::new (v35) bhkBoxShape(hkvec);
-                    }
-                    else {
-                        pshape_3 = nullptr;
-                    }
-                    pshape = pshape_3;
-                    break;
+    if ((pw) && (pprim)) {
+        bhkCollisionObject* pcoll;
+        alignas(16) NiQuaternion nirot;
+        hkVector4 hkpos;
+        bhkRigidBody* prb;
+        BSXFlags* pflags;
+        COL_LAYER elayer;
+        bhkShape* pshape = nullptr;
+        hkTransform transform;
+        this->SetScale(1.0f);
+        NiNode* v1 = this->Get3D();
+        v1->SetScale(1.0f);
+        NiUpdateData UpdateData(0.0f, false, false);
+        NiNode* v2 = this->Get3D();
+        v2->Update(UpdateData);
+        alignas(16) NiTransform trn;
+        trn.m_Rotate = *::new (&v42) NiMatrix3(this->GetOrientation());
+        trn.m_Translate = this->GetLocationOnReference();
+        trn.m_fScale = 1.0f;
+        uint32_t FormHealth_0 = pprim->eType;
+        switch (FormHealth_0) {
+            case 1u: {
+                bhkShape* pshape_3;
+                NiPoint3* Radii = ::new (&v36) NiPoint3(pprim->GetRadii());
+                NI2HK(hkvec, *Radii);
+                bhkBoxShape* v35 = static_cast<bhkBoxShape*>(NiMemObject::operator new(sizeof(bhkBoxShape)));
+                if (v35) {
+                    pshape_3 = ::new (v35) bhkBoxShape(hkvec);
                 }
-                case 2u: {
-                    bhkShape* pshape_4;
-                    bhkSphereShape* v32 =
-                        static_cast<bhkSphereShape*>(NiMemObject::operator new(sizeof(bhkSphereShape)));
-                    if (v32) {
-                        float v10 = NI2HK(pprim->GetRadii().x);
-                        pshape_4 = ::new (v32) bhkSphereShape(v10, false);
-                    }
-                    else {
-                        pshape_4 = nullptr;
-                    }
-                    pshape = pshape_4;
-                    break;
+                else {
+                    pshape_3 = nullptr;
                 }
-                case 3u: {
-                    bhkShape* pshape_2;
-                    NiPoint3 halfextents = pprim->GetRadii();
-                    halfextents.y = 0.01f;
-                    NI2HK(hkvec, halfextents);
-                    bhkBoxShape* v39 = static_cast<bhkBoxShape*>(NiMemObject::operator new(sizeof(bhkBoxShape)));
-                    if (v39) {
-                        pshape_2 = ::new (v39) bhkBoxShape(hkvec);
-                    }
-                    else {
-                        pshape_2 = nullptr;
-                    }
-                    pshape = pshape_2;
-                    break;
+                pshape = pshape_3;
+                break;
+            }
+            case 2u: {
+                bhkShape* pshape_4;
+                bhkSphereShape* v32 = static_cast<bhkSphereShape*>(NiMemObject::operator new(sizeof(bhkSphereShape)));
+                if (v32) {
+                    float v10 = NI2HK(pprim->GetRadii().x);
+                    pshape_4 = ::new (v32) bhkSphereShape(v10, false);
                 }
+                else {
+                    pshape_4 = nullptr;
+                }
+                pshape = pshape_4;
+                break;
             }
-            bhkRigidBodyCinfo info;
-            info.SetShape(pshape);
-            uint32_t ifilterset = 0x30000;
-            CollisionData* pdata = (&this->m_Extra)->GetCollisionData();
-            if (pdata) {
-                elayer = pdata->eLayer;
+            case 3u: {
+                bhkShape* pshape_2;
+                NiPoint3 halfextents = pprim->GetRadii();
+                halfextents.y = 0.01f;
+                NI2HK(hkvec, halfextents);
+                bhkBoxShape* v39 = static_cast<bhkBoxShape*>(NiMemObject::operator new(sizeof(bhkBoxShape)));
+                if (v39) {
+                    pshape_2 = ::new (v39) bhkBoxShape(hkvec);
+                }
+                else {
+                    pshape_2 = nullptr;
+                }
+                pshape = pshape_2;
+                break;
             }
-            else {
-                elayer = L_TRANSPARENT;
-            }
-            ifilterset |= elayer;
-            info.SetCollisionFilter(ifilterset);
-            info.SetMotionType(hkpMotion::MOTION_FIXED);
-            BSXFlags* v23 = static_cast<BSXFlags*>(NiMemObject::operator new(sizeof(BSXFlags)));
-            if (v23) {
-                pflags = ::new (v23) BSXFlags;
-            }
-            else {
-                pflags = nullptr;
-            }
-            pflags->SetFlags(2u, true);
-            NiNode* v5 = this->Get3D();
-            v5->AddExtraData(pflags);
-            bhkRigidBody* v19 = static_cast<bhkRigidBody*>(NiMemObject::operator new(sizeof(bhkRigidBody)));
-            if (v19) {
-                prb = ::new (v19) bhkRigidBody(info);
-            }
-            else {
-                prb = nullptr;
-            }
-            hkrot.~hkQuaternion();
-            ::new (&hkrot) hkQuaternion;
-            NiNode* v6 = this->Get3D();
-            v6->GetRotate(nirot);
-            const NiPoint3* v7 = &this->GetLocationOnReference();
-            NI2HK(hkpos, *v7);
-            NI2HKMIGRATION_QUATERNION(hkrot, nirot);
-            prb->SetPosition(hkpos);
-            prb->SetRotation(hkrot);
-            NiNode* v8 = this->Get3D();
-            prb->SetAVObject(v8, 0);
-            prb->Add(pw);
-            bhkCollisionObject* v12 =
-                static_cast<bhkCollisionObject*>(NiMemObject::operator new(sizeof(bhkCollisionObject)));
-            if (v12) {
-                NiNode* v9 = this->Get3D();
-                pcoll = ::new (v12) bhkCollisionObject(v9);
-            }
-            else {
-                pcoll = nullptr;
-            }
-            pcoll->SetWorldObject(prb);
         }
+        bhkRigidBodyCinfo info;
+        info.SetShape(pshape);
+        uint32_t ifilterset = 0x30000;
+        CollisionData* pdata = (&this->m_Extra)->GetCollisionData();
+        if (pdata) {
+            elayer = pdata->eLayer;
+        }
+        else {
+            elayer = L_TRANSPARENT;
+        }
+        ifilterset |= elayer;
+        info.SetCollisionFilter(ifilterset);
+        info.SetMotionType(hkpMotion::MOTION_FIXED);
+        BSXFlags* v23 = static_cast<BSXFlags*>(NiMemObject::operator new(sizeof(BSXFlags)));
+        if (v23) {
+            pflags = ::new (v23) BSXFlags;
+        }
+        else {
+            pflags = nullptr;
+        }
+        pflags->SetFlags(2u, true);
+        NiNode* v5 = this->Get3D();
+        v5->AddExtraData(pflags);
+        bhkRigidBody* v19 = static_cast<bhkRigidBody*>(NiMemObject::operator new(sizeof(bhkRigidBody)));
+        if (v19) {
+            prb = ::new (v19) bhkRigidBody(info);
+        }
+        else {
+            prb = nullptr;
+        }
+        hkrot.~hkQuaternion();
+        ::new (&hkrot) hkQuaternion;
+        NiNode* v6 = this->Get3D();
+        v6->GetRotate(nirot);
+        const NiPoint3* v7 = &this->GetLocationOnReference();
+        NI2HK(hkpos, *v7);
+        NI2HKMIGRATION_QUATERNION(hkrot, nirot);
+        prb->SetPosition(hkpos);
+        prb->SetRotation(hkrot);
+        NiNode* v8 = this->Get3D();
+        prb->SetAVObject(v8, 0);
+        prb->Add(pw);
+        bhkCollisionObject* v12 =
+            static_cast<bhkCollisionObject*>(NiMemObject::operator new(sizeof(bhkCollisionObject)));
+        if (v12) {
+            NiNode* v9 = this->Get3D();
+            pcoll = ::new (v12) bhkCollisionObject(v9);
+        }
+        else {
+            pcoll = nullptr;
+        }
+        pcoll->SetWorldObject(prb);
     }
 }
 
@@ -9681,9 +9535,8 @@ BGSEncounterZone* TESObjectREFR::GetLocationEncounterZone() {
     if (worldSpace) {
         return worldSpace->GetEncounterZone();
     }
-    else {
-        return nullptr;
-    }
+
+    return nullptr;
 }
 
 void TESObjectREFR::FreeMultiBound() {
@@ -9740,11 +9593,10 @@ float TESObjectREFR::GetRadioStaticPct() {
     float v5 = (float)0.0;
     ExtraDataList* extra = TESObjectREFR::GetExtra();
     RADIO_DATA* extraRadioDataData = extra->GetRadioData();
-    if (extraRadioDataData) {
-        if (!extraRadioDataData->eRangeType) {
-            return extraRadioDataData->fStaticPct;
-        }
+    if ((extraRadioDataData) && (!extraRadioDataData->eRangeType)) {
+        return extraRadioDataData->fStaticPct;
     }
+
     return v5;
 }
 
@@ -9840,13 +9692,10 @@ void TESObjectREFR::MarkAsPickedUp() {
 
 void TESObjectREFR::AddReferenceItem(TESObjectREFR* apObject, int32_t aiNumber, bool abFlag, bool abWearit) {
     if (HasContainer()) {
-        if (!IsActor() || GetDisabled()) {
-            if (GetParentCell()) {
-                if (apObject->HasScript() && !HasScript()) {
-                    GetParentCell()->AddScriptedRef(this);
-                }
-            }
+        if ((!IsActor() || GetDisabled()) && (GetParentCell()) && (apObject->HasScript() && !HasScript())) {
+            GetParentCell()->AddScriptedRef(this);
         }
+
         if (this == pPlayer) {
             TESChallengeManager::UpdateChallenge(
                 CHALLENGE_TYPE_AQUIRE_LIST, aiNumber, apObject->GetObjectReference(), nullptr, 0, 0, 0
@@ -9869,24 +9718,21 @@ void TESObjectREFR::AddReferenceItem(TESObjectREFR* apObject, int32_t aiNumber, 
                 else {
                     pnewChange = nullptr;
                 }
-                if (pnewChange) {
-                    if (pnewChange->pExtraObjectList) {
-                        if (pnewChange->pExtraObjectList->m_item) {
-                            Script::SetActionFlag(this, pnewChange->pExtraObjectList->m_item, SCRIPT_ACTION_ONADD);
-                        }
-                    }
+                if ((pnewChange) && (pnewChange->pExtraObjectList) && (pnewChange->pExtraObjectList->m_item)) {
+                    Script::SetActionFlag(this, pnewChange->pExtraObjectList->m_item, SCRIPT_ACTION_ONADD);
                 }
+
                 pinventory->AddChangeItem(pnewChange, true);
             }
             else {
                 if (static_cast<Projectile*>(apObject)->pWeaponSource) {
                     TESBoundObject* paddObject;
                     TESObjectWEAP* pweapSource = static_cast<Projectile*>(apObject)->pWeaponSource;
-                    if (pweapSource->GetProjectile(nullptr)) {
-                        if (pweapSource->GetProjectile(nullptr)->GetDefaultWeaponSource()) {
-                            pweapSource = pweapSource->GetProjectile(nullptr)->GetDefaultWeaponSource();
-                        }
+                    if ((pweapSource->GetProjectile(nullptr)) &&
+                        (pweapSource->GetProjectile(nullptr)->GetDefaultWeaponSource())) {
+                        pweapSource = pweapSource->GetProjectile(nullptr)->GetDefaultWeaponSource();
                     }
+
                     if (pweapSource->IsThrownWeapon()) {
                         paddObject = (TESBoundObject*)pweapSource;
                     }
@@ -9906,27 +9752,26 @@ void TESObjectREFR::AddReferenceItem(TESObjectREFR* apObject, int32_t aiNumber, 
                                 pextra_2 = nullptr;
                             }
                             pextra_2->SetCount(1);
-                            if (pextra_2) {
-                                if (!pextra_2->GetScript()) {
-                                    TESObjectREFR* pref;
-                                    pextra_2->SetScript(pscript);
-                                    ScriptLocals* v5 = pscript->CloneLocals();
-                                    pextra_2->SetScriptLocals(v5);
-                                    TESObjectREFR* v11 = static_cast<TESObjectREFR*>(ourMalloc(sizeof(TESObjectREFR)));
-                                    if (v11) {
-                                        pref = ::new (v11) TESObjectREFR;
-                                    }
-                                    else {
-                                        pref = nullptr;
-                                    }
-                                    pref->SetTemporary();
-                                    ScriptLocals* ScriptLocals_ = pextra_2->GetScriptLocals();
-                                    pscript->Run(pref, ScriptLocals_, nullptr, false);
-                                    if (pref) {
-                                        delete pref;
-                                    }
+                            if ((pextra_2) && (!pextra_2->GetScript())) {
+                                TESObjectREFR* pref;
+                                pextra_2->SetScript(pscript);
+                                ScriptLocals* v5 = pscript->CloneLocals();
+                                pextra_2->SetScriptLocals(v5);
+                                TESObjectREFR* v11 = static_cast<TESObjectREFR*>(ourMalloc(sizeof(TESObjectREFR)));
+                                if (v11) {
+                                    pref = ::new (v11) TESObjectREFR;
+                                }
+                                else {
+                                    pref = nullptr;
+                                }
+                                pref->SetTemporary();
+                                ScriptLocals* ScriptLocals_ = pextra_2->GetScriptLocals();
+                                pscript->Run(pref, ScriptLocals_, nullptr, false);
+                                if (pref) {
+                                    delete pref;
                                 }
                             }
+
                             Script::SetActionFlag(this, pextra_2, SCRIPT_ACTION_ONADD);
                             pinventory->AddItem(paddObject, pextra_2, 1);
                         }
@@ -9984,16 +9829,12 @@ void TESObjectREFR::AddBoundObjectItem(TESBoundObject* apObject, ExtraDataList* 
     TESObjectCELL* parentCell;
     InventoryChanges* inventoryChanges;
     if (HasContainer()) {
-        if ((!IsActor()) || TESForm::GetDisabled()) {
-            if (TESObjectREFR::GetParentCell()) {
-                if (TESScriptableForm::GetFormScript(apObject)) {
-                    if (!HasScript()) {
-                        parentCell = TESObjectREFR::GetParentCell();
-                        parentCell->AddScriptedRef(this);
-                    }
-                }
-            }
+        if (((!IsActor()) || TESForm::GetDisabled()) && (TESObjectREFR::GetParentCell()) &&
+            (TESScriptableForm::GetFormScript(apObject)) && (!HasScript())) {
+            parentCell = TESObjectREFR::GetParentCell();
+            parentCell->AddScriptedRef(this);
         }
+
         if (static_cast<const void*>(this) == static_cast<const void*>(pPlayer)) {
             TESChallengeManager::UpdateChallenge(CHALLENGE_TYPE_AQUIRE_LIST, aiNumber, apObject, nullptr, 0, 0, 0);
             TESChallengeManager::UpdateChallenge(CHALLENGE_TYPE_AQUIRE, aiNumber, apObject, nullptr, 0, 0, 0);
@@ -10051,9 +9892,8 @@ TESObjectREFR* TESObjectREFR::GetRelevantWaterType() {
     if (pLoadedData) {
         return pLoadedData->pCurrentWaterObject;
     }
-    else {
-        return nullptr;
-    }
+
+    return nullptr;
 }
 
 void TESObjectREFR::SetRelevantWaterType(TESObjectREFR* a2) {
@@ -10081,25 +9921,20 @@ void TESObjectREFR::ResetAnimation_Old() {
         if (apString1) {
             v25 = BSstricmp(apString1, animGroupInfo[25].pName) == 0;
         }
-        if (!v25) {
-            if (v28->GetControllers()) {
-                NiObject* pkObject = v28->GetControllers();
-                v26 = static_cast<NiControllerManager*>(
-                    NiObject::DynamicCastStatic(&NiControllerManager::ms_RTTI, pkObject)
-                );
-                if (v26) {
-                    NiFixedString* kName = ::new (static_cast<void*>(&apString)) NiFixedString(animGroupInfo[25].pName);
-                    BSAnimGroupSequence* SequenceByName =
-                        static_cast<BSAnimGroupSequence*>(v26->GetSequenceByName(*kName));
-                    apString.~NiFixedString();
-                    if (SequenceByName) {
-                        if (SequenceByName->GetState()) {
-                            v25 = true;
-                        }
-                    }
+        if ((!v25) && (v28->GetControllers())) {
+            NiObject* pkObject = v28->GetControllers();
+            v26 =
+                static_cast<NiControllerManager*>(NiObject::DynamicCastStatic(&NiControllerManager::ms_RTTI, pkObject));
+            if (v26) {
+                NiFixedString* kName = ::new (static_cast<void*>(&apString)) NiFixedString(animGroupInfo[25].pName);
+                BSAnimGroupSequence* SequenceByName = static_cast<BSAnimGroupSequence*>(v26->GetSequenceByName(*kName));
+                apString.~NiFixedString();
+                if ((SequenceByName) && (SequenceByName->GetState())) {
+                    v25 = true;
                 }
             }
         }
+
         if (!v25) {
             v25 = HasMorpherController(v28);
         }
@@ -10110,57 +9945,55 @@ void TESObjectREFR::ResetAnimation_Old() {
         }
     }
     NiNode* v29 = TESObjectREFR::Get3D();
-    if (v29) {
-        if (v29->GetControllers()) {
-            NiObject* Controllers = v29->GetControllers();
-            v26 = static_cast<NiControllerManager*>(
-                NiObject::DynamicCastStatic(&NiControllerManager::ms_RTTI, Controllers)
-            );
-            if (v26) {
-                NiFixedString* v9 = ::new (static_cast<void*>(&v13)) NiFixedString(animGroupInfo[0].pName);
-                BSAnimGroupSequence* SequenceAt = static_cast<BSAnimGroupSequence*>(v26->GetSequenceByName(*v9));
-                v13.~NiFixedString();
-                NiFixedString* v8 = ::new (static_cast<void*>(&v12)) NiFixedString(animGroupInfo[2].pName);
-                BSAnimGroupSequence* v18 = static_cast<BSAnimGroupSequence*>(v26->GetSequenceByName(*v8));
-                v12.~NiFixedString();
-                v26->DeactivateAll(0.0f);
-                if (SequenceAt || v18) {
-                    v26->SetActive(true);
-                    if (SequenceAt) {
-                        if (!SequenceAt->GetState()) {
-                            v26->ActivateSequence(SequenceAt, 0, false, 1.0f, 0.0f, nullptr);
-                        }
-                        SequenceAt->SetOffset(-3.4028235e+38f);
-                        float a4 = SequenceAt->GetBeginKeyTime();
-                        NiUpdateData a2(a4, true, false);
-                        v29->Update(a2);
-                    }
-                    if (v18) {
-                        if (!v18->GetState()) {
-                            v26->ActivateSequence(v18, 0, false, 1.0f, 0.0f, nullptr);
-                        }
-                        v18->SetOffset(-3.4028235e+38f);
-                        float a4a = v18->GetBeginKeyTime();
-                        NiUpdateData arData(a4a, true, false);
-                        v29->Update(arData);
-                    }
-                }
-                else {
-                    v26->SetActive(true);
-                    SequenceAt = static_cast<BSAnimGroupSequence*>(v26->GetSequenceAt(0));
-                    if (SequenceAt) {
+    if ((v29) && (v29->GetControllers())) {
+        NiObject* Controllers = v29->GetControllers();
+        v26 =
+            static_cast<NiControllerManager*>(NiObject::DynamicCastStatic(&NiControllerManager::ms_RTTI, Controllers));
+        if (v26) {
+            NiFixedString* v9 = ::new (static_cast<void*>(&v13)) NiFixedString(animGroupInfo[0].pName);
+            BSAnimGroupSequence* SequenceAt = static_cast<BSAnimGroupSequence*>(v26->GetSequenceByName(*v9));
+            v13.~NiFixedString();
+            NiFixedString* v8 = ::new (static_cast<void*>(&v12)) NiFixedString(animGroupInfo[2].pName);
+            BSAnimGroupSequence* v18 = static_cast<BSAnimGroupSequence*>(v26->GetSequenceByName(*v8));
+            v12.~NiFixedString();
+            v26->DeactivateAll(0.0f);
+            if (SequenceAt || v18) {
+                v26->SetActive(true);
+                if (SequenceAt) {
+                    if (!SequenceAt->GetState()) {
                         v26->ActivateSequence(SequenceAt, 0, false, 1.0f, 0.0f, nullptr);
-                        SequenceAt->SetOffset(-3.4028235e+38f);
-                        float a4b = SequenceAt->GetBeginKeyTime();
-                        NiUpdateData apMemory(a4b, true, false);
-                        v29->Update(apMemory);
                     }
-                    v26->DeactivateAll(0.0f);
-                    v26->SetActive(false);
+                    SequenceAt->SetOffset(-3.4028235e+38f);
+                    float a4 = SequenceAt->GetBeginKeyTime();
+                    NiUpdateData a2(a4, true, false);
+                    v29->Update(a2);
                 }
+                if (v18) {
+                    if (!v18->GetState()) {
+                        v26->ActivateSequence(v18, 0, false, 1.0f, 0.0f, nullptr);
+                    }
+                    v18->SetOffset(-3.4028235e+38f);
+                    float a4a = v18->GetBeginKeyTime();
+                    NiUpdateData arData(a4a, true, false);
+                    v29->Update(arData);
+                }
+            }
+            else {
+                v26->SetActive(true);
+                SequenceAt = static_cast<BSAnimGroupSequence*>(v26->GetSequenceAt(0));
+                if (SequenceAt) {
+                    v26->ActivateSequence(SequenceAt, 0, false, 1.0f, 0.0f, nullptr);
+                    SequenceAt->SetOffset(-3.4028235e+38f);
+                    float a4b = SequenceAt->GetBeginKeyTime();
+                    NiUpdateData apMemory(a4b, true, false);
+                    v29->Update(apMemory);
+                }
+                v26->DeactivateAll(0.0f);
+                v26->SetActive(false);
             }
         }
     }
+
     if (v29) {
         v7 = v29->GetControllers();
     }
@@ -10280,11 +10113,11 @@ float TESObjectREFR::GetWeightInContainer(bool abIsHardcore) {
     if (static_cast<const void*>(this) == static_cast<const void*>(pPlayer)) {
         return (pPlayer->GetRockItLauncherWeight() + inventoryWeight);
     }
-    else {
-        if (inventoryWeight > static_cast<Actor*>(this)->GetMaxCarryWeight()) {
-            return static_cast<Actor*>(this)->GetMaxCarryWeight();
-        }
+
+    if (inventoryWeight > static_cast<Actor*>(this)->GetMaxCarryWeight()) {
+        return static_cast<Actor*>(this)->GetMaxCarryWeight();
     }
+
     return inventoryWeight;
 }
 
@@ -10433,17 +10266,16 @@ void TESObjectREFR::LoadHavokDataPreVersion81(uint16_t aiSaveSize) {
         recData.uDataA[2].i = cflags;
         recData.uDataA[3].i = 0;
         bhkWorld::DoObjectRec(pobj3D, recData, &TESObjectREFR::LoadHavokDataForCollisionObjectPreVersion81);
-        if (pactor) {
-            if (pactor->IsParalyzed()) {
-                bhkRigidBody::SetFixed(pobj3D, 1, 1);
-                bhkWorld::SetMotion(pobj3D, hkpMotion::MOTION_DYNAMIC, true, false, true);
-                Animation* panim = pactor->GetAnimation();
-                if (panim) {
-                    panim->ClearGroup(AGS_WHOLE_BODY, 0.0f);
-                    panim->ClearAccumRootTranslate();
-                }
+        if ((pactor) && (pactor->IsParalyzed())) {
+            bhkRigidBody::SetFixed(pobj3D, 1, 1);
+            bhkWorld::SetMotion(pobj3D, hkpMotion::MOTION_DYNAMIC, true, false, true);
+            Animation* panim = pactor->GetAnimation();
+            if (panim) {
+                panim->ClearGroup(AGS_WHOLE_BODY, 0.0f);
+                panim->ClearAccumRootTranslate();
             }
         }
+
         NiUpdateData kUpdateData(0.0f, false, false);
         pobj3D->Update(kUpdateData);
     }
@@ -10468,23 +10300,20 @@ void TESObjectREFR::ResetAnimation() {
         if (plastFinishedSequence) {
             v33 = BSstricmp(plastFinishedSequence, animGroupInfo[25].pName) == 0;
         }
-        if (!v33) {
-            if (pobj3D->GetControllers()) {
-                NiObject* po = pobj3D->GetControllers();
-                pmanager =
-                    static_cast<NiControllerManager*>(NiObject::DynamicCastStatic(&NiControllerManager::ms_RTTI, po));
-                if (pmanager) {
-                    NiFixedString* kName = ::new (static_cast<void*>(&apString)) NiFixedString(animGroupInfo[25].pName);
-                    NiControllerSequence* punequipSeq = pmanager->GetSequenceByName(*kName);
-                    apString.~NiFixedString();
-                    if (punequipSeq) {
-                        if (punequipSeq->GetState()) {
-                            v33 = true;
-                        }
-                    }
+        if ((!v33) && (pobj3D->GetControllers())) {
+            NiObject* po = pobj3D->GetControllers();
+            pmanager =
+                static_cast<NiControllerManager*>(NiObject::DynamicCastStatic(&NiControllerManager::ms_RTTI, po));
+            if (pmanager) {
+                NiFixedString* kName = ::new (static_cast<void*>(&apString)) NiFixedString(animGroupInfo[25].pName);
+                NiControllerSequence* punequipSeq = pmanager->GetSequenceByName(*kName);
+                apString.~NiFixedString();
+                if ((punequipSeq) && (punequipSeq->GetState())) {
+                    v33 = true;
                 }
             }
         }
+
         if (!v33) {
             v33 = HasMorpherController(pobj3D);
         }
@@ -10492,74 +10321,68 @@ void TESObjectREFR::ResetAnimation() {
             NiAVObject* pnew3D = data.pObjectReference->Clone3D(this);
             Set3D(pnew3D, true);
             InitHavok();
-            if (pParentCell) {
-                if (TES::pInstance->IsCellLoaded(pParentCell, false)) {
-                    pParentCell->AttachReference3D(this, false);
-                }
+            if ((pParentCell) && (TES::pInstance->IsCellLoaded(pParentCell, false))) {
+                pParentCell->AttachReference3D(this, false);
             }
         }
     }
     pobj3D = TESObjectREFR::Get3D();
-    if (pobj3D) {
-        if (pobj3D->GetControllers()) {
-            NiObject* po_2 = pobj3D->GetControllers();
-            pmanager =
-                static_cast<NiControllerManager*>(NiObject::DynamicCastStatic(&NiControllerManager::ms_RTTI, po_2));
-            if (pmanager) {
-                for (uint32_t i = 0;; ++i) {
-                    uint32_t SequenceCount = pmanager->GetSequenceCount();
-                    if (i >= SequenceCount) {
-                        break;
-                    }
-                    NiControllerSequence* pseq = pmanager->GetSequenceAt(i);
-                    if (pseq) {
-                        if (pseq->GetState()) {
-                            BGSOpenCloseForm::HandleAnimEndHavok(this, pseq);
-                        }
-                    }
+    if ((pobj3D) && (pobj3D->GetControllers())) {
+        NiObject* po_2 = pobj3D->GetControllers();
+        pmanager = static_cast<NiControllerManager*>(NiObject::DynamicCastStatic(&NiControllerManager::ms_RTTI, po_2));
+        if (pmanager) {
+            for (uint32_t i = 0;; ++i) {
+                uint32_t SequenceCount = pmanager->GetSequenceCount();
+                if (i >= SequenceCount) {
+                    break;
                 }
-                pmanager->DeactivateAll(0.0f);
+                NiControllerSequence* pseq = pmanager->GetSequenceAt(i);
+                if ((pseq) && (pseq->GetState())) {
+                    BGSOpenCloseForm::HandleAnimEndHavok(this, pseq);
+                }
+            }
+            pmanager->DeactivateAll(0.0f);
+            pmanager->SetActive(true);
+            NiControllerSequence* pfirstSeq = pmanager->GetSequenceAt(0);
+            if (pfirstSeq) {
+                pmanager->ActivateSequence(pfirstSeq, 0, false, 1.0f, 0.0f, nullptr);
+                pfirstSeq->SetOffset(-3.4028235e+38f);
+                float a4 = pfirstSeq->GetBeginKeyTime();
+                NiUpdateData UpdateData(a4, true, false);
+                pobj3D->Update(UpdateData);
+            }
+            pmanager->DeactivateAll(0.0f);
+            pmanager->SetActive(false);
+            NiFixedString* v12 = ::new (static_cast<void*>(&v16)) NiFixedString(animGroupInfo[0].pName);
+            NiControllerSequence* pdefaultSeq1 = pmanager->GetSequenceByName(*v12);
+            v16.~NiFixedString();
+            NiFixedString* v11 = ::new (static_cast<void*>(&v15)) NiFixedString(animGroupInfo[2].pName);
+            NiControllerSequence* pdefaultSeq2 = pmanager->GetSequenceByName(*v11);
+            v15.~NiFixedString();
+            if (pdefaultSeq1 || pdefaultSeq2) {
                 pmanager->SetActive(true);
-                NiControllerSequence* pfirstSeq = pmanager->GetSequenceAt(0);
-                if (pfirstSeq) {
-                    pmanager->ActivateSequence(pfirstSeq, 0, false, 1.0f, 0.0f, nullptr);
-                    pfirstSeq->SetOffset(-3.4028235e+38f);
-                    float a4 = pfirstSeq->GetBeginKeyTime();
-                    NiUpdateData UpdateData(a4, true, false);
-                    pobj3D->Update(UpdateData);
+                if (pdefaultSeq1) {
+                    if (!pdefaultSeq1->GetState()) {
+                        pmanager->ActivateSequence(pdefaultSeq1, 0, false, 1.0f, 0.0f, nullptr);
+                    }
+                    pdefaultSeq1->SetOffset(-3.4028235e+38f);
+                    float a4a = pdefaultSeq1->GetBeginKeyTime();
+                    NiUpdateData UpdateData_2(a4a, true, false);
+                    pobj3D->Update(UpdateData_2);
                 }
-                pmanager->DeactivateAll(0.0f);
-                pmanager->SetActive(false);
-                NiFixedString* v12 = ::new (static_cast<void*>(&v16)) NiFixedString(animGroupInfo[0].pName);
-                NiControllerSequence* pdefaultSeq1 = pmanager->GetSequenceByName(*v12);
-                v16.~NiFixedString();
-                NiFixedString* v11 = ::new (static_cast<void*>(&v15)) NiFixedString(animGroupInfo[2].pName);
-                NiControllerSequence* pdefaultSeq2 = pmanager->GetSequenceByName(*v11);
-                v15.~NiFixedString();
-                if (pdefaultSeq1 || pdefaultSeq2) {
-                    pmanager->SetActive(true);
-                    if (pdefaultSeq1) {
-                        if (!pdefaultSeq1->GetState()) {
-                            pmanager->ActivateSequence(pdefaultSeq1, 0, false, 1.0f, 0.0f, nullptr);
-                        }
-                        pdefaultSeq1->SetOffset(-3.4028235e+38f);
-                        float a4a = pdefaultSeq1->GetBeginKeyTime();
-                        NiUpdateData UpdateData_2(a4a, true, false);
-                        pobj3D->Update(UpdateData_2);
+                if (pdefaultSeq2) {
+                    if (!pdefaultSeq2->GetState()) {
+                        pmanager->ActivateSequence(pdefaultSeq2, 0, false, 1.0f, 0.0f, nullptr);
                     }
-                    if (pdefaultSeq2) {
-                        if (!pdefaultSeq2->GetState()) {
-                            pmanager->ActivateSequence(pdefaultSeq2, 0, false, 1.0f, 0.0f, nullptr);
-                        }
-                        pdefaultSeq2->SetOffset(-3.4028235e+38f);
-                        float a4b = pdefaultSeq2->GetBeginKeyTime();
-                        NiUpdateData UpdateData_3(a4b, true, false);
-                        pobj3D->Update(UpdateData_3);
-                    }
+                    pdefaultSeq2->SetOffset(-3.4028235e+38f);
+                    float a4b = pdefaultSeq2->GetBeginKeyTime();
+                    NiUpdateData UpdateData_3(a4b, true, false);
+                    pobj3D->Update(UpdateData_3);
                 }
             }
         }
     }
+
     if (pobj3D) {
         po_3 = pobj3D->GetControllers();
     }
@@ -10571,11 +10394,9 @@ void TESObjectREFR::ResetAnimation() {
     if (pmanager) {
         pmanager->DeactivateAll(0.0f);
     }
-    if (v33) {
-        if (pobj3D) {
-            ShadowSceneNode* ShadowSceneNode_ = BSShaderManager::GetShadowSceneNode(0);
-            ShadowSceneNode_->AddObject(pobj3D);
-        }
+    if ((v33) && (pobj3D)) {
+        ShadowSceneNode* ShadowSceneNode_ = BSShaderManager::GetShadowSceneNode(0);
+        ShadowSceneNode_->AddObject(pobj3D);
     }
 }
 
@@ -10617,9 +10438,8 @@ const NiPoint3& TESObjectREFR::GetLinkedDoorTeleportRotation() {
     if (Teleport && ((v2 = Teleport->GetLinkedDoor()) != nullptr && (v4 = v2->GetTeleport()) != nullptr)) {
         return *&v4->rotation;
     }
-    else {
-        return NiPoint3_ZERO;
-    }
+
+    return NiPoint3_ZERO;
 }
 
 LockData* TESObjectREFR::AddLock() {
@@ -10784,26 +10604,22 @@ void* TESObjectREFR::GetInventoryIterator(char a1, InventoryChanges::IterData** 
 
 void TESObjectREFR::ShowPrimitive(bool abShow) {
     BGSPrimitive* pprim = (&m_Extra)->GetPrimitive();
-    if (pprim) {
-        if (pprim->GetNode()) {
-            float fAlpha;
-            FNVD_INLINED_LOCAL(NiColorA, clr, std::nullopt, std::nullopt);
-            clr = pprim->GetColor();
-            if (abShow) {
-                fAlpha = 0.2f;
-            }
-            else {
-                fAlpha = 0.0f;
-            }
-            clr.a = fAlpha;
-            pprim->SetColor(clr);
-            TESObjectSTAT* ObjectReference = static_cast<TESObjectSTAT*>(GetObjectReference());
-            if (ObjectReference != pCollisionMarker) {
-                if (Get3D()) {
-                    NiNode* v3 = Get3D();
-                    v3->SetAppCulled(!abShow);
-                }
-            }
+    if ((pprim) && (pprim->GetNode())) {
+        float fAlpha;
+        FNVD_INLINED_LOCAL(NiColorA, clr, std::nullopt, std::nullopt);
+        clr = pprim->GetColor();
+        if (abShow) {
+            fAlpha = 0.2f;
+        }
+        else {
+            fAlpha = 0.0f;
+        }
+        clr.a = fAlpha;
+        pprim->SetColor(clr);
+        TESObjectSTAT* ObjectReference = static_cast<TESObjectSTAT*>(GetObjectReference());
+        if ((ObjectReference != pCollisionMarker) && (Get3D())) {
+            NiNode* v3 = Get3D();
+            v3->SetAppCulled(!abShow);
         }
     }
 }
@@ -10859,44 +10675,41 @@ void TESObjectREFR::SayForceGoodbyeGreetingToPlayer(
         pactor = static_cast<Actor*>(this);
     }
     if (pactor) {
-        if (pactor->pCurrentProcess) {
-            if (!pactor->IsDead(false)) {
-                DialogueItem* pVoice = apGreetTopic->CreateDialogueItem(pactor, pPlayer, nullptr, nullptr, true);
-                pactor->bSoundFileDone = true;
-                pactor->SetDialogueItemTarget(pPlayer);
-                if (pactor->GetSitSleepState() == SIT_SLEEP_NORMAL) {
-                    if (pactor->pCurrentProcess->GetGreetingFlag()) {
-                        pactor->EndInterruptPackage(false);
-                        pactor->pCurrentProcess->CreateFollownoEscort(pactor, true);
+        if ((pactor->pCurrentProcess) && (!pactor->IsDead(false))) {
+            DialogueItem* pVoice = apGreetTopic->CreateDialogueItem(pactor, pPlayer, nullptr, nullptr, true);
+            pactor->bSoundFileDone = true;
+            pactor->SetDialogueItemTarget(pPlayer);
+            if ((pactor->GetSitSleepState() == SIT_SLEEP_NORMAL) && (pactor->pCurrentProcess->GetGreetingFlag())) {
+                pactor->EndInterruptPackage(false);
+                pactor->pCurrentProcess->CreateFollownoEscort(pactor, true);
+            }
+
+            pactor->pCurrentProcess->ProcessGreet(pactor, apGreetTopic, abForceSubtitle, true, true, false);
+            if (pVoice) {
+                pVoice->FirstResponse();
+                pVoice->GetCurrentResponse();
+                pVoice->RunResult(TIRS_BEGIN);
+                pVoice->RunResult(TIRS_END);
+                Script::SetActionFlag(apGreetTopic, &pactor->m_Extra, SCRIPT_ACTION_ONSAYTODONE);
+            }
+            if (pactor->pCurrentProcess->GetGreetingFlag()) {
+                pactor->GetSayToTopic();
+                DialogueItem* pItem = pactor->pCurrentProcess->GetSubtitleItem();
+                if (pItem) {
+                    DialogueResponse* pResponse = pItem->GetCurrentResponse();
+                    if (GetIsFullHelp()) {
+                        char acSubtitle[268];
+                        std::sprintf(acSubtitle, "'%s' :%s", GetFullName(), pResponse->cText.pString);
+                        NiPoint3 kSpeakerLoc = GetLocationOnReference();
+                        BSSoundHandle kHandle(0u);
+                        Interface::ShowSubtitle(acSubtitle, kHandle, kSpeakerLoc, pPlayer, false);
                     }
-                }
-                pactor->pCurrentProcess->ProcessGreet(pactor, apGreetTopic, abForceSubtitle, true, true, false);
-                if (pVoice) {
-                    pVoice->FirstResponse();
-                    pVoice->GetCurrentResponse();
-                    pVoice->RunResult(TIRS_BEGIN);
-                    pVoice->RunResult(TIRS_END);
-                    Script::SetActionFlag(apGreetTopic, &pactor->m_Extra, SCRIPT_ACTION_ONSAYTODONE);
-                }
-                if (pactor->pCurrentProcess->GetGreetingFlag()) {
-                    pactor->GetSayToTopic();
-                    DialogueItem* pItem = pactor->pCurrentProcess->GetSubtitleItem();
-                    if (pItem) {
-                        DialogueResponse* pResponse = pItem->GetCurrentResponse();
-                        if (GetIsFullHelp()) {
-                            char acSubtitle[268];
-                            std::sprintf(acSubtitle, "'%s' :%s", GetFullName(), pResponse->cText.pString);
-                            NiPoint3 kSpeakerLoc = GetLocationOnReference();
-                            BSSoundHandle kHandle(0u);
-                            Interface::ShowSubtitle(acSubtitle, kHandle, kSpeakerLoc, pPlayer, false);
-                        }
-                        else {
-                            NiPoint3 kSpeakerLoc = GetLocationOnReference();
-                            BSSoundHandle kHandle(0u);
-                            Interface::ShowSubtitle(pResponse->cText.pString, kHandle, kSpeakerLoc, pPlayer, false);
-                        }
-                        pactor->pCurrentProcess->SetSubtitleItem(nullptr);
+                    else {
+                        NiPoint3 kSpeakerLoc = GetLocationOnReference();
+                        BSSoundHandle kHandle(0u);
+                        Interface::ShowSubtitle(pResponse->cText.pString, kHandle, kSpeakerLoc, pPlayer, false);
                     }
+                    pactor->pCurrentProcess->SetSubtitleItem(nullptr);
                 }
             }
         }
@@ -11049,22 +10862,19 @@ void TESObjectREFR::SaveControllerManager(
     }
     uint32_t aiVariableValue = 0;
     uint32_t aiPosition = apSaveGameBuffer->StartVariableSizedValue();
-    if (apManager) {
-        if (apManager->GetActive()) {
-            for (uint32_t uiIndex = 0; uiIndex < apManager->GetSequenceCount(); ++uiIndex) {
-                BSAnimGroupSequence* SequenceAt = static_cast<BSAnimGroupSequence*>(apManager->GetSequenceAt(uiIndex));
-                if (SequenceAt) {
-                    if (SequenceAt->GetState()) {
-                        NiFixedString* Name = &SequenceAt->m_kName;
-                        const char* HandleString = Name->GetHandleString();
-                        apSaveGameBuffer->SaveString(HandleString, 0);
-                        SequenceAt->SaveGame(static_cast<BGSSaveFormBuffer*>(apSaveGameBuffer), afTime);
-                        ++aiVariableValue;
-                    }
-                }
+    if ((apManager) && (apManager->GetActive())) {
+        for (uint32_t uiIndex = 0; uiIndex < apManager->GetSequenceCount(); ++uiIndex) {
+            BSAnimGroupSequence* SequenceAt = static_cast<BSAnimGroupSequence*>(apManager->GetSequenceAt(uiIndex));
+            if ((SequenceAt) && (SequenceAt->GetState())) {
+                NiFixedString* Name = &SequenceAt->m_kName;
+                const char* HandleString = Name->GetHandleString();
+                apSaveGameBuffer->SaveString(HandleString, 0);
+                SequenceAt->SaveGame(static_cast<BGSSaveFormBuffer*>(apSaveGameBuffer), afTime);
+                ++aiVariableValue;
             }
         }
     }
+
     apSaveGameBuffer->SaveVariableSizedValue(aiVariableValue, aiPosition);
 }
 
@@ -11079,28 +10889,25 @@ void TESObjectREFR::SaveControllerManager(NiControllerManager* apManager, float 
     icount = 0;
     uint16_t* pcount = static_cast<uint16_t*>(pSaveLoadGameOLD->m_pBuffer);
     pSaveLoadGameOLD->SaveGameDataOLD(&icount, 2u);
-    if (apManager) {
-        if (apManager->GetActive()) {
-            for (uint32_t n = 0;; ++n) {
-                uint32_t SequenceCount = apManager->GetSequenceCount();
-                if (n >= SequenceCount) {
-                    break;
-                }
-                BSAnimGroupSequence* pseq = static_cast<BSAnimGroupSequence*>(apManager->GetSequenceAt(n));
-                if (pseq) {
-                    if (pseq->GetState()) {
-                        const char* pname = (&pseq->m_kName)->GetHandleString();
-                        clength = BSstrlen(pname);
-                        pSaveLoadGameOLD->SaveGameDataOLD(&clength, 1u);
-                        const char* pname_2 = (&pseq->m_kName)->GetHandleString();
-                        pSaveLoadGameOLD->SaveGameDataOLD(pname_2, clength);
-                        pseq->SaveGame(afTime);
-                        ++icount;
-                    }
-                }
+    if ((apManager) && (apManager->GetActive())) {
+        for (uint32_t n = 0;; ++n) {
+            uint32_t SequenceCount = apManager->GetSequenceCount();
+            if (n >= SequenceCount) {
+                break;
+            }
+            BSAnimGroupSequence* pseq = static_cast<BSAnimGroupSequence*>(apManager->GetSequenceAt(n));
+            if ((pseq) && (pseq->GetState())) {
+                const char* pname = (&pseq->m_kName)->GetHandleString();
+                clength = BSstrlen(pname);
+                pSaveLoadGameOLD->SaveGameDataOLD(&clength, 1u);
+                const char* pname_2 = (&pseq->m_kName)->GetHandleString();
+                pSaveLoadGameOLD->SaveGameDataOLD(pname_2, clength);
+                pseq->SaveGame(afTime);
+                ++icount;
             }
         }
     }
+
     *pcount = icount;
 }
 
@@ -11285,14 +11092,10 @@ bool TESObjectREFR::RemoveAddonNodes(NiNode* apNode) {
     if (NiObject::IsKindOf_0(&BSValueNode::ms_RTTI, apNode)) {
         bhkWorld::RemoveObjects(apNode, true, true);
         BGSAddonNode* pAddonNode = pDataHandler->GetAddonNode(static_cast<BSValueNode*>(apNode)->iValue);
-        if (pAddonNode) {
-            if (pAddonNode->GetModelLength()) {
-                if (apNode->GetChildCount()) {
-                    pAddonNode->UnClone3D(nullptr);
-                    apNode->DetachAllChildren();
-                    bResult = true;
-                }
-            }
+        if ((pAddonNode) && (pAddonNode->GetModelLength()) && (apNode->GetChildCount())) {
+            pAddonNode->UnClone3D(nullptr);
+            apNode->DetachAllChildren();
+            bResult = true;
         }
     }
     for (uint32_t i = 0; i < apNode->GetArrayCount(); ++i) {
@@ -11348,21 +11151,18 @@ TESObjectREFR* TESObjectREFR::GetBackgroundLoadingRef() {
 
 uint16_t TESObjectREFR::GetControllerManagerSaveSize(NiControllerManager* apManager) {
     uint16_t v6 = 2;
-    if (apManager) {
-        if (apManager->GetActive()) {
-            for (uint32_t uiIndex = 0; uiIndex < apManager->GetSequenceCount(); ++uiIndex) {
-                BSAnimGroupSequence* SequenceAt = static_cast<BSAnimGroupSequence*>(apManager->GetSequenceAt(uiIndex));
-                if (SequenceAt) {
-                    if (SequenceAt->GetState()) {
-                        NiFixedString* Name = &SequenceAt->m_kName;
-                        const char* HandleString = Name->GetHandleString();
-                        int16_t v7 = BSstrlen(HandleString) + (v6 + 1);
-                        v6 = SequenceAt->GetSaveSize() + v7;
-                    }
-                }
+    if ((apManager) && (apManager->GetActive())) {
+        for (uint32_t uiIndex = 0; uiIndex < apManager->GetSequenceCount(); ++uiIndex) {
+            BSAnimGroupSequence* SequenceAt = static_cast<BSAnimGroupSequence*>(apManager->GetSequenceAt(uiIndex));
+            if ((SequenceAt) && (SequenceAt->GetState())) {
+                NiFixedString* Name = &SequenceAt->m_kName;
+                const char* HandleString = Name->GetHandleString();
+                int16_t v7 = BSstrlen(HandleString) + (v6 + 1);
+                v6 = SequenceAt->GetSaveSize() + v7;
             }
         }
     }
+
     return v6;
 }
 
@@ -11637,11 +11437,9 @@ bool TESObjectREFR::RemoveMasterParticleAddonNodes(NiNode* apNode) {
     if (NiObject::IsKindOf_0(&BSValueNode::ms_RTTI, apNode)) {
         aiIndex = (uint32_t)static_cast<BSValueNode*>(apNode)->iValue;
         pAddonNode = pDataHandler->GetAddonNode(aiIndex);
-        if (pAddonNode) {
-            if (pAddonNode->IsMasterParticleSystem()) {
-                apNode->SetAppCulled(true);
-                v7 = 1;
-            }
+        if ((pAddonNode) && (pAddonNode->IsMasterParticleSystem())) {
+            apNode->SetAppCulled(true);
+            v7 = 1;
         }
     }
     for (a1 = 0; a1 < apNode->GetArrayCount(); ++a1) {
@@ -11735,11 +11533,11 @@ void TESObjectREFR::GetCollisionObjectSize(bhkNiCollisionObject* apCollision, bh
         pSaveData->cFlags |= 8;
     }
     NiAVObject* pObject = apCollision->GetSceneGraphObject();
-    if (apCollision != pSaveData->pCollisionRoot && pObject && pObject->GetName().GetHandleString()) {
-        if (!BSstrcmp(pObject->GetName().GetHandleString(), "Arrow")) {
-            return;
-        }
+    if ((apCollision != pSaveData->pCollisionRoot && pObject && pObject->GetName().GetHandleString()) &&
+        (!BSstrcmp(pObject->GetName().GetHandleString(), "Arrow"))) {
+        return;
     }
+
     if (pSaveData->pRef->IsActor()) {
         bool bFade;
         bFade = NiObject::IsKindOf(&BSFadeNode::ms_RTTI, pObject);
@@ -11775,11 +11573,11 @@ void TESObjectREFR::SaveHavokDataForCollisionObjectOld(
 ) {
     HavokSaveData* pSaveData = static_cast<HavokSaveData*>(arData.uDataA[0].p);
     NiAVObject* pObject = apCollision->GetSceneGraphObject();
-    if (apCollision != pSaveData->pCollisionRoot && pObject && pObject->GetName().GetHandleString()) {
-        if (!BSstrcmp(pObject->GetName().GetHandleString(), "Arrow")) {
-            return;
-        }
+    if ((apCollision != pSaveData->pCollisionRoot && pObject && pObject->GetName().GetHandleString()) &&
+        (!BSstrcmp(pObject->GetName().GetHandleString(), "Arrow"))) {
+        return;
     }
+
     if (pSaveData->pRef->IsActor()) {
         bool bFade;
         bFade = NiObject::IsKindOf(&BSFadeNode::ms_RTTI, pObject);
@@ -11836,11 +11634,11 @@ void TESObjectREFR::LoadHavokDataForCollisionObjectPreVersion81(
 ) {
     bhkWorldObject* pWorldObject = apCollision->GetWorldObject();
     apCollision->SetReset(false);
-    if (apCollision->GetSceneGraphObject() && apCollision->GetSceneGraphObject()->GetName().GetHandleString()) {
-        if (!BSstrcmp(apCollision->GetSceneGraphObject()->GetName().GetHandleString(), "Arrow")) {
-            return;
-        }
+    if ((apCollision->GetSceneGraphObject() && apCollision->GetSceneGraphObject()->GetName().GetHandleString()) &&
+        (!BSstrcmp(apCollision->GetSceneGraphObject()->GetName().GetHandleString(), "Arrow"))) {
+        return;
     }
+
     TESObjectREFR* pRef = static_cast<TESObjectREFR*>(arData.uDataA[1].p);
     if (pRef->IsActor()) {
         bool bFade;
@@ -11939,21 +11737,18 @@ bool TESObjectREFR::AddAddonNodes(NiNode* apNode) {
         }
         iValue = (uint32_t)static_cast<BSValueNode*>(apNode)->iValue;
         addonNode = pDataHandler->GetAddonNode(iValue);
-        if (addonNode) {
-            if (static_cast<TESModelTextureSwap*>(addonNode)->GetModelLength()) {
-                if (!addonNode->IsMasterParticleSystem()) {
-                    v11 = addonNode->Clone3D(nullptr);
-                    if (v11) {
-                        v9 = v11->IsFadeNode();
-                        if (v9) {
-                            v9->SetUserData(nullptr);
-                        }
-                        v10 = (float)(((double)(Random() % 1000)) / 100.0);
-                        TESObjectREFR::RandomizeAddons(v11, v10);
-                        apNode->AttachChild(v11, true);
-                        bHasAddonNodes = 1;
-                    }
+        if ((addonNode) && (static_cast<TESModelTextureSwap*>(addonNode)->GetModelLength()) &&
+            (!addonNode->IsMasterParticleSystem())) {
+            v11 = addonNode->Clone3D(nullptr);
+            if (v11) {
+                v9 = v11->IsFadeNode();
+                if (v9) {
+                    v9->SetUserData(nullptr);
                 }
+                v10 = (float)(((double)(Random() % 1000)) / 100.0);
+                TESObjectREFR::RandomizeAddons(v11, v10);
+                apNode->AttachChild(v11, true);
+                bHasAddonNodes = 1;
             }
         }
     }
@@ -11991,10 +11786,8 @@ bool TESObjectREFR::HasAddonNodes(NiNode* apNode) {
         v3 = apNode->GetAt(a1);
         if (v3) {
             v2 = v3->IsNode();
-            if (v2) {
-                if (TESObjectREFR::HasAddonNodes(v2)) {
-                    return true;
-                }
+            if ((v2) && (TESObjectREFR::HasAddonNodes(v2))) {
+                return true;
             }
         }
     }
@@ -12085,24 +11878,23 @@ void TESObjectREFR::LoadControllerManagerBGS(NiControllerManager* a1, BGSLoadGam
                             a1->ActivateSequence(pseq, 0, false, 1.0f, 0.0f, nullptr);
                         }
                         pseq->LoadGame(a2, a3);
-                        if (pobj3D) {
-                            if (HasParticleSystem(pobj3D)) {
-                                float fsequenceTime = pseq->GetOffset() + a3;
-                                float fstartTime = a3 - fsequenceTime;
-                                if (fstartTime < 0.0) {
-                                    fstartTime = 0.0f;
-                                }
-                                float fframeTime = fsequenceTime / 20.0;
-                                if (fframeTime < 0.016666600480675697) {
-                                    fframeTime = 0.0166666f;
-                                }
-                                for (float fStepTime = fstartTime; a3 > static_cast<double>(fStepTime);
-                                     fStepTime = fStepTime + fframeTime) {
-                                    NiUpdateData UpdateData(fStepTime, false, false);
-                                    pobj3D->UpdateSelected(UpdateData);
-                                }
+                        if ((pobj3D) && (HasParticleSystem(pobj3D))) {
+                            float fsequenceTime = pseq->GetOffset() + a3;
+                            float fstartTime = a3 - fsequenceTime;
+                            if (fstartTime < 0.0) {
+                                fstartTime = 0.0f;
+                            }
+                            float fframeTime = fsequenceTime / 20.0;
+                            if (fframeTime < 0.016666600480675697) {
+                                fframeTime = 0.0166666f;
+                            }
+                            for (float fStepTime = fstartTime; a3 > static_cast<double>(fStepTime);
+                                 fStepTime = fStepTime + fframeTime) {
+                                NiUpdateData UpdateData(fStepTime, false, false);
+                                pobj3D->UpdateSelected(UpdateData);
                             }
                         }
+
                         bfound = true;
                         banyFound = true;
                         break;
@@ -12115,12 +11907,10 @@ void TESObjectREFR::LoadControllerManagerBGS(NiControllerManager* a1, BGSLoadGam
             tempSequence.LoadGame(a2, a3);
         }
     }
-    if (banyFound) {
-        if (pobj3D) {
-            bhkNiCollisionObject::ResetSim(pobj3D, true);
-            NiUpdateData UpdateData_2(a3, true, false);
-            pobj3D->Update(UpdateData_2);
-        }
+    if ((banyFound) && (pobj3D)) {
+        bhkNiCollisionObject::ResetSim(pobj3D, true);
+        NiUpdateData UpdateData_2(a3, true, false);
+        pobj3D->Update(UpdateData_2);
     }
 }
 
@@ -12141,54 +11931,52 @@ void TESObjectREFR::LoadHavokDataForCollisionObject(
     NiObject* pkObject = apCollision->GetWorldObject();
     apCollision->SetReset(false);
     NiObjectNET* SceneGraphObject = apCollision->m_pkSceneObject;
-    if (apCollision == phavokSaveData->pCollisionRoot ||
-        (!SceneGraphObject ||
-         (!(&SceneGraphObject->m_kName)->GetHandleString() ||
-          (HandleString = (&SceneGraphObject->m_kName)->GetHandleString(), BSstrcmp(HandleString, "Arrow"))))) {
-        if (!phavokSaveData->pRef->IsActor() || !NiObject::IsKindOf_0(&BSFadeNode::ms_RTTI, SceneGraphObject)) {
-            if (pkObject) {
-                bhkRigidBody* prigidBody =
-                    static_cast<bhkRigidBody*>(NiObject::DynamicCastStatic(&bhkRigidBody::ms_RTTI, pkObject));
-                if (prigidBody) {
-                    const hkpWorld* v3 = prigidBody->GethkWorld();
-                    bool v11 = v3 != nullptr;
-                    if (v3) {
-                        prigidBody->SetActive(false);
-                    }
-                    if ((phavokSaveData->cFlags & 2) != 0) {
-                        NiQuaternion ecx0_12;
-                        phavokSaveData->cFlags &= ~2u;
-                        prigidBody->SetPosition(phavokSaveData->pRef->GetLocationOnReference());
-                        ecx0_12.FromRotation(phavokSaveData->pRef->GetOrientation());
-                        prigidBody->SetRotation(ecx0_12);
-                    }
-                    else {
-                        pSaveLoadGameOLD->LoadGameDataOLD(&rotation, 12u);
-                        pSaveLoadGameOLD->LoadGameDataOLD(&rotation_2, 16u);
-                        prigidBody->SetPosition(rotation);
-                        prigidBody->SetRotation(rotation_2);
-                    }
-                    v12 = false;
-                    if ((phavokSaveData->cFlags & 4) != 0) {
-                        pSaveLoadGameOLD->LoadGameDataOLD(&v12, 1u);
-                    }
-                    else {
-                        v12 = (phavokSaveData->cFlags & 1) != 0;
-                    }
-                    if (v12) {
-                        pSaveLoadGameOLD->LoadGameDataOLD(&kLinearVelocity, 12u);
-                        pSaveLoadGameOLD->LoadGameDataOLD(&kAngularVelocity, 12u);
-                        prigidBody->SetLinearVelocity(kLinearVelocity);
-                        prigidBody->SetAngularVelocity(kAngularVelocity);
-                        prigidBody->SetActive(true);
-                    }
-                    else {
-                        prigidBody->SetLinearVelocity(NiPoint3_ZERO);
-                        prigidBody->SetAngularVelocity(NiPoint3_ZERO);
-                        if (v11) {
-                            prigidBody->SetActive(false);
-                        }
-                    }
+    if ((apCollision == phavokSaveData->pCollisionRoot ||
+         (!SceneGraphObject ||
+          (!(&SceneGraphObject->m_kName)->GetHandleString() ||
+           (HandleString = (&SceneGraphObject->m_kName)->GetHandleString(), BSstrcmp(HandleString, "Arrow"))))) &&
+        (!phavokSaveData->pRef->IsActor() || !NiObject::IsKindOf_0(&BSFadeNode::ms_RTTI, SceneGraphObject)) &&
+        (pkObject)) {
+        bhkRigidBody* prigidBody =
+            static_cast<bhkRigidBody*>(NiObject::DynamicCastStatic(&bhkRigidBody::ms_RTTI, pkObject));
+        if (prigidBody) {
+            const hkpWorld* v3 = prigidBody->GethkWorld();
+            bool v11 = v3 != nullptr;
+            if (v3) {
+                prigidBody->SetActive(false);
+            }
+            if ((phavokSaveData->cFlags & 2) != 0) {
+                NiQuaternion ecx0_12;
+                phavokSaveData->cFlags &= ~2u;
+                prigidBody->SetPosition(phavokSaveData->pRef->GetLocationOnReference());
+                ecx0_12.FromRotation(phavokSaveData->pRef->GetOrientation());
+                prigidBody->SetRotation(ecx0_12);
+            }
+            else {
+                pSaveLoadGameOLD->LoadGameDataOLD(&rotation, 12u);
+                pSaveLoadGameOLD->LoadGameDataOLD(&rotation_2, 16u);
+                prigidBody->SetPosition(rotation);
+                prigidBody->SetRotation(rotation_2);
+            }
+            v12 = false;
+            if ((phavokSaveData->cFlags & 4) != 0) {
+                pSaveLoadGameOLD->LoadGameDataOLD(&v12, 1u);
+            }
+            else {
+                v12 = (phavokSaveData->cFlags & 1) != 0;
+            }
+            if (v12) {
+                pSaveLoadGameOLD->LoadGameDataOLD(&kLinearVelocity, 12u);
+                pSaveLoadGameOLD->LoadGameDataOLD(&kAngularVelocity, 12u);
+                prigidBody->SetLinearVelocity(kLinearVelocity);
+                prigidBody->SetAngularVelocity(kAngularVelocity);
+                prigidBody->SetActive(true);
+            }
+            else {
+                prigidBody->SetLinearVelocity(NiPoint3_ZERO);
+                prigidBody->SetAngularVelocity(NiPoint3_ZERO);
+                if (v11) {
+                    prigidBody->SetActive(false);
                 }
             }
         }
@@ -12251,10 +12039,9 @@ NiPoint3* TESObjectREFR::GetBoundMax_0056FC30(NiPoint3* apResult, NiAVObject* ap
         *apResult = TESObjectREFR_boundMax;
         return apResult;
     }
-    else {
-        *apResult = NiPoint3_ZERO;
-        return apResult;
-    }
+
+    *apResult = NiPoint3_ZERO;
+    return apResult;
 }
 
 void TESObjectREFR::TransChangeCallback(bhkNiCollisionObject* apCollision, uint32_t aiChanged) {
@@ -12347,25 +12134,24 @@ void TESObjectREFR::TransChangeCallback(bhkNiCollisionObject* apCollision, uint3
             pref->SetLocationOnReference(*WorldTranslate);
             pSaveLoadGame->SetThreadAllowChanges(bresetAllow);
             pref->AddChange(4);
-            if (pref->GetObjectReference()) {
-                if (pref->GetObjectReference()->GetFormType() == LIGH_ID && !pref->GetFireOff()) {
-                    const NiPoint3* v10 = &pref->GetLocationOnReference();
-                    if (static_cast<double>(v10->z) < pref->GetRelevantWaterHeight()) {
-                        pref->SetFireOff(true);
-                        NiNode* v11 = pref->Get3D();
-                        TESObjectREFR::RemoveAddonNodes(v11);
-                        pref->RemoveLight(false);
-                    }
+            if ((pref->GetObjectReference()) &&
+                (pref->GetObjectReference()->GetFormType() == LIGH_ID && !pref->GetFireOff())) {
+                const NiPoint3* v10 = &pref->GetLocationOnReference();
+                if (static_cast<double>(v10->z) < pref->GetRelevantWaterHeight()) {
+                    pref->SetFireOff(true);
+                    NiNode* v11 = pref->Get3D();
+                    TESObjectREFR::RemoveAddonNodes(v11);
+                    pref->RemoveLight(false);
                 }
             }
+
             if (!TES::pInstance->pInteriorCell) {
                 TESWorldSpace* pworld = TES::pInstance->pWorldSpace;
                 Actor* pac = nullptr;
-                if (pref) {
-                    if (pref->IsActor()) {
-                        pac = static_cast<Actor*>(pref);
-                    }
+                if ((pref) && (pref->IsActor())) {
+                    pac = static_cast<Actor*>(pref);
                 }
+
                 if (pac) {
                     pac->SetForceUpdateQuest(false);
                 }
@@ -12375,16 +12161,14 @@ void TESObjectREFR::TransChangeCallback(bhkNiCollisionObject* apCollision, uint3
                 if (pnewcell != prefcell) {
                     if (pnewcell) {
                         TESObjectREFR::MoveRefToNewSpace(pref, nullptr, pworld);
-                        if (!pref->IsActor()) {
-                            if (pref->Get3D()) {
-                                NiNode* pdynamic = static_cast<NiNode*>(pnewcell->GetDynamicNode());
-                                if (pdynamic) {
-                                    if (AILinearTaskThreadManager::ShouldQueue3DTask()) {
-                                        TESObjectCELL::QueueAttachChild(pref, pdynamic);
-                                    }
-                                    else {
-                                        pnewcell->PerformCellNodeAttach(pref, pdynamic);
-                                    }
+                        if ((!pref->IsActor()) && (pref->Get3D())) {
+                            NiNode* pdynamic = static_cast<NiNode*>(pnewcell->GetDynamicNode());
+                            if (pdynamic) {
+                                if (AILinearTaskThreadManager::ShouldQueue3DTask()) {
+                                    TESObjectCELL::QueueAttachChild(pref, pdynamic);
+                                }
+                                else {
+                                    pnewcell->PerformCellNodeAttach(pref, pdynamic);
                                 }
                             }
                         }
@@ -12555,9 +12339,8 @@ bhkShapeCollection* bhkBvTreeShape::GetShapeCollection() {
     if (pShape) {
         return static_cast<bhkShapeCollection*>(bhkShapeCollection::Getbhk(pShape));
     }
-    else {
-        return nullptr;
-    }
+
+    return nullptr;
 }
 
 hkpShapeCollection* bhkBvTreeShape::GethkShapeCollection() const {
@@ -12650,9 +12433,8 @@ float bhkRigidBody::GethkMaxLinearVelocity() {
         }
         return p_m_maxLinearVelocity->operator float();
     }
-    else {
-        return 0.0f;
-    }
+
+    return 0.0f;
 }
 
 void bhkRigidBodyCinfo::SetMotionType(hkpMotion::MotionType aeType) {
@@ -12756,15 +12538,9 @@ void CheckWithinMultiBoundTask::Run() {
     if (sp3D.m_pObject) {
         NiAVObject* v1 = sp3D.m_pObject;
         BSFadeNode* pfade = v1->IsFadeNode();
-        if (pfade) {
-            if (pfade->GetLinkedObj()) {
-                if (pBoundRef->Get3D()) {
-                    bool bignore = true;
-                    bWithin = TESObjectREFR::QVerticesInsideMultiboundRecurse(
-                        sp3D.m_pObject, spBound.m_pObject, bignore, true
-                    );
-                }
-            }
+        if ((pfade) && (pfade->GetLinkedObj()) && (pBoundRef->Get3D())) {
+            bool bignore = true;
+            bWithin = TESObjectREFR::QVerticesInsideMultiboundRecurse(sp3D.m_pObject, spBound.m_pObject, bignore, true);
         }
     }
 }

@@ -50,10 +50,9 @@ NiObject* NiParticleSystem::CreateClone(NiCloningProcess& kCloning) {
         CopyMembers(pkObject, kCloning);
         return pkObject;
     }
-    else {
-        CopyMembers(nullptr, kCloning);
-        return nullptr;
-    }
+
+    CopyMembers(nullptr, kCloning);
+    return nullptr;
 }
 
 // The modifier link IDs are queued here and resolved in LinkObject. A short read leaves ucWorldSpace uninitialised.
@@ -267,24 +266,21 @@ void NiParticleSystem::SetModelData(NiGeometryData* pkModelData) {
 // Queues the update on the parallel update manager when it runs and this is the update thread; a task the manager
 // does not take goes back to the pool, and the system updates itself.
 void NiParticleSystem::UpdateSystem(float fTime) {
-    if (NiParticleSystem::ms_bParallelUpdateEnabled) {
-        if (NiParallelUpdateTaskManager::ms_pkManager) {
-            if (NiParallelUpdateTaskManager::ms_pkManager->m_bActive &&
-                (m_spModelData.m_pObject->m_kBound.m_fRadius > 0.0f &&
-                 GetCurrentThreadId() == NiParticleSystem::iThreadID)) {
-                NiPSysUpdateTask* pkTask = NiPSysUpdateTask::GetFreeObject();
-                if (pkTask) {
-                    pkTask->Init(this, fTime);
-                    if (NiParallelUpdateTaskManager::ms_pkManager->AddTask(
-                            pkTask, NiParticleSystem::ms_eParallelUpdatePriority
-                        )) {
-                        return;
-                    }
-                    pkTask->Clear();
-                }
+    if ((NiParticleSystem::ms_bParallelUpdateEnabled) && (NiParallelUpdateTaskManager::ms_pkManager) &&
+        (NiParallelUpdateTaskManager::ms_pkManager->m_bActive &&
+         (m_spModelData.m_pObject->m_kBound.m_fRadius > 0.0f && GetCurrentThreadId() == NiParticleSystem::iThreadID))) {
+        NiPSysUpdateTask* pkTask = NiPSysUpdateTask::GetFreeObject();
+        if (pkTask) {
+            pkTask->Init(this, fTime);
+            if (NiParallelUpdateTaskManager::ms_pkManager->AddTask(
+                    pkTask, NiParticleSystem::ms_eParallelUpdatePriority
+                )) {
+                return;
             }
+            pkTask->Clear();
         }
     }
+
     Do_UpdateSystem(fTime);
 }
 
@@ -426,7 +422,6 @@ NiObject* NiParticleSystem::CreateObject() {
     if (v0) {
         return ::new (v0) NiParticleSystem;
     }
-    else {
-        return nullptr;
-    }
+
+    return nullptr;
 }

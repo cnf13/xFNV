@@ -1194,7 +1194,6 @@ hkpWingedEdge::WingedEdgeStatus hkpWingedEdge::findVisibilityBoundaryEdges(
     if (v6 == hkpWingedEdge::Triangle::HK_VISIBLE) {
         return findVisibleTriangles(initialTriangle, pointOfView, chainLength, edgeChain);
     }
-    else {
-        return hkpWingedEdge::HK_WINGED_EDGE_FAIL;
-    }
+
+    return hkpWingedEdge::HK_WINGED_EDGE_FAIL;
 }

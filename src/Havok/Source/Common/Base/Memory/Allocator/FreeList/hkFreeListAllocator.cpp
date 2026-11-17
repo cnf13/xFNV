@@ -249,11 +249,11 @@ void hkFreeListAllocator::getMemoryStatistics(hkMemoryAllocator::MemoryStatistic
         hkFreeList* pFreeList = m_freeLists[i];
         hkMemoryAllocator::MemoryStatistics listStats = {};
         pFreeList->calculateStatistics(listStats);
-        if (pFreeList->m_free || pFreeList->m_top < pFreeList->m_blockEnd) {
-            if (pFreeList->m_elementSize > stats.m_largestBlock) {
-                stats.m_largestBlock = pFreeList->m_elementSize;
-            }
+        if ((pFreeList->m_free || pFreeList->m_top < pFreeList->m_blockEnd) &&
+            (pFreeList->m_elementSize > stats.m_largestBlock)) {
+            stats.m_largestBlock = pFreeList->m_elementSize;
         }
+
         uiAvailable += listStats.m_available;
         uiInUse += listStats.m_inUse;
         uiAllocated += listStats.m_allocated;
@@ -283,9 +283,8 @@ int32_t hkFreeListAllocator::getAllocatedSize(const void* p, int32_t nbytes) {
     if (v4) {
         return (int32_t)v4->m_elementSize;
     }
-    else {
-        return (&m_largeAllocator)->getAllocatedSize(p, nbytes);
-    }
+
+    return (&m_largeAllocator)->getAllocatedSize(p, nbytes);
 }
 
 void hkFreeListAllocator::resetPeakMemoryStatistics() {
@@ -369,11 +368,11 @@ void hkFreeListAllocator::incrementalGarbageCollect(int32_t numBlocks) {
         const uint32_t uiNumFreeElementsBefore = pFreeList->m_numFreeElements;
         hkBool kFound;
         int32_t iNumBlocksOut;
-        if (pFreeList->incrementalFindGarbage(&kFound, iNumBlocks, iNumBlocksOut)->m_bool) {
-            if (++iIndex >= m_numFreeLists) {
-                iIndex = 0;
-            }
+        if ((pFreeList->incrementalFindGarbage(&kFound, iNumBlocks, iNumBlocksOut)->m_bool) &&
+            (++iIndex >= m_numFreeLists)) {
+            iIndex = 0;
         }
+
         pFreeList->_freeFreeBlocks();
         iNumBlocks -= iNumBlocksOut;
         m_totalBytesInFreeLists += (pFreeList->m_numFreeElements - uiNumFreeElementsBefore) * pFreeList->m_elementSize;

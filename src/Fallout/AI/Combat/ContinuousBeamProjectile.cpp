@@ -209,15 +209,11 @@ void ContinuousBeamProjectile::UpdateProjectile(float afDelta) {
                     fskill = fGunReferenceSkill.Float();
                 }
                 bool bUseSpreadMod = false;
-                if (pactor_2) {
-                    if (pactor_2->pCurrentProcess) {
-                        if (pweaponItem) {
-                            if (pweaponItem->HasModEffectActive(3)) {
-                                bUseSpreadMod = true;
-                            }
-                        }
-                    }
+                if ((pactor_2) && (pactor_2->pCurrentProcess) && (pweaponItem) &&
+                    (pweaponItem->HasModEffectActive(3))) {
+                    bUseSpreadMod = true;
                 }
+
                 double MinSpreadDegrees = pWeaponSource->GetMinSpreadDegrees(bUseSpreadMod);
                 double SpreadDegrees = pWeaponSource->GetSpreadDegrees(bUseSpreadMod);
                 float totalSpread = (SpreadDegrees * fskill + MinSpreadDegrees) * 0.01745329238474369;
@@ -237,22 +233,21 @@ void ContinuousBeamProjectile::UpdateProjectile(float afDelta) {
             SetAngleOnReferenceY(0.0f);
         }
         NiNode* p3d = Get3D();
-        if (pfireNode) {
-            if (p3d) {
-                bool bRoot = false;
-                if (pWeaponSource->HasScope() && pactor_2->GetIronSights() && pactor_2 == pPlayer) {
-                    bRoot = true;
-                }
-                NiCamera* pcam = Main::WorldRootCamera();
-                if (bRoot && pcam) {
-                    static NiPoint3 offset(0.0f, -15.0f, 0.0f);
-                    SetLocationOnReference(pcam->GetWorldTransform() * offset);
-                }
-                else {
-                    SetLocationOnReference(pfireNode->GetWorldTranslate());
-                }
+        if ((pfireNode) && (p3d)) {
+            bool bRoot = false;
+            if (pWeaponSource->HasScope() && pactor_2->GetIronSights() && pactor_2 == pPlayer) {
+                bRoot = true;
+            }
+            NiCamera* pcam = Main::WorldRootCamera();
+            if (bRoot && pcam) {
+                static NiPoint3 offset(0.0f, -15.0f, 0.0f);
+                SetLocationOnReference(pcam->GetWorldTransform() * offset);
+            }
+            else {
+                SetLocationOnReference(pfireNode->GetWorldTranslate());
             }
         }
+
         Sync3DWithReference(true, false);
         SetRange(10000.0f);
         RunTargetPick();

@@ -307,24 +307,22 @@ void ActorPackage::FinishLoadGame(BGSLoadFormBuffer* apLoadGameBuffer) {
             }
         }
     }
-    if (this->pData) {
-        if (pPackage) {
-            PACKAGE_TYPE PackType = pPackage->GetPackType();
-            if (PackType != this->pData->GetPackageType()) {
-                const char* v6 = packageTypeToString[pPackage->GetPackType()];
-                const char* v5 = packageTypeToString[this->pData->GetPackageType()];
-                int32_t v4 = pPackage->iFormID;
-                SaveGameWarning(
-                    "Package '%s' (%08X) changed type from %s to %s, so the actor package data was "
-                    "replaced",
-                    pPackage->GetFormEditorID(), v4, v5, v6
-                );
-                ActorPackageData* pData = this->pData;
-                if (pData) {
-                    delete pData;
-                }
-                this->pData = ActorPackageData::CreateActorPackageData(pPackage->GetPackType());
+    if ((this->pData) && (pPackage)) {
+        PACKAGE_TYPE PackType = pPackage->GetPackType();
+        if (PackType != this->pData->GetPackageType()) {
+            const char* v6 = packageTypeToString[pPackage->GetPackType()];
+            const char* v5 = packageTypeToString[this->pData->GetPackageType()];
+            int32_t v4 = pPackage->iFormID;
+            SaveGameWarning(
+                "Package '%s' (%08X) changed type from %s to %s, so the actor package data was "
+                "replaced",
+                pPackage->GetFormEditorID(), v4, v5, v6
+            );
+            ActorPackageData* pData = this->pData;
+            if (pData) {
+                delete pData;
             }
+            this->pData = ActorPackageData::CreateActorPackageData(pPackage->GetPackType());
         }
     }
 }

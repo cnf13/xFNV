@@ -202,9 +202,9 @@ NiGeometryGroup* NiUnsharedGeometryGroup::Create() {
         NiUnsharedGeometryGroup::ms_pkGroup = v2;
         return v2;
     }
-    else {
-        NiUnsharedGeometryGroup::ms_pkGroup = nullptr;
-        return nullptr;
-    }
+
+    NiUnsharedGeometryGroup::ms_pkGroup = nullptr;
+    return nullptr;
+
     return result;
 }

@@ -236,13 +236,12 @@ uint32_t TallGrassShader::SetupTransformations(
         if (BSShaderAccumulator::IsShadowPass(uiPass)) {
             UpdateShadowLights(apSkin, aWorld);
         }
-        else if (TallGrassShaderProperty::bPointLighting) {
-            // Tests only the count's low 16 bits.
-            if (pTGSProp->GetNumberofActiveNonShadowLights()) {
-                UpdatePointLights(
-                    pTGSProp, kInvWorld, aWorld.m_fScale, static_cast<BSShaderManager::eBSSMPassEnum>(uiPass)
-                );
-            }
+        else if ((TallGrassShaderProperty::bPointLighting) && (pTGSProp->GetNumberofActiveNonShadowLights()))
+        // Tests only the count's low 16 bits.
+        {
+            UpdatePointLights(
+                pTGSProp, kInvWorld, aWorld.m_fScale, static_cast<BSShaderManager::eBSSMPassEnum>(uiPass)
+            );
         }
     }
     return NiD3DShader::SetupTransformations(

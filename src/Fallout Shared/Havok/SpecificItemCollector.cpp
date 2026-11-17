@@ -24,10 +24,9 @@ void SpecificItemCollector::addRayHit(const hkpCdBody& arBody, const hkpShapeRay
     if (pRoot) {
         CFilter kFilter;
         FNVD_RECONSTRUCT(CFilter)(&kFilter, pRoot->getCollisionFilterInfo());
-        if (kFilter.GetLayer() != iFilter.GetLayer() || kFilter.GetGroup() == iFilter.GetGroup()) {
-            if (arHitInfo.m_hitFraction >= fMinHitFraction) {
-                hkpClosestRayHitCollector::addRayHit(arBody, arHitInfo);
-            }
+        if ((kFilter.GetLayer() != iFilter.GetLayer() || kFilter.GetGroup() == iFilter.GetGroup()) &&
+            (arHitInfo.m_hitFraction >= fMinHitFraction)) {
+            hkpClosestRayHitCollector::addRayHit(arBody, arHitInfo);
         }
     }
 }

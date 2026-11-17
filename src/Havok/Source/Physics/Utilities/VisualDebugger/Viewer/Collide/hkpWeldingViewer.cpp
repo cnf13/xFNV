@@ -249,9 +249,8 @@ hkProcess* hkpWeldingViewer::create(const hkArray<hkProcessContext*, hkContainer
     if (v3) {
         return &static_cast<hkProcess&>(static_cast<hkpWorldViewerBase&>(*v3));
     }
-    else {
-        return nullptr;
-    }
+
+    return nullptr;
 }
 
 // Registers create under getName() and stores the tag in m_tag.

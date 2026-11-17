@@ -246,9 +246,8 @@ float Normal::Density(float x) const {
         v4 = (float)std::exp(static_cast<double>(v5));
         return (float)(v4 * 0.3989422917366028);
     }
-    else {
-        return (float)0.0;
-    }
+
+    return (float)0.0;
 }
 
 ExtReal Normal::Mean() const {

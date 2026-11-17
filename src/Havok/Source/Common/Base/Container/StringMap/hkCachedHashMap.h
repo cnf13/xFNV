@@ -98,7 +98,7 @@ public:
 // The SDK's bodies (hkCachedHashMap.cxx). The slot table holds m_hashMod + 1 hashes, then as many keys, then as many
 // values; an Iterator is a slot's index stored in the pointer. The table comes from the thread's heap allocator.
 template <typename Operations, typename Allocator>
-typename hkCachedHashMap<Operations, Allocator>::Iterator hkCachedHashMap<Operations, Allocator>::getIterator() const {
+hkCachedHashMap<Operations, Allocator>::Iterator hkCachedHashMap<Operations, Allocator>::getIterator() const {
     int32_t i;
     for (i = 0; i <= m_hashMod; ++i) {
         if (m_elem[i] != hkUlong(-1)) {
@@ -127,8 +127,7 @@ void hkCachedHashMap<Operations, Allocator>::setValue(Iterator it, hkUlong val) 
 }
 
 template <typename Operations, typename Allocator>
-typename hkCachedHashMap<Operations, Allocator>::Iterator
-hkCachedHashMap<Operations, Allocator>::getNext(Iterator it) const {
+hkCachedHashMap<Operations, Allocator>::Iterator hkCachedHashMap<Operations, Allocator>::getNext(Iterator it) const {
     int32_t i;
     for (i = static_cast<int32_t>(reinterpret_cast<hkUlong>(it)) + 1; i <= m_hashMod; ++i) {
         if (m_elem[i] != hkUlong(-1)) {
@@ -170,8 +169,7 @@ void hkCachedHashMap<Operations, Allocator>::insert(hkUlong key, hkUlong val) {
 }
 
 template <typename Operations, typename Allocator>
-typename hkCachedHashMap<Operations, Allocator>::Iterator
-hkCachedHashMap<Operations, Allocator>::findKey(hkUlong key) const {
+hkCachedHashMap<Operations, Allocator>::Iterator hkCachedHashMap<Operations, Allocator>::findKey(hkUlong key) const {
     hkUlong hash = m_ops.hash(key);
     for (hkUlong i = hash & m_hashMod; m_elem[i] != hkUlong(-1); i = (i + 1) & m_hashMod) {
         if (m_elem[i] == hash && m_ops.equal(key, m_elem[i + m_hashMod + 1])) {
@@ -229,10 +227,10 @@ void hkCachedHashMap<Operations, Allocator>::remove(Iterator it) {
         if (i >= lo && hmod > empty) {
             continue;
         }
-        else if (i < empty && (hmod > empty || hmod <= i)) {
+        if (i < empty && (hmod > empty || hmod <= i)) {
             continue;
         }
-        else if (hmod > empty && hmod < lo) {
+        if (hmod > empty && hmod < lo) {
             continue;
         }
         m_elem[empty] = m_elem[i];

@@ -126,7 +126,6 @@ NiObject* BSValueNode::CreateObject() {
     if (apMemory) {
         return ::new (apMemory) BSValueNode;
     }
-    else {
-        return nullptr;
-    }
+
+    return nullptr;
 }

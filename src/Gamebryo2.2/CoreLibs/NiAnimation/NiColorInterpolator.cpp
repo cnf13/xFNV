@@ -34,10 +34,9 @@ NiObject* NiColorInterpolator::CreateClone(NiCloningProcess& kCloning) {
         CopyMembers(pkObject, kCloning);
         return pkObject;
     }
-    else {
-        CopyMembers(nullptr, kCloning);
-        return nullptr;
-    }
+
+    CopyMembers(nullptr, kCloning);
+    return nullptr;
 }
 
 // NiQuaternionInterpolator uses the same function: its quaternion is read as four floats, like the colour.

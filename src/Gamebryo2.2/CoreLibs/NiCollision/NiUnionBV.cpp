@@ -109,9 +109,8 @@ NiBoundingVolume* NiUnionBV::Clone() const {
     if (v2) {
         return ::new (v2) NiUnionBV(*this);
     }
-    else {
-        return nullptr;
-    }
+
+    return nullptr;
 }
 
 // Replaces the members with fresh copies of the other union's; anything but a union is ignored.

@@ -357,9 +357,8 @@ float hkpVehicleDefaultAnalogDriverInput::calcSteeringInput(
         }
         return v14 * deviceStatusb;
     }
-    else {
-        return 0.0;
-    }
+
+    return 0.0;
 }
 
 const hkClass& hkpVehicleDefaultAnalogDriverInput::staticClass() {

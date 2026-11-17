@@ -15,9 +15,8 @@ uint32_t BGSLoadGameBuffer::Load(BGSSaveLoadFile* apFile) {
     if (v4 == ((uint32_t)((int32_t)iBufferSize))) {
         return v4;
     }
-    else {
-        return (uint32_t)(-1);
-    }
+
+    return (uint32_t)(-1);
 }
 
 void BGSLoadGameBuffer::LoadDataFromBuffer(void* apData, size_t aiSize) {
@@ -78,9 +77,8 @@ uint32_t BGSLoadGameBuffer::Load(BGSSaveLoadFile* apFile, uint32_t aiSize) {
     if (v5 == iBufferSize) {
         return v5;
     }
-    else {
-        return -1;
-    }
+
+    return -1;
 }
 
 void BGSLoadGameBuffer::AdvanceBuffer(uint32_t aiNumBytes) {

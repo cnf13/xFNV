@@ -398,38 +398,37 @@ NiAVObject* TESAmmo::Clone3D(TESObjectREFR* pRequester, bool deepCopy) {
     else {
         icount = 1;
     }
-    if (pobj) {
-        if (icount < iMaxArrowsInQuiver.Int()) {
-            NiAVObject* pchild;
-            if (icount == 1) {
-                NiFixedString* v3 = &FixedStrings::QArrowQuiver();
-                pchild = pobj->GetObjectByName(*v3);
-                if (pchild) {
-                    NiNode* Parent = pchild->m_pkParent;
-                    Parent->DetachChild(pchild);
-                }
-                bhkRigidBody::RemoveAllActionConstraints(pobj);
+    if ((pobj) && (icount < iMaxArrowsInQuiver.Int())) {
+        NiAVObject* pchild;
+        if (icount == 1) {
+            NiFixedString* v3 = &FixedStrings::QArrowQuiver();
+            pchild = pobj->GetObjectByName(*v3);
+            if (pchild) {
+                NiNode* Parent = pchild->m_pkParent;
+                Parent->DetachChild(pchild);
             }
-            else {
-                for (int32_t n_2 = icount;; ++n_2) {
-                    int32_t* v4 = &iMaxArrowsInQuiver.Int();
-                    if (n_2 >= *v4) {
-                        break;
-                    }
-                    BSStringT<char> arrowName;
-                    arrowName.SPrintF("Arrow%d", n_2);
-                    NiFixedString* v7 = ::new (static_cast<void*>(&apString))
-                        NiFixedString(static_cast<const char*>(arrowName.pString));
-                    pchild = pobj->GetObjectByName(*v7);
-                    apString.~NiFixedString();
-                    if (pchild) {
-                        NiNode* v6 = pchild->m_pkParent;
-                        v6->DetachChild(pchild);
-                    }
+            bhkRigidBody::RemoveAllActionConstraints(pobj);
+        }
+        else {
+            for (int32_t n_2 = icount;; ++n_2) {
+                int32_t* v4 = &iMaxArrowsInQuiver.Int();
+                if (n_2 >= *v4) {
+                    break;
+                }
+                BSStringT<char> arrowName;
+                arrowName.SPrintF("Arrow%d", n_2);
+                NiFixedString* v7 =
+                    ::new (static_cast<void*>(&apString)) NiFixedString(static_cast<const char*>(arrowName.pString));
+                pchild = pobj->GetObjectByName(*v7);
+                apString.~NiFixedString();
+                if (pchild) {
+                    NiNode* v6 = pchild->m_pkParent;
+                    v6->DetachChild(pchild);
                 }
             }
         }
     }
+
     return pobj;
 }
 

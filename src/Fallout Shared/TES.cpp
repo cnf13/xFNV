@@ -869,12 +869,11 @@ TESObjectCELL* TES::GetGridCellCell(int32_t aiCellX, int32_t aiCellY) {
         (iY >= 0)) {
         pCell = pGridCellA->Get(iX, iY)->pCell;
     }
-    if (!pCell) {
-        if (GetWorldSpace()) {
-            worldSpace = GetWorldSpace();
-            return pDataHandler->GetCellFromCellCoord(aiCellX, aiCellY, worldSpace, false);
-        }
+    if ((!pCell) && (GetWorldSpace())) {
+        worldSpace = GetWorldSpace();
+        return pDataHandler->GetCellFromCellCoord(aiCellX, aiCellY, worldSpace, false);
     }
+
     return pCell;
 }
 
@@ -890,28 +889,24 @@ bool TES::PickWorldDistance(
     uint32_t aiY;
     uint32_t aiX;
     uint8_t v12 = 0;
-    if (apPick) {
-        if ((uint8_t)acNodeFlags) {
-            apPick->SetTarget(nullptr);
-            apPick->PickObjects(NiPoint3_ZERO, NiPoint3_ZERO, false);
-            if (TES::pInstance->TES::GetInterior()) {
-                interior = TES::pInstance->TES::GetInterior();
-                return (bool)((uint8_t)interior->PickWorldDistance(apPick, aOrigin, aDir, afDistance, acNodeFlags));
-            }
-            else {
-                for (aiX = 0; aiX < (&uGridsToLoad)->UInt(); ++aiX) {
-                    for (aiY = 0; aiY < (&uGridsToLoad)->UInt(); ++aiY) {
-                        pCell = GetGridCell(aiX, aiY)->pCell;
-                        if (pCell) {
-                            if (pCell->PickWorldDistance(apPick, aOrigin, aDir, afDistance, acNodeFlags)) {
-                                v12 = 1;
-                            }
-                        }
-                    }
+    if ((apPick) && ((uint8_t)acNodeFlags)) {
+        apPick->SetTarget(nullptr);
+        apPick->PickObjects(NiPoint3_ZERO, NiPoint3_ZERO, false);
+        if (TES::pInstance->TES::GetInterior()) {
+            interior = TES::pInstance->TES::GetInterior();
+            return (bool)((uint8_t)interior->PickWorldDistance(apPick, aOrigin, aDir, afDistance, acNodeFlags));
+        }
+
+        for (aiX = 0; aiX < (&uGridsToLoad)->UInt(); ++aiX) {
+            for (aiY = 0; aiY < (&uGridsToLoad)->UInt(); ++aiY) {
+                pCell = GetGridCell(aiX, aiY)->pCell;
+                if ((pCell) && (pCell->PickWorldDistance(apPick, aOrigin, aDir, afDistance, acNodeFlags))) {
+                    v12 = 1;
                 }
             }
         }
     }
+
     return (bool)v12;
 }
 
@@ -926,15 +921,12 @@ bool TES::PickWaterDistance(NiPick* apPick, const NiPoint3& aOrigin, const NiPoi
             pInteriorCell = TES::pInstance->TES::GetInterior();
             return pInteriorCell->PickWaterDistance(apPick, aOrigin, aDir, afDistance);
         }
-        else {
-            for (i = 0; i < (&uGridsToLoad)->UInt(); ++i) {
-                for (j = 0; j < (&uGridsToLoad)->UInt(); ++j) {
-                    pCell = GetGridCell(i, j)->pCell;
-                    if (pCell) {
-                        if (pCell->PickWaterDistance(apPick, aOrigin, aDir, afDistance)) {
-                            v11 = 1;
-                        }
-                    }
+
+        for (i = 0; i < (&uGridsToLoad)->UInt(); ++i) {
+            for (j = 0; j < (&uGridsToLoad)->UInt(); ++j) {
+                pCell = GetGridCell(i, j)->pCell;
+                if ((pCell) && (pCell->PickWaterDistance(apPick, aOrigin, aDir, afDistance))) {
+                    v11 = 1;
                 }
             }
         }
@@ -1424,176 +1416,167 @@ int32_t TES::UpdateCurrentGridCell(const NiPoint3* apPos, bool abAllowPartialRem
         InitGridCells(apPos, false);
         return 1;
     }
-    else {
-        int32_t x = FloatToInt(apPos->x);
-        int32_t y_2 = FloatToInt(apPos->y);
-        int32_t Number = x - ((this->GetCurrentGridX() << 12) + 2048);
-        int32_t v41 = y_2 - ((this->GetCurrentGridY() << 12) + 2048);
-        float floadDistance = 4096.0f;
-        if (uGridsToLoad.Int() == 3) {
-            floadDistance = 3072.0f;
-        }
-        fCell_delta_x = floadDistance - static_cast<double>(std::abs(Number));
-        fCell_delta_y = floadDistance - static_cast<double>(std::abs(v41));
-        bool bsavegameLoading = pSaveLoadGame->GetSaveGameLoading();
-        if (!(fCell_delta_x > 0.0) || (!(fCell_delta_y > 0.0) || bsavegameLoading)) {
-            BSTaskThread::SetUpdateSleepEnabled(false);
-            bool bmenudisplayed = Interface::GetLoadingMenuVisible();
-            if (!bmenudisplayed) {
-                if (pExteriorCellLoader->QueuedCellCount()) {
-                    if (!pSaveLoadGame->GetSaveGameLoading()) {
-                        ShowLoadingMessage("Loading Area (queued cells)...");
-                        bmenudisplayed = true;
-                    }
-                }
-            }
-            int32_t inewX = x >> 12;
-            int32_t inewY = y_2 >> 12;
-            if (pSaveLoadGame->GetSaveGameLoading() && pSaveLoadGame->GetPositioningPlayerCharacter()) {
-                inewX = this->GetCurrentGridX();
-                inewY = this->GetCurrentGridY();
-            }
-            int32_t ideltaX = inewX - this->GetCurrentGridX();
-            int32_t ideltaY = inewY - this->GetCurrentGridY();
-            iCurrentGridX = inewX;
-            iCurrentGridY = inewY;
-            iCurrentQueuedX = this->GetCurrentGridX();
-            iCurrentQueuedY = this->GetCurrentGridY();
-            BSShaderManager::kOldGridArrayCenter = BSShaderManager::kGridArrayCenter;
-            float v25 = (static_cast<double>(this->GetCurrentGridY()) + 0.5) * 4096.0;
-            float v24 = (static_cast<double>(this->GetCurrentGridX()) + 0.5) * 4096.0;
-            NiPoint2* v5 = ::new (&v27) NiPoint2(v24, v25);
-            float y = v5->y;
-            BSShaderManager::kGridArrayCenter.x = v5->x;
-            BSShaderManager::kGridArrayCenter.y = y;
-            if (BSShaderManager::kOldGridArrayCenter.operator==(NiPoint2::ZERO) ||
-                (std::abs(ideltaX) > 1 || std::abs(ideltaY) > 1)) {
-                BSShaderManager::kOldGridArrayCenter = BSShaderManager::kGridArrayCenter;
-            }
-            BSShaderManager::fGriddArrayLerpStart = BSShaderManager::GetTimer(false);
-            TES::bLODFadeInProgress = true;
-            BSShaderManager::bLODFadeInProgress = true;
-            HideFarLandNormalMaps();
-            HideUnneededLandPasses();
-            pExteriorCellLoader->PostProcessCompletedTasks();
-            if (pExteriorCellLoader->TryCancelTasks()) {
-                pExteriorCellLoader->WaitForTasks();
-            }
-            if (!pInteriorCell || bsavegameLoading) {
-                if (bPreemptivelyUnloadCells.Bool()) {
-                    if (FreeInteriorBuffer(true)) {
-                        CleanUpUnusedTextures(false);
-                    }
-                }
-                if (!pWorldSpace) {
-                    SetWorldSpace(static_cast<TESWorldSpace*>(pDataHandler->GetWorldSpaceList()->m_item));
-                }
-                bool bmoveImmediate = false;
-                if (std::abs(ideltaX) > 1 || std::abs(ideltaY) > 1) {
-                    bmoveImmediate = true;
-                }
-                if (TESObjectCELL::ExteriorWorld()) {
-                    if (bmoveImmediate || !abAllowPartialRemovals) {
-                        bhkWorldM* ExteriorbhkWorld = TESObjectCELL::ExteriorWorld();
-                        ExteriorbhkWorld->StopBatchingAdds(false);
-                        bhkWorldM* v8 = TESObjectCELL::ExteriorWorld();
-                        v8->StopBatchingRemovals(false);
-                    }
-                    bhkWorldM* v9 = TESObjectCELL::ExteriorWorld();
-                    v9->StartBatchingRemovals();
-                }
-                pGridCellA->SetCenter(inewX, inewY);
-                if (TESObjectCELL::ExteriorWorld()) {
-                    if (!bmenudisplayed && (!bmoveImmediate || !pExteriorCellLoader->QueuedCellCount())) {
-                        bhkWorldM* v10 = TESObjectCELL::ExteriorWorld();
-                    }
-                    if (bmoveImmediate) {
-                        bhkWorldM* v11 = TESObjectCELL::ExteriorWorld();
-                        v11->StopBatchingRemovals(false);
-                    }
-                    else {
-                        bhkWorldM* v12 = TESObjectCELL::ExteriorWorld();
-                        v12->StopBatchingRemovals(abAllowPartialRemovals);
-                    }
-                }
-                if (!bmenudisplayed && !AllCellsInGridLoaded() && !pSaveLoadGame->GetSaveGameLoading()) {
-                    ShowLoadingMessage("Loading Area (unloaded cells)...");
-                    bmenudisplayed = true;
-                }
-                if (std::abs(ideltaX) > 1 || std::abs(ideltaY) > 1) {
-                    InitModelsToLoad(MODEL_COUNT_PRELOAD);
-                }
-                if (TESObjectCELL::ExteriorWorld()) {
-                    bhkWorldM* v13 = TESObjectCELL::ExteriorWorld();
-                    v13->StartBatchingAdds();
-                }
-                GridArrayLoad();
-                SetUpdateGridString();
-                if (TESObjectCELL::ExteriorWorld()) {
-                    if (bmoveImmediate) {
-                        bhkWorldM* v14 = TESObjectCELL::ExteriorWorld();
-                        v14->StopBatchingAdds(false);
-                    }
-                    else {
-                        bhkWorldM* v15 = TESObjectCELL::ExteriorWorld();
-                        v15->StopBatchingAdds(abAllowPartialRemovals);
-                    }
-                }
-            }
-            CleanUpUnusedTextures(false);
-            TESWaterListener::RefreshExteriorWaterHeights();
-            if (!pInteriorCell) {
-                const NiPoint3* a1a = &pPlayer->GetLocationOnReference();
-                BGSTerrainManager* TerrainManager = pWorldSpace->GetTerrainManager();
-                TerrainManager->Update(*a1a, BGSTerrainManager::UPDATE_ALL);
-            }
-            BSTaskThread::SetUpdateSleepEnabled(true);
-            return 1;
-        }
-        else {
-            if (bBackgroundCellLoads.Bool() && !pInteriorCell) {
-                int32_t icellx = x >> 12;
-                int32_t icelly = y_2 >> 12;
-                if (iCurrentQueuedX != x >> 12 || iCurrentQueuedY != icelly) {
-                    if (bPreemptivelyUnloadCells.Bool()) {
-                        if (FreeInteriorBuffer(true)) {
-                            CleanUpUnusedTextures(false);
-                        }
-                    }
-                    int32_t ihalfgrid = uGridsToLoad.UInt() >> 1;
-                    int32_t iqueuex = iCurrentQueuedX;
-                    int32_t ideltax = icellx - iCurrentQueuedX;
-                    if (ideltax) {
-                        iqueuex += ideltax * (ihalfgrid + 1);
-                        for (int32_t iy = -ihalfgrid; iy <= ihalfgrid; ++iy) {
-                            int32_t someFloata = iCurrentQueuedY + iy;
-                            TESWorldSpace* WorldSpace = pWorldSpace;
-                            pExteriorCellLoader->QueueCellLoad(WorldSpace, iqueuex, someFloata);
-                        }
-                    }
-                    int32_t iqueuey = iCurrentQueuedY;
-                    int32_t ideltay = icelly - iCurrentQueuedY;
-                    if (ideltay) {
-                        iqueuey += ideltay * (ihalfgrid + 1);
-                        for (int32_t ix = -ihalfgrid; ix <= ihalfgrid; ++ix) {
-                            int32_t a1 = iCurrentQueuedX + ix;
-                            TESWorldSpace* v18 = pWorldSpace;
-                            pExteriorCellLoader->QueueCellLoad(v18, a1, iqueuey);
-                        }
-                    }
-                    if (ideltax) {
-                        if (ideltay) {
-                            TESWorldSpace* v19 = pWorldSpace;
-                            pExteriorCellLoader->QueueCellLoad(v19, iqueuex, iqueuey);
-                        }
-                    }
-                }
-                iCurrentQueuedX = icellx;
-                iCurrentQueuedY = icelly;
-            }
-            return 0;
-        }
+
+    int32_t x = FloatToInt(apPos->x);
+    int32_t y_2 = FloatToInt(apPos->y);
+    int32_t Number = x - ((this->GetCurrentGridX() << 12) + 2048);
+    int32_t v41 = y_2 - ((this->GetCurrentGridY() << 12) + 2048);
+    float floadDistance = 4096.0f;
+    if (uGridsToLoad.Int() == 3) {
+        floadDistance = 3072.0f;
     }
+    fCell_delta_x = floadDistance - static_cast<double>(std::abs(Number));
+    fCell_delta_y = floadDistance - static_cast<double>(std::abs(v41));
+    bool bsavegameLoading = pSaveLoadGame->GetSaveGameLoading();
+    if (!(fCell_delta_x > 0.0) || (!(fCell_delta_y > 0.0) || bsavegameLoading)) {
+        BSTaskThread::SetUpdateSleepEnabled(false);
+        bool bmenudisplayed = Interface::GetLoadingMenuVisible();
+        if ((!bmenudisplayed) && (pExteriorCellLoader->QueuedCellCount()) && (!pSaveLoadGame->GetSaveGameLoading())) {
+            ShowLoadingMessage("Loading Area (queued cells)...");
+            bmenudisplayed = true;
+        }
+
+        int32_t inewX = x >> 12;
+        int32_t inewY = y_2 >> 12;
+        if (pSaveLoadGame->GetSaveGameLoading() && pSaveLoadGame->GetPositioningPlayerCharacter()) {
+            inewX = this->GetCurrentGridX();
+            inewY = this->GetCurrentGridY();
+        }
+        int32_t ideltaX = inewX - this->GetCurrentGridX();
+        int32_t ideltaY = inewY - this->GetCurrentGridY();
+        iCurrentGridX = inewX;
+        iCurrentGridY = inewY;
+        iCurrentQueuedX = this->GetCurrentGridX();
+        iCurrentQueuedY = this->GetCurrentGridY();
+        BSShaderManager::kOldGridArrayCenter = BSShaderManager::kGridArrayCenter;
+        float v25 = (static_cast<double>(this->GetCurrentGridY()) + 0.5) * 4096.0;
+        float v24 = (static_cast<double>(this->GetCurrentGridX()) + 0.5) * 4096.0;
+        NiPoint2* v5 = ::new (&v27) NiPoint2(v24, v25);
+        float y = v5->y;
+        BSShaderManager::kGridArrayCenter.x = v5->x;
+        BSShaderManager::kGridArrayCenter.y = y;
+        if (BSShaderManager::kOldGridArrayCenter.operator==(NiPoint2::ZERO) ||
+            (std::abs(ideltaX) > 1 || std::abs(ideltaY) > 1)) {
+            BSShaderManager::kOldGridArrayCenter = BSShaderManager::kGridArrayCenter;
+        }
+        BSShaderManager::fGriddArrayLerpStart = BSShaderManager::GetTimer(false);
+        TES::bLODFadeInProgress = true;
+        BSShaderManager::bLODFadeInProgress = true;
+        HideFarLandNormalMaps();
+        HideUnneededLandPasses();
+        pExteriorCellLoader->PostProcessCompletedTasks();
+        if (pExteriorCellLoader->TryCancelTasks()) {
+            pExteriorCellLoader->WaitForTasks();
+        }
+        if (!pInteriorCell || bsavegameLoading) {
+            if ((bPreemptivelyUnloadCells.Bool()) && (FreeInteriorBuffer(true))) {
+                CleanUpUnusedTextures(false);
+            }
+
+            if (!pWorldSpace) {
+                SetWorldSpace(static_cast<TESWorldSpace*>(pDataHandler->GetWorldSpaceList()->m_item));
+            }
+            bool bmoveImmediate = false;
+            if (std::abs(ideltaX) > 1 || std::abs(ideltaY) > 1) {
+                bmoveImmediate = true;
+            }
+            if (TESObjectCELL::ExteriorWorld()) {
+                if (bmoveImmediate || !abAllowPartialRemovals) {
+                    bhkWorldM* ExteriorbhkWorld = TESObjectCELL::ExteriorWorld();
+                    ExteriorbhkWorld->StopBatchingAdds(false);
+                    bhkWorldM* v8 = TESObjectCELL::ExteriorWorld();
+                    v8->StopBatchingRemovals(false);
+                }
+                bhkWorldM* v9 = TESObjectCELL::ExteriorWorld();
+                v9->StartBatchingRemovals();
+            }
+            pGridCellA->SetCenter(inewX, inewY);
+            if (TESObjectCELL::ExteriorWorld()) {
+                if (!bmenudisplayed && (!bmoveImmediate || !pExteriorCellLoader->QueuedCellCount())) {
+                    bhkWorldM* v10 = TESObjectCELL::ExteriorWorld();
+                }
+                if (bmoveImmediate) {
+                    bhkWorldM* v11 = TESObjectCELL::ExteriorWorld();
+                    v11->StopBatchingRemovals(false);
+                }
+                else {
+                    bhkWorldM* v12 = TESObjectCELL::ExteriorWorld();
+                    v12->StopBatchingRemovals(abAllowPartialRemovals);
+                }
+            }
+            if (!bmenudisplayed && !AllCellsInGridLoaded() && !pSaveLoadGame->GetSaveGameLoading()) {
+                ShowLoadingMessage("Loading Area (unloaded cells)...");
+                bmenudisplayed = true;
+            }
+            if (std::abs(ideltaX) > 1 || std::abs(ideltaY) > 1) {
+                InitModelsToLoad(MODEL_COUNT_PRELOAD);
+            }
+            if (TESObjectCELL::ExteriorWorld()) {
+                bhkWorldM* v13 = TESObjectCELL::ExteriorWorld();
+                v13->StartBatchingAdds();
+            }
+            GridArrayLoad();
+            SetUpdateGridString();
+            if (TESObjectCELL::ExteriorWorld()) {
+                if (bmoveImmediate) {
+                    bhkWorldM* v14 = TESObjectCELL::ExteriorWorld();
+                    v14->StopBatchingAdds(false);
+                }
+                else {
+                    bhkWorldM* v15 = TESObjectCELL::ExteriorWorld();
+                    v15->StopBatchingAdds(abAllowPartialRemovals);
+                }
+            }
+        }
+        CleanUpUnusedTextures(false);
+        TESWaterListener::RefreshExteriorWaterHeights();
+        if (!pInteriorCell) {
+            const NiPoint3* a1a = &pPlayer->GetLocationOnReference();
+            BGSTerrainManager* TerrainManager = pWorldSpace->GetTerrainManager();
+            TerrainManager->Update(*a1a, BGSTerrainManager::UPDATE_ALL);
+        }
+        BSTaskThread::SetUpdateSleepEnabled(true);
+        return 1;
+    }
+
+    if (bBackgroundCellLoads.Bool() && !pInteriorCell) {
+        int32_t icellx = x >> 12;
+        int32_t icelly = y_2 >> 12;
+        if (iCurrentQueuedX != x >> 12 || iCurrentQueuedY != icelly) {
+            if ((bPreemptivelyUnloadCells.Bool()) && (FreeInteriorBuffer(true))) {
+                CleanUpUnusedTextures(false);
+            }
+
+            int32_t ihalfgrid = uGridsToLoad.UInt() >> 1;
+            int32_t iqueuex = iCurrentQueuedX;
+            int32_t ideltax = icellx - iCurrentQueuedX;
+            if (ideltax) {
+                iqueuex += ideltax * (ihalfgrid + 1);
+                for (int32_t iy = -ihalfgrid; iy <= ihalfgrid; ++iy) {
+                    int32_t someFloata = iCurrentQueuedY + iy;
+                    TESWorldSpace* WorldSpace = pWorldSpace;
+                    pExteriorCellLoader->QueueCellLoad(WorldSpace, iqueuex, someFloata);
+                }
+            }
+            int32_t iqueuey = iCurrentQueuedY;
+            int32_t ideltay = icelly - iCurrentQueuedY;
+            if (ideltay) {
+                iqueuey += ideltay * (ihalfgrid + 1);
+                for (int32_t ix = -ihalfgrid; ix <= ihalfgrid; ++ix) {
+                    int32_t a1 = iCurrentQueuedX + ix;
+                    TESWorldSpace* v18 = pWorldSpace;
+                    pExteriorCellLoader->QueueCellLoad(v18, a1, iqueuey);
+                }
+            }
+            if ((ideltax) && (ideltay)) {
+                TESWorldSpace* v19 = pWorldSpace;
+                pExteriorCellLoader->QueueCellLoad(v19, iqueuex, iqueuey);
+            }
+        }
+        iCurrentQueuedX = icellx;
+        iCurrentQueuedY = icelly;
+    }
+    return 0;
 }
 
 bool TES::IsBuffered(TESObjectCELL* apCell) {
@@ -2362,11 +2345,10 @@ void TES::LoadInterior(TESObjectCELL* apNewInterior, const NiPoint3* apPos) {
             pint->LoadAllTempData();
             bool bloadingSaveGame = pSaveLoadGame->GetSaveGameLoading();
             bool bloadingSaveGameOLD = pSaveLoadGameOLD->GetLoading();
-            if (pint->GetReferenceCount()) {
-                if (!pint->IsLoaded()) {
-                    ShowLoadingMenu(true, pint, false);
-                }
+            if ((pint->GetReferenceCount()) && (!pint->IsLoaded())) {
+                ShowLoadingMenu(true, pint, false);
             }
+
             pint->AttachToWorld(pObjRoot);
             bhkWorld* pw = pint->GetbhkWorld();
             if (spLoadedAreaBound.m_pObject) {
@@ -2387,11 +2369,10 @@ void TES::LoadInterior(TESObjectCELL* apNewInterior, const NiPoint3* apPos) {
                 pw->StopBatchingAdds(false);
             }
             TES::pInstance->ActivateAllSubmergedReferencesIslands();
-            if (!CellTestRunning() && !bloadingSaveGame) {
-                if (pPlayer->Get3D()) {
-                    pFaderManager->CreateFader(FADER_TO_BLACK, 0.0f, false);
-                }
+            if ((!CellTestRunning() && !bloadingSaveGame) && (pPlayer->Get3D())) {
+                pFaderManager->CreateFader(FADER_TO_BLACK, 0.0f, false);
             }
+
             if (!bloadingSaveGame) {
                 ReferenceProcessLists.HandleInvalidPositions();
                 CreateFurnitureList();
@@ -2553,12 +2534,11 @@ void TES::LeaveInterior(NiPoint3* apPos) {
         ReferenceProcessLists.PlaceActorsinBedsOrChairs();
         ReferenceProcessLists.AnimateDeadActors();
     }
-    if (pint) {
-        if (!pint->GetFakeExterior()) {
-            pSky->ActivateWeatherSounds(pSky->pCurrentWeather);
-            pSky->ActivateWeatherSounds(pSky->pLastWeather);
-        }
+    if ((pint) && (!pint->GetFakeExterior())) {
+        pSky->ActivateWeatherSounds(pSky->pCurrentWeather);
+        pSky->ActivateWeatherSounds(pSky->pLastWeather);
     }
+
     UpdateGridLights();
     SetAtmosphere(nullptr);
     pObjRoot->UpdateProperties();
@@ -3267,10 +3247,8 @@ void TES::TestAllCells(int32_t aiControl) {
                         for (pCurrentWorldSpace = pDataHandler->GetWorldSpaceList(); pCurrentWorldSpace;
                              pCurrentWorldSpace = pCurrentWorldSpace->m_pkNext) {
                             TESWorldSpace* pws = pCurrentWorldSpace->m_item;
-                            if (pws) {
-                                if (pws == pWorldSpace) {
-                                    break;
-                                }
+                            if ((pws) && (pws == pWorldSpace)) {
+                                break;
                             }
                         }
                     }
@@ -3381,20 +3359,14 @@ void TES::TestAllCells(int32_t aiControl) {
                         bfinishedints = true;
                     }
                 }
-                if (pcell) {
-                    if (!pcell->GetDelete()) {
-                        if (pcell->GetFirstRefr()) {
-                            v81 = 1;
-                        }
-                    }
+                if ((pcell) && (!pcell->GetDelete()) && (pcell->GetFirstRefr())) {
+                    v81 = 1;
                 }
             }
             if (pcell && v81) {
                 TESRegionList* pregionList = pcell->GetRegionList(true);
-                if (pTACRegionFilter) {
-                    if (!pregionList || !pregionList->IsInList(pTACRegionFilter)) {
-                        v81 = 0;
-                    }
+                if ((pTACRegionFilter) && (!pregionList || !pregionList->IsInList(pTACRegionFilter))) {
+                    v81 = 0;
                 }
             }
             else {
@@ -3473,11 +3445,10 @@ void TES::TestAllCells(int32_t aiControl) {
                     BGSSceneInfo::BuildMNumberString(fMnumber, textMnum, false);
                     bool bportaled = false;
                     BSPortalGraph* pportalgraph = pcell->GetPortalGraph();
-                    if (pportalgraph) {
-                        if (!pportalgraph->QRooms().IsEmpty()) {
-                            bportaled = true;
-                        }
+                    if ((pportalgraph) && (!pportalgraph->QRooms().IsEmpty())) {
+                        bportaled = true;
                     }
+
                     uint32_t ultexmemory = 0;
                     for (NiTexture* ptex = NiTexture::GetListHead(); ptex; ptex = ptex->m_pkNext) {
                         if (ptex->m_pkRendererData) {
@@ -3713,17 +3684,13 @@ void TES::FinishLoadGame(BGSLoadGameBuffer* apLoadGameBuffer) {
     int32_t j;
     int32_t i;
     for (i = 0; i < ((int32_t)(&TES::uInteriorCellBufferGeneral)->UInt()); ++i) {
-        if (pInteriorBuffer[i]) {
-            if (TES::pInstance->IsCellLoaded(pInteriorBuffer[i], true)) {
-                pInteriorBuffer[i]->UpdateSounds();
-            }
+        if ((pInteriorBuffer[i]) && (TES::pInstance->IsCellLoaded(pInteriorBuffer[i], true))) {
+            pInteriorBuffer[i]->UpdateSounds();
         }
     }
     for (j = 0; j < ((int32_t)(&uExteriorCellBuffer)->UInt()); ++j) {
-        if (pExteriorBuffer[j]) {
-            if (TES::pInstance->IsCellLoaded(pExteriorBuffer[j], true)) {
-                pExteriorBuffer[j]->UpdateSounds();
-            }
+        if ((pExteriorBuffer[j]) && (TES::pInstance->IsCellLoaded(pExteriorBuffer[j], true))) {
+            pExteriorBuffer[j]->UpdateSounds();
         }
     }
     LoadedAreaBound* v2 = spLoadedAreaBound.m_pObject;
@@ -3791,9 +3758,8 @@ TESObjectCELL* TES::GetCellForPoint(NiPoint3 aLocation) {
     if (a1 && TES::pInstance->IsCellLoaded(a1, true)) {
         return a1;
     }
-    else {
-        return nullptr;
-    }
+
+    return nullptr;
 }
 
 void TES::UpdateRefSounds() {
@@ -3820,10 +3786,8 @@ void TES::ToggleCollisionGeometry() {
 void TES::ShowLandBorders(bool abShow) {
     if (((uint8_t)bShowLANDborders) != ((uint8_t)abShow)) {
         bShowLANDborders = (bool)((uint8_t)abShow);
-        if (pDataHandler) {
-            if (!TES::GetInterior()) {
-                pGridCellA->ShowLandBorders(abShow);
-            }
+        if ((pDataHandler) && (!TES::GetInterior())) {
+            pGridCellA->ShowLandBorders(abShow);
         }
     }
 }
@@ -3909,22 +3873,20 @@ void TES::SetHideLandBlendPassForGridCell(int32_t aiGridX, int32_t aiGridY, bool
     NiAVObject* landNode;
     int32_t i;
     GridCell* v10 = pGridCellA->Get(aiGridX, aiGridY);
-    if (v10) {
-        if (v10->pCell) {
-            for (i = 0; i < 4; ++i) {
-                landNode = v10->pCell->GetLandNode(i);
-                if (static_cast<NiNode*>(landNode)->GetAtChecked(0)) {
-                    v6 = static_cast<NiNode*>(landNode)->GetAt(0);
-                    v5 = v6->IsGeometry();
-                }
-                else {
-                    v5 = nullptr;
-                }
-                if (v5) {
-                    type = NiShadeProperty::GetType();
-                    a1 = v5->NiAVObject::GetProperty(type);
-                    static_cast<BSShaderProperty*>(a1)->SetFlag(BSShaderProperty::BSSP_FLAG_SKIP_LANDLO_PASS, abFlag);
-                }
+    if ((v10) && (v10->pCell)) {
+        for (i = 0; i < 4; ++i) {
+            landNode = v10->pCell->GetLandNode(i);
+            if (static_cast<NiNode*>(landNode)->GetAtChecked(0)) {
+                v6 = static_cast<NiNode*>(landNode)->GetAt(0);
+                v5 = v6->IsGeometry();
+            }
+            else {
+                v5 = nullptr;
+            }
+            if (v5) {
+                type = NiShadeProperty::GetType();
+                a1 = v5->NiAVObject::GetProperty(type);
+                static_cast<BSShaderProperty*>(a1)->SetFlag(BSShaderProperty::BSSP_FLAG_SKIP_LANDLO_PASS, abFlag);
             }
         }
     }
@@ -3989,10 +3951,8 @@ void TES::QueueReferencesForAttachedCells() {
         for (x = 0; x < (&uGridsToLoad)->UInt(); ++x) {
             for (y = 0; y < (&uGridsToLoad)->UInt(); ++y) {
                 pCell = pGridCellA->Get(x, y)->pCell;
-                if (pCell) {
-                    if (pCell->GetAttached()) {
-                        pCell->QueueReferences(false);
-                    }
+                if ((pCell) && (pCell->GetAttached())) {
+                    pCell->QueueReferences(false);
                 }
             }
         }
@@ -4016,10 +3976,8 @@ void TES::UpdateFadeNodesForAttachedCells() {
         for (x = 0; x < (&uGridsToLoad)->UInt(); ++x) {
             for (y = 0; y < (&uGridsToLoad)->UInt(); ++y) {
                 pCell = pGridCellA->Get(x, y)->pCell;
-                if (pCell) {
-                    if (pCell->GetAttached()) {
-                        pCell->UpdateFadeNodes();
-                    }
+                if ((pCell) && (pCell->GetAttached())) {
+                    pCell->UpdateFadeNodes();
                 }
             }
         }
@@ -4040,13 +3998,9 @@ void TES::InitDistantTextureBlending() {
             else {
                 land = nullptr;
             }
-            if (cell) {
-                if (land) {
-                    if (land->HasVertices()) {
-                        land = cell->GetLand();
-                        land->InitDistantTextureBlending();
-                    }
-                }
+            if ((cell) && (land) && (land->HasVertices())) {
+                land = cell->GetLand();
+                land->InitDistantTextureBlending();
             }
         }
     }
@@ -4059,10 +4013,8 @@ void TES::UpdateGridLights() {
     for (x = 0; x < (&uGridsToLoad)->UInt(); ++x) {
         for (y = 0; y < (&uGridsToLoad)->UInt(); ++y) {
             pCell = pGridCellA->Get(x, y)->pCell;
-            if (pCell) {
-                if (pCell->GetAttached()) {
-                    pCell->AttachLights(true);
-                }
+            if ((pCell) && (pCell->GetAttached())) {
+                pCell->AttachLights(true);
             }
         }
     }
@@ -4182,12 +4134,8 @@ GridCell* TES::FindFirstGridCellWithWater() {
         }
         else {
             v12 = pGridCellA->Get(_2grids, _2grids);
-            if (v12) {
-                if (v12->pCell) {
-                    if (v12->pCell->HasWater()) {
-                        pCell = v12;
-                    }
-                }
+            if ((v12) && (v12->pCell) && (v12->pCell->HasWater())) {
+                pCell = v12;
             }
         }
         if (pCell) {
@@ -4233,14 +4181,12 @@ void TES::ShowCellNode(int32_t aiNode, bool abShow, bool abActiveCellsOnly) {
             else {
                 v6 = pInteriorBuffer[i];
             }
-            if (v6) {
-                if (((uint32_t)aiNode) <= 8) {
-                    childNode = v6->GetChildNode(static_cast<TESObjectCELL::CELLNODE>(aiNode));
-                    if (childNode) {
-                        childNode->SetAppCulled(!abShow);
-                    }
-                    v6->CullChildrenOfMultibounds(!abShow, static_cast<TESObjectCELL::CELL_CULL_NODE>(aiNode));
+            if ((v6) && (((uint32_t)aiNode) <= 8)) {
+                childNode = v6->GetChildNode(static_cast<TESObjectCELL::CELLNODE>(aiNode));
+                if (childNode) {
+                    childNode->SetAppCulled(!abShow);
                 }
+                v6->CullChildrenOfMultibounds(!abShow, static_cast<TESObjectCELL::CELL_CULL_NODE>(aiNode));
             }
         }
         if (abActiveCellsOnly) {
@@ -4455,13 +4401,12 @@ bool TES::ClearOldestBufferedCell() {
         return false;
     }
     pDataHandler->UnloadCell(v15);
-    if (!*pExteriorBuffer) {
-        if (GetWorldSpace()) {
-            TESWorldSpace* WorldSpace = GetWorldSpace();
-            BGSTerrainManager* TerrainManager = WorldSpace->GetTerrainManager();
-            TerrainManager->UnloadAll();
-        }
+    if ((!*pExteriorBuffer) && (GetWorldSpace())) {
+        TESWorldSpace* WorldSpace = GetWorldSpace();
+        BGSTerrainManager* TerrainManager = WorldSpace->GetTerrainManager();
+        TerrainManager->UnloadAll();
     }
+
     return true;
 }
 
@@ -4670,13 +4615,11 @@ void TES::LoadGame(BGSLoadGameBuffer* apLoadGameBuffer) {
             TESObjectCELL* pcell = pGridCellA->Get(x, y)->pCell;
             uint32_t icellID = 0;
             apLoadGameBuffer->LoadFormID(icellID);
-            if (pcell) {
-                if (icellID) {
-                    uint32_t CastingType = pcell->iFormID;
-                    if (pDataHandler->IsFormIDCreated(CastingType)) {
-                        pSaveLoadGame->ClearFormID(icellID);
-                        pcell->SetFormID(icellID, true);
-                    }
+            if ((pcell) && (icellID)) {
+                uint32_t CastingType = pcell->iFormID;
+                if (pDataHandler->IsFormIDCreated(CastingType)) {
+                    pSaveLoadGame->ClearFormID(icellID);
+                    pcell->SetFormID(icellID, true);
                 }
             }
         }

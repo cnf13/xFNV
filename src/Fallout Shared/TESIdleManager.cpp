@@ -51,11 +51,9 @@ void TESIdleManager::InitLoadedIdles() {
     }
     for (uint32_t i_2 = 0; i_2 < isize; ++i_2) {
         TESIdleForm* pidle_2 = LoadedIdleArray.operator[](i_2);
-        if (pidle_2) {
-            if (pidle_2->InitParents()) {
-                TESIdleForm* proot = nullptr;
-                LoadedIdleArray.SetAt(i_2, proot);
-            }
+        if ((pidle_2) && (pidle_2->InitParents())) {
+            TESIdleForm* proot = nullptr;
+            LoadedIdleArray.SetAt(i_2, proot);
         }
     }
     LoadedIdleArray.Compact();
@@ -65,20 +63,17 @@ void TESIdleManager::InitLoadedIdles() {
 BSSimpleList<const char*>*
 TESIdleManager::GetRootFilenameList(const char* apIdleDir, ANIM_GROUP_WEAPON_ENUM aeWeaponGroup) {
     BSSimpleList<const char*>* pret = nullptr;
-    if (apIdleDir) {
-        if (*apIdleDir) {
-            char Dst[132];
-            IDLE_ANIM_ROOT* proot = nullptr;
-            BSstrcpy(Dst, 128, apIdleDir);
-            char* plastSlash = std::strrchr(Dst, 92);
-            BSstrcpy(plastSlash + 1, 128 - (plastSlash - Dst) - 1, "IdleAnims");
-            if (IdleArrayMap.GetAt(Dst, proot)) {
-                if (proot) {
-                    return proot->pKFFileList[aeWeaponGroup];
-                }
-            }
+    if ((apIdleDir) && (*apIdleDir)) {
+        char Dst[132];
+        IDLE_ANIM_ROOT* proot = nullptr;
+        BSstrcpy(Dst, 128, apIdleDir);
+        char* plastSlash = std::strrchr(Dst, 92);
+        BSstrcpy(plastSlash + 1, 128 - (plastSlash - Dst) - 1, "IdleAnims");
+        if ((IdleArrayMap.GetAt(Dst, proot)) && (proot)) {
+            return proot->pKFFileList[aeWeaponGroup];
         }
     }
+
     return pret;
 }
 
@@ -164,11 +159,10 @@ TESIdleForm* TESIdleManager::GetIdleToPlay(TESObjectREFR* apActionRef, TESObject
             }
         }
     }
-    if (pretidle) {
-        if (pretidle->GetAllowNoFile() && !pretidle->CheckIdleFile()) {
-            return nullptr;
-        }
+    if ((pretidle) && (pretidle->GetAllowNoFile() && !pretidle->CheckIdleFile())) {
+        return nullptr;
     }
+
     return pretidle;
 }
 
@@ -180,16 +174,13 @@ void TESIdleManager::AddLoadedIdle(TESIdleForm* apIdle) {
 
 NiFormArray* TESIdleManager::GetLooseIdleArray(const char* apIdleDir) {
     NiFormArray* pretarray = nullptr;
-    if (apIdleDir) {
-        if (*apIdleDir) {
-            IDLE_ANIM_ROOT* proot = nullptr;
-            if (IdleArrayMap.GetAt(apIdleDir, proot)) {
-                if (proot) {
-                    return &proot->LooseIdleArray;
-                }
-            }
+    if ((apIdleDir) && (*apIdleDir)) {
+        IDLE_ANIM_ROOT* proot = nullptr;
+        if ((IdleArrayMap.GetAt(apIdleDir, proot)) && (proot)) {
+            return &proot->LooseIdleArray;
         }
     }
+
     return pretarray;
 }
 
@@ -216,16 +207,13 @@ NiFormArray* TESIdleManager::GetRootIdleArray(TESForm* apForm) {
 
 IDLE_ANIM_ROOT* TESIdleManager::GetIdleAnimRoot(const char* apIdleDir) {
     IDLE_ANIM_ROOT* v4 = nullptr;
-    if (apIdleDir) {
-        if (*apIdleDir) {
-            IDLE_ANIM_ROOT* proot = nullptr;
-            if (IdleArrayMap.GetAt(apIdleDir, proot)) {
-                if (proot) {
-                    return proot;
-                }
-            }
+    if ((apIdleDir) && (*apIdleDir)) {
+        IDLE_ANIM_ROOT* proot = nullptr;
+        if ((IdleArrayMap.GetAt(apIdleDir, proot)) && (proot)) {
+            return proot;
         }
     }
+
     return v4;
 }
 
@@ -352,24 +340,22 @@ void TESIdleManager::InitRootIdleArrays() {
 
 void TESIdleManager::GetIdleDirName(const char* apInDir, char* apOutDir) {
     *apOutDir = 0;
-    if (apInDir) {
-        if (*apInDir) {
-            char Str[264];
-            BSstrcpy(Str, 260, apInDir);
-            char* pfind = std::strstr(Str, "IdleAnims");
+    if ((apInDir) && (*apInDir)) {
+        char Str[264];
+        BSstrcpy(Str, 260, apInDir);
+        char* pfind = std::strstr(Str, "IdleAnims");
+        if (pfind) {
+            uint32_t v2 = BSstrlen("IdleAnims");
+            pfind += v2;
+            *pfind = 0;
+            BSstrcpy(apOutDir, 260, Str);
+        }
+        else {
+            pfind = std::strrchr(Str, 92);
             if (pfind) {
-                uint32_t v2 = BSstrlen("IdleAnims");
-                pfind += v2;
-                *pfind = 0;
+                *++pfind = 0;
                 BSstrcpy(apOutDir, 260, Str);
-            }
-            else {
-                pfind = std::strrchr(Str, 92);
-                if (pfind) {
-                    *++pfind = 0;
-                    BSstrcpy(apOutDir, 260, Str);
-                    BSstrcat(apOutDir, 260, "IdleAnims");
-                }
+                BSstrcat(apOutDir, 260, "IdleAnims");
             }
         }
     }

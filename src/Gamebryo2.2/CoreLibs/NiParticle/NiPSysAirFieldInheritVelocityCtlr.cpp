@@ -25,10 +25,9 @@ NiObject* NiPSysAirFieldInheritVelocityCtlr::CreateClone(NiCloningProcess& kClon
         NiPSysModifierCtlr::CopyMembers(v4, kCloning);
         return v4;
     }
-    else {
-        NiPSysModifierCtlr::CopyMembers(nullptr, kCloning);
-        return nullptr;
-    }
+
+    NiPSysModifierCtlr::CopyMembers(nullptr, kCloning);
+    return nullptr;
 }
 
 void NiPSysAirFieldInheritVelocityCtlr::LoadBinary(NiStream& kStream) {

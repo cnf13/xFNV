@@ -152,15 +152,14 @@ int32_t TraitMenu::GetClass() {
 bool TraitMenu::DoGamepad(int32_t a1, float a2) {
     static int32_t inext;
     bool bhandled = false;
-    if (a1 == 9) {
-        if (lbPerksList.GetHighlightedItem()) {
-            Tile* v3 = static_cast<Tile*>(lbPerksList.GetHighlightedItem());
-            v3->PlayTileSound(4043);
-            Tile* v4 = static_cast<Tile*>(lbPerksList.GetHighlightedItem());
-            DoClick(10, v4);
-            bhandled = true;
-        }
+    if ((a1 == 9) && (lbPerksList.GetHighlightedItem())) {
+        Tile* v3 = static_cast<Tile*>(lbPerksList.GetHighlightedItem());
+        v3->PlayTileSound(4043);
+        Tile* v4 = static_cast<Tile*>(lbPerksList.GetHighlightedItem());
+        DoClick(10, v4);
+        bhandled = true;
     }
+
     if (Interface::Has360Controller() && pTiles[8]->IsTrue(4003)) {
         int32_t iscrollDelta = 0;
         Controls* Controls_ = appMain->GetControls();
@@ -361,21 +360,16 @@ Tile* TraitMenu::Create() {
             TraitMenu::pMe->lbPerksList.RestoreListState(true);
             return ptile;
         }
-        else {
-            Warning("MENUS: Trait Menu Creation Failed... Are your menu and art resources up to date?");
-            return nullptr;
-        }
-    }
-    else {
-        if (TraitMenu::pMe) {
-            if (TraitMenu::pMe->pMenu) {
-                if (TraitMenu::pMe) {
-                    delete TraitMenu::pMe;
-                }
-            }
-        }
+
+        Warning("MENUS: Trait Menu Creation Failed... Are your menu and art resources up to date?");
         return nullptr;
     }
+
+    if ((TraitMenu::pMe) && (TraitMenu::pMe->pMenu) && (TraitMenu::pMe)) {
+        delete TraitMenu::pMe;
+    }
+
+    return nullptr;
 }
 
 void TraitMenu::Close() {

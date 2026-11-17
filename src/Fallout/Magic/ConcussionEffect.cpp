@@ -136,7 +136,6 @@ ActiveEffect* ConcussionEffect::Instantiate(MagicCaster* apCaster, MagicItem* ap
     if (v5) {
         return ::new (v5) ConcussionEffect(apCaster, apSpell, apEffect);
     }
-    else {
-        return nullptr;
-    }
+
+    return nullptr;
 }

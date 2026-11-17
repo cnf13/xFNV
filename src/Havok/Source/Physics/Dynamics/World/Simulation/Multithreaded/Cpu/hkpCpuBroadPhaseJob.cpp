@@ -73,13 +73,12 @@ hkJobQueue::JobStatus hkpSingleThreadedJobsOnIsland::cpuBroadPhaseJob(hkpMtThrea
 	hkpSimulationIsland* island = job.m_island;
 	HK_TIMER_BEGIN("Broadphase", nullptr);
 
-	if (job.m_taskHeader->m_islandShouldBeDeactivated && tl.m_world->m_wantDeactivation.m_bool) {
-		if (island->m_activeMark && !island->m_sparseEnabled) {
-			hkpWorldOperationUtil::markIslandInactiveMt(tl.m_world, island);
-		}
-	}
+    if ((job.m_taskHeader->m_islandShouldBeDeactivated && tl.m_world->m_wantDeactivation.m_bool) &&
+        (island->m_activeMark && !island->m_sparseEnabled)) {
+        hkpWorldOperationUtil::markIslandInactiveMt(tl.m_world, island);
+    }
 
-	// Another thread sets the flag: it is read again on each test, and the pointer is tested for null first.
+    // Another thread sets the flag: it is read again on each test, and the pointer is tested for null first.
 	volatile int8_t* exportFinished = &job.m_taskHeader->m_exportFinished;
 
 	FNVD_INLINED_LOCAL(hkLocalArray<hkpBroadPhaseHandlePair>, newPairs, std::nullopt, std::nullopt);

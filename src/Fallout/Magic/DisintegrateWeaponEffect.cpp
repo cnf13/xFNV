@@ -91,7 +91,6 @@ ActiveEffect* DisintegrateWeaponEffect::Instantiate(MagicCaster* a1, MagicItem* 
     if (v5) {
         return ::new (v5) DisintegrateWeaponEffect(a1, a2, a3);
     }
-    else {
-        return nullptr;
-    }
+
+    return nullptr;
 }

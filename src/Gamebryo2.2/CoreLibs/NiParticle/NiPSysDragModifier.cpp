@@ -201,7 +201,6 @@ NiObject* NiPSysDragModifier::CreateObject() {
     if (v0) {
         return ::new (v0) NiPSysDragModifier;
     }
-    else {
-        return nullptr;
-    }
+
+    return nullptr;
 }

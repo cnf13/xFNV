@@ -85,30 +85,29 @@ void TraitSelectMenu::DoIdle() {
             }
         }
     }
-    if (m_CurrentlyCheckedTile != TraitSelectMenu::TI_NO_TILE) {
-        if (pTiles[17]) {
-            uint32_t nCheckMarkTimer = BSGetTickCount() - m_nCheckmarkAnimStartTime;
-            if (nCheckMarkTimer >= 50) {
-                if (nCheckMarkTimer >= 100) {
-                    pTiles[17]->Set(4032, 64.0f, true);
-                    if (nCheckMarkTimer >= 150) {
-                        pTiles[17]->Set(4031, 32.0f, true);
-                    }
-                    else {
-                        pTiles[17]->Set(4031, 0.0f, true);
-                    }
+    if ((m_CurrentlyCheckedTile != TraitSelectMenu::TI_NO_TILE) && (pTiles[17])) {
+        uint32_t nCheckMarkTimer = BSGetTickCount() - m_nCheckmarkAnimStartTime;
+        if (nCheckMarkTimer >= 50) {
+            if (nCheckMarkTimer >= 100) {
+                pTiles[17]->Set(4032, 64.0f, true);
+                if (nCheckMarkTimer >= 150) {
+                    pTiles[17]->Set(4031, 32.0f, true);
                 }
                 else {
-                    pTiles[17]->Set(4032, 0.0f, true);
-                    pTiles[17]->Set(4031, 32.0f, true);
+                    pTiles[17]->Set(4031, 0.0f, true);
                 }
             }
             else {
                 pTiles[17]->Set(4032, 0.0f, true);
-                pTiles[17]->Set(4031, 0.0f, true);
+                pTiles[17]->Set(4031, 32.0f, true);
             }
         }
+        else {
+            pTiles[17]->Set(4032, 0.0f, true);
+            pTiles[17]->Set(4031, 0.0f, true);
+        }
     }
+
     InterfaceManager::Instance();
     if (InterfaceManager::Has360Controller()) {
         InterfaceManager* v3 = InterfaceManager::Instance();
@@ -241,11 +240,10 @@ bool TraitSelectMenu::IsWellFormedMenu() {
 
 void TraitSelectMenu::SetButtonAsHighlighted(int32_t a1, char a2) {
     if (a2 || m_CurrentlySelectedTile != a1) {
-        if (m_CurrentlySelectedTile != TraitSelectMenu::TI_NO_TILE) {
-            if (pTiles[m_CurrentlySelectedTile]) {
-                pTiles[m_CurrentlySelectedTile]->Set(Tile::kTileValue_User1, 0);
-            }
+        if ((m_CurrentlySelectedTile != TraitSelectMenu::TI_NO_TILE) && (pTiles[m_CurrentlySelectedTile])) {
+            pTiles[m_CurrentlySelectedTile]->Set(Tile::kTileValue_User1, 0);
         }
+
         m_CurrentlySelectedTile = static_cast<TraitSelectMenu::TILE_INDEX>(a1);
         if (m_CurrentlySelectedTile != TraitSelectMenu::TI_NO_TILE) {
             if (pTiles[m_CurrentlySelectedTile]) {
@@ -256,17 +254,15 @@ void TraitSelectMenu::SetButtonAsHighlighted(int32_t a1, char a2) {
                 InterfaceManager* v3 = InterfaceManager::Instance();
                 if (!v3->GetMouseVisible()) {
                     Tile* th_s = Menu::GetMenuByClass(1076);
-                    if (th_s) {
-                        if (pTiles[15]) {
-                            th_s->GetFloat(Tile::kTileValue_User4);
-                            float Float = pTiles[15]->GetFloat(4016);
-                            float v5 = pTiles[m_CurrentlySelectedTile]->GetFloat(4002);
-                            if (Float == 0.0) {
-                                m_fDesiredYScroll = 0.0f;
-                            }
-                            else {
-                                m_fDesiredYScroll = v5 / Float;
-                            }
+                    if ((th_s) && (pTiles[15])) {
+                        th_s->GetFloat(Tile::kTileValue_User4);
+                        float Float = pTiles[15]->GetFloat(4016);
+                        float v5 = pTiles[m_CurrentlySelectedTile]->GetFloat(4002);
+                        if (Float == 0.0) {
+                            m_fDesiredYScroll = 0.0f;
+                        }
+                        else {
+                            m_fDesiredYScroll = v5 / Float;
                         }
                     }
                 }

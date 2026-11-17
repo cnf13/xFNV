@@ -297,9 +297,8 @@ static hkMonitorStreamAnalyzer::Node* findChildNode(hkMonitorStreamAnalyzer::Nod
     if (!(a2 >= v8->m_absoluteStartTime)) {
         return nullptr;
     }
-    else {
-        return *i;
-    }
+
+    return *i;
 }
 
 // The type info's finish-loaded-object callback for hkMonitorStreamColorTable::ColorPair: its finish constructor
@@ -351,47 +350,40 @@ static void printSingleNodeValues(hkOstream& a1, float a2, const hkMonitorStream
         v5 = v3;
     }
     uint16_t v6 = a3->m_count[1];
-    if (v6) {
-        if (v6 > v5) {
-            v5 = v6;
-        }
+    if ((v6) && (v6 > v5)) {
+        v5 = v6;
     }
+
     uint16_t v7 = a3->m_count[2];
-    if (v7) {
-        if (v7 > v5) {
-            v5 = v7;
-        }
+    if ((v7) && (v7 > v5)) {
+        v5 = v7;
     }
+
     uint16_t v8 = a3->m_count[3];
-    if (v8) {
-        if (v8 > v5) {
-            v5 = v8;
-        }
+    if ((v8) && (v8 > v5)) {
+        v5 = v8;
     }
+
     uint16_t v9 = a3->m_count[4];
-    if (v9) {
-        if (v9 > v5) {
-            v5 = v9;
-        }
+    if ((v9) && (v9 > v5)) {
+        v5 = v9;
     }
+
     uint16_t v10 = a3->m_count[5];
-    if (v10) {
-        if (v10 > v5) {
-            v5 = v10;
-        }
+    if ((v10) && (v10 > v5)) {
+        v5 = v10;
     }
+
     uint16_t v11 = a3->m_count[6];
-    if (v11) {
-        if (v11 > v5) {
-            v5 = v11;
-        }
+    if ((v11) && (v11 > v5)) {
+        v5 = v11;
     }
+
     uint16_t v12 = a3->m_count[7];
-    if (v12) {
-        if (v12 > v5) {
-            v5 = v12;
-        }
+    if ((v12) && (v12 > v5)) {
+        v5 = v12;
     }
+
     if (!(a2 > 0.0f)) {
         hkString::snprintf(a1a, 200, "%s (%i)", a3->m_name, v5);
     }
@@ -763,9 +755,8 @@ char* hkMonitorStreamAnalyzer::getStreamBegin() {
     if (m_data.m_size) {
         return static_cast<hkArrayBase<char>&>(m_data).begin();
     }
-    else {
-        return nullptr;
-    }
+
+    return nullptr;
 }
 
 hkBool* hkMonitorStreamAnalyzer::captureFrameDetails(
@@ -798,10 +789,9 @@ hkBool* hkMonitorStreamAnalyzer::captureFrameDetails(
         apResult->m_bool = 1;
         return apResult;
     }
-    else {
-        apResult->m_bool = 0;
-        return apResult;
-    }
+
+    apResult->m_bool = 0;
+    return apResult;
 }
 
 // The prefix is a NUL-terminated char array on the debug allocator, set up by hkInitIndentString and reset to "" for
@@ -821,12 +811,12 @@ void hkMonitorStreamAnalyzer::writeRawStatistics(hkOstream& os) {
         }
         prefix.m_data[prefix.m_size++] = c;
     };
-    auto openIndent = [&prefix, &pushBack]() {
+    auto openIndent = [&prefix, &pushBack] {
         prefix.m_data[prefix.m_size - 1] = ' ';
         pushBack(' ');
         pushBack('\0');
     };
-    auto closeIndent = [&prefix]() {
+    auto closeIndent = [&prefix] {
         prefix.m_size -= 2;
         prefix.m_data[prefix.m_size - 1] = '\0';
     };
@@ -1937,7 +1927,7 @@ hkMonitorStreamAnalyzer::Node* hkMonitorStreamAnalyzer::makeStatisticsTreeForSin
         slot.m_time1 = command.m_time1;
         ++stack.m_size;
     };
-    auto popBoth = [&timerStack, &timerStackCopy]() {
+    auto popBoth = [&timerStack, &timerStackCopy] {
         // EXE-INLINED none: hkArray<hkMonitorStream::TimerCommand, hkContainerHeapAllocator>::popBack
         --timerStack.m_size;
         // EXE-INLINED none: hkArray<hkMonitorStream::TimerCommand, hkContainerHeapAllocator>::setSize
@@ -2271,18 +2261,16 @@ hkFindChildByName(hkMonitorStreamAnalyzer::Node* node, const char* childName, hk
         if (searchAnyChild.m_bool && node->m_children.m_size > 0) {
             return *node->m_children.begin();
         }
-        else {
-            return nullptr;
+
+        return nullptr;
+    }
+
+    while (hkString::strCmp(childName, node->m_children.m_data[v3]->m_name)) {
+        if (++v3 >= node->m_children.m_size) {
+            goto LABEL_4;
         }
     }
-    else {
-        while (hkString::strCmp(childName, node->m_children.m_data[v3]->m_name)) {
-            if (++v3 >= node->m_children.m_size) {
-                goto LABEL_4;
-            }
-        }
-        return node->m_children.m_data[v3];
-    }
+    return node->m_children.m_data[v3];
 }
 
 uint32_t hkRoundUpPow2(uint32_t n) {
@@ -2949,9 +2937,8 @@ hkMonitorStreamAnalyzer::Node* createNewNode(
     if (v8) {
         return ::new (v8) hkMonitorStreamAnalyzer::Node(parent, name, type);
     }
-    else {
-        return nullptr;
-    }
+
+    return nullptr;
 }
 
 hkMonitorStreamAnalyzer::Node* hkFindNextChildByName(

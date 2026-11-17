@@ -436,41 +436,38 @@ void CombatProcedureAttackMelee::DisplayDebugText(
         apDebugText->PrintLine(aeLocation, aeJustify, "Target Unreachable Timer: %.2f/%.2f", dElapsedTime, dTargetTime);
     }
     apDebugText->PrintLine(aeLocation, aeJustify, "Melee: %s %s", pCombatStateNames[this->eCombatState], Dst);
-    if (MovementRestrictions.sRestrictedMoves) {
-        if (!pattacker->IsPathing()) {
-            const char* v12;
-            const char* v13;
-            const char* v14;
-            const char* v15;
-            if (MovementRestrictions.CanMove(2)) {
-                v15 = "Y";
-            }
-            else {
-                v15 = "N";
-            }
-            if (MovementRestrictions.CanMove(1)) {
-                v14 = "Y";
-            }
-            else {
-                v14 = "N";
-            }
-            if (MovementRestrictions.CanMove(8)) {
-                v13 = "Y";
-            }
-            else {
-                v13 = "N";
-            }
-            if (MovementRestrictions.CanMove(4)) {
-                v12 = "Y";
-            }
-            else {
-                v12 = "N";
-            }
-            apDebugText->PrintLine(
-                aeLocation, aeJustify, "Movement Restrictions: L:%s R:%s F:%s B:%s", v12, v13, v14, v15
-            );
+    if ((MovementRestrictions.sRestrictedMoves) && (!pattacker->IsPathing())) {
+        const char* v12;
+        const char* v13;
+        const char* v14;
+        const char* v15;
+        if (MovementRestrictions.CanMove(2)) {
+            v15 = "Y";
         }
+        else {
+            v15 = "N";
+        }
+        if (MovementRestrictions.CanMove(1)) {
+            v14 = "Y";
+        }
+        else {
+            v14 = "N";
+        }
+        if (MovementRestrictions.CanMove(8)) {
+            v13 = "Y";
+        }
+        else {
+            v13 = "N";
+        }
+        if (MovementRestrictions.CanMove(4)) {
+            v12 = "Y";
+        }
+        else {
+            v12 = "N";
+        }
+        apDebugText->PrintLine(aeLocation, aeJustify, "Movement Restrictions: L:%s R:%s F:%s B:%s", v12, v13, v14, v15);
     }
+
     if (MovementRestrictions.bReset) {
         apDebugText->PrintLine(aeLocation, aeJustify, "Reset Movement restrictions");
     }
@@ -927,139 +924,127 @@ void CombatProcedureAttackMelee::HandleAdvance() {
 void CombatProcedureAttackMelee::MeleeDecision() {
     Actor* pattacker = GetAttacker();
     Actor* ptarget = GetTarget();
-    if (eCombatState == CombatProcedureAttackMelee::DONE) {
-        if (ptarget) {
-            if (!pCombatController->IsSwitchingWeapons()) {
-                eCurrentAttack = ANIM_GROUP_NONE;
-                float fdistance = GetFacingTargetDistance();
-                float freach = GetCurrentAttackReach();
-                Animation* panim = pattacker->GetAnimation();
-                ANIMATION_ACTION eanimAction = pattacker->GetAnimAction();
-                ANIMATION_ACTION etargetAnimAction = ptarget->GetAnimAction();
-                uint16_t Group = panim->GetGroup(AGS_WEAPON);
-                bool bmidAttack = TESAnimGroup::IsAttackAction(Group);
-                bool bfollowThrough = panim->GetGroupAction(AGS_WEAPON) == AGA_SPECIAL_IDLE_STOP;
-                bool bpostAttack = eanimAction == ANIM_ACTION_ATTACK_FOLLOW_THROUGH;
-                bool v22 = eanimAction == ANIM_ACTION_RECOIL || eanimAction == ANIM_ACTION_STAGGER;
-                bool btargetAttacking = ptarget->IsAttacking();
-                bool btargetPostAttack = etargetAnimAction == ANIM_ACTION_ATTACK_FOLLOW_THROUGH;
-                bool btargetRecoiling =
-                    etargetAnimAction == ANIM_ACTION_RECOIL || etargetAnimAction == ANIM_ACTION_STAGGER;
-                bool btargetInCombat = ptarget->IsInCombat();
-                bool btargetBlocking = ptarget->GetBlocked();
-                if (CombatProcedure::WithinAttackRange(fdistance, freach, 0)) {
-                    uint32_t v16;
-                    bool bcanAttack;
-                    float abDoPowerAttack_1 = 0.0f;
-                    bool a1 = ptarget->IsKnockedOut();
-                    bool v10 = pCombatController->GetCurrentWeapon() == nullptr;
-                    int32_t afReach = pattacker->GetClampedActorValue(ActorValue::LUCK);
-                    int32_t afDistance = pCombatController->GetAttackSkill();
-                    TESCombatStyle* CurrentCombatStyle = pCombatController->GetCurrentCombatStyle();
-                    float fattackScore = CombatFormulas::ChooseAttack(
-                        CurrentCombatStyle, afDistance, afReach, btargetAttacking, v10, btargetRecoiling, a1,
-                        btargetBlocking
-                    );
-                    // The elapsed time is compared with 5.0 (a double) without being stored first.
-                    if (pCombatController->pCombatState->GetLastAttackTimeStamp().ElapsedTime() > 5.0 &&
-                        fattackScore != 0.0) {
-                        fattackScore = fattackScore + 100.0;
+    if ((eCombatState == CombatProcedureAttackMelee::DONE) && (ptarget) && (!pCombatController->IsSwitchingWeapons())) {
+        eCurrentAttack = ANIM_GROUP_NONE;
+        float fdistance = GetFacingTargetDistance();
+        float freach = GetCurrentAttackReach();
+        Animation* panim = pattacker->GetAnimation();
+        ANIMATION_ACTION eanimAction = pattacker->GetAnimAction();
+        ANIMATION_ACTION etargetAnimAction = ptarget->GetAnimAction();
+        uint16_t Group = panim->GetGroup(AGS_WEAPON);
+        bool bmidAttack = TESAnimGroup::IsAttackAction(Group);
+        bool bfollowThrough = panim->GetGroupAction(AGS_WEAPON) == AGA_SPECIAL_IDLE_STOP;
+        bool bpostAttack = eanimAction == ANIM_ACTION_ATTACK_FOLLOW_THROUGH;
+        bool v22 = eanimAction == ANIM_ACTION_RECOIL || eanimAction == ANIM_ACTION_STAGGER;
+        bool btargetAttacking = ptarget->IsAttacking();
+        bool btargetPostAttack = etargetAnimAction == ANIM_ACTION_ATTACK_FOLLOW_THROUGH;
+        bool btargetRecoiling = etargetAnimAction == ANIM_ACTION_RECOIL || etargetAnimAction == ANIM_ACTION_STAGGER;
+        bool btargetInCombat = ptarget->IsInCombat();
+        bool btargetBlocking = ptarget->GetBlocked();
+        if (CombatProcedure::WithinAttackRange(fdistance, freach, 0)) {
+            uint32_t v16;
+            bool bcanAttack;
+            float abDoPowerAttack_1 = 0.0f;
+            bool a1 = ptarget->IsKnockedOut();
+            bool v10 = pCombatController->GetCurrentWeapon() == nullptr;
+            int32_t afReach = pattacker->GetClampedActorValue(ActorValue::LUCK);
+            int32_t afDistance = pCombatController->GetAttackSkill();
+            TESCombatStyle* CurrentCombatStyle = pCombatController->GetCurrentCombatStyle();
+            float fattackScore = CombatFormulas::ChooseAttack(
+                CurrentCombatStyle, afDistance, afReach, btargetAttacking, v10, btargetRecoiling, a1, btargetBlocking
+            );
+            // The elapsed time is compared with 5.0 (a double) without being stored first.
+            if (pCombatController->pCombatState->GetLastAttackTimeStamp().ElapsedTime() > 5.0 && fattackScore != 0.0) {
+                fattackScore = fattackScore + 100.0;
+            }
+            if (!btargetInCombat && ptarget != pPlayer) {
+                fattackScore = fattackScore + 100.0;
+            }
+            TESCombatStyle* v4 = pCombatController->GetCurrentCombatStyle();
+            float fblockScore = CombatFormulas::ChooseBlock(v4, 50, 50, false, btargetAttacking);
+            bool v20 = ptarget->IsParalyzed() ||
+                (ptarget->IsKnockedOut() ||
+                 (ptarget->IsUnConscious() || (ptarget->IsSleeping() || ptarget->IsRestrained())));
+            TESObjectWEAP* ptargetWeap = ptarget->GetCurrentWeapon();
+            if (v20 || (!ptarget->IsWeaponDrawn() || (ptargetWeap && ptargetWeap->IsRangedWeapon()))) {
+                fblockScore = 0.0f;
+            }
+            if (bmidAttack && fattackScore > 0.0) {
+                bcanAttack = true;
+            }
+            else {
+                BaseProcess* CurrentAIProcess = GetAttacker()->pCurrentProcess;
+                bcanAttack = CurrentAIProcess->CanAttack();
+            }
+            if (!bcanAttack || !pCombatController->HasLineOfSight()) {
+                fattackScore = 0.0f;
+                if (!pCombatController->HasLineOfSight()) {
+                    fblockScore = 0.0f;
+                }
+            }
+            if ((bmidAttack && !bfollowThrough) || (eManeuverState == CombatProcedureAttackMelee::ADVANCE || v22)) {
+                fblockScore = 0.0f;
+            }
+            if (!panim->GroupLoaded(170)) {
+                fblockScore = 0.0f;
+            }
+            float* v5 = &fCombatMaxHoldScore.Float();
+            float v17 = 100.0 - (fattackScore + fblockScore);
+            float fholdScore = BSMAX(v17, *v5);
+            if (bmidAttack && !bfollowThrough) {
+                fholdScore = 0.0f;
+            }
+            if (eLastCombatState == CombatProcedureAttackMelee::HOLD) {
+                fholdScore = 0.0f;
+            }
+            int32_t isum = static_cast<int32_t>(fattackScore + fblockScore + fholdScore);
+            if (isum <= 0) {
+                v16 = 100;
+            }
+            else {
+                v16 = isum;
+            }
+            float fdieRoll_2 = static_cast<float>(Random() % v16);
+            if (!(fattackScore > static_cast<double>(fdieRoll_2))) {
+                if (!(fblockScore > 0.0) || !(fdieRoll_2 < fattackScore + fblockScore)) {
+                    if (eLastCombatState != CombatProcedureAttackMelee::HOLD) {
+                        SetCombatState(CombatProcedureAttackMelee::HOLD);
+                        TESCombatStyle* v6 = pCombatController->GetCurrentCombatStyle();
+                        float a2a = v6->Data.fHoldMaxTime;
+                        TESCombatStyle* v7 = pCombatController->GetCurrentCombatStyle();
+                        float a1a = v7->Data.fHoldMinTime;
+                        float fmeleeTargetTime = CombatFormulas::GetRandomBetween(a1a, a2a);
+                        MeleeTimer.Reset(fmeleeTargetTime);
                     }
-                    if (!btargetInCombat && ptarget != pPlayer) {
-                        fattackScore = fattackScore + 100.0;
+                }
+                else {
+                    pattacker->SetBlock(true);
+                    SetCombatState(CombatProcedureAttackMelee::BLOCK);
+                }
+            }
+            else {
+                if (pCombatController->IsBlocking()) {
+                    pattacker->SetBlock(false);
+                    if (eCombatState == CombatProcedureAttackMelee::BLOCK) {
+                        SetCombatState(CombatProcedureAttackMelee::DONE);
                     }
-                    TESCombatStyle* v4 = pCombatController->GetCurrentCombatStyle();
-                    float fblockScore = CombatFormulas::ChooseBlock(v4, 50, 50, false, btargetAttacking);
-                    bool v20 = ptarget->IsParalyzed() ||
-                        (ptarget->IsKnockedOut() ||
-                         (ptarget->IsUnConscious() || (ptarget->IsSleeping() || ptarget->IsRestrained())));
-                    TESObjectWEAP* ptargetWeap = ptarget->GetCurrentWeapon();
-                    if (v20 || (!ptarget->IsWeaponDrawn() || (ptargetWeap && ptargetWeap->IsRangedWeapon()))) {
-                        fblockScore = 0.0f;
-                    }
-                    if (bmidAttack && fattackScore > 0.0) {
-                        bcanAttack = true;
-                    }
-                    else {
-                        BaseProcess* CurrentAIProcess = GetAttacker()->pCurrentProcess;
-                        bcanAttack = CurrentAIProcess->CanAttack();
-                    }
-                    if (!bcanAttack || !pCombatController->HasLineOfSight()) {
-                        fattackScore = 0.0f;
-                        if (!pCombatController->HasLineOfSight()) {
-                            fblockScore = 0.0f;
-                        }
-                    }
-                    if ((bmidAttack && !bfollowThrough) ||
-                        (eManeuverState == CombatProcedureAttackMelee::ADVANCE || v22)) {
-                        fblockScore = 0.0f;
-                    }
-                    if (!panim->GroupLoaded(170)) {
-                        fblockScore = 0.0f;
-                    }
-                    float* v5 = &fCombatMaxHoldScore.Float();
-                    float v17 = 100.0 - (fattackScore + fblockScore);
-                    float fholdScore = BSMAX(v17, *v5);
-                    if (bmidAttack && !bfollowThrough) {
-                        fholdScore = 0.0f;
-                    }
-                    if (eLastCombatState == CombatProcedureAttackMelee::HOLD) {
-                        fholdScore = 0.0f;
-                    }
-                    int32_t isum = static_cast<int32_t>(fattackScore + fblockScore + fholdScore);
-                    if (isum <= 0) {
-                        v16 = 100;
-                    }
-                    else {
-                        v16 = isum;
-                    }
-                    float fdieRoll_2 = static_cast<float>(Random() % v16);
-                    if (!(fattackScore > static_cast<double>(fdieRoll_2))) {
-                        if (!(fblockScore > 0.0) || !(fdieRoll_2 < fattackScore + fblockScore)) {
-                            if (eLastCombatState != CombatProcedureAttackMelee::HOLD) {
-                                SetCombatState(CombatProcedureAttackMelee::HOLD);
-                                TESCombatStyle* v6 = pCombatController->GetCurrentCombatStyle();
-                                float a2a = v6->Data.fHoldMaxTime;
-                                TESCombatStyle* v7 = pCombatController->GetCurrentCombatStyle();
-                                float a1a = v7->Data.fHoldMinTime;
-                                float fmeleeTargetTime = CombatFormulas::GetRandomBetween(a1a, a2a);
-                                MeleeTimer.Reset(fmeleeTargetTime);
-                            }
+                }
+                bool bdoPowerAttack = false;
+                bool bswitchAttack = false;
+                ANIM_GROUP_ENUM eattack = SelectAttack(
+                    bmidAttack, fdistance, freach, btargetAttacking, btargetPostAttack, btargetRecoiling,
+                    bdoPowerAttack, bswitchAttack
+                );
+                if (eattack != ANIM_GROUP_NONE) {
+                    Actor* afTarget = GetTarget();
+                    if (afTarget->Get3D()) {
+                        if (bdoPowerAttack) {
+                            pCombatDialogueManager->StartDialogue(pCombatController, DT_COMBAT, DC_POWER_ATTACK, false);
                         }
                         else {
-                            pattacker->SetBlock(true);
-                            SetCombatState(CombatProcedureAttackMelee::BLOCK);
+                            pCombatDialogueManager->StartDialogue(pCombatController, DT_COMBAT, DC_ATTACK, false);
                         }
-                    }
-                    else {
-                        if (pCombatController->IsBlocking()) {
-                            pattacker->SetBlock(false);
-                            if (eCombatState == CombatProcedureAttackMelee::BLOCK) {
-                                SetCombatState(CombatProcedureAttackMelee::DONE);
-                            }
-                        }
-                        bool bdoPowerAttack = false;
-                        bool bswitchAttack = false;
-                        ANIM_GROUP_ENUM eattack = SelectAttack(
-                            bmidAttack, fdistance, freach, btargetAttacking, btargetPostAttack, btargetRecoiling,
-                            bdoPowerAttack, bswitchAttack
-                        );
-                        if (eattack != ANIM_GROUP_NONE) {
-                            Actor* afTarget = GetTarget();
-                            if (afTarget->Get3D()) {
-                                if (bdoPowerAttack) {
-                                    pCombatDialogueManager->StartDialogue(
-                                        pCombatController, DT_COMBAT, DC_POWER_ATTACK, false
-                                    );
-                                }
-                                else {
-                                    pCombatDialogueManager->StartDialogue(
-                                        pCombatController, DT_COMBAT, DC_ATTACK, false
-                                    );
-                                }
-                                StartAttack(eattack, bswitchAttack);
-                            }
-                        }
+                        StartAttack(eattack, bswitchAttack);
                     }
                 }
             }
@@ -1215,13 +1200,11 @@ CombatProcedureAttackMelee::CombatState CombatProcedureAttackMelee::GetCombatSta
 
 void CombatProcedureAttackMelee::StartAttack(ANIM_GROUP_ENUM aeAttack, bool abSwitchAttack) {
     Actor* th_s;
-    if (((int32_t)aeAttack) != 255) {
-        if (GetCombatState()) {
-            th_s = CombatProcedure::GetAttacker();
-            if (th_s->QueueAttack(aeAttack)) {
-                SetCombatState(CombatProcedureAttackMelee::ATTACK);
-                eCurrentAttack = aeAttack;
-            }
+    if ((((int32_t)aeAttack) != 255) && (GetCombatState())) {
+        th_s = CombatProcedure::GetAttacker();
+        if (th_s->QueueAttack(aeAttack)) {
+            SetCombatState(CombatProcedureAttackMelee::ATTACK);
+            eCurrentAttack = aeAttack;
         }
     }
 }
@@ -1351,9 +1334,8 @@ ANIM_GROUP_ENUM CombatProcedureAttackMelee::SelectAttack(
                 if (v11->FindNextNoteKey(AGS_MOVEMENT, v16, nullptr) == 108) {
                     return ANIM_GROUP_ATTACK_LEFT;
                 }
-                else {
-                    return ANIM_GROUP_ATTACK_RIGHT;
-                }
+
+                return ANIM_GROUP_ATTACK_RIGHT;
             }
         }
     }
@@ -1564,68 +1546,61 @@ void CombatProcedureAttackMelee::CheckForwardPowerAttack(float afDistance, float
     if (eCombatState == CombatProcedureAttackMelee::DONE) {
         Actor* pattacker = GetAttacker();
         Actor* ptarget = GetTarget();
-        if (ptarget) {
-            if (!(fAttackPickFailedTimestamp.ElapsedTime() < 1.0) && pCombatController->bHasForwardAttacks) {
-                BaseProcess* CurrentAIProcess = pattacker->pCurrentProcess;
-                if (CurrentAIProcess->CanAttack()) {
-                    bool bmidAttack;
-                    if (pattacker->GetAnimation()) {
-                        Animation* v3 = pattacker->GetAnimation();
-                        uint16_t Group = v3->GetGroup(AGS_WEAPON);
-                        bmidAttack = TESAnimGroup::IsPowerAttackAction(Group);
-                    }
-                    else {
-                        bmidAttack = false;
-                    }
-                    if (!bmidAttack && (!pattacker->IsNpc() || !pattacker->IsSwimming())) {
-                        if (pCombatController->HasLineOfSight()) {
-                            if (CombatUtilities::IsTargetWithinStrikeAngle(pattacker, ptarget, nullptr)) {
-                                ANIMATION_ACTION etargetAnimAction = ptarget->GetAnimAction();
-                                bool btargetAttacking = ptarget->IsAttacking();
-                                bool btargetPostAttack = etargetAnimAction == ANIM_ACTION_ATTACK_FOLLOW_THROUGH;
-                                bool btargetRecoiling =
-                                    etargetAnimAction == ANIM_ACTION_RECOIL || etargetAnimAction == ANIM_ACTION_STAGGER;
-                                bool btargetBlocking = ptarget->GetBlocked();
-                                ANIM_GROUP_ENUM eattack = static_cast<ANIM_GROUP_ENUM>(
-                                    SelectPowerAttack(afDistance, afReach, btargetAttacking, btargetPostAttack, true)
-                                );
-                                if (eattack != ANIM_GROUP_NONE && CanDoPowerAttack(eattack)) {
-                                    int32_t idieRoll = Random() % 100;
-                                    TESCombatStyle* CurrentCombatStyle = pCombatController->GetCurrentCombatStyle();
-                                    if (idieRoll < CurrentCombatStyle->GetRushingAttackPercentChance()) {
-                                        CombatTimer fattackScore;
-                                        bool a1 = ptarget->IsKnockedOut();
-                                        bool a3 = pCombatController->GetCurrentWeapon() == nullptr;
-                                        int32_t ClampedActorValue = pattacker->GetClampedActorValue(ActorValue::LUCK);
-                                        int32_t AttackSkill = pCombatController->GetAttackSkill();
-                                        TESCombatStyle* v6 = pCombatController->GetCurrentCombatStyle();
-                                        fattackScore.fTargetTime = CombatFormulas::ChooseAttack(
-                                            v6, AttackSkill, ClampedActorValue, btargetAttacking, a3, btargetRecoiling,
-                                            a1, btargetBlocking
-                                        );
-                                        TESCombatStyle* v7 = pCombatController->GetCurrentCombatStyle();
-                                        float fblockScore =
-                                            CombatFormulas::ChooseBlock(v7, 50, 50, false, btargetAttacking);
-                                        float* v8 = &fCombatMaxHoldScore.Float();
-                                        float v16 = 100.0 - (fattackScore.fTargetTime + fblockScore);
-                                        float fholdScore = BSMAX(v16, *v8);
-                                        if (fblockScore < static_cast<double>(fattackScore.fTargetTime) &&
-                                            fholdScore < static_cast<double>(fattackScore.fTargetTime)) {
-                                            const NiPoint3* v13 = &ptarget->GetLocationOnReference();
-                                            const NiPoint3* v9 = &pattacker->GetLocationOnReference();
-                                            if (CombatUtilities::CalculateLOS(
-                                                    pattacker, ptarget, *v9, *v13, false, 30
-                                                )) {
-                                                StartAttack(eattack, false);
-                                                SetManeuverState(CombatProcedureAttackMelee::ENGAGE);
-                                            }
-                                            else {
-                                                float a2 = CombatTimer::GetTimer();
-                                                fattackScore.SetStartTime(a2);
-                                                fAttackPickFailedTimestamp.fTimeStamp = fattackScore.fStartTime;
-                                            }
-                                        }
-                                    }
+        if ((ptarget) && (!(fAttackPickFailedTimestamp.ElapsedTime() < 1.0) && pCombatController->bHasForwardAttacks)) {
+            BaseProcess* CurrentAIProcess = pattacker->pCurrentProcess;
+            if (CurrentAIProcess->CanAttack()) {
+                bool bmidAttack;
+                if (pattacker->GetAnimation()) {
+                    Animation* v3 = pattacker->GetAnimation();
+                    uint16_t Group = v3->GetGroup(AGS_WEAPON);
+                    bmidAttack = TESAnimGroup::IsPowerAttackAction(Group);
+                }
+                else {
+                    bmidAttack = false;
+                }
+                if ((!bmidAttack && (!pattacker->IsNpc() || !pattacker->IsSwimming())) &&
+                    (pCombatController->HasLineOfSight()) &&
+                    (CombatUtilities::IsTargetWithinStrikeAngle(pattacker, ptarget, nullptr))) {
+                    ANIMATION_ACTION etargetAnimAction = ptarget->GetAnimAction();
+                    bool btargetAttacking = ptarget->IsAttacking();
+                    bool btargetPostAttack = etargetAnimAction == ANIM_ACTION_ATTACK_FOLLOW_THROUGH;
+                    bool btargetRecoiling =
+                        etargetAnimAction == ANIM_ACTION_RECOIL || etargetAnimAction == ANIM_ACTION_STAGGER;
+                    bool btargetBlocking = ptarget->GetBlocked();
+                    ANIM_GROUP_ENUM eattack = static_cast<ANIM_GROUP_ENUM>(
+                        SelectPowerAttack(afDistance, afReach, btargetAttacking, btargetPostAttack, true)
+                    );
+                    if (eattack != ANIM_GROUP_NONE && CanDoPowerAttack(eattack)) {
+                        int32_t idieRoll = Random() % 100;
+                        TESCombatStyle* CurrentCombatStyle = pCombatController->GetCurrentCombatStyle();
+                        if (idieRoll < CurrentCombatStyle->GetRushingAttackPercentChance()) {
+                            CombatTimer fattackScore;
+                            bool a1 = ptarget->IsKnockedOut();
+                            bool a3 = pCombatController->GetCurrentWeapon() == nullptr;
+                            int32_t ClampedActorValue = pattacker->GetClampedActorValue(ActorValue::LUCK);
+                            int32_t AttackSkill = pCombatController->GetAttackSkill();
+                            TESCombatStyle* v6 = pCombatController->GetCurrentCombatStyle();
+                            fattackScore.fTargetTime = CombatFormulas::ChooseAttack(
+                                v6, AttackSkill, ClampedActorValue, btargetAttacking, a3, btargetRecoiling, a1,
+                                btargetBlocking
+                            );
+                            TESCombatStyle* v7 = pCombatController->GetCurrentCombatStyle();
+                            float fblockScore = CombatFormulas::ChooseBlock(v7, 50, 50, false, btargetAttacking);
+                            float* v8 = &fCombatMaxHoldScore.Float();
+                            float v16 = 100.0 - (fattackScore.fTargetTime + fblockScore);
+                            float fholdScore = BSMAX(v16, *v8);
+                            if (fblockScore < static_cast<double>(fattackScore.fTargetTime) &&
+                                fholdScore < static_cast<double>(fattackScore.fTargetTime)) {
+                                const NiPoint3* v13 = &ptarget->GetLocationOnReference();
+                                const NiPoint3* v9 = &pattacker->GetLocationOnReference();
+                                if (CombatUtilities::CalculateLOS(pattacker, ptarget, *v9, *v13, false, 30)) {
+                                    StartAttack(eattack, false);
+                                    SetManeuverState(CombatProcedureAttackMelee::ENGAGE);
+                                }
+                                else {
+                                    float a2 = CombatTimer::GetTimer();
+                                    fattackScore.SetStartTime(a2);
+                                    fAttackPickFailedTimestamp.fTimeStamp = fattackScore.fStartTime;
                                 }
                             }
                         }
@@ -1692,7 +1667,6 @@ float CombatProcedureAttackMelee::GetMovingTargetVelocity() {
         Target->GetLinearVelocity(v6);
         return v6.XYLength();
     }
-    else {
-        return 0.0;
-    }
+
+    return 0.0;
 }

@@ -221,9 +221,8 @@ FileFinder::Locate(const char* apName, char* apFilePath, uint32_t aiFlags, uint3
     if (FileFinder::pFinder) {
         return FileFinder::pFinder->Exist(apName, apFilePath, aiFlags, aiArchiveType);
     }
-    else {
-        return NOTFOUND;
-    }
+
+    return NOTFOUND;
 }
 
 // A name without wildcards is looked up alone; otherwise the loose files (unless only the archives count) and the
@@ -285,16 +284,15 @@ bool FileFinder::AccessFile(const char* apName, NiFile::OpenMode aeMode) {
         bool v4 = tempFile.operator bool();
         return v4;
     }
-    else {
-        int32_t v3;
-        if (FileFinder::pFinder) {
-            v3 = FileFinder::pFinder->Exist(apName, nullptr, 0, 0xFFFFFFFFu);
-        }
-        else {
-            v3 = 0;
-        }
-        return v3 != 0;
+
+    int32_t v3;
+    if (FileFinder::pFinder) {
+        v3 = FileFinder::pFinder->Exist(apName, nullptr, 0, 0xFFFFFFFFu);
     }
+    else {
+        v3 = 0;
+    }
+    return v3 != 0;
 }
 
 BSSimpleList<const char*>* FileFinder::BuildFileList_(const char* apSearchName, const char* apBaseFilename) {

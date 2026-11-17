@@ -26,9 +26,8 @@ ActiveEffect* CurePoision(MagicCaster* a1, MagicItem* a2, EffectItem* a3) {
     if (apMemory) {
         return ::new (apMemory) CureEffect(a1, a2, a3, 5);
     }
-    else {
-        return nullptr;
-    }
+
+    return nullptr;
 }
 
 CureEffect::CureEffect(MagicCaster* apCaster, MagicItem* apItem, EffectItem* apEffect, int32_t aiActorValue)
@@ -98,9 +97,8 @@ ActiveEffect* CureEffect::InstantiateCureDisease(MagicCaster* apCaster, MagicIte
     if (apMemory) {
         return ::new (apMemory) CureEffect(apCaster, apSpell, apEffect, 1);
     }
-    else {
-        return nullptr;
-    }
+
+    return nullptr;
 }
 
 ActiveEffect* CureEffect::InstantiateCureParalysis(MagicCaster* apCaster, MagicItem* apSpell, EffectItem* apEffect) {
@@ -108,9 +106,8 @@ ActiveEffect* CureEffect::InstantiateCureParalysis(MagicCaster* apCaster, MagicI
     if (apMemory) {
         return ::new (apMemory) CureEffect(apCaster, apSpell, apEffect, 24);
     }
-    else {
-        return nullptr;
-    }
+
+    return nullptr;
 }
 
 ActiveEffect* CureEffect::InstantiateCureAddiction(MagicCaster* apCaster, MagicItem* apSpell, EffectItem* apEffect) {
@@ -118,7 +115,6 @@ ActiveEffect* CureEffect::InstantiateCureAddiction(MagicCaster* apCaster, MagicI
     if (apMemory) {
         return ::new (apMemory) CureEffect(apCaster, apSpell, apEffect, 10);
     }
-    else {
-        return nullptr;
-    }
+
+    return nullptr;
 }

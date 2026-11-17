@@ -205,7 +205,7 @@ IDX hkAabbTree<BOUNDING_VOLUME, IDX>::NodeManager::pushBack(Node*& rootNode, IDX
 
 // Takes the last free slot (growing the storage first when none is left): its index in newNodeIdx, its node returned.
 template <class BOUNDING_VOLUME, typename IDX>
-typename hkAabbTree<BOUNDING_VOLUME, IDX>::Node*
+hkAabbTree<BOUNDING_VOLUME, IDX>::Node*
 hkAabbTree<BOUNDING_VOLUME, IDX>::NodeManager::newNode(Node*& rootNode, IDX& rootIdx, IDX& newNodeIdx) {
     if (m_freeList.getSize() == 0) {
         reserve(static_cast<IDX>(m_nodes.getSize() + MEM_INCREASE_SIZE), rootNode, rootIdx);
@@ -221,12 +221,12 @@ void hkAabbTree<BOUNDING_VOLUME, IDX>::NodeManager::deleteNode(IDX idx) {
 }
 
 template <class BOUNDING_VOLUME, typename IDX>
-typename hkAabbTree<BOUNDING_VOLUME, IDX>::Node* hkAabbTree<BOUNDING_VOLUME, IDX>::NodeManager::getNode(IDX idx) {
+hkAabbTree<BOUNDING_VOLUME, IDX>::Node* hkAabbTree<BOUNDING_VOLUME, IDX>::NodeManager::getNode(IDX idx) {
     return &m_nodes.m_data[idx];
 }
 
 template <class BOUNDING_VOLUME, typename IDX>
-typename hkAabbTree<BOUNDING_VOLUME, IDX>::Node* hkAabbTree<BOUNDING_VOLUME, IDX>::NodeManager::getNode(IDX idx) const {
+hkAabbTree<BOUNDING_VOLUME, IDX>::Node* hkAabbTree<BOUNDING_VOLUME, IDX>::NodeManager::getNode(IDX idx) const {
     return &m_nodes.m_data[idx];
 }
 
@@ -293,7 +293,7 @@ void hkAabbTree<BOUNDING_VOLUME, IDX>::build(
 // skip past it. The parent is read without checking that the leaf has one, as the game does. Returns the node it
 // stopped at (the root when it reached the top).
 template <class BOUNDING_VOLUME, typename IDX>
-typename hkAabbTree<BOUNDING_VOLUME, IDX>::Node*
+hkAabbTree<BOUNDING_VOLUME, IDX>::Node*
 hkAabbTree<BOUNDING_VOLUME, IDX>::removeLeafInternal(uint32_t leafIdx, IDX& toDeleteNodeIdx) {
     Node* leaf = m_nodeManager.getNode(static_cast<IDX>(leafIdx));
     const IDX parentIdx = static_cast<IDX>(leaf->m_parentIdx & Node::s_leafMask);

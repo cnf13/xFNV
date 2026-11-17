@@ -221,9 +221,8 @@ uint16_t BGSEncounterZone::QZoneLevel() {
     if (GameData.sZoneLevel) {
         return GameData.sZoneLevel;
     }
-    else {
-        return GetCalcedZoneLevel();
-    }
+
+    return GetCalcedZoneLevel();
 }
 
 bool BGSEncounterZone::QNeverReset() {

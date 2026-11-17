@@ -80,20 +80,19 @@ void TESLeveledList::CopyComponent(BaseFormComponent* apCopyFC) {
             pdata->pForm = pcopydata->pForm;
             pdata_2->sLevel = pcopydata->sLevel;
             pdata_2->sCount = pcopydata->sCount;
-            if (pcopydata->pItemExtra) {
-                if (!pcopydata->pItemExtra->IsDefault()) {
-                    ContainerItemExtra* v6;
-                    ContainerItemExtra* v9 = static_cast<ContainerItemExtra*>(ourMalloc(sizeof(ContainerItemExtra)));
-                    if (v9) {
-                        v6 = ::new (v9) ContainerItemExtra;
-                    }
-                    else {
-                        v6 = nullptr;
-                    }
-                    pdata_2->pItemExtra = v6;
-                    pdata_2->pItemExtra->Copy(pcopydata->pItemExtra);
+            if ((pcopydata->pItemExtra) && (!pcopydata->pItemExtra->IsDefault())) {
+                ContainerItemExtra* v6;
+                ContainerItemExtra* v9 = static_cast<ContainerItemExtra*>(ourMalloc(sizeof(ContainerItemExtra)));
+                if (v9) {
+                    v6 = ::new (v9) ContainerItemExtra;
                 }
+                else {
+                    v6 = nullptr;
+                }
+                pdata_2->pItemExtra = v6;
+                pdata_2->pItemExtra->Copy(pcopydata->pItemExtra);
             }
+
             if ((&leveledList)->IsEmpty()) {
                 pList->AddHead(pdata_2);
             }
@@ -556,10 +555,8 @@ void TESLeveledList::InitItem(TESForm* apOwner) {
                 Warning("MASTERFILE: Unable to find Leveled Object Form (%08X) for unknown owner.", tempint);
             }
         }
-        if (pdata) {
-            if (pdata->pItemExtra) {
-                pdata->pItemExtra->InitItem(apOwner);
-            }
+        if ((pdata) && (pdata->pItemExtra)) {
+            pdata->pItemExtra->InitItem(apOwner);
         }
     }
     if (pChanceGlobal) {

@@ -597,9 +597,8 @@ uint32_t hkpExtendedMeshShape::getCollisionFilterInfo(uint32_t key) const {
     if (MeshMaterial) {
         return MeshMaterial->m_filterInfo;
     }
-    else {
-        return m_defaultCollisionFilterInfo;
-    }
+
+    return m_defaultCollisionFilterInfo;
 }
 
 // KEEP: a triangle key's vertices are each loaded into a stack vector by x, y and z only (the SDK's load3), and the
@@ -788,12 +787,11 @@ hkpExtendedMeshShape::TrianglesSubpart* hkpExtendedMeshShape::expandOneTriangleS
         ++p_m_trianglesSubparts->m_size;
         return &p_m_trianglesSubparts->m_data[m_size];
     }
-    else {
-        m_trianglesSubparts.m_data = &m_embeddedTrianglesSubpart;
-        m_trianglesSubparts.m_size = 1;
-        m_trianglesSubparts.m_capacityAndFlags = -0x7FFFFFFF;
-        return &m_embeddedTrianglesSubpart;
-    }
+
+    m_trianglesSubparts.m_data = &m_embeddedTrianglesSubpart;
+    m_trianglesSubparts.m_size = 1;
+    m_trianglesSubparts.m_capacityAndFlags = -0x7FFFFFFF;
+    return &m_embeddedTrianglesSubpart;
 }
 
 hkpExtendedMeshShape::ShapesSubpart* hkpExtendedMeshShape::expandOneShapesSubparts() {

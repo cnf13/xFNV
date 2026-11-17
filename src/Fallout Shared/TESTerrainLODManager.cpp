@@ -129,22 +129,17 @@ void TESTerrainLODManager::UpdateGrass(NiPoint3 apCameraPosition, NiPoint3 apCam
                     pcell = TES::pInstance->GetGridCellCell(icellx + icitx - 2, icelly + icity - 2);
                     if (pcell) {
                         bool bremove = true;
-                        if (icitx) {
-                            if (icitx != 4) {
-                                if (icity) {
-                                    if (icity != 4) {
-                                        double DistanceFromPoint = pcell->GetDistanceFromPoint(apCameraPosition);
-                                        if (fmaxrange > DistanceFromPoint) {
-                                            TESTerrainLODManager::UpdateGrassForCell(
-                                                pcell, TESTerrainLODManager::pGrassNode, apCameraPosition,
-                                                apCameraDirection, ffaderange, fmaxrange, afUpdateAngle
-                                            );
-                                            bremove = false;
-                                        }
-                                    }
-                                }
+                        if ((icitx) && (icitx != 4) && (icity) && (icity != 4)) {
+                            double DistanceFromPoint = pcell->GetDistanceFromPoint(apCameraPosition);
+                            if (fmaxrange > DistanceFromPoint) {
+                                TESTerrainLODManager::UpdateGrassForCell(
+                                    pcell, TESTerrainLODManager::pGrassNode, apCameraPosition, apCameraDirection,
+                                    ffaderange, fmaxrange, afUpdateAngle
+                                );
+                                bremove = false;
                             }
                         }
+
                         if (bremove) {
                             int32_t afLowMaxFade = pcell->GetDataY();
                             int32_t DataX = pcell->GetDataX();
@@ -297,26 +292,25 @@ void TESTerrainLODManager::UpdateGrassForCell(
                                 TESGrassAreaParam** pparam = pland->GetGrassParameters(iQuad, vertIndex);
                                 for (int32_t l = 0;
                                      pparam && (pparam[l] && (l < 16 && pparam[l]->kGrassParam.pcGeomFilename)); ++l) {
-                                    if (pparam[l]) {
-                                        if (!TallGrassShaderProperty::ContainsChunk_00B617B0(
-                                                pparam[l]->kGrassParam.iGrassID, lseed
-                                            )) {
-                                            TESGrass* pgrass = static_cast<TESGrass*>(
-                                                TESForm::GetFormByNumericID(pparam[l]->kGrassParam.iGrassID)
-                                            );
-                                            if (pgrass) {
-                                                usHeightLimit = pgrass->GetDistanceFromWaterLevel();
-                                                eWaterState = pgrass->GetUnderwaterState();
-                                                ucMinSlope = pgrass->GetMaxSlopeDegrees();
-                                                ucMaxSlope = pgrass->GetMinSlopeDegrees();
-                                            }
-                                            TESTerrainLODManager::CreateGrass(
-                                                iCellX, iCellY, iQuad, pland, lseed, kVertexPos.m_kNormal, apGrassNode,
-                                                apCameraPosition, &pparam[l]->kGrassParam, pparam[l]->pfDensity,
-                                                fFadeRange, fMaxRange, usHeightLimit, eWaterState,
-                                                kVertexPos.m_fConstant, ucMaxSlope, ucMinSlope
-                                            );
+                                    if ((pparam[l]) &&
+                                        (!TallGrassShaderProperty::ContainsChunk_00B617B0(
+                                            pparam[l]->kGrassParam.iGrassID, lseed
+                                        ))) {
+                                        TESGrass* pgrass = static_cast<TESGrass*>(
+                                            TESForm::GetFormByNumericID(pparam[l]->kGrassParam.iGrassID)
+                                        );
+                                        if (pgrass) {
+                                            usHeightLimit = pgrass->GetDistanceFromWaterLevel();
+                                            eWaterState = pgrass->GetUnderwaterState();
+                                            ucMinSlope = pgrass->GetMaxSlopeDegrees();
+                                            ucMaxSlope = pgrass->GetMinSlopeDegrees();
                                         }
+                                        TESTerrainLODManager::CreateGrass(
+                                            iCellX, iCellY, iQuad, pland, lseed, kVertexPos.m_kNormal, apGrassNode,
+                                            apCameraPosition, &pparam[l]->kGrassParam, pparam[l]->pfDensity, fFadeRange,
+                                            fMaxRange, usHeightLimit, eWaterState, kVertexPos.m_fConstant, ucMaxSlope,
+                                            ucMinSlope
+                                        );
                                     }
                                 }
                             }

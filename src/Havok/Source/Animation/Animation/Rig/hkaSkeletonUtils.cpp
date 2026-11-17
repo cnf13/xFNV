@@ -555,18 +555,17 @@ hkaSkeletonUtils::isBindingOk(hkBool* apResult, const hkaSkeleton& skeleton, con
         apResult->m_bool = 1;
         return apResult;
     }
-    else {
-        int16_t* m_data = binding.m_transformTrackToBoneIndices.m_data;
-        while (*m_data >= 0 && *m_data < skeleton.m_bones.m_size) {
-            ++v4;
-            ++m_data;
-            if (v4 >= m_size) {
-                goto LABEL_6;
-            }
+
+    int16_t* m_data = binding.m_transformTrackToBoneIndices.m_data;
+    while (*m_data >= 0 && *m_data < skeleton.m_bones.m_size) {
+        ++v4;
+        ++m_data;
+        if (v4 >= m_size) {
+            goto LABEL_6;
         }
-        apResult->m_bool = 0;
-        return apResult;
     }
+    apResult->m_bool = 0;
+    return apResult;
 }
 
 // Each bone's world transform is worldFromModel times its model space one.

@@ -313,51 +313,48 @@ void LockPickMenu::DoIdle() {
             }
             switch (eLockState) {
                 case LockPickMenu::LS_INTRO_ANIM: {
-                    if (pIntroAnim) {
-                        if (pPickIntroAnim) {
-                            NiUpdateData UpdateData1(ftotalStateSecs_1, true, false);
-                            NiUpdateData UpdateData2(ftotalStateSecs_1, true, false);
-                            NiAVObject* v5 = LockPickMenu::spCameraRoot.m_pObject->GetAt(0);
-                            v5->Update(UpdateData1);
-                            if (ftotalStateSecs_1 == 0.0 ||
-                                (!pLockTarget || pTiles[1]->GetFloat(LockPickMenu::iUT_Value) > 0.0)) {
-                                NiAVObject* v6 = LockPickMenu::spCameraRoot.m_pObject->GetAt(1u);
-                                v6->Update(UpdateData2);
+                    if ((pIntroAnim) && (pPickIntroAnim)) {
+                        NiUpdateData UpdateData1(ftotalStateSecs_1, true, false);
+                        NiUpdateData UpdateData2(ftotalStateSecs_1, true, false);
+                        NiAVObject* v5 = LockPickMenu::spCameraRoot.m_pObject->GetAt(0);
+                        v5->Update(UpdateData1);
+                        if (ftotalStateSecs_1 == 0.0 ||
+                            (!pLockTarget || pTiles[1]->GetFloat(LockPickMenu::iUT_Value) > 0.0)) {
+                            NiAVObject* v6 = LockPickMenu::spCameraRoot.m_pObject->GetAt(1u);
+                            v6->Update(UpdateData2);
+                        }
+                        if ((ftotalStateSecs_1 == 0.0) && (pLockTarget)) {
+                            if (!(pTiles[1]->GetFloat(LockPickMenu::iUT_Value) <= 0.0)) {
+                                BSAudio* v8 = &BSAudio::QInstance();
+                                BSSoundHandle* SoundHandleByName =
+                                    v8->GetSoundHandleByName(&arHandle, "UILockpickingEnter", 289u);
+                                SoundHandleByName->Play(false);
                             }
-                            if (ftotalStateSecs_1 == 0.0) {
-                                if (pLockTarget) {
-                                    if (!(pTiles[1]->GetFloat(LockPickMenu::iUT_Value) <= 0.0)) {
-                                        BSAudio* v8 = &BSAudio::QInstance();
-                                        BSSoundHandle* SoundHandleByName =
-                                            v8->GetSoundHandleByName(&arHandle, "UILockpickingEnter", 289u);
-                                        SoundHandleByName->Play(false);
-                                    }
-                                    else {
-                                        const char* v7 = sOutOfLockpicks.String();
-                                        Interface::ShowMessage(
-                                            v7, 0,
-                                            "Interface\\Icons\\Message Icons\\glow_message_vaultboy_surprised.dds",
-                                            nullptr, 2.0f, false
-                                        );
-                                    }
-                                }
-                            }
-                            if (static_cast<double>(ftotalStateSecs_1) >= pIntroAnim->m_fEndKeyTime) {
-                                NiAVObject* v9 = LockPickMenu::spCameraRoot.m_pObject->GetAt(0);
-                                NiControllerManager* plockAnimManager =
-                                    static_cast<NiControllerManager*>(v9->GetController(&NiControllerManager::ms_RTTI));
-                                NiNode* v10 = static_cast<NiNode*>(LockPickMenu::spCameraRoot.m_pObject->GetAt(0));
-                                NiNode* v11 = static_cast<NiNode*>(v10->GetAt(0));
-                                NiAVObject* pscrewdriver = v11->GetAt(2u);
-                                NiPoint3 origtrans = pscrewdriver->GetTranslate();
-                                eLockState = LockPickMenu::LS_IDLE;
-                                plockAnimManager->DeactivateSequence(pIntroAnim, 0.0f);
-                                plockAnimManager->ActivateSequence(pLockRotateAnim, 0, true, 1.0f, 0.0f, nullptr);
-                                ppickAnimManager->DeactivateSequence(pPickIntroAnim, 0.0f);
-                                ppickAnimManager->ActivateSequence(pPickBendAnim, 0, true, 1.0f, 0.0f, nullptr);
+                            else {
+                                const char* v7 = sOutOfLockpicks.String();
+                                Interface::ShowMessage(
+                                    v7, 0, "Interface\\Icons\\Message Icons\\glow_message_vaultboy_surprised.dds",
+                                    nullptr, 2.0f, false
+                                );
                             }
                         }
+
+                        if (static_cast<double>(ftotalStateSecs_1) >= pIntroAnim->m_fEndKeyTime) {
+                            NiAVObject* v9 = LockPickMenu::spCameraRoot.m_pObject->GetAt(0);
+                            NiControllerManager* plockAnimManager =
+                                static_cast<NiControllerManager*>(v9->GetController(&NiControllerManager::ms_RTTI));
+                            NiNode* v10 = static_cast<NiNode*>(LockPickMenu::spCameraRoot.m_pObject->GetAt(0));
+                            NiNode* v11 = static_cast<NiNode*>(v10->GetAt(0));
+                            NiAVObject* pscrewdriver = v11->GetAt(2u);
+                            NiPoint3 origtrans = pscrewdriver->GetTranslate();
+                            eLockState = LockPickMenu::LS_IDLE;
+                            plockAnimManager->DeactivateSequence(pIntroAnim, 0.0f);
+                            plockAnimManager->ActivateSequence(pLockRotateAnim, 0, true, 1.0f, 0.0f, nullptr);
+                            ppickAnimManager->DeactivateSequence(pPickIntroAnim, 0.0f);
+                            ppickAnimManager->ActivateSequence(pPickBendAnim, 0, true, 1.0f, 0.0f, nullptr);
+                        }
                     }
+
                     break;
                 }
                 case LockPickMenu::LS_PICK_INTRO_ANIM: {
@@ -521,11 +518,11 @@ void LockPickMenu::DoIdle() {
                                     if (pLockTarget->GetFormType() == DOOR_ID) {
                                         pPlayer->btransporting = true;
                                     }
-                                    if (pLockTarget->GetObjectReference()) {
-                                        if (pLockTarget->GetObjectReference()->GetFormType() == CONT_ID) {
-                                            InterfaceManager::SetContainerMenuQueued(true);
-                                        }
+                                    if ((pLockTarget->GetObjectReference()) &&
+                                        (pLockTarget->GetObjectReference()->GetFormType() == CONT_ID)) {
+                                        InterfaceManager::SetContainerMenuQueued(true);
                                     }
+
                                     pLockTarget->Activate(pPlayer, false, nullptr, 1);
                                     if (pLockTarget->GetFormType() == DOOR_ID) {
                                         pPlayer->btransporting = false;
@@ -617,16 +614,15 @@ void LockPickMenu::DoIdle() {
                     break;
                 }
                 case LockPickMenu::LS_BREAKING_PICK: {
-                    if (pPickBreakAnim) {
-                        if (bisMenuOnTop) {
-                            NiUpdateData UpdateData_3(ftotalStateSecs_1, true, false);
-                            NiAVObject* v33 = LockPickMenu::spCameraRoot.m_pObject->GetAt(1u);
-                            v33->Update(UpdateData_3);
-                            if (static_cast<double>(ftotalStateSecs_1) >= pPickBreakAnim->m_fEndKeyTime) {
-                                eLockState = LockPickMenu::LS_RESETTING_LOCK;
-                            }
+                    if ((pPickBreakAnim) && (bisMenuOnTop)) {
+                        NiUpdateData UpdateData_3(ftotalStateSecs_1, true, false);
+                        NiAVObject* v33 = LockPickMenu::spCameraRoot.m_pObject->GetAt(1u);
+                        v33->Update(UpdateData_3);
+                        if (static_cast<double>(ftotalStateSecs_1) >= pPickBreakAnim->m_fEndKeyTime) {
+                            eLockState = LockPickMenu::LS_RESETTING_LOCK;
                         }
                     }
+
                     break;
                 }
                 case LockPickMenu::LS_RESETTING_LOCK: {
@@ -1065,79 +1061,73 @@ Tile* LockPickMenu::Create(TESObjectREFR* apTarget, int32_t aiLockLevel, bool ab
         SoundHandleByName->Play(false);
         return nullptr;
     }
-    else {
-        int32_t v7;
-        if (pold_menu_tile) {
-            delete pold_menu_tile;
-        }
-        Tile* ptile = pin->GetMenusRoot()->ReadFile("Data\\Menus\\lockpick_menu.xml");
-        LockPickMenu::pMe = static_cast<LockPickMenu*>(ptile->GetMenu());
-        if (LockPickMenu::pMe && (v7 = LockPickMenu::pMe->GetClass(), v7 == LockPickMenu::GetClassStatic())) {
-            LockPickMenu::pMe->SetMenuTile(static_cast<TileMenu*>(ptile), false);
-            if (LockPickMenu::pMe->IsWellFormedMenu()) {
-                char Src[64];
-                if (ptile->GetFloat(4007) == 6006.0 || ptile->GetFloat(4007) == 102.0) {
-                    float time = Tile::GetMaximumDepth();
-                    ptile->Set(4013, time, true);
-                }
-                LockPickMenu::pMe->pLockTarget = apTarget;
-                LockPickMenu::pMe->eLockLevel = static_cast<LOCK_LEVEL>(ilockLevel_2);
-                int32_t v8 = Tile::TextToTrait("_DebugMode");
-                LockPickMenu::pMe->pMenu->Set(v8, static_cast<int32_t>(abDebugMode));
-                BSsprintf(Src, 64, "%d", LockPickMenu::pMe->iLockpickSkill);
-                LockPickMenu::pMe->pTiles[0]->Set(LockPickMenu::iUT_Value, Src, true);
-                int32_t afValue = LockLevelMaxVeryEasy[LockPickMenu::pMe->eLockLevel];
-                int32_t ClampedActorValue = pPlayer->GetClampedActorValue(ActorValue::LOCKPICK);
-                int32_t afValuea = GamePlayFormulas::GetForceLockChance(ClampedActorValue, afValue);
-                BSsprintf(Src, 64, "%s [%d", sForceLock.String(), afValuea);
-                BSstrcat(Src, 64, "%]");
-                LockPickMenu::pMe->pTiles[9]->Set(4036, Src, true);
-                const char* v10 = pLockLevelNames[LockPickMenu::pMe->eLockLevel]->String();
-                LockPickMenu::pMe->pTiles[2]->Set(LockPickMenu::iUT_Value, v10, true);
-                LockPickMenu::pMe->pTiles[12]->Set(4036, "PICK HEALTH: 100%", true);
-                LockPickMenu::pMe->pTiles[1]->Poke(LockPickMenu::iUT_Value, 1.0f);
-                if (apTarget) {
-                    int32_t a3 = pPlayer->GetInventoryObjectCount(pLockpick);
-                    LockPickMenu::pMe->pTiles[1]->Set(LockPickMenu::iUT_Value, a3);
-                }
-                else {
-                    LockPickMenu::pMe->pTiles[1]->Set(LockPickMenu::iUT_Value, 0);
-                }
-                const char* v11 = sLanguage.String();
-                if (BSstrcmp(v11, "ENGLISH")) {
-                    const char* timea = sLockpickSkillText.String();
-                    Tile* ChildByName = ptile->GetChildByName("LPM_SkillTitle");
-                    ChildByName->Set(4036, timea, true);
-                    const char* timeb = sPicksRemainingText.String();
-                    Tile* v13 = ptile->GetChildByName("LPM_PickCountTitle");
-                    v13->Set(4036, timeb, true);
-                    const char* timec = sLockLevelText.String();
-                    Tile* v14 = ptile->GetChildByName("LPM_LevelTitle");
-                    v14->Set(4036, timec, true);
-                    const char* v15 = sExit.String();
-                    LockPickMenu::pMe->pTiles[10]->Set(4036, v15, true);
-                }
-                LockPickMenu::pMe->Prepare3DElements();
-                LockPickMenu::pMe->SetupLockLevelSweetSpots();
-                LockPickMenu::pMe->PrepForVisibility(false);
-                return ptile;
+
+    int32_t v7;
+    if (pold_menu_tile) {
+        delete pold_menu_tile;
+    }
+    Tile* ptile = pin->GetMenusRoot()->ReadFile("Data\\Menus\\lockpick_menu.xml");
+    LockPickMenu::pMe = static_cast<LockPickMenu*>(ptile->GetMenu());
+    if (LockPickMenu::pMe && (v7 = LockPickMenu::pMe->GetClass(), v7 == LockPickMenu::GetClassStatic())) {
+        LockPickMenu::pMe->SetMenuTile(static_cast<TileMenu*>(ptile), false);
+        if (LockPickMenu::pMe->IsWellFormedMenu()) {
+            char Src[64];
+            if (ptile->GetFloat(4007) == 6006.0 || ptile->GetFloat(4007) == 102.0) {
+                float time = Tile::GetMaximumDepth();
+                ptile->Set(4013, time, true);
+            }
+            LockPickMenu::pMe->pLockTarget = apTarget;
+            LockPickMenu::pMe->eLockLevel = static_cast<LOCK_LEVEL>(ilockLevel_2);
+            int32_t v8 = Tile::TextToTrait("_DebugMode");
+            LockPickMenu::pMe->pMenu->Set(v8, static_cast<int32_t>(abDebugMode));
+            BSsprintf(Src, 64, "%d", LockPickMenu::pMe->iLockpickSkill);
+            LockPickMenu::pMe->pTiles[0]->Set(LockPickMenu::iUT_Value, Src, true);
+            int32_t afValue = LockLevelMaxVeryEasy[LockPickMenu::pMe->eLockLevel];
+            int32_t ClampedActorValue = pPlayer->GetClampedActorValue(ActorValue::LOCKPICK);
+            int32_t afValuea = GamePlayFormulas::GetForceLockChance(ClampedActorValue, afValue);
+            BSsprintf(Src, 64, "%s [%d", sForceLock.String(), afValuea);
+            BSstrcat(Src, 64, "%]");
+            LockPickMenu::pMe->pTiles[9]->Set(4036, Src, true);
+            const char* v10 = pLockLevelNames[LockPickMenu::pMe->eLockLevel]->String();
+            LockPickMenu::pMe->pTiles[2]->Set(LockPickMenu::iUT_Value, v10, true);
+            LockPickMenu::pMe->pTiles[12]->Set(4036, "PICK HEALTH: 100%", true);
+            LockPickMenu::pMe->pTiles[1]->Poke(LockPickMenu::iUT_Value, 1.0f);
+            if (apTarget) {
+                int32_t a3 = pPlayer->GetInventoryObjectCount(pLockpick);
+                LockPickMenu::pMe->pTiles[1]->Set(LockPickMenu::iUT_Value, a3);
             }
             else {
-                Warning("MENUS: Lockpicking Menu Creation Failed... Are your menu and art resources up to date?");
-                return nullptr;
+                LockPickMenu::pMe->pTiles[1]->Set(LockPickMenu::iUT_Value, 0);
             }
-        }
-        else {
-            if (LockPickMenu::pMe) {
-                if (LockPickMenu::pMe->pMenu) {
-                    if (LockPickMenu::pMe) {
-                        delete LockPickMenu::pMe;
-                    }
-                }
+            const char* v11 = sLanguage.String();
+            if (BSstrcmp(v11, "ENGLISH")) {
+                const char* timea = sLockpickSkillText.String();
+                Tile* ChildByName = ptile->GetChildByName("LPM_SkillTitle");
+                ChildByName->Set(4036, timea, true);
+                const char* timeb = sPicksRemainingText.String();
+                Tile* v13 = ptile->GetChildByName("LPM_PickCountTitle");
+                v13->Set(4036, timeb, true);
+                const char* timec = sLockLevelText.String();
+                Tile* v14 = ptile->GetChildByName("LPM_LevelTitle");
+                v14->Set(4036, timec, true);
+                const char* v15 = sExit.String();
+                LockPickMenu::pMe->pTiles[10]->Set(4036, v15, true);
             }
-            return nullptr;
+            LockPickMenu::pMe->Prepare3DElements();
+            LockPickMenu::pMe->SetupLockLevelSweetSpots();
+            LockPickMenu::pMe->PrepForVisibility(false);
+            return ptile;
         }
+
+        Warning("MENUS: Lockpicking Menu Creation Failed... Are your menu and art resources up to date?");
+        return nullptr;
     }
+
+    if ((LockPickMenu::pMe) && (LockPickMenu::pMe->pMenu) && (LockPickMenu::pMe)) {
+        delete LockPickMenu::pMe;
+    }
+
+    return nullptr;
 }
 
 void LockPickMenu::Close() {

@@ -207,7 +207,6 @@ NiObject* BSPSysSimpleColorModifier::CreateObject() {
     if (apMemory) {
         return ::new (apMemory) BSPSysSimpleColorModifier;
     }
-    else {
-        return nullptr;
-    }
+
+    return nullptr;
 }

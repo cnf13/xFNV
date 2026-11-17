@@ -43,9 +43,8 @@ int32_t SeekSoundFileCallback(std::FILE* Stream, int32_t Offset, int32_t a3, int
     if (Stream) {
         return std::fseek(Stream, Offset, Origin);
     }
-    else {
-        return (-1);
-    }
+
+    return (-1);
 }
 
 intptr_t CALLBACK mmio_IOProc(_MMIOINFO* lpmmioinfo, uint32_t uMsg, intptr_t lParam1, intptr_t lParam2) {
@@ -142,9 +141,8 @@ int32_t SeekStreamCallback(std::FILE* Stream, int32_t Offset, int32_t a3, int32_
     if (Stream) {
         return std::fseek(Stream, Offset, Origin);
     }
-    else {
-        return -1;
-    }
+
+    return -1;
 }
 
 size_t read_func(void* ptr, size_t size, size_t nmemb, void* datasource) {
@@ -190,9 +188,8 @@ long tell_func(void* datasource) {
     if (pFile->iAuxTrueFilePos == (-1)) {
         return (int32_t)pFile->iTrueFilePos;
     }
-    else {
-        return pFile->iAuxTrueFilePos;
-    }
+
+    return pFile->iAuxTrueFilePos;
 }
 
 // The library's decoder state starts zeroed.
@@ -652,16 +649,15 @@ bool BSWin32GameSound::Prepare() {
             return OpenResult(false);
         }
         hResult = pTempSoundBuffer->QueryInterface(CLSID_IDirectSoundBuffer8, reinterpret_cast<void**>(&pSoundBuffer));
-        if (pSoundBuffer) {
-            if ((iSoundTypeFlags & BSGameSound::SOUND_FLAG_IS_3D) != 0) {
-                hResult =
-                    pSoundBuffer->QueryInterface(CLSID_IDirectSound3DBuffer, reinterpret_cast<void**>(&p3DSoundBuffer));
-                p3DSoundBuffer->SetMinDistance(1e+09f, 1);
-                SetEmitterPosition(-3.4028235e+37f, -3.4028235e+37f, -3.4028235e+37f);
-                fDistanceToListener = 3.4028235e+38f;
-                pTempSoundBuffer->SetVolume(DSBVOLUME_MIN);
-            }
+        if ((pSoundBuffer) && ((iSoundTypeFlags & BSGameSound::SOUND_FLAG_IS_3D) != 0)) {
+            hResult =
+                pSoundBuffer->QueryInterface(CLSID_IDirectSound3DBuffer, reinterpret_cast<void**>(&p3DSoundBuffer));
+            p3DSoundBuffer->SetMinDistance(1e+09f, 1);
+            SetEmitterPosition(-3.4028235e+37f, -3.4028235e+37f, -3.4028235e+37f);
+            fDistanceToListener = 3.4028235e+38f;
+            pTempSoundBuffer->SetVolume(DSBVOLUME_MIN);
         }
+
         v11 = nullptr;
         v14 = 0;
         hResult = pSoundBuffer->Lock(0, uiBufferBytes, &v11, &v14, nullptr, nullptr, 0);
@@ -823,39 +819,36 @@ void BSWin32GameSound::Copy(BSGameSound* apToCopy, bool abPlayable) {
                 }
                 pTempSoundBuffer->Unlock(v10, v14, v13, v9);
                 pTempSoundBuffer->QueryInterface(CLSID_IDirectSoundBuffer8, reinterpret_cast<void**>(&pSoundBuffer));
-                if (pSoundBuffer) {
-                    if ((iSoundTypeFlags & BSGameSound::SOUND_FLAG_IS_3D) != 0) {
-                        pSoundBuffer->QueryInterface(
-                            CLSID_IDirectSound3DBuffer, reinterpret_cast<void**>(&p3DSoundBuffer)
-                        );
-                        if (p3DSoundBuffer) {
-                            p3DSoundBuffer->SetMinDistance(1e+09f, 1);
-                        }
+                if ((pSoundBuffer) && ((iSoundTypeFlags & BSGameSound::SOUND_FLAG_IS_3D) != 0)) {
+                    pSoundBuffer->QueryInterface(CLSID_IDirectSound3DBuffer, reinterpret_cast<void**>(&p3DSoundBuffer));
+                    if (p3DSoundBuffer) {
+                        p3DSoundBuffer->SetMinDistance(1e+09f, 1);
                     }
                 }
-                if ((v8->iSoundTypeFlags & BSGameSound::SOUND_FLAG_ENVELOPE_SLOW) != 0 ||
-                    (v8->iSoundTypeFlags & BSGameSound::SOUND_FLAG_ENVELOPE_FAST) != 0) {
-                    if (v8->pEnvelope) {
-                        pEnvelope = static_cast<BSWin32GameSound::EnvelopeBuffer*>(
-                            MemoryManager_Singleton.Allocate(sizeof(BSWin32GameSound::EnvelopeBuffer))
-                        );
-                        pEnvelope->uiHeadBytes = v8->pEnvelope->uiHeadBytes;
-                        pEnvelope->uiTailSize = v8->pEnvelope->uiTailSize;
-                        pEnvelope->uiMiddleSize = v8->pEnvelope->uiMiddleSize;
-                        pEnvelope->uiPlayCursor = 0;
-                        pEnvelope->uiState = 0;
-                        pEnvelope->uiSize = 0;
-                        pEnvelope->pHeadBuf =
-                            static_cast<uint8_t*>(MemoryManager_Singleton.Allocate(pEnvelope->uiHeadBytes));
-                        pEnvelope->pMidBuf =
-                            static_cast<uint8_t*>(MemoryManager_Singleton.Allocate(pEnvelope->uiMiddleSize));
-                        pEnvelope->pTailBuf =
-                            static_cast<uint8_t*>(MemoryManager_Singleton.Allocate(pEnvelope->uiTailSize));
-                        rt::memcpy(pEnvelope->pHeadBuf, v8->pEnvelope->pHeadBuf, pEnvelope->uiHeadBytes);
-                        rt::memcpy(pEnvelope->pMidBuf, v8->pEnvelope->pMidBuf, pEnvelope->uiMiddleSize);
-                        rt::memcpy(pEnvelope->pTailBuf, v8->pEnvelope->pTailBuf, pEnvelope->uiTailSize);
-                    }
+
+                if (((v8->iSoundTypeFlags & BSGameSound::SOUND_FLAG_ENVELOPE_SLOW) != 0 ||
+                     (v8->iSoundTypeFlags & BSGameSound::SOUND_FLAG_ENVELOPE_FAST) != 0) &&
+                    (v8->pEnvelope)) {
+                    pEnvelope = static_cast<BSWin32GameSound::EnvelopeBuffer*>(
+                        MemoryManager_Singleton.Allocate(sizeof(BSWin32GameSound::EnvelopeBuffer))
+                    );
+                    pEnvelope->uiHeadBytes = v8->pEnvelope->uiHeadBytes;
+                    pEnvelope->uiTailSize = v8->pEnvelope->uiTailSize;
+                    pEnvelope->uiMiddleSize = v8->pEnvelope->uiMiddleSize;
+                    pEnvelope->uiPlayCursor = 0;
+                    pEnvelope->uiState = 0;
+                    pEnvelope->uiSize = 0;
+                    pEnvelope->pHeadBuf =
+                        static_cast<uint8_t*>(MemoryManager_Singleton.Allocate(pEnvelope->uiHeadBytes));
+                    pEnvelope->pMidBuf =
+                        static_cast<uint8_t*>(MemoryManager_Singleton.Allocate(pEnvelope->uiMiddleSize));
+                    pEnvelope->pTailBuf =
+                        static_cast<uint8_t*>(MemoryManager_Singleton.Allocate(pEnvelope->uiTailSize));
+                    rt::memcpy(pEnvelope->pHeadBuf, v8->pEnvelope->pHeadBuf, pEnvelope->uiHeadBytes);
+                    rt::memcpy(pEnvelope->pMidBuf, v8->pEnvelope->pMidBuf, pEnvelope->uiMiddleSize);
+                    rt::memcpy(pEnvelope->pTailBuf, v8->pEnvelope->pTailBuf, pEnvelope->uiTailSize);
                 }
+
                 iStateFlags = 0;
                 OpenResult(true);
                 if (abPlayable) {
@@ -937,63 +930,52 @@ void BSWin32GameSound::Copy(BSGameSound* apToCopy, bool abPlayable) {
 
 bool BSWin32GameSound::Play(bool abLoopPlayback) {
     int32_t eResult = E_FAIL;
-    if (pSoundBuffer) {
-        if (pDirectSound8) {
-            if ((iSoundTypeFlags & BSGameSound::SOUND_FLAG_LOOP) != 0) {
+    if ((pSoundBuffer) && (pDirectSound8)) {
+        if ((iSoundTypeFlags & BSGameSound::SOUND_FLAG_LOOP) != 0) {
+            abLoopPlayback = true;
+            uint32_t iSoundSize = this->iSoundSize;
+            uint32_t v2 = rt::rand();
+            pSoundBuffer->SetCurrentPosition(v2 % (iSoundSize - 1));
+        }
+        else {
+            if (((iSoundTypeFlags & BSGameSound::SOUND_FLAG_ENVELOPE_SLOW) != 0 ||
+                 (iSoundTypeFlags & BSGameSound::SOUND_FLAG_ENVELOPE_FAST) != 0) &&
+                (!IsPaused() || (!pEnvelope || pEnvelope->uiState != 5))) {
                 abLoopPlayback = true;
-                uint32_t iSoundSize = this->iSoundSize;
-                uint32_t v2 = rt::rand();
-                pSoundBuffer->SetCurrentPosition(v2 % (iSoundSize - 1));
-            }
-            else {
                 if (((iSoundTypeFlags & BSGameSound::SOUND_FLAG_ENVELOPE_SLOW) != 0 ||
                      (iSoundTypeFlags & BSGameSound::SOUND_FLAG_ENVELOPE_FAST) != 0) &&
-                    (!IsPaused() || (!pEnvelope || pEnvelope->uiState != 5))) {
-                    abLoopPlayback = true;
-                    if ((iSoundTypeFlags & BSGameSound::SOUND_FLAG_ENVELOPE_SLOW) != 0 ||
-                        (iSoundTypeFlags & BSGameSound::SOUND_FLAG_ENVELOPE_FAST) != 0) {
-                        if (pEnvelope) {
-                            if (pEnvelope->pHeadBuf) {
-                                if (pEnvelope->uiState != 1 && pEnvelope->uiState != 2) {
-                                    pSoundBuffer->SetCurrentPosition(0);
-                                    if (pEnvelope->uiHeadBytes <= uiBufferBytes) {
-                                        uint32_t dwWriteBytes = uiBufferBytes - pEnvelope->uiHeadBytes;
-                                        Write(
-                                            0, 0, pEnvelope->uiHeadBytes, reinterpret_cast<char*>(pEnvelope->pHeadBuf)
-                                        );
-                                        Write(
-                                            0, pEnvelope->uiHeadBytes, dwWriteBytes,
-                                            reinterpret_cast<char*>(pEnvelope->pMidBuf)
-                                        );
-                                        pEnvelope->uiSize = dwWriteBytes + pEnvelope->uiHeadBytes;
-                                        pEnvelope->uiState = 2;
-                                    }
-                                    else {
-                                        Write(0, 0, uiBufferBytes, reinterpret_cast<char*>(pEnvelope->pHeadBuf));
-                                        pEnvelope->uiSize = uiBufferBytes;
-                                        pEnvelope->uiState = 1;
-                                    }
-                                }
-                            }
-                        }
+                    (pEnvelope) && (pEnvelope->pHeadBuf) && (pEnvelope->uiState != 1 && pEnvelope->uiState != 2)) {
+                    pSoundBuffer->SetCurrentPosition(0);
+                    if (pEnvelope->uiHeadBytes <= uiBufferBytes) {
+                        uint32_t dwWriteBytes = uiBufferBytes - pEnvelope->uiHeadBytes;
+                        Write(0, 0, pEnvelope->uiHeadBytes, reinterpret_cast<char*>(pEnvelope->pHeadBuf));
+                        Write(0, pEnvelope->uiHeadBytes, dwWriteBytes, reinterpret_cast<char*>(pEnvelope->pMidBuf));
+                        pEnvelope->uiSize = dwWriteBytes + pEnvelope->uiHeadBytes;
+                        pEnvelope->uiState = 2;
+                    }
+                    else {
+                        Write(0, 0, uiBufferBytes, reinterpret_cast<char*>(pEnvelope->pHeadBuf));
+                        pEnvelope->uiSize = uiBufferBytes;
+                        pEnvelope->uiState = 1;
                     }
                 }
             }
-            if (abLoopPlayback) {
-                eResult = pSoundBuffer->Play(0, 0, 1);
-                if (pReverbBuffer) {
-                    pReverbBuffer->Play(0, 0, 1);
-                }
-            }
-            else {
-                eResult = pSoundBuffer->Play(0, 0, 0);
-                if (pReverbBuffer) {
-                    pReverbBuffer->Play(0, 0, 0);
-                }
-            }
-            HandlePlayCallback();
         }
+        if (abLoopPlayback) {
+            eResult = pSoundBuffer->Play(0, 0, 1);
+            if (pReverbBuffer) {
+                pReverbBuffer->Play(0, 0, 1);
+            }
+        }
+        else {
+            eResult = pSoundBuffer->Play(0, 0, 0);
+            if (pReverbBuffer) {
+                pReverbBuffer->Play(0, 0, 0);
+            }
+        }
+        HandlePlayCallback();
     }
+
     if (eResult >= 0) {
         iStateFlags |= BSGameSound::STATE_PLAYING;
         iStateFlags &= ~BSGameSound::STATE_PAUSED;
@@ -1004,14 +986,13 @@ bool BSWin32GameSound::Play(bool abLoopPlayback) {
 
 bool BSWin32GameSound::Pause() {
     HRESULT eResult = E_FAIL;
-    if (pSoundBuffer) {
-        if (pDirectSound8) {
-            eResult = pSoundBuffer->Stop();
-            if (pReverbBuffer) {
-                pReverbBuffer->Stop();
-            }
+    if ((pSoundBuffer) && (pDirectSound8)) {
+        eResult = pSoundBuffer->Stop();
+        if (pReverbBuffer) {
+            pReverbBuffer->Stop();
         }
     }
+
     if (eResult >= 0) {
         iStateFlags |= BSGameSound::STATE_PAUSED;
         iStateFlags &= ~BSGameSound::STATE_PLAYING;
@@ -1021,33 +1002,32 @@ bool BSWin32GameSound::Pause() {
 
 bool BSWin32GameSound::Stop() {
     int32_t eResult = E_FAIL;
-    if (pSoundBuffer) {
-        if (pDirectSound8) {
-            bool v4 = (iSoundTypeFlags & BSGameSound::SOUND_FLAG_ENVELOPE_SLOW) != 0 ||
+    if ((pSoundBuffer) && (pDirectSound8)) {
+        bool v4 = (iSoundTypeFlags & BSGameSound::SOUND_FLAG_ENVELOPE_SLOW) != 0 ||
+            (iSoundTypeFlags & BSGameSound::SOUND_FLAG_ENVELOPE_FAST) != 0;
+        if (!v4 || (!pEnvelope || (pEnvelope->uiState == 5 || pEnvelope->uiState == 6))) {
+            bool v3 = (iSoundTypeFlags & BSGameSound::SOUND_FLAG_ENVELOPE_SLOW) != 0 ||
                 (iSoundTypeFlags & BSGameSound::SOUND_FLAG_ENVELOPE_FAST) != 0;
-            if (!v4 || (!pEnvelope || (pEnvelope->uiState == 5 || pEnvelope->uiState == 6))) {
-                bool v3 = (iSoundTypeFlags & BSGameSound::SOUND_FLAG_ENVELOPE_SLOW) != 0 ||
-                    (iSoundTypeFlags & BSGameSound::SOUND_FLAG_ENVELOPE_FAST) != 0;
-                if (!v3 || !pEnvelope) {
-                    eResult = pSoundBuffer->Stop();
-                    pSoundBuffer->SetCurrentPosition(0);
-                    if (pReverbBuffer) {
-                        pReverbBuffer->Stop();
-                        pReverbBuffer->SetCurrentPosition(0);
-                    }
-                    if (eResult >= 0) {
-                        iStateFlags &= ~BSGameSound::STATE_PLAYING;
-                    }
+            if (!v3 || !pEnvelope) {
+                eResult = pSoundBuffer->Stop();
+                pSoundBuffer->SetCurrentPosition(0);
+                if (pReverbBuffer) {
+                    pReverbBuffer->Stop();
+                    pReverbBuffer->SetCurrentPosition(0);
+                }
+                if (eResult >= 0) {
+                    iStateFlags &= ~BSGameSound::STATE_PLAYING;
                 }
             }
-            else {
-                pEnvelope->uiState = 4;
-            }
-            if ((iStateFlags & BSGameSound::STATE_PAUSED) != 0) {
-                iStateFlags &= ~BSGameSound::STATE_PAUSED;
-            }
+        }
+        else {
+            pEnvelope->uiState = 4;
+        }
+        if ((iStateFlags & BSGameSound::STATE_PAUSED) != 0) {
+            iStateFlags &= ~BSGameSound::STATE_PAUSED;
         }
     }
+
     return eResult >= 0;
 }
 
@@ -1126,16 +1106,15 @@ bool BSWin32GameSound::SetVolume(float afNewVolume) {
         }
         return pSoundBuffer->SetVolume(DSBVOLUME_MIN) >= 0;
     }
-    else {
-        int32_t v14 = E_FAIL;
-        if (pReverbBuffer) {
-            pReverbBuffer->SetVolume(iReverbVolume);
-        }
-        if (pSoundBuffer) {
-            v14 = pSoundBuffer->SetVolume(iNormalVolume);
-        }
-        return v14 >= 0;
+
+    int32_t v14 = E_FAIL;
+    if (pReverbBuffer) {
+        pReverbBuffer->SetVolume(iReverbVolume);
     }
+    if (pSoundBuffer) {
+        v14 = pSoundBuffer->SetVolume(iNormalVolume);
+    }
+    return v14 >= 0;
 }
 
 void BSWin32GameSound::UpdateEmitterPosition() {
@@ -1143,147 +1122,145 @@ void BSWin32GameSound::UpdateEmitterPosition() {
     float y = 0.0f;
     float z = 0.0f;
     NiPoint3 kPos = NiPoint3_ZERO;
-    if (Is3DSound() || Is2DRadiusSound()) {
-        if (BSAudio::pAudioInstance->pListener) {
-            if ((iSoundTypeFlags & BSGameSound::SOUND_FLAG_FIRST_PERSON) != 0) {
-                BSAudioListener* pListener = BSAudio::pAudioInstance->pListener;
-                NiPoint3 kListenerPos = pListener->GetPosition();
-                x = kListenerPos.x;
-                y = kListenerPos.y;
-                z = kListenerPos.z;
-                // DirectSound's y is Gamebryo's z, so the position is passed as x, z, y.
-                if (p3DSoundBuffer) {
-                    float v18 = y * 0.014287755824625492;
-                    float v17 = z * 0.014287755824625492;
-                    float v16 = x * 0.014287755824625492;
-                    p3DSoundBuffer->SetPosition(v16, v17, v18, 1);
-                    if (p3DReverbBuffer) {
-                        float v15 = y * 0.014287755824625492;
-                        float v14 = z * 0.014287755824625492;
-                        float v13 = x * 0.014287755824625492;
-                        p3DReverbBuffer->SetPosition(v13, v14, v15, 1);
-                    }
+    if ((Is3DSound() || Is2DRadiusSound()) && (BSAudio::pAudioInstance->pListener)) {
+        if ((iSoundTypeFlags & BSGameSound::SOUND_FLAG_FIRST_PERSON) != 0) {
+            BSAudioListener* pListener = BSAudio::pAudioInstance->pListener;
+            NiPoint3 kListenerPos = pListener->GetPosition();
+            x = kListenerPos.x;
+            y = kListenerPos.y;
+            z = kListenerPos.z;
+            // DirectSound's y is Gamebryo's z, so the position is passed as x, z, y.
+            if (p3DSoundBuffer) {
+                float v18 = y * 0.014287755824625492;
+                float v17 = z * 0.014287755824625492;
+                float v16 = x * 0.014287755824625492;
+                p3DSoundBuffer->SetPosition(v16, v17, v18, 1);
+                if (p3DReverbBuffer) {
+                    float v15 = y * 0.014287755824625492;
+                    float v14 = z * 0.014287755824625492;
+                    float v13 = x * 0.014287755824625492;
+                    p3DReverbBuffer->SetPosition(v13, v14, v15, 1);
                 }
             }
-            else {
-                if ((iSoundTypeFlags & BSGameSound::SOUND_FLAG_BEAM_EMITTER) != 0 &&
-                    (iStateFlags & BSGameSound::STATE_IS_VALID_BEAM) != 0) {
-                    float v33 = 0.0;
-                    float v32 = 0.0;
-                    float v31 = 0.0;
-                    NiPoint3 v35 = BSAudio::pAudioInstance->pListener->GetPosition();
-                    NiPoint3 pt = vBeamEnd - kPosition;
-                    NiPoint3 v30 = v35 - kPosition;
-                    v33 = v30.Dot(pt);
-                    if (!(v33 <= 0.0)) {
-                        v32 = pt.Dot(pt);
-                        if (!(v33 >= static_cast<double>(v32))) {
-                            v31 = v33 / v32;
-                            kPos = kPosition + v31 * pt;
-                        }
-                        else {
-                            kPos = vBeamEnd;
-                        }
+        }
+        else {
+            if ((iSoundTypeFlags & BSGameSound::SOUND_FLAG_BEAM_EMITTER) != 0 &&
+                (iStateFlags & BSGameSound::STATE_IS_VALID_BEAM) != 0) {
+                float v33 = 0.0;
+                float v32 = 0.0;
+                float v31 = 0.0;
+                NiPoint3 v35 = BSAudio::pAudioInstance->pListener->GetPosition();
+                NiPoint3 pt = vBeamEnd - kPosition;
+                NiPoint3 v30 = v35 - kPosition;
+                v33 = v30.Dot(pt);
+                if (!(v33 <= 0.0)) {
+                    v32 = pt.Dot(pt);
+                    if (!(v33 >= static_cast<double>(v32))) {
+                        v31 = v33 / v32;
+                        kPos = kPosition + v31 * pt;
                     }
                     else {
-                        kPos = kPosition;
+                        kPos = vBeamEnd;
                     }
-                    if (p3DSoundBuffer) {
-                        float v12 = kPos.y * 0.014287755824625492;
-                        float v11 = kPos.z * 0.014287755824625492;
-                        float v10 = kPos.x * 0.014287755824625492;
-                        p3DSoundBuffer->SetPosition(v10, v11, v12, 1);
-                        if (p3DReverbBuffer) {
-                            float v9 = kPos.y * 0.014287755824625492;
-                            float v8 = kPos.z * 0.014287755824625492;
-                            float v7 = kPos.x * 0.014287755824625492;
-                            p3DReverbBuffer->SetPosition(v7, v8, v9, 1);
-                        }
-                    }
-                }
-            }
-            float fListenerDistance = fDistanceToListener;
-            if ((iSoundTypeFlags & BSGameSound::SOUND_FLAG_BEAM_EMITTER) != 0 &&
-                ((iStateFlags & BSGameSound::STATE_IS_VALID_BEAM) != 0 && BSAudio::pAudioInstance->pListener)) {
-                NiPoint3* v2 = &BSAudio::pAudioInstance->pListener->GetPosition();
-                fListenerDistance = (kPos - *v2).Length();
-                fDistanceToListener = fListenerDistance;
-            }
-            else {
-                if (BSAudio::pAudioInstance->pListener) {
-                    NiPoint3* v4 = &BSAudio::pAudioInstance->pListener->GetPosition();
-                    fListenerDistance = (kPosition - *v4).Length();
-                    fDistanceToListener = fListenerDistance;
-                }
-            }
-            float v20 = fMaxDist - fMinDist;
-            float v6 = std::fabs(static_cast<double>(v20));
-            if (!(v6 > 10.0) || !(fListenerDistance < fMaxDist * 1.100000023841858)) {
-                if (!(fMaxDist <= static_cast<double>(fListenerDistance))) {
-                    iDistanceAttenuation = 0;
                 }
                 else {
-                    iDistanceAttenuation = 0x2710;
+                    kPos = kPosition;
                 }
-                SetVolume(fVolume);
+                if (p3DSoundBuffer) {
+                    float v12 = kPos.y * 0.014287755824625492;
+                    float v11 = kPos.z * 0.014287755824625492;
+                    float v10 = kPos.x * 0.014287755824625492;
+                    p3DSoundBuffer->SetPosition(v10, v11, v12, 1);
+                    if (p3DReverbBuffer) {
+                        float v9 = kPos.y * 0.014287755824625492;
+                        float v8 = kPos.z * 0.014287755824625492;
+                        float v7 = kPos.x * 0.014287755824625492;
+                        p3DReverbBuffer->SetPosition(v7, v8, v9, 1);
+                    }
+                }
+            }
+        }
+        float fListenerDistance = fDistanceToListener;
+        if ((iSoundTypeFlags & BSGameSound::SOUND_FLAG_BEAM_EMITTER) != 0 &&
+            ((iStateFlags & BSGameSound::STATE_IS_VALID_BEAM) != 0 && BSAudio::pAudioInstance->pListener)) {
+            NiPoint3* v2 = &BSAudio::pAudioInstance->pListener->GetPosition();
+            fListenerDistance = (kPos - *v2).Length();
+            fDistanceToListener = fListenerDistance;
+        }
+        else {
+            if (BSAudio::pAudioInstance->pListener) {
+                NiPoint3* v4 = &BSAudio::pAudioInstance->pListener->GetPosition();
+                fListenerDistance = (kPosition - *v4).Length();
+                fDistanceToListener = fListenerDistance;
+            }
+        }
+        float v20 = fMaxDist - fMinDist;
+        float v6 = std::fabs(static_cast<double>(v20));
+        if (!(v6 > 10.0) || !(fListenerDistance < fMaxDist * 1.100000023841858)) {
+            if (!(fMaxDist <= static_cast<double>(fListenerDistance))) {
+                iDistanceAttenuation = 0;
             }
             else {
-                float fAttenStart = (fMaxDist - fMinDist) * 0.25 + fMinDist;
-                float fAttenMid = (fMaxDist - fMinDist) * 0.5 + fMinDist;
-                float fAttenEnd = (fMaxDist - fMinDist) * 0.75 + fMinDist;
-                if (!(fMaxDist <= static_cast<double>(fListenerDistance))) {
-                    if (!(fAttenEnd < static_cast<double>(fListenerDistance)) || !(fMaxDist - fAttenEnd > 0.0)) {
-                        if (!(fAttenMid < static_cast<double>(fListenerDistance)) || !(fAttenEnd - fAttenMid > 0.0)) {
-                            if (!(fAttenStart < static_cast<double>(fListenerDistance)) ||
-                                !(fAttenMid - fAttenStart > 0.0)) {
-                                if (!(fMinDist < static_cast<double>(fListenerDistance)) ||
-                                    !(fAttenStart - fMinDist > 0.0)) {
-                                    iDistanceAttenuation = 0;
-                                    SetVolume(fVolume);
-                                }
-                                else {
-                                    iDistanceAttenuation = static_cast<int32_t>(
-                                        (fListenerDistance - fMinDist) / (fAttenStart - fMinDist) *
-                                            static_cast<double>(usAttenuationCurve[1] - usAttenuationCurve[0]) +
-                                        static_cast<double>(usAttenuationCurve[0])
-                                    );
-                                    SetVolume(fVolume);
-                                }
+                iDistanceAttenuation = 0x2710;
+            }
+            SetVolume(fVolume);
+        }
+        else {
+            float fAttenStart = (fMaxDist - fMinDist) * 0.25 + fMinDist;
+            float fAttenMid = (fMaxDist - fMinDist) * 0.5 + fMinDist;
+            float fAttenEnd = (fMaxDist - fMinDist) * 0.75 + fMinDist;
+            if (!(fMaxDist <= static_cast<double>(fListenerDistance))) {
+                if (!(fAttenEnd < static_cast<double>(fListenerDistance)) || !(fMaxDist - fAttenEnd > 0.0)) {
+                    if (!(fAttenMid < static_cast<double>(fListenerDistance)) || !(fAttenEnd - fAttenMid > 0.0)) {
+                        if (!(fAttenStart < static_cast<double>(fListenerDistance)) ||
+                            !(fAttenMid - fAttenStart > 0.0)) {
+                            if (!(fMinDist < static_cast<double>(fListenerDistance)) ||
+                                !(fAttenStart - fMinDist > 0.0)) {
+                                iDistanceAttenuation = 0;
+                                SetVolume(fVolume);
                             }
                             else {
                                 iDistanceAttenuation = static_cast<int32_t>(
-                                    (fListenerDistance - fAttenStart) / (fAttenMid - fAttenStart) *
-                                        static_cast<double>(usAttenuationCurve[2] - usAttenuationCurve[1]) +
-                                    static_cast<double>(usAttenuationCurve[1])
+                                    (fListenerDistance - fMinDist) / (fAttenStart - fMinDist) *
+                                        static_cast<double>(usAttenuationCurve[1] - usAttenuationCurve[0]) +
+                                    static_cast<double>(usAttenuationCurve[0])
                                 );
                                 SetVolume(fVolume);
                             }
                         }
                         else {
                             iDistanceAttenuation = static_cast<int32_t>(
-                                (fListenerDistance - fAttenMid) / (fAttenEnd - fAttenMid) *
-                                    static_cast<double>(usAttenuationCurve[3] - usAttenuationCurve[2]) +
-                                static_cast<double>(usAttenuationCurve[2])
+                                (fListenerDistance - fAttenStart) / (fAttenMid - fAttenStart) *
+                                    static_cast<double>(usAttenuationCurve[2] - usAttenuationCurve[1]) +
+                                static_cast<double>(usAttenuationCurve[1])
                             );
                             SetVolume(fVolume);
                         }
                     }
                     else {
                         iDistanceAttenuation = static_cast<int32_t>(
-                            (fListenerDistance - fAttenEnd) / (fMaxDist - fAttenEnd) *
-                                static_cast<double>(usAttenuationCurve[4] - usAttenuationCurve[3]) +
-                            static_cast<double>(usAttenuationCurve[3])
+                            (fListenerDistance - fAttenMid) / (fAttenEnd - fAttenMid) *
+                                static_cast<double>(usAttenuationCurve[3] - usAttenuationCurve[2]) +
+                            static_cast<double>(usAttenuationCurve[2])
                         );
                         SetVolume(fVolume);
                     }
                 }
                 else {
-                    iDistanceAttenuation = 0x2710;
+                    iDistanceAttenuation = static_cast<int32_t>(
+                        (fListenerDistance - fAttenEnd) / (fMaxDist - fAttenEnd) *
+                            static_cast<double>(usAttenuationCurve[4] - usAttenuationCurve[3]) +
+                        static_cast<double>(usAttenuationCurve[3])
+                    );
                     SetVolume(fVolume);
                 }
             }
-            SetVolume(fVolume);
+            else {
+                iDistanceAttenuation = 0x2710;
+                SetVolume(fVolume);
+            }
         }
+        SetVolume(fVolume);
     }
 }
 
@@ -1506,155 +1483,153 @@ bool BSWin32GameSound::SetEmitterPosition(float afX, float afY, float afZ) {
     NiPoint3 kListenerPos = NiPoint3_ZERO;
     bool bPositionChanged = false;
     bool v4 = Is3DSound();
-    if (v4 || (v4 = Is2DRadiusSound())) {
-        if (pDirectSound8) {
-            if (BSAudio::pAudioInstance->pListener) {
-                BSAudioListener* pListener = BSAudio::pAudioInstance->pListener;
-                kListenerPos = pListener->GetPosition();
-                if ((iSoundTypeFlags & BSGameSound::SOUND_FLAG_FIRST_PERSON) != 0) {
-                    afX = kListenerPos.x;
-                    afY = kListenerPos.y;
-                    afZ = kListenerPos.z;
-                }
-                if (afX != kPosition.x || (afY != kPosition.y || afZ != kPosition.z)) {
-                    kPosition.x = afX;
-                    kPosition.y = afY;
-                    kPosition.z = afZ;
-                    bPositionChanged = true;
-                }
+    if ((v4 || (v4 = Is2DRadiusSound())) && (pDirectSound8)) {
+        if (BSAudio::pAudioInstance->pListener) {
+            BSAudioListener* pListener = BSAudio::pAudioInstance->pListener;
+            kListenerPos = pListener->GetPosition();
+            if ((iSoundTypeFlags & BSGameSound::SOUND_FLAG_FIRST_PERSON) != 0) {
+                afX = kListenerPos.x;
+                afY = kListenerPos.y;
+                afZ = kListenerPos.z;
             }
-            padding224 = 1;
-            if (p3DSoundBuffer) {
-                if (((iSoundTypeFlags & BSGameSound::SOUND_FLAG_BEAM_EMITTER) != 0 &&
-                     (iStateFlags & BSGameSound::STATE_IS_VALID_BEAM) != 0) ||
-                    !bPositionChanged) {
-                    if (BSAudio::pAudioInstance->pListener) {
-                        if ((iSoundTypeFlags & BSGameSound::SOUND_FLAG_BEAM_EMITTER) != 0 &&
-                            (iStateFlags & BSGameSound::STATE_IS_VALID_BEAM) != 0) {
-                            float v37 = 0.0;
-                            float v36 = 0.0;
-                            float v35 = 0.0;
-                            NiPoint3 v39 = BSAudio::pAudioInstance->pListener->GetPosition();
-                            NiPoint3 pt = vBeamEnd - kPosition;
-                            NiPoint3 v34 = v39 - kPosition;
-                            v37 = v34.Dot(pt);
-                            if (!(v37 <= 0.0)) {
-                                v36 = pt.Dot(pt);
-                                if (!(v37 >= static_cast<double>(v36))) {
-                                    v35 = v37 / v36;
-                                    kPos = kPosition + v35 * pt;
-                                }
-                                else {
-                                    kPos = vBeamEnd;
-                                }
-                            }
-                            else {
-                                kPos = kPosition;
-                            }
-                            // DirectSound's y is the game's z: the position is passed as x, z, y.
-                            float v15 = kPos.y * 0.014287755824625492;
-                            float v14 = kPos.z * 0.014287755824625492;
-                            float v13 = kPos.x * 0.014287755824625492;
-                            p3DSoundBuffer->SetPosition(v13, v14, v15, 1);
-                            if (p3DReverbBuffer) {
-                                float v12 = kPos.y * 0.014287755824625492;
-                                float v11 = kPos.z * 0.014287755824625492;
-                                float v10 = kPos.x * 0.014287755824625492;
-                                p3DReverbBuffer->SetPosition(v10, v11, v12, 1);
-                            }
+            if (afX != kPosition.x || (afY != kPosition.y || afZ != kPosition.z)) {
+                kPosition.x = afX;
+                kPosition.y = afY;
+                kPosition.z = afZ;
+                bPositionChanged = true;
+            }
+        }
+        padding224 = 1;
+        if (p3DSoundBuffer) {
+            if (((iSoundTypeFlags & BSGameSound::SOUND_FLAG_BEAM_EMITTER) != 0 &&
+                 (iStateFlags & BSGameSound::STATE_IS_VALID_BEAM) != 0) ||
+                !bPositionChanged) {
+                if ((BSAudio::pAudioInstance->pListener) &&
+                    ((iSoundTypeFlags & BSGameSound::SOUND_FLAG_BEAM_EMITTER) != 0 &&
+                     (iStateFlags & BSGameSound::STATE_IS_VALID_BEAM) != 0)) {
+                    float v37 = 0.0;
+                    float v36 = 0.0;
+                    float v35 = 0.0;
+                    NiPoint3 v39 = BSAudio::pAudioInstance->pListener->GetPosition();
+                    NiPoint3 pt = vBeamEnd - kPosition;
+                    NiPoint3 v34 = v39 - kPosition;
+                    v37 = v34.Dot(pt);
+                    if (!(v37 <= 0.0)) {
+                        v36 = pt.Dot(pt);
+                        if (!(v37 >= static_cast<double>(v36))) {
+                            v35 = v37 / v36;
+                            kPos = kPosition + v35 * pt;
+                        }
+                        else {
+                            kPos = vBeamEnd;
                         }
                     }
-                }
-                else {
-                    float v21 = afY * 0.014287755824625492;
-                    float v20 = afZ * 0.014287755824625492;
-                    float v19 = afX * 0.014287755824625492;
-                    p3DSoundBuffer->SetPosition(v19, v20, v21, 1);
+                    else {
+                        kPos = kPosition;
+                    }
+                    // DirectSound's y is the game's z: the position is passed as x, z, y.
+                    float v15 = kPos.y * 0.014287755824625492;
+                    float v14 = kPos.z * 0.014287755824625492;
+                    float v13 = kPos.x * 0.014287755824625492;
+                    p3DSoundBuffer->SetPosition(v13, v14, v15, 1);
                     if (p3DReverbBuffer) {
-                        float v18 = afY * 0.014287755824625492;
-                        float v17 = afZ * 0.014287755824625492;
-                        float v16 = afX * 0.014287755824625492;
-                        p3DReverbBuffer->SetPosition(v16, v17, v18, 1);
+                        float v12 = kPos.y * 0.014287755824625492;
+                        float v11 = kPos.z * 0.014287755824625492;
+                        float v10 = kPos.x * 0.014287755824625492;
+                        p3DReverbBuffer->SetPosition(v10, v11, v12, 1);
                     }
                 }
             }
-            float v24 = (kListenerPos - kPosition).Length();
-            this->fDistanceToListener = v24;
-            float fDistanceToListener = this->fDistanceToListener;
-            if ((iSoundTypeFlags & BSGameSound::SOUND_FLAG_BEAM_EMITTER) != 0 &&
-                (iStateFlags & BSGameSound::STATE_IS_VALID_BEAM) != 0) {
-                if (BSAudio::pAudioInstance->pListener) {
-                    NiPoint3* v7 = &BSAudio::pAudioInstance->pListener->GetPosition();
-                    fDistanceToListener = (kPos - *v7).Length();
+            else {
+                float v21 = afY * 0.014287755824625492;
+                float v20 = afZ * 0.014287755824625492;
+                float v19 = afX * 0.014287755824625492;
+                p3DSoundBuffer->SetPosition(v19, v20, v21, 1);
+                if (p3DReverbBuffer) {
+                    float v18 = afY * 0.014287755824625492;
+                    float v17 = afZ * 0.014287755824625492;
+                    float v16 = afX * 0.014287755824625492;
+                    p3DReverbBuffer->SetPosition(v16, v17, v18, 1);
                 }
             }
-            float v23 = fMaxDist - fMinDist;
-            float v9 = std::fabs(static_cast<double>(v23));
-            if (!(v9 > 10.0)) {
-                if (!(fMaxDist <= static_cast<double>(fDistanceToListener))) {
-                    iDistanceAttenuation = 0;
-                }
-                else {
-                    iDistanceAttenuation = 10000;
-                }
-                SetVolume(fVolume);
+        }
+        float v24 = (kListenerPos - kPosition).Length();
+        this->fDistanceToListener = v24;
+        float fDistanceToListener = this->fDistanceToListener;
+        if (((iSoundTypeFlags & BSGameSound::SOUND_FLAG_BEAM_EMITTER) != 0 &&
+             (iStateFlags & BSGameSound::STATE_IS_VALID_BEAM) != 0) &&
+            (BSAudio::pAudioInstance->pListener)) {
+            NiPoint3* v7 = &BSAudio::pAudioInstance->pListener->GetPosition();
+            fDistanceToListener = (kPos - *v7).Length();
+        }
+
+        float v23 = fMaxDist - fMinDist;
+        float v9 = std::fabs(static_cast<double>(v23));
+        if (!(v9 > 10.0)) {
+            if (!(fMaxDist <= static_cast<double>(fDistanceToListener))) {
+                iDistanceAttenuation = 0;
             }
             else {
-                float v33 = (fMaxDist - fMinDist) * 0.25 + fMinDist;
-                float v32 = (fMaxDist - fMinDist) * 0.5 + fMinDist;
-                float v31 = (fMaxDist - fMinDist) * 0.75 + fMinDist;
-                if (!(fMaxDist <= static_cast<double>(fDistanceToListener))) {
-                    if (!(v31 < static_cast<double>(fDistanceToListener)) || !(fMaxDist - v31 > 0.0)) {
-                        if (!(v32 < static_cast<double>(fDistanceToListener)) || !(v31 - v32 > 0.0)) {
-                            if (!(v33 < static_cast<double>(fDistanceToListener)) || !(v32 - v33 > 0.0)) {
-                                if (!(fMinDist < static_cast<double>(fDistanceToListener)) || !(v33 - fMinDist > 0.0)) {
-                                    iDistanceAttenuation = 0;
-                                    SetVolume(fVolume);
-                                }
-                                else {
-                                    iDistanceAttenuation = static_cast<int32_t>(
-                                        (fDistanceToListener - fMinDist) / (v33 - fMinDist) *
-                                            static_cast<double>(usAttenuationCurve[1] - usAttenuationCurve[0]) +
-                                        static_cast<double>(usAttenuationCurve[0])
-                                    );
-                                    SetVolume(fVolume);
-                                }
+                iDistanceAttenuation = 10000;
+            }
+            SetVolume(fVolume);
+        }
+        else {
+            float v33 = (fMaxDist - fMinDist) * 0.25 + fMinDist;
+            float v32 = (fMaxDist - fMinDist) * 0.5 + fMinDist;
+            float v31 = (fMaxDist - fMinDist) * 0.75 + fMinDist;
+            if (!(fMaxDist <= static_cast<double>(fDistanceToListener))) {
+                if (!(v31 < static_cast<double>(fDistanceToListener)) || !(fMaxDist - v31 > 0.0)) {
+                    if (!(v32 < static_cast<double>(fDistanceToListener)) || !(v31 - v32 > 0.0)) {
+                        if (!(v33 < static_cast<double>(fDistanceToListener)) || !(v32 - v33 > 0.0)) {
+                            if (!(fMinDist < static_cast<double>(fDistanceToListener)) || !(v33 - fMinDist > 0.0)) {
+                                iDistanceAttenuation = 0;
+                                SetVolume(fVolume);
                             }
                             else {
                                 iDistanceAttenuation = static_cast<int32_t>(
-                                    (fDistanceToListener - v33) / (v32 - v33) *
-                                        static_cast<double>(usAttenuationCurve[2] - usAttenuationCurve[1]) +
-                                    static_cast<double>(usAttenuationCurve[1])
+                                    (fDistanceToListener - fMinDist) / (v33 - fMinDist) *
+                                        static_cast<double>(usAttenuationCurve[1] - usAttenuationCurve[0]) +
+                                    static_cast<double>(usAttenuationCurve[0])
                                 );
                                 SetVolume(fVolume);
                             }
                         }
                         else {
                             iDistanceAttenuation = static_cast<int32_t>(
-                                (fDistanceToListener - v32) / (v31 - v32) *
-                                    static_cast<double>(usAttenuationCurve[3] - usAttenuationCurve[2]) +
-                                static_cast<double>(usAttenuationCurve[2])
+                                (fDistanceToListener - v33) / (v32 - v33) *
+                                    static_cast<double>(usAttenuationCurve[2] - usAttenuationCurve[1]) +
+                                static_cast<double>(usAttenuationCurve[1])
                             );
                             SetVolume(fVolume);
                         }
                     }
                     else {
                         iDistanceAttenuation = static_cast<int32_t>(
-                            (fDistanceToListener - v31) / (fMaxDist - v31) *
-                                static_cast<double>(usAttenuationCurve[4] - usAttenuationCurve[3]) +
-                            static_cast<double>(usAttenuationCurve[3])
+                            (fDistanceToListener - v32) / (v31 - v32) *
+                                static_cast<double>(usAttenuationCurve[3] - usAttenuationCurve[2]) +
+                            static_cast<double>(usAttenuationCurve[2])
                         );
                         SetVolume(fVolume);
                     }
                 }
                 else {
-                    iDistanceAttenuation = 10000;
+                    iDistanceAttenuation = static_cast<int32_t>(
+                        (fDistanceToListener - v31) / (fMaxDist - v31) *
+                            static_cast<double>(usAttenuationCurve[4] - usAttenuationCurve[3]) +
+                        static_cast<double>(usAttenuationCurve[3])
+                    );
                     SetVolume(fVolume);
                 }
             }
-            return SetVolume(fVolume);
+            else {
+                iDistanceAttenuation = 10000;
+                SetVolume(fVolume);
+            }
         }
+        return SetVolume(fVolume);
     }
+
     return v4;
 }
 
@@ -1683,24 +1658,20 @@ void BSWin32GameSound::SetMinMax(float afMin, float afMax) {
             SetEmitterPosition(kPosition);
         }
     }
-    if (Is3DSound()) {
-        if (p3DSoundBuffer) {
-            if (pDirectSound8) {
-                p3DSoundBuffer->SetMinDistance(1e+09f, 0);
-                if (!(afMin > 0.0)) {
-                    fMinDist = 69.99f;
-                }
-                else {
-                    fMinDist = afMin;
-                }
-                p3DSoundBuffer->SetMaxDistance(1e+09f, 0);
-                if (!(afMax > 0.0)) {
-                    fMaxDist = 1e+09f;
-                }
-                else {
-                    fMaxDist = afMax;
-                }
-            }
+    if ((Is3DSound()) && (p3DSoundBuffer) && (pDirectSound8)) {
+        p3DSoundBuffer->SetMinDistance(1e+09f, 0);
+        if (!(afMin > 0.0)) {
+            fMinDist = 69.99f;
+        }
+        else {
+            fMinDist = afMin;
+        }
+        p3DSoundBuffer->SetMaxDistance(1e+09f, 0);
+        if (!(afMax > 0.0)) {
+            fMaxDist = 1e+09f;
+        }
+        else {
+            fMaxDist = afMax;
         }
     }
 }
@@ -1775,11 +1746,10 @@ bool BSWin32GameSound::SetFrequency(float afNewFrequency) {
     else {
         uiFreq = 100;
     }
-    if (pSoundBuffer) {
-        if (pDirectSound8) {
-            eResult = pSoundBuffer->SetFrequency(uiFreq);
-        }
+    if ((pSoundBuffer) && (pDirectSound8)) {
+        eResult = pSoundBuffer->SetFrequency(uiFreq);
     }
+
     return eResult >= 0;
 }
 
@@ -1788,11 +1758,10 @@ float BSWin32GameSound::GetFrequency() {
     HRESULT eResult = E_FAIL;
     uiFrequency = 0;
     float fResult = 1.0f;
-    if (pSoundBuffer) {
-        if (pDirectSound8) {
-            eResult = pSoundBuffer->GetFrequency(&uiFrequency);
-        }
+    if ((pSoundBuffer) && (pDirectSound8)) {
+        eResult = pSoundBuffer->GetFrequency(&uiFrequency);
     }
+
     if (eResult >= 0) {
         return static_cast<double>(uiFrequency) / static_cast<double>(iModSamplesPerSecond);
     }
@@ -1934,15 +1903,14 @@ bool BSWin32GameSound::OpenOgg() {
         }
         return OpenResult(true);
     }
-    else {
-        BSWin32GameSound::OggVorbisFile* Block = pOggFile;
-        if (Block) {
-            Block->Destroy();
-            MemoryManager_Singleton.Deallocate(Block);
-        }
-        pOggFile = nullptr;
-        return false;
+
+    BSWin32GameSound::OggVorbisFile* Block = pOggFile;
+    if (Block) {
+        Block->Destroy();
+        MemoryManager_Singleton.Deallocate(Block);
     }
+    pOggFile = nullptr;
+    return false;
 }
 
 bool BSWin32GameSound::PrepareReverb() {
@@ -2043,15 +2011,13 @@ bool BSWin32GameSound::PrepareReverb() {
             MemoryManager_Singleton.Deallocate(kBufferDesc.lpwfxFormat);
             return true;
         }
-        else {
-            MemoryManager_Singleton.Deallocate(kBufferDesc.lpwfxFormat);
-            return false;
-        }
-    }
-    else {
+
         MemoryManager_Singleton.Deallocate(kBufferDesc.lpwfxFormat);
         return false;
     }
+
+    MemoryManager_Singleton.Deallocate(kBufferDesc.lpwfxFormat);
+    return false;
 }
 
 void BSWin32GameSound::RemoveEffects() {

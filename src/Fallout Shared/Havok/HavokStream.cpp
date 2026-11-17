@@ -348,18 +348,16 @@ int32_t HavokFileStreambufReader::tell() {
     if (pFile) {
         return (int32_t)pFile->Tell();
     }
-    else {
-        return 0;
-    }
+
+    return 0;
 }
 
 int32_t HavokFileStreambufReader::sysGetFileSize() {
     if (pFile) {
         return (int32_t)pFile->GetSize();
     }
-    else {
-        return (-1);
-    }
+
+    return (-1);
 }
 
 void HavokFileStreambufReader::operator delete(void* apMemory) {
@@ -403,9 +401,8 @@ int32_t HavokFileStreambufWriter::tell() {
     if (pFile) {
         return (int32_t)pFile->Tell();
     }
-    else {
-        return 0;
-    }
+
+    return 0;
 }
 
 void HavokFileStreambufWriter::operator delete(void* apMemory) {
@@ -421,9 +418,8 @@ hkStreamReader* HavokStreambufFactory::openReader(const char* apName) {
     if (apMemory) {
         return ::new (apMemory) HavokFileStreambufReader(apName);
     }
-    else {
-        return nullptr;
-    }
+
+    return nullptr;
 }
 
 hkStreamWriter* HavokStreambufFactory::openWriter(const char* apName) {
@@ -432,9 +428,8 @@ hkStreamWriter* HavokStreambufFactory::openWriter(const char* apName) {
     if (v4) {
         return ::new (v4) HavokFileStreambufWriter(apName);
     }
-    else {
-        return nullptr;
-    }
+
+    return nullptr;
 }
 
 void HavokStreambufFactory::operator delete(void* apMemory) {

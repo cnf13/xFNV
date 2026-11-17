@@ -52,15 +52,13 @@ void hkpWorldMemoryViewer::step(float frameTimeInMs) {
         m_context = this->m_context;
     }
     p_m_collector->endSnapshot();
-    if (p_m_collector->m_stream.m_size > 0) {
-        if (p_m_collector->m_stream.begin()) {
-            int32_t m_size = m_collector.m_stream.m_size;
-            if (p_m_collector->m_stream.m_size <= 0) {
-                m_displayHandler->sendMemStatsDump(nullptr, m_collector.m_stream.m_size);
-            }
-            else {
-                m_displayHandler->sendMemStatsDump(p_m_collector->m_stream.begin(), m_collector.m_stream.m_size);
-            }
+    if ((p_m_collector->m_stream.m_size > 0) && (p_m_collector->m_stream.begin())) {
+        int32_t m_size = m_collector.m_stream.m_size;
+        if (p_m_collector->m_stream.m_size <= 0) {
+            m_displayHandler->sendMemStatsDump(nullptr, m_collector.m_stream.m_size);
+        }
+        else {
+            m_displayHandler->sendMemStatsDump(p_m_collector->m_stream.begin(), m_collector.m_stream.m_size);
         }
     }
 }
@@ -74,9 +72,8 @@ hkProcess* hkpWorldMemoryViewer::create(const hkArray<hkProcessContext*, hkConta
     if (v3) {
         return &static_cast<hkProcess&>(static_cast<hkpWorldViewerBase&>(*v3));
     }
-    else {
-        return nullptr;
-    }
+
+    return nullptr;
 }
 
 void hkpWorldMemoryViewer::registerViewer() {

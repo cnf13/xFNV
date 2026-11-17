@@ -49,14 +49,12 @@ void CIdvBranch::ComputeVolume() {
     SIdvBranchVertex* v2;
     float v3;
     int32_t i;
-    if (m_pVertices) {
-        if (m_nVertexCount > 1) {
-            m_fVolume = (float)0.0;
-            for (i = 0; i < (m_nVertexCount - 1); ++i) {
-                v2 = &m_pVertices[i];
-                v3 = (&v2->m_cPos)->Distance(v2[1].m_cPos);
-                m_fVolume = (((v2->m_fRadius + v2[1].m_fRadius) * v3) + m_fVolume);
-            }
+    if ((m_pVertices) && (m_nVertexCount > 1)) {
+        m_fVolume = (float)0.0;
+        for (i = 0; i < (m_nVertexCount - 1); ++i) {
+            v2 = &m_pVertices[i];
+            v3 = (&v2->m_cPos)->Distance(v2[1].m_cPos);
+            m_fVolume = (((v2->m_fRadius + v2[1].m_fRadius) * v3) + m_fVolume);
         }
     }
 }
@@ -817,11 +815,11 @@ bool CIdvBranch::IsBlossom(const CIdvBranch* pParent, float fPercentOfParent) co
             fTestPercent = pBranch->m_fPercentOfParent;
         }
     }
-    if (m_pLeafInfo->m_fBlossomDistance < fTestPercent) {
-        if (m_pLeafInfo->m_fBlossomWeighting >= m_cRandom.GetUniform(0.0f, 1.0f)) {
-            bIsBlossom = true;
-        }
+    if ((m_pLeafInfo->m_fBlossomDistance < fTestPercent) &&
+        (m_pLeafInfo->m_fBlossomWeighting >= m_cRandom.GetUniform(0.0f, 1.0f))) {
+        bIsBlossom = true;
     }
+
     return bIsBlossom;
 }
 

@@ -47,10 +47,8 @@ void BSClonePools::KillClones(NiAVObject* apLoadedObject, uint32_t aiCloneCount)
         for (BSSimpleList<BSClonePools::ClonePool*>* plist = &ClonePools; plist && (!ppool && !plist->IsEmpty());
              plist = plist->m_pkNext) {
             BSClonePools::ClonePool* pitem = plist->m_item;
-            if (pitem) {
-                if (pitem->pObject == apLoadedObject) {
-                    ppool = pitem;
-                }
+            if ((pitem) && (pitem->pObject == apLoadedObject)) {
+                ppool = pitem;
             }
         }
         if (ppool) {
@@ -77,10 +75,8 @@ void BSClonePools::MakeClones(NiAVObject* apLoadedObject, uint32_t aiCloneCount)
         for (BSSimpleList<BSClonePools::ClonePool*>* plist = &ClonePools; plist && (!ppool && !plist->IsEmpty());
              plist = plist->m_pkNext) {
             BSClonePools::ClonePool* pitem = plist->m_item;
-            if (pitem) {
-                if (pitem->pObject == apLoadedObject) {
-                    ppool = pitem;
-                }
+            if ((pitem) && (pitem->pObject == apLoadedObject)) {
+                ppool = pitem;
             }
         }
         if (!ppool) {
@@ -111,10 +107,8 @@ NiAVObject* BSClonePools::RequestClone(NiAVObject* apLoadedObject) {
     for (BSSimpleList<BSClonePools::ClonePool*>* plist = &ClonePools; plist && (!ppool && !plist->IsEmpty());
          plist = plist->m_pkNext) {
         BSClonePools::ClonePool* pitem = plist->m_item;
-        if (pitem) {
-            if (pitem->pObject == apLoadedObject) {
-                ppool = pitem;
-            }
+        if ((pitem) && (pitem->pObject == apLoadedObject)) {
+            ppool = pitem;
         }
     }
     NiAVObject* presult = nullptr;
@@ -123,10 +117,8 @@ NiAVObject* BSClonePools::RequestClone(NiAVObject* apLoadedObject) {
              !presult && (pclones && !pclones->IsEmpty()); pclones = pclones->m_pkNext) {
             // The pool holds the clones MakeClones made of an NiAVObject.
             NiAVObject* pclone = static_cast<NiAVObject*>(pclones->m_item.m_pObject);
-            if (pclone) {
-                if (pclone->m_uiRefCount == 1) {
-                    presult = pclone;
-                }
+            if ((pclone) && (pclone->m_uiRefCount == 1)) {
+                presult = pclone;
             }
         }
     }
@@ -161,10 +153,8 @@ BSCloneReserver::~BSCloneReserver() {
 }
 
 void BSCloneReserver::DecRefCount() {
-    if (!NiAtomicDecrement(iRefCount)) {
-        if (this) {
-            delete this;
-        }
+    if ((!NiAtomicDecrement(iRefCount)) && (this)) {
+        delete this;
     }
 }
 
@@ -176,13 +166,11 @@ void BSCloneReserver::Init() {
     BSClonePools* singleton;
     NiAVObject* pModel;
     int32_t uiCloneCount;
-    if (this->pModel) {
-        if (iCloneCount) {
-            uiCloneCount = (int32_t)iCloneCount;
-            pModel = this->pModel;
-            singleton = BSClonePools::GetInstance(true);
-            singleton->MakeClones(pModel, uiCloneCount);
-        }
+    if ((this->pModel) && (iCloneCount)) {
+        uiCloneCount = (int32_t)iCloneCount;
+        pModel = this->pModel;
+        singleton = BSClonePools::GetInstance(true);
+        singleton->MakeClones(pModel, uiCloneCount);
     }
 }
 

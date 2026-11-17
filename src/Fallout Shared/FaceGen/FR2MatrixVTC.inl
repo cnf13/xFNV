@@ -28,12 +28,12 @@ void FR2MatrixVTC<T>::resize(int32_t nr, int32_t nc) {
 }
 
 template <class T>
-typename FR2MatrixVTC<T>::RowT FR2MatrixVTC<T>::operator[](uint32_t i) {
+FR2MatrixVTC<T>::RowT FR2MatrixVTC<T>::operator[](uint32_t i) {
     return RowT(data.data() + ncols * i, ncols);
 }
 
 template <class T>
-typename FR2MatrixVTC<T>::RowConstT FR2MatrixVTC<T>::operator[](uint32_t i) const {
+FR2MatrixVTC<T>::RowConstT FR2MatrixVTC<T>::operator[](uint32_t i) const {
     return RowConstT{data.data() + ncols * i, ncols};
 }
 

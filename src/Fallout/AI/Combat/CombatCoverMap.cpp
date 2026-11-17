@@ -36,9 +36,8 @@ uint8_t BSMIN(uint8_t a1, uint8_t a2) {
     if (((int32_t)a1) >= ((int32_t)a2)) {
         return a2;
     }
-    else {
-        return a1;
-    }
+
+    return a1;
 }
 
 CoverReservationInfo::CoverReservationInfo()

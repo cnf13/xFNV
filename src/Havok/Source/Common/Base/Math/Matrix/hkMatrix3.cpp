@@ -65,10 +65,9 @@ hkBool hkMatrix3::isOk() const {
         result.m_bool = 1;
         return result;
     }
-    else {
-        result.m_bool = 0;
-        return result;
-    }
+
+    result.m_bool = 0;
+    return result;
 }
 
 hkBool hkMatrix3::isApproximatelyEqual(const hkMatrix3& m, float zero) const {
@@ -89,10 +88,9 @@ hkBool hkMatrix3::isApproximatelyEqual(const hkMatrix3& m, float zero) const {
         result.m_bool = 1;
         return result;
     }
-    else {
-        result.m_bool = 0;
-        return result;
-    }
+
+    result.m_bool = 0;
+    return result;
 }
 
 // Builds the transpose with the w components zeroed, then compares through isApproximatelyEqual.

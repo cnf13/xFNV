@@ -58,21 +58,17 @@ bool OpenEffect::CheckTarget(MagicTarget* apTarget) {
 
 void OpenEffect::Start() {
     NonActorMagicTarget* pnaTarget = dynamic_cast<NonActorMagicTarget*>(pTarget);
-    if (pnaTarget) {
-        if (pnaTarget->GetTargetStatsObject()) {
-            TESObjectREFR* v1 = pnaTarget->GetTargetStatsObject();
-            LockData* plock = v1->GetLock();
-            double SequenceWeight = fMagnitude;
-            LOCK_LEVEL espellLevel = static_cast<LOCK_LEVEL>(GetLockPickLevel(static_cast<int32_t>(SequenceWeight)));
-            TESObjectREFR* v3 = pnaTarget->GetTargetStatsObject();
-            int32_t LockLevel = v3->GetLockLevel();
-            LOCK_LEVEL elockLevel = static_cast<LOCK_LEVEL>(GetLockPickLevel(LockLevel));
-            if (plock) {
-                if (espellLevel >= elockLevel) {
-                    TESObjectREFR* v5 = pnaTarget->GetTargetStatsObject();
-                    v5->UnLock();
-                }
-            }
+    if ((pnaTarget) && (pnaTarget->GetTargetStatsObject())) {
+        TESObjectREFR* v1 = pnaTarget->GetTargetStatsObject();
+        LockData* plock = v1->GetLock();
+        double SequenceWeight = fMagnitude;
+        LOCK_LEVEL espellLevel = static_cast<LOCK_LEVEL>(GetLockPickLevel(static_cast<int32_t>(SequenceWeight)));
+        TESObjectREFR* v3 = pnaTarget->GetTargetStatsObject();
+        int32_t LockLevel = v3->GetLockLevel();
+        LOCK_LEVEL elockLevel = static_cast<LOCK_LEVEL>(GetLockPickLevel(LockLevel));
+        if ((plock) && (espellLevel >= elockLevel)) {
+            TESObjectREFR* v5 = pnaTarget->GetTargetStatsObject();
+            v5->UnLock();
         }
     }
 }
@@ -82,7 +78,6 @@ ActiveEffect* OpenEffect::Instantiate(MagicCaster* a1, MagicItem* a2, EffectItem
     if (v5) {
         return ::new (v5) OpenEffect(a1, a2, a3);
     }
-    else {
-        return nullptr;
-    }
+
+    return nullptr;
 }

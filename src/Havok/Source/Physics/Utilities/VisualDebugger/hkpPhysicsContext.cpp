@@ -104,10 +104,8 @@ void hkpPhysicsContext::phantomAddedCallback(hkpPhantom* phantom) {
 void hkpPhysicsContext::constraintAddedCallback(hkpConstraintInstance* constraint) {
     if (m_owner) {
         hkpConstraintData* m_data = constraint->getDataRw();
-        if (m_data) {
-            if (m_data->getType() != 11) {
-                m_owner->addTrackedObject(constraint, hkpConstraintInstanceClass, "Constraints", 0);
-            }
+        if ((m_data) && (m_data->getType() != 11)) {
+            m_owner->addTrackedObject(constraint, hkpConstraintInstanceClass, "Constraints", 0);
         }
     }
 }
@@ -115,10 +113,8 @@ void hkpPhysicsContext::constraintAddedCallback(hkpConstraintInstance* constrain
 void hkpPhysicsContext::constraintRemovedCallback(hkpConstraintInstance* constraint) {
     if (m_owner) {
         hkpConstraintData* m_data = constraint->getDataRw();
-        if (m_data) {
-            if (m_data->getType() != 11) {
-                m_owner->removeTrackedObject(constraint);
-            }
+        if ((m_data) && (m_data->getType() != 11)) {
+            m_owner->removeTrackedObject(constraint);
         }
     }
 }
@@ -131,51 +127,48 @@ void hkpPhysicsContext::actionAddedCallback(hkpAction* action) {
 }
 
 void hkpPhysicsContext::addForInspection(hkpWorld* w) {
-    if (this->m_owner) {
-        if (w) {
-            w->lock();
-            hkpEntityListener* v19 = static_cast<hkpEntityListener*>(this);
-            w->addEntityListener(this);
-            hkpPhantomListener* v16 = static_cast<hkpPhantomListener*>(this);
-            w->addPhantomListener(this);
-            hkpActionListener* v17 = static_cast<hkpActionListener*>(this);
-            w->addActionListener(this);
-            hkpConstraintListener* v18 = static_cast<hkpConstraintListener*>(this);
-            w->addConstraintListener(this);
-            hkArray<hkpWorldCinfo, hkContainerHeapAllocator>* p_m_worldCinfos = &m_worldCinfos;
-            hkMemoryRouter* Instance = &hkMemoryRouter::getInstance();
-            if (m_worldCinfos.m_size ==
-                (m_worldCinfos.m_capacityAndFlags & hkArrayBase<hkpWorldCinfo>::CAPACITY_MASK)) {
-                hkArrayUtil::_reserveMore(*Instance->m_heap, &m_worldCinfos, sizeof(hkpWorldCinfo));
-            }
-            hkpWorldCinfo* v6 = &p_m_worldCinfos->m_data[m_worldCinfos.m_size];
-            if (v6) {
-                ::new (v6) hkpWorldCinfo;
-            }
-            int32_t m_size = m_worldCinfos.m_size;
-            hkpWorldCinfo* v8 = &p_m_worldCinfos->m_data[m_size];
-            m_worldCinfos.m_size = m_size + 1;
-            w->getCinfo(*v8);
-            hkVisualDebugger* m_owner = this->m_owner;
-            if (m_owner) {
-                m_owner->addTrackedObject(v8, hkpWorldCinfoClass, "hkpWorldCinfo", 0);
-            }
-            hkpPhysicsSystem* WorldAsOneSystem = w->getWorldAsOneSystem();
-            for (int32_t i = 0; i < WorldAsOneSystem->m_rigidBodies.m_size; ++i) {
-                v19->entityAddedCallback(WorldAsOneSystem->m_rigidBodies.m_data[i]);
-            }
-            for (int32_t j = 0; j < WorldAsOneSystem->m_phantoms.m_size; ++j) {
-                v16->phantomAddedCallback(WorldAsOneSystem->m_phantoms.m_data[j]);
-            }
-            for (int32_t k = 0; k < WorldAsOneSystem->m_actions.m_size; ++k) {
-                v17->actionAddedCallback(WorldAsOneSystem->m_actions.m_data[k]);
-            }
-            for (int32_t m = 0; m < WorldAsOneSystem->m_constraints.m_size; ++m) {
-                v18->constraintAddedCallback(WorldAsOneSystem->m_constraints.m_data[m]);
-            }
-            WorldAsOneSystem->removeReference();
-            w->unlock();
+    if ((this->m_owner) && (w)) {
+        w->lock();
+        hkpEntityListener* v19 = static_cast<hkpEntityListener*>(this);
+        w->addEntityListener(this);
+        hkpPhantomListener* v16 = static_cast<hkpPhantomListener*>(this);
+        w->addPhantomListener(this);
+        hkpActionListener* v17 = static_cast<hkpActionListener*>(this);
+        w->addActionListener(this);
+        hkpConstraintListener* v18 = static_cast<hkpConstraintListener*>(this);
+        w->addConstraintListener(this);
+        hkArray<hkpWorldCinfo, hkContainerHeapAllocator>* p_m_worldCinfos = &m_worldCinfos;
+        hkMemoryRouter* Instance = &hkMemoryRouter::getInstance();
+        if (m_worldCinfos.m_size == (m_worldCinfos.m_capacityAndFlags & hkArrayBase<hkpWorldCinfo>::CAPACITY_MASK)) {
+            hkArrayUtil::_reserveMore(*Instance->m_heap, &m_worldCinfos, sizeof(hkpWorldCinfo));
         }
+        hkpWorldCinfo* v6 = &p_m_worldCinfos->m_data[m_worldCinfos.m_size];
+        if (v6) {
+            ::new (v6) hkpWorldCinfo;
+        }
+        int32_t m_size = m_worldCinfos.m_size;
+        hkpWorldCinfo* v8 = &p_m_worldCinfos->m_data[m_size];
+        m_worldCinfos.m_size = m_size + 1;
+        w->getCinfo(*v8);
+        hkVisualDebugger* m_owner = this->m_owner;
+        if (m_owner) {
+            m_owner->addTrackedObject(v8, hkpWorldCinfoClass, "hkpWorldCinfo", 0);
+        }
+        hkpPhysicsSystem* WorldAsOneSystem = w->getWorldAsOneSystem();
+        for (int32_t i = 0; i < WorldAsOneSystem->m_rigidBodies.m_size; ++i) {
+            v19->entityAddedCallback(WorldAsOneSystem->m_rigidBodies.m_data[i]);
+        }
+        for (int32_t j = 0; j < WorldAsOneSystem->m_phantoms.m_size; ++j) {
+            v16->phantomAddedCallback(WorldAsOneSystem->m_phantoms.m_data[j]);
+        }
+        for (int32_t k = 0; k < WorldAsOneSystem->m_actions.m_size; ++k) {
+            v17->actionAddedCallback(WorldAsOneSystem->m_actions.m_data[k]);
+        }
+        for (int32_t m = 0; m < WorldAsOneSystem->m_constraints.m_size; ++m) {
+            v18->constraintAddedCallback(WorldAsOneSystem->m_constraints.m_data[m]);
+        }
+        WorldAsOneSystem->removeReference();
+        w->unlock();
     }
 }
 

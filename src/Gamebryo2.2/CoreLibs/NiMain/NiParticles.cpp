@@ -25,10 +25,9 @@ NiObject* NiParticles::CreateClone(NiCloningProcess& kCloning) {
         NiGeometry::CopyMembers(pkClone, kCloning);
         return pkClone;
     }
-    else {
-        NiGeometry::CopyMembers(nullptr, kCloning);
-        return nullptr;
-    }
+
+    NiGeometry::CopyMembers(nullptr, kCloning);
+    return nullptr;
 }
 
 void NiParticles::LoadBinary(NiStream& stream) {

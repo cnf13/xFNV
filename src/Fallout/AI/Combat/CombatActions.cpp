@@ -399,11 +399,11 @@ void CombatActionAttackRanged::Execute(CombatController* apCombatController, int
 
 // Keeps the base cost as a double and rounds the sum to float.
 float CombatActionAttackRanged::GetCost(CombatController* apCombatController, int32_t aiActionValue) {
-    if (apCombatController->GetAttacker() && apCombatController->GetAttacker()->IsPlayerTeammate()) {
-        if (apCombatController->GetAttacker()->GetLocalVariableOnActor("CombatStyleMelee") == 1.0) {
-            return 3.40282347e+38f;
-        }
+    if ((apCombatController->GetAttacker() && apCombatController->GetAttacker()->IsPlayerTeammate()) &&
+        (apCombatController->GetAttacker()->GetLocalVariableOnActor("CombatStyleMelee") == 1.0)) {
+        return 3.40282347e+38f;
     }
+
     double dCost = CombatAction::GetCost(apCombatController, aiActionValue);
     float fCost =
         static_cast<float>(CombatUtilities::GetCostForWeaponType(apCombatController, COMBAT_WEAPON_RANGED) + dCost);
@@ -816,9 +816,8 @@ float CombatActionMoveAndAttackGrenade::GetCost(CombatController* apCombatContro
     if (!(CombatUtilities::GetCostForWeaponType(apCombatController, COMBAT_WEAPON_GRENADE) >= 3.4028235e+38f)) {
         return CombatAction::GetCost(apCombatController, aiActionValue);
     }
-    else {
-        return 3.4028235e+38f;
-    }
+
+    return 3.4028235e+38f;
 }
 
 void CombatActionMoveAndAttackGrenade::GetDebugText(char* apDebugText, uint32_t aiMaxLength, int32_t aiActionValue) {
@@ -878,13 +877,11 @@ float CombatActionMoveAndAttackRanged::GetCost(CombatController* apCombatControl
              (v5 = apCombatController->GetAttacker(), v5->GetLocalVariableOnActor("CombatStyleMelee") == 1.0))) {
             return 3.4028235e+38f;
         }
-        else {
-            return CombatAction::GetCost(apCombatController, aiActionValue);
-        }
+
+        return CombatAction::GetCost(apCombatController, aiActionValue);
     }
-    else {
-        return 3.4028235e+38f;
-    }
+
+    return 3.4028235e+38f;
 }
 
 void CombatActionMoveAndAttackRanged::GetDebugText(char* apDebugText, uint32_t aiMaxLength, int32_t aiActionValue) {
@@ -942,9 +939,8 @@ float CombatActionMoveAndAttackRangedExplosive::GetCost(CombatController* apComb
           0x1.fffffe0000000p+127f)) {
         return CombatAction::GetCost(apCombatController, aiActionValue);
     }
-    else {
-        return 0x1.fffffe0000000p+127f;
-    }
+
+    return 0x1.fffffe0000000p+127f;
 }
 
 void CombatActionMoveAndAttackRangedExplosive::GetDebugText(
@@ -1045,9 +1041,8 @@ float CombatActionSwitchWeapon::GetCost(CombatController* apCombatController, in
     if (WeaponByCombatType && !WeaponByCombatType->IsMeleeWeapon()) {
         return 3.4028235e+38f;
     }
-    else {
-        return CombatAction::GetCost(apCombatController, aiActionValue);
-    }
+
+    return CombatAction::GetCost(apCombatController, aiActionValue);
 }
 
 void CombatActionSwitchWeapon::GetDebugText(char* apDebugText, uint32_t aiMaxLength, int32_t aiActionValue) {

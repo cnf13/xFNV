@@ -148,62 +148,59 @@ bool NavMeshInfoSearch::GetNodeConnections(
                 if (static_cast<TESObjectDOOR*>(pdoor->GetObjectReference())->TESObjectDOOR::IsMinimalUse()) {
                     fdoorAdditionalCost = 409600.0f;
                 }
-                if (this->DoorLockDisposition != Pathing::DOOR_LOCK_DISPOSITION_LOCKS_ARE_MINIMAL_USE ||
-                    !pdoor->GetIsHiddenDoor()) {
-                    if (pdoor->GetTeleport()) {
-                        TESObjectREFR* potherDoor = pdoor->GetTeleport()->pLinkedDoor;
-                        if (potherDoor) {
-                            ExtraNavMeshPortal* pextraPortal = (&potherDoor->m_Extra)->GetNavMeshPortal();
-                            if (pextraPortal) {
-                                NavMeshInfoMap* NavMeshInfoMap_ = TES::pInstance->GetNavMeshInfoMap();
-                                NavMeshInfo* pinfo = NavMeshInfoMap_->GetNavMeshInfo(pextraPortal->Portal.NavMeshID);
-                                if (pinfo) {
-                                    if (!pinfo->GetDisabled()) {
-                                        NiPoint3* v21;
-                                        const NiPoint3* v22;
-                                        if (pparentInfo == pStartMesh) {
-                                            v22 = &StartLocation;
-                                        }
-                                        else {
-                                            v22 = &pparentInfo->ApproxLocation;
-                                        }
-                                        NiPoint3 begin_3 = *v22;
-                                        if (pinfo == pGoalMesh) {
-                                            v21 = &GoalLocation;
-                                        }
-                                        else {
-                                            v21 = &pinfo->ApproxLocation;
-                                        }
-                                        NiPoint3 end_3 = *v21;
-                                        DoorTeleportData* Teleport = potherDoor->GetTeleport();
-                                        double v20 = (Teleport->position - begin_3).Length();
-                                        DoorTeleportData* v14 = pdoor->GetTeleport();
-                                        float fcost_3 = (end_3 - v14->position).Length() + v20;
-                                        fcost_3 = fcost_3 * fcostFactor;
-                                        fcost_3 = fcost_3 * 3.0;
-                                        fcost_3 = fcost_3 + fparentCost;
-                                        float fcost_4 = fcost_3 + fdoorAdditionalCost;
-                                        int32_t v19 =
-                                            GetOrCreateAStarNode(reinterpret_cast<uintptr_t>(pinfo), fcost_4, &pnode_3);
-                                        if (v19) {
-                                            if (v19 != 1) {
-                                                continue;
-                                            }
-                                        }
-                                        else {
-                                            pnode_3->tNodeData = pinfo;
-                                            if (bSameSpace) {
-                                                double Value = apNode->fHeuristic;
-                                                pnode_3->fHeuristic = Value + Value;
-                                            }
-                                            else {
-                                                pnode_3->fHeuristic = 1.0f;
-                                            }
-                                        }
-                                        pnode_3->ParentLink = pdoor;
-                                        apRetNodes->Add(pnode_3);
+                if ((this->DoorLockDisposition != Pathing::DOOR_LOCK_DISPOSITION_LOCKS_ARE_MINIMAL_USE ||
+                     !pdoor->GetIsHiddenDoor()) &&
+                    (pdoor->GetTeleport())) {
+                    TESObjectREFR* potherDoor = pdoor->GetTeleport()->pLinkedDoor;
+                    if (potherDoor) {
+                        ExtraNavMeshPortal* pextraPortal = (&potherDoor->m_Extra)->GetNavMeshPortal();
+                        if (pextraPortal) {
+                            NavMeshInfoMap* NavMeshInfoMap_ = TES::pInstance->GetNavMeshInfoMap();
+                            NavMeshInfo* pinfo = NavMeshInfoMap_->GetNavMeshInfo(pextraPortal->Portal.NavMeshID);
+                            if ((pinfo) && (!pinfo->GetDisabled())) {
+                                NiPoint3* v21;
+                                const NiPoint3* v22;
+                                if (pparentInfo == pStartMesh) {
+                                    v22 = &StartLocation;
+                                }
+                                else {
+                                    v22 = &pparentInfo->ApproxLocation;
+                                }
+                                NiPoint3 begin_3 = *v22;
+                                if (pinfo == pGoalMesh) {
+                                    v21 = &GoalLocation;
+                                }
+                                else {
+                                    v21 = &pinfo->ApproxLocation;
+                                }
+                                NiPoint3 end_3 = *v21;
+                                DoorTeleportData* Teleport = potherDoor->GetTeleport();
+                                double v20 = (Teleport->position - begin_3).Length();
+                                DoorTeleportData* v14 = pdoor->GetTeleport();
+                                float fcost_3 = (end_3 - v14->position).Length() + v20;
+                                fcost_3 = fcost_3 * fcostFactor;
+                                fcost_3 = fcost_3 * 3.0;
+                                fcost_3 = fcost_3 + fparentCost;
+                                float fcost_4 = fcost_3 + fdoorAdditionalCost;
+                                int32_t v19 =
+                                    GetOrCreateAStarNode(reinterpret_cast<uintptr_t>(pinfo), fcost_4, &pnode_3);
+                                if (v19) {
+                                    if (v19 != 1) {
+                                        continue;
                                     }
                                 }
+                                else {
+                                    pnode_3->tNodeData = pinfo;
+                                    if (bSameSpace) {
+                                        double Value = apNode->fHeuristic;
+                                        pnode_3->fHeuristic = Value + Value;
+                                    }
+                                    else {
+                                        pnode_3->fHeuristic = 1.0f;
+                                    }
+                                }
+                                pnode_3->ParentLink = pdoor;
+                                apRetNodes->Add(pnode_3);
                             }
                         }
                     }

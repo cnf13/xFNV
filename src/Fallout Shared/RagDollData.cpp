@@ -59,40 +59,37 @@ bool RagDollData::UpdateReferenceFromData(TESObjectREFR* apRef) {
     NiMatrix3 result;
     uint32_t aiBoneIndex = 0;
     bool bUpdated = true;
-    if (apRef) {
-        if (apRef->TESObjectREFR::Get3D()) {
-            if (iBoneCount) {
-                NiNode* pRootNode;
-                NiNode* pRoot = apRef->TESObjectREFR::Get3D();
-                if (pRoot) {
-                    pRootNode = pRoot->IsNode();
-                }
-                else {
-                    pRootNode = nullptr;
-                }
-                NiAVObject* a1 = pRootNode;
-                if (apRef->IsActor()) {
-                    UpdateBip01NodeFromRagdollData(apRef);
-                }
-                bUpdated = UpdateNodeFromRagDollData(static_cast<NiNode*>(a1), aiBoneIndex);
-                if (pRoot) {
-                    NiMatrix3* v2;
-                    if ((&pRoot->GetTranslate())->operator!=(apRef->GetLocationOnReference()) ||
-                        (v2 = &(result = apRef->GetOrientation()), (&pRoot->m_kLocal)->m_Rotate.operator!=(*v2))) {
-                        const NiPoint3* v3 = &apRef->GetLocationOnReference();
-                        pRoot->SetTranslate(*v3);
-                        pRoot->SetRotate(apRef->GetOrientation());
-                        bhkNiCollisionObject::ResetSim(pRoot, true);
-                        NiUpdateData a2(0.0f, false, false);
-                        pRoot->Update(a2);
-                    }
-                }
-                if (!bUpdated) {
-                    bhkWorld::SetMotion(a1, hkpMotion::MOTION_DYNAMIC, true, false, true);
-                }
+    if ((apRef) && (apRef->TESObjectREFR::Get3D()) && (iBoneCount)) {
+        NiNode* pRootNode;
+        NiNode* pRoot = apRef->TESObjectREFR::Get3D();
+        if (pRoot) {
+            pRootNode = pRoot->IsNode();
+        }
+        else {
+            pRootNode = nullptr;
+        }
+        NiAVObject* a1 = pRootNode;
+        if (apRef->IsActor()) {
+            UpdateBip01NodeFromRagdollData(apRef);
+        }
+        bUpdated = UpdateNodeFromRagDollData(static_cast<NiNode*>(a1), aiBoneIndex);
+        if (pRoot) {
+            NiMatrix3* v2;
+            if ((&pRoot->GetTranslate())->operator!=(apRef->GetLocationOnReference()) ||
+                (v2 = &(result = apRef->GetOrientation()), (&pRoot->m_kLocal)->m_Rotate.operator!=(*v2))) {
+                const NiPoint3* v3 = &apRef->GetLocationOnReference();
+                pRoot->SetTranslate(*v3);
+                pRoot->SetRotate(apRef->GetOrientation());
+                bhkNiCollisionObject::ResetSim(pRoot, true);
+                NiUpdateData a2(0.0f, false, false);
+                pRoot->Update(a2);
             }
         }
+        if (!bUpdated) {
+            bhkWorld::SetMotion(a1, hkpMotion::MOTION_DYNAMIC, true, false, true);
+        }
     }
+
     return aiBoneIndex == iBoneCount && bUpdated;
 }
 
@@ -217,11 +214,10 @@ bool RagDollData::UpdateRagDollDataFromNode(NiNode* apNode, uint32_t& aiBoneInde
             NiAVObject* pav = apNode->GetAt(i);
             NiNode* pnode = pav ? pav->IsNode() : nullptr;
             NiNode* pnode_2 = pnode;
-            if (pnode) {
-                if (!UpdateRagDollDataFromNode(pnode_2, aiBoneIndex, abInit)) {
-                    bsuccess = false;
-                }
+            if ((pnode) && (!UpdateRagDollDataFromNode(pnode_2, aiBoneIndex, abInit))) {
+                bsuccess = false;
             }
+
             if (aiBoneIndex >= iBoneCount) {
                 break;
             }
@@ -343,11 +339,10 @@ bool RagDollData::UpdateNodeFromRagDollData(NiNode* apNode, uint32_t& aiBoneInde
             NiAVObject* pav = apNode->GetAt(i);
             NiNode* pnode = pav ? pav->IsNode() : nullptr;
             NiNode* pnode_2 = pnode;
-            if (pnode) {
-                if (!UpdateNodeFromRagDollData(pnode_2, aiBoneIndex)) {
-                    bretval = false;
-                }
+            if ((pnode) && (!UpdateNodeFromRagDollData(pnode_2, aiBoneIndex))) {
+                bretval = false;
             }
+
             if (aiBoneIndex >= iBoneCount) {
                 break;
             }

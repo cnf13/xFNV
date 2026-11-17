@@ -153,18 +153,16 @@ void ScriptEffect::CopyData(ActiveEffect* apDestination) {
     ScriptEffect* pse = dynamic_cast<ScriptEffect*>(apDestination);
     if (pse) {
         pse->pScript = pScript;
-        if (pScript) {
-            if (pEffectLocals) {
-                pse->pEffectLocals = pScript->CloneLocals();
-                pse->pEffectLocals->CopyActionList(pEffectLocals);
-                for (BSSimpleList<SCRIPT_LOCAL*>* plist = pEffectLocals->m_pLocalList; plist && !plist->IsEmpty();
-                     plist = plist->m_pkNext) {
-                    pse->pEffectLocals->SetVariable(plist->m_item->uiID, plist->m_item->fValue);
-                }
-                if (pEffectLocals->m_pScriptEffectData) {
-                    pse->pEffectLocals->m_pScriptEffectData =
-                        static_cast<SCRIPT_EFFECT_DATA*>(ourMalloc(sizeof(SCRIPT_EFFECT_DATA)));
-                }
+        if ((pScript) && (pEffectLocals)) {
+            pse->pEffectLocals = pScript->CloneLocals();
+            pse->pEffectLocals->CopyActionList(pEffectLocals);
+            for (BSSimpleList<SCRIPT_LOCAL*>* plist = pEffectLocals->m_pLocalList; plist && !plist->IsEmpty();
+                 plist = plist->m_pkNext) {
+                pse->pEffectLocals->SetVariable(plist->m_item->uiID, plist->m_item->fValue);
+            }
+            if (pEffectLocals->m_pScriptEffectData) {
+                pse->pEffectLocals->m_pScriptEffectData =
+                    static_cast<SCRIPT_EFFECT_DATA*>(ourMalloc(sizeof(SCRIPT_EFFECT_DATA)));
             }
         }
     }
@@ -201,7 +199,6 @@ ActiveEffect* ScriptEffect::Instantiate(MagicCaster* apCaster, MagicItem* apSpel
     if (v5) {
         return ::new (v5) ScriptEffect(apCaster, apSpell, apEffect);
     }
-    else {
-        return nullptr;
-    }
+
+    return nullptr;
 }

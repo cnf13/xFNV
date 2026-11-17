@@ -62,9 +62,8 @@ const hkpShapeContainer* hkpConvexPieceShape::getContainer() const {
     if (this) {
         return static_cast<const hkpShapeContainer*>(this);
     }
-    else {
-        return nullptr;
-    }
+
+    return nullptr;
 }
 
 void hkpConvexPieceShape::getAabbImpl(const hkTransform& localToWorld, float tolerance, hkAabb& out) const {
@@ -107,17 +106,18 @@ hkBool hkpConvexPieceShape::castRayImpl(const hkpShapeRayCastInput& input, hkpSh
     ++results.m_shapeKeyIndex;
     int32_t hitIndex = -1;
     for (int32_t i = 0; i < m_numDisplayShapeKeys; ++i) {
-        if (input.m_rayShapeCollectionFilter) {
-            // Stands in for *m_displayMesh->getContainer(); the container adjustment is null-tested here.
-            if (!input.m_rayShapeCollectionFilter
-                     ->isCollisionEnabled(
-                         input, *m_displayMesh, *static_cast<const hkpShapeContainer*>(m_displayMesh),
-                         m_displayShapeKeys[i]
-                     )
-                     .m_bool) {
-                continue;
-            }
+        if ((input.m_rayShapeCollectionFilter) &&
+            (!input.m_rayShapeCollectionFilter
+                  ->isCollisionEnabled(
+                      input, *m_displayMesh, *static_cast<const hkpShapeContainer*>(m_displayMesh),
+                      m_displayShapeKeys[i]
+                  )
+                  .m_bool))
+        // Stands in for *m_displayMesh->getContainer(); the container adjustment is null-tested here.
+        {
+            continue;
         }
+
         // m_displayMesh->getChildShape: adjusts to the container base without a null test, as the game does.
         const hkpShape* childShape =
             static_cast<const hkpShapeContainer&>(*m_displayMesh).getChildShape(m_displayShapeKeys[i], buffer);

@@ -86,9 +86,8 @@ int32_t MiscSaveStatCompare(MiscSaveStat* apCompare1, MiscSaveStat* apCompare2) 
     if (totalSize <= v5) {
         return (int32_t)((uint8_t)(totalSize < v5));
     }
-    else {
-        return (-1);
-    }
+
+    return (-1);
 }
 
 int32_t SavedFormDataCompare(SavedFormData* a1, SavedFormData* a2) {
@@ -97,9 +96,8 @@ int32_t SavedFormDataCompare(SavedFormData* a1, SavedFormData* a2) {
     if (totalSize <= v5) {
         return (int32_t)((uint8_t)(totalSize < v5));
     }
-    else {
-        return (-1);
-    }
+
+    return (-1);
 }
 
 BGSSaveLoadStatsMap::BGSSaveLoadStatsMap()
@@ -456,9 +454,8 @@ uint32_t BGSNumericIDIndex::GetNumericID() {
     if ((iindex & 0x800000) != 0) {
         return (iindex & 0x7FFFFF) | 0xFF000000u;
     }
-    else {
-        return pSaveLoadGame->pFormIDMap->GetFormID(iindex);
-    }
+
+    return pSaveLoadGame->pFormIDMap->GetFormID(iindex);
 }
 
 void BGSNumericIDIndex::SetNumericID(uint32_t aiNumericID) {
@@ -503,9 +500,8 @@ const char* BGSSaveLoadGlobalData::GetGlobalDataName(uint32_t aiType) {
     if (aiType < GLOBAL_DATA_FINAL_START) {
         return pGlobalDataInitialNames[aiType];
     }
-    else {
-        return pGlobalDataFinalNames[aiType - GLOBAL_DATA_FINAL_START];
-    }
+
+    return pGlobalDataFinalNames[aiType - GLOBAL_DATA_FINAL_START];
 }
 
 DebugSaveDumpData::DebugSaveDumpData() : total(0), data(0), overhead(0), debug(0), minSize(0xFFFFFFFFu), maxSize(0) {}

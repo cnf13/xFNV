@@ -47,12 +47,10 @@ void BSTimer::Init(uint32_t aiTime) {
 
 void BSTimer::Enable() {
     uint32_t tickCount;
-    if (cDisableCounter) {
-        if (!(--cDisableCounter)) {
-            tickCount = GetTickCount();
-            iLastTime = tickCount - iLastTime;
-            iFirstTime = tickCount - iFirstTime;
-        }
+    if ((cDisableCounter) && (!(--cDisableCounter))) {
+        tickCount = GetTickCount();
+        iLastTime = tickCount - iLastTime;
+        iFirstTime = tickCount - iFirstTime;
     }
 }
 

@@ -49,10 +49,8 @@ void ParalysisEffect::Update(float afSecondsElapsed) {
     else {
         targetAsActor = nullptr;
     }
-    if (targetAsActor) {
-        if (targetAsActor->IsDead(false)) {
-            ActiveEffect::Dispel(true);
-        }
+    if ((targetAsActor) && (targetAsActor->IsDead(false))) {
+        ActiveEffect::Dispel(true);
     }
 }
 
@@ -98,7 +96,6 @@ ActiveEffect* ParalysisEffect::Instantiate(MagicCaster* apCaster, MagicItem* apS
     if (v5) {
         return ::new (v5) ParalysisEffect(apCaster, apSpell, apEffect);
     }
-    else {
-        return nullptr;
-    }
+
+    return nullptr;
 }

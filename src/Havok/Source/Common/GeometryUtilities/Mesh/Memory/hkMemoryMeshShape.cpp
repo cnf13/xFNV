@@ -504,11 +504,10 @@ void hkMemoryMeshShape::lockSection(int32_t sectionIndex, uint8_t accessFlags, h
     }
     sectionOut.m_vertexBuffer = m_vertexBuffer;
     sectionOut.m_indices = nullptr;
-    if ((accessFlags & 1) != 0) {
-        if (v4->m_indexType.m_storage) {
-            sectionOut.m_indices = v4->m_indices;
-        }
+    if (((accessFlags & 1) != 0) && (v4->m_indexType.m_storage)) {
+        sectionOut.m_indices = v4->m_indices;
     }
+
     hkMeshMaterial* m_material = v4->m_material;
     sectionOut.m_sectionIndex = sectionIndex;
     sectionOut.m_material = m_material;

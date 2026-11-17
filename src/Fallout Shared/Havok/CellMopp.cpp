@@ -86,36 +86,35 @@ bhkWorldM* CellMopp::GetParent() {
 
 bool CellMopp::Make(bhkWorld* apWorld, const NiPoint3& arPosition, const NiQuaternion& arRotation) {
     bool bres = false;
-    if (apWorld) {
-        if (QCreated()) {
-            NiQuaternion rot;
-            rot.FromAngleAxisX(1.5707964f);
-            float fy = 0.0f;
-            uint32_t K = 0;
-            for (uint32_t I = 0; I < 2; ++I) {
-                float fx = -2048.0f;
-                for (uint32_t J = 0; J < 2; ++J) {
-                    NiPointer<bhkRigidBody>* v6 = &spRigidBodyA.operator[](K++);
-                    bhkRigidBody* prb = v6->m_pObject;
-                    NiPoint3 pos = arPosition;
-                    pos.x = pos.x + fx;
-                    pos.y = pos.y + fy;
-                    prb->SetPosition(pos);
-                    prb->SetRotation(rot);
-                    fx = fx + 2048.0;
-                }
-                fy = fy + 2048.0;
+    if ((apWorld) && (QCreated())) {
+        NiQuaternion rot;
+        rot.FromAngleAxisX(1.5707964f);
+        float fy = 0.0f;
+        uint32_t K = 0;
+        for (uint32_t I = 0; I < 2; ++I) {
+            float fx = -2048.0f;
+            for (uint32_t J = 0; J < 2; ++J) {
+                NiPointer<bhkRigidBody>* v6 = &spRigidBodyA.operator[](K++);
+                bhkRigidBody* prb = v6->m_pObject;
+                NiPoint3 pos = arPosition;
+                pos.x = pos.x + fx;
+                pos.y = pos.y + fy;
+                prb->SetPosition(pos);
+                prb->SetRotation(rot);
+                fx = fx + 2048.0;
             }
-            if (!GetParent()) {
-                for (uint32_t I_2 = 0; I_2 < spRigidBodyA.m_usESize; ++I_2) {
-                    bhkRigidBody* prb_2 = (&spRigidBodyA.operator[](I_2))->m_pObject;
-                    apWorld->Add(prb_2);
-                    uint32_t v4 = hkColor::rgbFromChars(220, 150, 40, 255);
-                    apWorld->SetDebugObjectColor(prb_2, v4);
-                }
+            fy = fy + 2048.0;
+        }
+        if (!GetParent()) {
+            for (uint32_t I_2 = 0; I_2 < spRigidBodyA.m_usESize; ++I_2) {
+                bhkRigidBody* prb_2 = (&spRigidBodyA.operator[](I_2))->m_pObject;
+                apWorld->Add(prb_2);
+                uint32_t v4 = hkColor::rgbFromChars(220, 150, 40, 255);
+                apWorld->SetDebugObjectColor(prb_2, v4);
             }
         }
     }
+
     return bres;
 }
 

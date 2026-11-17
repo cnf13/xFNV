@@ -113,7 +113,7 @@ bool NiGPUProgramCache::Load() {
         return false;
     }
     NiBinaryStream* pkStream = pkFile;
-    if (static_cast<bool>(*pkStream) != true) {
+    if (!*pkStream) {
         delete pkStream;
         return false;
     }
@@ -190,7 +190,7 @@ bool NiGPUProgramCache::Save() {
         return false;
     }
     NiBinaryStream* pkStream = pkFile;
-    if (static_cast<bool>(*pkStream) != true) {
+    if (!*pkStream) {
         return false;
     }
     const char* pcHeader = "NiGPUProgram Cache File";
@@ -308,17 +308,17 @@ bool NiGPUProgramCache::AppendEntry(NiGPUProgramCache::NiGPUProgramDesc* pkDesc,
     if (m_kPathAndFilename.m_kHandle == NiGlobalStringTable::NULL_STRING) {
         return false;
     }
-    if (!NiFile::Access(m_kPathAndFilename.m_kHandle, NiFile::READ_ONLY)) {
-        if (!NiFile::Access(m_kPathAndFilename.m_kHandle, NiFile::WRITE_ONLY) || !Save()) {
-            return false;
-        }
+    if ((!NiFile::Access(m_kPathAndFilename.m_kHandle, NiFile::READ_ONLY)) &&
+        (!NiFile::Access(m_kPathAndFilename.m_kHandle, NiFile::WRITE_ONLY) || !Save())) {
+        return false;
     }
+
     NiFile* pkFile = NiFile::GetFile(m_kPathAndFilename.m_kHandle, NiFile::APPEND_ONLY, 0x8000);
     if (!pkFile) {
         return false;
     }
     NiBinaryStream* pkStream = pkFile;
-    if (static_cast<bool>(*pkStream) == true) {
+    if (*pkStream) {
         bool bSuccess = SaveEntry(*pkFile, pkDesc, kName);
         delete pkStream;
         return bSuccess;
@@ -418,7 +418,7 @@ bool NiGPUProgramCache::LoadEntry(NiBinaryStream& kStream, bool& bDeprecated) {
     }
 
     // EXE-INLINED 0xEE92D0
-    auto ReadString = [&]() __attribute__((always_inline)) {
+    auto ReadString = [&] __attribute__((always_inline)) {
         uiLength = 0;
         uiSize = 4;
         kStream.BinaryRead(&uiLength, 4, &uiSize, 1);

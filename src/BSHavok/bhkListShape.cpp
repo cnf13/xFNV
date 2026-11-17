@@ -458,9 +458,8 @@ hkpShape* bhkListShape::GetChildhkShape(int32_t aiAt) {
         // GetChildhkShape returns hkpShape*, but getChildShapeInl returns a const one, so the const is cast away.
         return const_cast<hkpShape*>(v4->getChildShapeInl(aiAt));
     }
-    else {
-        return nullptr;
-    }
+
+    return nullptr;
 }
 
 bhkShape* bhkListShape::GetChildShape(int32_t aiAt) {
@@ -529,9 +528,8 @@ int32_t bhkListShape::GetNumChildShapes() const {
     if (v3) {
         return static_cast<hkpShapeContainer*>(v3)->getNumChildShapes();
     }
-    else {
-        return 0;
-    }
+
+    return 0;
 }
 
 // The bodies of GetNumChildShapes and GetChildShape are written out here, with their null tests of this and of the

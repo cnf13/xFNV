@@ -114,7 +114,7 @@ public:
 class ActorPathingMessageQueue : public BSTCommonLLMessageQueue<ActorPathingMessage>, public NiRefObject {
 public:
     ActorPathingMessageQueue();
-    ~ActorPathingMessageQueue();
+    ~ActorPathingMessageQueue() override;
 
     // Uses NiMemObject's operator delete; declared here because BSTMessageQueue's makes the inherited one ambiguous.
     static void operator delete(void* apMemory, size_t astSize) {

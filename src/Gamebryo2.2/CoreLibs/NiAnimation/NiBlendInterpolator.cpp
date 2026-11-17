@@ -624,9 +624,8 @@ float NiBlendInterpolator::GetTime(uint8_t ucIndex) const {
     if ((m_ucInterpCount == 1) && (ucIndex == m_ucSingleIdx)) {
         return m_fSingleTime;
     }
-    else {
-        return m_pkInterpArray[ucIndex].m_fUpdateTime;
-    }
+
+    return m_pkInterpArray[ucIndex].m_fUpdateTime;
 }
 
 // The interpolator array is allocated with a count cookie. The items come from CreateClone of each interpolator unless

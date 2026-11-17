@@ -546,18 +546,17 @@ hkBool* hkaSplineCompressedAnimation::PerTrackCompressionParams::isOk(hkBool* ar
         arResult->m_bool = 1;
         return arResult;
     }
-    else {
-        int32_t v4 = 0;
-        while (m_parameterPalette.m_data[v4].isOk(&arResulta)->m_bool) {
-            ++v3;
-            ++v4;
-            if (v3 >= m_parameterPalette.m_size) {
-                goto LABEL_5;
-            }
+
+    int32_t v4 = 0;
+    while (m_parameterPalette.m_data[v4].isOk(&arResulta)->m_bool) {
+        ++v3;
+        ++v4;
+        if (v3 >= m_parameterPalette.m_size) {
+            goto LABEL_5;
         }
-        arResult->m_bool = 0;
-        return arResult;
     }
+    arResult->m_bool = 0;
+    return arResult;
 }
 
 // A palette of trackParams alone, every transform and float track indexing it.

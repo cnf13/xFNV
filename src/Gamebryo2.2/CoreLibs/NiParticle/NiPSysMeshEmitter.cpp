@@ -386,17 +386,17 @@ bool NiPSysMeshEmitter::EmitFromVertex(NiGeometry* pkGeomEmitter, NiPoint3& kPos
         return false;
     }
     kPosition = m_pkVertex[v8];
-    if (m_eInitVelocityType == NiPSysMeshEmitter::NI_VELOCITY_USE_NORMALS) {
-        if (pkGeomEmitter->m_spModelData.m_pObject->m_pkNormal) {
-            NiPoint3 v14;
-            float apGeometrya = kVelocity.y * kVelocity.y + kVelocity.x * kVelocity.x + kVelocity.z * kVelocity.z;
-            float apGeometryb = std::sqrt((double)apGeometrya);
-            v14.x = m_pkNormal[v8].x * apGeometryb;
-            v14.y = m_pkNormal[v8].y * apGeometryb;
-            v14.z = apGeometryb * m_pkNormal[v8].z;
-            kVelocity = v14;
-        }
+    if ((m_eInitVelocityType == NiPSysMeshEmitter::NI_VELOCITY_USE_NORMALS) &&
+        (pkGeomEmitter->m_spModelData.m_pObject->m_pkNormal)) {
+        NiPoint3 v14;
+        float apGeometrya = kVelocity.y * kVelocity.y + kVelocity.x * kVelocity.x + kVelocity.z * kVelocity.z;
+        float apGeometryb = std::sqrt((double)apGeometrya);
+        v14.x = m_pkNormal[v8].x * apGeometryb;
+        v14.y = m_pkNormal[v8].y * apGeometryb;
+        v14.z = apGeometryb * m_pkNormal[v8].z;
+        kVelocity = v14;
     }
+
     TransformIntoCoordinateSpace(pkGeomEmitter, kPosition, kVelocity);
     return true;
 }
@@ -1061,7 +1061,6 @@ NiObject* NiPSysMeshEmitter::CreateObject() {
     if (v0) {
         return ::new (v0) NiPSysMeshEmitter;
     }
-    else {
-        return nullptr;
-    }
+
+    return nullptr;
 }

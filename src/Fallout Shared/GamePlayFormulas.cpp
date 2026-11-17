@@ -535,19 +535,17 @@ float GamePlayFormulas::GetActorWalkSpeed(
             }
         }
     }
-    if (pWeap) {
-        if (!abNoWeapon && pWeap->IsTwoHandedWeapon()) {
-            if (pWeap->GetWeaponType() == WEAPON_TWO_HAND_HANDLE ||
-                pWeap->GetWeaponType() == WEAPON_TWO_HAND_LAUNCHER) {
-                movePenalties = movePenalties + fMove2HBigPenalty.Float();
-            }
-            else {
-                if (pWeap->GetWeaponType() != WEAPON_TWO_HAND_MELEE) {
-                    movePenalties = movePenalties + fMove2HRPenalty.Float();
-                }
+    if ((pWeap) && (!abNoWeapon && pWeap->IsTwoHandedWeapon())) {
+        if (pWeap->GetWeaponType() == WEAPON_TWO_HAND_HANDLE || pWeap->GetWeaponType() == WEAPON_TWO_HAND_LAUNCHER) {
+            movePenalties = movePenalties + fMove2HBigPenalty.Float();
+        }
+        else {
+            if (pWeap->GetWeaponType() != WEAPON_TWO_HAND_MELEE) {
+                movePenalties = movePenalties + fMove2HRPenalty.Float();
             }
         }
     }
+
     double LeftMobility =
         1.0 - CombatFormulas::GetBodyPartCondition(apActor, ActorValue::LEFT_MOBILITY_CONDITION, false);
     float totalMobility =
@@ -561,11 +559,10 @@ float GamePlayFormulas::GetActorWalkSpeed(
             crippledLimbMult = fMoveTwoCrippledLegsSpeedMult.Float();
         }
     }
-    if (!abOverEncumbered) {
-        if (apActor->GetActorValue(ActorValue::IGNORE_CRIPPLED_LIMBS)) {
-            crippledLimbMult = 1.0;
-        }
+    if ((!abOverEncumbered) && (apActor->GetActorValue(ActorValue::IGNORE_CRIPPLED_LIMBS))) {
+        crippledLimbMult = 1.0;
     }
+
     float speedMult = apActor->GetActorFloatValue(ActorValue::SPEED_MULT) * 0.01;
     float v11 = speedMult * fMoveBaseSpeed.Float() * crippledLimbMult;
     float v15 = v11;
@@ -579,9 +576,8 @@ float GamePlayFormulas::GetActorWalkSpeed(
     if (!(v16 < 0.0)) {
         return v16;
     }
-    else {
-        return 0.0;
-    }
+
+    return 0.0;
 }
 
 int32_t GamePlayFormulas::GetLevelUpSkillPoints(int32_t aiIntelligence, int32_t aiLevel) {
@@ -603,15 +599,14 @@ float GamePlayFormulas::GetDifficultyMultiplier(
         if (abToPC) {
             return fDiffMultHPToPC[aeDifficulty]->Float();
         }
-        else {
-            return fDiffMultHPByPC[aeDifficulty]->Float();
-        }
+
+        return fDiffMultHPByPC[aeDifficulty]->Float();
     }
-    else {
-        if (aiWhich == ActorValue::EXPERIENCE_POINTS) {
-            return fDiffMultXP[aeDifficulty]->Float();
-        }
+
+    if (aiWhich == ActorValue::EXPERIENCE_POINTS) {
+        return fDiffMultXP[aeDifficulty]->Float();
     }
+
     return fresult;
 }
 
@@ -1044,9 +1039,8 @@ GamePlayFormulas::GetSpeechChallengeChance(float afPlayerSpeech, float afTargetD
     if (!((&::fSpeechAutoSuccessThreshold)->Float() < ((double)v10))) {
         return (int32_t)((v10 * 100.0) + 0.5);
     }
-    else {
-        return 100;
-    }
+
+    return 100;
 }
 
 float GamePlayFormulas::GetActorSwimWalkSpeed(

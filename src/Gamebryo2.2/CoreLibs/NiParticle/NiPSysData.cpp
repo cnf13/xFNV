@@ -44,10 +44,9 @@ NiObject* NiPSysData::CreateClone(NiCloningProcess& kCloning) {
         CopyMembers(pkObject, kCloning);
         return pkObject;
     }
-    else {
-        CopyMembers(nullptr, kCloning);
-        return nullptr;
-    }
+
+    CopyMembers(nullptr, kCloning);
+    return nullptr;
 }
 
 // Files before 10.3.0.5 store rotations as quaternions: they become angle/axis pairs. Every particle gets a
@@ -143,12 +142,10 @@ bool NiPSysData::IsEqual(NiObject* pkObject) {
         }
     }
 
-    if (m_usNumAddedParticles != pkData->m_usNumAddedParticles ||
-        m_usAddedParticlesBase != pkData->m_usAddedParticlesBase) {
-        return false;
-    }
-
-    return true;
+    return !(
+        m_usNumAddedParticles != pkData->m_usNumAddedParticles ||
+        m_usAddedParticlesBase != pkData->m_usAddedParticlesBase
+    );
 }
 
 void NiPSysData::GetViewerStrings(NiTPrimitiveArray<char*>* pkStrings) {

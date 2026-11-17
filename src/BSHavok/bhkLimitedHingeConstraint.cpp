@@ -152,9 +152,8 @@ hkpConstraintInstance* bhkLimitedHingeConstraint::operator*() {
     if (this) {
         return static_cast<hkpConstraintInstance*>(GethkObject());
     }
-    else {
-        return nullptr;
-    }
+
+    return nullptr;
 }
 
 void bhkLimitedHingeConstraint::SetMotorTargetAngle(float afAngle) {

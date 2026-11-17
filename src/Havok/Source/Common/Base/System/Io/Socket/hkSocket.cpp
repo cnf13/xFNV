@@ -67,11 +67,9 @@ int32_t hkSocket::WriterAdapter::write(const void* buf, int32_t nbytes) {
 
 // The first socket made starts the platform's network layer.
 hkSocket::hkSocket() : m_reader(this), m_writer(this) {
-    if (!hkSocket::s_platformNetInitialized.m_bool) {
-        if (hkSocket::s_platformNetInit) {
-            hkSocket::s_platformNetInit();
-            hkSocket::s_platformNetInitialized.m_bool = 1;
-        }
+    if ((!hkSocket::s_platformNetInitialized.m_bool) && (hkSocket::s_platformNetInit)) {
+        hkSocket::s_platformNetInit();
+        hkSocket::s_platformNetInitialized.m_bool = 1;
     }
 }
 

@@ -218,31 +218,30 @@ void TESObject::UnClone3D(TESObjectREFR* apRequester) {
         apRequester = nullptr;
     }
     const char* pworldFilename = GetModelFileName(apRequester);
-    if (pworldFilename) {
-        if (*pworldFilename) {
-            if (!apRequester || apRequester->GetScale() == 1.0) {
+    if ((pworldFilename) && (*pworldFilename)) {
+        if (!apRequester || apRequester->GetScale() == 1.0) {
+            pModelLoader->ReleaseFile(pworldFilename);
+        }
+        else {
+            char cPath[264];
+            GetScaledModelFileName(apRequester, cPath);
+            pModelLoader->ReleaseFile(cPath);
+            bool blastCopy = true;
+            ::new (&spmodel) NiPointer<Model>(static_cast<Model*>(nullptr));
+            if (pModelLoader->FindModel(cPath, spmodel) && spmodel.m_pObject->iManualRefCount > 0) {
+                blastCopy = false;
+            }
+            if (blastCopy) {
                 pModelLoader->ReleaseFile(pworldFilename);
+                --iNumScaledModelsAdded;
             }
             else {
-                char cPath[264];
-                GetScaledModelFileName(apRequester, cPath);
-                pModelLoader->ReleaseFile(cPath);
-                bool blastCopy = true;
-                ::new (&spmodel) NiPointer<Model>(static_cast<Model*>(nullptr));
-                if (pModelLoader->FindModel(cPath, spmodel) && spmodel.m_pObject->iManualRefCount > 0) {
-                    blastCopy = false;
-                }
-                if (blastCopy) {
-                    pModelLoader->ReleaseFile(pworldFilename);
-                    --iNumScaledModelsAdded;
-                }
-                else {
-                    --iNumScaledModelsCloned;
-                }
-                NiPointer<Model>::Destroy(&spmodel);
+                --iNumScaledModelsCloned;
             }
+            NiPointer<Model>::Destroy(&spmodel);
         }
     }
+
     if (GetFormType() == NPC__ID) {
         static_cast<TESNPC*>(this)->TESNPC::ClearFaceGenModels();
     }
@@ -326,20 +325,19 @@ NiAVObject* TESObject::LoadGraphics(TESObjectREFR* apRef) {
     }
     else {
         ENUM_LOD_MULT elod = TES::GetLODMult(this);
-        if (apRef) {
-            if (apRef->GetScale() != 1.0) {
-                char cScaledPath[264];
-                GetScaledModelFileName(apRef, cScaledPath);
-                ::new (&spmodel_2) NiPointer<Model>(static_cast<Model*>(nullptr));
-                pModelLoader->FindModel(cScaledPath, spmodel_2);
-                if (spmodel_2.m_pObject) {
-                    spmodel_2.m_pObject->IncManualRefCount();
-                    pData3D = spmodel_2.m_pObject->GetModel();
-                    ++iNumScaledModelsCloned;
-                }
-                NiPointer<Model>::Destroy(&spmodel_2);
+        if ((apRef) && (apRef->GetScale() != 1.0)) {
+            char cScaledPath[264];
+            GetScaledModelFileName(apRef, cScaledPath);
+            ::new (&spmodel_2) NiPointer<Model>(static_cast<Model*>(nullptr));
+            pModelLoader->FindModel(cScaledPath, spmodel_2);
+            if (spmodel_2.m_pObject) {
+                spmodel_2.m_pObject->IncManualRefCount();
+                pData3D = spmodel_2.m_pObject->GetModel();
+                ++iNumScaledModelsCloned;
             }
+            NiPointer<Model>::Destroy(&spmodel_2);
         }
+
         if (!pData3D) {
             return pModelLoader->LoadFile(pworldFilename, elod, true, false, false, false);
         }
@@ -401,12 +399,10 @@ void TESBoundObject::SaveObjectBound() {
 }
 
 void TESBoundObject::LoadObjectBound(TESFile* apFile) {
-    if (apFile) {
-        if (((int32_t)apFile->GetTESChunk()) == 1145979471) {
-            apFile->GetChunkData(&BoundData, 0xCu);
-            if (apFile->QEndian()) {
-                (&BoundData)->Endian();
-            }
+    if ((apFile) && (((int32_t)apFile->GetTESChunk()) == 1145979471)) {
+        apFile->GetChunkData(&BoundData, 0xCu);
+        if (apFile->QEndian()) {
+            (&BoundData)->Endian();
         }
     }
 }
@@ -663,14 +659,11 @@ NiAVObject* TESBoundTreeObject::Clone3D(TESObjectREFR* pRequester, bool deepCopy
         pnode = Singleton->CreateTreeForReference(pRequester, static_cast<TESObjectTREE*>(this));
     }
     RefreshBound(pnode);
-    if (pnode) {
-        if (pnode->GetModel()) {
-            if (pRequester) {
-                BSTreeModel* v5 = pnode->GetModel();
-                pRequester->SetSeed(v5->iSeed);
-            }
-        }
+    if ((pnode) && (pnode->GetModel()) && (pRequester)) {
+        BSTreeModel* v5 = pnode->GetModel();
+        pRequester->SetSeed(v5->iSeed);
     }
+
     return pnode;
 }
 

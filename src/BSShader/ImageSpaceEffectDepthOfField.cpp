@@ -186,11 +186,10 @@ bool ImageSpaceEffectDepthOfField::UpdateParams(ImageSpaceEffectParam* apParam) 
     else {
         fblurfront = 0.0f;
     }
-    if (Mode != ImageSpaceEffectDepthOfField::DOF_BACK) {
-        if (Mode) {
-            fblurback = 0.0;
-        }
+    if ((Mode != ImageSpaceEffectDepthOfField::DOF_BACK) && (Mode)) {
+        fblurback = 0.0;
     }
+
     float fblurback_2 = fblurback;
     ImageSpaceShaderParam* pparam = pEffectParamList.m_pBase[2].m_pObject;
     float fmindistance = fDepth - fRange;

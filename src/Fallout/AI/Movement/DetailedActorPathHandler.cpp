@@ -223,20 +223,18 @@ ActorPathHandler::PATH_HANDLER_RESULT DetailedActorPathHandler::Init(float afPer
         if (!(afDeltaT > 0.0)) {
             return ActorPathHandler::PATH_HANDLER_RESULT_OK;
         }
-        else {
-            return Update(afDeltaT);
-        }
+
+        return Update(afDeltaT);
     }
-    else {
-        ResetMoveModeAndDelta();
-        bWaitingForUpdate = false;
-        TetherTargetPoint = pActor->GetLocationOnReference();
-        LastTetherPoint.x = TetherTargetPoint.x;
-        LastTetherPoint.y = TetherTargetPoint.y;
-        LastTetherPoint.z = TetherTargetPoint.z;
-        eState = DetailedActorPathHandler::DAP_GOAL_REACHED;
-        return ActorPathHandler::PATH_HANDLER_RESULT_DONE;
-    }
+
+    ResetMoveModeAndDelta();
+    bWaitingForUpdate = false;
+    TetherTargetPoint = pActor->GetLocationOnReference();
+    LastTetherPoint.x = TetherTargetPoint.x;
+    LastTetherPoint.y = TetherTargetPoint.y;
+    LastTetherPoint.z = TetherTargetPoint.z;
+    eState = DetailedActorPathHandler::DAP_GOAL_REACHED;
+    return ActorPathHandler::PATH_HANDLER_RESULT_DONE;
 }
 
 bool DetailedActorPathHandler::InitRotationOnly(float afTargetAngle, bool abForceTurn) {
@@ -256,10 +254,9 @@ bool DetailedActorPathHandler::InitRotationOnly(float afTargetAngle, bool abForc
         eState = DetailedActorPathHandler::DAP_ROTATING_WITHOUT_PATH;
         return true;
     }
-    else {
-        eState = DetailedActorPathHandler::DAP_GOAL_REACHED;
-        return false;
-    }
+
+    eState = DetailedActorPathHandler::DAP_GOAL_REACHED;
+    return false;
 }
 
 ActorPathHandler::PATH_HANDLER_RESULT DetailedActorPathHandler::Update(float afDeltaT) {
@@ -306,12 +303,10 @@ ActorPathHandler::PATH_HANDLER_RESULT DetailedActorPathHandler::Update(float afD
     }
     if (!bRotateMode && !bWaitingForUpdate) {
         ActorPathHandler::PATH_HANDLER_RESULT eresult_2 = CheckGoalReached();
-        if (eresult_2) {
-            if (eresult_2 != ActorPathHandler::PATH_HANDLER_RESULT_DONE || !CheckForEndRotate()) {
-                ResetMoveModeAndDelta();
-                eState = DetailedActorPathHandler::DAP_GOAL_REACHED;
-                return eresult_2;
-            }
+        if ((eresult_2) && (eresult_2 != ActorPathHandler::PATH_HANDLER_RESULT_DONE || !CheckForEndRotate())) {
+            ResetMoveModeAndDelta();
+            eState = DetailedActorPathHandler::DAP_GOAL_REACHED;
+            return eresult_2;
         }
     }
     if (!bWaitingForUpdate) {
@@ -472,29 +467,28 @@ ActorPathHandler::PATH_HANDLER_RESULT DetailedActorPathHandler::Update(float afD
         }
         return ActorPathHandler::PATH_HANDLER_RESULT_OK;
     }
-    else {
-        if (spPath.m_pObject) {
-            uint32_t v7 = iCurrentNodeIndex + 1;
-            if (v7 >= spPath.m_pObject->GetNodeCount()) {
-                PathingNode* LastNode = spPath.m_pObject->GetLastNode();
-                NiPoint3* a2a = ::new (&v17) NiPoint3((&LastNode->Location)->GetLocation());
-                const NiPoint3* v9 = &pActor->GetLocationOnReference();
-                float fdistToGoal = (*v9 - *a2a).XYLength();
-                if (fdistToGoal < static_cast<double>(fLastFrameMinMoveDelta)) {
-                    float fmoveDeltaZ = MoveDelta.z;
-                    MoveDelta.Unitize();
-                    MoveDelta.x = MoveDelta.x * fdistToGoal;
-                    MoveDelta.y = MoveDelta.y * fdistToGoal;
-                    MoveDelta.z = fmoveDeltaZ;
-                    fLastFrameMinMoveDelta = MoveDelta.XYLength();
-                    LastFrameMinMoveDelta.x = MoveDelta.x;
-                    LastFrameMinMoveDelta.y = MoveDelta.y;
-                    LastFrameMinMoveDelta.z = MoveDelta.z;
-                }
+
+    if (spPath.m_pObject) {
+        uint32_t v7 = iCurrentNodeIndex + 1;
+        if (v7 >= spPath.m_pObject->GetNodeCount()) {
+            PathingNode* LastNode = spPath.m_pObject->GetLastNode();
+            NiPoint3* a2a = ::new (&v17) NiPoint3((&LastNode->Location)->GetLocation());
+            const NiPoint3* v9 = &pActor->GetLocationOnReference();
+            float fdistToGoal = (*v9 - *a2a).XYLength();
+            if (fdistToGoal < static_cast<double>(fLastFrameMinMoveDelta)) {
+                float fmoveDeltaZ = MoveDelta.z;
+                MoveDelta.Unitize();
+                MoveDelta.x = MoveDelta.x * fdistToGoal;
+                MoveDelta.y = MoveDelta.y * fdistToGoal;
+                MoveDelta.z = fmoveDeltaZ;
+                fLastFrameMinMoveDelta = MoveDelta.XYLength();
+                LastFrameMinMoveDelta.x = MoveDelta.x;
+                LastFrameMinMoveDelta.y = MoveDelta.y;
+                LastFrameMinMoveDelta.z = MoveDelta.z;
             }
         }
-        return ActorPathHandler::PATH_HANDLER_RESULT_OK;
     }
+    return ActorPathHandler::PATH_HANDLER_RESULT_OK;
 }
 
 ActorPathHandler::PATH_HANDLER_RESULT DetailedActorPathHandler::NoPathUpdate(float afDeltaT) {
@@ -670,64 +664,62 @@ ActorPathHandler::PATH_HANDLER_RESULT DetailedActorPathHandler::UpdateWhilePlaye
         pActor->SetHeading(pPlayer);
         return ActorPathHandler::PATH_HANDLER_RESULT_OK;
     }
-    else {
-        float fdistToGoal = fPathLength - GetDistanceTraveled();
-        PathingNode* plastNode = spPath.m_pObject->GetLastNode();
-        const PathingLocation* loc = &plastNode->Location;
-        NiPoint3 goalPoint = loc->GetLocation();
-        NiPoint3* FrustumPlanes = &plastNode->Tangent;
-        float fgoalAngle = GetZAngleFromVector(*FrustumPlanes);
-        TESObjectCELL* pgoalCell = loc->GetCell();
-        TESWorldSpace* pgoalWS = loc->pWorldSpace;
-        float fdelta = 3600.0 / appCalendar.GetTimeScale();
-        float fdistanceCanTravel = pActor->GetCurrentSpeed() * fdelta;
-        int32_t v4 = pActorMover->iNextNode + 1;
-        bool bfinishedPath = v4 == spPath.m_pObject->GetVirtualNodeCount();
-        if (pActor->GetSitSleepState() != SIT_SLEEP_IS_SITTING || pActor->GetSitSleepState() != SIT_SLEEP_IS_SLEEPING) {
-            if (spRequest.m_pObject && (spRequest.m_pObject->bFaceTargetAtGoal && bfinishedPath)) {
-                fgoalAngle = spRequest.m_pObject->fGoalAngle;
+
+    float fdistToGoal = fPathLength - GetDistanceTraveled();
+    PathingNode* plastNode = spPath.m_pObject->GetLastNode();
+    const PathingLocation* loc = &plastNode->Location;
+    NiPoint3 goalPoint = loc->GetLocation();
+    NiPoint3* FrustumPlanes = &plastNode->Tangent;
+    float fgoalAngle = GetZAngleFromVector(*FrustumPlanes);
+    TESObjectCELL* pgoalCell = loc->GetCell();
+    TESWorldSpace* pgoalWS = loc->pWorldSpace;
+    float fdelta = 3600.0 / appCalendar.GetTimeScale();
+    float fdistanceCanTravel = pActor->GetCurrentSpeed() * fdelta;
+    int32_t v4 = pActorMover->iNextNode + 1;
+    bool bfinishedPath = v4 == spPath.m_pObject->GetVirtualNodeCount();
+    if (pActor->GetSitSleepState() != SIT_SLEEP_IS_SITTING || pActor->GetSitSleepState() != SIT_SLEEP_IS_SLEEPING) {
+        if (spRequest.m_pObject && (spRequest.m_pObject->bFaceTargetAtGoal && bfinishedPath)) {
+            fgoalAngle = spRequest.m_pObject->fGoalAngle;
+        }
+        else {
+            if (pActorMover->HasLookAtTarget()) {
+                NiPoint3 lookatPoint;
+                pActorMover->GetLookAtPoint(lookatPoint);
+                CombatUtilities::GetAngleToProjectedPoint(&rot, pActor, lookatPoint);
+                fgoalAngle = ClampAngle(rot.z);
             }
             else {
-                if (pActorMover->HasLookAtTarget()) {
-                    NiPoint3 lookatPoint;
-                    pActorMover->GetLookAtPoint(lookatPoint);
-                    CombatUtilities::GetAngleToProjectedPoint(&rot, pActor, lookatPoint);
-                    fgoalAngle = ClampAngle(rot.z);
+                uint32_t inodeCount = spPath.m_pObject->GetNodeCount();
+                if (inodeCount <= 1) {
+                    fgoalAngle = pActor->GetHeading(false);
                 }
                 else {
-                    uint32_t inodeCount = spPath.m_pObject->GetNodeCount();
-                    if (inodeCount <= 1) {
-                        fgoalAngle = pActor->GetHeading(false);
-                    }
-                    else {
-                        PathingNode* Node = spPath.m_pObject->GetNode(inodeCount - 2);
-                        NiPoint3 nextToLastNode = (&Node->Location)->GetLocation();
-                        PathingNode* v6 = spPath.m_pObject->GetNode(inodeCount - 1);
-                        NiPoint3 lastNode = (&v6->Location)->GetLocation();
-                        NiPoint3 movedirDelta = lastNode - nextToLastNode;
-                        fgoalAngle = GetZAngleFromVector(movedirDelta);
-                    }
+                    PathingNode* Node = spPath.m_pObject->GetNode(inodeCount - 2);
+                    NiPoint3 nextToLastNode = (&Node->Location)->GetLocation();
+                    PathingNode* v6 = spPath.m_pObject->GetNode(inodeCount - 1);
+                    NiPoint3 lastNode = (&v6->Location)->GetLocation();
+                    NiPoint3 movedirDelta = lastNode - nextToLastNode;
+                    fgoalAngle = GetZAngleFromVector(movedirDelta);
                 }
             }
         }
-        pActor->MoveActorAndFollowers(goalPoint, fgoalAngle, pgoalCell, pgoalWS, true, false);
-        ActorPathHandler::PATH_HANDLER_RESULT eresult = ActorPathHandler::PATH_HANDLER_RESULT_DONE;
-        ResetMoveModeAndDelta();
-        eState = DetailedActorPathHandler::DAP_GOAL_REACHED;
-        if (!bfinishedPath) {
-            return ActorPathHandler::PATH_HANDLER_RESULT_DONE_SLEEP_SPECIAL;
-        }
-        return eresult;
     }
+    pActor->MoveActorAndFollowers(goalPoint, fgoalAngle, pgoalCell, pgoalWS, true, false);
+    ActorPathHandler::PATH_HANDLER_RESULT eresult = ActorPathHandler::PATH_HANDLER_RESULT_DONE;
+    ResetMoveModeAndDelta();
+    eState = DetailedActorPathHandler::DAP_GOAL_REACHED;
+    if (!bfinishedPath) {
+        return ActorPathHandler::PATH_HANDLER_RESULT_DONE_SLEEP_SPECIAL;
+    }
+    return eresult;
 }
 
 float DetailedActorPathHandler::GetDistanceTraveled() {
     if ((&spPath)->operator->()) {
         return fDistanceTraveled;
     }
-    else {
-        return 0.0;
-    }
+
+    return 0.0;
 }
 
 // The share of the path walked, clamped to [0, 1]; 1 when the path has no length. A NaN length takes the division.
@@ -754,10 +746,9 @@ NiPoint3 DetailedActorPathHandler::GetNextNodeLocation() {
         result = (&LastNode->Location)->GetLocation();
         return result;
     }
-    else {
-        result = pActor->GetLocationOnReference();
-        return result;
-    }
+
+    result = pActor->GetLocationOnReference();
+    return result;
 }
 
 bool DetailedActorPathHandler::GetNodeLocation(uint32_t aiIndex, NiPoint3& arLocation) {
@@ -789,27 +780,25 @@ NiPoint3 DetailedActorPathHandler::ComputeApproximateLocation(float afDeltaT) {
         result = pActor->GetLocationOnReference();
         return result;
     }
-    else {
-        sppath.SetPointer(&spPath);
-        if (sppath.m_pObject && sppath.m_pObject->GetNodeCount()) {
-            float fspeed;
-            if ((pActorMover->GetPreferredMoveMode() & 512) != 0) {
-                fspeed = pActor->GetRunSpeed();
-            }
-            else {
-                fspeed = pActor->GetWalkSpeed();
-            }
-            float fdistance = fspeed * afDeltaT;
-            ::new (&result) NiPoint3(sppath.m_pObject->ComputeApproxLocationForDistance(fCurrentSplineT, fdistance));
-            sppath.~NiPointer<PathingSolution>();
-            return result;
+
+    sppath.SetPointer(&spPath);
+    if (sppath.m_pObject && sppath.m_pObject->GetNodeCount()) {
+        float fspeed;
+        if ((pActorMover->GetPreferredMoveMode() & 512) != 0) {
+            fspeed = pActor->GetRunSpeed();
         }
         else {
-            result = pActor->GetLocationOnReference();
-            sppath.~NiPointer<PathingSolution>();
-            return result;
+            fspeed = pActor->GetWalkSpeed();
         }
+        float fdistance = fspeed * afDeltaT;
+        ::new (&result) NiPoint3(sppath.m_pObject->ComputeApproxLocationForDistance(fCurrentSplineT, fdistance));
+        sppath.~NiPointer<PathingSolution>();
+        return result;
     }
+
+    result = pActor->GetLocationOnReference();
+    sppath.~NiPointer<PathingSolution>();
+    return result;
 }
 
 uint32_t DetailedActorPathHandler::GetCurrentNodeIndex() {
@@ -1009,10 +998,9 @@ bool DetailedActorPathHandler::GetMoveDelta(NiPoint3& aDelta) {
         aDelta = MoveDelta;
         return true;
     }
-    else {
-        aDelta = NiPoint3_ZERO;
-        return false;
-    }
+
+    aDelta = NiPoint3_ZERO;
+    return false;
 }
 
 bool DetailedActorPathHandler::GetNextTetherPoint(NiPoint3& arPoint) {
@@ -1232,10 +1220,9 @@ bool DetailedActorPathHandler::WarpToNextNode() {
     if (filter.bEnterTriWithDoor || (filter.bLeaveTriWithDoor || filter.bEntirePathInDoor)) {
         return false;
     }
-    else {
-        pActorMover->MoveActorToLocation(TetherTargetPoint);
-        return true;
-    }
+
+    pActorMover->MoveActorToLocation(TetherTargetPoint);
+    return true;
 }
 
 void DetailedActorPathHandler::SaveGame(BGSSaveFormBuffer* apSaveGameBuffer) {
@@ -1413,52 +1400,45 @@ bool DetailedActorPathHandler::IsDoorInPath(uint32_t aDoorID) {
         if (spPath.m_pObject->IsDoorInPath(aDoorID)) {
             return true;
         }
-        else {
-            for (float fparam = 0.0f;; fparam = fparam + 0.5) {
-                double v3 = static_cast<double>(spPath.m_pObject->GetNodeCount()) - 1.0;
-                if (!(fparam < v3)) {
-                    break;
-                }
-                float fnextParam = fparam + 0.5;
-                spPath.m_pObject->ComputeLocationFromParameter(fparam, thisPoint);
-                spPath.m_pObject->ComputeLocationFromParameter(fnextParam, nextPoint);
-                DoorInPathFilter filter_2(aDoorID);
-                PathingLocation start(thisPoint, pActor);
-                start.ResolveNavMeshInfo(nullptr);
-                NavMeshPtr spmesh_2;
-                if (start.GetNavMeshAndTriangle(spmesh_2, ustri_2)) {
-                    NavMeshTriangle* ptri_2 = spmesh_2.m_pObject->GetTriangle(ustri_2);
-                    if (ptri_2) {
-                        filter_2.bEntirePathInDoor = ptri_2->GetFlag(NavMeshTriangle::NAV_TRI_CLOSED_DOOR);
-                    }
-                }
-                Pathing::CheckLineOfSight(start, nextPoint, static_cast<PathingLocation*>(nullptr), &filter_2);
-                if (filter_2.bEnterTriWithDoor || (filter_2.bLeaveTriWithDoor || filter_2.bEntirePathInDoor)) {
-                    return true;
+
+        for (float fparam = 0.0f;; fparam = fparam + 0.5) {
+            double v3 = static_cast<double>(spPath.m_pObject->GetNodeCount()) - 1.0;
+            if (!(fparam < v3)) {
+                break;
+            }
+            float fnextParam = fparam + 0.5;
+            spPath.m_pObject->ComputeLocationFromParameter(fparam, thisPoint);
+            spPath.m_pObject->ComputeLocationFromParameter(fnextParam, nextPoint);
+            DoorInPathFilter filter_2(aDoorID);
+            PathingLocation start(thisPoint, pActor);
+            start.ResolveNavMeshInfo(nullptr);
+            NavMeshPtr spmesh_2;
+            if (start.GetNavMeshAndTriangle(spmesh_2, ustri_2)) {
+                NavMeshTriangle* ptri_2 = spmesh_2.m_pObject->GetTriangle(ustri_2);
+                if (ptri_2) {
+                    filter_2.bEntirePathInDoor = ptri_2->GetFlag(NavMeshTriangle::NAV_TRI_CLOSED_DOOR);
                 }
             }
-            return false;
-        }
-    }
-    else {
-        DoorInPathFilter filter(aDoorID);
-        PathingLocation actorLoc(pActor);
-        actorLoc.ResolveNavMeshInfo(nullptr);
-        NavMeshPtr spmesh;
-        if (actorLoc.GetNavMeshAndTriangle(spmesh, ustri)) {
-            NavMeshTriangle* ptri = spmesh.m_pObject->GetTriangle(ustri);
-            if (ptri) {
-                filter.bEntirePathInDoor = ptri->GetFlag(NavMeshTriangle::NAV_TRI_CLOSED_DOOR);
+            Pathing::CheckLineOfSight(start, nextPoint, static_cast<PathingLocation*>(nullptr), &filter_2);
+            if (filter_2.bEnterTriWithDoor || (filter_2.bLeaveTriWithDoor || filter_2.bEntirePathInDoor)) {
+                return true;
             }
         }
-        Pathing::CheckLineOfSight(actorLoc, TetherTargetPoint, static_cast<PathingLocation*>(nullptr), &filter);
-        if (filter.bEnterTriWithDoor || (filter.bLeaveTriWithDoor || filter.bEntirePathInDoor)) {
-            return true;
-        }
-        else {
-            return false;
+        return false;
+    }
+
+    DoorInPathFilter filter(aDoorID);
+    PathingLocation actorLoc(pActor);
+    actorLoc.ResolveNavMeshInfo(nullptr);
+    NavMeshPtr spmesh;
+    if (actorLoc.GetNavMeshAndTriangle(spmesh, ustri)) {
+        NavMeshTriangle* ptri = spmesh.m_pObject->GetTriangle(ustri);
+        if (ptri) {
+            filter.bEntirePathInDoor = ptri->GetFlag(NavMeshTriangle::NAV_TRI_CLOSED_DOOR);
         }
     }
+    Pathing::CheckLineOfSight(actorLoc, TetherTargetPoint, static_cast<PathingLocation*>(nullptr), &filter);
+    return filter.bEnterTriWithDoor || (filter.bLeaveTriWithDoor || filter.bEntirePathInDoor);
 }
 
 bool DetailedActorPathHandler::InitRotationMode(float afGoalAngle, bool abForceTurn, bool abPathTransition) {
@@ -1897,10 +1877,9 @@ float DetailedActorPathHandler::UpdateRotation(float afDeltaT) {
         fMinRotateTime = fMinRotateTime - afDeltaT;
         return factangle;
     }
-    else {
-        MoveMode = pActorMover->GetPreferredMoveModeType();
-        return factangle;
-    }
+
+    MoveMode = pActorMover->GetPreferredMoveModeType();
+    return factangle;
 }
 
 bool DetailedActorPathHandler::ComputeMoveMode(float afDeltaT) {
@@ -2358,32 +2337,31 @@ float DetailedActorPathHandler::UpdateHeading(float fdeltaT, float& afSlowDown) 
     BSWrap(fangledelta, -3.1415927f, 3.1415927f);
     if (std::fabs(fangledelta) >= 0.01745329238474369) {
         fratio = 1.0f;
-        if (spPath.m_pObject) {
-            if (pActor->GetTurningSpeed() > 45.0) {
-                float fspeed;
-                const NiPoint3* v3 = &pActor->GetLocationOnReference();
-                float fdistToTether = (TetherTargetPoint - *v3).Length();
-                if ((MoveMode & ActorMover::MF_RUNNING) != 0) {
-                    fspeed = pActor->GetRunSpeed();
-                }
-                else {
-                    fspeed = pActor->GetWalkSpeed();
-                }
-                furtherTetherLoc = TetherTargetPoint;
-                if (fspeed > static_cast<double>(fdistToTether)) {
-                    float afDist = fspeed - fdistToTether;
-                    spPath.m_pObject->FindPointOnPath(fCurrentSplineT, afDist, true, &fnewT, &furtherTetherLoc);
-                }
-                float factorAngle = pActor->GetHeading(false);
-                const NiPoint3* v5 = &pActor->GetLocationOnReference();
-                NiPoint3 deltaToFurtherTether = furtherTetherLoc - *v5;
-                float ffurtherTetherAngle = GetZAngleFromVector(deltaToFurtherTether);
-                float fangleDiff = ffurtherTetherAngle - factorAngle;
-                BSWrap(fangleDiff, -3.1415927f, 3.1415927f);
-                fratio = std::fabs(fangleDiff) / 1.5707963267948966;
-                BSClamp(fratio, 0.025f, 1.0f);
+        if ((spPath.m_pObject) && (pActor->GetTurningSpeed() > 45.0)) {
+            float fspeed;
+            const NiPoint3* v3 = &pActor->GetLocationOnReference();
+            float fdistToTether = (TetherTargetPoint - *v3).Length();
+            if ((MoveMode & ActorMover::MF_RUNNING) != 0) {
+                fspeed = pActor->GetRunSpeed();
             }
+            else {
+                fspeed = pActor->GetWalkSpeed();
+            }
+            furtherTetherLoc = TetherTargetPoint;
+            if (fspeed > static_cast<double>(fdistToTether)) {
+                float afDist = fspeed - fdistToTether;
+                spPath.m_pObject->FindPointOnPath(fCurrentSplineT, afDist, true, &fnewT, &furtherTetherLoc);
+            }
+            float factorAngle = pActor->GetHeading(false);
+            const NiPoint3* v5 = &pActor->GetLocationOnReference();
+            NiPoint3 deltaToFurtherTether = furtherTetherLoc - *v5;
+            float ffurtherTetherAngle = GetZAngleFromVector(deltaToFurtherTether);
+            float fangleDiff = ffurtherTetherAngle - factorAngle;
+            BSWrap(fangleDiff, -3.1415927f, 3.1415927f);
+            fratio = std::fabs(fangleDiff) / 1.5707963267948966;
+            BSClamp(fratio, 0.025f, 1.0f);
         }
+
         double v6 = pActor->GetTurningSpeed();
         float frotate = v6 * 0.01745329238474369 * fdeltaT * 3.0 * fratio;
         double v7 = std::fabs(fangledelta);
@@ -2392,17 +2370,15 @@ float DetailedActorPathHandler::UpdateHeading(float fdeltaT, float& afSlowDown) 
                 if (!(std::fabs(fangledelta) > 2.0)) {
                     v8 = std::fabs(fangledelta);
                     if (!(v8 > 1.600000023841858)) {
-                        if (spPath.m_pObject) {
-                            if (spRequest.m_pObject) {
-                                PathingNode* LastNode = spPath.m_pObject->GetLastNode();
-                                NiPoint3* a1 = ::new (&v21) NiPoint3((&LastNode->Location)->GetLocation());
-                                const NiPoint3* v10 = &pActor->GetLocationOnReference();
-                                // The squared length is kept at double precision.
-                                double v16 = (*v10 - *a1).SqrXYLength();
-                                double Radius = pActor->GetRadius();
-                                if (pActor->GetRadius() * Radius > v16) {
-                                    afSlowDown = 0.5f;
-                                }
+                        if ((spPath.m_pObject) && (spRequest.m_pObject)) {
+                            PathingNode* LastNode = spPath.m_pObject->GetLastNode();
+                            NiPoint3* a1 = ::new (&v21) NiPoint3((&LastNode->Location)->GetLocation());
+                            const NiPoint3* v10 = &pActor->GetLocationOnReference();
+                            // The squared length is kept at double precision.
+                            double v16 = (*v10 - *a1).SqrXYLength();
+                            double Radius = pActor->GetRadius();
+                            if (pActor->GetRadius() * Radius > v16) {
+                                afSlowDown = 0.5f;
                             }
                         }
                     }
@@ -2532,14 +2508,13 @@ bool DetailedActorPathHandler::UpdateStaticAvoidance(float afDeltaT) {
             return true;
         }
     }
-    if (fBlockTime > 1.5) {
-        if (pActor->GetAnimation()) {
-            Animation* v6 = pActor->GetAnimation();
-            if (v6->ShouldBeMoving()) {
-                bMovementBlocked = true;
-            }
+    if ((fBlockTime > 1.5) && (pActor->GetAnimation())) {
+        Animation* v6 = pActor->GetAnimation();
+        if (v6->ShouldBeMoving()) {
+            bMovementBlocked = true;
         }
     }
+
     if (bMovementBlocked) {
         breturnBlocked = true;
         // Tests the three states for equality, not a range.
@@ -2983,15 +2958,14 @@ void DetailedActorPathHandler::UpdateAvoidNodesForPath(
                 }
                 avoidCenter = pavoidActor->GetLocationOnReference();
                 bhkCharacterController* pavoidCon = pavoidActor->GetCharController();
-                if (pavoidCon) {
-                    if (!pavoidCon->GetFlag(bhkCharacterController::NO_CHARACTER_COLLISIONS)) {
-                        NiPoint3 pconPosNi;
-                        FNVD_RECONSTRUCT(hkVector4)(&pconPos, pavoidCon->GethkPosition());
-                        HK2NI(pconPosNi, pconPos);
-                        avoidCenter.x = pconPosNi.x;
-                        avoidCenter.y = pconPosNi.y;
-                    }
+                if ((pavoidCon) && (!pavoidCon->GetFlag(bhkCharacterController::NO_CHARACTER_COLLISIONS))) {
+                    NiPoint3 pconPosNi;
+                    FNVD_RECONSTRUCT(hkVector4)(&pconPos, pavoidCon->GethkPosition());
+                    HK2NI(pconPosNi, pconPos);
+                    avoidCenter.x = pconPosNi.x;
+                    avoidCenter.y = pconPosNi.y;
                 }
+
                 PathingAvoidNode* v11 =
                     FNVD_RECONSTRUCT(PathingAvoidNode)(&v16, avoidCenter, fnodeRadius_2, 2.0f, nodeType);
                 pavoidNodes->Add(*v11);
@@ -3018,18 +2992,16 @@ bool DetailedActorPathHandler::UpdateAvoidanceCandidateList() {
         Actor* pobj = plist->m_item;
         if (pobj) {
             NiNode* ptheir3d = pobj->Get3D();
-            if (ptheir3d) {
-                if (static_cast<uint8_t>(ptheir3d->QFadedIn())) {
-                    bhkCharacterController* CharController;
-                    double LODDistance;
-                    if (!pobj->GetCharController() ||
-                        (!static_cast<uint8_t>(ptheir3d->GetNotVisible()) ||
-                         (CharController = pobj->GetCharController(),
-                          (LODDistance = CharController->GetLODDistance(),
-                           !(fLODActorAvoidanceDistance.Float() < LODDistance))))) {
-                        ++DetailedActorPathHandler::uiAvoidanceCandidatesSize;
-                        DetailedActorPathHandler::AvoidanceCandidates.Add(pobj);
-                    }
+            if ((ptheir3d) && (static_cast<uint8_t>(ptheir3d->QFadedIn()))) {
+                bhkCharacterController* CharController;
+                double LODDistance;
+                if (!pobj->GetCharController() ||
+                    (!static_cast<uint8_t>(ptheir3d->GetNotVisible()) ||
+                     (CharController = pobj->GetCharController(),
+                      (LODDistance = CharController->GetLODDistance(),
+                       !(fLODActorAvoidanceDistance.Float() < LODDistance))))) {
+                    ++DetailedActorPathHandler::uiAvoidanceCandidatesSize;
+                    DetailedActorPathHandler::AvoidanceCandidates.Add(pobj);
                 }
             }
         }
@@ -3148,20 +3120,16 @@ bool DoorInPathFilter::CanCrossEdge(FastNavMeshEdgeHandle hEdge, FastNavMeshEdge
     NavMeshTriangle* triangle = hEdge.pNavMesh->GetTriangle(hEdge.usTriangle);
     if (triangle->GetFlag(4096)) {
         closedDoorInfo = hEdge.pNavMesh->GetClosedDoorInfoForTriangle(hEdge.usTriangle);
-        if (closedDoorInfo) {
-            if ((closedDoorInfo->DoorFormID == DoorID) || (!DoorID)) {
-                v10 = 1;
-            }
+        if ((closedDoorInfo) && ((closedDoorInfo->DoorFormID == DoorID) || (!DoorID))) {
+            v10 = 1;
         }
     }
     int8_t v9 = 0;
     NavMeshTriangle* v4 = hMatchingEdge.pNavMesh->GetTriangle(hMatchingEdge.usTriangle);
     if (v4->GetFlag(4096)) {
         v7 = hMatchingEdge.pNavMesh->GetClosedDoorInfoForTriangle(hMatchingEdge.usTriangle);
-        if (v7) {
-            if ((v7->DoorFormID == DoorID) || (!DoorID)) {
-                v9 = 1;
-            }
+        if ((v7) && ((v7->DoorFormID == DoorID) || (!DoorID))) {
+            v9 = 1;
         }
     }
     if (!v10) {
@@ -3170,16 +3138,14 @@ bool DoorInPathFilter::CanCrossEdge(FastNavMeshEdgeHandle hEdge, FastNavMeshEdge
     if (!v9) {
         bEntirePathInDoor = false;
     }
-    if (v10) {
-        if (!v9) {
-            bLeaveTriWithDoor = true;
-        }
+    if ((v10) && (!v9)) {
+        bLeaveTriWithDoor = true;
     }
-    if (!v10) {
-        if (v9) {
-            bEnterTriWithDoor = true;
-        }
+
+    if ((!v10) && (v9)) {
+        bEnterTriWithDoor = true;
     }
+
     return true;
 }
 

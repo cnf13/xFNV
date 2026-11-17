@@ -37,10 +37,9 @@ NiObject* BSSegmentedTriShape::CreateClone(NiCloningProcess& kCloning) {
         CopyMembers(pkObject, kCloning);
         return pkObject;
     }
-    else {
-        CopyMembers(nullptr, kCloning);
-        return nullptr;
-    }
+
+    CopyMembers(nullptr, kCloning);
+    return nullptr;
 }
 
 // Reads the segments; empty ones start at index 0. Every segment loads disabled, its flag byte is skipped.
@@ -171,9 +170,8 @@ uint32_t BSSegmentedTriShape::GetNumSegments() {
     if (bIgnoreSegments) {
         return (uint32_t)1;
     }
-    else {
-        return (uint32_t)((int32_t)iNumSegments);
-    }
+
+    return (uint32_t)((int32_t)iNumSegments);
 }
 
 bool BSSegmentedTriShape::GetSegmentEmpty(uint32_t aiSegment) {

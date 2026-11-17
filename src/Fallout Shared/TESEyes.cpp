@@ -102,24 +102,23 @@ bool TESEyes::IsPlayable() {
 
 bool TESEyes::CanBeEyesForNPC(TESNPC* apNPC) {
     bool bretval = false;
-    if (apNPC) {
-        if (apNPC->GetRace()) {
-            TESEyes* item = this;
-            if (apNPC->GetRace()->GetEyeColorList()->IsInList(item)) {
-                TESActorBase::SEX Sex = apNPC->GetSex();
-                if (Sex) {
-                    if (Sex == TESActorBase::SEX_FEMALE && CanBeFemale()) {
-                        return true;
-                    }
+    if ((apNPC) && (apNPC->GetRace())) {
+        TESEyes* item = this;
+        if (apNPC->GetRace()->GetEyeColorList()->IsInList(item)) {
+            TESActorBase::SEX Sex = apNPC->GetSex();
+            if (Sex) {
+                if (Sex == TESActorBase::SEX_FEMALE && CanBeFemale()) {
+                    return true;
                 }
-                else {
-                    if (CanBeMale()) {
-                        return true;
-                    }
+            }
+            else {
+                if (CanBeMale()) {
+                    return true;
                 }
             }
         }
     }
+
     return bretval;
 }
 

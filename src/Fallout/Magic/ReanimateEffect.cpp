@@ -333,14 +333,8 @@ void ReanimateEffect::FinishInitLoadGame(Actor* apActor) {
 
 void ReanimateEffect::Revert(Actor* apActor) {
     ActiveEffect::Revert(apActor);
-    if (iState < 50) {
-        if (apActor) {
-            if (apActor->Get3D()) {
-                if (pBody) {
-                    pBody->SetMotionType(hkpMotion::MOTION_DYNAMIC);
-                }
-            }
-        }
+    if ((iState < 50) && (apActor) && (apActor->Get3D()) && (pBody)) {
+        pBody->SetMotionType(hkpMotion::MOTION_DYNAMIC);
     }
 }
 
@@ -399,7 +393,6 @@ ActiveEffect* ReanimateEffect::Instantiate(MagicCaster* a1, MagicItem* a2, Effec
     if (v5) {
         return ::new (v5) ReanimateEffect(a1, a2, a3);
     }
-    else {
-        return nullptr;
-    }
+
+    return nullptr;
 }

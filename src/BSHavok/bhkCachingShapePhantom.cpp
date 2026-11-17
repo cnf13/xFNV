@@ -185,14 +185,13 @@ void hkpCachingShapePhantomRay::castRay(const hkpWorldRayCastInput& arInput, hkp
         sout.m_extraInfo = -1;
         sout.m_shapeKeys[0] = HK_INVALID_SHAPE_KEY;
         sout.m_shapeKeyIndex = 0;
-        if (pShape->castRay(sinput, sout).m_bool) {
-            // Only a strictly greater best fraction (ordered compare) is replaced.
-            if (!bHit || arOutput.m_hitFraction > sout.m_hitFraction) {
-                arOutput.m_hitFraction = sout.m_hitFraction;
-                bHit = true;
-                arOutput.m_normal.m_quad = sout.m_normal.m_quad;
-                arOutput.m_rootCollidable = pCollidable;
-            }
+        if ((pShape->castRay(sinput, sout).m_bool) && (!bHit || arOutput.m_hitFraction > sout.m_hitFraction))
+        // Only a strictly greater best fraction (ordered compare) is replaced.
+        {
+            arOutput.m_hitFraction = sout.m_hitFraction;
+            bHit = true;
+            arOutput.m_normal.m_quad = sout.m_normal.m_quad;
+            arOutput.m_rootCollidable = pCollidable;
         }
     }
     if (arOutput.m_rootCollidable) {

@@ -109,18 +109,16 @@ TESForm* PackageLocation::GetLocObject() const {
     if (eLocType == 4) {
         return uObject.pRef;
     }
-    else {
-        return nullptr;
-    }
+
+    return nullptr;
 }
 
 PACKAGE_OBJECT_TYPE PackageLocation::GetLocObjectType() const {
     if (eLocType == 5) {
         return uObject.eObjType;
     }
-    else {
-        return (PACKAGE_OBJECT_TYPE)0u;
-    }
+
+    return (PACKAGE_OBJECT_TYPE)0u;
 }
 
 uint32_t PackageLocation::GetRadius() const {
@@ -167,11 +165,10 @@ TESObjectREFR* PackageLocation::GetRunningPackageLocReference(MobileObject* apAc
             break;
         }
         case PLT_LINKEDREF:
-            if (apActor) {
-                if (apActor->GetLinkedRef()) {
-                    pRef = apActor->GetLinkedRef();
-                }
+            if ((apActor) && (apActor->GetLinkedRef())) {
+                pRef = apActor->GetLinkedRef();
             }
+
             break;
         default: break;
     }
@@ -417,11 +414,11 @@ uint16_t PackageLocation::GetSaveSize() {
     if (((int32_t)ucLocationType) <= 4) {
         return (uint16_t)9;
     }
-    else {
-        if (ucLocationType == 5) {
-            return (uint16_t)9;
-        }
+
+    if (ucLocationType == 5) {
+        return (uint16_t)9;
     }
+
     return (uint16_t)v3;
 }
 

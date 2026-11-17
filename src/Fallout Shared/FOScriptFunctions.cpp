@@ -155,28 +155,23 @@ bool Cmd_GetVATSValue(TESObjectREFR* apRefObject, void* apParam1, void* apParam2
                 case 1: {
                     BGSListForm* v26 = static_cast<BGSListForm*>(apParam2);
                     TESObjectWEAP* v27 = CurrentAction->pHitData->pWeapon;
-                    if (apParam2) {
-                        if (v27) {
-                            item = v27;
-                            if (v26->GetFormList()->IsInList(item)) {
-                                afReturnValue = 1.0;
-                            }
+                    if ((apParam2) && (v27)) {
+                        item = v27;
+                        if (v26->GetFormList()->IsInList(item)) {
+                            afReturnValue = 1.0;
                         }
                     }
+
                     break;
                 }
                 case 2: {
                     // A form compared with the target's base object (TESForm::Compare), as in case 9.
                     TESForm* v20 = static_cast<TESForm*>(apParam2);
-                    if (apParam2) {
-                        if (CurrentAction->pTarget) {
-                            if (CurrentAction->pTarget->GetObjectReference()) {
-                                if (!v20->Compare(CurrentAction->pTarget->GetObjectReference())) {
-                                    afReturnValue = 1.0;
-                                }
-                            }
-                        }
+                    if ((apParam2) && (CurrentAction->pTarget) && (CurrentAction->pTarget->GetObjectReference()) &&
+                        (!v20->Compare(CurrentAction->pTarget->GetObjectReference()))) {
+                        afReturnValue = 1.0;
                     }
+
                     break;
                 }
                 case 3: {
@@ -232,13 +227,11 @@ bool Cmd_GetVATSValue(TESObjectREFR* apRefObject, void* apParam1, void* apParam2
                     break;
                 }
                 case 9: {
-                    if (apParam2) {
-                        if (CurrentAction->pHitData->pCriticalEffect) {
-                            if (!static_cast<TESForm*>(apParam2)->Compare(CurrentAction->pHitData->pCriticalEffect)) {
-                                afReturnValue = 1.0;
-                            }
-                        }
+                    if ((apParam2) && (CurrentAction->pHitData->pCriticalEffect) &&
+                        (!static_cast<TESForm*>(apParam2)->Compare(CurrentAction->pHitData->pCriticalEffect))) {
+                        afReturnValue = 1.0;
                     }
+
                     break;
                 }
                 case 10: {

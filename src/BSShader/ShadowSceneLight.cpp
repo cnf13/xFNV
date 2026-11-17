@@ -100,56 +100,55 @@ float ShadowSceneLight::GetLuminanceAtPoint(NiPoint3 apPoint, NiLight* apIgnore)
     if (m_pObject == apIgnore || bCastShadow == 1) {
         return 0.0;
     }
-    else {
-        bool v4 = !bPointLight;
-        float apIgnorec = m_pObject->m_fDimmer;
-        float y = m_pObject->m_kWorld.m_Translate.y;
-        float kLightPos = m_pObject->m_kWorld.m_Translate.x;
-        float kDimmedColor = apIgnorec * m_pObject->m_kDiff.r;
-        float z = m_pObject->m_kWorld.m_Translate.z;
-        float kDimmedColor_4 = apIgnorec * m_pObject->m_kDiff.g;
-        float kDimmedColor_8 = apIgnorec * m_pObject->m_kDiff.b;
-        float fRadius = m_pObject->m_kSpec.r;
-        fLuminance = 1.0;
-        if (!v4) {
-            double v6;
-            double v7;
-            float kPosDiff = apPoint.x - kLightPos;
-            float kPosDiff_4 = apPoint.y - y;
-            float kPosDiff_8 = apPoint.z - z;
-            float apIgnored = kPosDiff_4 * kPosDiff_4 + kPosDiff * kPosDiff + kPosDiff_8 * kPosDiff_8;
-            float apIgnoree = std::sqrt((double)apIgnored);
-            float apIgnoref = apIgnoree / fRadius;
-            double v5 = apIgnoref;
-            if (apIgnoref < 0.0) {
-                v5 = 0.0;
-            }
-            float apIgnorea = v5;
-            if (!(apIgnorea > 1.0)) {
-                v7 = apIgnorea;
-                v6 = 1.0;
-            }
-            else {
-                v6 = 1.0;
-                v7 = 1.0;
-            }
-            float apIgnoreg = v7;
-            fLuminance = v6 - apIgnoreg * apIgnoreg;
+
+    bool v4 = !bPointLight;
+    float apIgnorec = m_pObject->m_fDimmer;
+    float y = m_pObject->m_kWorld.m_Translate.y;
+    float kLightPos = m_pObject->m_kWorld.m_Translate.x;
+    float kDimmedColor = apIgnorec * m_pObject->m_kDiff.r;
+    float z = m_pObject->m_kWorld.m_Translate.z;
+    float kDimmedColor_4 = apIgnorec * m_pObject->m_kDiff.g;
+    float kDimmedColor_8 = apIgnorec * m_pObject->m_kDiff.b;
+    float fRadius = m_pObject->m_kSpec.r;
+    fLuminance = 1.0;
+    if (!v4) {
+        double v6;
+        double v7;
+        float kPosDiff = apPoint.x - kLightPos;
+        float kPosDiff_4 = apPoint.y - y;
+        float kPosDiff_8 = apPoint.z - z;
+        float apIgnored = kPosDiff_4 * kPosDiff_4 + kPosDiff * kPosDiff + kPosDiff_8 * kPosDiff_8;
+        float apIgnoree = std::sqrt((double)apIgnored);
+        float apIgnoref = apIgnoree / fRadius;
+        double v5 = apIgnoref;
+        if (apIgnoref < 0.0) {
+            v5 = 0.0;
         }
-        double v8 = kDimmedColor_4;
-        if (!(kDimmedColor_8 < static_cast<double>(kDimmedColor_4))) {
-            v8 = kDimmedColor_8;
+        float apIgnorea = v5;
+        if (!(apIgnorea > 1.0)) {
+            v7 = apIgnorea;
+            v6 = 1.0;
         }
-        float apIgnoreb = v8;
-        double v9 = kDimmedColor;
-        if (!(apIgnoreb < static_cast<double>(kDimmedColor))) {
-            v9 = apIgnoreb;
+        else {
+            v6 = 1.0;
+            v7 = 1.0;
         }
-        float apIgnoreh = v9;
-        float apIgnorei = apIgnoreh * fLuminance;
-        fLuminance = apIgnorei;
-        return apIgnorei;
+        float apIgnoreg = v7;
+        fLuminance = v6 - apIgnoreg * apIgnoreg;
     }
+    double v8 = kDimmedColor_4;
+    if (!(kDimmedColor_8 < static_cast<double>(kDimmedColor_4))) {
+        v8 = kDimmedColor_8;
+    }
+    float apIgnoreb = v8;
+    double v9 = kDimmedColor;
+    if (!(apIgnoreb < static_cast<double>(kDimmedColor))) {
+        v9 = apIgnoreb;
+    }
+    float apIgnoreh = v9;
+    float apIgnorei = apIgnoreh * fLuminance;
+    fLuminance = apIgnorei;
+    return apIgnorei;
 }
 
 void ShadowSceneLight::SetShadowCaster(NiNode* apNode) {
@@ -248,13 +247,13 @@ void ShadowSceneLight::SetCastShadow(int32_t abCastShadow) {
     // Tests and stores only the low byte, unconverted.
     uint8_t ucCastShadow = static_cast<uint8_t>(abCastShadow);
     // Bit 4 of the enabled passes is the shadow pass.
-    if ((bCastShadow && !ucCastShadow) || BSShaderManager::eShaderLevel < 3 ||
-        !(BSShaderManager::iEnabledPasses & 0x10)) {
-        if (spDynamicShadowMap.m_pObject) {
-            BSShaderManager::pTextureManager->ReturnFrustumShadowTexture(spDynamicShadowMap.m_pObject);
-            spDynamicShadowMap = nullptr;
-        }
+    if (((bCastShadow && !ucCastShadow) || BSShaderManager::eShaderLevel < 3 ||
+         !(BSShaderManager::iEnabledPasses & 0x10)) &&
+        (spDynamicShadowMap.m_pObject)) {
+        BSShaderManager::pTextureManager->ReturnFrustumShadowTexture(spDynamicShadowMap.m_pObject);
+        spDynamicShadowMap = nullptr;
     }
+
     bCastShadow = ucCastShadow;
 }
 
@@ -318,52 +317,50 @@ bool ShadowSceneLight::BoundWithinLightRadius(const NiBound& apBound, NiLight* a
 void ShadowSceneLight::AddTriGeom(NiTriBasedGeom* apTriGeom) {
     static NiPointer<NiGeometry> sptriGeom;
     BSShader* m_spShader = apTriGeom->GetShader();
-    if (m_spShader) {
-        if (NiD3DShaderInterface::DynamicCast(m_spShader, &NiD3DDefaultShader::ms_RTTI)) {
-            // The address &apTriGeom->m_PropertyState is never null.
-            BSShaderLightingProperty* pshprop =
-                static_cast<BSShaderLightingProperty*>(apTriGeom->m_PropertyState.m_aspProps[3].m_pObject);
-            int32_t iType = pshprop ? pshprop->iShaderPropertyType : -1;
-            // Tests 1 <= iType <= 12 as one unsigned compare of iType - 1 against 11.
-            if (static_cast<uint32_t>(iType - 1) <= 11) {
-                NiTListItem<NiPointer<NiGeometry>>* pFence = kGeomListFence;
-                NiTListItem<NiPointer<NiGeometry>>* pPos = pFence;
-                if (!pFence) {
-                    pPos = lGeomList.m_pkHead;
+    if ((m_spShader) && (NiD3DShaderInterface::DynamicCast(m_spShader, &NiD3DDefaultShader::ms_RTTI))) {
+        // The address &apTriGeom->m_PropertyState is never null.
+        BSShaderLightingProperty* pshprop =
+            static_cast<BSShaderLightingProperty*>(apTriGeom->m_PropertyState.m_aspProps[3].m_pObject);
+        int32_t iType = pshprop ? pshprop->iShaderPropertyType : -1;
+        // Tests 1 <= iType <= 12 as one unsigned compare of iType - 1 against 11.
+        if (static_cast<uint32_t>(iType - 1) <= 11) {
+            NiTListItem<NiPointer<NiGeometry>>* pFence = kGeomListFence;
+            NiTListItem<NiPointer<NiGeometry>>* pPos = pFence;
+            if (!pFence) {
+                pPos = lGeomList.m_pkHead;
+            }
+            if (pPos) {
+                NiTListItem<NiPointer<NiGeometry>>* pItem;
+                while (true) {
+                    pItem = pPos;
+                    pPos = pPos->m_pkNext;
+                    if (pItem->m_element.m_pObject == apTriGeom) {
+                        break;
+                    }
+                    if (!pPos) {
+                        goto LABEL_15;
+                    }
                 }
-                if (pPos) {
-                    NiTListItem<NiPointer<NiGeometry>>* pItem;
-                    while (true) {
-                        pItem = pPos;
-                        pPos = pPos->m_pkNext;
-                        if (pItem->m_element.m_pObject == apTriGeom) {
-                            break;
-                        }
-                        if (!pPos) {
-                            goto LABEL_15;
-                        }
-                    }
-                    if (pFence) {
-                        lGeomList.MoveToBefore(pItem, pFence);
-                    }
-                    BSNiBound* m_kWorldBound = apTriGeom->m_kWorldBound;
-                    if (!m_kWorldBound) {
-                        m_kWorldBound = static_cast<BSNiBound*>(&NiAVObject::NullBoundS);
-                    }
-                    pshprop->AttachLight(this, m_kWorldBound);
+                if (pFence) {
+                    lGeomList.MoveToBefore(pItem, pFence);
                 }
-                else {
-                LABEL_15:;
-                    if (!pshprop->GetFlag(12u) || iType == 4) {
-                        sptriGeom.m_pObject = apTriGeom;
-                        BSNiBound* v10 = apTriGeom->m_kWorldBound;
-                        if (!v10) {
-                            v10 = static_cast<BSNiBound*>(&NiAVObject::NullBoundS);
-                        }
-                        pshprop->AttachLight(this, v10);
-                        lGeomList.AddHead(sptriGeom);
-                        sptriGeom.m_pObject = nullptr;
+                BSNiBound* m_kWorldBound = apTriGeom->m_kWorldBound;
+                if (!m_kWorldBound) {
+                    m_kWorldBound = static_cast<BSNiBound*>(&NiAVObject::NullBoundS);
+                }
+                pshprop->AttachLight(this, m_kWorldBound);
+            }
+            else {
+            LABEL_15:;
+                if (!pshprop->GetFlag(12u) || iType == 4) {
+                    sptriGeom.m_pObject = apTriGeom;
+                    BSNiBound* v10 = apTriGeom->m_kWorldBound;
+                    if (!v10) {
+                        v10 = static_cast<BSNiBound*>(&NiAVObject::NullBoundS);
                     }
+                    pshprop->AttachLight(this, v10);
+                    lGeomList.AddHead(sptriGeom);
+                    sptriGeom.m_pObject = nullptr;
                 }
             }
         }
@@ -713,12 +710,11 @@ LABEL_51:;
                     }
                 }
             }
-            if (v9 == fShadowLODDimmer) {
-                if (spDynamicShadowMap.m_pObject) {
-                    BSShaderManager::pTextureManager->ReturnFrustumShadowTexture(spDynamicShadowMap.m_pObject);
-                    spDynamicShadowMap = nullptr;
-                }
+            if ((v9 == fShadowLODDimmer) && (spDynamicShadowMap.m_pObject)) {
+                BSShaderManager::pTextureManager->ReturnFrustumShadowTexture(spDynamicShadowMap.m_pObject);
+                spDynamicShadowMap = nullptr;
             }
+
             goto LABEL_81;
         }
         v31 = fnewShadowLODdim_3;
@@ -745,11 +741,10 @@ void ShadowSceneLight::SetDynamicShadowMap(BSRenderedTexture* apDynamicShadowMap
     BSRenderedTexture* m_pObject;
     m_pObject = spDynamicShadowMap.m_pObject;
     if (m_pObject != apDynamicShadowMap) {
-        if (m_pObject) {
-            if (!InterlockedDecrementUInt32(&m_pObject->m_uiRefCount)) {
-                m_pObject->DeleteThis();
-            }
+        if ((m_pObject) && (!InterlockedDecrementUInt32(&m_pObject->m_uiRefCount))) {
+            m_pObject->DeleteThis();
         }
+
         spDynamicShadowMap.m_pObject = apDynamicShadowMap;
         if (apDynamicShadowMap) {
             InterlockedIncrementUInt32(&apDynamicShadowMap->m_uiRefCount);
@@ -788,17 +783,16 @@ void ShadowSceneLight::ParseObjectAddFrustum(NiAVObject* apObject) {
     if ((apObject->m_uFlags & NiAVObject::NO_SHADOWS) != 0) {
         goto LABEL_20;
     }
-    if (m_uiActivePlanes) {
-        if ((apObject->m_uFlags & NiAVObject::ALWAYS_DRAW) == 0) {
-            NiBound* m_kWorldBound = apObject->m_kWorldBound;
-            if (!m_kWorldBound) {
-                m_kWorldBound = &NiAVObject::NullBoundS;
-            }
-            if (!BoundWithinLightFrustum(*m_kWorldBound)) {
-                goto LABEL_20;
-            }
+    if ((m_uiActivePlanes) && ((apObject->m_uFlags & NiAVObject::ALWAYS_DRAW) == 0)) {
+        NiBound* m_kWorldBound = apObject->m_kWorldBound;
+        if (!m_kWorldBound) {
+            m_kWorldBound = &NiAVObject::NullBoundS;
+        }
+        if (!BoundWithinLightFrustum(*m_kWorldBound)) {
+            goto LABEL_20;
         }
     }
+
     v5 = apObject->IsNode();
     if (!v5) {
         if (apObject->IsTriBasedGeom()) {
@@ -851,11 +845,11 @@ void ShadowSceneLight::ParseObjectAddRadius(NiAVObject* apObject) {
                 continue;
             }
             uint32_t uiFlags = pChild->m_uFlags;
-            if (!(uiFlags & NiAVObject::ALWAYS_DRAW)) {
-                if (!pChild->m_kWorldBound || 0.0f == pChild->m_kWorldBound->m_fRadius) {
-                    continue;
-                }
+            if ((!(uiFlags & NiAVObject::ALWAYS_DRAW)) &&
+                (!pChild->m_kWorldBound || 0.0f == pChild->m_kWorldBound->m_fRadius)) {
+                continue;
             }
+
             if (!(uiFlags & NiAVObject::APP_CULLED)) {
                 ParseObjectAddRadius(pChild);
             }
@@ -873,64 +867,63 @@ float ShadowSceneLight::GetViewLuminanceAtPoint(NiPoint3 apPoint, NiPoint3 apVie
     if (m_pObject == apIgnore || (bCastShadow == 1 || (m_pObject->m_uFlags & 1) != 0)) {
         return 0.0;
     }
-    else {
-        NiPoint3 v20;
-        NiPoint3 v21;
-        bool v6 = !bPointLight;
-        float a8c = m_pObject->m_fDimmer;
-        float x = m_pObject->m_kWorld.m_Translate.x;
-        v21.y = m_pObject->m_kWorld.m_Translate.y;
-        float r = m_pObject->m_kDiff.r;
-        float b = m_pObject->m_kDiff.b;
-        v21.x = x;
-        float v17 = a8c * r;
-        v21.z = m_pObject->m_kWorld.m_Translate.z;
-        float v18 = a8c * m_pObject->m_kDiff.g;
-        float v19 = a8c * b;
-        float a8a = m_pObject->m_kSpec.r;
-        fLuminance = 1.0;
-        v20.x = apPoint.x - v21.x;
-        v20.y = apPoint.y - v21.y;
-        v20.z = apPoint.z - v21.z;
-        if (!v6) {
-            float a8d = v20.Length() / a8a;
-            float a2 = BSMAX(static_cast<float>(0.0), a8d);
-            float a8e = BSMIN(static_cast<float>(1.0), a2);
-            fLuminance = 1.0 - a8e * a8e;
-        }
-        v21.x = apView.x - apPoint.x;
-        v21.y = apView.y - apPoint.y;
-        v21.z = apView.z - apPoint.z;
-        v21.Unitize();
-        v20.Unitize();
-        float apPointb = -v21.x;
-        float apPoint_4 = -v21.y;
-        float apPoint_8 = -v21.z;
-        float a8f = apPoint_4 * v20.y + apPointb * v20.x + apPoint_8 * v20.z;
-        double v9 = a8f;
-        if (a8f > 1.0) {
-            v9 = 1.0;
-        }
-        float a8g = v9;
-        double v10 = a8g;
-        if (a8g < 0.0) {
-            v10 = 0.0;
-        }
-        float apPointa = v10;
-        double v11 = v18;
-        if (!(v19 < static_cast<double>(v18))) {
-            v11 = v19;
-        }
-        float a8b = v11;
-        double v12 = v17;
-        if (!(a8b < static_cast<double>(v17))) {
-            v12 = a8b;
-        }
-        float a8h = v12;
-        float a8i = fLuminance * apPointa * a8h;
-        fLuminance = a8i;
-        return a8i;
+
+    NiPoint3 v20;
+    NiPoint3 v21;
+    bool v6 = !bPointLight;
+    float a8c = m_pObject->m_fDimmer;
+    float x = m_pObject->m_kWorld.m_Translate.x;
+    v21.y = m_pObject->m_kWorld.m_Translate.y;
+    float r = m_pObject->m_kDiff.r;
+    float b = m_pObject->m_kDiff.b;
+    v21.x = x;
+    float v17 = a8c * r;
+    v21.z = m_pObject->m_kWorld.m_Translate.z;
+    float v18 = a8c * m_pObject->m_kDiff.g;
+    float v19 = a8c * b;
+    float a8a = m_pObject->m_kSpec.r;
+    fLuminance = 1.0;
+    v20.x = apPoint.x - v21.x;
+    v20.y = apPoint.y - v21.y;
+    v20.z = apPoint.z - v21.z;
+    if (!v6) {
+        float a8d = v20.Length() / a8a;
+        float a2 = BSMAX(static_cast<float>(0.0), a8d);
+        float a8e = BSMIN(static_cast<float>(1.0), a2);
+        fLuminance = 1.0 - a8e * a8e;
     }
+    v21.x = apView.x - apPoint.x;
+    v21.y = apView.y - apPoint.y;
+    v21.z = apView.z - apPoint.z;
+    v21.Unitize();
+    v20.Unitize();
+    float apPointb = -v21.x;
+    float apPoint_4 = -v21.y;
+    float apPoint_8 = -v21.z;
+    float a8f = apPoint_4 * v20.y + apPointb * v20.x + apPoint_8 * v20.z;
+    double v9 = a8f;
+    if (a8f > 1.0) {
+        v9 = 1.0;
+    }
+    float a8g = v9;
+    double v10 = a8g;
+    if (a8g < 0.0) {
+        v10 = 0.0;
+    }
+    float apPointa = v10;
+    double v11 = v18;
+    if (!(v19 < static_cast<double>(v18))) {
+        v11 = v19;
+    }
+    float a8b = v11;
+    double v12 = v17;
+    if (!(a8b < static_cast<double>(v17))) {
+        v12 = a8b;
+    }
+    float a8h = v12;
+    float a8i = fLuminance * apPointa * a8h;
+    fLuminance = a8i;
+    return a8i;
 }
 
 // The value of aTargetCenter is never read.
@@ -1081,72 +1074,71 @@ void ShadowSceneLight::ComputeWeightedShadowLight(
         }
         uint32_t v30 = 0;
         for (ShadowSceneLight* i = plight_2; v30 < v76; i = plight_3) {
-            if (i) {
-                if (!i->bCastShadow) {
-                    NiLight* v32 = i->spLight.m_pObject;
-                    if ((v32->m_uFlags & 1) == 0) {
-                        float v57 = fLightWeights[v30] / v77;
-                        if (v57 > 0.0f) {
-                            NiPoint3 kvector_2;
-                            double dInvWeight = 1.0 - fLightWeights[v30];
-                            v64 = v57 * (v32->m_kSpec.r * fLightWeights[v30] + dInvWeight * 1000.0) + v64;
-                            kvector_2.x = v32->m_kWorld.m_Translate.x - aTargetCenter.x;
-                            kvector_2.y = v32->m_kWorld.m_Translate.y - aTargetCenter.y;
-                            kvector_2.z = v32->m_kWorld.m_Translate.z - aTargetCenter.z;
-                            kvector_2.Unitize();
-                            float fInvWeight = dInvWeight;
-                            double v33 = fInvWeight;
-                            v82 = fInvWeight * kdirlightvect.x;
-                            v83 = kdirlightvect.y * fInvWeight;
-                            v84 = fInvWeight * kdirlightvect.z;
-                            float fWeight = fLightWeights[v30];
-                            float v99 = kvector_2.x * fWeight;
-                            float v100 = kvector_2.y * fWeight;
-                            float v101 = fWeight * kvector_2.z;
-                            kvector.x = v99 + v82;
-                            kvector.y = v100 + v83;
-                            kvector.z = v101 + v84;
-                            kvector_2 = kvector;
-                            v66 = kvector.x * v57;
-                            v67 = kvector.y * v57;
-                            v68 = kvector.z * v57;
-                            blendedVect.x = v66 + blendedVect.x;
-                            float v34 = v21->m_kDiff.r;
-                            float v35 = v21->m_kDiff.g;
-                            float v36 = v21->m_kDiff.b;
-                            blendedVect.y = blendedVect.y + v67;
-                            float v85 = v34;
-                            float v37 = v32->m_kDiff.r;
-                            float v86 = v35;
-                            float v38 = v32->m_kDiff.g;
-                            float v87 = v36;
-                            blendedVect.z = v68 + blendedVect.z;
-                            float v39 = v32->m_kDiff.b;
-                            float v78 = v37;
-                            float fInvWeight2 = v33;
-                            float v79 = v38;
-                            float v80 = v39;
-                            v85 = v85 * fInvWeight2;
-                            v86 = v86 * fInvWeight2;
-                            v87 = fInvWeight2 * v87;
-                            float fWeight2 = fLightWeights[v30];
-                            v78 = v37 * fWeight2;
-                            v79 = v38 * fWeight2;
-                            v80 = fWeight2 * v39;
-                            float v88 = v78 + v85;
-                            float v89 = v79 + v86;
-                            float v90 = v80 + v87;
-                            float v93 = v88 * v57;
-                            float v94 = v89 * v57;
-                            float v95 = v57 * v90;
-                            r = v93 + r;
-                            g = v94 + g;
-                            b = v95 + b;
-                        }
+            if ((i) && (!i->bCastShadow)) {
+                NiLight* v32 = i->spLight.m_pObject;
+                if ((v32->m_uFlags & 1) == 0) {
+                    float v57 = fLightWeights[v30] / v77;
+                    if (v57 > 0.0f) {
+                        NiPoint3 kvector_2;
+                        double dInvWeight = 1.0 - fLightWeights[v30];
+                        v64 = v57 * (v32->m_kSpec.r * fLightWeights[v30] + dInvWeight * 1000.0) + v64;
+                        kvector_2.x = v32->m_kWorld.m_Translate.x - aTargetCenter.x;
+                        kvector_2.y = v32->m_kWorld.m_Translate.y - aTargetCenter.y;
+                        kvector_2.z = v32->m_kWorld.m_Translate.z - aTargetCenter.z;
+                        kvector_2.Unitize();
+                        float fInvWeight = dInvWeight;
+                        double v33 = fInvWeight;
+                        v82 = fInvWeight * kdirlightvect.x;
+                        v83 = kdirlightvect.y * fInvWeight;
+                        v84 = fInvWeight * kdirlightvect.z;
+                        float fWeight = fLightWeights[v30];
+                        float v99 = kvector_2.x * fWeight;
+                        float v100 = kvector_2.y * fWeight;
+                        float v101 = fWeight * kvector_2.z;
+                        kvector.x = v99 + v82;
+                        kvector.y = v100 + v83;
+                        kvector.z = v101 + v84;
+                        kvector_2 = kvector;
+                        v66 = kvector.x * v57;
+                        v67 = kvector.y * v57;
+                        v68 = kvector.z * v57;
+                        blendedVect.x = v66 + blendedVect.x;
+                        float v34 = v21->m_kDiff.r;
+                        float v35 = v21->m_kDiff.g;
+                        float v36 = v21->m_kDiff.b;
+                        blendedVect.y = blendedVect.y + v67;
+                        float v85 = v34;
+                        float v37 = v32->m_kDiff.r;
+                        float v86 = v35;
+                        float v38 = v32->m_kDiff.g;
+                        float v87 = v36;
+                        blendedVect.z = v68 + blendedVect.z;
+                        float v39 = v32->m_kDiff.b;
+                        float v78 = v37;
+                        float fInvWeight2 = v33;
+                        float v79 = v38;
+                        float v80 = v39;
+                        v85 = v85 * fInvWeight2;
+                        v86 = v86 * fInvWeight2;
+                        v87 = fInvWeight2 * v87;
+                        float fWeight2 = fLightWeights[v30];
+                        v78 = v37 * fWeight2;
+                        v79 = v38 * fWeight2;
+                        v80 = fWeight2 * v39;
+                        float v88 = v78 + v85;
+                        float v89 = v79 + v86;
+                        float v90 = v80 + v87;
+                        float v93 = v88 * v57;
+                        float v94 = v89 * v57;
+                        float v95 = v57 * v90;
+                        r = v93 + r;
+                        g = v94 + g;
+                        b = v95 + b;
                     }
-                    v27 = apLightingProperty;
                 }
+                v27 = apLightingProperty;
             }
+
             if (v27) {
                 plight_3 = v27->GetNextActiveNonShadowLight(kiter);
             }

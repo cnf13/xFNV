@@ -294,16 +294,14 @@ void SandBoxActorPackageData::InitLoadGame(BGSLoadFormBuffer* apLoadGameBuffer) 
         bShouldPickNewProcedure = true;
         iNextTimeToScanWorld = 0;
     }
-    if (pLocation) {
-        if (!iNextTimeToChangeLocations) {
-            iNextTimeToChangeLocations = -1;
-            if ((&pLocation->m_Extra)->GetLinkedRef()) {
-                iNextTimeToChangeLocations = 0;
-                PatrolRefData* prefData = (&pLocation->m_Extra)->GetPatrolRefData();
-                if (prefData) {
-                    uint32_t Time = appTimer.iLastTime;
-                    iNextTimeToChangeLocations = static_cast<int64_t>(prefData->fTimeAtRef * 1000.0) + Time;
-                }
+    if ((pLocation) && (!iNextTimeToChangeLocations)) {
+        iNextTimeToChangeLocations = -1;
+        if ((&pLocation->m_Extra)->GetLinkedRef()) {
+            iNextTimeToChangeLocations = 0;
+            PatrolRefData* prefData = (&pLocation->m_Extra)->GetPatrolRefData();
+            if (prefData) {
+                uint32_t Time = appTimer.iLastTime;
+                iNextTimeToChangeLocations = static_cast<int64_t>(prefData->fTimeAtRef * 1000.0) + Time;
             }
         }
     }
@@ -391,11 +389,9 @@ bool SandBoxActorPackageData::IsDoneWithIdleAnims(Actor* apActor, bool bfreeIfDo
             }
             if (bfreeIfDone) {
                 BSAnimGroupSequence* Sequence = v7->SpecialIdleGetSequence();
-                if (Sequence) {
-                    if (Sequence->GetState() != NiControllerSequence::kEaseOut) {
-                        BaseProcess* CurrentAIProcess = apActor->pCurrentProcess;
-                        CurrentAIProcess->FreeUpSpecialIdle(apActor);
-                    }
+                if ((Sequence) && (Sequence->GetState() != NiControllerSequence::kEaseOut)) {
+                    BaseProcess* CurrentAIProcess = apActor->pCurrentProcess;
+                    CurrentAIProcess->FreeUpSpecialIdle(apActor);
                 }
             }
         }
@@ -404,11 +400,10 @@ bool SandBoxActorPackageData::IsDoneWithIdleAnims(Actor* apActor, bool bfreeIfDo
 }
 
 void SandBoxActorPackageData::ReleaseTargetObject() {
-    if ((!pDataHandler) || (!pDataHandler->GetClearingData())) {
-        if (pCurrentTargetObject) {
-            pCurrentTargetObject->SetMarkerReserved(cCurrentTargetMarker, false);
-        }
+    if (((!pDataHandler) || (!pDataHandler->GetClearingData())) && (pCurrentTargetObject)) {
+        pCurrentTargetObject->SetMarkerReserved(cCurrentTargetMarker, false);
     }
+
     pCurrentTargetObject = nullptr;
     cCurrentTargetMarker = (uint8_t)127;
 }
@@ -485,27 +480,24 @@ void SandBoxActorPackageData::PickProcedure(Actor* apActor, TESPackage* apOrigin
     bShouldPickNewProcedure = false;
     SetUpNextActivity();
     if (fTotalTime == 0.0) {
-        if (apOriginalPackage) {
-            if (apOriginalPackage->GetPackageSchedule()) {
-                fTotalTime = static_cast<float>(apOriginalPackage->GetPackageSchedule()->PSData.iDuration);
-            }
+        if ((apOriginalPackage) && (apOriginalPackage->GetPackageSchedule())) {
+            fTotalTime = static_cast<float>(apOriginalPackage->GetPackageSchedule()->PSData.iDuration);
         }
+
         if (fTotalTime == 0.0) {
             fTotalTime = 24.0f;
         }
     }
-    if (pCurrentTargetObject) {
-        if (pPrevTargetObject != pCurrentTargetObject) {
-            uint32_t Time = appTimer.iLastTime;
-            iPrevTargetChangedTimeStamp = 1000 * iSandBoxPreventRepeatedActionTime.Int() + Time;
-            pPrevTargetObject = pCurrentTargetObject;
-        }
+    if ((pCurrentTargetObject) && (pPrevTargetObject != pCurrentTargetObject)) {
+        uint32_t Time = appTimer.iLastTime;
+        iPrevTargetChangedTimeStamp = 1000 * iSandBoxPreventRepeatedActionTime.Int() + Time;
+        pPrevTargetObject = pCurrentTargetObject;
     }
-    if (pPrevTargetObject) {
-        if (appTimer.iLastTime > iPrevTargetChangedTimeStamp) {
-            pPrevTargetObject = nullptr;
-        }
+
+    if ((pPrevTargetObject) && (appTimer.iLastTime > iPrevTargetChangedTimeStamp)) {
+        pPrevTargetObject = nullptr;
     }
+
     if (pCurrentTargetObject) {
         pCurrentTargetObject->SetMarkerReserved(cCurrentTargetMarker, false);
     }
@@ -832,11 +824,10 @@ bool SandBoxActorPackageData::ShouldPickNewProcedure(Actor* apActor) {
                                         return eProcedure !=
                                             SandBoxActorPackageData::ProceduresForActivities[eActivity];
                                     }
-                                    else {
-                                        float a2 = appCalendar.GetHour();
-                                        float ftime = GetTimeDifference(fLastTimeChanged, a2);
-                                        bresult = fProcedureDuration < static_cast<double>(ftime);
-                                    }
+
+                                    float a2 = appCalendar.GetHour();
+                                    float ftime = GetTimeDifference(fLastTimeChanged, a2);
+                                    bresult = fProcedureDuration < static_cast<double>(ftime);
                                 }
                             }
                         }
@@ -858,9 +849,8 @@ PROCEDURE SandBoxActorPackageData::GetProcedure() {
     if (eProcedure == -1) {
         return PROCEDURE_NONE;
     }
-    else {
-        return SandBoxActorPackageData::kProcedures[eProcedure];
-    }
+
+    return SandBoxActorPackageData::kProcedures[eProcedure];
 }
 
 void SandBoxActorPackageData::ScanWorld(Actor* apActor) {
@@ -898,12 +888,10 @@ void SandBoxActorPackageData::ScanWorld(Actor* apActor) {
     );
     if (ppack->SandboxGetAllowEating()) {
         ItemChange* pfood = apActor->GetBestFoodItem();
-        if (pfood) {
-            if (pfood->pContainerObj) {
-                SandBoxChoiceListItem* v2 = FNVD_RECONSTRUCT(SandBoxChoiceListItem)(&apMemory, nullptr, 2, 1u);
-                PotentialTargets.Add(*v2);
-                bFood = true;
-            }
+        if ((pfood) && (pfood->pContainerObj)) {
+            SandBoxChoiceListItem* v2 = FNVD_RECONSTRUCT(SandBoxChoiceListItem)(&apMemory, nullptr, 2, 1u);
+            PotentialTargets.Add(*v2);
+            bFood = true;
         }
     }
     if (ppack->SandboxGetAllowWandering()) {
@@ -927,18 +915,16 @@ bool SandBoxActorPackageData::UpdateIsActorAtLocation(MobileObject* apMobileObje
     }
     TESWorldSpace* plocworld = pLocation->GetWorldSpace();
     TESObjectCELL* plocintcell = pLocation->GetParentCell();
-    if (plocintcell) {
-        if (!plocintcell->GetInterior()) {
-            plocintcell = nullptr;
-        }
+    if ((plocintcell) && (!plocintcell->GetInterior())) {
+        plocintcell = nullptr;
     }
+
     TESWorldSpace* pactorworld = apMobileObject->GetWorldSpace();
     TESObjectCELL* pactorintcell = apMobileObject->GetParentCell();
-    if (pactorintcell) {
-        if (!pactorintcell->GetInterior()) {
-            pactorintcell = nullptr;
-        }
+    if ((pactorintcell) && (!pactorintcell->GetInterior())) {
+        pactorintcell = nullptr;
     }
+
     bool bsamespace = false;
     if (pactorintcell || plocintcell) {
         if (pactorintcell == plocintcell) {
@@ -993,31 +979,27 @@ bool SandBoxActorPackageData::UpdateIsActorAtLocation(MobileObject* apMobileObje
             fradius = static_cast<float>(iAIDistanceRadiusMinLocation.Int());
         }
         if (apMobileObject->IsAtPoint(*loccoord, fradius, !bexactpos, true)) {
-            if (iNextTimeToChangeLocations == -1) {
-                if ((&pLocation->m_Extra)->GetLinkedRef()) {
-                    iNextTimeToChangeLocations = 0;
-                    PatrolRefData* prefData = (&pLocation->m_Extra)->GetPatrolRefData();
-                    if (prefData) {
-                        uint32_t Time = appTimer.iLastTime;
-                        iNextTimeToChangeLocations = static_cast<int64_t>(prefData->fTimeAtRef * 1000.0) + Time;
-                    }
-                    // Tests both bounds: an unset procedure (-1) gets no new duration.
-                    if (eProcedure > SANDBOX_PROCEDURE_NONE && eProcedure < NUM_SANDBOX_PROCEDURES) {
-                        int32_t iactorEnergy = apActor->GetActorBaseEnergyLevel();
-                        fProcedureDuration =
-                            AiFormulas::ComputeRandomSandboxSubProcessDuration(iactorEnergy, eProcedure);
-                    }
+            if ((iNextTimeToChangeLocations == -1) && ((&pLocation->m_Extra)->GetLinkedRef())) {
+                iNextTimeToChangeLocations = 0;
+                PatrolRefData* prefData = (&pLocation->m_Extra)->GetPatrolRefData();
+                if (prefData) {
+                    uint32_t Time = appTimer.iLastTime;
+                    iNextTimeToChangeLocations = static_cast<int64_t>(prefData->fTimeAtRef * 1000.0) + Time;
+                }
+                // Tests both bounds: an unset procedure (-1) gets no new duration.
+                if (eProcedure > SANDBOX_PROCEDURE_NONE && eProcedure < NUM_SANDBOX_PROCEDURES) {
+                    int32_t iactorEnergy = apActor->GetActorBaseEnergyLevel();
+                    fProcedureDuration = AiFormulas::ComputeRandomSandboxSubProcessDuration(iactorEnergy, eProcedure);
                 }
             }
+
             return true;
         }
-        else {
-            return false;
-        }
-    }
-    else {
+
         return false;
     }
+
+    return false;
 }
 
 void SandBoxActorPackageData::operator delete(void* apMemory) {

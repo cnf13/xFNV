@@ -109,111 +109,109 @@ void FORenderedMenu::Draw(
     NiRect<float> kViewport;
     NiFrustum oldfrust;
     NiFrustum frust;
-    if (bInitialized) {
-        if (spMenuRoot.m_pObject) {
-            bool bconsoleCulled;
-            NiRenderer* pr = NiRenderer::GetRenderer();
-            InterfaceManager* pim = InterfaceManager::Instance();
-            if (pim->IsDebugTextVisible()) {
-                pim->GetDebugTextRoot()->SetAppCulled(true);
-            }
-            SceneGraph* pscene_graph = pim->GetSceneGraph();
-            BSCullingProcess* pculler = pscene_graph->pCuller;
-            pculler->SetAccumulator(static_cast<NiAccumulator*>(spAccumulator.m_pObject));
-            NiColorA prevcolor(0.0f, 0.0f, 0.0f, 0.0f);
-            pr->GetBackgroundColor(prevcolor);
-            pr->SetBackgroundColor(BackgroundColor);
-            NiCamera* pcamera = pscene_graph->GetCamera();
-            NiPointer<BSRenderedTexture> sptempRenderTarget(static_cast<BSRenderedTexture*>(nullptr));
-            if (apSwapTarget) {
-                sptempRenderTarget.operator=(apSwapTarget);
-            }
-            else {
-                NiDX9Renderer* Renderer_ = static_cast<NiDX9Renderer*>(NiRenderer::GetRenderer());
-                BSTextureManager* TextureManager = BSShaderManager::TextureManagerPtr();
-                sptempRenderTarget.operator=(TextureManager->BorrowRenderedTexture(
-                    Renderer_, BSTextureManager::TEX_INTERFACE_TEMP, 0, nullptr, 0
-                ));
-            }
-            if (BSRenderedTexture::QOutsideFrame()) {
-                NiRenderTargetGroup* Group = sptempRenderTarget.m_pObject->GetGroup();
-                BSRenderedTexture::StartOffscreen(aeClearMode, Group);
-                // The viewport is built with NiColorA's constructor, components in the order left, right, top, bottom.
-                ::new (&kViewport) NiColorA(0.0f, 1.0f, 1.0f, 0.0f);
-                pcamera->SetViewPort(kViewport);
-            }
-            frust = pcamera->GetViewFrustum();
-            oldfrust = frust;
-            frust.m_bOrtho = true;
-            frust.m_fLeft = 0.0f;
-            frust.m_fRight = 1280.0f;
-            frust.m_fTop = 960.0f;
-            frust.m_fBottom = 0.0f;
-            frust.m_fNear = 0.0f;
-            frust.m_fFar = 10000.0f;
-            pcamera->SetViewFrustum(frust);
-            pr->SetCameraData(pcamera);
-            Tile* pcursor = (Tile*)pim->pCursor;
-            bool bcullcursor = false;
-            if (pcursor) {
-                bcullcursor = pcursor->GetModel()->GetAppCulled();
-                pcursor->GetModel()->SetAppCulled(true);
-            }
-            NiAVObject* pconsoleRoot = (NiAVObject*)Interface::GetDebugTextRoot();
-            if (pconsoleRoot) {
-                bconsoleCulled = pconsoleRoot->GetAppCulled();
-            }
-            else {
-                bconsoleCulled = false;
-            }
-            if (pconsoleRoot) {
-                pconsoleRoot->SetAppCulled(true);
-            }
-            Tile* pHUD = (Tile*)HUDMainMenu::pme->pMenu;
-            Tile* MenuTile = pHUD->GetMenuTile();
-            bool bHUDCulled = MenuTile->GetModel()->GetAppCulled();
-            Tile* v8 = pHUD->GetMenuTile();
-            v8->GetModel()->SetAppCulled(true);
-            if (this != Interface::GetPipboy()) {
-                static_cast<NiAVObject*>(spMenuRoot.m_pObject)->NiAVObject::SetAppCulled(false);
-            }
-            HideMessageQuantityTutorialMenus();
-            pculler->PushCullMode(BSCullingProcess::BSCP_CULL_ALLPASS);
-            NiAVObject* fB = static_cast<NiAVObject*>(spMenuRoot.m_pObject);
-            BSShaderUtil::AccumulateScene(pscene_graph->GetCamera(), fB, *pculler);
-            BSShaderAccumulator* fBa = static_cast<BSShaderAccumulator*>(spAccumulator.m_pObject);
-            BSShaderUtil::RenderScene(pscene_graph->GetCamera(), fBa, false);
-            pculler->PopCullMode();
-            UnhideMessageQuantityTutorialMenus();
-            pculler->SetAccumulator(nullptr);
-            if (this != Interface::GetPipboy()) {
-                static_cast<NiAVObject*>(spMenuRoot.m_pObject)->NiAVObject::SetAppCulled(true);
-            }
-            Tile* v9 = pHUD->GetMenuTile();
-            v9->GetModel()->SetAppCulled(bHUDCulled);
-            if (pcursor) {
-                pcursor->GetModel()->SetAppCulled(bcullcursor);
-            }
-            if (pconsoleRoot) {
-                pconsoleRoot->SetAppCulled(bconsoleCulled);
-            }
-            BSRenderedTexture::StopOffscreen();
-            DoEffect(sptempRenderTarget.m_pObject, apTarget, aeClearMode);
-            if (!apSwapTarget) {
-                BSRenderedTexture* fA = sptempRenderTarget.m_pObject;
-                BSTextureManager* v10 = BSShaderManager::TextureManagerPtr();
-                v10->ReturnRenderedTexture(fA);
-            }
-            pr->SetBackgroundColor(prevcolor);
-            pcamera->SetViewFrustum(oldfrust);
-            if (bUsePartialScreenGeometry) {
-                ImageSpaceManager* ImageSpaceManager_ = BSShaderManager::GetImageSpaceManager();
-                ImageSpaceManager_->EnablePartialRender(false, nullptr);
-            }
-            PostDraw();
-            if (pim->IsDebugTextVisible()) {
-                pim->GetDebugTextRoot()->SetAppCulled(false);
-            }
+    if ((bInitialized) && (spMenuRoot.m_pObject)) {
+        bool bconsoleCulled;
+        NiRenderer* pr = NiRenderer::GetRenderer();
+        InterfaceManager* pim = InterfaceManager::Instance();
+        if (pim->IsDebugTextVisible()) {
+            pim->GetDebugTextRoot()->SetAppCulled(true);
+        }
+        SceneGraph* pscene_graph = pim->GetSceneGraph();
+        BSCullingProcess* pculler = pscene_graph->pCuller;
+        pculler->SetAccumulator(static_cast<NiAccumulator*>(spAccumulator.m_pObject));
+        NiColorA prevcolor(0.0f, 0.0f, 0.0f, 0.0f);
+        pr->GetBackgroundColor(prevcolor);
+        pr->SetBackgroundColor(BackgroundColor);
+        NiCamera* pcamera = pscene_graph->GetCamera();
+        NiPointer<BSRenderedTexture> sptempRenderTarget(static_cast<BSRenderedTexture*>(nullptr));
+        if (apSwapTarget) {
+            sptempRenderTarget.operator=(apSwapTarget);
+        }
+        else {
+            NiDX9Renderer* Renderer_ = static_cast<NiDX9Renderer*>(NiRenderer::GetRenderer());
+            BSTextureManager* TextureManager = BSShaderManager::TextureManagerPtr();
+            sptempRenderTarget.operator=(
+                TextureManager->BorrowRenderedTexture(Renderer_, BSTextureManager::TEX_INTERFACE_TEMP, 0, nullptr, 0)
+            );
+        }
+        if (BSRenderedTexture::QOutsideFrame()) {
+            NiRenderTargetGroup* Group = sptempRenderTarget.m_pObject->GetGroup();
+            BSRenderedTexture::StartOffscreen(aeClearMode, Group);
+            // The viewport is built with NiColorA's constructor, components in the order left, right, top, bottom.
+            ::new (&kViewport) NiColorA(0.0f, 1.0f, 1.0f, 0.0f);
+            pcamera->SetViewPort(kViewport);
+        }
+        frust = pcamera->GetViewFrustum();
+        oldfrust = frust;
+        frust.m_bOrtho = true;
+        frust.m_fLeft = 0.0f;
+        frust.m_fRight = 1280.0f;
+        frust.m_fTop = 960.0f;
+        frust.m_fBottom = 0.0f;
+        frust.m_fNear = 0.0f;
+        frust.m_fFar = 10000.0f;
+        pcamera->SetViewFrustum(frust);
+        pr->SetCameraData(pcamera);
+        Tile* pcursor = (Tile*)pim->pCursor;
+        bool bcullcursor = false;
+        if (pcursor) {
+            bcullcursor = pcursor->GetModel()->GetAppCulled();
+            pcursor->GetModel()->SetAppCulled(true);
+        }
+        NiAVObject* pconsoleRoot = (NiAVObject*)Interface::GetDebugTextRoot();
+        if (pconsoleRoot) {
+            bconsoleCulled = pconsoleRoot->GetAppCulled();
+        }
+        else {
+            bconsoleCulled = false;
+        }
+        if (pconsoleRoot) {
+            pconsoleRoot->SetAppCulled(true);
+        }
+        Tile* pHUD = (Tile*)HUDMainMenu::pme->pMenu;
+        Tile* MenuTile = pHUD->GetMenuTile();
+        bool bHUDCulled = MenuTile->GetModel()->GetAppCulled();
+        Tile* v8 = pHUD->GetMenuTile();
+        v8->GetModel()->SetAppCulled(true);
+        if (this != Interface::GetPipboy()) {
+            static_cast<NiAVObject*>(spMenuRoot.m_pObject)->NiAVObject::SetAppCulled(false);
+        }
+        HideMessageQuantityTutorialMenus();
+        pculler->PushCullMode(BSCullingProcess::BSCP_CULL_ALLPASS);
+        NiAVObject* fB = static_cast<NiAVObject*>(spMenuRoot.m_pObject);
+        BSShaderUtil::AccumulateScene(pscene_graph->GetCamera(), fB, *pculler);
+        BSShaderAccumulator* fBa = static_cast<BSShaderAccumulator*>(spAccumulator.m_pObject);
+        BSShaderUtil::RenderScene(pscene_graph->GetCamera(), fBa, false);
+        pculler->PopCullMode();
+        UnhideMessageQuantityTutorialMenus();
+        pculler->SetAccumulator(nullptr);
+        if (this != Interface::GetPipboy()) {
+            static_cast<NiAVObject*>(spMenuRoot.m_pObject)->NiAVObject::SetAppCulled(true);
+        }
+        Tile* v9 = pHUD->GetMenuTile();
+        v9->GetModel()->SetAppCulled(bHUDCulled);
+        if (pcursor) {
+            pcursor->GetModel()->SetAppCulled(bcullcursor);
+        }
+        if (pconsoleRoot) {
+            pconsoleRoot->SetAppCulled(bconsoleCulled);
+        }
+        BSRenderedTexture::StopOffscreen();
+        DoEffect(sptempRenderTarget.m_pObject, apTarget, aeClearMode);
+        if (!apSwapTarget) {
+            BSRenderedTexture* fA = sptempRenderTarget.m_pObject;
+            BSTextureManager* v10 = BSShaderManager::TextureManagerPtr();
+            v10->ReturnRenderedTexture(fA);
+        }
+        pr->SetBackgroundColor(prevcolor);
+        pcamera->SetViewFrustum(oldfrust);
+        if (bUsePartialScreenGeometry) {
+            ImageSpaceManager* ImageSpaceManager_ = BSShaderManager::GetImageSpaceManager();
+            ImageSpaceManager_->EnablePartialRender(false, nullptr);
+        }
+        PostDraw();
+        if (pim->IsDebugTextVisible()) {
+            pim->GetDebugTextRoot()->SetAppCulled(false);
         }
     }
 }
@@ -274,24 +272,22 @@ bool FORenderedMenu::Pick(bool abPressed, float* apX, float* apY) {
     Camera->WindowPointToRay(static_cast<int32_t>(DataClipDist), ScriptProcessingDelay, a1, a2, nullptr);
     if (kPick.PickObjects(a1, a2, false)) {
         NiPick::Record* pPickResult = (&kPick.m_pickResults)->GetAt(0);
-        if (pPickResult) {
-            if (pPickResult->GetAVObject() == spScreenTriShape.m_pObject) {
-                // The record's texture coordinates, copied out of m_texture.
-                float fUV_X = pPickResult->m_texture.x;
-                float fUV_Y = pPickResult->m_texture.y;
-                if (Interface::IsMenuIDVisible(Interface::eRaceSexMenu, 0)) {
-                    float fUV_Xa = fUV_X * 0.6299999952316284;
-                    fUV_X = fUV_Xa + 0.3700000047683716;
-                    float fUV_Ya = fUV_Y * 0.6499999761581421;
-                    fUV_Y = fUV_Ya + 0.3400000035762787;
-                }
-                NiRenderer* pRenderer = NiRenderer::GetRenderer();
-                float uiHeight = static_cast<float>(pRenderer->GetDefaultBackBuffer()->GetHeight());
-                float v16 = uiHeight * 1.3333330154418945;
-                *apX = fUV_X * v16;
-                *apY = fUV_Y * uiHeight;
-                v22 = 1;
+        if ((pPickResult) && (pPickResult->GetAVObject() == spScreenTriShape.m_pObject)) {
+            // The record's texture coordinates, copied out of m_texture.
+            float fUV_X = pPickResult->m_texture.x;
+            float fUV_Y = pPickResult->m_texture.y;
+            if (Interface::IsMenuIDVisible(Interface::eRaceSexMenu, 0)) {
+                float fUV_Xa = fUV_X * 0.6299999952316284;
+                fUV_X = fUV_Xa + 0.3700000047683716;
+                float fUV_Ya = fUV_Y * 0.6499999761581421;
+                fUV_Y = fUV_Ya + 0.3400000035762787;
             }
+            NiRenderer* pRenderer = NiRenderer::GetRenderer();
+            float uiHeight = static_cast<float>(pRenderer->GetDefaultBackBuffer()->GetHeight());
+            float v16 = uiHeight * 1.3333330154418945;
+            *apX = fUV_X * v16;
+            *apY = fUV_Y * uiHeight;
+            v22 = 1;
         }
     }
     bool v11 = v22;
@@ -706,27 +702,24 @@ bool FORenderedMenu::CreateMenuLight(const char* apLightNodeName, ShadowSceneNod
             static_cast<NiAVObject*>(spLight.m_pObject)->SetName(*kName);
             return true;
         }
+
+        NiAVObject* pMenuNode = FORenderedMenu::GetParentNodeToRender();
+        NiFixedString* cRenderedMenuLight =
+            ::new (static_cast<void*>(&strRenderedMenuLight)) NiFixedString("RenderedMenuLight");
+        NiAVObject* plight = pMenuNode->GetObjectByName(*cRenderedMenuLight);
+        strRenderedMenuLight.~NiFixedString();
+        if (plight) {
+            spLight.operator=(static_cast<NiRefObject*>(NiObject::DynamicCastStatic(&NiPointLight::ms_RTTI, plight)));
+            if (spLight.m_pObject) {
+                return true;
+            }
+        }
         else {
-            NiAVObject* pMenuNode = FORenderedMenu::GetParentNodeToRender();
-            NiFixedString* cRenderedMenuLight =
-                ::new (static_cast<void*>(&strRenderedMenuLight)) NiFixedString("RenderedMenuLight");
-            NiAVObject* plight = pMenuNode->GetObjectByName(*cRenderedMenuLight);
-            strRenderedMenuLight.~NiFixedString();
-            if (plight) {
-                spLight.operator=(
-                    static_cast<NiRefObject*>(NiObject::DynamicCastStatic(&NiPointLight::ms_RTTI, plight))
-                );
-                if (spLight.m_pObject) {
-                    return true;
-                }
-            }
-            else {
-                Warning(
-                    "MENUS: FORenderedMenu::CreateMenuLight could not find light node '%s' in the rendered menu "
-                    "with mesh '%s'",
-                    apLightNodeName, (&FORenderedMenu::GetParentNodeToRender()->m_kName)->GetHandleString()
-                );
-            }
+            Warning(
+                "MENUS: FORenderedMenu::CreateMenuLight could not find light node '%s' in the rendered menu "
+                "with mesh '%s'",
+                apLightNodeName, (&FORenderedMenu::GetParentNodeToRender()->m_kName)->GetHandleString()
+            );
         }
     }
     return bsuccess;

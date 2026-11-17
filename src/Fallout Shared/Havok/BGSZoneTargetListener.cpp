@@ -66,9 +66,8 @@ ZoneEntry* ZoneEntry::GetZoneEntry(const hkpCollidable* apCollidable) {
     if (Entry) {
         return static_cast<ZoneEntry*>(Entry);
     }
-    else {
-        return nullptr;
-    }
+
+    return nullptr;
 }
 
 void ZoneEntry::RemoveTargetEntry(TargetEntry* apTarget) {
@@ -110,9 +109,8 @@ ZoneEntry* ZoneEntry::GetZoneEntry(TESObjectREFR* apZone) {
     if (Entry) {
         return static_cast<ZoneEntry*>(Entry);
     }
-    else {
-        return nullptr;
-    }
+
+    return nullptr;
 }
 
 TargetEntry* ZoneEntry::GetTargetEntry(TESObjectREFR* apTarget) {
@@ -124,9 +122,8 @@ ZoneEntry* ZoneEntry::QNextEntry() {
     if (v3) {
         return static_cast<ZoneEntry*>(v3);
     }
-    else {
-        return nullptr;
-    }
+
+    return nullptr;
 }
 
 TargetEntry* ZoneEntry::GetTargets() {
@@ -179,9 +176,8 @@ ZoneEntry* BGSZoneTargetListener::CreateZoneEntry(TESObjectREFR* apZone, const h
     if (apMemory) {
         return ::new (apMemory) ZoneEntry(apZone, apCol);
     }
-    else {
-        return nullptr;
-    }
+
+    return nullptr;
 }
 
 TargetEntry* BGSZoneTargetListener::CreateTargetEntry(TESObjectREFR* apZone, const hkpCollidable* apCol) {
@@ -189,9 +185,8 @@ TargetEntry* BGSZoneTargetListener::CreateTargetEntry(TESObjectREFR* apZone, con
     if (alignedTo0x10) {
         return ::new (alignedTo0x10) TargetEntry(apZone, apCol);
     }
-    else {
-        return nullptr;
-    }
+
+    return nullptr;
 }
 
 // Each zone's next entry is read before apTarget is removed from it.
@@ -229,9 +224,8 @@ ZoneEntry* BGSZoneTargetListener::GetZoneEntry(TESObjectREFR* apZone) {
     if (pZones) {
         return pZones->GetZoneEntry(apZone);
     }
-    else {
-        return nullptr;
-    }
+
+    return nullptr;
 }
 
 ZoneEntry* BGSZoneTargetListener::QZoneEntryList() {

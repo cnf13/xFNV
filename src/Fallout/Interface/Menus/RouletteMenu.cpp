@@ -211,19 +211,18 @@ void RouletteMenu::DoClick(int32_t a1, Tile* a2) {
                 break;
             }
             case 5: {
-                if (pBetList) {
-                    if (!pBetList->IsEmpty()) {
-                        SetWinningSlotLuckyAndAnimToPlay();
-                        RouletteMenu::pMe->SetTileTextAlpha(RouletteMenu::TI_FINISHBETS_CNTRL, 128.0f);
-                        RouletteMenu::pMe->SetTileTextAlpha(RouletteMenu::TI_REMOVEBET_CNTRL, 128.0f);
-                        RouletteMenu::pMe->SetTileTextAlpha(RouletteMenu::TI_PLACEBET_CNTRL, 128.0f);
-                        RouletteMenu::pMe->SetTileTextAlpha(RouletteMenu::TI_INCREASEBET_CNTRL, 128.0f);
-                        RouletteMenu::pMe->SetTileTextAlpha(RouletteMenu::TI_DECREASEBET_CNTRL, 128.0f);
-                        RouletteMenu::pMe->SetTileTextAlpha(RouletteMenu::TI_EXIT_CNTRL, 128.0f);
-                        eRouletteState = RouletteMenu::RO_SPIN_ANIM;
-                        MiscStatManager::Increment(MiscStatManager::MS_ROULETTE_GAMES_PLAYED);
-                    }
+                if ((pBetList) && (!pBetList->IsEmpty())) {
+                    SetWinningSlotLuckyAndAnimToPlay();
+                    RouletteMenu::pMe->SetTileTextAlpha(RouletteMenu::TI_FINISHBETS_CNTRL, 128.0f);
+                    RouletteMenu::pMe->SetTileTextAlpha(RouletteMenu::TI_REMOVEBET_CNTRL, 128.0f);
+                    RouletteMenu::pMe->SetTileTextAlpha(RouletteMenu::TI_PLACEBET_CNTRL, 128.0f);
+                    RouletteMenu::pMe->SetTileTextAlpha(RouletteMenu::TI_INCREASEBET_CNTRL, 128.0f);
+                    RouletteMenu::pMe->SetTileTextAlpha(RouletteMenu::TI_DECREASEBET_CNTRL, 128.0f);
+                    RouletteMenu::pMe->SetTileTextAlpha(RouletteMenu::TI_EXIT_CNTRL, 128.0f);
+                    eRouletteState = RouletteMenu::RO_SPIN_ANIM;
+                    MiscStatManager::Increment(MiscStatManager::MS_ROULETTE_GAMES_PLAYED);
                 }
+
                 break;
             }
             case 6: {

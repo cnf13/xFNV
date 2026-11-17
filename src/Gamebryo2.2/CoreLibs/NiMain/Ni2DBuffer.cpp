@@ -88,11 +88,10 @@ bool Ni2DBuffer::CreateRendererData(const NiPixelFormat& kFormat, Ni2DBuffer::Mu
         return false;
     }
     NiDX9Renderer* pkRenderer = static_cast<NiDX9Renderer*>(NiRenderer::ms_pkRenderer);
-    if (pkRenderer &&
-        !pkRenderer->CreateDepthStencilRendererData(static_cast<NiDepthStencilBuffer*>(this), &kFormat, eMSAAPref)) {
-        return false;
-    }
-    return true;
+    return !(
+        pkRenderer &&
+        !pkRenderer->CreateDepthStencilRendererData(static_cast<NiDepthStencilBuffer*>(this), &kFormat, eMSAAPref)
+    );
 }
 
 void Ni2DBuffer::ResetDimensions(uint32_t uiWidth, uint32_t uiHeight) {

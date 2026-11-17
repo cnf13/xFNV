@@ -246,10 +246,8 @@ void VATS::UpdateCurrentCameraAction(VATS_COMMAND* apCommand) {
                 (((AnimGroup = pseq->GetAnimGroup(), !AnimGroup->IsAimAnim()) || apCommand->cFireShots) &&
                  ((v3 = pseq->GetAnimGroup(), !v3->IsAttackAction()) ||
                   panim->GetGroupAction(AGS_WEAPON) < AGA_STOP))) {
-                if (apCommand->pTarget) {
-                    if (apCommand->pTarget->IsDead(false)) {
-                        eVATSCameraAction = 2;
-                    }
+                if ((apCommand->pTarget) && (apCommand->pTarget->IsDead(false))) {
+                    eVATSCameraAction = 2;
                 }
             }
             else {
@@ -271,11 +269,10 @@ void VATS::UpdateCurrentCameraAction(VATS_COMMAND* apCommand) {
             pCamera->bCameraIsKillCam = true;
         }
         else {
-            if (pFirstProjectile) {
-                if (!eVATSCameraAction) {
-                    eVATSCameraAction = 1;
-                }
+            if ((pFirstProjectile) && (!eVATSCameraAction)) {
+                eVATSCameraAction = 1;
             }
+
             if (pFirstProjectile || pLastProjectile) {
                 if (pFirstProjectile) {
                     if (pLastProjectile && (!pCamera || pCamera->GetCameraAction() == BGSCameraShot::CA_HIT)) {
@@ -332,11 +329,10 @@ bool VATS::UseNextCamera() {
             pCamera = nullptr;
         }
         pCamera = plist->m_item;
-        if (pCamera) {
-            if (static_cast<double>(fCameraMinTimer) < pCamera->Data.fMinTime) {
-                fCameraMinTimer = pCamera->Data.fMinTime;
-            }
+        if ((pCamera) && (static_cast<double>(fCameraMinTimer) < pCamera->Data.fMinTime)) {
+            fCameraMinTimer = pCamera->Data.fMinTime;
         }
+
         if (pCamera && pCamera->GetIsFirstPersonCamera()) {
             pPlayer->SetFirstPerson(true);
         }
@@ -345,14 +341,12 @@ bool VATS::UseNextCamera() {
         }
         return true;
     }
-    else {
-        if (pCamera) {
-            if (!pCamera->IsInitialized()) {
-                pCamera->FreeCamera();
-                pCamera = nullptr;
-            }
-        }
+
+    if ((pCamera) && (!pCamera->IsInitialized())) {
+        pCamera->FreeCamera();
+        pCamera = nullptr;
     }
+
     return bretVal;
 }
 
@@ -481,10 +475,8 @@ void VATS::SetMode(VATS::VATS_MODE_ENUM aeMode, bool bForce) {
         }
     }
     if (aeMode) {
-        if (aeMode > VATS::VATS_TARGET_SELECT && aeMode <= VATS::VATS_SCAN_MODE) {
-            if (pVATSTarget) {
-                pVATS.UpdateVATSLight(pVATSTarget);
-            }
+        if ((aeMode > VATS::VATS_TARGET_SELECT && aeMode <= VATS::VATS_SCAN_MODE) && (pVATSTarget)) {
+            pVATS.UpdateVATSLight(pVATSTarget);
         }
     }
     else {
@@ -566,34 +558,31 @@ void VATS::ClearTarget(TESObjectREFR* apRef) {
 }
 
 void VATS::QuitVATSPlayback(bool abForceQuit, bool abFinishCommandPlayback) {
-    if (eMode) {
-        if ((fEndVATSDelay == 0.0 || !commandList.IsEmpty()) &&
-            (abForceQuit ||
-             (commandList.IsEmpty() || commandList.m_item->eAction != ActionPoints::ACTION_PLAYER_VATS_DEATH))) {
-            if (abFinishCommandPlayback) {
-                VATS_COMMAND* pcommand = GetCurrentAction();
-                if (pcommand) {
-                    if (pcommand->cFireShots > 1u) {
-                        pcommand->cFireShots = 1;
-                        pcommand->cFakeFireShots = 0;
+    if ((eMode) &&
+        ((fEndVATSDelay == 0.0 || !commandList.IsEmpty()) &&
+         (abForceQuit ||
+          (commandList.IsEmpty() || commandList.m_item->eAction != ActionPoints::ACTION_PLAYER_VATS_DEATH)))) {
+        if (abFinishCommandPlayback) {
+            VATS_COMMAND* pcommand = GetCurrentAction();
+            if ((pcommand) && (pcommand->cFireShots > 1u)) {
+                pcommand->cFireShots = 1;
+                pcommand->cFakeFireShots = 0;
+            }
+
+            if (!commandList.IsEmpty()) {
+                for (BSSimpleList<VATS_COMMAND*>* plist = commandList.m_pkNext; plist; plist = commandList.m_pkNext) {
+                    VATS_COMMAND* pdelete = plist->m_item;
+                    if (pdelete) {
+                        delete pdelete;
                     }
-                }
-                if (!commandList.IsEmpty()) {
-                    for (BSSimpleList<VATS_COMMAND*>* plist = commandList.m_pkNext; plist;
-                         plist = commandList.m_pkNext) {
-                        VATS_COMMAND* pdelete = plist->m_item;
-                        if (pdelete) {
-                            delete pdelete;
-                        }
-                        commandList.Remove(pdelete);
-                    }
+                    commandList.Remove(pdelete);
                 }
             }
-            else {
-                ClearCommandList();
-                fEndVATSDelay = fVATSPlaybackDelay.Float();
-                appTimer.SetGlobalTimeMultiplier(1.0f, false);
-            }
+        }
+        else {
+            ClearCommandList();
+            fEndVATSDelay = fVATSPlaybackDelay.Float();
+            appTimer.SetGlobalTimeMultiplier(1.0f, false);
         }
     }
 }
@@ -645,21 +634,17 @@ void VATS::IncrementKillCount() {
 }
 
 void VATS::EvaluateCommand(VATS_COMMAND* apCommand) {
-    if (apCommand) {
-        if ((uint8_t)ActionPoints::IsAttackAction(apCommand->eAction)) {
-            if (apCommand->bSuccess) {
-                if (apCommand->pTarget) {
-                    if ((!bhkWorld::QPickTimeOverMax()) &&
-                        (!pVATSAttacker->LineOfSight(true, apCommand->pTarget, true, nullptr, false))) {
-                        apCommand->bSuccess = false;
-                    }
-                }
-            }
-            if (apCommand->pHitData) {
-                apCommand->pHitData->ClearData();
-            }
-            HitData::InitializeHitData(apCommand->pHitData, apCommand);
+    if ((apCommand) && ((uint8_t)ActionPoints::IsAttackAction(apCommand->eAction))) {
+        if ((apCommand->bSuccess) && (apCommand->pTarget) &&
+            ((!bhkWorld::QPickTimeOverMax()) &&
+             (!pVATSAttacker->LineOfSight(true, apCommand->pTarget, true, nullptr, false)))) {
+            apCommand->bSuccess = false;
         }
+
+        if (apCommand->pHitData) {
+            apCommand->pHitData->ClearData();
+        }
+        HitData::InitializeHitData(apCommand->pHitData, apCommand);
     }
 }
 
@@ -699,11 +684,10 @@ void VATS::Update() {
                     if (!(fEndVATSDelay <= 0.0)) {
                         double v23 = appTimer.fDelta;
                         fVATSPlaybackTimer = v23 / BSTimer::QGlobalTimeMultiplier() + fVATSPlaybackTimer;
-                        if (pCamera) {
-                            if (pCamera->IsInitialized()) {
-                                pCamera->Update(fVATSPlaybackTimer);
-                            }
+                        if ((pCamera) && (pCamera->IsInitialized())) {
+                            pCamera->Update(fVATSPlaybackTimer);
                         }
+
                         if (bDollyToNewPos) {
                             appTimer.SetGlobalTimeMultiplier(0.0001f, false);
                         }
@@ -716,12 +700,11 @@ void VATS::Update() {
                                 appTimer.SetGlobalTimeMultiplier(1.0f, false);
                             }
                         }
-                        if (bLastCommandBlock) {
-                            if (pPlayer->GetAnimAction() != ANIM_ACTION_RELOAD &&
-                                pPlayer->GetAnimAction() != ANIM_ACTION_RELOAD_LOOP) {
-                                Controls* pcontrols_2 = appMain->GetControls();
-                                pcontrols_2->ForceUserAction(Controls::UACTN_BLOCK);
-                            }
+                        if ((bLastCommandBlock) &&
+                            (pPlayer->GetAnimAction() != ANIM_ACTION_RELOAD &&
+                             pPlayer->GetAnimAction() != ANIM_ACTION_RELOAD_LOOP)) {
+                            Controls* pcontrols_2 = appMain->GetControls();
+                            pcontrols_2->ForceUserAction(Controls::UACTN_BLOCK);
                         }
                     }
                     else {
@@ -757,11 +740,10 @@ void VATS::Update() {
                     }
                 }
             }
-            if (pVATSTarget) {
-                if (eMode) {
-                    pVATS.UpdateVATSLight(pVATSTarget);
-                }
+            if ((pVATSTarget) && (eMode)) {
+                pVATS.UpdateVATSLight(pVATSTarget);
             }
+
             return;
         }
         VATS_COMMAND* pcommand = commandList.m_item;
@@ -783,28 +765,25 @@ void VATS::Update() {
             }
         }
         else {
-            if (pCamera) {
-                if (pcommand != pcameraCommand) {
-                    pCamera->FreeCamera();
-                    eVATSCameraAction = 0;
-                    pCamera = nullptr;
-                    pCameraList = nullptr;
-                    fCameraTimer = 0.0f;
-                    fCameraMinTimer = 0.0f;
-                }
+            if ((pCamera) && (pcommand != pcameraCommand)) {
+                pCamera->FreeCamera();
+                eVATSCameraAction = 0;
+                pCamera = nullptr;
+                pCameraList = nullptr;
+                fCameraTimer = 0.0f;
+                fCameraMinTimer = 0.0f;
             }
         }
-        if (pCamera) {
-            if (fCameraTimer > 0.0) {
-                double v37 = appTimer.fDelta;
-                fCameraTimer = fCameraTimer - v37 / BSTimer::QGlobalTimeMultiplier();
-                if (fCameraTimer <= 0.0) {
-                    bgetNextCamera = true;
-                    fCameraTimer = 0.0f;
-                    fCameraMinTimer = 0.0f;
-                }
+        if ((pCamera) && (fCameraTimer > 0.0)) {
+            double v37 = appTimer.fDelta;
+            fCameraTimer = fCameraTimer - v37 / BSTimer::QGlobalTimeMultiplier();
+            if (fCameraTimer <= 0.0) {
+                bgetNextCamera = true;
+                fCameraTimer = 0.0f;
+                fCameraMinTimer = 0.0f;
             }
         }
+
         if (!pCameraList || bgetNextCamera) {
             bool bnewCamera_2 = false;
             if (!pCameraList) {
@@ -861,11 +840,10 @@ void VATS::Update() {
                 }
                 else {
                     pCamera = pCameraList->m_item;
-                    if (pCamera) {
-                        if (static_cast<double>(fCameraMinTimer) < pCamera->Data.fMinTime) {
-                            fCameraMinTimer = pCamera->Data.fMinTime;
-                        }
+                    if ((pCamera) && (static_cast<double>(fCameraMinTimer) < pCamera->Data.fMinTime)) {
+                        fCameraMinTimer = pCamera->Data.fMinTime;
                     }
+
                     if (pCamera && pCamera->GetIsFirstPersonCamera()) {
                         pPlayer->SetFirstPerson(true);
                     }
@@ -883,16 +861,16 @@ void VATS::Update() {
             }
         }
         AnimIdle* panimIdle = pVATSAttacker->Actor::GetAnimation()->spAnimIdle.m_pObject;
-        if (pMeleeAttack) {
-            if (!panimIdle ||
-                (panimIdle->pIdleForm != pMeleeAttack ||
-                 (panimIdle->eFlags >= AnimIdle::ANIM_IDLE_PLAYING && !panimIdle->GetSequence()))) {
-                ANIM_GROUP_SECTION a2 = pMeleeAttack->GetIdleAnimGroupSection();
-                TESIdleForm* afStrength = pMeleeAttack;
-                Animation* Animation_ = pVATSAttacker->Actor::GetAnimation();
-                Animation_->SpecialIdleQueue(afStrength, a2);
-            }
+        if ((pMeleeAttack) &&
+            (!panimIdle ||
+             (panimIdle->pIdleForm != pMeleeAttack ||
+              (panimIdle->eFlags >= AnimIdle::ANIM_IDLE_PLAYING && !panimIdle->GetSequence())))) {
+            ANIM_GROUP_SECTION a2 = pMeleeAttack->GetIdleAnimGroupSection();
+            TESIdleForm* afStrength = pMeleeAttack;
+            Animation* Animation_ = pVATSAttacker->Actor::GetAnimation();
+            Animation_->SpecialIdleQueue(afStrength, a2);
         }
+
         if (!pCamera) {
         LABEL_169:;
             float fuseActionPoints = 0.0f;
@@ -1177,11 +1155,10 @@ void VATS::Update() {
                                     pImagespaceMod->SetPermanent(true);
                                 }
                             }
-                            if (pCamera) {
-                                if (!pCamera->IsInitialized()) {
-                                    UseNextCamera();
-                                }
+                            if ((pCamera) && (!pCamera->IsInitialized())) {
+                                UseNextCamera();
                             }
+
                             goto LABEL_150;
                         }
                         if (ptarget3d) {
@@ -1245,19 +1222,18 @@ void VATS::FreeHeadAction() {
             while (!commandList.IsEmpty()) {
                 pcommand_2 = commandList.m_item;
                 bool v4 = false;
-                if (pcommand_2) {
-                    if (pcommand_2->pTarget) {
-                        if (pcommand_2->pTarget->IsDead(false)) {
-                            v4 = true;
-                        }
-                        else {
-                            if (pcommand_2->bStranger) {
-                                double Health = pcommand_2->pTarget->GetHealth();
-                                v4 = static_cast<double>(iVATSStrangerMaxHP.Int()) < Health;
-                            }
+                if ((pcommand_2) && (pcommand_2->pTarget)) {
+                    if (pcommand_2->pTarget->IsDead(false)) {
+                        v4 = true;
+                    }
+                    else {
+                        if (pcommand_2->bStranger) {
+                            double Health = pcommand_2->pTarget->GetHealth();
+                            v4 = static_cast<double>(iVATSStrangerMaxHP.Int()) < Health;
                         }
                     }
                 }
+
                 if (!v4) {
                     break;
                 }
@@ -1267,17 +1243,14 @@ void VATS::FreeHeadAction() {
                 pcommand_2 = nullptr;
                 commandList.RemoveHead();
             }
-            if (pcommand_2) {
-                if (pcommand_2->bStranger) {
-                    pVATSAttacker = VATS::pStranger;
-                    MiscStatManager::Increment(MiscStatManager::MS_STRANGER_ASSISTS);
-                }
+            if ((pcommand_2) && (pcommand_2->bStranger)) {
+                pVATSAttacker = VATS::pStranger;
+                MiscStatManager::Increment(MiscStatManager::MS_STRANGER_ASSISTS);
             }
-            if (pcommand_2) {
-                if (pcommand_2->bMissFortune) {
-                    pVATSAttacker = VATS::pMissFortune;
-                    MiscStatManager::Increment(MiscStatManager::MS_MISS_FORTUNE);
-                }
+
+            if ((pcommand_2) && (pcommand_2->bMissFortune)) {
+                pVATSAttacker = VATS::pMissFortune;
+                MiscStatManager::Increment(MiscStatManager::MS_MISS_FORTUNE);
             }
         }
     }
@@ -1286,137 +1259,130 @@ void VATS::FreeHeadAction() {
 void VATS::UpdateMeleeAttack(VATS_COMMAND* apCommand) {
     NiPoint3 ecx0;
     if (apCommand->cFireShots) {
-        if (pVATSAttacker == VATS::pStranger || (pVATSAttacker == VATS::pMissFortune || IsMeleeCommand(apCommand))) {
-            if (apCommand->pTarget) {
-                float a3 = 0.0;
-                if (apCommand->bStranger) {
+        if ((pVATSAttacker == VATS::pStranger || (pVATSAttacker == VATS::pMissFortune || IsMeleeCommand(apCommand))) &&
+            (apCommand->pTarget)) {
+            float a3 = 0.0;
+            if (apCommand->bStranger) {
+                a3 = fVATSStrangerDistance.Float();
+                if (VATS::pStranger->GetAlphaMult() != 1.0) {
+                    VATS::pStranger->SetAlphaMult(1.0);
+                    VATS::pStranger->UpdateAlpha();
+                    PlayMysteriousStrangerMusic();
+                }
+            }
+            else {
+                if (apCommand->bMissFortune) {
                     a3 = fVATSStrangerDistance.Float();
-                    if (VATS::pStranger->GetAlphaMult() != 1.0) {
-                        VATS::pStranger->SetAlphaMult(1.0);
-                        VATS::pStranger->UpdateAlpha();
+                    if (VATS::pMissFortune->GetAlphaMult() != 1.0) {
+                        VATS::pMissFortune->SetAlphaMult(1.0);
+                        VATS::pMissFortune->UpdateAlpha();
                         PlayMysteriousStrangerMusic();
                     }
                 }
                 else {
-                    if (apCommand->bMissFortune) {
-                        a3 = fVATSStrangerDistance.Float();
-                        if (VATS::pMissFortune->GetAlphaMult() != 1.0) {
-                            VATS::pMissFortune->SetAlphaMult(1.0);
-                            VATS::pMissFortune->UpdateAlpha();
-                            PlayMysteriousStrangerMusic();
+                    TESObjectWEAP* CurrentWeapon = pVATSAttacker->GetCurrentWeapon();
+                    a3 = CombatUtilities::GetWeaponReach(pVATSAttacker, CurrentWeapon);
+                    if (pVATSAttacker->GetCurrentWeapon()) {
+                        TESObjectWEAP* v3 = pVATSAttacker->GetCurrentWeapon();
+                        if (v3->IsMeleeWeapon()) {
+                            a3 = a3 * fVATSMeleeWarpDistanceMult.Float();
                         }
                     }
                     else {
-                        TESObjectWEAP* CurrentWeapon = pVATSAttacker->GetCurrentWeapon();
-                        a3 = CombatUtilities::GetWeaponReach(pVATSAttacker, CurrentWeapon);
-                        if (pVATSAttacker->GetCurrentWeapon()) {
-                            TESObjectWEAP* v3 = pVATSAttacker->GetCurrentWeapon();
-                            if (v3->IsMeleeWeapon()) {
-                                a3 = a3 * fVATSMeleeWarpDistanceMult.Float();
-                            }
-                        }
-                        else {
-                            a3 = a3 * fVATSH2HWarpDistanceMult.Float();
-                        }
+                        a3 = a3 * fVATSH2HWarpDistanceMult.Float();
                     }
                 }
-                if (pVATSAttacker == VATS::pStranger || pVATSAttacker == VATS::pMissFortune) {
-                    const NiPoint3* v4 = &pPlayer->GetLocationOnReference();
-                    pVATSAttacker->SetLocationOnReference(*v4);
-                }
-                if (Pathing::FindSafeStraightLinePathPoint(pVATSAttacker, apCommand->pTarget, a3, &ecx0)) {
-                    pVATSAttacker->SetPosition(ecx0);
-                    pVATSAttacker->SetHeading(apCommand->pTarget);
-                    if (pPlayer == pVATSAttacker && !GetLineOfSight(apCommand)) {
-                        const NiPoint3* v5 = &apCommand->pTarget->GetLocationOnReference();
-                        pVATSAttacker->SetPosition(*v5);
-                        pVATSAttacker->SetHeading(apCommand->pTarget);
-                    }
-                }
-                else {
-                    const NiPoint3* v6 = &apCommand->pTarget->GetLocationOnReference();
-                    pVATSAttacker->SetPosition(*v6);
-                    pVATSAttacker->SetHeading(apCommand->pTarget);
-                }
-                Animation* v7 = pVATSAttacker->GetAnimation();
-                v7->UpdateSceneGraphNoController();
             }
+            if (pVATSAttacker == VATS::pStranger || pVATSAttacker == VATS::pMissFortune) {
+                const NiPoint3* v4 = &pPlayer->GetLocationOnReference();
+                pVATSAttacker->SetLocationOnReference(*v4);
+            }
+            if (Pathing::FindSafeStraightLinePathPoint(pVATSAttacker, apCommand->pTarget, a3, &ecx0)) {
+                pVATSAttacker->SetPosition(ecx0);
+                pVATSAttacker->SetHeading(apCommand->pTarget);
+                if (pPlayer == pVATSAttacker && !GetLineOfSight(apCommand)) {
+                    const NiPoint3* v5 = &apCommand->pTarget->GetLocationOnReference();
+                    pVATSAttacker->SetPosition(*v5);
+                    pVATSAttacker->SetHeading(apCommand->pTarget);
+                }
+            }
+            else {
+                const NiPoint3* v6 = &apCommand->pTarget->GetLocationOnReference();
+                pVATSAttacker->SetPosition(*v6);
+                pVATSAttacker->SetHeading(apCommand->pTarget);
+            }
+            Animation* v7 = pVATSAttacker->GetAnimation();
+            v7->UpdateSceneGraphNoController();
         }
+
         pMeleeAttack = pIdleManager->GetIdleToPlay(pVATSAttacker, apCommand->pTarget);
-        if (pMeleeAttack) {
-            if (pMeleeAttack->GetIdleAnimGroupSection() != AGS_WEAPON) {
-                const char* v8 = pMeleeAttack->GetFormEditorID();
-                Warning(
-                    "COMBAT: Bad VATS Melee Attack '%s' in the idle manager. Attacks should be tagged for 'Weapon' "
-                    "anim group section.",
-                    v8
-                );
-                pMeleeAttack = nullptr;
-            }
+        if ((pMeleeAttack) && (pMeleeAttack->GetIdleAnimGroupSection() != AGS_WEAPON)) {
+            const char* v8 = pMeleeAttack->GetFormEditorID();
+            Warning(
+                "COMBAT: Bad VATS Melee Attack '%s' in the idle manager. Attacks should be tagged for 'Weapon' "
+                "anim group section.",
+                v8
+            );
+            pMeleeAttack = nullptr;
         }
     }
 }
 
 void VATS::UpdateVATSLight(TESObjectREFR* apVictim) {
     NiPoint3 v33;
-    if (apVictim->IsActor()) {
-        if (apVictim->Get3D()) {
-            if (spVATSLight.m_pObject) {
-                Actor* pactor = static_cast<Actor*>(apVictim);
-                if (pactor->GetCurrentAIProcess()) {
-                    NiMatrix3 rotmat;
-                    NiNode* v2 = apVictim->Get3D();
-                    NiPoint3 pos = v2->GetWorldBound().m_kCenter;
-                    const NiPoint3* a2 = &apVictim->GetLocationOnReference();
-                    const NiPoint3* v3 = &pVATSAttacker->GetLocationOnReference();
-                    NiPoint3 vec_2 = *v3 - *a2;
-                    float a2a = gs_fVATSLightAngle_VATS.operator float();
-                    rotmat.MakeZRotation(a2a);
-                    vec_2.Unitize();
-                    vec_2 = vec_2 * rotmat;
-                    float a2b = gs_fVATSLightDistance_VATS.operator float();
-                    vec_2.operator*=(a2b);
-                    pos = pos + vec_2;
-                    double v4 = gs_fVATSLightElevation_VATS.operator float();
-                    pos.z = v4 + pos.z;
-                    float a2c = gs_fVatsLightColorB_VATS.Float();
-                    float a1 = gs_fVatsLightColorG_VATS.Float();
-                    float* v5 = &gs_fVatsLightColorR_VATS.Float();
-                    NiColor lightcolor(*v5, a1, a2c);
-                    int32_t inumberlights = 0;
-                    float fambient = 0.0f;
-                    float fdirectional = 0.0f;
-                    float a2d = pactor->GetHeight();
-                    NiPoint3* a2e = ::new (&v33) NiPoint3(0.0f, 0.0f, a2d);
-                    const NiPoint3* v6 = &pactor->GetLocationOnReference();
-                    NiPoint3 ktarget = *v6 + *a2e;
-                    NiLight* a2f = spVATSLight.m_pObject->GetLight();
-                    NiPoint3 x2 = pVATSAttacker->GetLocationOnReference();
-                    NiPoint3 v48 = ktarget;
-                    ShadowSceneNode* ShadowSceneNode_ = BSShaderManager::GetShadowSceneNode(0);
-                    float ftargetluminance =
-                        ShadowSceneNode_->GetViewLuminanceAtPoint(v48, inumberlights, fambient, fdirectional, x2, a2f) *
-                        100.0;
-                    float a1a = gs_fVATSLightLevelMax_VATS.operator float();
-                    float x = gs_fVATSLightLevelMin_VATS.operator float();
-                    float a2h = FLerp(1.0f, 0.0f, x, a1a, ftargetluminance);
-                    float a2i = BSMAX(0.0f, a2h);
-                    float intensity = BSMIN(1.0f, a2i);
-                    lightcolor *= intensity;
-                    NiNode* v8 = apVictim->Get3D();
-                    double v11 = (pos - v8->GetWorldBound().m_kCenter).Length();
-                    float radius = v11 + v11;
-                    NiLight* Light = spVATSLight.m_pObject->GetLight();
-                    Light->SetWorldTranslate(pos);
-                    NiColor specularcolor(radius, 0.0f, 0.0f);
-                    NiLight* v13 = spVATSLight.m_pObject->GetLight();
-                    v13->SetSpecularColor(specularcolor);
-                    NiLight* v14 = spVATSLight.m_pObject->GetLight();
-                    v14->SetDiffuseColor(lightcolor);
-                    NiLight* v15 = spVATSLight.m_pObject->GetLight();
-                    v15->SetAppCulled(false);
-                }
-            }
+    if ((apVictim->IsActor()) && (apVictim->Get3D()) && (spVATSLight.m_pObject)) {
+        Actor* pactor = static_cast<Actor*>(apVictim);
+        if (pactor->GetCurrentAIProcess()) {
+            NiMatrix3 rotmat;
+            NiNode* v2 = apVictim->Get3D();
+            NiPoint3 pos = v2->GetWorldBound().m_kCenter;
+            const NiPoint3* a2 = &apVictim->GetLocationOnReference();
+            const NiPoint3* v3 = &pVATSAttacker->GetLocationOnReference();
+            NiPoint3 vec_2 = *v3 - *a2;
+            float a2a = gs_fVATSLightAngle_VATS.operator float();
+            rotmat.MakeZRotation(a2a);
+            vec_2.Unitize();
+            vec_2 = vec_2 * rotmat;
+            float a2b = gs_fVATSLightDistance_VATS.operator float();
+            vec_2.operator*=(a2b);
+            pos = pos + vec_2;
+            double v4 = gs_fVATSLightElevation_VATS.operator float();
+            pos.z = v4 + pos.z;
+            float a2c = gs_fVatsLightColorB_VATS.Float();
+            float a1 = gs_fVatsLightColorG_VATS.Float();
+            float* v5 = &gs_fVatsLightColorR_VATS.Float();
+            NiColor lightcolor(*v5, a1, a2c);
+            int32_t inumberlights = 0;
+            float fambient = 0.0f;
+            float fdirectional = 0.0f;
+            float a2d = pactor->GetHeight();
+            NiPoint3* a2e = ::new (&v33) NiPoint3(0.0f, 0.0f, a2d);
+            const NiPoint3* v6 = &pactor->GetLocationOnReference();
+            NiPoint3 ktarget = *v6 + *a2e;
+            NiLight* a2f = spVATSLight.m_pObject->GetLight();
+            NiPoint3 x2 = pVATSAttacker->GetLocationOnReference();
+            NiPoint3 v48 = ktarget;
+            ShadowSceneNode* ShadowSceneNode_ = BSShaderManager::GetShadowSceneNode(0);
+            float ftargetluminance =
+                ShadowSceneNode_->GetViewLuminanceAtPoint(v48, inumberlights, fambient, fdirectional, x2, a2f) * 100.0;
+            float a1a = gs_fVATSLightLevelMax_VATS.operator float();
+            float x = gs_fVATSLightLevelMin_VATS.operator float();
+            float a2h = FLerp(1.0f, 0.0f, x, a1a, ftargetluminance);
+            float a2i = BSMAX(0.0f, a2h);
+            float intensity = BSMIN(1.0f, a2i);
+            lightcolor *= intensity;
+            NiNode* v8 = apVictim->Get3D();
+            double v11 = (pos - v8->GetWorldBound().m_kCenter).Length();
+            float radius = v11 + v11;
+            NiLight* Light = spVATSLight.m_pObject->GetLight();
+            Light->SetWorldTranslate(pos);
+            NiColor specularcolor(radius, 0.0f, 0.0f);
+            NiLight* v13 = spVATSLight.m_pObject->GetLight();
+            v13->SetSpecularColor(specularcolor);
+            NiLight* v14 = spVATSLight.m_pObject->GetLight();
+            v14->SetDiffuseColor(lightcolor);
+            NiLight* v15 = spVATSLight.m_pObject->GetLight();
+            v15->SetAppCulled(false);
         }
     }
 }
@@ -1623,7 +1589,6 @@ float bhkWorld::QMaxPickTime() {
     if (bhkWorld::bVatsReplay) {
         return bhkWorld::fMaxPickTimeVATS;
     }
-    else {
-        return bhkWorld::fMaxPickTime;
-    }
+
+    return bhkWorld::fMaxPickTime;
 }

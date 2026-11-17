@@ -787,31 +787,28 @@ uint8_t* hkaPose::checkPoseTransformsValidity(uint8_t* a1) {
         *a1 = 1;
         return a1;
     }
-    else {
-        int32_t v5 = 0;
-        while (true) {
-            uint32_t v6 = m_boneFlags.m_data[v4];
-            if ((v6 & 2) != 0 && (v6 & 1) != 0) {
-                break;
-            }
-            m_boneFlags.m_data[v4];
-            if ((m_boneFlags.m_data[v4] & 2) == 0 &&
-                !m_modelPose.m_data[v5].isOk(reinterpret_cast<hkBool*>(&v8))->m_bool) {
-                break;
-            }
-            if ((m_boneFlags.m_data[v4] & 1) == 0 &&
-                !m_localPose.m_data[v5].isOk(reinterpret_cast<hkBool*>(&v9))->m_bool) {
-                break;
-            }
-            ++v4;
-            ++v5;
-            if (v4 >= m_size) {
-                goto LABEL_10;
-            }
+
+    int32_t v5 = 0;
+    while (true) {
+        uint32_t v6 = m_boneFlags.m_data[v4];
+        if ((v6 & 2) != 0 && (v6 & 1) != 0) {
+            break;
         }
-        *a1 = 0;
-        return a1;
+        m_boneFlags.m_data[v4];
+        if ((m_boneFlags.m_data[v4] & 2) == 0 && !m_modelPose.m_data[v5].isOk(reinterpret_cast<hkBool*>(&v8))->m_bool) {
+            break;
+        }
+        if ((m_boneFlags.m_data[v4] & 1) == 0 && !m_localPose.m_data[v5].isOk(reinterpret_cast<hkBool*>(&v9))->m_bool) {
+            break;
+        }
+        ++v4;
+        ++v5;
+        if (v4 >= m_size) {
+            goto LABEL_10;
+        }
     }
+    *a1 = 0;
+    return a1;
 }
 
 void hkaPose::getModelSpaceAabb(__m128* a1) {

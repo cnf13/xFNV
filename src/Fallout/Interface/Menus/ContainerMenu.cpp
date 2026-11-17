@@ -214,47 +214,42 @@ void ContainerMenu::DoEnter(int32_t aiID, Tile* apTarget) {
 }
 
 void ContainerMenu::DoIdle() {
-    if (m_nTimeToClearSubtitle) {
-        if (BSGetTickCount() > m_nTimeToClearSubtitle) {
-            m_nTimeToClearSubtitle = 0;
-            Tile* pTile = Tile::GetTileByName(ContainerMenu::pMe->pMenu, "CM_Subtitle");
-            if (pTile) {
-                pTile->Set(4036, "", true);
-            }
+    if ((m_nTimeToClearSubtitle) && (BSGetTickCount() > m_nTimeToClearSubtitle)) {
+        m_nTimeToClearSubtitle = 0;
+        Tile* pTile = Tile::GetTileByName(ContainerMenu::pMe->pMenu, "CM_Subtitle");
+        if (pTile) {
+            pTile->Set(4036, "", true);
         }
     }
-    if (lbContainer.NumItems()) {
-        if (bMouseOverEnabled) {
-            if (ContainerMenu::pCurrItem && ContainerMenu::pCurrItem->pContainerObj->GetFormType() == WEAP_ID) {
-                InterfaceManager::UpdatePipBoyInventoryEffects(
-                    pTiles[TI_DAM], pTiles[TI_DPS], pTiles[TI_STRREQ], ContainerMenu::pCurrItem, false
-                );
-            }
-            else {
-                if (ContainerMenu::pCurrItem) {
-                    if (ContainerMenu::pCurrItem->pContainerObj->GetFormType() == ARMO_ID) {
-                        Tile* pTileFade2;
-                        if (!ContainerMenu::pCurrItem ||
-                            static_cast<TESObjectARMO*>(ContainerMenu::pCurrItem->pContainerObj)
-                                    ->TESObjectARMO::GetDamageThreshold() == 0.0) {
-                            pTileFade2 = nullptr;
-                        }
-                        else {
-                            pTileFade2 = pTiles[TI_DT];
-                        }
-                        if (!ContainerMenu::pCurrItem ||
-                            static_cast<TESObjectARMO*>(ContainerMenu::pCurrItem->pContainerObj)
-                                    ->TESObjectARMO::GetArmorRating() == 0.0) {
-                            InterfaceManager::UpdatePipBoyInventoryEffects(
-                                nullptr, pTileFade2, nullptr, ContainerMenu::pCurrItem, false
-                            );
-                        }
-                        else {
-                            InterfaceManager::UpdatePipBoyInventoryEffects(
-                                pTiles[TI_DR], pTileFade2, nullptr, ContainerMenu::pCurrItem, false
-                            );
-                        }
-                    }
+
+    if ((lbContainer.NumItems()) && (bMouseOverEnabled)) {
+        if (ContainerMenu::pCurrItem && ContainerMenu::pCurrItem->pContainerObj->GetFormType() == WEAP_ID) {
+            InterfaceManager::UpdatePipBoyInventoryEffects(
+                pTiles[TI_DAM], pTiles[TI_DPS], pTiles[TI_STRREQ], ContainerMenu::pCurrItem, false
+            );
+        }
+        else {
+            if ((ContainerMenu::pCurrItem) && (ContainerMenu::pCurrItem->pContainerObj->GetFormType() == ARMO_ID)) {
+                Tile* pTileFade2;
+                if (!ContainerMenu::pCurrItem ||
+                    static_cast<TESObjectARMO*>(ContainerMenu::pCurrItem->pContainerObj)
+                            ->TESObjectARMO::GetDamageThreshold() == 0.0) {
+                    pTileFade2 = nullptr;
+                }
+                else {
+                    pTileFade2 = pTiles[TI_DT];
+                }
+                if (!ContainerMenu::pCurrItem ||
+                    static_cast<TESObjectARMO*>(ContainerMenu::pCurrItem->pContainerObj)
+                            ->TESObjectARMO::GetArmorRating() == 0.0) {
+                    InterfaceManager::UpdatePipBoyInventoryEffects(
+                        nullptr, pTileFade2, nullptr, ContainerMenu::pCurrItem, false
+                    );
+                }
+                else {
+                    InterfaceManager::UpdatePipBoyInventoryEffects(
+                        pTiles[TI_DR], pTileFade2, nullptr, ContainerMenu::pCurrItem, false
+                    );
                 }
             }
         }
@@ -283,25 +278,23 @@ bool ContainerMenu::DoGamepad(int32_t aiButton, float afValue) {
                 break;
             }
             case 13: {
-                if (!lbItems.GetHighlightedItem()) {
-                    if (lbItems.NumItems()) {
-                        lbContainer.SaveListState();
-                        DoEnter(21, nullptr);
-                        lbItems.RestoreListState(true);
-                        bresult = true;
-                    }
+                if ((!lbItems.GetHighlightedItem()) && (lbItems.NumItems())) {
+                    lbContainer.SaveListState();
+                    DoEnter(21, nullptr);
+                    lbItems.RestoreListState(true);
+                    bresult = true;
                 }
+
                 break;
             }
             case 14: {
-                if (!lbContainer.GetHighlightedItem()) {
-                    if (lbContainer.NumItems()) {
-                        lbItems.SaveListState();
-                        DoEnter(22, nullptr);
-                        lbContainer.RestoreListState(true);
-                        bresult = true;
-                    }
+                if ((!lbContainer.GetHighlightedItem()) && (lbContainer.NumItems())) {
+                    lbItems.SaveListState();
+                    DoEnter(22, nullptr);
+                    lbContainer.RestoreListState(true);
+                    bresult = true;
                 }
+
                 break;
             }
             default: {
@@ -360,11 +353,10 @@ void ContainerMenu::UpdateLists(TESBoundObject* apUpdateObj) {
     float fCurrWeight;
     char Src[68];
     int32_t pnewHighlight = 0;
-    if (plbCurrListbox) {
-        if (plbCurrListbox->GetHighlightedItem()) {
-            plbCurrListbox->SaveListState();
-        }
+    if ((plbCurrListbox) && (plbCurrListbox->GetHighlightedItem())) {
+        plbCurrListbox->SaveListState();
     }
+
     if (eContainerMode == Interface::CMM_ROCK_N_LOAD) {
         BSSimpleArray<ItemChange*, 1024>* prockItLauncherItems = pPlayer->GetRockItAmmoArray();
         // RemoveAll and Sort are called through pointers so that they dispatch virtually; calls on the members
@@ -449,52 +441,49 @@ void ContainerMenu::UpdateLists(TESBoundObject* apUpdateObj) {
             pmineTile->xChildren.GetTail()->Set(4009, 128.0f, true);
         }
     }
-    if (pContainerRef) {
-        if (pContainerRef->IsActor() && pContainerRef->IsDead(false)) {
-            TESObjectREFR* pref = (&pContainerRef->m_Extra)->GetDroppedWeapon();
-            if (pref) {
-                if (!pref->GetDisabledOrDeleted() && (!apUpdateObj || apUpdateObj == pref->GetObjectReference())) {
-                    ItemChange* pnewItem_2;
-                    ItemChange* v23 = static_cast<ItemChange*>(ourMalloc(sizeof(ItemChange)));
-                    if (v23) {
-                        pnewItem_2 = ::new (v23) ItemChange(pref->GetObjectReference(), 1);
-                    }
-                    else {
-                        pnewItem_2 = nullptr;
-                    }
-                    const char* v5 = pnewItem_2->GetFullName();
-                    Tile* pnewTile = lbContainer.AddItem(pnewItem_2, v5, nullptr, nullptr);
-                    if (pnewItem_2->pExtraObjectList) {
-                        BSSimpleList<ExtraDataList*>* v15;
-                        BSSimpleList<ExtraDataList*>* v22 =
-                            static_cast<BSSimpleList<ExtraDataList*>*>(ourMalloc(sizeof(BSSimpleList<ExtraDataList*>)));
-                        if (v22) {
-                            v15 = ::new (v22) BSSimpleList<ExtraDataList*>;
-                        }
-                        else {
-                            v15 = nullptr;
-                        }
-                        pnewItem_2->pExtraObjectList = v15;
-                    }
-                    if (!pnewItem_2->pExtraObjectList->m_item) {
-                        ExtraDataList* pextra;
-                        ExtraDataList* v21 = static_cast<ExtraDataList*>(ourMalloc(sizeof(ExtraDataList)));
-                        if (v21) {
-                            pextra = ::new (v21) ExtraDataList;
-                        }
-                        else {
-                            pextra = nullptr;
-                        }
-                        ExtraDataList* pextra_2 = pextra;
-                        pnewItem_2->pExtraObjectList->AddHead(pextra_2);
-                    }
-                    pnewItem_2->pExtraObjectList->m_item->SetItemDropper(pref);
-                    float afHealtha = pref->GetHealth();
-                    pnewItem_2->pExtraObjectList->m_item->SetHealth(afHealtha);
-                }
+    if ((pContainerRef) && (pContainerRef->IsActor() && pContainerRef->IsDead(false))) {
+        TESObjectREFR* pref = (&pContainerRef->m_Extra)->GetDroppedWeapon();
+        if ((pref) && (!pref->GetDisabledOrDeleted() && (!apUpdateObj || apUpdateObj == pref->GetObjectReference()))) {
+            ItemChange* pnewItem_2;
+            ItemChange* v23 = static_cast<ItemChange*>(ourMalloc(sizeof(ItemChange)));
+            if (v23) {
+                pnewItem_2 = ::new (v23) ItemChange(pref->GetObjectReference(), 1);
             }
+            else {
+                pnewItem_2 = nullptr;
+            }
+            const char* v5 = pnewItem_2->GetFullName();
+            Tile* pnewTile = lbContainer.AddItem(pnewItem_2, v5, nullptr, nullptr);
+            if (pnewItem_2->pExtraObjectList) {
+                BSSimpleList<ExtraDataList*>* v15;
+                BSSimpleList<ExtraDataList*>* v22 =
+                    static_cast<BSSimpleList<ExtraDataList*>*>(ourMalloc(sizeof(BSSimpleList<ExtraDataList*>)));
+                if (v22) {
+                    v15 = ::new (v22) BSSimpleList<ExtraDataList*>;
+                }
+                else {
+                    v15 = nullptr;
+                }
+                pnewItem_2->pExtraObjectList = v15;
+            }
+            if (!pnewItem_2->pExtraObjectList->m_item) {
+                ExtraDataList* pextra;
+                ExtraDataList* v21 = static_cast<ExtraDataList*>(ourMalloc(sizeof(ExtraDataList)));
+                if (v21) {
+                    pextra = ::new (v21) ExtraDataList;
+                }
+                else {
+                    pextra = nullptr;
+                }
+                ExtraDataList* pextra_2 = pextra;
+                pnewItem_2->pExtraObjectList->AddHead(pextra_2);
+            }
+            pnewItem_2->pExtraObjectList->m_item->SetItemDropper(pref);
+            float afHealtha = pref->GetHealth();
+            pnewItem_2->pExtraObjectList->m_item->SetHealth(afHealtha);
         }
     }
+
     lbItems.Traverse(&ContainerMenu::InitFunc, 0, 0x7FFFFFFF);
     lbItems.Filter(&ContainerMenu::FilterModeFunc);
     ListBox<ItemChange*>* pItemList = &lbItems;
@@ -616,19 +605,18 @@ void ContainerMenu::DisplayContainerMenuSubtitle(BSStringT<char> asText, BSSound
     else {
         v4 = nullptr;
     }
-    if (asText.GetLength()) {
-        if (gs_bGeneralSubtitles_Gameplay.Bool() || (v4 && static_cast<uint8_t>(v4->GetShowSubtitles()))) {
-            Tile* pTile = Tile::GetTileByName(ContainerMenu::pMe->pMenu, "CM_Subtitle");
-            if (pTile) {
-                pTile->Set(Tile::kTileValue_String, asText.pString, true);
-            }
-            float fSubtitleDuration = static_cast<float>(ahSound.GetDuration());
-            if (fSubtitleDuration == 0.0) {
-                double v3 = static_cast<double>(std::strlen(asText.pString));
-                fSubtitleDuration = fNoticeTextTimePerCharacter.Float() * v3 * 1000.0;
-            }
-            m_nTimeToClearSubtitle = static_cast<int64_t>(static_cast<double>(BSGetTickCount()) + fSubtitleDuration);
+    if ((asText.GetLength()) &&
+        (gs_bGeneralSubtitles_Gameplay.Bool() || (v4 && static_cast<uint8_t>(v4->GetShowSubtitles())))) {
+        Tile* pTile = Tile::GetTileByName(ContainerMenu::pMe->pMenu, "CM_Subtitle");
+        if (pTile) {
+            pTile->Set(Tile::kTileValue_String, asText.pString, true);
         }
+        float fSubtitleDuration = static_cast<float>(ahSound.GetDuration());
+        if (fSubtitleDuration == 0.0) {
+            double v3 = static_cast<double>(std::strlen(asText.pString));
+            fSubtitleDuration = fNoticeTextTimePerCharacter.Float() * v3 * 1000.0;
+        }
+        m_nTimeToClearSubtitle = static_cast<int64_t>(static_cast<double>(BSGetTickCount()) + fSubtitleDuration);
     }
 }
 
@@ -767,19 +755,16 @@ void ContainerMenu::UpdateItemInList(
 ) {
     FNVD_INLINED_LOCAL(BSSimpleList<ItemChange*>, pnewItemGroup, std::nullopt, std::nullopt);
     ::new (&pnewItemGroup) BSSimpleList<void*>;
-    if (apInventory) {
-        if (apObj) {
-            if (apListbox) {
-                apInventory->GetItemGroup(apObj, &pnewItemGroup);
-                apListbox->RemoveItemGroup(apObj);
-                for (ItemChange*& rpItem : pnewItemGroup.ItemsUntilNull()) {
-                    const char* FullName = rpItem->GetFullName();
-                    apListbox->AddItem(rpItem, FullName, nullptr, nullptr);
-                }
-                pnewItemGroup.RemoveAll();
-            }
+    if ((apInventory) && (apObj) && (apListbox)) {
+        apInventory->GetItemGroup(apObj, &pnewItemGroup);
+        apListbox->RemoveItemGroup(apObj);
+        for (ItemChange*& rpItem : pnewItemGroup.ItemsUntilNull()) {
+            const char* FullName = rpItem->GetFullName();
+            apListbox->AddItem(rpItem, FullName, nullptr, nullptr);
         }
+        pnewItemGroup.RemoveAll();
     }
+
     pnewItemGroup.~BSSimpleList<ItemChange*>();
 }
 
@@ -809,133 +794,126 @@ bool ContainerMenu::IsPlacingMine(ItemChange* apItem, TESObjectREFR* apRefFrom, 
         }
     }
     TESObjectWEAP* pweapon = static_cast<TESObjectWEAP*>(apItem->pContainerObj);
-    if (pweapon->IsThrownWeapon() &&
+    return pweapon->IsThrownWeapon() &&
         (pweapon->GetProjectile(ptoActor) &&
          (Projectile_ = pweapon->GetProjectile(ptoActor),
-          Projectile_->GetMotionType() == BGSProjectile::MOTION_GRENADE))) {
-        return true;
-    }
-    else {
-        return false;
-    }
+          Projectile_->GetMotionType() == BGSProjectile::MOTION_GRENADE));
 }
 
 void ContainerMenu::SwitchContainer(Tile* apTile, ItemChange* apItem, int32_t aiAmountSwitched) {
-    if (apItem) {
-        if (apTile) {
-            ExtraDataList* pextraFrom;
-            TESObjectREFR* prefFrom;
-            PlayerCharacter* prefTo;
-            if (plbCurrListbox == &lbItems) {
-                prefTo = static_cast<PlayerCharacter*>(pContainerRef);
-            }
-            else {
-                prefTo = pPlayer;
-            }
-            TESObjectREFR* prefTo_2 = (TESObjectREFR*)prefTo;
-            if (plbCurrListbox == &lbItems) {
-                prefFrom = (TESObjectREFR*)pPlayer;
-            }
-            else {
-                prefFrom = pContainerRef;
-            }
-            bool bisPlacingMine = IsPlacingMine(apItem, prefFrom, prefTo_2);
-            if (apItem->pExtraObjectList) {
-                pextraFrom = apItem->pExtraObjectList->m_item;
-            }
-            else {
-                pextraFrom = nullptr;
-            }
-            if (bisPlacingMine) {
-                TESObjectWEAP* FormFlags = static_cast<TESObjectWEAP*>(apItem->pContainerObj);
-                BGSProjectile* Projectile_ =
-                    static_cast<TESObjectWEAP*>(apItem->pContainerObj)->TESObjectWEAP::GetProjectile(nullptr);
-                BGSProjectile::InitLiveGrenade(Projectile_, static_cast<Actor*>(prefFrom), prefTo_2, FormFlags);
-                TESBoundObject* a2 = apItem->pContainerObj;
-                ActiveMineList.AddHead(a2);
-                TESBoundObject* v8 = apItem->pContainerObj;
-                prefFrom->RemoveItem(
-                    v8, pextraFrom, aiAmountSwitched, false, false, nullptr, nullptr, nullptr, true, false
-                );
-            }
-            else {
-                TESObjectREFR* v5;
-                TESObjectREFR* v6;
-                if (!pextraFrom ||
-                    (!pextraFrom->GetItemDropper() ||
-                     ((v5 = pextraFrom->GetItemDropper(), v5->GetDisabled()) ||
-                      (v6 = pextraFrom->GetItemDropper(), v6->GetDelete())))) {
-                    if (eContainerMode == Interface::CMM_ROCK_N_LOAD) {
-                        int32_t iswitchCounter = aiAmountSwitched;
-                        BSSimpleList<ExtraDataList*>* pextraObj_2 = apItem->pExtraObjectList;
-                        while (iswitchCounter > 0) {
-                            int32_t iamountToSwitch;
-                            ExtraDataList* pextra;
-                            if (pextraObj_2) {
-                                pextra = pextraObj_2->m_item;
+    if ((apItem) && (apTile)) {
+        ExtraDataList* pextraFrom;
+        TESObjectREFR* prefFrom;
+        PlayerCharacter* prefTo;
+        if (plbCurrListbox == &lbItems) {
+            prefTo = static_cast<PlayerCharacter*>(pContainerRef);
+        }
+        else {
+            prefTo = pPlayer;
+        }
+        TESObjectREFR* prefTo_2 = (TESObjectREFR*)prefTo;
+        if (plbCurrListbox == &lbItems) {
+            prefFrom = (TESObjectREFR*)pPlayer;
+        }
+        else {
+            prefFrom = pContainerRef;
+        }
+        bool bisPlacingMine = IsPlacingMine(apItem, prefFrom, prefTo_2);
+        if (apItem->pExtraObjectList) {
+            pextraFrom = apItem->pExtraObjectList->m_item;
+        }
+        else {
+            pextraFrom = nullptr;
+        }
+        if (bisPlacingMine) {
+            TESObjectWEAP* FormFlags = static_cast<TESObjectWEAP*>(apItem->pContainerObj);
+            BGSProjectile* Projectile_ =
+                static_cast<TESObjectWEAP*>(apItem->pContainerObj)->TESObjectWEAP::GetProjectile(nullptr);
+            BGSProjectile::InitLiveGrenade(Projectile_, static_cast<Actor*>(prefFrom), prefTo_2, FormFlags);
+            TESBoundObject* a2 = apItem->pContainerObj;
+            ActiveMineList.AddHead(a2);
+            TESBoundObject* v8 = apItem->pContainerObj;
+            prefFrom->RemoveItem(
+                v8, pextraFrom, aiAmountSwitched, false, false, nullptr, nullptr, nullptr, true, false
+            );
+        }
+        else {
+            TESObjectREFR* v5;
+            TESObjectREFR* v6;
+            if (!pextraFrom ||
+                (!pextraFrom->GetItemDropper() ||
+                 ((v5 = pextraFrom->GetItemDropper(), v5->GetDisabled()) ||
+                  (v6 = pextraFrom->GetItemDropper(), v6->GetDelete())))) {
+                if (eContainerMode == Interface::CMM_ROCK_N_LOAD) {
+                    int32_t iswitchCounter = aiAmountSwitched;
+                    BSSimpleList<ExtraDataList*>* pextraObj_2 = apItem->pExtraObjectList;
+                    while (iswitchCounter > 0) {
+                        int32_t iamountToSwitch;
+                        ExtraDataList* pextra;
+                        if (pextraObj_2) {
+                            pextra = pextraObj_2->m_item;
+                        }
+                        else {
+                            pextra = nullptr;
+                        }
+                        ExtraDataList* pextra_2 = pextra;
+                        if (pextra) {
+                            iamountToSwitch = pextra_2->GetCount();
+                        }
+                        else {
+                            iamountToSwitch = iswitchCounter;
+                        }
+                        int32_t iamountToSwitch_2 = BSMIN(iamountToSwitch, iswitchCounter);
+                        if (prefTo_2 == pPlayer) {
+                            ExtraDataList* m_item;
+                            TESBoundObject* v10 = apItem->pContainerObj;
+                            ItemChange* premovedItem =
+                                pPlayer->RemoveRockItAmmo(v10, pextra_2, iamountToSwitch_2, true);
+                            if (premovedItem->pExtraObjectList) {
+                                m_item = premovedItem->pExtraObjectList->m_item;
                             }
                             else {
-                                pextra = nullptr;
+                                m_item = nullptr;
                             }
-                            ExtraDataList* pextra_2 = pextra;
-                            if (pextra) {
-                                iamountToSwitch = pextra_2->GetCount();
+                            uint32_t FormHealth_0 = premovedItem->iNumber;
+                            TESBoundObject* v11 = premovedItem->pContainerObj;
+                            pPlayer->AddObjecttoContainer(v11, m_item, FormHealth_0);
+                            if (premovedItem) {
+                                delete premovedItem;
                             }
-                            else {
-                                iamountToSwitch = iswitchCounter;
-                            }
-                            int32_t iamountToSwitch_2 = BSMIN(iamountToSwitch, iswitchCounter);
-                            if (prefTo_2 == pPlayer) {
-                                ExtraDataList* m_item;
-                                TESBoundObject* v10 = apItem->pContainerObj;
-                                ItemChange* premovedItem =
-                                    pPlayer->RemoveRockItAmmo(v10, pextra_2, iamountToSwitch_2, true);
-                                if (premovedItem->pExtraObjectList) {
-                                    m_item = premovedItem->pExtraObjectList->m_item;
+                            pextraObj_2 = apItem->pExtraObjectList;
+                        }
+                        else {
+                            if (prefFrom == pPlayer) {
+                                BSSimpleList<ExtraDataList*>* pextraObj;
+                                TESBoundObject* v12 = apItem->pContainerObj;
+                                pPlayer->AddRockItAmmo(v12, pextra_2, iamountToSwitch_2);
+                                prefFrom->RemoveItem(
+                                    apItem->pContainerObj, pextra_2, iamountToSwitch_2, false, false, nullptr, nullptr,
+                                    nullptr, true, false
+                                );
+                                if (pextraObj_2) {
+                                    pextraObj = pextraObj_2->m_pkNext;
                                 }
                                 else {
-                                    m_item = nullptr;
+                                    pextraObj = nullptr;
                                 }
-                                uint32_t FormHealth_0 = premovedItem->iNumber;
-                                TESBoundObject* v11 = premovedItem->pContainerObj;
-                                pPlayer->AddObjecttoContainer(v11, m_item, FormHealth_0);
-                                if (premovedItem) {
-                                    delete premovedItem;
-                                }
-                                pextraObj_2 = apItem->pExtraObjectList;
+                                pextraObj_2 = pextraObj;
                             }
-                            else {
-                                if (prefFrom == pPlayer) {
-                                    BSSimpleList<ExtraDataList*>* pextraObj;
-                                    TESBoundObject* v12 = apItem->pContainerObj;
-                                    pPlayer->AddRockItAmmo(v12, pextra_2, iamountToSwitch_2);
-                                    prefFrom->RemoveItem(
-                                        apItem->pContainerObj, pextra_2, iamountToSwitch_2, false, false, nullptr,
-                                        nullptr, nullptr, true, false
-                                    );
-                                    if (pextraObj_2) {
-                                        pextraObj = pextraObj_2->m_pkNext;
-                                    }
-                                    else {
-                                        pextraObj = nullptr;
-                                    }
-                                    pextraObj_2 = pextraObj;
-                                }
-                            }
-                            iswitchCounter -= iamountToSwitch_2;
                         }
-                    }
-                    else {
-                        prefFrom->RemoveItem(
-                            apItem->pContainerObj, pextraFrom, aiAmountSwitched,
-                            eContainerMode == Interface::CMM_PICKPOCKET, false, prefTo_2, nullptr, nullptr, true, false
-                        );
+                        iswitchCounter -= iamountToSwitch_2;
                     }
                 }
                 else {
-                    TESObjectREFR* ItemDropper = pextraFrom->GetItemDropper();
-                    pPlayer->PickUpObject(ItemDropper, 1, false);
+                    prefFrom->RemoveItem(
+                        apItem->pContainerObj, pextraFrom, aiAmountSwitched,
+                        eContainerMode == Interface::CMM_PICKPOCKET, false, prefTo_2, nullptr, nullptr, true, false
+                    );
                 }
+            }
+            else {
+                TESObjectREFR* ItemDropper = pextraFrom->GetItemDropper();
+                pPlayer->PickUpObject(ItemDropper, 1, false);
             }
         }
     }
@@ -951,107 +929,102 @@ void ContainerMenu::SetFilterModeTitle(Tile* apTitleTile) {
     }
     const char* v2 = sLanguage.String();
     bool v12 = BSstrcmp(v2, "ENGLISH") != 0;
-    if (pContainerRef) {
-        if (apTitleTile) {
-            char Dst[268];
-            switch (eItemsFilterMode) {
-                case 0: {
-                    if (apTitleTile == pTiles[TI_ITEMS_TITLE]) {
-                        const char* v3 = sInventoryItems.String();
-                        BSstrcpy(Dst, 260, v3);
-                        if (!v12) {
-                            BSstrupr(Dst, 260);
-                        }
-                        apTitleTile->Set(4036, Dst, true);
-                    }
-                    else {
-                        const char* FullName = pContainerRef->GetFullName();
-                        SetContainerTitle(FullName);
-                    }
-                    break;
-                }
-                case 1: {
-                    const char* v5 = sInventoryWeapons.String();
-                    BSstrcpy(Dst, 260, v5);
+    if ((pContainerRef) && (apTitleTile)) {
+        char Dst[268];
+        switch (eItemsFilterMode) {
+            case 0: {
+                if (apTitleTile == pTiles[TI_ITEMS_TITLE]) {
+                    const char* v3 = sInventoryItems.String();
+                    BSstrcpy(Dst, 260, v3);
                     if (!v12) {
                         BSstrupr(Dst, 260);
                     }
-                    break;
+                    apTitleTile->Set(4036, Dst, true);
                 }
-                case 2: {
-                    const char* v6 = sInventoryApparel.String();
-                    BSstrcpy(Dst, 260, v6);
-                    if (!v12) {
-                        BSstrupr(Dst, 260);
-                    }
-                    break;
+                else {
+                    const char* FullName = pContainerRef->GetFullName();
+                    SetContainerTitle(FullName);
                 }
-                case 3: {
-                    const char* v7 = sInventoryAid.String();
-                    BSstrcpy(Dst, 260, v7);
-                    if (!v12) {
-                        BSstrupr(Dst, 260);
-                    }
-                    break;
-                }
-                case 4: {
-                    const char* v8 = sInventoryMisc.String();
-                    BSstrcpy(Dst, 260, v8);
-                    if (!v12) {
-                        BSstrupr(Dst, 260);
-                    }
-                    break;
-                }
-                case 5: {
-                    const char* v9 = sInventoryAmmo.String();
-                    BSstrcpy(Dst, 260, v9);
-                    if (!v12) {
-                        BSstrupr(Dst, 260);
-                    }
-                    break;
-                }
-                default: {
-                    break;
-                }
+                break;
             }
-            if (eItemsFilterMode) {
-                apTitleTile->Set(4036, Dst, true);
+            case 1: {
+                const char* v5 = sInventoryWeapons.String();
+                BSstrcpy(Dst, 260, v5);
+                if (!v12) {
+                    BSstrupr(Dst, 260);
+                }
+                break;
             }
+            case 2: {
+                const char* v6 = sInventoryApparel.String();
+                BSstrcpy(Dst, 260, v6);
+                if (!v12) {
+                    BSstrupr(Dst, 260);
+                }
+                break;
+            }
+            case 3: {
+                const char* v7 = sInventoryAid.String();
+                BSstrcpy(Dst, 260, v7);
+                if (!v12) {
+                    BSstrupr(Dst, 260);
+                }
+                break;
+            }
+            case 4: {
+                const char* v8 = sInventoryMisc.String();
+                BSstrcpy(Dst, 260, v8);
+                if (!v12) {
+                    BSstrupr(Dst, 260);
+                }
+                break;
+            }
+            case 5: {
+                const char* v9 = sInventoryAmmo.String();
+                BSstrcpy(Dst, 260, v9);
+                if (!v12) {
+                    BSstrupr(Dst, 260);
+                }
+                break;
+            }
+            default: {
+                break;
+            }
+        }
+        if (eItemsFilterMode) {
+            apTitleTile->Set(4036, Dst, true);
         }
     }
 }
 
 void ContainerMenu::SetContainerTitle(const char* astrTitle) {
     NiPoint3 stringDims;
-    if (astrTitle) {
-        if (*astrTitle) {
-            int32_t ifontNum = static_cast<int32_t>(pTiles[TI_CONTAINER_TITLE]->GetFloat(4025));
-            FontManager* Singleton = FontManager::Instance();
-            Singleton->CalculateStringDimensions(&stringDims, astrTitle, ifontNum, 3.4028235e+38f, 0);
-            float fmaxWidth = pTiles[TI_CONTAINER_TITLE]->pParent->GetFloat(4017) - 80.0;
-            if (pTiles[TI_CONTAINER_FILTER_LEFT]->IsTrue(4003)) {
-                fmaxWidth = fmaxWidth - 35.0;
+    if ((astrTitle) && (*astrTitle)) {
+        int32_t ifontNum = static_cast<int32_t>(pTiles[TI_CONTAINER_TITLE]->GetFloat(4025));
+        FontManager* Singleton = FontManager::Instance();
+        Singleton->CalculateStringDimensions(&stringDims, astrTitle, ifontNum, 3.4028235e+38f, 0);
+        float fmaxWidth = pTiles[TI_CONTAINER_TITLE]->pParent->GetFloat(4017) - 80.0;
+        if (pTiles[TI_CONTAINER_FILTER_LEFT]->IsTrue(4003)) {
+            fmaxWidth = fmaxWidth - 35.0;
+        }
+        if (!(fmaxWidth < static_cast<double>(stringDims.x))) {
+            pTiles[TI_CONTAINER_TITLE]->Set(4036, astrTitle, true);
+        }
+        else {
+            char* newTitle = static_cast<char*>(ourMalloc(260u));
+            FontLetter* plettersA = FontManager::Instance()->GetFont(ifontNum - 1)->pFontData->pFontLetters;
+            int32_t icurrIndex = 0;
+            ourMemset(newTitle, 0, 260u);
+            float fnewWidth = (plettersA[46].fLeadingEdge + plettersA[46].fWidth + plettersA[46].fSpacing) * 3.0 + 0.0f;
+            while (fmaxWidth >= static_cast<double>(fnewWidth) && icurrIndex < 260) {
+                newTitle[icurrIndex] = astrTitle[icurrIndex];
+                fnewWidth = plettersA[astrTitle[icurrIndex]].fLeadingEdge + plettersA[astrTitle[icurrIndex]].fWidth +
+                    plettersA[astrTitle[icurrIndex]].fSpacing + fnewWidth;
+                ++icurrIndex;
             }
-            if (!(fmaxWidth < static_cast<double>(stringDims.x))) {
-                pTiles[TI_CONTAINER_TITLE]->Set(4036, astrTitle, true);
-            }
-            else {
-                char* newTitle = static_cast<char*>(ourMalloc(260u));
-                FontLetter* plettersA = FontManager::Instance()->GetFont(ifontNum - 1)->pFontData->pFontLetters;
-                int32_t icurrIndex = 0;
-                ourMemset(newTitle, 0, 260u);
-                float fnewWidth =
-                    (plettersA[46].fLeadingEdge + plettersA[46].fWidth + plettersA[46].fSpacing) * 3.0 + 0.0f;
-                while (fmaxWidth >= static_cast<double>(fnewWidth) && icurrIndex < 260) {
-                    newTitle[icurrIndex] = astrTitle[icurrIndex];
-                    fnewWidth = plettersA[astrTitle[icurrIndex]].fLeadingEdge +
-                        plettersA[astrTitle[icurrIndex]].fWidth + plettersA[astrTitle[icurrIndex]].fSpacing + fnewWidth;
-                    ++icurrIndex;
-                }
-                BSstrcat(newTitle, 260, "...");
-                pTiles[TI_CONTAINER_TITLE]->Set(4036, newTitle, true);
-                ourFree(newTitle);
-            }
+            BSstrcat(newTitle, 260, "...");
+            pTiles[TI_CONTAINER_TITLE]->Set(4036, newTitle, true);
+            ourFree(newTitle);
         }
     }
 }
@@ -1126,21 +1099,16 @@ TileMenu* ContainerMenu::Create(TESObjectREFR* apContainer, Interface::CONTAINER
             ContainerMenu::pMe->UpdateLists(nullptr);
             return static_cast<TileMenu*>(ptile);
         }
-        else {
-            Warning("MENUS: Container Menu Creation Failed... Are your menu and art resources up to date?");
-            return nullptr;
-        }
-    }
-    else {
-        if (ContainerMenu::pMe) {
-            if (ContainerMenu::pMe->pMenu) {
-                if (ContainerMenu::pMe) {
-                    delete ContainerMenu::pMe;
-                }
-            }
-        }
+
+        Warning("MENUS: Container Menu Creation Failed... Are your menu and art resources up to date?");
         return nullptr;
     }
+
+    if ((ContainerMenu::pMe) && (ContainerMenu::pMe->pMenu) && (ContainerMenu::pMe)) {
+        delete ContainerMenu::pMe;
+    }
+
+    return nullptr;
 }
 
 void ContainerMenu::Close() {
@@ -1171,16 +1139,17 @@ void ContainerMenu::Close() {
             }
             case Interface::CMM_TEAMMATE: {
                 bool bstartedWithWeapon = false;
-                if (ContainerMenu::pMe->pContainerRef->IsActor()) {
-                    if (ContainerMenu::pMe->pContainerRef->GetAnimation()) {
-                        // The container ref is an actor here (IsActor above).
-                        if (static_cast<Actor*>(ContainerMenu::pMe->pContainerRef)->GetCurrentAIProcess()) {
-                            BaseProcess* pprocess =
-                                static_cast<Actor*>(ContainerMenu::pMe->pContainerRef)->GetCurrentAIProcess();
-                            bstartedWithWeapon = pprocess->GetCurrentWeapon() != nullptr;
-                        }
-                    }
+                if ((ContainerMenu::pMe->pContainerRef->IsActor()) &&
+                    (ContainerMenu::pMe->pContainerRef->GetAnimation()) &&
+                    (static_cast<Actor*>(ContainerMenu::pMe->pContainerRef)->GetCurrentAIProcess()))
+
+                // The container ref is an actor here (IsActor above).
+                {
+                    BaseProcess* pprocess =
+                        static_cast<Actor*>(ContainerMenu::pMe->pContainerRef)->GetCurrentAIProcess();
+                    bstartedWithWeapon = pprocess->GetCurrentWeapon() != nullptr;
                 }
+
                 if (ContainerMenu::pMe->pContainerRef->IsCreature()) {
                     TESCreature* pcreature =
                         static_cast<TESCreature*>(ContainerMenu::pMe->pContainerRef->GetObjectReference());
@@ -1237,57 +1206,51 @@ void ContainerMenu::ForceContainerUpdate() {
 }
 
 void ContainerMenu::TakeAllFn(Tile* a1, ItemChange* a2) {
-    if (a2) {
-        if (ContainerMenu::pMe) {
-            if (a1) {
-                if (!ContainerMenu::pMe->bPickPocketTallied) {
-                    TESObjectREFR* v2;
-                    TESObjectREFR* v3;
-                    ExtraDataList* m_item = nullptr;
-                    if (a2->pExtraObjectList) {
-                        m_item = a2->pExtraObjectList->m_item;
-                    }
-                    if (!m_item ||
-                        (!m_item->GetItemDropper() ||
-                         ((v2 = m_item->GetItemDropper(), v2->GetDisabled()) ||
-                          (v3 = m_item->GetItemDropper(), v3->GetDelete())))) {
-                        if (a1->xChildren.GetTail()->GetFloat(4009) != 128.0) {
-                            ExtraDataList* v10;
-                            if (ContainerMenu::pMe->eContainerMode == Interface::CMM_PICKPOCKET) {
-                                Actor* pContainerRef;
-                                if (ContainerMenu::pMe->pContainerRef->IsActor()) {
-                                    pContainerRef = static_cast<Actor*>(ContainerMenu::pMe->pContainerRef);
-                                }
-                                else {
-                                    pContainerRef = nullptr;
-                                }
-                                uint32_t FormHealth_0 = a2->iNumber;
-                                int32_t aiStealValue = ContainerMenu::pMe->GetStolenValue(a2, FormHealth_0, true);
-                                ContainerMenu::pMe->iValueStolen += aiStealValue;
-                                ContainerMenu::pMe->bPickPocketTallied =
-                                    !ContainerMenu::pMe->PickpocketCheck(pContainerRef, aiStealValue);
-                            }
-                            if (a2->pExtraObjectList) {
-                                v10 = a2->pExtraObjectList->m_item;
-                            }
-                            else {
-                                v10 = nullptr;
-                            }
-                            PlayerCharacter* v9 = pPlayer;
-                            bool v8 = ContainerMenu::pMe->eContainerMode == Interface::CMM_PICKPOCKET;
-                            uint32_t v7 = a2->iNumber;
-                            TESBoundObject* FormFlags = a2->pContainerObj;
-                            ContainerMenu::pMe->pContainerRef->RemoveItem(
-                                FormFlags, v10, v7, v8, false, v9, nullptr, nullptr, true, false
-                            );
-                        }
+    if ((a2) && (ContainerMenu::pMe) && (a1) && (!ContainerMenu::pMe->bPickPocketTallied)) {
+        TESObjectREFR* v2;
+        TESObjectREFR* v3;
+        ExtraDataList* m_item = nullptr;
+        if (a2->pExtraObjectList) {
+            m_item = a2->pExtraObjectList->m_item;
+        }
+        if (!m_item ||
+            (!m_item->GetItemDropper() ||
+             ((v2 = m_item->GetItemDropper(), v2->GetDisabled()) ||
+              (v3 = m_item->GetItemDropper(), v3->GetDelete())))) {
+            if (a1->xChildren.GetTail()->GetFloat(4009) != 128.0) {
+                ExtraDataList* v10;
+                if (ContainerMenu::pMe->eContainerMode == Interface::CMM_PICKPOCKET) {
+                    Actor* pContainerRef;
+                    if (ContainerMenu::pMe->pContainerRef->IsActor()) {
+                        pContainerRef = static_cast<Actor*>(ContainerMenu::pMe->pContainerRef);
                     }
                     else {
-                        TESObjectREFR* ItemDropper = m_item->GetItemDropper();
-                        pPlayer->PickUpObject(ItemDropper, 1, false);
+                        pContainerRef = nullptr;
                     }
+                    uint32_t FormHealth_0 = a2->iNumber;
+                    int32_t aiStealValue = ContainerMenu::pMe->GetStolenValue(a2, FormHealth_0, true);
+                    ContainerMenu::pMe->iValueStolen += aiStealValue;
+                    ContainerMenu::pMe->bPickPocketTallied =
+                        !ContainerMenu::pMe->PickpocketCheck(pContainerRef, aiStealValue);
                 }
+                if (a2->pExtraObjectList) {
+                    v10 = a2->pExtraObjectList->m_item;
+                }
+                else {
+                    v10 = nullptr;
+                }
+                PlayerCharacter* v9 = pPlayer;
+                bool v8 = ContainerMenu::pMe->eContainerMode == Interface::CMM_PICKPOCKET;
+                uint32_t v7 = a2->iNumber;
+                TESBoundObject* FormFlags = a2->pContainerObj;
+                ContainerMenu::pMe->pContainerRef->RemoveItem(
+                    FormFlags, v10, v7, v8, false, v9, nullptr, nullptr, true, false
+                );
             }
+        }
+        else {
+            TESObjectREFR* ItemDropper = m_item->GetItemDropper();
+            pPlayer->PickUpObject(ItemDropper, 1, false);
         }
     }
 }
@@ -1307,30 +1270,29 @@ bool ContainerMenu::FirstPassFilterFunc(ItemChange* apItem) {
             BGSListForm* AmmoFormList = CurrentWeapon->GetAmmoFormList();
             return AmmoFormList->GetItemIndex(pobj) < 0;
         }
+
+        TESAmmo* pammo;
+        TESObjectWEAP* pweap;
+        TESBipedModelForm* pbipedForm = TESBipedModelForm::GetFormAsBipedModel(pobj);
+        TESFullName* pfull = dynamic_cast<TESFullName*>(pobj);
+        if (apItem->pContainerObj->GetFormType() == WEAP_ID) {
+            pweap = static_cast<TESObjectWEAP*>(apItem->pContainerObj);
+        }
         else {
-            TESAmmo* pammo;
-            TESObjectWEAP* pweap;
-            TESBipedModelForm* pbipedForm = TESBipedModelForm::GetFormAsBipedModel(pobj);
-            TESFullName* pfull = dynamic_cast<TESFullName*>(pobj);
-            if (apItem->pContainerObj->GetFormType() == WEAP_ID) {
-                pweap = static_cast<TESObjectWEAP*>(apItem->pContainerObj);
-            }
-            else {
-                pweap = nullptr;
-            }
-            if (apItem->pContainerObj->GetFormType() == AMMO_ID) {
-                pammo = static_cast<TESAmmo*>(apItem->pContainerObj);
-            }
-            else {
-                pammo = nullptr;
-            }
-            if (!pobj ||
-                ((pbipedForm && !pbipedForm->GetPlayable()) ||
-                 (!pfull ||
-                  (!pfull->GetFullNameLength() ||
-                   ((pweap && !pweap->GetIsPlayable()) || (pammo && !pammo->GetIsPlayable())))))) {
-                return true;
-            }
+            pweap = nullptr;
+        }
+        if (apItem->pContainerObj->GetFormType() == AMMO_ID) {
+            pammo = static_cast<TESAmmo*>(apItem->pContainerObj);
+        }
+        else {
+            pammo = nullptr;
+        }
+        if (!pobj ||
+            ((pbipedForm && !pbipedForm->GetPlayable()) ||
+             (!pfull ||
+              (!pfull->GetFullNameLength() ||
+               ((pweap && !pweap->GetIsPlayable()) || (pammo && !pammo->GetIsPlayable())))))) {
+            return true;
         }
     }
     return bisFiltered;
@@ -1383,49 +1345,46 @@ void ContainerMenu::ItemSelectCallback(int32_t aiAmountSelected) {
     if (pcurrTile->xChildren.GetTail()->GetFloat(4009) == 128.0) {
         bcancelTransfer = true;
     }
-    if (ContainerMenu::pMe->eContainerMode == Interface::CMM_TEAMMATE &&
-        ContainerMenu::pMe->plbCurrListbox == &ContainerMenu::pMe->lbItems) {
-        if (pactor) {
-            double WeightInContainer = pactor->GetWeightInContainer(false);
-            bool IsHardcore = pPlayer->IsHardcore();
-            double v9 = TESWeightForm::GetFormWeight(ContainerMenu::pCurrItem->pContainerObj, IsHardcore) *
-                    static_cast<double>(aiAmountSelected) +
-                WeightInContainer;
-            if (pactor->GetMaxCarryWeight() <= v9) {
-                char msg[268];
-                const char* v5 = sTeammateOverencumbered.String();
-                BSsprintf(msg, 260, "%s %s", pactor->GetFullName(), v5);
-                Interface::ShowMessage(msg, 2, nullptr, nullptr, 2.0f, false);
+    if ((ContainerMenu::pMe->eContainerMode == Interface::CMM_TEAMMATE &&
+         ContainerMenu::pMe->plbCurrListbox == &ContainerMenu::pMe->lbItems) &&
+        (pactor)) {
+        double WeightInContainer = pactor->GetWeightInContainer(false);
+        bool IsHardcore = pPlayer->IsHardcore();
+        double v9 = TESWeightForm::GetFormWeight(ContainerMenu::pCurrItem->pContainerObj, IsHardcore) *
+                static_cast<double>(aiAmountSelected) +
+            WeightInContainer;
+        if (pactor->GetMaxCarryWeight() <= v9) {
+            char msg[268];
+            const char* v5 = sTeammateOverencumbered.String();
+            BSsprintf(msg, 260, "%s %s", pactor->GetFullName(), v5);
+            Interface::ShowMessage(msg, 2, nullptr, nullptr, 2.0f, false);
+            bcancelTransfer = true;
+            TESForm* FormByEditorID = TESForm::GetFormByEditorID("FollowersOverburdened");
+            TESTopic* pTopic = dynamic_cast<TESTopic*>(FormByEditorID);
+            ContainerMenu::pMe->PlayReactivityBark(pTopic);
+        }
+    }
+
+    if ((ContainerMenu::pMe) && (ContainerMenu::pMe->eContainerMode == Interface::CMM_PICKPOCKET)) {
+        TESBoundObject* ItemOwnership;
+        if ((v22 == pPlayer && pactor) ||
+            (v22 != pPlayer &&
+             (ItemOwnership = static_cast<TESBoundObject*>(ContainerMenu::pCurrItem->GetItemOwnership()),
+              ItemOwnership != pPlayer->GetObjectReference()))) {
+            bool bfromContainer = ContainerMenu::pMe->plbCurrListbox == &ContainerMenu::pMe->lbContainer;
+            int32_t istealValue = (bfromContainer ? 1 : -1) *
+                ContainerMenu::pMe->GetStolenValue(ContainerMenu::pCurrItem, aiAmountSelected, bfromContainer);
+            ContainerMenu::pMe->iValueStolen += istealValue;
+            if (!bfromContainer) {
+                istealValue = 1;
+            }
+            if ((pactor) && (!ContainerMenu::pMe->PickpocketCheck(pactor, istealValue))) {
                 bcancelTransfer = true;
-                TESForm* FormByEditorID = TESForm::GetFormByEditorID("FollowersOverburdened");
-                TESTopic* pTopic = dynamic_cast<TESTopic*>(FormByEditorID);
-                ContainerMenu::pMe->PlayReactivityBark(pTopic);
+                ContainerMenu::Close();
             }
         }
     }
-    if (ContainerMenu::pMe) {
-        if (ContainerMenu::pMe->eContainerMode == Interface::CMM_PICKPOCKET) {
-            TESBoundObject* ItemOwnership;
-            if ((v22 == pPlayer && pactor) ||
-                (v22 != pPlayer &&
-                 (ItemOwnership = static_cast<TESBoundObject*>(ContainerMenu::pCurrItem->GetItemOwnership()),
-                  ItemOwnership != pPlayer->GetObjectReference()))) {
-                bool bfromContainer = ContainerMenu::pMe->plbCurrListbox == &ContainerMenu::pMe->lbContainer;
-                int32_t istealValue = (bfromContainer ? 1 : -1) *
-                    ContainerMenu::pMe->GetStolenValue(ContainerMenu::pCurrItem, aiAmountSelected, bfromContainer);
-                ContainerMenu::pMe->iValueStolen += istealValue;
-                if (!bfromContainer) {
-                    istealValue = 1;
-                }
-                if (pactor) {
-                    if (!ContainerMenu::pMe->PickpocketCheck(pactor, istealValue)) {
-                        bcancelTransfer = true;
-                        ContainerMenu::Close();
-                    }
-                }
-            }
-        }
-    }
+
     if (!bcancelTransfer) {
         TESBoundObject* pcurrItemObj = ContainerMenu::pCurrItem->pContainerObj;
         BaseProcess* CurrentAIProcess = pPlayer->pCurrentProcess;
@@ -1494,15 +1453,12 @@ bool ContainerMenu::FilterModeFunc(ItemChange* apItem) {
     if (eid_2 == AMMO_ID) {
         BGSListForm* pList = static_cast<BGSListForm*>(TESForm::GetFormByEditorID("RegeneratingAmmo"));
         TESAmmo* pammo = static_cast<TESAmmo*>(apItem->pContainerObj);
-        if (pList) {
-            if (pList->GetItemIndex(pammo) >= 0) {
-                v13 = true;
-            }
+        if ((pList) && (pList->GetItemIndex(pammo) >= 0)) {
+            v13 = true;
         }
-        if (pammo) {
-            if (!pammo->GetIsPlayable()) {
-                v13 = true;
-            }
+
+        if ((pammo) && (!pammo->GetIsPlayable())) {
+            v13 = true;
         }
     }
     if (v12) {
@@ -1515,10 +1471,10 @@ bool ContainerMenu::FilterModeFunc(ItemChange* apItem) {
         }
         return v3;
     }
-    else {
-        if (ContainerMenu::pMe->eContainerMode == Interface::CMM_PICKPOCKET) {
-            return v13 || apItem->GetWorn(false);
-        }
+
+    if (ContainerMenu::pMe->eContainerMode == Interface::CMM_PICKPOCKET) {
+        return v13 || apItem->GetWorn(false);
     }
+
     return v13;
 }

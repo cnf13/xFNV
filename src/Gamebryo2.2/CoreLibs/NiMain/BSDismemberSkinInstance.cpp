@@ -132,7 +132,7 @@ void BSDismemberSkinInstance::SaveBinary(NiStream& kStream) {
 
     // The entries are written as one 32-bit block, so a big-endian file gets them converted in place first and
     // restored afterwards.
-    if (kStream.m_bSaveLittleEndian != true) {
+    if (!kStream.m_bSaveLittleEndian) {
         for (uint32_t i = 0; i < uiPartitionDataArraySize; i++) {
             SwapBodyPart(&pPartitionDataArray[i]);
             SwapEntry(&pPartitionDataArray[i]);
@@ -144,7 +144,7 @@ void BSDismemberSkinInstance::SaveBinary(NiStream& kStream) {
         pPartitionDataArray, sizeof(PartitionData) * uiPartitionDataArraySize, &uiComponentSize, 1
     );
 
-    if (kStream.m_bSaveLittleEndian != true) {
+    if (!kStream.m_bSaveLittleEndian) {
         for (uint32_t i = 0; i < uiPartitionDataArraySize; i++) {
             SwapEntry(&pPartitionDataArray[i]);
             SwapBodyPart(&pPartitionDataArray[i]);

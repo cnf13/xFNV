@@ -583,16 +583,12 @@ void SpectatorPackage::Update(Actor* pOwner) {
     int32_t isize = kThreatInfos.iSize;
     for (int32_t i = 0; i < isize; ++i) {
         SpectatorThreatInfo* info = &kThreatInfos.operator[](i);
-        if (info->pSource) {
-            if (info->pTarget) {
-                Actor* Source = info->pSource;
-                Actor* pcurrentTarget = Source->GetCombatTarget();
-                if (pcurrentTarget) {
-                    if (pcurrentTarget != info->pTarget) {
-                        AddThreatFromActorToCombatTarget(*pOwner);
-                        v18 = 1;
-                    }
-                }
+        if ((info->pSource) && (info->pTarget)) {
+            Actor* Source = info->pSource;
+            Actor* pcurrentTarget = Source->GetCombatTarget();
+            if ((pcurrentTarget) && (pcurrentTarget != info->pTarget)) {
+                AddThreatFromActorToCombatTarget(*pOwner);
+                v18 = 1;
             }
         }
     }
@@ -615,17 +611,16 @@ void SpectatorPackage::Update(Actor* pOwner) {
                 else {
                     DetectionState* v3;
                     BaseProcess* CurrentAIProcess;
-                    if (!psource ||
-                        (!psource->IsNpc() ||
-                         (!pOwner->pCurrentProcess ||
-                          (!pOwner->pCurrentProcess ? v3 = nullptr
-                                                    : (CurrentAIProcess = pOwner->pCurrentProcess,
-                                                       v3 = CurrentAIProcess->GetDetectionState(psource, 0)),
-                           v3 && v3->iLevel > 0)))) {
-                        if (!psource || (!ptarget || psource->GetCombatTarget() == ptarget)) {
-                            v18 = 1;
-                            info_2->Update();
-                        }
+                    if ((!psource ||
+                         (!psource->IsNpc() ||
+                          (!pOwner->pCurrentProcess ||
+                           (!pOwner->pCurrentProcess ? v3 = nullptr
+                                                     : (CurrentAIProcess = pOwner->pCurrentProcess,
+                                                        v3 = CurrentAIProcess->GetDetectionState(psource, 0)),
+                            v3 && v3->iLevel > 0)))) &&
+                        (!psource || (!ptarget || psource->GetCombatTarget() == ptarget))) {
+                        v18 = 1;
+                        info_2->Update();
                     }
                 }
             }

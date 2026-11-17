@@ -262,11 +262,10 @@ const char* hkxEnvironment::getVariableValue(const char* name) {
     if (VariableByName == -1) {
         return nullptr;
     }
-    else {
-        return reinterpret_cast<const char*>(
-            reinterpret_cast<uintptr_t>(m_variables.m_data[VariableByName].m_value.m_stringAndFlag) & ~uintptr_t(1)
-        );
-    }
+
+    return reinterpret_cast<const char*>(
+        reinterpret_cast<uintptr_t>(m_variables.m_data[VariableByName].m_value.m_stringAndFlag) & ~uintptr_t(1)
+    );
 }
 
 void hkxEnvironment::clear() {

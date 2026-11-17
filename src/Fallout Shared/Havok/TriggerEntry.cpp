@@ -52,12 +52,10 @@ void TriggerEntry::RefList::ForceLeaveTrigger(TESObjectREFR* apTriggerRef) {
         ExtraDataList* pextralist = &apTriggerRef->m_Extra;
         for (uint32_t i_2 = 0; i_2 < isize; ++i_2) {
             TESObjectREFR* pref = static_cast<TESObjectREFR*>(TESForm::GetFormByNumericID(pids[i_2]));
-            if (pref) {
-                if (pref->IsReference()) {
-                    Script::SetActionFlag(pref, pextralist, SCRIPT_ACTION_ONTRIGGERLEAVE);
-                    apTriggerRef->SetActionRef(pref);
-                    apTriggerRef->RunScript();
-                }
+            if ((pref) && (pref->IsReference())) {
+                Script::SetActionFlag(pref, pextralist, SCRIPT_ACTION_ONTRIGGERLEAVE);
+                apTriggerRef->SetActionRef(pref);
+                apTriggerRef->RunScript();
             }
         }
         ourFree(pids);

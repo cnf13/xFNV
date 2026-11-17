@@ -381,45 +381,42 @@ void TESWaterForm::InitItem() {
                 const char* v8 = GetFormEditorID();
                 Warning("MASTERFILE: Could not find sound (%08X) for spell item '%s' (%08X).", itempint, v8, v11);
             }
-            if (this->pSpellItem) {
-                if (!this->pSpellItem->IsEmpty()) {
-                    EffectItemList* plist;
-                    SpellItem* pSpellItem = this->pSpellItem;
-                    if (pSpellItem) {
-                        plist = &static_cast<EffectItemList&>(
-                            static_cast<MagicItem&>(static_cast<MagicItemForm&>(*pSpellItem))
-                        );
+            if ((this->pSpellItem) && (!this->pSpellItem->IsEmpty())) {
+                EffectItemList* plist;
+                SpellItem* pSpellItem = this->pSpellItem;
+                if (pSpellItem) {
+                    plist = &static_cast<EffectItemList&>(
+                        static_cast<MagicItem&>(static_cast<MagicItemForm&>(*pSpellItem))
+                    );
+                }
+                else {
+                    plist = nullptr;
+                }
+                EffectItemList* plist_3 = plist;
+                EffectItem* v21 = nullptr;
+                EffectItem* v22 = nullptr;
+                while (plist_3 && (!v21 || !v22)) {
+                    EffectItemList* plist_2;
+                    EffectItem* pdamageRadiationEffect__prestoreHealthEffect = plist_3->m_item;
+                    if (pdamageRadiationEffect__prestoreHealthEffect->GetActorValueIndex() ==
+                            ActorValue::RADIATION_RADS &&
+                        pdamageRadiationEffect__prestoreHealthEffect->pEffectSetting->IsFlagSet(
+                            EffectSetting::DETRIMENTAL
+                        )) {
+                        v21 = pdamageRadiationEffect__prestoreHealthEffect;
+                        iRadiationDamage = pdamageRadiationEffect__prestoreHealthEffect->GetMagnitude();
                     }
                     else {
-                        plist = nullptr;
-                    }
-                    EffectItemList* plist_3 = plist;
-                    EffectItem* v21 = nullptr;
-                    EffectItem* v22 = nullptr;
-                    while (plist_3 && (!v21 || !v22)) {
-                        EffectItemList* plist_2;
-                        EffectItem* pdamageRadiationEffect__prestoreHealthEffect = plist_3->m_item;
-                        if (pdamageRadiationEffect__prestoreHealthEffect->GetActorValueIndex() ==
-                                ActorValue::RADIATION_RADS &&
-                            pdamageRadiationEffect__prestoreHealthEffect->pEffectSetting->IsFlagSet(
+                        if (pdamageRadiationEffect__prestoreHealthEffect->GetActorValueIndex() == ActorValue::HEALTH &&
+                            !pdamageRadiationEffect__prestoreHealthEffect->pEffectSetting->IsFlagSet(
                                 EffectSetting::DETRIMENTAL
                             )) {
-                            v21 = pdamageRadiationEffect__prestoreHealthEffect;
-                            iRadiationDamage = pdamageRadiationEffect__prestoreHealthEffect->GetMagnitude();
+                            v22 = pdamageRadiationEffect__prestoreHealthEffect;
+                            iHealthRestoration = pdamageRadiationEffect__prestoreHealthEffect->GetMagnitude();
                         }
-                        else {
-                            if (pdamageRadiationEffect__prestoreHealthEffect->GetActorValueIndex() ==
-                                    ActorValue::HEALTH &&
-                                !pdamageRadiationEffect__prestoreHealthEffect->pEffectSetting->IsFlagSet(
-                                    EffectSetting::DETRIMENTAL
-                                )) {
-                                v22 = pdamageRadiationEffect__prestoreHealthEffect;
-                                iHealthRestoration = pdamageRadiationEffect__prestoreHealthEffect->GetMagnitude();
-                            }
-                        }
-                        // The list is walked as EffectItemList nodes: each next node is downcast.
-                        plist_3 = static_cast<EffectItemList*>(plist_3->GetNext());
                     }
+                    // The list is walked as EffectItemList nodes: each next node is downcast.
+                    plist_3 = static_cast<EffectItemList*>(plist_3->GetNext());
                 }
             }
         }
@@ -597,9 +594,8 @@ const char* TESWaterForm::GetMaterialName() {
     if ((&cMaterialID)->pString) {
         return (&cMaterialID)->pString;
     }
-    else {
-        return "";
-    }
+
+    return "";
 }
 
 void TESWaterForm::SetRemappedWaterForm(TESWaterForm* apWater) {

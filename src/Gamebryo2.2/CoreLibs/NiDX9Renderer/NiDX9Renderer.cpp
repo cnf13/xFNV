@@ -1197,76 +1197,71 @@ void NiDX9Renderer::Do_BeginBatch(const NiPropertyState* apProperties, NiDynamic
 
 void NiDX9Renderer::Do_RenderScreenTexture(NiScreenTexture* apScreenTexture) {
     NiTransform kWorld;
-    if (!m_bDeviceLost) {
-        if (apScreenTexture) {
-            if (apScreenTexture->m_kScreenRects.m_uiUsed) {
-                NiBound kWorldBound;
-                NiPropertyState* pkScreenTexture = m_pkCurrProp;
-                NiDynamicEffectState* pkOldEffects = m_pkCurrEffects;
-                if (!m_spScreenTexturePropertyState) {
-                    NiPropertyState* v5;
-                    NiVertexColorProperty* v7;
-                    NiAlphaProperty* v9;
-                    NiZBufferProperty* v11;
-                    NiPropertyState* v4 =
-                        static_cast<NiPropertyState*>(MemoryManager_Singleton.Allocate(sizeof(NiPropertyState)));
-                    if (v4) {
-                        v5 = ::new (v4) NiPropertyState;
-                    }
-                    else {
-                        v5 = nullptr;
-                    }
-                    m_spScreenTexturePropertyState = v5;
-                    NiVertexColorProperty* v6 =
-                        static_cast<NiVertexColorProperty*>(NiMemObject::operator new(sizeof(NiVertexColorProperty)));
-                    if (v6) {
-                        v7 = ::new (v6) NiVertexColorProperty;
-                    }
-                    else {
-                        v7 = nullptr;
-                    }
-                    v7->m_uFlags = (v7->m_uFlags & 0xFFC7) | 16;
-                    m_spScreenTexturePropertyState->SetProperty(v7);
-                    NiAlphaProperty* v8 =
-                        static_cast<NiAlphaProperty*>(NiMemObject::operator new(sizeof(NiAlphaProperty)));
-                    if (v8) {
-                        v9 = ::new (v8) NiAlphaProperty;
-                    }
-                    else {
-                        v9 = nullptr;
-                    }
-                    v9->m_uFlags = (v9->m_uFlags & 0xFE00) | 237;
-                    m_spScreenTexturePropertyState->SetProperty(v9);
-                    NiZBufferProperty* v10 =
-                        static_cast<NiZBufferProperty*>(NiMemObject::operator new(sizeof(NiZBufferProperty)));
-                    if (v10) {
-                        v11 = ::new (v10) NiZBufferProperty;
-                    }
-                    else {
-                        v11 = nullptr;
-                    }
-                    v11->m_uFlags &= 0xFFFCu;
-                    m_spScreenTexturePropertyState->SetProperty(v11);
-                }
-                m_spScreenTexturePropertyState->SetProperty(apScreenTexture->m_spTexProp.m_pObject);
-                NiUnsharedGeometryGroup* m_pkDefaultGroup = this->m_pkDefaultGroup;
-                m_pkCurrProp = m_spScreenTexturePropertyState;
-                NiD3DGeometryGroupManager* m_pkGeometryGroupManager = this->m_pkGeometryGroupManager;
-                m_pkCurrEffects = nullptr;
-                m_pkGeometryGroupManager->AddObjectToGroup(m_pkDefaultGroup, apScreenTexture);
-                PackScreenTextureGeomBuffer(apScreenTexture);
-                kWorld.m_Rotate = NiMatrix3_IDENTITY;
-                kWorld.m_fScale = 1.0f;
-                kWorld.m_Translate.x = NiPoint3_ZERO.x;
-                NiGeometryBufferData* m_pkBuffData = apScreenTexture->m_pkBuffData;
-                kWorld.m_Translate.y = NiPoint3_ZERO.y;
-                kWorld.m_Translate.z = NiPoint3_ZERO.z;
-                DrawPrimitive(nullptr, nullptr, nullptr, kWorld, kWorldBound, m_pkBuffData);
-                m_spScreenTexturePropertyState->SetProperty(NiTexturingProperty::ms_spDefault.m_pObject);
-                m_pkCurrProp = pkScreenTexture;
-                m_pkCurrEffects = pkOldEffects;
+    if ((!m_bDeviceLost) && (apScreenTexture) && (apScreenTexture->m_kScreenRects.m_uiUsed)) {
+        NiBound kWorldBound;
+        NiPropertyState* pkScreenTexture = m_pkCurrProp;
+        NiDynamicEffectState* pkOldEffects = m_pkCurrEffects;
+        if (!m_spScreenTexturePropertyState) {
+            NiPropertyState* v5;
+            NiVertexColorProperty* v7;
+            NiAlphaProperty* v9;
+            NiZBufferProperty* v11;
+            NiPropertyState* v4 =
+                static_cast<NiPropertyState*>(MemoryManager_Singleton.Allocate(sizeof(NiPropertyState)));
+            if (v4) {
+                v5 = ::new (v4) NiPropertyState;
             }
+            else {
+                v5 = nullptr;
+            }
+            m_spScreenTexturePropertyState = v5;
+            NiVertexColorProperty* v6 =
+                static_cast<NiVertexColorProperty*>(NiMemObject::operator new(sizeof(NiVertexColorProperty)));
+            if (v6) {
+                v7 = ::new (v6) NiVertexColorProperty;
+            }
+            else {
+                v7 = nullptr;
+            }
+            v7->m_uFlags = (v7->m_uFlags & 0xFFC7) | 16;
+            m_spScreenTexturePropertyState->SetProperty(v7);
+            NiAlphaProperty* v8 = static_cast<NiAlphaProperty*>(NiMemObject::operator new(sizeof(NiAlphaProperty)));
+            if (v8) {
+                v9 = ::new (v8) NiAlphaProperty;
+            }
+            else {
+                v9 = nullptr;
+            }
+            v9->m_uFlags = (v9->m_uFlags & 0xFE00) | 237;
+            m_spScreenTexturePropertyState->SetProperty(v9);
+            NiZBufferProperty* v10 =
+                static_cast<NiZBufferProperty*>(NiMemObject::operator new(sizeof(NiZBufferProperty)));
+            if (v10) {
+                v11 = ::new (v10) NiZBufferProperty;
+            }
+            else {
+                v11 = nullptr;
+            }
+            v11->m_uFlags &= 0xFFFCu;
+            m_spScreenTexturePropertyState->SetProperty(v11);
         }
+        m_spScreenTexturePropertyState->SetProperty(apScreenTexture->m_spTexProp.m_pObject);
+        NiUnsharedGeometryGroup* m_pkDefaultGroup = this->m_pkDefaultGroup;
+        m_pkCurrProp = m_spScreenTexturePropertyState;
+        NiD3DGeometryGroupManager* m_pkGeometryGroupManager = this->m_pkGeometryGroupManager;
+        m_pkCurrEffects = nullptr;
+        m_pkGeometryGroupManager->AddObjectToGroup(m_pkDefaultGroup, apScreenTexture);
+        PackScreenTextureGeomBuffer(apScreenTexture);
+        kWorld.m_Rotate = NiMatrix3_IDENTITY;
+        kWorld.m_fScale = 1.0f;
+        kWorld.m_Translate.x = NiPoint3_ZERO.x;
+        NiGeometryBufferData* m_pkBuffData = apScreenTexture->m_pkBuffData;
+        kWorld.m_Translate.y = NiPoint3_ZERO.y;
+        kWorld.m_Translate.z = NiPoint3_ZERO.z;
+        DrawPrimitive(nullptr, nullptr, nullptr, kWorld, kWorldBound, m_pkBuffData);
+        m_spScreenTexturePropertyState->SetProperty(NiTexturingProperty::ms_spDefault.m_pObject);
+        m_pkCurrProp = pkScreenTexture;
+        m_pkCurrEffects = pkOldEffects;
     }
 }
 

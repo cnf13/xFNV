@@ -139,54 +139,52 @@ bool NiHalfSpaceBV::HalfSpaceSphereFindIntersect(
         if (kABV0a <= 0.0f || !(kABV0a * fTime + v12 >= kABV1a)) {
             return false;
         }
-        else {
-            NiPoint3 v38;
-            fIntrTime = -((v12 + kSphABV.m_kSphere.m_fRadius) / kABV0a);
-            if (bCalcNormals) {
-                NiPoint3 v37;
-                kNormal1 = kHalfABV.m_kPlane.m_kNormal;
-                v37.x = -kNormal1.x;
-                v37.y = -kNormal1.y;
-                v37.z = -kNormal1.z;
-                kNormal0 = v37;
-            }
-            float kABV0d = kSphABV.m_kSphere.m_fRadius;
-            float v27 = kABV0d * kNormal1.x;
-            float v28 = kNormal1.y * kABV0d;
-            float v29 = kABV0d * kNormal1.z;
-            float kABV0e = fIntrTime;
-            float v22 = kV1.x * kABV0e;
-            float v24 = kABV0e * kV1.y;
-            float v26 = kABV0e * kV1.z;
-            float v16 = v22 + kSphABV.m_kSphere.m_kCenter.x;
-            float v18 = kSphABV.m_kSphere.m_kCenter.y + v24;
-            float v20 = kSphABV.m_kSphere.m_kCenter.z + v26;
-            v38.x = v16 + v27;
-            v38.y = v18 + v28;
-            v38.z = v20 + v29;
-            kIntrPt = v38;
-            return true;
-        }
-    }
-    else {
-        NiPoint3 v36;
-        fIntrTime = 0.0f;
-        float v15 = kHalfABV.m_kPlane.m_kNormal.x * v12;
-        float v17 = kHalfABV.m_kPlane.m_kNormal.y * v12;
-        float v19 = v12 * kHalfABV.m_kPlane.m_kNormal.z;
-        v36.x = kSphABV.m_kSphere.m_kCenter.x - v15;
-        v36.y = kSphABV.m_kSphere.m_kCenter.y - v17;
-        v36.z = kSphABV.m_kSphere.m_kCenter.z - v19;
-        kIntrPt = v36;
+
+        NiPoint3 v38;
+        fIntrTime = -((v12 + kSphABV.m_kSphere.m_fRadius) / kABV0a);
         if (bCalcNormals) {
+            NiPoint3 v37;
             kNormal1 = kHalfABV.m_kPlane.m_kNormal;
-            v36.x = -kNormal1.x;
-            v36.y = -kNormal1.y;
-            v36.z = -kNormal1.z;
-            kNormal0 = v36;
+            v37.x = -kNormal1.x;
+            v37.y = -kNormal1.y;
+            v37.z = -kNormal1.z;
+            kNormal0 = v37;
         }
+        float kABV0d = kSphABV.m_kSphere.m_fRadius;
+        float v27 = kABV0d * kNormal1.x;
+        float v28 = kNormal1.y * kABV0d;
+        float v29 = kABV0d * kNormal1.z;
+        float kABV0e = fIntrTime;
+        float v22 = kV1.x * kABV0e;
+        float v24 = kABV0e * kV1.y;
+        float v26 = kABV0e * kV1.z;
+        float v16 = v22 + kSphABV.m_kSphere.m_kCenter.x;
+        float v18 = kSphABV.m_kSphere.m_kCenter.y + v24;
+        float v20 = kSphABV.m_kSphere.m_kCenter.z + v26;
+        v38.x = v16 + v27;
+        v38.y = v18 + v28;
+        v38.z = v20 + v29;
+        kIntrPt = v38;
         return true;
     }
+
+    NiPoint3 v36;
+    fIntrTime = 0.0f;
+    float v15 = kHalfABV.m_kPlane.m_kNormal.x * v12;
+    float v17 = kHalfABV.m_kPlane.m_kNormal.y * v12;
+    float v19 = v12 * kHalfABV.m_kPlane.m_kNormal.z;
+    v36.x = kSphABV.m_kSphere.m_kCenter.x - v15;
+    v36.y = kSphABV.m_kSphere.m_kCenter.y - v17;
+    v36.z = kSphABV.m_kSphere.m_kCenter.z - v19;
+    kIntrPt = v36;
+    if (bCalcNormals) {
+        kNormal1 = kHalfABV.m_kPlane.m_kNormal;
+        v36.x = -kNormal1.x;
+        v36.y = -kNormal1.y;
+        v36.z = -kNormal1.z;
+        kNormal0 = v36;
+    }
+    return true;
 }
 
 // The swept capsule against the half space. The NiPoint3 arithmetic is done in the order written out below, with each

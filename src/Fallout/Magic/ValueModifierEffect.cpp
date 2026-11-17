@@ -74,20 +74,18 @@ void ValueModifierEffect::Finalize() {
     EffectSetting* Time = pEffect->GetEffectSetting();
     if (Time->IsDetrimental(v5)) {
         fMagnitude = -fMagnitude;
-        if (TargetAsActor) {
-            if (GetActorValue() == ActorValue::HEALTH) {
-                EffectItem* CastingType = GetEffectItem();
-                if (CastingType->GetRange()) {
-                    Actor* CasterAsActor;
-                    if (GetCaster()) {
-                        MagicCaster* ProcessLevel = GetCaster();
-                        CasterAsActor = ProcessLevel->GetCasterAsActor();
-                    }
-                    else {
-                        CasterAsActor = nullptr;
-                    }
-                    fMagnitude = TargetAsActor->DifficultyLevelAdjustHealthModifier(fMagnitude, CasterAsActor);
+        if ((TargetAsActor) && (GetActorValue() == ActorValue::HEALTH)) {
+            EffectItem* CastingType = GetEffectItem();
+            if (CastingType->GetRange()) {
+                Actor* CasterAsActor;
+                if (GetCaster()) {
+                    MagicCaster* ProcessLevel = GetCaster();
+                    CasterAsActor = ProcessLevel->GetCasterAsActor();
                 }
+                else {
+                    CasterAsActor = nullptr;
+                }
+                fMagnitude = TargetAsActor->DifficultyLevelAdjustHealthModifier(fMagnitude, CasterAsActor);
             }
         }
     }
@@ -227,19 +225,16 @@ void ValueModifierEffect::Start() {
             else {
                 ppotion_2 = nullptr;
             }
-            if (ppotion_2) {
-                if (ppotion_2->IsFlagSet(AlchemyItem::FOOD_ITEM)) {
-                    float afA = static_cast<double>(pEffect->GetDuration()) * fMagnitude;
-                    double v3 = BSMIN(afA, fPlayerHealthDiff_2);
-                    MiscStatManager::ModVal(MiscStatManager::MS_FOOD_HEALTH_RESTORED, static_cast<int32_t>(v3));
-                }
+            if ((ppotion_2) && (ppotion_2->IsFlagSet(AlchemyItem::FOOD_ITEM))) {
+                float afA = static_cast<double>(pEffect->GetDuration()) * fMagnitude;
+                double v3 = BSMIN(afA, fPlayerHealthDiff_2);
+                MiscStatManager::ModVal(MiscStatManager::MS_FOOD_HEALTH_RESTORED, static_cast<int32_t>(v3));
             }
-            if (ppotion_2) {
-                if (ppotion_2->IsFlagSet(AlchemyItem::MEDICINE)) {
-                    float v7 = static_cast<double>(pEffect->GetDuration()) * fMagnitude;
-                    double v4 = BSMIN(v7, fPlayerHealthDiff_2);
-                    MiscStatManager::ModVal(MiscStatManager::MS_STIMPAK_HEALTH_RESTORED, static_cast<int32_t>(v4));
-                }
+
+            if ((ppotion_2) && (ppotion_2->IsFlagSet(AlchemyItem::MEDICINE))) {
+                float v7 = static_cast<double>(pEffect->GetDuration()) * fMagnitude;
+                double v4 = BSMIN(v7, fPlayerHealthDiff_2);
+                MiscStatManager::ModVal(MiscStatManager::MS_STIMPAK_HEALTH_RESTORED, static_cast<int32_t>(v4));
             }
         }
     }
@@ -256,17 +251,14 @@ void ValueModifierEffect::Start() {
             else {
                 ppotion = nullptr;
             }
-            if (ppotion) {
-                if (ppotion->IsFlagSet(AlchemyItem::FOOD_ITEM)) {
-                    double v1 = BSMIN(fMagnitude, fPlayerHealthDiff);
-                    MiscStatManager::ModVal(MiscStatManager::MS_FOOD_HEALTH_RESTORED, static_cast<int32_t>(v1));
-                }
+            if ((ppotion) && (ppotion->IsFlagSet(AlchemyItem::FOOD_ITEM))) {
+                double v1 = BSMIN(fMagnitude, fPlayerHealthDiff);
+                MiscStatManager::ModVal(MiscStatManager::MS_FOOD_HEALTH_RESTORED, static_cast<int32_t>(v1));
             }
-            if (ppotion) {
-                if (ppotion->IsFlagSet(AlchemyItem::MEDICINE)) {
-                    double v2 = BSMIN(fMagnitude, fPlayerHealthDiff);
-                    MiscStatManager::ModVal(MiscStatManager::MS_STIMPAK_HEALTH_RESTORED, static_cast<int32_t>(v2));
-                }
+
+            if ((ppotion) && (ppotion->IsFlagSet(AlchemyItem::MEDICINE))) {
+                double v2 = BSMIN(fMagnitude, fPlayerHealthDiff);
+                MiscStatManager::ModVal(MiscStatManager::MS_STIMPAK_HEALTH_RESTORED, static_cast<int32_t>(v2));
             }
         }
         if (eWhichActorValue == ActorValue::ENDURANCE && fMagnitude < 0.0 &&
@@ -284,13 +276,12 @@ void ValueModifierEffect::Start() {
     }
     if (eWhichActorValue == ActorValue::RADIATION_RADS &&
         pEffect->pEffectSetting->IsFlagSet(EffectSetting::DETRIMENTAL)) {
-        if (pActor) {
-            if (pActor->pCurrentProcess) {
-                BaseProcess* afDamage = pActor->pCurrentProcess;
-                float zero = fMagnitude;
-                afDamage->AddRadiationMagicDelta(zero);
-            }
+        if ((pActor) && (pActor->pCurrentProcess)) {
+            BaseProcess* afDamage = pActor->pCurrentProcess;
+            float zero = fMagnitude;
+            afDamage->AddRadiationMagicDelta(zero);
         }
+
         if (pActor == pPlayer) {
             pPlayer->ReportRadiationChange();
         }
@@ -344,43 +335,40 @@ void ValueModifierEffect::Finish() {
         pActor = nullptr;
     }
     if (pEffect->pEffectSetting->IsFlagSet(EffectSetting::RECOVER)) {
-        if (pActor) {
-            if (fMagnitude > 0.0) {
-                float fadjust = CheckAdjustNoNegativeMagnitude(-fMagnitude) + fMagnitude;
-                if (GetActorValue() == ActorValue::HEALTH && fMagnitude + 1.0 >= pActor->GetHealth() + fadjust) {
-                    fadjust = fadjust + 1.0;
+        if ((pActor) && (fMagnitude > 0.0)) {
+            float fadjust = CheckAdjustNoNegativeMagnitude(-fMagnitude) + fMagnitude;
+            if (GetActorValue() == ActorValue::HEALTH && fMagnitude + 1.0 >= pActor->GetHealth() + fadjust) {
+                fadjust = fadjust + 1.0;
+            }
+            if (fadjust != 0.0) {
+                if (pCaster) {
+                    Actor* CasterAsActor = pCaster->GetCasterAsActor();
+                    pActor->DamageModActorValue(eWhichActorValue, fadjust, CasterAsActor);
                 }
-                if (fadjust != 0.0) {
-                    if (pCaster) {
-                        Actor* CasterAsActor = pCaster->GetCasterAsActor();
-                        pActor->DamageModActorValue(eWhichActorValue, fadjust, CasterAsActor);
-                    }
-                    else {
-                        pActor->DamageModActorValue(eWhichActorValue, fadjust, nullptr);
-                    }
+                else {
+                    pActor->DamageModActorValue(eWhichActorValue, fadjust, nullptr);
                 }
             }
         }
+
         ModifyActorValue(pActor, -fMagnitude, ActorValue::VALUE_NONE);
-        if (pActor) {
-            if (pActor->IsDead(false) &&
-                (eWhichActorValue == ActorValue::HEALTH || eWhichActorValue == ActorValue::ENDURANCE)) {
-                float v9 = static_cast<float>(pActor->GetActorValue(ActorValue::HEALTH));
-                if (v9 > 0.0) {
-                    pActor->DamageModActorValue(ActorValue::HEALTH, (-v9), static_cast<Actor*>(nullptr));
-                }
+        if ((pActor) &&
+            (pActor->IsDead(false) &&
+             (eWhichActorValue == ActorValue::HEALTH || eWhichActorValue == ActorValue::ENDURANCE))) {
+            float v9 = static_cast<float>(pActor->GetActorValue(ActorValue::HEALTH));
+            if (v9 > 0.0) {
+                pActor->DamageModActorValue(ActorValue::HEALTH, (-v9), static_cast<Actor*>(nullptr));
             }
         }
     }
     if (eWhichActorValue == ActorValue::RADIATION_RADS &&
         pEffect->pEffectSetting->IsFlagSet(EffectSetting::DETRIMENTAL)) {
-        if (pActor) {
-            if (pActor->pCurrentProcess) {
-                BaseProcess* CurrentAIProcess = pActor->pCurrentProcess;
-                float afMagnitudea = fMagnitude;
-                CurrentAIProcess->RemoveRadiationMagicDelta(afMagnitudea);
-            }
+        if ((pActor) && (pActor->pCurrentProcess)) {
+            BaseProcess* CurrentAIProcess = pActor->pCurrentProcess;
+            float afMagnitudea = fMagnitude;
+            CurrentAIProcess->RemoveRadiationMagicDelta(afMagnitudea);
         }
+
         if (pActor == pPlayer) {
             pPlayer->ReportRadiationChange();
         }
@@ -425,16 +413,13 @@ void ValueModifierEffect::ModifyActorValue(Actor* apActor, float afValue, ActorV
                     apActor->TempModActorValue(eactorValue, afValue, v10);
                 }
                 else {
-                    if (v10) {
-                        if (afValue < 0.0 && eactorValue == ActorValue::HEALTH && v10->IsPc() && apActor != v10) {
-                            if (apActor->pCurrentProcess) {
-                                if (!apActor->GetEssential()) {
-                                    BaseProcess* CurrentAIProcess = apActor->pCurrentProcess;
-                                    CurrentAIProcess->ModTrackedDamage(pPlayer, -afValue);
-                                }
-                            }
-                        }
+                    if ((v10) &&
+                        (afValue < 0.0 && eactorValue == ActorValue::HEALTH && v10->IsPc() && apActor != v10) &&
+                        (apActor->pCurrentProcess) && (!apActor->GetEssential())) {
+                        BaseProcess* CurrentAIProcess = apActor->pCurrentProcess;
+                        CurrentAIProcess->ModTrackedDamage(pPlayer, -afValue);
                     }
+
                     apActor->DamageModActorValue(eactorValue, afValue, v10);
                     if (afValue < 0.0 && eactorValue == ActorValue::HEALTH) {
                         TaskQueueInterface::GetInstance()->QueueScriptFunctionCall(0x116Cu, apActor, -afValue);
@@ -456,27 +441,26 @@ void ValueModifierEffect::ShowAttributeReductionMessage() {
     if (pTarget == v9) {
         ActorValue::Index v2;
         ActorValue::Index ActorValueIndex = pEffect->GetActorValueIndex();
-        if (ActorValue::IsSPECIAL(ActorValueIndex) || (v2 = pEffect->GetActorValueIndex(), ActorValue::IsSkill(v2))) {
-            if (pEffect->IsHostile()) {
-                MagicItem* Spell = pSpell;
-                if (Spell->GetSpellType() != MagicSystem::ABILITY &&
-                    pEffect->pEffectSetting->IsFlagSet(EffectSetting::DETRIMENTAL)) {
-                    const char* v6;
-                    char msg[208];
-                    bool v7 = pEffect->pEffectSetting->IsFlagSet(EffectSetting::RECOVER) || FromWornEnchantment();
-                    msg[207] = v7;
-                    if (v7) {
-                        v6 = sAttributeDrained.String();
-                    }
-                    else {
-                        v6 = sAttributeDamaged.String();
-                    }
-                    ActorValue::Index v3 = pEffect->GetActorValueIndex();
-                    const char* time = ActorValue::GetActorValueName(v3);
-                    const char* v4 = sYour.String();
-                    std::sprintf(msg, "%s %s %s", v4, time, v6);
-                    Interface::ShowMessage(msg, 0, nullptr, nullptr, 2.0f, false);
+        if ((ActorValue::IsSPECIAL(ActorValueIndex) || (v2 = pEffect->GetActorValueIndex(), ActorValue::IsSkill(v2))) &&
+            (pEffect->IsHostile())) {
+            MagicItem* Spell = pSpell;
+            if (Spell->GetSpellType() != MagicSystem::ABILITY &&
+                pEffect->pEffectSetting->IsFlagSet(EffectSetting::DETRIMENTAL)) {
+                const char* v6;
+                char msg[208];
+                bool v7 = pEffect->pEffectSetting->IsFlagSet(EffectSetting::RECOVER) || FromWornEnchantment();
+                msg[207] = v7;
+                if (v7) {
+                    v6 = sAttributeDrained.String();
                 }
+                else {
+                    v6 = sAttributeDamaged.String();
+                }
+                ActorValue::Index v3 = pEffect->GetActorValueIndex();
+                const char* time = ActorValue::GetActorValueName(v3);
+                const char* v4 = sYour.String();
+                std::sprintf(msg, "%s %s %s", v4, time, v6);
+                Interface::ShowMessage(msg, 0, nullptr, nullptr, 2.0f, false);
             }
         }
     }
@@ -486,30 +470,29 @@ float ValueModifierEffect::CheckAdjustNoNegativeMagnitude(float afMagnitude) {
     if (HasConditions()) {
         return afMagnitude;
     }
-    else {
-        ActorValue::Index v4;
-        ActorValue::Index v5;
-        ActorValue::Index v3 = GetActorValue();
-        if (ActorValue::IsSPECIAL(v3) ||
-            ((v4 = GetActorValue(), ActorValue::IsDerivedAttribute(v4)) ||
-             (v5 = GetActorValue(), ActorValue::IsSkill(v5)))) {
-            if (afMagnitude <= 0.0) {
-                Actor* TargetAsActor;
-                if (pTarget) {
-                    TargetAsActor = pTarget->GetTargetAsActor();
-                }
-                else {
-                    TargetAsActor = nullptr;
-                }
-                ActorValue::Index v6 = GetActorValue();
-                float v10 = TargetAsActor->GetActorFloatValue(v6) + afMagnitude;
-                if (v10 < 0.0) {
-                    return afMagnitude - v10;
-                }
-            }
+
+    ActorValue::Index v4;
+    ActorValue::Index v5;
+    ActorValue::Index v3 = GetActorValue();
+    if ((ActorValue::IsSPECIAL(v3) ||
+         ((v4 = GetActorValue(), ActorValue::IsDerivedAttribute(v4)) ||
+          (v5 = GetActorValue(), ActorValue::IsSkill(v5)))) &&
+        (afMagnitude <= 0.0)) {
+        Actor* TargetAsActor;
+        if (pTarget) {
+            TargetAsActor = pTarget->GetTargetAsActor();
         }
-        return afMagnitude;
+        else {
+            TargetAsActor = nullptr;
+        }
+        ActorValue::Index v6 = GetActorValue();
+        float v10 = TargetAsActor->GetActorFloatValue(v6) + afMagnitude;
+        if (v10 < 0.0) {
+            return afMagnitude - v10;
+        }
     }
+
+    return afMagnitude;
 }
 
 ActiveEffect* ValueModifierEffect::Instantiate(MagicCaster* apCaster, MagicItem* apSpell, EffectItem* apEffect) {
@@ -517,7 +500,6 @@ ActiveEffect* ValueModifierEffect::Instantiate(MagicCaster* apCaster, MagicItem*
     if (v5) {
         return ::new (v5) ValueModifierEffect(apCaster, apSpell, apEffect);
     }
-    else {
-        return nullptr;
-    }
+
+    return nullptr;
 }

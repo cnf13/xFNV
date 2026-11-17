@@ -237,26 +237,24 @@ void TileShader::SetupGeometryConstants(const NiPropertyState* apState) {
             BSRenderState::SetScissorRect(iLeft, iTop, iRight, iBottom, BSRS_NOLOCK);
         }
         NiStencilProperty* pStencil = static_cast<NiStencilProperty*>(apState->m_aspProps[4].m_pObject);
-        if (pStencil) {
-            if (pStencil->m_uFlags & NiStencilProperty::ENABLE_MASK) {
-                BSRenderState::SetStencilEnable(true, BSRS_NOLOCK);
-                BSRenderState::SetStencilAction(
-                    static_cast<NiStencilProperty::Action>(
-                        (pStencil->m_uFlags & NiStencilProperty::FAILACTION_MASK) >> NiStencilProperty::FAILACTION_POS
-                    ),
-                    static_cast<NiStencilProperty::Action>(
-                        (pStencil->m_uFlags & NiStencilProperty::ZFAILACTION_MASK) >> NiStencilProperty::ZFAILACTION_POS
-                    ),
-                    static_cast<NiStencilProperty::Action>(
-                        (pStencil->m_uFlags & NiStencilProperty::PASSACTION_MASK) >> NiStencilProperty::PASSACTION_POS
-                    ),
-                    BSRS_NOLOCK
-                );
-                BSRenderState::SetStencilFunc(
-                    static_cast<NiStencilProperty::TestFunc>(pStencil->m_uFlags >> NiStencilProperty::TESTFUNC_POS),
-                    pStencil->m_uiRef, pStencil->m_uiMask, BSRS_NOLOCK
-                );
-            }
+        if ((pStencil) && (pStencil->m_uFlags & NiStencilProperty::ENABLE_MASK)) {
+            BSRenderState::SetStencilEnable(true, BSRS_NOLOCK);
+            BSRenderState::SetStencilAction(
+                static_cast<NiStencilProperty::Action>(
+                    (pStencil->m_uFlags & NiStencilProperty::FAILACTION_MASK) >> NiStencilProperty::FAILACTION_POS
+                ),
+                static_cast<NiStencilProperty::Action>(
+                    (pStencil->m_uFlags & NiStencilProperty::ZFAILACTION_MASK) >> NiStencilProperty::ZFAILACTION_POS
+                ),
+                static_cast<NiStencilProperty::Action>(
+                    (pStencil->m_uFlags & NiStencilProperty::PASSACTION_MASK) >> NiStencilProperty::PASSACTION_POS
+                ),
+                BSRS_NOLOCK
+            );
+            BSRenderState::SetStencilFunc(
+                static_cast<NiStencilProperty::TestFunc>(pStencil->m_uFlags >> NiStencilProperty::TESTFUNC_POS),
+                pStencil->m_uiRef, pStencil->m_uiMask, BSRS_NOLOCK
+            );
         }
     }
 }
@@ -266,10 +264,8 @@ void TileShader::PostGeometry(const NiPropertyState* apState) {
         BSRenderState::SetScissorEnable(false, BSRS_NOLOCK);
     }
     NiStencilProperty* pStencil = static_cast<NiStencilProperty*>(apState->m_aspProps[4].m_pObject);
-    if (pStencil) {
-        if ((pStencil->m_uFlags & 1) != 0) {
-            BSRenderState::SetStencilEnable(false, BSRS_NOLOCK);
-        }
+    if ((pStencil) && ((pStencil->m_uFlags & 1) != 0)) {
+        BSRenderState::SetStencilEnable(false, BSRS_NOLOCK);
     }
 }
 

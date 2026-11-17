@@ -779,35 +779,31 @@ void CSpeedTreeRT::ComputeSelfShadowTexCoords() {
     CVec3 a2;
     CVec3 v10;
     float fRadius;
-    if (m_pBranchGeometry) {
-        if (m_pFrondGeometry) {
-            if (m_pProjectedShadow) {
-                v5 = m_pTreeSizes[1];
-                v6 = m_pTreeSizes[2];
-                v10.m_afData[0] = (*m_pTreeSizes);
-                v10.m_afData[1] = v5;
-                v10.m_afData[2] = v6;
-                v3 = m_pTreeSizes[4];
-                v4 = m_pTreeSizes[5];
-                a2.m_afData[0] = m_pTreeSizes[3];
-                a2.m_afData[1] = v3;
-                a2.m_afData[2] = v4;
-                fRadius = (float)((&v10)->Distance(a2) * 0.5);
-                v1 = (&v10)->Add(&v7, &a2);
-                v1->Scale(&v8, 0x1p-1f);
-                if (m_pEmbeddedTexCoords) {
-                    m_pProjectedShadow->ComputeTexCoords(
-                        m_pBranchGeometry, v8, fRadius, m_pEmbeddedTexCoords->m_afShadowTexCoords
-                    );
-                    m_pProjectedShadow->ComputeTexCoords(
-                        m_pFrondGeometry, v8, fRadius, m_pEmbeddedTexCoords->m_afShadowTexCoords
-                    );
-                }
-                else {
-                    m_pProjectedShadow->ComputeTexCoords(m_pBranchGeometry, v8, fRadius, nullptr);
-                    m_pProjectedShadow->ComputeTexCoords(m_pFrondGeometry, v8, fRadius, nullptr);
-                }
-            }
+    if ((m_pBranchGeometry) && (m_pFrondGeometry) && (m_pProjectedShadow)) {
+        v5 = m_pTreeSizes[1];
+        v6 = m_pTreeSizes[2];
+        v10.m_afData[0] = (*m_pTreeSizes);
+        v10.m_afData[1] = v5;
+        v10.m_afData[2] = v6;
+        v3 = m_pTreeSizes[4];
+        v4 = m_pTreeSizes[5];
+        a2.m_afData[0] = m_pTreeSizes[3];
+        a2.m_afData[1] = v3;
+        a2.m_afData[2] = v4;
+        fRadius = (float)((&v10)->Distance(a2) * 0.5);
+        v1 = (&v10)->Add(&v7, &a2);
+        v1->Scale(&v8, 0x1p-1f);
+        if (m_pEmbeddedTexCoords) {
+            m_pProjectedShadow->ComputeTexCoords(
+                m_pBranchGeometry, v8, fRadius, m_pEmbeddedTexCoords->m_afShadowTexCoords
+            );
+            m_pProjectedShadow->ComputeTexCoords(
+                m_pFrondGeometry, v8, fRadius, m_pEmbeddedTexCoords->m_afShadowTexCoords
+            );
+        }
+        else {
+            m_pProjectedShadow->ComputeTexCoords(m_pBranchGeometry, v8, fRadius, nullptr);
+            m_pProjectedShadow->ComputeTexCoords(m_pFrondGeometry, v8, fRadius, nullptr);
         }
     }
 }
@@ -2452,84 +2448,79 @@ void CSpeedTreeRT::Get360BillboardGeometry(CSpeedTreeRT::SGeometry& sGeometry, u
     float fLowValue;
     float fHighValue;
     GetSimpleBillboardGeometry(sGeometry);
-    if (sGeometry.m_sBillboard0.m_bIsActive) {
-        if (this->m_usNum360Billboards) {
-            float a1[3];
-            int16_t sHighLod[2];
-            int16_t sLowLod[2];
-            float fFade =
-                (sGeometry.m_sBillboard0.m_fAlphaTestValue - static_cast<double>(this->m_ucTargetAlphaValue)) /
-                (255.0 - static_cast<double>(this->m_ucTargetAlphaValue));
-            CVec3 cCameraPos = CIdvCamera::m_cCameraPos;
-            float cCameraDir = -CIdvCamera::m_cCameraDir.m_afData[0];
-            float cCameraDir_4 = -CIdvCamera::m_cCameraDir.m_afData[1];
-            float cCameraDir_8 = -CIdvCamera::m_cCameraDir.m_afData[2];
-            a1[0] = cCameraDir;
-            a1[1] = cCameraDir_4;
-            a1[2] = cCameraDir_8;
-            float fAzimuth = ComputeAzimuth(a1);
-            if (fAzimuth < 0.0) {
-                fAzimuth = fAzimuth + 360.0;
-            }
-            fHighValue = -1.0f;
-            fLowValue = -1.0f;
-            sHighLod[0] = -1;
-            sLowLod[0] = -1;
-            uint16_t m_usNum360Billboards = this->m_usNum360Billboards;
-            float fOverlapRadius = 0.5 / static_cast<double>(m_usNum360Billboards);
-            float v5 = fAzimuth / 360.0;
-            float v4 = 1.0 - fOverlapRadius;
-            float fLodLevel = v5 * (v4 - fOverlapRadius) + fOverlapRadius;
-            float fTargetAlphaValue = static_cast<float>(this->m_ucTargetAlphaValue);
-            CSpeedTreeRT::GetTransitionValues(
-                fLodLevel, m_usNum360Billboards, fOverlapRadius, m_fLeafTransitionFactor, m_fLeafLodCurveExponent,
-                fTargetAlphaValue, fHighValue, fLowValue, sHighLod[0], sLowLod[0]
-            );
-            sHighLod[0] = this->m_usNum360Billboards - 1 - sHighLod[0];
-            sLowLod[0] = this->m_usNum360Billboards - 1 - sLowLod[0];
-            while (sHighLod[0] >= static_cast<int32_t>(m_usNum360Billboards)) {
-                sHighLod[0] -= m_usNum360Billboards;
-            }
-            while (sLowLod[0] >= static_cast<int32_t>(m_usNum360Billboards)) {
-                sLowLod[0] -= m_usNum360Billboards;
-            }
-            if ((ulBitVector & 32) != 0) {
-                sGeometry.m_sBillboard0.m_bIsActive = true;
-                if (!(fLowValue > static_cast<double>(fHighValue))) {
-                    sGeometry.m_sBillboard0.m_pTexCoords = &m_pEmbeddedTexCoords->m_pBillboardTexCoords[8 * sLowLod[0]];
-                    float m_ucTargetAlphaValue = static_cast<float>(this->m_ucTargetAlphaValue);
-                    sGeometry.m_sBillboard0.m_fAlphaTestValue =
-                        fFade * (255.0f - m_ucTargetAlphaValue) + m_ucTargetAlphaValue;
-                }
-                else {
-                    sGeometry.m_sBillboard0.m_pTexCoords =
-                        &m_pEmbeddedTexCoords->m_pBillboardTexCoords[8 * sHighLod[0]];
-                    float v8 = static_cast<float>(this->m_ucTargetAlphaValue);
-                    sGeometry.m_sBillboard0.m_fAlphaTestValue = fFade * (255.0f - v8) + v8;
-                }
-                sGeometry.m_sBillboard1.m_bIsActive = false;
+    if ((sGeometry.m_sBillboard0.m_bIsActive) && (this->m_usNum360Billboards)) {
+        float a1[3];
+        int16_t sHighLod[2];
+        int16_t sLowLod[2];
+        float fFade = (sGeometry.m_sBillboard0.m_fAlphaTestValue - static_cast<double>(this->m_ucTargetAlphaValue)) /
+            (255.0 - static_cast<double>(this->m_ucTargetAlphaValue));
+        CVec3 cCameraPos = CIdvCamera::m_cCameraPos;
+        float cCameraDir = -CIdvCamera::m_cCameraDir.m_afData[0];
+        float cCameraDir_4 = -CIdvCamera::m_cCameraDir.m_afData[1];
+        float cCameraDir_8 = -CIdvCamera::m_cCameraDir.m_afData[2];
+        a1[0] = cCameraDir;
+        a1[1] = cCameraDir_4;
+        a1[2] = cCameraDir_8;
+        float fAzimuth = ComputeAzimuth(a1);
+        if (fAzimuth < 0.0) {
+            fAzimuth = fAzimuth + 360.0;
+        }
+        fHighValue = -1.0f;
+        fLowValue = -1.0f;
+        sHighLod[0] = -1;
+        sLowLod[0] = -1;
+        uint16_t m_usNum360Billboards = this->m_usNum360Billboards;
+        float fOverlapRadius = 0.5 / static_cast<double>(m_usNum360Billboards);
+        float v5 = fAzimuth / 360.0;
+        float v4 = 1.0 - fOverlapRadius;
+        float fLodLevel = v5 * (v4 - fOverlapRadius) + fOverlapRadius;
+        float fTargetAlphaValue = static_cast<float>(this->m_ucTargetAlphaValue);
+        CSpeedTreeRT::GetTransitionValues(
+            fLodLevel, m_usNum360Billboards, fOverlapRadius, m_fLeafTransitionFactor, m_fLeafLodCurveExponent,
+            fTargetAlphaValue, fHighValue, fLowValue, sHighLod[0], sLowLod[0]
+        );
+        sHighLod[0] = this->m_usNum360Billboards - 1 - sHighLod[0];
+        sLowLod[0] = this->m_usNum360Billboards - 1 - sLowLod[0];
+        while (sHighLod[0] >= static_cast<int32_t>(m_usNum360Billboards)) {
+            sHighLod[0] -= m_usNum360Billboards;
+        }
+        while (sLowLod[0] >= static_cast<int32_t>(m_usNum360Billboards)) {
+            sLowLod[0] -= m_usNum360Billboards;
+        }
+        if ((ulBitVector & 32) != 0) {
+            sGeometry.m_sBillboard0.m_bIsActive = true;
+            if (!(fLowValue > static_cast<double>(fHighValue))) {
+                sGeometry.m_sBillboard0.m_pTexCoords = &m_pEmbeddedTexCoords->m_pBillboardTexCoords[8 * sLowLod[0]];
+                float m_ucTargetAlphaValue = static_cast<float>(this->m_ucTargetAlphaValue);
+                sGeometry.m_sBillboard0.m_fAlphaTestValue =
+                    fFade * (255.0f - m_ucTargetAlphaValue) + m_ucTargetAlphaValue;
             }
             else {
-                if (m_pEmbeddedTexCoords) {
-                    sGeometry.m_sBillboard0.m_pTexCoords =
-                        &m_pEmbeddedTexCoords->m_pBillboardTexCoords[8 * sHighLod[0]];
-                }
-                else {
-                    sGeometry.m_sBillboard0.m_pTexCoords = nullptr;
-                }
-                sGeometry.m_sBillboard0.m_fAlphaTestValue = fFade * (255.0f - fHighValue) + fHighValue;
-                sGeometry.m_sBillboard0.m_usWhich = sHighLod[0];
-                sGeometry.m_sBillboard1.m_pCoords = sGeometry.m_sBillboard0.m_pCoords;
-                if (m_pEmbeddedTexCoords) {
-                    sGeometry.m_sBillboard1.m_pTexCoords = &m_pEmbeddedTexCoords->m_pBillboardTexCoords[8 * sLowLod[0]];
-                }
-                else {
-                    sGeometry.m_sBillboard1.m_pTexCoords = nullptr;
-                }
-                sGeometry.m_sBillboard1.m_usWhich = sLowLod[0];
-                sGeometry.m_sBillboard1.m_bIsActive = true;
-                sGeometry.m_sBillboard1.m_fAlphaTestValue = fFade * (255.0f - fLowValue) + fLowValue;
+                sGeometry.m_sBillboard0.m_pTexCoords = &m_pEmbeddedTexCoords->m_pBillboardTexCoords[8 * sHighLod[0]];
+                float v8 = static_cast<float>(this->m_ucTargetAlphaValue);
+                sGeometry.m_sBillboard0.m_fAlphaTestValue = fFade * (255.0f - v8) + v8;
             }
+            sGeometry.m_sBillboard1.m_bIsActive = false;
+        }
+        else {
+            if (m_pEmbeddedTexCoords) {
+                sGeometry.m_sBillboard0.m_pTexCoords = &m_pEmbeddedTexCoords->m_pBillboardTexCoords[8 * sHighLod[0]];
+            }
+            else {
+                sGeometry.m_sBillboard0.m_pTexCoords = nullptr;
+            }
+            sGeometry.m_sBillboard0.m_fAlphaTestValue = fFade * (255.0f - fHighValue) + fHighValue;
+            sGeometry.m_sBillboard0.m_usWhich = sHighLod[0];
+            sGeometry.m_sBillboard1.m_pCoords = sGeometry.m_sBillboard0.m_pCoords;
+            if (m_pEmbeddedTexCoords) {
+                sGeometry.m_sBillboard1.m_pTexCoords = &m_pEmbeddedTexCoords->m_pBillboardTexCoords[8 * sLowLod[0]];
+            }
+            else {
+                sGeometry.m_sBillboard1.m_pTexCoords = nullptr;
+            }
+            sGeometry.m_sBillboard1.m_usWhich = sLowLod[0];
+            sGeometry.m_sBillboard1.m_bIsActive = true;
+            sGeometry.m_sBillboard1.m_fAlphaTestValue = fFade * (255.0f - fLowValue) + fLowValue;
         }
     }
 }
@@ -3229,127 +3220,125 @@ void CLightingEngine::ComputeLeafStaticLighting(
     CVec3 cEmissive;
     CVec3 cAmbient;
     CVec3 cLightPos;
-    if (m_eLeafLightingMethod == CSpeedTreeRT::LIGHT_STATIC) {
-        if (m_eStaticLightingStyle) {
-            for (int32_t nLod = 0; nLod < nNumLeafLods; ++nLod) {
-                const LeafVector& vLeaves = pLeafLods[nLod];
-                LeafVector::const_iterator hProcess = vLeaves.begin();
-                while (true) {
-                    CVec3 cDominantLight;
-                    CVec3 cColor;
-                    LeafVector::const_iterator apMemory = vLeaves.end();
-                    if (hProcess == apMemory) {
-                        break;
-                    }
-                    const CVec3* cNormal = &hProcess.operator*()->m_cNormal;
-                    const CVec3* cVertex = &hProcess.operator*()->m_cPosition;
-                    CVec3 cDiffuseColor = hProcess.operator*()->GetColor();
-                    cDominantLight.m_afData[2] = 0.0f;
-                    cDominantLight.m_afData[1] = 0.0f;
-                    cDominantLight.m_afData[0] = 0.0f;
-                    float fMaxDotProduct = -1.0f;
-                    cColor.m_afData[2] = 0.0f;
-                    cColor.m_afData[1] = 0.0f;
-                    cColor.m_afData[0] = 0.0f;
-                    for (int32_t nLight = 0; nLight < 8; ++nLight) {
-                        if (CLightingEngine::m_abLightEnabled[nLight]) {
-                            CVec3* p_cLightPos;
-                            float v18 = CLightingEngine::m_afLightAttributes[nLight][1];
-                            float v19 = CLightingEngine::m_afLightAttributes[nLight][2];
-                            cLightPos.m_afData[0] = CLightingEngine::m_afLightAttributes[nLight][0];
-                            cLightPos.m_afData[1] = v18;
-                            cLightPos.m_afData[2] = v19;
-                            if (CLightingEngine::m_afLightAttributes[nLight][12] == 0.0) {
-                                p_cLightPos = &cLightPos;
-                            }
-                            else {
-                                p_cLightPos = cLightPos.Diff(&v23, cVertex);
-                            }
-                            CVec3 cLightVector = *p_cLightPos;
-                            cLightVector.Normalize();
-                            float fDotProduct = cLightVector.operator*(*cNormal);
-                            if (fMaxDotProduct <= static_cast<double>(fDotProduct)) {
-                                fMaxDotProduct = fDotProduct;
-                                cDominantLight = cLightPos;
-                            }
-                            if (fDotProduct < 0.0) {
-                                fDotProduct = 0.0f;
-                            }
-                            fDotProduct =
-                                fDotProduct * (1.0 - m_fLeafLightingAdjustmentScalar) + m_fLeafLightingAdjustmentScalar;
-                            if ((m_eStaticLightingStyle & CSpeedTreeRT::SLS_USE_LIGHT_SOURCES) != 0) {
-                                float v16 = m_afLeafMaterial[10];
-                                float v17 = m_afLeafMaterial[11];
-                                cEmissive.m_afData[0] = m_afLeafMaterial[9];
-                                cEmissive.m_afData[1] = v16;
-                                cEmissive.m_afData[2] = v17;
-                                float v13 = m_afLeafMaterial[3] * CLightingEngine::m_afLightAttributes[nLight][6];
-                                float v14 = m_afLeafMaterial[4] * CLightingEngine::m_afLightAttributes[nLight][7];
-                                float v15 = m_afLeafMaterial[5] * CLightingEngine::m_afLightAttributes[nLight][8];
-                                cAmbient.m_afData[0] = v13;
-                                cAmbient.m_afData[1] = v14;
-                                cAmbient.m_afData[2] = v15;
-                                float fAttenuation = 1.0f;
-                                if (CLightingEngine::m_afLightAttributes[nLight][12] != 0.0) {
-                                    float fDistance = cVertex->Distance(cLightPos);
-                                    float fDenominator = CLightingEngine::m_afLightAttributes[nLight][14] * fDistance +
-                                        CLightingEngine::m_afLightAttributes[nLight][13] +
-                                        CLightingEngine::m_afLightAttributes[nLight][15] * fDistance * fDistance;
-                                    if (fDenominator != 0.0) {
-                                        fAttenuation = 1.0 / fDenominator;
-                                    }
-                                }
-                                float v10 = cDiffuseColor.m_afData[0] *
-                                    (CLightingEngine::m_afLightAttributes[nLight][3] * fDotProduct);
-                                float v11 = cDiffuseColor.m_afData[1] *
-                                    (CLightingEngine::m_afLightAttributes[nLight][4] * fDotProduct);
-                                float v12 = cDiffuseColor.m_afData[2] *
-                                    (CLightingEngine::m_afLightAttributes[nLight][5] * fDotProduct);
-                                cDiffuse.m_afData[0] = v10;
-                                cDiffuse.m_afData[1] = v11;
-                                cDiffuse.m_afData[2] = v12;
-                                float v7 = fAttenuation;
-                                CVec3* v4 = cAmbient.Add(&apResult, &cDiffuse);
-                                CVec3* v5 = v4->Scale(&v21, v7);
-                                CVec3* v6 = cEmissive.Add(&v20, v5);
-                                cColor.operator+=(*v6);
-                            }
-                        }
-                    }
-                    if (!(cColor.m_afData[0] < 0.0)) {
-                        if (cColor.m_afData[0] > 1.0) {
-                            cColor.m_afData[0] = 1.0f;
-                        }
-                    }
-                    else {
-                        cColor.m_afData[0] = 0.0f;
-                    }
-                    if (!(cColor.m_afData[1] < 0.0)) {
-                        if (cColor.m_afData[1] > 1.0) {
-                            cColor.m_afData[1] = 1.0f;
-                        }
-                    }
-                    else {
-                        cColor.m_afData[1] = 0.0f;
-                    }
-                    if (!(cColor.m_afData[2] < 0.0)) {
-                        if (cColor.m_afData[2] > 1.0) {
-                            cColor.m_afData[2] = 1.0f;
-                        }
-                    }
-                    else {
-                        cColor.m_afData[2] = 0.0f;
-                    }
-                    if ((m_eStaticLightingStyle & CSpeedTreeRT::SLS_USE_LIGHT_SOURCES) != 0) {
-                        hProcess.operator*()->SetColor(cColor, false);
-                    }
-                    if ((m_eStaticLightingStyle & CSpeedTreeRT::SLS_SIMULATE_SHADOWS) != 0) {
-                        hProcess.operator*()->AdjustStaticLighting(
-                            cTreeCenter, cDominantLight, m_fLeafLightingAdjustmentScalar
-                        );
-                    }
-                    hProcess.operator++();
+    if ((m_eLeafLightingMethod == CSpeedTreeRT::LIGHT_STATIC) && (m_eStaticLightingStyle)) {
+        for (int32_t nLod = 0; nLod < nNumLeafLods; ++nLod) {
+            const LeafVector& vLeaves = pLeafLods[nLod];
+            LeafVector::const_iterator hProcess = vLeaves.begin();
+            while (true) {
+                CVec3 cDominantLight;
+                CVec3 cColor;
+                LeafVector::const_iterator apMemory = vLeaves.end();
+                if (hProcess == apMemory) {
+                    break;
                 }
+                const CVec3* cNormal = &hProcess.operator*()->m_cNormal;
+                const CVec3* cVertex = &hProcess.operator*()->m_cPosition;
+                CVec3 cDiffuseColor = hProcess.operator*()->GetColor();
+                cDominantLight.m_afData[2] = 0.0f;
+                cDominantLight.m_afData[1] = 0.0f;
+                cDominantLight.m_afData[0] = 0.0f;
+                float fMaxDotProduct = -1.0f;
+                cColor.m_afData[2] = 0.0f;
+                cColor.m_afData[1] = 0.0f;
+                cColor.m_afData[0] = 0.0f;
+                for (int32_t nLight = 0; nLight < 8; ++nLight) {
+                    if (CLightingEngine::m_abLightEnabled[nLight]) {
+                        CVec3* p_cLightPos;
+                        float v18 = CLightingEngine::m_afLightAttributes[nLight][1];
+                        float v19 = CLightingEngine::m_afLightAttributes[nLight][2];
+                        cLightPos.m_afData[0] = CLightingEngine::m_afLightAttributes[nLight][0];
+                        cLightPos.m_afData[1] = v18;
+                        cLightPos.m_afData[2] = v19;
+                        if (CLightingEngine::m_afLightAttributes[nLight][12] == 0.0) {
+                            p_cLightPos = &cLightPos;
+                        }
+                        else {
+                            p_cLightPos = cLightPos.Diff(&v23, cVertex);
+                        }
+                        CVec3 cLightVector = *p_cLightPos;
+                        cLightVector.Normalize();
+                        float fDotProduct = cLightVector.operator*(*cNormal);
+                        if (fMaxDotProduct <= static_cast<double>(fDotProduct)) {
+                            fMaxDotProduct = fDotProduct;
+                            cDominantLight = cLightPos;
+                        }
+                        if (fDotProduct < 0.0) {
+                            fDotProduct = 0.0f;
+                        }
+                        fDotProduct =
+                            fDotProduct * (1.0 - m_fLeafLightingAdjustmentScalar) + m_fLeafLightingAdjustmentScalar;
+                        if ((m_eStaticLightingStyle & CSpeedTreeRT::SLS_USE_LIGHT_SOURCES) != 0) {
+                            float v16 = m_afLeafMaterial[10];
+                            float v17 = m_afLeafMaterial[11];
+                            cEmissive.m_afData[0] = m_afLeafMaterial[9];
+                            cEmissive.m_afData[1] = v16;
+                            cEmissive.m_afData[2] = v17;
+                            float v13 = m_afLeafMaterial[3] * CLightingEngine::m_afLightAttributes[nLight][6];
+                            float v14 = m_afLeafMaterial[4] * CLightingEngine::m_afLightAttributes[nLight][7];
+                            float v15 = m_afLeafMaterial[5] * CLightingEngine::m_afLightAttributes[nLight][8];
+                            cAmbient.m_afData[0] = v13;
+                            cAmbient.m_afData[1] = v14;
+                            cAmbient.m_afData[2] = v15;
+                            float fAttenuation = 1.0f;
+                            if (CLightingEngine::m_afLightAttributes[nLight][12] != 0.0) {
+                                float fDistance = cVertex->Distance(cLightPos);
+                                float fDenominator = CLightingEngine::m_afLightAttributes[nLight][14] * fDistance +
+                                    CLightingEngine::m_afLightAttributes[nLight][13] +
+                                    CLightingEngine::m_afLightAttributes[nLight][15] * fDistance * fDistance;
+                                if (fDenominator != 0.0) {
+                                    fAttenuation = 1.0 / fDenominator;
+                                }
+                            }
+                            float v10 = cDiffuseColor.m_afData[0] *
+                                (CLightingEngine::m_afLightAttributes[nLight][3] * fDotProduct);
+                            float v11 = cDiffuseColor.m_afData[1] *
+                                (CLightingEngine::m_afLightAttributes[nLight][4] * fDotProduct);
+                            float v12 = cDiffuseColor.m_afData[2] *
+                                (CLightingEngine::m_afLightAttributes[nLight][5] * fDotProduct);
+                            cDiffuse.m_afData[0] = v10;
+                            cDiffuse.m_afData[1] = v11;
+                            cDiffuse.m_afData[2] = v12;
+                            float v7 = fAttenuation;
+                            CVec3* v4 = cAmbient.Add(&apResult, &cDiffuse);
+                            CVec3* v5 = v4->Scale(&v21, v7);
+                            CVec3* v6 = cEmissive.Add(&v20, v5);
+                            cColor.operator+=(*v6);
+                        }
+                    }
+                }
+                if (!(cColor.m_afData[0] < 0.0)) {
+                    if (cColor.m_afData[0] > 1.0) {
+                        cColor.m_afData[0] = 1.0f;
+                    }
+                }
+                else {
+                    cColor.m_afData[0] = 0.0f;
+                }
+                if (!(cColor.m_afData[1] < 0.0)) {
+                    if (cColor.m_afData[1] > 1.0) {
+                        cColor.m_afData[1] = 1.0f;
+                    }
+                }
+                else {
+                    cColor.m_afData[1] = 0.0f;
+                }
+                if (!(cColor.m_afData[2] < 0.0)) {
+                    if (cColor.m_afData[2] > 1.0) {
+                        cColor.m_afData[2] = 1.0f;
+                    }
+                }
+                else {
+                    cColor.m_afData[2] = 0.0f;
+                }
+                if ((m_eStaticLightingStyle & CSpeedTreeRT::SLS_USE_LIGHT_SOURCES) != 0) {
+                    hProcess.operator*()->SetColor(cColor, false);
+                }
+                if ((m_eStaticLightingStyle & CSpeedTreeRT::SLS_SIMULATE_SHADOWS) != 0) {
+                    hProcess.operator*()->AdjustStaticLighting(
+                        cTreeCenter, cDominantLight, m_fLeafLightingAdjustmentScalar
+                    );
+                }
+                hProcess.operator++();
             }
         }
     }

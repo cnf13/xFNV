@@ -284,11 +284,10 @@ NiDX9TextureData::FindClosestPixelFormat(const NiTexture::FormatPrefs* apPrefs, 
                     return pkFormat;
                 }
             }
-            else if (eAlphaFmt == Prefs::SMOOTH) {
-                if ((pkFormat = appkFormats[NiDX9Renderer::TEX_DXT3])) {
-                    return pkFormat;
-                }
+            else if ((eAlphaFmt == Prefs::SMOOTH) && ((pkFormat = appkFormats[NiDX9Renderer::TEX_DXT3]))) {
+                return pkFormat;
             }
+
             [[fallthrough]];
         case Prefs::HIGH_COLOR_16:
             switch (eAlphaFmt) {
@@ -648,14 +647,9 @@ NiDX9SourceCubeMapData* NiDX9SourceCubeMapData::Create(NiSourceCubeMap* apCubeMa
         pkThis->m_uiSourceRevID = pkSrcPixels->m_uiRevID;
         pkThis->m_kPixelFormat = *pkDestFmt;
         pkThis->m_uiWidth = pkThis->m_uiHeight = *pkFormatted->m_puiWidth;
-        if ((!pkThis->m_bReplacementData && kPrefs.m_eMipMapped == NiTexture::FormatPrefs::YES) ||
+        pkThis->m_bMipmap = (!pkThis->m_bReplacementData && kPrefs.m_eMipMapped == NiTexture::FormatPrefs::YES) ||
             (kPrefs.m_eMipMapped == NiTexture::FormatPrefs::MIP_DEFAULT && NiTexture::ms_bMipmapByDefault &&
-             apRenderer->m_bMipmapCubeMaps)) {
-            pkThis->m_bMipmap = true;
-        }
-        else {
-            pkThis->m_bMipmap = false;
-        }
+             apRenderer->m_bMipmapCubeMaps);
         pkThis->m_uiLevels = apRenderer->m_bMipmapCubeMaps ? pkFormatted->m_uiMipmapLevels : 1;
 
         if (!pkThis->CreateCubeMap() || !pkThis->m_pkD3DTexture ||

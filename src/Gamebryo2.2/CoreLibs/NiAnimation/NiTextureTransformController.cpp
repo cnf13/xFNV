@@ -296,7 +296,6 @@ NiObject* NiTextureTransformController::CreateObject() {
     if (v0) {
         return ::new (v0) NiTextureTransformController(nullptr, nullptr, TT_TRANSLATE_U);
     }
-    else {
-        return nullptr;
-    }
+
+    return nullptr;
 }

@@ -532,9 +532,8 @@ hkpShapeCollection* bhkShapeCollection::operator*() const {
     if (this) {
         return static_cast<hkpShapeCollection*>(const_cast<bhkShapeCollection*>(this)->Gethk());
     }
-    else {
-        return nullptr;
-    }
+
+    return nullptr;
 }
 
 // The container base is taken without a null test, as the game does, so it goes through a reference.

@@ -442,29 +442,26 @@ void TESWorldSpace::Save() {
         TESForm::AddChunk(WNAM_ID, tempint);
         TESForm::AddChunk(PNAM_ID, sParentUseFlags);
     }
-    if (!GetParentUseFlag(TESWorldSpace::PU_CLIMATE)) {
-        if (GetClimate()) {
-            TESClimate* Climate = GetClimate();
-            tempint = Climate->iFormID;
-            TESForm::AddChunk(CNAM_ID, tempint);
-        }
+    if ((!GetParentUseFlag(TESWorldSpace::PU_CLIMATE)) && (GetClimate())) {
+        TESClimate* Climate = GetClimate();
+        tempint = Climate->iFormID;
+        TESForm::AddChunk(CNAM_ID, tempint);
     }
-    if (!GetParentUseFlag(TESWorldSpace::PU_WATER)) {
-        if (GetWaterType()) {
-            TESWaterForm* WaterType = GetWaterType();
-            tempint = WaterType->iFormID;
-            TESForm::AddChunk(NAM2_ID, tempint);
-        }
+
+    if ((!GetParentUseFlag(TESWorldSpace::PU_WATER)) && (GetWaterType())) {
+        TESWaterForm* WaterType = GetWaterType();
+        tempint = WaterType->iFormID;
+        TESForm::AddChunk(NAM2_ID, tempint);
     }
-    if (!GetParentUseFlag(TESWorldSpace::PU_LOD)) {
-        if (GetLODWaterType()) {
-            TESWaterForm* LODWaterType = GetLODWaterType();
-            tempint = LODWaterType->iFormID;
-            TESForm::AddChunk(NAM3_ID, tempint);
-            float LeafDimming = fLODWaterHeight;
-            TESForm::AddChunk(NAM4_ID, std::bit_cast<uint32_t>(LeafDimming));
-        }
+
+    if ((!GetParentUseFlag(TESWorldSpace::PU_LOD)) && (GetLODWaterType())) {
+        TESWaterForm* LODWaterType = GetLODWaterType();
+        tempint = LODWaterType->iFormID;
+        TESForm::AddChunk(NAM3_ID, tempint);
+        float LeafDimming = fLODWaterHeight;
+        TESForm::AddChunk(NAM4_ID, std::bit_cast<uint32_t>(LeafDimming));
     }
+
     if (!GetParentUseFlag(TESWorldSpace::PU_LAND)) {
         DEFAULT_CELL_DATA defdata;
         defdata.fLandHeight = fDefaultLandHeight;
@@ -494,12 +491,11 @@ void TESWorldSpace::Save() {
     if (TESForm::QEndianSwapOnSave()) {
         WorldMapOffsetData.Endian();
     }
-    if (!GetParentUseFlag(TESWorldSpace::PU_UNUSED)) {
-        if (pImageSpace) {
-            tempint = pImageSpace->iFormID;
-            TESForm::AddChunk(INAM_ID, tempint);
-        }
+    if ((!GetParentUseFlag(TESWorldSpace::PU_UNUSED)) && (pImageSpace)) {
+        tempint = pImageSpace->iFormID;
+        TESForm::AddChunk(INAM_ID, tempint);
     }
+
     TESForm::AddChunk(DATA_ID, cFlags);
     TESForm::AddChunkArray(NAM0_ID, &MinimumCoords.X, 2u);
     TESForm::AddChunkArray(NAM9_ID, &MaximumCoords.X, 2u);
@@ -569,45 +565,44 @@ bool TESWorldSpace::SavesBefore(TESForm* apForm) {
 
 bool TESWorldSpace::SavesBefore(FORM* apGroupFORM) {
     bool bretval = false;
-    if (apGroupFORM) {
-        if (apGroupFORM->form == formEnumString[2].uiFormString) {
-            uint32_t form = apGroupFORM->form;
-            switch (apGroupFORM->iFormID) {
-                case 0u: {
-                    bretval = TESForm::SavesBefore(apGroupFORM);
-                    break;
+    if ((apGroupFORM) && (apGroupFORM->form == formEnumString[2].uiFormString)) {
+        uint32_t form = apGroupFORM->form;
+        switch (apGroupFORM->iFormID) {
+            case 0u: {
+                bretval = TESForm::SavesBefore(apGroupFORM);
+                break;
+            }
+            case 1u: {
+                TESForm* FormByNumericID = TESForm::GetFormByNumericID(apGroupFORM->flags);
+                TESWorldSpace* pworld = dynamic_cast<TESWorldSpace*>(FormByNumericID);
+                if (pworld) {
+                    bretval = SavesBefore(pworld);
                 }
-                case 1u: {
-                    TESForm* FormByNumericID = TESForm::GetFormByNumericID(apGroupFORM->flags);
-                    TESWorldSpace* pworld = dynamic_cast<TESWorldSpace*>(FormByNumericID);
-                    if (pworld) {
-                        bretval = SavesBefore(pworld);
-                    }
-                    break;
+                break;
+            }
+            case 2u:
+            case 3u: {
+                bretval = false;
+                break;
+            }
+            case 6u: {
+                TESForm* v3 = TESForm::GetFormByNumericID(apGroupFORM->flags);
+                TESObjectCELL* pcell = dynamic_cast<TESObjectCELL*>(v3);
+                if (pcell) {
+                    bretval = SavesBefore(pcell);
                 }
-                case 2u:
-                case 3u: {
-                    bretval = false;
-                    break;
-                }
-                case 6u: {
-                    TESForm* v3 = TESForm::GetFormByNumericID(apGroupFORM->flags);
-                    TESObjectCELL* pcell = dynamic_cast<TESObjectCELL*>(v3);
-                    if (pcell) {
-                        bretval = SavesBefore(pcell);
-                    }
-                    break;
-                }
-                case 7u: {
-                    bretval = true;
-                    break;
-                }
-                default: {
-                    return bretval;
-                }
+                break;
+            }
+            case 7u: {
+                bretval = true;
+                break;
+            }
+            default: {
+                return bretval;
             }
         }
     }
+
     return bretval;
 }
 
@@ -1190,9 +1185,8 @@ TESObjectCELL* TESWorldSpace::GetCellFromKey(uint32_t aiKey) {
     if (pCellMap->GetAt(static_cast<int32_t>(aiKey), pcell)) {
         return pcell;
     }
-    else {
-        return nullptr;
-    }
+
+    return nullptr;
 }
 
 // The parent is looked up twice, as the game does. The function calls itself for the parent; disable_tail_calls keeps
@@ -1343,14 +1337,12 @@ TESWaterForm* TESWorldSpace::GetWaterType() {
         TESWorldSpace* ParentWorld = GetParentWorld(TESWorldSpace::PU_WATER);
         return ParentWorld->GetWaterType();
     }
-    else {
-        if (pWorldWater) {
-            return pWorldWater;
-        }
-        else {
-            return pDefaultWater;
-        }
+
+    if (pWorldWater) {
+        return pWorldWater;
     }
+
+    return pDefaultWater;
 }
 
 TESWaterForm* TESWorldSpace::GetLODWaterType() {
@@ -1358,14 +1350,12 @@ TESWaterForm* TESWorldSpace::GetLODWaterType() {
         TESWorldSpace* pParentWorld = GetParentWorld(TESWorldSpace::PU_LOD);
         return pParentWorld->GetLODWaterType();
     }
-    else {
-        if (pLODWater) {
-            return pLODWater;
-        }
-        else {
-            return pDefaultWater;
-        }
+
+    if (pLODWater) {
+        return pLODWater;
     }
+
+    return pDefaultWater;
 }
 
 TESWorldSpace* TESWorldSpace::GetParentWorldSimple() {
@@ -1393,63 +1383,60 @@ bool TESWorldSpace::GetParentUseFlag(PARENT_USE_FLAG aeFlag) {
 }
 
 void TESWorldSpace::AddMultiBoundRef(TESObjectREFR* apRef) {
-    if (apRef) {
-        if (apRef->IsMultiBoundRef()) {
-            NiPoint3 ext = apRef->GetMultiBoundHalfExtent();
-            float frad = ext.Length();
-            const NiPoint3* v2 = &apRef->GetLocationOnReference();
-            float someFloat = v2->x - frad;
-            int32_t iminx = FloatToInt(someFloat) >> 12;
-            const NiPoint3* v3 = &apRef->GetLocationOnReference();
-            float v12 = v3->y - frad;
-            int32_t iminy = FloatToInt(v12) >> 12;
-            const NiPoint3* v4 = &apRef->GetLocationOnReference();
-            float v11 = v4->x + frad;
-            int32_t imaxx = FloatToInt(v11) >> 12;
-            const NiPoint3* v5 = &apRef->GetLocationOnReference();
-            float v10 = v5->y + frad;
-            int32_t imaxy = FloatToInt(v10) >> 12;
-            const NiPoint3* v6 = &apRef->GetLocationOnReference();
-            int32_t iparentx = FloatToInt(v6->x) >> 12;
-            const NiPoint3* v7 = &apRef->GetLocationOnReference();
-            int32_t iparenty = FloatToInt(v7->y) >> 12;
-            for (int32_t ix = iminx; ix <= imaxx; ++ix) {
-                for (int32_t iy = iminy; iy <= imaxy; ++iy) {
-                    if ((ix != iparentx || iy != iparenty) &&
-                        MultiBoundMarkerData::MultiBoundIntersectsCell(apRef, ix, iy)) {
-                        if (!pOverlappedMultiboundMap) {
-                            NiTPointerMap<uint32_t, BSSimpleList<TESObjectREFR*>*>* v9;
-                            NiTPointerMap<uint32_t, BSSimpleList<TESObjectREFR*>*>* apMemory =
-                                static_cast<NiTPointerMap<uint32_t, BSSimpleList<TESObjectREFR*>*>*>(
-                                    ourMalloc(sizeof(NiTPointerMap<uint32_t, BSSimpleList<TESObjectREFR*>*>))
-                                );
-                            if (apMemory) {
-                                v9 = ::new (apMemory) NiTPointerMap<uint32_t, BSSimpleList<TESObjectREFR*>*>(37u);
-                            }
-                            else {
-                                v9 = nullptr;
-                            }
-                            pOverlappedMultiboundMap = v9;
-                        }
-                        uint32_t ikey = TESObjectCELL::GetCoord(static_cast<uint16_t>(ix), static_cast<uint16_t>(iy));
-                        BSSimpleList<TESObjectREFR*>* preflist = nullptr;
-                        pOverlappedMultiboundMap->GetAt(ikey, preflist);
-                        if (!preflist) {
-                            BSSimpleList<TESObjectREFR*>* preflist_2;
-                            BSSimpleList<TESObjectREFR*>* v15 = static_cast<BSSimpleList<TESObjectREFR*>*>(
-                                ourMalloc(sizeof(BSSimpleList<TESObjectREFR*>))
+    if ((apRef) && (apRef->IsMultiBoundRef())) {
+        NiPoint3 ext = apRef->GetMultiBoundHalfExtent();
+        float frad = ext.Length();
+        const NiPoint3* v2 = &apRef->GetLocationOnReference();
+        float someFloat = v2->x - frad;
+        int32_t iminx = FloatToInt(someFloat) >> 12;
+        const NiPoint3* v3 = &apRef->GetLocationOnReference();
+        float v12 = v3->y - frad;
+        int32_t iminy = FloatToInt(v12) >> 12;
+        const NiPoint3* v4 = &apRef->GetLocationOnReference();
+        float v11 = v4->x + frad;
+        int32_t imaxx = FloatToInt(v11) >> 12;
+        const NiPoint3* v5 = &apRef->GetLocationOnReference();
+        float v10 = v5->y + frad;
+        int32_t imaxy = FloatToInt(v10) >> 12;
+        const NiPoint3* v6 = &apRef->GetLocationOnReference();
+        int32_t iparentx = FloatToInt(v6->x) >> 12;
+        const NiPoint3* v7 = &apRef->GetLocationOnReference();
+        int32_t iparenty = FloatToInt(v7->y) >> 12;
+        for (int32_t ix = iminx; ix <= imaxx; ++ix) {
+            for (int32_t iy = iminy; iy <= imaxy; ++iy) {
+                if ((ix != iparentx || iy != iparenty) &&
+                    MultiBoundMarkerData::MultiBoundIntersectsCell(apRef, ix, iy)) {
+                    if (!pOverlappedMultiboundMap) {
+                        NiTPointerMap<uint32_t, BSSimpleList<TESObjectREFR*>*>* v9;
+                        NiTPointerMap<uint32_t, BSSimpleList<TESObjectREFR*>*>* apMemory =
+                            static_cast<NiTPointerMap<uint32_t, BSSimpleList<TESObjectREFR*>*>*>(
+                                ourMalloc(sizeof(NiTPointerMap<uint32_t, BSSimpleList<TESObjectREFR*>*>))
                             );
-                            if (v15) {
-                                preflist_2 = ::new (v15) BSSimpleList<TESObjectREFR*>;
-                            }
-                            else {
-                                preflist_2 = nullptr;
-                            }
-                            preflist = preflist_2;
-                            pOverlappedMultiboundMap->SetAt(ikey, preflist_2);
+                        if (apMemory) {
+                            v9 = ::new (apMemory) NiTPointerMap<uint32_t, BSSimpleList<TESObjectREFR*>*>(37u);
                         }
-                        preflist->AddHead(apRef);
+                        else {
+                            v9 = nullptr;
+                        }
+                        pOverlappedMultiboundMap = v9;
                     }
+                    uint32_t ikey = TESObjectCELL::GetCoord(static_cast<uint16_t>(ix), static_cast<uint16_t>(iy));
+                    BSSimpleList<TESObjectREFR*>* preflist = nullptr;
+                    pOverlappedMultiboundMap->GetAt(ikey, preflist);
+                    if (!preflist) {
+                        BSSimpleList<TESObjectREFR*>* preflist_2;
+                        BSSimpleList<TESObjectREFR*>* v15 =
+                            static_cast<BSSimpleList<TESObjectREFR*>*>(ourMalloc(sizeof(BSSimpleList<TESObjectREFR*>)));
+                        if (v15) {
+                            preflist_2 = ::new (v15) BSSimpleList<TESObjectREFR*>;
+                        }
+                        else {
+                            preflist_2 = nullptr;
+                        }
+                        preflist = preflist_2;
+                        pOverlappedMultiboundMap->SetAt(ikey, preflist_2);
+                    }
+                    preflist->AddHead(apRef);
                 }
             }
         }
@@ -1504,10 +1491,8 @@ BSSimpleList<TESObjectREFR*>* TESWorldSpace::BuildMapMarkerList(bool abLocalOnly
             for (BSSimpleList<TESWorldSpace*>* plist = pDataHandler->GetWorldSpaceList(); plist;
                  plist = plist->m_pkNext) {
                 TESWorldSpace* pworld = plist->m_item;
-                if (pworld) {
-                    if (pworld->GetParentWorld(TESWorldSpace::PU_MAP) == this) {
-                        pworld->AddMapMarkersToList(pretlist_2);
-                    }
+                if ((pworld) && (pworld->GetParentWorld(TESWorldSpace::PU_MAP) == this)) {
+                    pworld->AddMapMarkersToList(pretlist_2);
                 }
             }
         }
@@ -1535,10 +1520,8 @@ BSSimpleList<TESObjectREFR*>* TESWorldSpace::BuildAudioMarkerList(bool abLocalOn
             for (BSSimpleList<TESWorldSpace*>* plist = pDataHandler->GetWorldSpaceList(); plist;
                  plist = plist->m_pkNext) {
                 TESWorldSpace* pworld = plist->m_item;
-                if (pworld) {
-                    if (pworld->GetParentWorld(TESWorldSpace::PU_MAP) == this) {
-                        pworld->AddAudioMarkersToList(pretlist_2);
-                    }
+                if ((pworld) && (pworld->GetParentWorld(TESWorldSpace::PU_MAP) == this)) {
+                    pworld->AddAudioMarkersToList(pretlist_2);
                 }
             }
         }
@@ -1658,70 +1641,70 @@ void TESWorldSpace::EnumReferencesCloseToPoint(
                 v21 = 0;
                 for (int32_t i = 0; i < v15; ++i) {
                     TESObjectCELL* v10 = GetCellFromCellCoord(aiX, aiY);
-                    if (v10) {
-                        if ((afRadius1 == 3.4028234663852886e+38 ||
-                             static_cast<double>(afRadius1) > v10->GetDistanceFromPoint(aPoint1)) &&
-                            (afRadius2 == 3.4028234663852886e+38 ||
-                             static_cast<double>(afRadius2) > v10->GetDistanceFromPoint(aPoint2))) {
-                            ++v21;
-                            if (!v10->EnumReferencesCloseToPoint(
-                                    aPoint1, afRadius1, aPoint2, afRadius2, apfnEnumFunc, aiEnumData
-                                )) {
-                                return;
-                            }
+                    if ((v10) &&
+                        ((afRadius1 == 3.4028234663852886e+38 ||
+                          static_cast<double>(afRadius1) > v10->GetDistanceFromPoint(aPoint1)) &&
+                         (afRadius2 == 3.4028234663852886e+38 ||
+                          static_cast<double>(afRadius2) > v10->GetDistanceFromPoint(aPoint2)))) {
+                        ++v21;
+                        if (!v10->EnumReferencesCloseToPoint(
+                                aPoint1, afRadius1, aPoint2, afRadius2, apfnEnumFunc, aiEnumData
+                            )) {
+                            return;
                         }
                     }
+
                     ++aiX;
                 }
                 for (int32_t j = 0; j < v15; ++j) {
                     TESObjectCELL* v11 = GetCellFromCellCoord(aiX, aiY);
-                    if (v11) {
-                        if ((afRadius1 == 3.4028234663852886e+38 ||
-                             static_cast<double>(afRadius1) > v11->GetDistanceFromPoint(aPoint1)) &&
-                            (afRadius2 == 3.4028234663852886e+38 ||
-                             static_cast<double>(afRadius2) > v11->GetDistanceFromPoint(aPoint2))) {
-                            ++v21;
-                            if (!v11->EnumReferencesCloseToPoint(
-                                    aPoint1, afRadius1, aPoint2, afRadius2, apfnEnumFunc, aiEnumData
-                                )) {
-                                return;
-                            }
+                    if ((v11) &&
+                        ((afRadius1 == 3.4028234663852886e+38 ||
+                          static_cast<double>(afRadius1) > v11->GetDistanceFromPoint(aPoint1)) &&
+                         (afRadius2 == 3.4028234663852886e+38 ||
+                          static_cast<double>(afRadius2) > v11->GetDistanceFromPoint(aPoint2)))) {
+                        ++v21;
+                        if (!v11->EnumReferencesCloseToPoint(
+                                aPoint1, afRadius1, aPoint2, afRadius2, apfnEnumFunc, aiEnumData
+                            )) {
+                            return;
                         }
                     }
+
                     ++aiY;
                 }
                 for (int32_t k = 0; k < v15; ++k) {
                     TESObjectCELL* v12 = GetCellFromCellCoord(aiX, aiY);
-                    if (v12) {
-                        if ((afRadius1 == 3.4028234663852886e+38 ||
-                             static_cast<double>(afRadius1) > v12->GetDistanceFromPoint(aPoint1)) &&
-                            (afRadius2 == 3.4028234663852886e+38 ||
-                             static_cast<double>(afRadius2) > v12->GetDistanceFromPoint(aPoint2))) {
-                            ++v21;
-                            if (!v12->EnumReferencesCloseToPoint(
-                                    aPoint1, afRadius1, aPoint2, afRadius2, apfnEnumFunc, aiEnumData
-                                )) {
-                                return;
-                            }
+                    if ((v12) &&
+                        ((afRadius1 == 3.4028234663852886e+38 ||
+                          static_cast<double>(afRadius1) > v12->GetDistanceFromPoint(aPoint1)) &&
+                         (afRadius2 == 3.4028234663852886e+38 ||
+                          static_cast<double>(afRadius2) > v12->GetDistanceFromPoint(aPoint2)))) {
+                        ++v21;
+                        if (!v12->EnumReferencesCloseToPoint(
+                                aPoint1, afRadius1, aPoint2, afRadius2, apfnEnumFunc, aiEnumData
+                            )) {
+                            return;
                         }
                     }
+
                     --aiX;
                 }
                 for (int32_t m = 0; m < v15; ++m) {
                     TESObjectCELL* v13 = GetCellFromCellCoord(aiX, aiY);
-                    if (v13) {
-                        if ((afRadius1 == 3.4028234663852886e+38 ||
-                             static_cast<double>(afRadius1) > v13->GetDistanceFromPoint(aPoint1)) &&
-                            (afRadius2 == 3.4028234663852886e+38 ||
-                             static_cast<double>(afRadius2) > v13->GetDistanceFromPoint(aPoint2))) {
-                            ++v21;
-                            if (!v13->EnumReferencesCloseToPoint(
-                                    aPoint1, afRadius1, aPoint2, afRadius2, apfnEnumFunc, aiEnumData
-                                )) {
-                                return;
-                            }
+                    if ((v13) &&
+                        ((afRadius1 == 3.4028234663852886e+38 ||
+                          static_cast<double>(afRadius1) > v13->GetDistanceFromPoint(aPoint1)) &&
+                         (afRadius2 == 3.4028234663852886e+38 ||
+                          static_cast<double>(afRadius2) > v13->GetDistanceFromPoint(aPoint2)))) {
+                        ++v21;
+                        if (!v13->EnumReferencesCloseToPoint(
+                                aPoint1, afRadius1, aPoint2, afRadius2, apfnEnumFunc, aiEnumData
+                            )) {
+                            return;
                         }
                     }
+
                     --aiY;
                 }
             }
@@ -2015,21 +1998,15 @@ TESObjectCELL* TESWorldSpace::GetCellFromWorldCoord(const NiPoint3& aCoord) {
 
 void TESWorldSpace::AdjustCellOffsets(TESFile* apFile, int32_t aiDelta) {
     TESWorldSpace::OFFSET_DATA* pdata = GetOffsetData(apFile);
-    if (pdata) {
-        if (pdata->pCellFileOffsets) {
-            if (aiDelta) {
-                int32_t iYMin = static_cast<int32_t>(pdata->OffsetMinCoords.y) >> 12;
-                int32_t iXMax = static_cast<int32_t>(pdata->OffsetMaxCoords.x) >> 12;
-                int32_t iYMax = static_cast<int32_t>(pdata->OffsetMaxCoords.y) >> 12;
-                for (int32_t ix = static_cast<int32_t>(pdata->OffsetMinCoords.x) >> 12; ix <= iXMax; ++ix) {
-                    for (int32_t iy = iYMin; iy <= iYMax; ++iy) {
-                        int32_t iindex = GetIndexForCellCoord(apFile, ix, iy);
-                        if (iindex >= 0) {
-                            if (pdata->pCellFileOffsets[iindex]) {
-                                pdata->pCellFileOffsets[iindex] += aiDelta;
-                            }
-                        }
-                    }
+    if ((pdata) && (pdata->pCellFileOffsets) && (aiDelta)) {
+        int32_t iYMin = static_cast<int32_t>(pdata->OffsetMinCoords.y) >> 12;
+        int32_t iXMax = static_cast<int32_t>(pdata->OffsetMaxCoords.x) >> 12;
+        int32_t iYMax = static_cast<int32_t>(pdata->OffsetMaxCoords.y) >> 12;
+        for (int32_t ix = static_cast<int32_t>(pdata->OffsetMinCoords.x) >> 12; ix <= iXMax; ++ix) {
+            for (int32_t iy = iYMin; iy <= iYMax; ++iy) {
+                int32_t iindex = GetIndexForCellCoord(apFile, ix, iy);
+                if ((iindex >= 0) && (pdata->pCellFileOffsets[iindex])) {
+                    pdata->pCellFileOffsets[iindex] += aiDelta;
                 }
             }
         }
@@ -2046,12 +2023,11 @@ TESClimate* TESWorldSpace::GetClimate() {
 
 TESImageSpace* TESWorldSpace::GetImageSpace() {
     TESImageSpace* pImageSpace = this->pImageSpace;
-    if (!pImageSpace) {
-        if (GetParentWorld(TESWorldSpace::PU_UNUSED)) {
-            TESWorldSpace* ParentWorld = GetParentWorld(TESWorldSpace::PU_UNUSED);
-            return ParentWorld->GetImageSpace();
-        }
+    if ((!pImageSpace) && (GetParentWorld(TESWorldSpace::PU_UNUSED))) {
+        TESWorldSpace* ParentWorld = GetParentWorld(TESWorldSpace::PU_UNUSED);
+        return ParentWorld->GetImageSpace();
     }
+
     return pImageSpace;
 }
 
@@ -2164,22 +2140,20 @@ void TESWorldSpace::AddAudioMarkersToList(BSSimpleList<TESObjectREFR*>* apMarkLi
 }
 
 void TESWorldSpace::UnLoadCell(TESObjectCELL* apCell) {
-    if (apCell) {
-        if (apCell->GetWorldSpace() == this) {
-            TESFile* File = apCell->GetFile(-1);
-            if (File && !File->GetMaster()) {
-                apCell->UnLoadAllTempData();
+    if ((apCell) && (apCell->GetWorldSpace() == this)) {
+        TESFile* File = apCell->GetFile(-1);
+        if (File && !File->GetMaster()) {
+            apCell->UnLoadAllTempData();
+        }
+        else {
+            apCell->UnLoadAllTempData();
+            pSaveLoadGameOLD->UnloadForm(apCell);
+            uint32_t CastingType = apCell->iFormID;
+            if (!pDataHandler->IsFormIDCreated(CastingType)) {
+                pSaveLoadGame->UnloadForm(apCell, false);
             }
-            else {
-                apCell->UnLoadAllTempData();
-                pSaveLoadGameOLD->UnloadForm(apCell);
-                uint32_t CastingType = apCell->iFormID;
-                if (!pDataHandler->IsFormIDCreated(CastingType)) {
-                    pSaveLoadGame->UnloadForm(apCell, false);
-                }
-                ReleaseCell(apCell);
-                delete apCell;
-            }
+            ReleaseCell(apCell);
+            delete apCell;
         }
     }
 }
@@ -2189,17 +2163,15 @@ void TESWorldSpace::ReleaseCell(TESObjectCELL* apCell) {
     int32_t dataY;
     int32_t a1;
     TESObjectCELL* a2;
-    if (apCell) {
-        if (!apCell->GetInterior()) {
-            dataY = apCell->GetDataY();
-            dataX = apCell->GetDataX();
-            a1 = TESObjectCELL::GetCoord(dataX, dataY);
-            bool vCondition1;
-            vCondition1 = pCellMap->GetAt(a1, a2) && (apCell == a2);
-            if (vCondition1) {
-                pCellMap->RemoveAt(a1);
-                apCell->SetWorldSpace(nullptr);
-            }
+    if ((apCell) && (!apCell->GetInterior())) {
+        dataY = apCell->GetDataY();
+        dataX = apCell->GetDataX();
+        a1 = TESObjectCELL::GetCoord(dataX, dataY);
+        bool vCondition1;
+        vCondition1 = pCellMap->GetAt(a1, a2) && (apCell == a2);
+        if (vCondition1) {
+            pCellMap->RemoveAt(a1);
+            apCell->SetWorldSpace(nullptr);
         }
     }
 }
@@ -2242,9 +2214,8 @@ int32_t TESWorldSpace::GetIndexForCellCoord(TESFile* apFile, int32_t aiX, int32_
         (aiX >= iMinX && (aiY <= static_cast<int32_t>(pdata->OffsetMaxCoords.y) >> 12 && aiY >= iMinY))) {
         return aiX + (aiY - iMinY) * (iMaxX - iMinX + 1) - iMinX;
     }
-    else {
-        return 0xFFFFFFFFu;
-    }
+
+    return 0xFFFFFFFFu;
 }
 
 bool TESWorldSpace::GetExtCellDataFromFileByEditorID(const char* apCellID, int32_t& aiOutX, int32_t& aiOutY) {

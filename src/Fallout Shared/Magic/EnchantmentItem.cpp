@@ -54,9 +54,8 @@ float EnchantmentItem::GetCost(Actor* apActor) {
     if (GetFlag(1u)) {
         return static_cast<float>(data.iCostOverride);
     }
-    else {
-        return static_cast<EffectItemList*>(this)->EffectItemList::GetCost(nullptr);
-    }
+
+    return static_cast<EffectItemList*>(this)->EffectItemList::GetCost(nullptr);
 }
 
 void EnchantmentItem::Endian() {

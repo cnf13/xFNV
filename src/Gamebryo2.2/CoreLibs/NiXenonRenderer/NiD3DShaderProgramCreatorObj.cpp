@@ -63,10 +63,9 @@ bool NiD3DShaderProgramCreatorObj::LoadShaderCodeFromFile(
         pvCode = pbyData;
         return true;
     }
-    else {
-        NiShaderFactory::ReportError(1u, bRecoverable, "Invalid shader file name\n");
-        return false;
-    }
+
+    NiShaderFactory::ReportError(1u, bRecoverable, "Invalid shader file name\n");
+    return false;
 }
 
 bool NiD3DShaderProgramCreatorObj::LoadShaderCodeFromBuffer(
@@ -89,10 +88,9 @@ bool NiD3DShaderProgramCreatorObj::LoadShaderCodeFromBuffer(
         uiCodeSize = uiBufferSize;
         return true;
     }
-    else {
-        NiShaderFactory::ReportError(1u, bRecoverable, "Invalid shader buffer\n");
-        return false;
-    }
+
+    NiShaderFactory::ReportError(1u, bRecoverable, "Invalid shader buffer\n");
+    return false;
 }
 
 // Creates the creator into NiD3DShaderProgramCreatorObj::ms_pkCreator and registers it for both extensions; the global

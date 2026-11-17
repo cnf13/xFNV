@@ -86,11 +86,10 @@ class TESQuest;
 bool Cmd_GetIsCurrentWeather(TESObjectREFR* apRefObject, void* apParam1, void* apParam2, double& afReturnValue) {
     afReturnValue = 0.0;
     TESForm* v6 = nullptr;
-    if (apParam1) {
-        if (((int32_t)static_cast<TESForm*>(apParam1)->GetFormType()) == 53) {
-            v6 = static_cast<TESForm*>(apParam1);
-        }
+    if ((apParam1) && (((int32_t)static_cast<TESForm*>(apParam1)->GetFormType()) == 53)) {
+        v6 = static_cast<TESForm*>(apParam1);
     }
+
     Sky* instance = Sky::GetInstance();
     if (static_cast<const void*>(v6) == static_cast<const void*>(instance->GetCurrentWeather())) {
         afReturnValue = 1.0;
@@ -116,11 +115,10 @@ bool Cmd_IsWeaponSkillType(TESObjectREFR* apRefObject, void* apParam1, void* apP
     else {
         afReturnValue = 1.0;
     }
-    if (v6) {
-        if (reinterpret_cast<intptr_t>(apParam1) == v6->TESObjectWEAP::GetWeaponSkill()) {
-            afReturnValue = 1.0;
-        }
+    if ((v6) && (reinterpret_cast<intptr_t>(apParam1) == v6->TESObjectWEAP::GetWeaponSkill())) {
+        afReturnValue = 1.0;
     }
+
     if (Script::GetThreadSystemOutput()) {
         Interface::PrintLine("Is Weapon Skill Type >> %0.2f", afReturnValue);
     }
@@ -134,30 +132,26 @@ bool Cmd_SameFactionAsPC(TESObjectREFR* apRefObject, void* apParam1, void* apPar
 bool Cmd_SameFaction(TESObjectREFR* apRefObject, void* apParam1, void* apParam2, double& afReturnValue) {
     afReturnValue = 0.0;
     Actor* pActor = nullptr;
-    if (apRefObject) {
-        if (apRefObject->IsActor()) {
-            pActor = static_cast<Actor*>(apRefObject);
-        }
+    if ((apRefObject) && (apRefObject->IsActor())) {
+        pActor = static_cast<Actor*>(apRefObject);
     }
+
     Actor* pOther = static_cast<Actor*>(apParam1);
     if (!pActor || !pOther) {
         return true;
     }
     TESActorBase* pActorBase = pActor->GetActorBase();
     TESActorBase* pOtherBase = pOther->GetActorBase();
-    if (pActorBase) {
-        if (pOtherBase) {
-            for (BSSimpleList<FACTION_RANK*>* pNode = pActorBase->GetFactionList();
-                 pNode && !pNode->IsEmpty() && 1.0 != afReturnValue; pNode = pNode->GetNext()) {
-                TESFaction* pFaction = pNode->GetItem()->pFaction;
-                if (pFaction) {
-                    if (pOtherBase->GetFactionRank(pFaction, pOther == pPlayer) != -1) {
-                        afReturnValue = 1.0;
-                    }
-                }
+    if ((pActorBase) && (pOtherBase)) {
+        for (BSSimpleList<FACTION_RANK*>* pNode = pActorBase->GetFactionList();
+             pNode && !pNode->IsEmpty() && 1.0 != afReturnValue; pNode = pNode->GetNext()) {
+            TESFaction* pFaction = pNode->GetItem()->pFaction;
+            if ((pFaction) && (pOtherBase->GetFactionRank(pFaction, pOther == pPlayer) != -1)) {
+                afReturnValue = 1.0;
             }
         }
     }
+
     if (GetThreadTLSData()->bSystemOutput) {
         Interface::PrintLine("SameFaction >> %0.2f", afReturnValue);
     }
@@ -193,14 +187,13 @@ bool Cmd_SameRace(TESObjectREFR* apRefObject, void* apParam1, void* apParam2, do
             v9 = static_cast<TESNPC*>(static_cast<TESObjectREFR*>(apParam1)->GetObjectReference());
         }
     }
-    if (v8) {
-        if (v9) {
-            TESRace* Race = v8->GetRace();
-            if (Race == v9->GetRace()) {
-                afReturnValue = 1.0;
-            }
+    if ((v8) && (v9)) {
+        TESRace* Race = v8->GetRace();
+        if (Race == v9->GetRace()) {
+            afReturnValue = 1.0;
         }
     }
+
     if (GetThreadTLSData()->bSystemOutput) {
         Interface::PrintLine("SameRace >> %0.2f", afReturnValue);
     }
@@ -223,14 +216,13 @@ bool Cmd_SameSex(TESObjectREFR* apRefObject, void* apParam1, void* apParam2, dou
             v9 = static_cast<TESActorBase*>(static_cast<TESObjectREFR*>(apParam1)->GetObjectReference());
         }
     }
-    if (v8) {
-        if (v9) {
-            TESActorBase::SEX Sex = v8->GetSex();
-            if (Sex == v9->GetSex()) {
-                afReturnValue = 1.0;
-            }
+    if ((v8) && (v9)) {
+        TESActorBase::SEX Sex = v8->GetSex();
+        if (Sex == v9->GetSex()) {
+            afReturnValue = 1.0;
         }
     }
+
     if (GetThreadTLSData()->bSystemOutput) {
         Interface::PrintLine("SameSex >> %0.2f", afReturnValue);
     }
@@ -242,36 +234,29 @@ bool Cmd_IsWeaponInList(TESObjectREFR* apRefObject, void* apParam1, void* apPara
     afReturnValue = 0.0;
     BGSListForm* pList = static_cast<BGSListForm*>(apParam1);
     Actor* pActor = nullptr;
-    if (apRefObject) {
-        if (apRefObject->IsActor()) {
-            pActor = static_cast<Actor*>(apRefObject);
-        }
+    if ((apRefObject) && (apRefObject->IsActor())) {
+        pActor = static_cast<Actor*>(apRefObject);
     }
-    if (pActor) {
-        if (pActor->pCurrentProcess) {
-            if (pList) {
-                BaseProcess* pProcess = pActor->pCurrentProcess;
-                ItemChange* pWeaponItem = pProcess->GetCurrentWeapon();
-                TESForm* pWeapon = nullptr;
-                if (pWeaponItem) {
-                    if (pWeaponItem->pContainerObj) {
-                        if (pWeaponItem->pContainerObj->GetFormType() == WEAP_ID) {
-                            pWeapon = pWeaponItem->pContainerObj;
-                        }
-                    }
-                }
-                if (!pWeapon) {
-                    pWeapon = pFists;
-                }
-                if (pWeapon) {
-                    TESForm* pItem = pWeapon;
-                    if (pList->GetFormList()->IsInList(pItem)) {
-                        afReturnValue = 1.0;
-                    }
-                }
+
+    if ((pActor) && (pActor->pCurrentProcess) && (pList)) {
+        BaseProcess* pProcess = pActor->pCurrentProcess;
+        ItemChange* pWeaponItem = pProcess->GetCurrentWeapon();
+        TESForm* pWeapon = nullptr;
+        if ((pWeaponItem) && (pWeaponItem->pContainerObj) && (pWeaponItem->pContainerObj->GetFormType() == WEAP_ID)) {
+            pWeapon = pWeaponItem->pContainerObj;
+        }
+
+        if (!pWeapon) {
+            pWeapon = pFists;
+        }
+        if (pWeapon) {
+            TESForm* pItem = pWeapon;
+            if (pList->GetFormList()->IsInList(pItem)) {
+                afReturnValue = 1.0;
             }
         }
     }
+
     if (GetThreadTLSData()->bSystemOutput) {
         Interface::PrintLine("IsWeaponInList >> %0.2f", afReturnValue);
     }
@@ -291,36 +276,32 @@ bool Cmd_GetDefaultOpen(TESObjectREFR* apRefObject, void* apParam1, void* apPara
 
 bool Cmd_GetFactionRelation(TESObjectREFR* apRefObject, Actor* apParam1, void* apParam2, double& afReturnValue) {
     afReturnValue = 0.0;
-    if (apRefObject) {
-        if (apRefObject->IsActor()) {
-            Actor* pActor = static_cast<Actor*>(apRefObject);
-            bool bFromCrime = false;
-            afReturnValue =
-                static_cast<double>(static_cast<int32_t>(pActor->GetFactionFightReaction(apParam1, bFromCrime)));
-            if (GetThreadTLSData()->bSystemOutput) {
-                // The result is truncated to 64 bits and the low 32 bits are printed.
-                Interface::PrintLine(
-                    "Faction Relation  >> %d", static_cast<int32_t>(static_cast<int64_t>(afReturnValue))
-                );
-            }
+    if ((apRefObject) && (apRefObject->IsActor())) {
+        Actor* pActor = static_cast<Actor*>(apRefObject);
+        bool bFromCrime = false;
+        afReturnValue =
+            static_cast<double>(static_cast<int32_t>(pActor->GetFactionFightReaction(apParam1, bFromCrime)));
+        if (GetThreadTLSData()->bSystemOutput) {
+            // The result is truncated to 64 bits and the low 32 bits are printed.
+            Interface::PrintLine("Faction Relation  >> %d", static_cast<int32_t>(static_cast<int64_t>(afReturnValue)));
         }
     }
+
     return true;
 }
 
 bool Cmd_IsLastIdlePlayed(TESObjectREFR* apRefObject, void* apParam1, void* apParam2, double& afReturnValue) {
     afReturnValue = 0.0;
-    if (apRefObject) {
-        if (apRefObject->IsActor()) {
-            BaseProcess* CurrentAIProcess = static_cast<Actor*>(apRefObject)->pCurrentProcess;
-            if (CurrentAIProcess->GetLastIdlePlayed() == apParam1) {
-                afReturnValue = 1.0;
-            }
-            if (GetThreadTLSData()->bSystemOutput) {
-                Interface::PrintLine("The last idle played was  >> %d", afReturnValue);
-            }
+    if ((apRefObject) && (apRefObject->IsActor())) {
+        BaseProcess* CurrentAIProcess = static_cast<Actor*>(apRefObject)->pCurrentProcess;
+        if (CurrentAIProcess->GetLastIdlePlayed() == apParam1) {
+            afReturnValue = 1.0;
+        }
+        if (GetThreadTLSData()->bSystemOutput) {
+            Interface::PrintLine("The last idle played was  >> %d", afReturnValue);
         }
     }
+
     return true;
 }
 
@@ -466,24 +447,23 @@ bool Script::GetInZoneConditionFunction(
     TESObjectCELL* parentCell;
     BGSEncounterZone* encounterZone;
     afReturnValue = 0.0;
-    if (apRefObject) {
-        if (apParam1) {
-            encounterZone = nullptr;
-            parentCell = apRefObject->TESObjectREFR::GetParentCell();
-            if (parentCell) {
-                encounterZone = parentCell->GetEncounterZone();
-            }
-            if (!encounterZone) {
-                worldSpace = apRefObject->GetWorldSpace();
-                if (worldSpace) {
-                    encounterZone = worldSpace->GetEncounterZone();
-                }
-            }
-            if (encounterZone == apParam1) {
-                afReturnValue = 1.0;
+    if ((apRefObject) && (apParam1)) {
+        encounterZone = nullptr;
+        parentCell = apRefObject->TESObjectREFR::GetParentCell();
+        if (parentCell) {
+            encounterZone = parentCell->GetEncounterZone();
+        }
+        if (!encounterZone) {
+            worldSpace = apRefObject->GetWorldSpace();
+            if (worldSpace) {
+                encounterZone = worldSpace->GetEncounterZone();
             }
         }
+        if (encounterZone == apParam1) {
+            afReturnValue = 1.0;
+        }
     }
+
     if (Script::GetThreadSystemOutput()) {
         Interface::PrintLine("GetInZone >> %0.2f", afReturnValue);
     }
@@ -499,19 +479,17 @@ bool Script::GetAlarmedConditionFunction(
     const char* currentPackageName;
     afReturnValue = 0.0;
     Actor* v6 = nullptr;
-    if (apRefObject) {
-        if (apRefObject->IsActor()) {
-            v6 = static_cast<Actor*>(apRefObject);
+    if ((apRefObject) && (apRefObject->IsActor())) {
+        v6 = static_cast<Actor*>(apRefObject);
+    }
+
+    if ((v6) && (v6->GetCurrentPackageName())) {
+        currentPackageName = v6->GetCurrentPackageName();
+        if (!BSstricmp(currentPackageName, "Alarm")) {
+            afReturnValue = 1.0;
         }
     }
-    if (v6) {
-        if (v6->GetCurrentPackageName()) {
-            currentPackageName = v6->GetCurrentPackageName();
-            if (!BSstricmp(currentPackageName, "Alarm")) {
-                afReturnValue = 1.0;
-            }
-        }
-    }
+
     if (Script::GetThreadSystemOutput()) {
         Interface::PrintLine("GetAlarmed >> %0.2f", afReturnValue);
     }
@@ -526,16 +504,14 @@ bool Script::IsWeaponOutConditionFunction(
 ) {
     afReturnValue = 0.0;
     Actor* v5 = nullptr;
-    if (apRefObject) {
-        if (apRefObject->IsActor()) {
-            v5 = static_cast<Actor*>(apRefObject);
-        }
+    if ((apRefObject) && (apRefObject->IsActor())) {
+        v5 = static_cast<Actor*>(apRefObject);
     }
-    if (v5) {
-        if (v5->IsWeaponDrawn()) {
-            afReturnValue = 1.0;
-        }
+
+    if ((v5) && (v5->IsWeaponDrawn())) {
+        afReturnValue = 1.0;
     }
+
     if (Script::GetThreadSystemOutput()) {
         Interface::PrintLine("Is Weapon Out >> %0.2f", afReturnValue);
     }
@@ -596,12 +572,12 @@ bool Script::IsCombatTargetConditionFunction(
     double& afReturnValue
 ) {
     afReturnValue = 0.0;
-    if (apRefObject) {
-        if (apRefObject->IsActor() &&
-            static_cast<Actor*>(apRefObject)->IsInCombatWithActor(static_cast<Actor*>(apParam1))) {
-            afReturnValue = 1.0;
-        }
+    if ((apRefObject) &&
+        (apRefObject->IsActor() &&
+         static_cast<Actor*>(apRefObject)->IsInCombatWithActor(static_cast<Actor*>(apParam1)))) {
+        afReturnValue = 1.0;
     }
+
     if (Script::GetThreadSystemOutput()) {
         Interface::PrintLine("IsCombatTarget >> %.2f", afReturnValue);
     }
@@ -645,11 +621,10 @@ bool Script::GetFatiguePercentageConditionFunction(
     double& afReturnValue
 ) {
     Actor* v5 = nullptr;
-    if (apRefObject) {
-        if (apRefObject->IsActor()) {
-            v5 = static_cast<Actor*>(apRefObject);
-        }
+    if ((apRefObject) && (apRefObject->IsActor())) {
+        v5 = static_cast<Actor*>(apRefObject);
     }
+
     if (!v5) {
         return true;
     }
@@ -667,11 +642,10 @@ bool Script::GetHealthPercentageConditionFunction(
     double& afReturnValue
 ) {
     Actor* v5 = nullptr;
-    if (apRefObject) {
-        if (apRefObject->IsActor()) {
-            v5 = static_cast<Actor*>(apRefObject);
-        }
+    if ((apRefObject) && (apRefObject->IsActor())) {
+        v5 = static_cast<Actor*>(apRefObject);
     }
+
     if (!v5) {
         return true;
     }
@@ -741,16 +715,13 @@ bool Script::GetGoldConditionFunction(
     InventoryChanges* inventoryChanges;
     afReturnValue = 0.0;
     TESBoundObject* formByNumericID = static_cast<TESBoundObject*>(TESForm::GetFormByNumericID(15));
-    if (apRefObject) {
-        if (formByNumericID) {
-            if (apRefObject->HasContainer()) {
-                inventoryChanges = InventoryChanges::GetInventoryChanges(apRefObject);
-                if (inventoryChanges) {
-                    afReturnValue = (double)inventoryChanges->GetObjectCount(formByNumericID);
-                }
-            }
+    if ((apRefObject) && (formByNumericID) && (apRefObject->HasContainer())) {
+        inventoryChanges = InventoryChanges::GetInventoryChanges(apRefObject);
+        if (inventoryChanges) {
+            afReturnValue = (double)inventoryChanges->GetObjectCount(formByNumericID);
         }
     }
+
     if (Script::GetThreadSystemOutput()) {
         Interface::PrintLine("GetGold >> %0.2f", afReturnValue);
     }
@@ -766,11 +737,10 @@ bool Script::GetFurnitureMarkerIDConditionFunction(
     BaseProcess* currentAIProcess;
     afReturnValue = 0.0;
     Actor* v6 = nullptr;
-    if (apRefObject) {
-        if (apRefObject->IsActor()) {
-            v6 = static_cast<Actor*>(apRefObject);
-        }
+    if ((apRefObject) && (apRefObject->IsActor())) {
+        v6 = static_cast<Actor*>(apRefObject);
     }
+
     if (v6) {
         currentAIProcess = v6->MobileObject::GetCurrentAIProcess();
         afReturnValue = (double)currentAIProcess->GetFurnitureMarkerID();
@@ -908,11 +878,10 @@ bool Script::GetAttackedConditionFunction(
     double& afReturnValue
 ) {
     Actor* v5 = nullptr;
-    if (apRefObject) {
-        if (apRefObject->IsActor()) {
-            v5 = static_cast<Actor*>(apRefObject);
-        }
+    if ((apRefObject) && (apRefObject->IsActor())) {
+        v5 = static_cast<Actor*>(apRefObject);
     }
+
     if (v5) {
         afReturnValue = (double)v5->HasBeenAttacked();
     }
@@ -929,11 +898,10 @@ bool Script::GetIsChildConditionFunction(
     double& afReturnValue
 ) {
     afReturnValue = 0.0;
-    if (apRefObject) {
-        if (apRefObject->IsChild(false)) {
-            afReturnValue = 1.0;
-        }
+    if ((apRefObject) && (apRefObject->IsChild(false))) {
+        afReturnValue = 1.0;
     }
+
     if (Script::GetThreadSystemOutput()) {
         Interface::PrintLine("IsChild >> %0.2f", afReturnValue);
     }
@@ -979,11 +947,10 @@ bool Script::GetRestrainedConditionFunction(
     const char* fullName;
     afReturnValue = 0.0;
     Actor* v7 = nullptr;
-    if (apRefObject) {
-        if (apRefObject->IsActor()) {
-            v7 = static_cast<Actor*>(apRefObject);
-        }
+    if ((apRefObject) && (apRefObject->IsActor())) {
+        v7 = static_cast<Actor*>(apRefObject);
     }
+
     if (v7) {
         if (v7->IsRestrained()) {
             afReturnValue = 1.0;
@@ -1010,11 +977,10 @@ bool Script::GetLevelConditionFunction(
 ) {
     afReturnValue = 0.0;
     Actor* v5 = nullptr;
-    if (apRefObject) {
-        if (apRefObject->IsActor()) {
-            v5 = static_cast<Actor*>(apRefObject);
-        }
+    if ((apRefObject) && (apRefObject->IsActor())) {
+        v5 = static_cast<Actor*>(apRefObject);
     }
+
     if (v5) {
         afReturnValue = (double)v5->GetLevel();
     }
@@ -1032,11 +998,10 @@ bool Script::GetAlertConditionFunction(
 ) {
     afReturnValue = 0.0;
     Actor* v5 = nullptr;
-    if (apRefObject) {
-        if (apRefObject->IsActor()) {
-            v5 = static_cast<Actor*>(apRefObject);
-        }
+    if ((apRefObject) && (apRefObject->IsActor())) {
+        v5 = static_cast<Actor*>(apRefObject);
     }
+
     if (v5) {
         afReturnValue = (double)v5->GetAlert();
         if (Script::GetThreadSystemOutput()) {
@@ -1057,11 +1022,10 @@ bool Script::IsFacingUpConditionFunction(
     NiNode* pRoot;
     afReturnValue = 0.0;
     TESObjectREFR* pActor = nullptr;
-    if (apRefObject) {
-        if (apRefObject->IsActor()) {
-            pActor = apRefObject;
-        }
+    if ((apRefObject) && (apRefObject->IsActor())) {
+        pActor = apRefObject;
     }
+
     if (pActor) {
         pRoot = pActor->TESObjectREFR::Get3D();
         pBip01Spine = FixedStrings::GetBip01_Spine();
@@ -1090,11 +1054,10 @@ bool Script::IsLeftUpConditionFunction(
     NiNode* apNode;
     afReturnValue = 0.0;
     TESObjectREFR* v8 = nullptr;
-    if (apRefObject) {
-        if (apRefObject->IsActor()) {
-            v8 = apRefObject;
-        }
+    if ((apRefObject) && (apRefObject->IsActor())) {
+        v8 = apRefObject;
     }
+
     if (v8) {
         apNode = v8->TESObjectREFR::Get3D();
         bip01_Spine = FixedStrings::GetBip01_Spine();
@@ -1118,148 +1081,144 @@ bool Script::GetCurrentAIPackageConditionFunction(
     TESPackage* currentPackage;
     afReturnValue = 0.0;
     Actor* v6 = nullptr;
-    if (apRefObject) {
-        if (apRefObject->IsActor()) {
-            v6 = static_cast<Actor*>(apRefObject);
-        }
+    if ((apRefObject) && (apRefObject->IsActor())) {
+        v6 = static_cast<Actor*>(apRefObject);
     }
-    if (v6) {
-        if (v6->MobileObject::GetCurrentAIProcess()) {
-            if (v6->MobileObject::GetCurrentPackage()) {
-                currentPackage = v6->MobileObject::GetCurrentPackage();
-                switch ((int32_t)currentPackage->GetPackType()) {
-                    case 0: {
-                        afReturnValue = 0.0;
-                        break;
-                    }
-                    case 1: {
-                        afReturnValue = 1.0;
-                        break;
-                    }
-                    case 2: {
-                        afReturnValue = 2.0;
-                        break;
-                    }
-                    case 3: {
-                        afReturnValue = 3.0;
-                        break;
-                    }
-                    case 4: {
-                        afReturnValue = 4.0;
-                        break;
-                    }
-                    case 5: {
-                        afReturnValue = 13.0;
-                        break;
-                    }
-                    case 6: {
-                        afReturnValue = 14.0;
-                        break;
-                    }
-                    case 7: {
-                        afReturnValue = 15.0;
-                        break;
-                    }
-                    case 8: {
-                        afReturnValue = 16.0;
-                        break;
-                    }
-                    case 9: {
-                        afReturnValue = 17.0;
-                        break;
-                    }
-                    case 10: {
-                        afReturnValue = 18.0;
-                        break;
-                    }
-                    case 11: {
-                        afReturnValue = 19.0;
-                        break;
-                    }
-                    case 12: {
-                        afReturnValue = 36.0;
-                        break;
-                    }
-                    case 13: {
-                        afReturnValue = 37.0;
-                        break;
-                    }
-                    case 14: {
-                        afReturnValue = 35.0;
-                        break;
-                    }
-                    case 15: {
-                        afReturnValue = 34.0;
-                        break;
-                    }
-                    case 16: {
-                        afReturnValue = 33.0;
-                        break;
-                    }
-                    case 18: {
-                        afReturnValue = 5.0;
-                        break;
-                    }
-                    case 19: {
-                        afReturnValue = 20.0;
-                        break;
-                    }
-                    case 20: {
-                        afReturnValue = 7.0;
-                        break;
-                    }
-                    case 21: {
-                        afReturnValue = 8.0;
-                        break;
-                    }
-                    case 22: {
-                        afReturnValue = 10.0;
-                        break;
-                    }
-                    case 23: {
-                        afReturnValue = 11.0;
-                        break;
-                    }
-                    case 24: {
-                        afReturnValue = 9.0;
-                        break;
-                    }
-                    case 25: {
-                        afReturnValue = 12.0;
-                        break;
-                    }
-                    case 26: {
-                        afReturnValue = 21.0;
-                        break;
-                    }
-                    case 27: {
-                        afReturnValue = 24.0;
-                        break;
-                    }
-                    case 28: {
-                        afReturnValue = 6.0;
-                        break;
-                    }
-                    case 29: {
-                        afReturnValue = 28.0;
-                        break;
-                    }
-                    case 30: {
-                        afReturnValue = 29.0;
-                        break;
-                    }
-                    case 31: {
-                        afReturnValue = 32.0;
-                        break;
-                    }
-                    default: {
-                        afReturnValue = (-1.0);
-                        break;
-                    }
-                }
+
+    if ((v6) && (v6->MobileObject::GetCurrentAIProcess()) && (v6->MobileObject::GetCurrentPackage())) {
+        currentPackage = v6->MobileObject::GetCurrentPackage();
+        switch ((int32_t)currentPackage->GetPackType()) {
+            case 0: {
+                afReturnValue = 0.0;
+                break;
+            }
+            case 1: {
+                afReturnValue = 1.0;
+                break;
+            }
+            case 2: {
+                afReturnValue = 2.0;
+                break;
+            }
+            case 3: {
+                afReturnValue = 3.0;
+                break;
+            }
+            case 4: {
+                afReturnValue = 4.0;
+                break;
+            }
+            case 5: {
+                afReturnValue = 13.0;
+                break;
+            }
+            case 6: {
+                afReturnValue = 14.0;
+                break;
+            }
+            case 7: {
+                afReturnValue = 15.0;
+                break;
+            }
+            case 8: {
+                afReturnValue = 16.0;
+                break;
+            }
+            case 9: {
+                afReturnValue = 17.0;
+                break;
+            }
+            case 10: {
+                afReturnValue = 18.0;
+                break;
+            }
+            case 11: {
+                afReturnValue = 19.0;
+                break;
+            }
+            case 12: {
+                afReturnValue = 36.0;
+                break;
+            }
+            case 13: {
+                afReturnValue = 37.0;
+                break;
+            }
+            case 14: {
+                afReturnValue = 35.0;
+                break;
+            }
+            case 15: {
+                afReturnValue = 34.0;
+                break;
+            }
+            case 16: {
+                afReturnValue = 33.0;
+                break;
+            }
+            case 18: {
+                afReturnValue = 5.0;
+                break;
+            }
+            case 19: {
+                afReturnValue = 20.0;
+                break;
+            }
+            case 20: {
+                afReturnValue = 7.0;
+                break;
+            }
+            case 21: {
+                afReturnValue = 8.0;
+                break;
+            }
+            case 22: {
+                afReturnValue = 10.0;
+                break;
+            }
+            case 23: {
+                afReturnValue = 11.0;
+                break;
+            }
+            case 24: {
+                afReturnValue = 9.0;
+                break;
+            }
+            case 25: {
+                afReturnValue = 12.0;
+                break;
+            }
+            case 26: {
+                afReturnValue = 21.0;
+                break;
+            }
+            case 27: {
+                afReturnValue = 24.0;
+                break;
+            }
+            case 28: {
+                afReturnValue = 6.0;
+                break;
+            }
+            case 29: {
+                afReturnValue = 28.0;
+                break;
+            }
+            case 30: {
+                afReturnValue = 29.0;
+                break;
+            }
+            case 31: {
+                afReturnValue = 32.0;
+                break;
+            }
+            default: {
+                afReturnValue = (-1.0);
+                break;
             }
         }
     }
+
     if (Script::GetThreadSystemOutput()) {
         Interface::PrintLine("Current Process >> %0.2f", afReturnValue);
     }
@@ -1274,16 +1233,14 @@ bool Script::IsWaitingConditionFunction(
 ) {
     afReturnValue = 0.0;
     Actor* v5 = nullptr;
-    if (apRefObject) {
-        if (apRefObject->IsActor()) {
-            v5 = static_cast<Actor*>(apRefObject);
-        }
+    if ((apRefObject) && (apRefObject->IsActor())) {
+        v5 = static_cast<Actor*>(apRefObject);
     }
-    if (v5) {
-        if (v5->IsWaiting()) {
-            afReturnValue = 1.0;
-        }
+
+    if ((v5) && (v5->IsWaiting())) {
+        afReturnValue = 1.0;
     }
+
     if (Script::GetThreadSystemOutput()) {
         Interface::PrintLine("Is Waiting >> %0.2f", afReturnValue);
     }
@@ -1300,10 +1257,8 @@ bool Script::IsIdlePlayingConditionFunction(
     afReturnValue = 0.0;
     if (apRefObject) {
         v5 = apRefObject->GetAnimation();
-        if (v5) {
-            if (!v5->SpecialIdleDonePlaying()) {
-                afReturnValue = 1.0;
-            }
+        if ((v5) && (!v5->SpecialIdleDonePlaying())) {
+            afReturnValue = 1.0;
         }
     }
     if (Script::GetThreadSystemOutput()) {
@@ -1353,19 +1308,17 @@ bool Script::IsInMyOwnedCellConditionFunction(
     TESObjectCELL* parentCell;
     afReturnValue = 0.0;
     PlayerCharacter* v6 = nullptr;
-    if (apRefObject) {
-        if (apRefObject->IsActor()) {
-            v6 = static_cast<PlayerCharacter*>(apRefObject);
+    if ((apRefObject) && (apRefObject->IsActor())) {
+        v6 = static_cast<PlayerCharacter*>(apRefObject);
+    }
+
+    if ((v6) && (v6->TESObjectREFR::GetParentCell())) {
+        parentCell = v6->TESObjectREFR::GetParentCell();
+        if (parentCell->IsActorCellOwner(v6)) {
+            afReturnValue = 1.0;
         }
     }
-    if (v6) {
-        if (v6->TESObjectREFR::GetParentCell()) {
-            parentCell = v6->TESObjectREFR::GetParentCell();
-            if (parentCell->IsActorCellOwner(v6)) {
-                afReturnValue = 1.0;
-            }
-        }
-    }
+
     if (Script::GetThreadSystemOutput()) {
         Interface::PrintLine("Is in owned cell value %0.2f", afReturnValue);
     }
@@ -1380,11 +1333,10 @@ bool Script::IsContinuingPackagePCNearConditionFunction(
 ) {
     afReturnValue = 0.0;
     Actor* v5 = nullptr;
-    if (apRefObject) {
-        if (apRefObject->IsActor()) {
-            v5 = static_cast<Actor*>(apRefObject);
-        }
+    if ((apRefObject) && (apRefObject->IsActor())) {
+        v5 = static_cast<Actor*>(apRefObject);
     }
+
     if (v5) {
         afReturnValue = (double)v5->IsContinuingPackagePCNear();
     }
@@ -1404,21 +1356,20 @@ bool Script::HasFlamesConditionFunction(
     float fResult;
     NiNode* v7;
     afReturnValue = 0.0;
-    if (apRefObject) {
-        if (apRefObject->Get3D()) {
-            v7 = apRefObject->Get3D();
-            if (v7) {
-                v4 = v7->IsNode();
-                if (TESObjectREFR::HasAddonNodes(v4)) {
-                    fResult = (float)1.0;
-                }
-                else {
-                    fResult = (float)0.0;
-                }
-                afReturnValue = (double)fResult;
+    if ((apRefObject) && (apRefObject->Get3D())) {
+        v7 = apRefObject->Get3D();
+        if (v7) {
+            v4 = v7->IsNode();
+            if (TESObjectREFR::HasAddonNodes(v4)) {
+                fResult = (float)1.0;
             }
+            else {
+                fResult = (float)0.0;
+            }
+            afReturnValue = (double)fResult;
         }
     }
+
     if (Script::GetThreadSystemOutput()) {
         Interface::PrintLine("HasFlames >> %0.2f", afReturnValue);
     }
@@ -1475,16 +1426,14 @@ bool Script::IsSwimmingConditionFunction(
 ) {
     afReturnValue = 0.0;
     Actor* v5 = nullptr;
-    if (apRefObject) {
-        if (apRefObject->IsActor()) {
-            v5 = static_cast<Actor*>(apRefObject);
-        }
+    if ((apRefObject) && (apRefObject->IsActor())) {
+        v5 = static_cast<Actor*>(apRefObject);
     }
-    if (v5) {
-        if (v5->IsSwimming()) {
-            afReturnValue = 1.0;
-        }
+
+    if ((v5) && (v5->IsSwimming())) {
+        afReturnValue = 1.0;
     }
+
     if (Script::GetThreadSystemOutput()) {
         Interface::PrintLine("Is Swimming >> %0.2f", afReturnValue);
     }
@@ -1498,11 +1447,10 @@ bool Script::GetDestroyedConditionFunction(
     double& afReturnValue
 ) {
     afReturnValue = 0.0;
-    if (apRefObject) {
-        if (apRefObject->TESForm::GetDestroyed()) {
-            afReturnValue = 1.0;
-        }
+    if ((apRefObject) && (apRefObject->TESForm::GetDestroyed())) {
+        afReturnValue = 1.0;
     }
+
     if (Script::GetThreadSystemOutput()) {
         Interface::PrintLine("GetDestroyed >> %.0f", afReturnValue);
     }
@@ -1518,19 +1466,17 @@ bool Script::HasMagicEffectConditionFunction(
     MagicTarget* v4;
     afReturnValue = 0.0;
     TESObjectREFR* v6 = nullptr;
-    if (apRefObject) {
-        if (apRefObject->IsActor()) {
-            v6 = apRefObject;
+    if ((apRefObject) && (apRefObject->IsActor())) {
+        v6 = apRefObject;
+    }
+
+    if ((v6) && (apParam1)) {
+        v4 = v6->GetMagicTarget();
+        if (v4->ChecksForMagicEffect(static_cast<EffectSetting*>(apParam1))) {
+            afReturnValue = 1.0;
         }
     }
-    if (v6) {
-        if (apParam1) {
-            v4 = v6->GetMagicTarget();
-            if (v4->ChecksForMagicEffect(static_cast<EffectSetting*>(apParam1))) {
-                afReturnValue = 1.0;
-            }
-        }
-    }
+
     if (Script::GetThreadSystemOutput()) {
         Interface::PrintLine("Has Magic Effect >> %0.2f", afReturnValue);
     }
@@ -1574,11 +1520,10 @@ bool Script::HasBeenEatenConditionFunction(
     double& afReturnValue
 ) {
     afReturnValue = 0.0;
-    if (apRefObject->IsActor()) {
-        if (static_cast<Actor*>(apRefObject)->GetHasBeenEaten()) {
-            afReturnValue = 1.0;
-        }
+    if ((apRefObject->IsActor()) && (static_cast<Actor*>(apRefObject)->GetHasBeenEaten())) {
+        afReturnValue = 1.0;
     }
+
     if (Script::GetThreadSystemOutput()) {
         Interface::PrintLine("Actor has been eaten >> %0.2f", afReturnValue);
     }
@@ -1593,16 +1538,14 @@ bool Script::GetGhostConditionFunction(
 ) {
     afReturnValue = 0.0;
     Actor* v5 = nullptr;
-    if (apRefObject) {
-        if (apRefObject->IsActor()) {
-            v5 = static_cast<Actor*>(apRefObject);
-        }
+    if ((apRefObject) && (apRefObject->IsActor())) {
+        v5 = static_cast<Actor*>(apRefObject);
     }
-    if (v5) {
-        if (v5->GetGhost()) {
-            afReturnValue = 1.0;
-        }
+
+    if ((v5) && (v5->GetGhost())) {
+        afReturnValue = 1.0;
     }
+
     if (Script::GetThreadSystemOutput()) {
         Interface::PrintLine("GetGhost >> %0.2f", afReturnValue);
     }
@@ -1619,16 +1562,14 @@ bool Script::GetOffersServiceConditionFunction(
     const char* baseFormFullName;
     afReturnValue = 0.0;
     Actor* pActor = nullptr;
-    if (apRefObject) {
-        if (apRefObject->IsActor()) {
-            pActor = static_cast<Actor*>(apRefObject);
-        }
+    if ((apRefObject) && (apRefObject->IsActor())) {
+        pActor = static_cast<Actor*>(apRefObject);
     }
-    if (pActor) {
-        if (pActor->GetOffersServicesNow()) {
-            afReturnValue = 1.0;
-        }
+
+    if ((pActor) && (pActor->GetOffersServicesNow())) {
+        afReturnValue = 1.0;
     }
+
     if (!Script::GetThreadSystemOutput()) {
         return true;
     }
@@ -1651,11 +1592,10 @@ bool Script::GetBarterGoldConditionFunction(
 ) {
     int32_t barterGold;
     Actor* v6 = nullptr;
-    if (apRefObject) {
-        if (apRefObject->IsActor()) {
-            v6 = static_cast<Actor*>(apRefObject);
-        }
+    if ((apRefObject) && (apRefObject->IsActor())) {
+        v6 = static_cast<Actor*>(apRefObject);
     }
+
     if (v6) {
         afReturnValue = (double)((uint32_t)v6->GetBarterGold());
         if (Script::GetThreadSystemOutput()) {
@@ -1689,11 +1629,10 @@ bool Script::IsSneakingConditionFunction(
     const char* fullName;
     afReturnValue = 0.0;
     Actor* v7 = nullptr;
-    if (apRefObject) {
-        if (apRefObject->IsActor()) {
-            v7 = static_cast<Actor*>(apRefObject);
-        }
+    if ((apRefObject) && (apRefObject->IsActor())) {
+        v7 = static_cast<Actor*>(apRefObject);
     }
+
     if (v7->IsSneaking()) {
         afReturnValue = 1.0;
     }
@@ -1721,11 +1660,10 @@ bool Script::IsRunningConditionFunction(
     const char* fullName;
     afReturnValue = 0.0;
     Actor* v7 = nullptr;
-    if (apRefObject) {
-        if (apRefObject->IsActor()) {
-            v7 = static_cast<Actor*>(apRefObject);
-        }
+    if ((apRefObject) && (apRefObject->IsActor())) {
+        v7 = static_cast<Actor*>(apRefObject);
     }
+
     if (v7->IsRunning()) {
         afReturnValue = 1.0;
     }
@@ -1754,11 +1692,10 @@ bool Script::GetFriendHitConditionFunction(
     double v8;
     afReturnValue = 0.0;
     TESObjectREFR* apObj = nullptr;
-    if (apRefObject) {
-        if (apRefObject->IsActor()) {
-            apObj = apRefObject;
-        }
+    if ((apRefObject) && (apRefObject->IsActor())) {
+        apObj = apRefObject;
     }
+
     if (!apObj) {
         return true;
     }
@@ -1783,14 +1720,13 @@ bool Script::IsInInteriorConditionFunction(
     const char* v5;
     const char* fullName;
     afReturnValue = 0.0;
-    if (apRefObject) {
-        if (apRefObject->TESObjectREFR::GetParentCell()) {
-            parentCell = apRefObject->TESObjectREFR::GetParentCell();
-            if (parentCell->GetInterior()) {
-                afReturnValue = 1.0;
-            }
+    if ((apRefObject) && (apRefObject->TESObjectREFR::GetParentCell())) {
+        parentCell = apRefObject->TESObjectREFR::GetParentCell();
+        if (parentCell->GetInterior()) {
+            afReturnValue = 1.0;
         }
     }
+
     if (!Script::GetThreadSystemOutput()) {
         return true;
     }
@@ -1933,20 +1869,17 @@ bool Script::GetLastHitCriticalConditionFunction(
     HitData* lastHitData;
     float v6;
     afReturnValue = 0.0;
-    if (apRefObject) {
-        if (apRefObject->IsActor()) {
-            if (static_cast<Actor*>(apRefObject)->GetLastHitData()) {
-                lastHitData = static_cast<Actor*>(apRefObject)->GetLastHitData();
-                if (lastHitData->IsFlagSet(HitData::HD_CRITICAL)) {
-                    v6 = (float)1.0;
-                }
-                else {
-                    v6 = (float)0.0;
-                }
-                afReturnValue = (double)v6;
-            }
+    if ((apRefObject) && (apRefObject->IsActor()) && (static_cast<Actor*>(apRefObject)->GetLastHitData())) {
+        lastHitData = static_cast<Actor*>(apRefObject)->GetLastHitData();
+        if (lastHitData->IsFlagSet(HitData::HD_CRITICAL)) {
+            v6 = (float)1.0;
         }
+        else {
+            v6 = (float)0.0;
+        }
+        afReturnValue = (double)v6;
     }
+
     return true;
 }
 
@@ -1992,11 +1925,10 @@ bool Script::GetAnimActionConditionFunction(
     double& afReturnValue
 ) {
     afReturnValue = (-1.0);
-    if (apRefObject) {
-        if (apRefObject->IsActor()) {
-            afReturnValue = (double)static_cast<Actor*>(apRefObject)->GetAnimAction();
-        }
+    if ((apRefObject) && (apRefObject->IsActor())) {
+        afReturnValue = (double)static_cast<Actor*>(apRefObject)->GetAnimAction();
     }
+
     return true;
 }
 
@@ -2008,14 +1940,12 @@ bool Script::GetPlantedExplosiveConditionFunction(
 ) {
     BaseProcess* currentAIProcess;
     afReturnValue = 0.0;
-    if (apRefObject) {
-        if (apRefObject->IsActor()) {
-            if (static_cast<MobileObject*>(apRefObject)->MobileObject::GetCurrentAIProcess()) {
-                currentAIProcess = static_cast<MobileObject*>(apRefObject)->MobileObject::GetCurrentAIProcess();
-                afReturnValue = (double)currentAIProcess->GetPlantedExplosive();
-            }
-        }
+    if ((apRefObject) && (apRefObject->IsActor()) &&
+        (static_cast<MobileObject*>(apRefObject)->MobileObject::GetCurrentAIProcess())) {
+        currentAIProcess = static_cast<MobileObject*>(apRefObject)->MobileObject::GetCurrentAIProcess();
+        afReturnValue = (double)currentAIProcess->GetPlantedExplosive();
     }
+
     return true;
 }
 
@@ -2026,12 +1956,11 @@ bool Script::IsActorTalkingThroughActivatorConditionFunction(
     double& afReturnValue
 ) {
     afReturnValue = 0.0;
-    if (apRefObject) {
-        if (apRefObject->IsActor()) {
-            afReturnValue =
-                (double)(&ReferenceProcessLists)->IsActorTalkingThroughActivator(static_cast<Actor*>(apRefObject));
-        }
+    if ((apRefObject) && (apRefObject->IsActor())) {
+        afReturnValue =
+            (double)(&ReferenceProcessLists)->IsActorTalkingThroughActivator(static_cast<Actor*>(apRefObject));
     }
+
     return true;
 }
 
@@ -2078,11 +2007,10 @@ bool Script::IsWaterObjectConditionFunction(
 ) {
     afReturnValue = 0.0;
     TESObject* usedItem = TESIdleManager::GetUsedItem();
-    if (usedItem) {
-        if (usedItem->GetWaterType()) {
-            afReturnValue = 1.0;
-        }
+    if ((usedItem) && (usedItem->GetWaterType())) {
+        afReturnValue = 1.0;
     }
+
     if (Script::GetThreadSystemOutput()) {
         Interface::PrintLine("IsWaterActivator >> %0.2f", afReturnValue);
     }
@@ -2096,16 +2024,15 @@ bool Script::GetPlayerTeammateConditionFunction(
     double& afReturnValue
 ) {
     afReturnValue = 0.0;
-    if (apRefObject) {
-        if (apRefObject->IsActor()) {
-            if (static_cast<Actor*>(apRefObject)->bPlayerTeammate) {
-                afReturnValue = 1.0;
-            }
-            if (Script::GetThreadSystemOutput()) {
-                Interface::PrintLine("Player teammate  >> %d", (int32_t)afReturnValue);
-            }
+    if ((apRefObject) && (apRefObject->IsActor())) {
+        if (static_cast<Actor*>(apRefObject)->bPlayerTeammate) {
+            afReturnValue = 1.0;
+        }
+        if (Script::GetThreadSystemOutput()) {
+            Interface::PrintLine("Player teammate  >> %d", (int32_t)afReturnValue);
         }
     }
+
     return true;
 }
 
@@ -2116,19 +2043,18 @@ bool Script::GetMinorCrimeCountConditionFunction(
     double& afReturnValue
 ) {
     afReturnValue = 0.0;
-    if (apRefObject) {
-        if (apRefObject->IsActor()) {
-            if (static_cast<const void*>(apRefObject) == static_cast<const void*>(pPlayer)) {
-                afReturnValue = (double)((int32_t)static_cast<PlayerCharacter*>(apRefObject)->GetMinorCrimeCount());
-            }
-            else {
-                afReturnValue = (double)static_cast<Actor*>(apRefObject)->GetMinorCrimeCount();
-            }
-            if (Script::GetThreadSystemOutput()) {
-                Interface::PrintLine("The number of minor crimes is %.2f", afReturnValue);
-            }
+    if ((apRefObject) && (apRefObject->IsActor())) {
+        if (static_cast<const void*>(apRefObject) == static_cast<const void*>(pPlayer)) {
+            afReturnValue = (double)((int32_t)static_cast<PlayerCharacter*>(apRefObject)->GetMinorCrimeCount());
+        }
+        else {
+            afReturnValue = (double)static_cast<Actor*>(apRefObject)->GetMinorCrimeCount();
+        }
+        if (Script::GetThreadSystemOutput()) {
+            Interface::PrintLine("The number of minor crimes is %.2f", afReturnValue);
         }
     }
+
     return true;
 }
 
@@ -2211,19 +2137,18 @@ bool Script::GetIsTurningConditionFunction(
 ) {
     int8_t moveMode;
     afReturnValue = 0.0;
-    if (apRefObject) {
-        if (apRefObject->IsActor()) {
-            moveMode = (int8_t)static_cast<Actor*>(apRefObject)->GetMoveMode();
-            if ((moveMode & 16) != 0) {
-                afReturnValue = 1.0;
-            }
-            else {
-                if ((moveMode & 32) != 0) {
-                    afReturnValue = 2.0;
-                }
+    if ((apRefObject) && (apRefObject->IsActor())) {
+        moveMode = (int8_t)static_cast<Actor*>(apRefObject)->GetMoveMode();
+        if ((moveMode & 16) != 0) {
+            afReturnValue = 1.0;
+        }
+        else {
+            if ((moveMode & 32) != 0) {
+                afReturnValue = 2.0;
             }
         }
     }
+
     return true;
 }
 
@@ -2554,11 +2479,10 @@ void Script::ClearButtonPressed() {
 bool Script::GetNoRumors(TESObjectREFR* apRefObject, void* apParam1, void* apParam2, double& afReturnValue) {
     afReturnValue = 0.0;
     Actor* v5 = nullptr;
-    if (apRefObject) {
-        if (apRefObject->IsActor()) {
-            v5 = static_cast<Actor*>(apRefObject);
-        }
+    if ((apRefObject) && (apRefObject->IsActor())) {
+        v5 = static_cast<Actor*>(apRefObject);
     }
+
     if (!v5) {
         return true;
     }
@@ -2625,9 +2549,8 @@ bool Script::GetWeaponAnimType(
     if (apRefObject) {
         return Script::GetWeaponAnimTypeConditionFunction(apRefObject, nullptr, nullptr, afReturnValue);
     }
-    else {
-        return true;
-    }
+
+    return true;
 }
 
 bool Script::DebugCombatPlan(

@@ -161,20 +161,19 @@ void CombatUtilities::Init() {
 bool CombatUtilities::IsTargetWithinStrikeAngle(Actor* apAttacker, TESObjectREFR* apTarget, float* afDelta) {
     bool bresult = false;
     ANIM_GROUP_ENUM eAttack = ANIM_GROUP_ATTACK_LEFT;
-    if (apAttacker == pPlayer) {
-        if (apAttacker->pCurrentProcess) {
-            BaseProcess* CurrentAIProcess = apAttacker->pCurrentProcess;
-            if (CurrentAIProcess->GetAnimActionAnimSeq()) {
-                BaseProcess* v14 = apAttacker->pCurrentProcess;
-                BSAnimGroupSequence* v3 = v14->GetAnimActionAnimSeq();
-                if (v3->GetAnimGroup()) {
-                    BaseProcess* v13 = apAttacker->pCurrentProcess;
-                    BSAnimGroupSequence* v4 = v13->GetAnimActionAnimSeq();
-                    eAttack = v4->GetAnimGroup()->GetType();
-                }
+    if ((apAttacker == pPlayer) && (apAttacker->pCurrentProcess)) {
+        BaseProcess* CurrentAIProcess = apAttacker->pCurrentProcess;
+        if (CurrentAIProcess->GetAnimActionAnimSeq()) {
+            BaseProcess* v14 = apAttacker->pCurrentProcess;
+            BSAnimGroupSequence* v3 = v14->GetAnimActionAnimSeq();
+            if (v3->GetAnimGroup()) {
+                BaseProcess* v13 = apAttacker->pCurrentProcess;
+                BSAnimGroupSequence* v4 = v13->GetAnimActionAnimSeq();
+                eAttack = v4->GetAnimGroup()->GetType();
             }
         }
     }
+
     const NiPoint3* a1 = &apAttacker->GetLocationOnReference();
     const NiPoint3* v5 = &apTarget->GetLocationOnReference();
     NiPoint3 movedir = *v5 - *a1;
@@ -264,39 +263,33 @@ Actor* CombatUtilities::GetFacingTarget(Actor* apAttacker, float afRadius) {
             pactor = nullptr;
         }
         if (pVATS.eMode != VATS::VATS_PLAYBACK || (!pactor || !pactor->IsDead(false))) {
-            if (pactor) {
-                if (pactor != apAttacker && (!pactor->IsDead(false) || apAttacker == pPlayer)) {
-                    if (pactor->Get3D()) {
-                        if (static_cast<double>(afRadius) >=
-                            CombatUtilities::GetDistanceBetweenFacingActors(apAttacker, pactor, false)) {
-                            fdelta = 3.4028235e+38f;
-                            if (CombatUtilities::IsTargetWithinStrikeAngle(apAttacker, pactor, &fdelta) &&
-                                fclosestDelta >= static_cast<double>(fdelta)) {
-                                pclosestTarget = pactor;
-                                fclosestDelta = fdelta;
-                            }
-                        }
-                    }
+            if ((pactor) && (pactor != apAttacker && (!pactor->IsDead(false) || apAttacker == pPlayer)) &&
+                (pactor->Get3D()) &&
+                (static_cast<double>(afRadius) >=
+                 CombatUtilities::GetDistanceBetweenFacingActors(apAttacker, pactor, false))) {
+                fdelta = 3.4028235e+38f;
+                if (CombatUtilities::IsTargetWithinStrikeAngle(apAttacker, pactor, &fdelta) &&
+                    fclosestDelta >= static_cast<double>(fdelta)) {
+                    pclosestTarget = pactor;
+                    fclosestDelta = fdelta;
                 }
             }
+
             if (pactor) {
                 ExtraFollower* pfollow = (&pactor->m_Extra)->GetFollowerExtra();
                 if (pfollow) {
                     for (Actor* pact : pfollow->pActorlist->ItemsUntilNull()) {
-                        if (pact) {
-                            if (pact->GetCurrentProcessType() == PROCESS_TYPE_HIGH && pact != apAttacker &&
-                                (!pactor->IsDead(false) || apAttacker == pPlayer)) {
-                                if (pact->Get3D()) {
-                                    if (static_cast<double>(afRadius) >=
-                                        CombatUtilities::GetDistanceBetweenFacingActors(apAttacker, pact, false)) {
-                                        fdelta_2 = 3.4028235e+38f;
-                                        if (CombatUtilities::IsTargetWithinStrikeAngle(apAttacker, pact, &fdelta_2) &&
-                                            fclosestDelta >= static_cast<double>(fdelta_2)) {
-                                            pclosestTarget = pact;
-                                            fclosestDelta = fdelta_2;
-                                        }
-                                    }
-                                }
+                        if ((pact) &&
+                            (pact->GetCurrentProcessType() == PROCESS_TYPE_HIGH && pact != apAttacker &&
+                             (!pactor->IsDead(false) || apAttacker == pPlayer)) &&
+                            (pact->Get3D()) &&
+                            (static_cast<double>(afRadius) >=
+                             CombatUtilities::GetDistanceBetweenFacingActors(apAttacker, pact, false))) {
+                            fdelta_2 = 3.4028235e+38f;
+                            if (CombatUtilities::IsTargetWithinStrikeAngle(apAttacker, pact, &fdelta_2) &&
+                                fclosestDelta >= static_cast<double>(fdelta_2)) {
+                                pclosestTarget = pact;
+                                fclosestDelta = fdelta_2;
                             }
                         }
                     }
@@ -313,11 +306,10 @@ Actor* CombatUtilities::GetFacingTarget(Actor* apAttacker, float afRadius) {
             pclosestTarget = pPlayer;
         }
     }
-    if (pclosestTarget) {
-        if (apAttacker->IsPc() && !pPlayer->LineOfSight(true, pclosestTarget, true, nullptr, false)) {
-            return nullptr;
-        }
+    if ((pclosestTarget) && (apAttacker->IsPc() && !pPlayer->LineOfSight(true, pclosestTarget, true, nullptr, false))) {
+        return nullptr;
     }
+
     return pclosestTarget;
 }
 
@@ -334,11 +326,10 @@ float CombatUtilities::GetAttackerFiringZOffset(TESObjectREFR* apAttacker, bool 
         }
         return fScale * 0.75;
     }
-    else {
-        NiPoint3 v8;
-        NiPoint3* v3 = &(v9 = apAttacker->GetBoundMax());
-        return (v3->z - (&(v8 = apAttacker->GetBoundMin()))->z) * 0.5;
-    }
+
+    NiPoint3 v8;
+    NiPoint3* v3 = &(v9 = apAttacker->GetBoundMax());
+    return (v3->z - (&(v8 = apAttacker->GetBoundMin()))->z) * 0.5;
 }
 
 NiPoint3 CombatUtilities::ComputeFaceTargetLocation(
@@ -472,16 +463,15 @@ float CombatUtilities::CalculateItemDPS(
             }
             v15 = TESAmmoEffect::ApplyAmmoEffect(AMMO_EFFECT_DAM, pAmmoEffectList, fdamagePerHit);
             fdamagePerHit = v15;
-            if (apWeapon->GetProjectile(nullptr)) {
-                if (apWeapon->GetProjectile(nullptr)->GetExplosion()) {
-                    BGSProjectile* Projectile_ = apWeapon->GetProjectile(nullptr);
-                    double BranchDimming = Projectile_->GetExplosion()->Data.fDamage;
-                    v15 = static_cast<double>(apWeapon->GetNumProjectiles(HasModEffectActive_0, false, pactor)) *
-                            BranchDimming +
-                        fdamagePerHit;
-                    fdamagePerHit = v15;
-                }
+            if ((apWeapon->GetProjectile(nullptr)) && (apWeapon->GetProjectile(nullptr)->GetExplosion())) {
+                BGSProjectile* Projectile_ = apWeapon->GetProjectile(nullptr);
+                double BranchDimming = Projectile_->GetExplosion()->Data.fDamage;
+                v15 = static_cast<double>(apWeapon->GetNumProjectiles(HasModEffectActive_0, false, pactor)) *
+                        BranchDimming +
+                    fdamagePerHit;
+                fdamagePerHit = v15;
             }
+
             switch (apWeapon->GetWeaponType()) {
                 case WEAPON_NONE:
                 case WEAPON_HAND_TO_HAND:
@@ -492,13 +482,12 @@ float CombatUtilities::CalculateItemDPS(
                 }
                 case WEAPON_ONE_HAND_GRENADE:
                 case WEAPON_ONE_HAND_MINE: {
-                    if (apWeapon->GetProjectile(nullptr)) {
-                        if (apWeapon->GetProjectile(nullptr)->GetExplosion()) {
-                            float* v17 = &fDamageWeaponMult.Float();
-                            BGSProjectile* v18 = apWeapon->GetProjectile(nullptr);
-                            fdamagePerHit = v18->GetExplosion()->Data.fDamage * *v17;
-                        }
+                    if ((apWeapon->GetProjectile(nullptr)) && (apWeapon->GetProjectile(nullptr)->GetExplosion())) {
+                        float* v17 = &fDamageWeaponMult.Float();
+                        BGSProjectile* v18 = apWeapon->GetProjectile(nullptr);
+                        fdamagePerHit = v18->GetExplosion()->Data.fDamage * *v17;
                     }
+
                     v15 = 1.0;
                     iroundedCondition = 10;
                     break;
@@ -548,17 +537,16 @@ float CombatUtilities::CalculateItemDPS(
             }
             fsecondsPerClip = static_cast<double>(iclipSize) / fsecondsPerClip;
             int32_t* v23 = &iMinClipSizeToAddReloadDelay.Int();
-            if ((iclipSize <= *v23 || a6) && apWeapon->GetWeaponType() != WEAPON_ONE_HAND_MELEE &&
-                apWeapon->GetWeaponType() != WEAPON_TWO_HAND_MELEE) {
-                if (apWeapon->GetWeaponType()) {
-                    if (apWeapon->GetWeaponType() != WEAPON_ONE_HAND_GRENADE &&
-                        apWeapon->GetWeaponType() != WEAPON_ONE_HAND_THROWN &&
-                        apWeapon->GetWeaponType() != WEAPON_ONE_HAND_MINE) {
-                        double AnimReloadTime = apWeapon->GetAnimReloadTime();
-                        fsecondsPerClip = AnimReloadTime + fsecondsPerClip;
-                    }
-                }
+            if (((iclipSize <= *v23 || a6) && apWeapon->GetWeaponType() != WEAPON_ONE_HAND_MELEE &&
+                 apWeapon->GetWeaponType() != WEAPON_TWO_HAND_MELEE) &&
+                (apWeapon->GetWeaponType()) &&
+                (apWeapon->GetWeaponType() != WEAPON_ONE_HAND_GRENADE &&
+                 apWeapon->GetWeaponType() != WEAPON_ONE_HAND_THROWN &&
+                 apWeapon->GetWeaponType() != WEAPON_ONE_HAND_MINE)) {
+                double AnimReloadTime = apWeapon->GetAnimReloadTime();
+                fsecondsPerClip = AnimReloadTime + fsecondsPerClip;
             }
+
             if (pactor != pPlayer && apWeapon->IsRangedWeapon()) {
                 if (!apWeapon->IsAutomaticWeapon()) {
                     double SemiAutomaticFireDelayMax = apWeapon->GetSemiAutomaticFireDelayMax();
@@ -655,9 +643,8 @@ float CombatUtilities::CalculateItemDPS(
         }
         return fresult;
     }
-    else {
-        return 0.0f;
-    }
+
+    return 0.0f;
 }
 
 // The products are kept in double with the double 2.0, the discriminant is compared with the double 0.0 (a NaN takes
@@ -709,39 +696,36 @@ float CombatUtilities::GetDistanceBetweenFacingActors(
     if (fDistance == 3.4028234663852886e+38) {
         return fDistance;
     }
-    if (apAttacker->IsActor() && apTarget->IsActor()) {
-        if (apAttacker) {
-            double fHeightDelta;
-            float fHeightDiff;
-            bool bAreSwimming =
-                static_cast<Actor*>(apAttacker)->IsSwimming() && static_cast<Actor*>(apTarget)->IsSwimming();
-            NiPoint3 kActorPos = apAttacker->GetLocationOnReference();
-            NiPoint3 kTargetPos = apTarget->GetLocationOnReference();
-            if (bAreSwimming ||
-                (abMeleeCombat &&
-                 (fHeightDiff = kActorPos.z - kTargetPos.z,
-                  (fHeightDelta = std::fabsf(fHeightDiff), fAICombatSlopeDifference.Float() <= fHeightDelta)))) {
-                kActorPos.z = 0.0;
-                kTargetPos.z = 0.0;
-                NiPoint3* pActorBoundMax = &(v15 = apAttacker->GetBoundMax());
-                float fActorZMax = pActorBoundMax->z + kActorPos.z;
-                NiPoint3* pActorBoundMin = &(v14 = apAttacker->GetBoundMin());
-                float fActorZMin = pActorBoundMin->z + kActorPos.z;
-                NiPoint3* pTargetBoundMax = &(v13 = apTarget->GetBoundMax());
-                float fTargetZMax = pTargetBoundMax->z + kTargetPos.z;
-                NiPoint3* pTargetBoundMin = &(v12 = apTarget->GetBoundMin());
-                float fTargetZMin = pTargetBoundMin->z + kTargetPos.z;
-                if ((fTargetZMax >= static_cast<double>(fActorZMax) &&
-                     fTargetZMin <= static_cast<double>(fActorZMax)) ||
-                    (fTargetZMax >= static_cast<double>(fActorZMin) &&
-                     fTargetZMin <= static_cast<double>(fActorZMin))) {
-                    NiPoint3 result;
-                    result = kActorPos - kTargetPos;
-                    fDistance = result.Length();
-                }
+    if ((apAttacker->IsActor() && apTarget->IsActor()) && (apAttacker)) {
+        double fHeightDelta;
+        float fHeightDiff;
+        bool bAreSwimming =
+            static_cast<Actor*>(apAttacker)->IsSwimming() && static_cast<Actor*>(apTarget)->IsSwimming();
+        NiPoint3 kActorPos = apAttacker->GetLocationOnReference();
+        NiPoint3 kTargetPos = apTarget->GetLocationOnReference();
+        if (bAreSwimming ||
+            (abMeleeCombat &&
+             (fHeightDiff = kActorPos.z - kTargetPos.z,
+              (fHeightDelta = std::fabsf(fHeightDiff), fAICombatSlopeDifference.Float() <= fHeightDelta)))) {
+            kActorPos.z = 0.0;
+            kTargetPos.z = 0.0;
+            NiPoint3* pActorBoundMax = &(v15 = apAttacker->GetBoundMax());
+            float fActorZMax = pActorBoundMax->z + kActorPos.z;
+            NiPoint3* pActorBoundMin = &(v14 = apAttacker->GetBoundMin());
+            float fActorZMin = pActorBoundMin->z + kActorPos.z;
+            NiPoint3* pTargetBoundMax = &(v13 = apTarget->GetBoundMax());
+            float fTargetZMax = pTargetBoundMax->z + kTargetPos.z;
+            NiPoint3* pTargetBoundMin = &(v12 = apTarget->GetBoundMin());
+            float fTargetZMin = pTargetBoundMin->z + kTargetPos.z;
+            if ((fTargetZMax >= static_cast<double>(fActorZMax) && fTargetZMin <= static_cast<double>(fActorZMax)) ||
+                (fTargetZMax >= static_cast<double>(fActorZMin) && fTargetZMin <= static_cast<double>(fActorZMin))) {
+                NiPoint3 result;
+                result = kActorPos - kTargetPos;
+                fDistance = result.Length();
             }
         }
     }
+
     float fExtents = CombatUtilities::GetAttackerTargetExtentSum(apAttacker, apTarget);
     return fDistance - fExtents;
 }
@@ -793,11 +777,10 @@ float CombatUtilities::GetAttackerTargetExtentSum(TESObjectREFR* apAttacker, TES
             double ForwardLength = static_cast<Actor*>(apTarget)->GetForwardLength();
             return ForwardLength + fHeight;
         }
-        else {
-            NiPoint3* v4 = &(v8 = apTarget->GetBoundMax());
-            double Scale = apTarget->GetScale();
-            return Scale * v4->y + fHeight;
-        }
+
+        NiPoint3* v4 = &(v8 = apTarget->GetBoundMax());
+        double Scale = apTarget->GetScale();
+        return Scale * v4->y + fHeight;
     }
     return fHeight;
 }
@@ -810,13 +793,11 @@ float CombatUtilities::GetWeaponReach(Actor* apAttacker, TESObjectWEAP* apWeapon
             maxFarNearRatio = apWeapon->GetReach();
             return (CombatFormulas::CalcWeaponReach(maxFarNearRatio) * scale);
         }
-        else {
-            return (float)(scale * 128.0);
-        }
+
+        return (float)(scale * 128.0);
     }
-    else {
-        return (apAttacker->GetReach() * scale);
-    }
+
+    return (apAttacker->GetReach() * scale);
 }
 
 // afAttackerReach is compared with the double -1.0 (a NaN keeps it) and halved with the double 0.5.
@@ -1404,10 +1385,9 @@ float CombatUtilities::GetCostForWeaponType(CombatController* apController, COMB
     if (fattackDPS == 0.0) {
         return 3.4028235e+38f;
     }
-    else {
-        float fmaxAttackDPS = pcombatState->fMaxModifiedCombatWeaponDPS;
-        return fmaxAttackDPS - fattackDPS;
-    }
+
+    float fmaxAttackDPS = pcombatState->fMaxModifiedCombatWeaponDPS;
+    return fmaxAttackDPS - fattackDPS;
 }
 
 float CombatUtilities::GetTargetFiringZOffset(
@@ -1429,35 +1409,34 @@ float CombatUtilities::GetTargetFiringZOffset(
         if (ptargetActor->IsKnockedOut() || (ptargetActor->IsSleeping() || ptargetActor->IsDead(false))) {
             return fheight * 0.10000000149011612;
         }
-        else {
-            switch (aeTargetSegmentInView) {
-                case ACTOR_SEGMENT_INVIEW_BOTTOM: {
-                    float v9 = fheight * 0.25;
-                    v3 = v9;
-                    break;
+
+        switch (aeTargetSegmentInView) {
+            case ACTOR_SEGMENT_INVIEW_BOTTOM: {
+                float v9 = fheight * 0.25;
+                v3 = v9;
+                break;
+            }
+            case ACTOR_SEGMENT_INVIEW_MIDDLE:
+            case ACTOR_SEGMENT_INVIEW_NONE: {
+                float fResult = fheight * 0.5;
+                v3 = fResult;
+                break;
+            }
+            case ACTOR_SEGMENT_INVIEW_TOP: {
+                double v4;
+                if (bIsSneaking) {
+                    v4 = fheight * 0.8999999761581421;
                 }
-                case ACTOR_SEGMENT_INVIEW_MIDDLE:
-                case ACTOR_SEGMENT_INVIEW_NONE: {
-                    float fResult = fheight * 0.5;
-                    v3 = fResult;
-                    break;
+                else {
+                    v4 = fheight * 0.75;
                 }
-                case ACTOR_SEGMENT_INVIEW_TOP: {
-                    double v4;
-                    if (bIsSneaking) {
-                        v4 = fheight * 0.8999999761581421;
-                    }
-                    else {
-                        v4 = fheight * 0.75;
-                    }
-                    float v11 = v4;
-                    v3 = v11;
-                    break;
-                }
-                default: {
-                    v3 = 0.0;
-                    break;
-                }
+                float v11 = v4;
+                v3 = v11;
+                break;
+            }
+            default: {
+                v3 = 0.0;
+                break;
             }
         }
     }
@@ -1510,13 +1489,12 @@ bool CombatUtilities::CalculateLOS(
     }
     bhkPickData pickData;
     apAttacker->GetCollisionFilter(&icolFilter.iFilter);
-    if (apTarget) {
-        if (apTarget->IsMobileObject()) {
-            MobileObject* pmobileTarget = static_cast<MobileObject*>(apTarget);
-            uint32_t uiTargetFilter;
-            icolFilter.iFilter = *pmobileTarget->MobileObject::GetCollisionFilter(&uiTargetFilter);
-        }
+    if ((apTarget) && (apTarget->IsMobileObject())) {
+        MobileObject* pmobileTarget = static_cast<MobileObject*>(apTarget);
+        uint32_t uiTargetFilter;
+        icolFilter.iFilter = *pmobileTarget->MobileObject::GetCollisionFilter(&uiTargetFilter);
     }
+
     SpecificItemCollector collector(ecollilsionLayer, icolFilter);
     pickData.SetClosestCollector(&collector);
     icolFilter.iFilter = *apAttacker->GetCollisionFilter(&v9);
@@ -1529,10 +1507,9 @@ bool CombatUtilities::CalculateLOS(
         CombatAI_LOS.Stop();
         return true;
     }
-    else {
-        CombatAI_LOS.Stop();
-        return false;
-    }
+
+    CombatAI_LOS.Stop();
+    return false;
 }
 
 float CombatUtilities::GetWorldGravity() {
@@ -1571,28 +1548,26 @@ bool CombatUtilities::CalculateAttackerCombatPositions(Actor* apTarget, Actor* a
                 pcombatController = nullptr;
             }
             CombatController* pcombatController_2 = pcombatController;
-            if (pcombatController) {
-                if (pcombatController_2->CombatPlanContainsAction(7) ||
-                    pcombatController_2->CombatPlanContainsAction(8)) {
-                    attackerData[imeleeAttackers].pCombatController = pcombatController_2;
-                    NiPoint3* v4 = pattacker->QLocationOnReference();
-                    attackerData[imeleeAttackers].Location = *v4;
-                    double ZAngleFromVector =
-                        GetZAngleFromVector(attackerData[imeleeAttackers].Location - targetLocation);
-                    attackerData[imeleeAttackers].fAngle = ZAngleFromVector * 57.2957763671875;
-                    char SlotFromAngle = GetSlotFromAngle(attackerData[imeleeAttackers].fAngle);
-                    attackerData[imeleeAttackers].cSlot = SlotFromAngle;
-                    if (pcombatController_2->pMovementProcedure) {
-                        CombatProcedure* pCombatProcedure = pcombatController_2->pMovementProcedure;
-                        if (pCombatProcedure->GetType() == CombatProcedure::ATTACK_MELEE) {
-                            attackerData[imeleeAttackers].bInMelee = true;
-                            ++imeleeAttackersInMelee;
-                        }
+            if ((pcombatController) &&
+                (pcombatController_2->CombatPlanContainsAction(7) ||
+                 pcombatController_2->CombatPlanContainsAction(8))) {
+                attackerData[imeleeAttackers].pCombatController = pcombatController_2;
+                NiPoint3* v4 = pattacker->QLocationOnReference();
+                attackerData[imeleeAttackers].Location = *v4;
+                double ZAngleFromVector = GetZAngleFromVector(attackerData[imeleeAttackers].Location - targetLocation);
+                attackerData[imeleeAttackers].fAngle = ZAngleFromVector * 57.2957763671875;
+                char SlotFromAngle = GetSlotFromAngle(attackerData[imeleeAttackers].fAngle);
+                attackerData[imeleeAttackers].cSlot = SlotFromAngle;
+                if (pcombatController_2->pMovementProcedure) {
+                    CombatProcedure* pCombatProcedure = pcombatController_2->pMovementProcedure;
+                    if (pCombatProcedure->GetType() == CombatProcedure::ATTACK_MELEE) {
+                        attackerData[imeleeAttackers].bInMelee = true;
+                        ++imeleeAttackersInMelee;
                     }
-                    ++imeleeAttackers;
-                    if (pattacker == apAttacker) {
-                        bresult = true;
-                    }
+                }
+                ++imeleeAttackers;
+                if (pattacker == apAttacker) {
+                    bresult = true;
                 }
             }
         }
@@ -1635,28 +1610,28 @@ float CombatUtilities::GetAngleForMeleeAttack(const ANIM_GROUP_ENUM eAttack) {
     if (eAttack < ANIM_GROUP_ATTACK_NORMAL_POWER || eAttack > ANIM_GROUP_POWER_ATTACK_STOP) {
         return fCombatHitConeAngle.Float();
     }
-    else {
-        switch (eAttack) {
-            case ANIM_GROUP_ATTACK_NORMAL_POWER:
-            case ANIM_GROUP_ATTACK_FORWARD_POWER: {
-                v1 = fCombatOverheadHitConeAngle.Float();
-                break;
-            }
-            case ANIM_GROUP_ATTACK_BACK_POWER:
-            case ANIM_GROUP_ATTACK_LEFT_POWER:
-            case ANIM_GROUP_ATTACK_RIGHT_POWER: {
-                v1 = fCombatSweepHitConeAngle.Float();
-                break;
-            }
-            case ANIM_GROUP_ATTACK_CUSTOM_1_POWER: {
-                v1 = fCombatUppercutHitConeAngle.Float();
-                break;
-            }
-            default: {
-                return fCombatHitConeAngle.Float();
-            }
+
+    switch (eAttack) {
+        case ANIM_GROUP_ATTACK_NORMAL_POWER:
+        case ANIM_GROUP_ATTACK_FORWARD_POWER: {
+            v1 = fCombatOverheadHitConeAngle.Float();
+            break;
+        }
+        case ANIM_GROUP_ATTACK_BACK_POWER:
+        case ANIM_GROUP_ATTACK_LEFT_POWER:
+        case ANIM_GROUP_ATTACK_RIGHT_POWER: {
+            v1 = fCombatSweepHitConeAngle.Float();
+            break;
+        }
+        case ANIM_GROUP_ATTACK_CUSTOM_1_POWER: {
+            v1 = fCombatUppercutHitConeAngle.Float();
+            break;
+        }
+        default: {
+            return fCombatHitConeAngle.Float();
         }
     }
+
     return v1;
 }
 
@@ -1725,17 +1700,16 @@ double CombatUtilities::ComputeProjectileTime_(
         double v7 = result.Length();
         return static_cast<float>(v7 / afSpeed);
     }
-    else {
-        if (abHighArc && afSpeed == 0.0) {
-            float* v5 = &gs_fGrenadeHighArcSpeedPercentage.Float();
-            afSpeed = afSpeed * *v5;
-        }
-        float afDeltaZ = result.z;
-        float fDeltaXY = result.XYLength();
-        float afGravity = apProjectile->GetGravity() * CombatUtilities::fWorldGravity;
-        float fAngle = CombatUtilities::FindAngleOfProjectile(fDeltaXY, afDeltaZ, afSpeed, afGravity, false);
-        return CombatUtilities::ComputeProjectileTime(fDeltaXY, fAngle, fSpeed);
+
+    if (abHighArc && afSpeed == 0.0) {
+        float* v5 = &gs_fGrenadeHighArcSpeedPercentage.Float();
+        afSpeed = afSpeed * *v5;
     }
+    float afDeltaZ = result.z;
+    float fDeltaXY = result.XYLength();
+    float afGravity = apProjectile->GetGravity() * CombatUtilities::fWorldGravity;
+    float fAngle = CombatUtilities::FindAngleOfProjectile(fDeltaXY, afDeltaZ, afSpeed, afGravity, false);
+    return CombatUtilities::ComputeProjectileTime(fDeltaXY, fAngle, fSpeed);
 }
 
 NiPoint3* CombatUtilities::GetAttackerFiringLocationSimple(NiPoint3* apResult, TESObjectREFR* apAttacker) {
@@ -1791,23 +1765,21 @@ NiPoint3* CombatUtilities::GetAngleToProjectedPoint(
         ::new (apResult) NiPoint3(CombatUtilities::GetAngleToProjectedPoint(aStartLocation, aProjectedPoint));
         return apResult;
     }
-    else {
-        NiPoint3 result = aProjectedPoint - aPivotLocation;
-        float fValue = result.SqrLength();
-        if (fValue == 0.0) {
-            ::new (apResult) NiPoint3(CombatUtilities::GetAngleToProjectedPoint(aStartLocation, aProjectedPoint));
-            return apResult;
-        }
-        else {
-            if (fValue < f1024_0 * f1024_0) {
-                float v10 = NiSqrt(fValue);
-                float v7 = f1024_0 / v10;
-                aProjectedPoint = aPivotLocation + result * v7;
-            }
-            ::new (apResult) NiPoint3(CombatUtilities::GetAngleToProjectedPoint(aStartLocation, aProjectedPoint));
-            return apResult;
-        }
+
+    NiPoint3 result = aProjectedPoint - aPivotLocation;
+    float fValue = result.SqrLength();
+    if (fValue == 0.0) {
+        ::new (apResult) NiPoint3(CombatUtilities::GetAngleToProjectedPoint(aStartLocation, aProjectedPoint));
+        return apResult;
     }
+
+    if (fValue < f1024_0 * f1024_0) {
+        float v10 = NiSqrt(fValue);
+        float v7 = f1024_0 / v10;
+        aProjectedPoint = aPivotLocation + result * v7;
+    }
+    ::new (apResult) NiPoint3(CombatUtilities::GetAngleToProjectedPoint(aStartLocation, aProjectedPoint));
+    return apResult;
 }
 
 void CombatUtilities::CalculateCoverPositions(
@@ -1938,25 +1910,24 @@ NiPoint3* CombatUtilities::GetProjectedPointForTarget(
         *arResult = akTargetLocation;
         return arResult;
     }
-    else {
-        NiPoint3 releasePoint;
-        if (arSourcePosition) {
-            releasePoint = *arSourcePosition;
-        }
-        else {
-            releasePoint = CombatUtilities::GetAttackerFiringLocation(apSource);
-        }
-        float fGravity = apProjectile->GetGravity() * CombatUtilities::fWorldGravity;
-        if (afProjectileSpeed == 0.0) {
-            afProjectileSpeed = apProjectile->GetSpeed();
-        }
-        ::new (arResult) NiPoint3(
-            CombatUtilities::GetProjectedPointForTarget(
-                releasePoint, akTargetLocation, akTargetVelocity, afProjectileSpeed, fGravity, abHighArc
-            )
-        );
-        return arResult;
+
+    NiPoint3 releasePoint;
+    if (arSourcePosition) {
+        releasePoint = *arSourcePosition;
     }
+    else {
+        releasePoint = CombatUtilities::GetAttackerFiringLocation(apSource);
+    }
+    float fGravity = apProjectile->GetGravity() * CombatUtilities::fWorldGravity;
+    if (afProjectileSpeed == 0.0) {
+        afProjectileSpeed = apProjectile->GetSpeed();
+    }
+    ::new (arResult) NiPoint3(
+        CombatUtilities::GetProjectedPointForTarget(
+            releasePoint, akTargetLocation, akTargetVelocity, afProjectileSpeed, fGravity, abHighArc
+        )
+    );
+    return arResult;
 }
 
 // The Havok world's gravity, or zero without a world. The world is looked up before the read mark.

@@ -200,7 +200,7 @@ void BSCubeMapCamera::RenderGeomForLight(ShadowSceneLight* apLight) {
     NiRenderer::EFrameState eFrameState = pRenderer->m_eFrameState;
     if ((eFrameState == NiRenderer::FRAMESTATE_INSIDE_FRAME ||
          eFrameState == NiRenderer::FRAMESTATE_INSIDE_OFFSCREEN_FRAME) &&
-        pRenderer->m_bRenderTargetGroupActive == true) {
+        pRenderer->m_bRenderTargetGroupActive) {
         pRenderer->Do_SetCameraData(m_kWorld.m_Translate, kWorldDir, kWorldUp, kWorldRight, m_kViewFrustum, m_kPort);
     }
     spAccumulator->StartAccumulating(this);

@@ -146,12 +146,11 @@ bool NavMesh::ReconnectEnabledPortals() {
                                     spotherMesh.m_pObject->GetEdgeVertices(
                                         pinfo->Portal.sTriangle, aiEdgeIndex, &kOtherVert1, &kOtherVert2
                                     );
-                                    if ((kVert1 - kOtherVert2).SqrLength() < 400.0) {
-                                        if ((kVert2 - kOtherVert1).SqrLength() < 400.0) {
-                                            portalEdge = aiEdgeIndex;
-                                            portalCount = 1;
-                                            break;
-                                        }
+                                    if (((kVert1 - kOtherVert2).SqrLength() < 400.0) &&
+                                        ((kVert2 - kOtherVert1).SqrLength() < 400.0)) {
+                                        portalEdge = aiEdgeIndex;
+                                        portalCount = 1;
+                                        break;
                                     }
                                 }
                             }
@@ -189,10 +188,9 @@ NavMesh::GetUndoDataIndexForObstacle(const NiPointer<ObstacleData>& apObstacle, 
         *apOutUndoData = nullptr;
         return -1;
     }
-    else {
-        *apOutUndoData = (&Obstacles.GetAt(static_cast<int32_t>(i)))->m_pObject;
-        return i;
-    }
+
+    *apOutUndoData = (&Obstacles.GetAt(static_cast<int32_t>(i)))->m_pObject;
+    return i;
 }
 
 bool NavMesh::RemoveObstacle(uint32_t aiUndoIndex, TaskPortalSwap& aPortalSwaps) {
@@ -468,11 +466,9 @@ void NavMesh::CreatePOVs() {
             POVs.GetNext(pos, iVertIndex, data);
             NiPoint3 delta = GetVertex(iVertIndex)->Location - circumCenter;
             float fsqrDist = delta.SqrXYLength();
-            if (fclosestPOVSqrDist > fsqrDist) {
-                if (std::fabs(delta.z) < 180.0) {
-                    fclosestPOVSqrDist = fsqrDist;
-                    iClosestPOV = iVertIndex;
-                }
+            if ((fclosestPOVSqrDist > fsqrDist) && (std::fabs(delta.z) < 180.0)) {
+                fclosestPOVSqrDist = fsqrDist;
+                iClosestPOV = iVertIndex;
             }
         }
         ClosestPOVs.Add(iClosestPOV);

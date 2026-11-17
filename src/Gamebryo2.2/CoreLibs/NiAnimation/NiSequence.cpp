@@ -295,9 +295,8 @@ NiObject* NiSequence::CreateObject() {
     if (v0) {
         return ::new (v0) NiSequence(nullptr, 0xCu, 0xCu);
     }
-    else {
-        return nullptr;
-    }
+
+    return nullptr;
 }
 
 void NiSequence::CreateFromKFFile(
@@ -319,11 +318,10 @@ void SetTextKeys(NiSequence* apThis, [[maybe_unused]] void* apEdx, NiRefObject* 
     NiRefObject* m_pObject;
     m_pObject = apThis->m_spTextKeys.m_pObject;
     if (m_pObject != a2) {
-        if (m_pObject) {
-            if (!InterlockedDecrementUInt32(&m_pObject->m_uiRefCount)) {
-                m_pObject->DeleteThis();
-            }
+        if ((m_pObject) && (!InterlockedDecrementUInt32(&m_pObject->m_uiRefCount))) {
+            m_pObject->DeleteThis();
         }
+
         apThis->m_spTextKeys.m_pObject = a2;
         if (a2) {
             InterlockedIncrementUInt32(&a2->m_uiRefCount);

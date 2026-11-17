@@ -82,15 +82,14 @@ bool CalmEffect::CheckTarget(MagicTarget* apTarget) {
         actor = nullptr;
     }
     uint8_t result = 0;
-    if (actor) {
-        if (((!actor->IsDead(false)) && (!actor->IsDying())) && actor->IsInCombat()) {
-            afMagnitude = fMagnitude;
-            level = actor->GetLevel();
-            if (MagicFormulas::CheckTargetLevelMagnitude(level, afMagnitude)) {
-                return true;
-            }
+    if ((actor) && (((!actor->IsDead(false)) && (!actor->IsDying())) && actor->IsInCombat())) {
+        afMagnitude = fMagnitude;
+        level = actor->GetLevel();
+        if (MagicFormulas::CheckTargetLevelMagnitude(level, afMagnitude)) {
+            return true;
         }
     }
+
     return (bool)result;
 }
 
@@ -106,11 +105,9 @@ void CalmEffect::Start() {
     else {
         targetAsActor = nullptr;
     }
-    if (targetAsActor) {
-        if (targetAsActor->GetCombatController()) {
-            v2 = targetAsActor->GetCombatController();
-            v2->StartCalmed();
-        }
+    if ((targetAsActor) && (targetAsActor->GetCombatController())) {
+        v2 = targetAsActor->GetCombatController();
+        v2->StartCalmed();
     }
 }
 
@@ -126,11 +123,9 @@ void CalmEffect::Finish() {
     else {
         targetAsActor = nullptr;
     }
-    if (targetAsActor) {
-        if (targetAsActor->GetCombatController()) {
-            v2 = targetAsActor->GetCombatController();
-            v2->TESForm::InitializeDataComponent();
-        }
+    if ((targetAsActor) && (targetAsActor->GetCombatController())) {
+        v2 = targetAsActor->GetCombatController();
+        v2->TESForm::InitializeDataComponent();
     }
 }
 
@@ -139,7 +134,6 @@ ActiveEffect* CalmEffect::Instantiate(MagicCaster* apCaster, MagicItem* apSpell,
     if (apMemory) {
         return ::new (apMemory) CalmEffect(apCaster, apSpell, apEffect);
     }
-    else {
-        return nullptr;
-    }
+
+    return nullptr;
 }

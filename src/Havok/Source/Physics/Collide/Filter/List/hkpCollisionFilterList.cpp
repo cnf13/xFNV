@@ -57,20 +57,19 @@ hkBool hkpCollisionFilterList::isCollisionEnabled(const hkpCollidable& a, const 
         result.m_bool = 1;
         return result;
     }
-    else {
-        const hkpCollidable* v6 = &b;
-        while (true) {
-            const hkpCollisionFilter* v7 = m_collisionFilters.m_data[v5];
-            if (!v7->isCollisionEnabled(a, *v6).m_bool) {
-                break;
-            }
-            if (--v5 < 0) {
-                goto LABEL_5;
-            }
+
+    const hkpCollidable* v6 = &b;
+    while (true) {
+        const hkpCollisionFilter* v7 = m_collisionFilters.m_data[v5];
+        if (!v7->isCollisionEnabled(a, *v6).m_bool) {
+            break;
         }
-        result.m_bool = 0;
-        return result;
+        if (--v5 < 0) {
+            goto LABEL_5;
+        }
     }
+    result.m_bool = 0;
+    return result;
 }
 
 hkBool hkpCollisionFilterList::isCollisionEnabled(
@@ -87,19 +86,18 @@ hkBool hkpCollisionFilterList::isCollisionEnabled(
         result.m_bool = 1;
         return result;
     }
-    else {
-        while (true) {
-            const hkpCollisionFilter* v10 = m_collisionFilters.m_data[v8];
-            if (!v10->isCollisionEnabled(input, a, b, bContainer, bKey).m_bool) {
-                break;
-            }
-            if (--v8 < 0) {
-                goto LABEL_5;
-            }
+
+    while (true) {
+        const hkpCollisionFilter* v10 = m_collisionFilters.m_data[v8];
+        if (!v10->isCollisionEnabled(input, a, b, bContainer, bKey).m_bool) {
+            break;
         }
-        result.m_bool = 0;
-        return result;
+        if (--v8 < 0) {
+            goto LABEL_5;
+        }
     }
+    result.m_bool = 0;
+    return result;
 }
 
 hkBool hkpCollisionFilterList::isCollisionEnabled(
@@ -118,23 +116,22 @@ hkBool hkpCollisionFilterList::isCollisionEnabled(
         result.m_bool = 1;
         return result;
     }
-    else {
-        while (true) {
-            hkBool v14;
-            const hkpCollisionFilter* v12 = m_collisionFilters.m_data[v10];
-            if (!(::new (&v14) hkBool(v12->isCollisionEnabled(
-                      input, collectionBodyA, collectionBodyB, containerShapeA, containerShapeB, keyA, keyB
-                  )))
-                     ->m_bool) {
-                break;
-            }
-            if (--v10 < 0) {
-                goto LABEL_5;
-            }
+
+    while (true) {
+        hkBool v14;
+        const hkpCollisionFilter* v12 = m_collisionFilters.m_data[v10];
+        if (!(::new (&v14) hkBool(v12->isCollisionEnabled(
+                  input, collectionBodyA, collectionBodyB, containerShapeA, containerShapeB, keyA, keyB
+              )))
+                 ->m_bool) {
+            break;
         }
-        result.m_bool = 0;
-        return result;
+        if (--v10 < 0) {
+            goto LABEL_5;
+        }
     }
+    result.m_bool = 0;
+    return result;
 }
 
 hkBool hkpCollisionFilterList::isCollisionEnabled(
@@ -150,20 +147,19 @@ hkBool hkpCollisionFilterList::isCollisionEnabled(
         result.m_bool = 1;
         return result;
     }
-    else {
-        while (true) {
-            hkBool v11;
-            const hkpCollisionFilter* v9 = m_collisionFilters.m_data[v7];
-            if (!(::new (&v11) hkBool(v9->isCollisionEnabled(aInput, bShape, bContainer, bKey)))->m_bool) {
-                break;
-            }
-            if (--v7 < 0) {
-                goto LABEL_5;
-            }
+
+    while (true) {
+        hkBool v11;
+        const hkpCollisionFilter* v9 = m_collisionFilters.m_data[v7];
+        if (!(::new (&v11) hkBool(v9->isCollisionEnabled(aInput, bShape, bContainer, bKey)))->m_bool) {
+            break;
         }
-        result.m_bool = 0;
-        return result;
+        if (--v7 < 0) {
+            goto LABEL_5;
+        }
     }
+    result.m_bool = 0;
+    return result;
 }
 
 hkBool
@@ -175,20 +171,19 @@ hkpCollisionFilterList::isCollisionEnabled(const hkpWorldRayCastInput& a, const 
         result.m_bool = 1;
         return result;
     }
-    else {
-        const hkpCollidable* v6 = &collidableB;
-        while (true) {
-            const hkpCollisionFilter* v7 = m_collisionFilters.m_data[v5];
-            if (!v7->isCollisionEnabled(a, *v6).m_bool) {
-                break;
-            }
-            if (--v5 < 0) {
-                goto LABEL_5;
-            }
+
+    const hkpCollidable* v6 = &collidableB;
+    while (true) {
+        const hkpCollisionFilter* v7 = m_collisionFilters.m_data[v5];
+        if (!v7->isCollisionEnabled(a, *v6).m_bool) {
+            break;
         }
-        result.m_bool = 0;
-        return result;
+        if (--v5 < 0) {
+            goto LABEL_5;
+        }
     }
+    result.m_bool = 0;
+    return result;
 }
 
 // The filter is taken as const, but the reference count changes, so it is cast to non-const.

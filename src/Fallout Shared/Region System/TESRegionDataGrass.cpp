@@ -81,9 +81,8 @@ TESRegionData* TESRegionDataGrass::Copy() {
     if (v4) {
         return ::new (v4) TESRegionDataGrass(this);
     }
-    else {
-        return nullptr;
-    }
+
+    return nullptr;
 }
 
 // A copy of this data with apRegionData blended into it.
@@ -162,39 +161,38 @@ bool TESRegionDataGrass::LoadRegionDataGrass(TESFile* apFile) {
         Warning("MODELS: Invalid Region Grass Object Data in file \"%s\".", &apFile->m_Filename);
         return false;
     }
-    else {
-        if (icount) {
-            TESRegionGrassObject::REGION_GRASS_OBJECT_FILE_DATA* pdataArray =
-                static_cast<TESRegionGrassObject::REGION_GRASS_OBJECT_FILE_DATA*>(ourMalloc(
-                    icount <= SIZE_MAX / sizeof(TESRegionGrassObject::REGION_GRASS_OBJECT_FILE_DATA)
-                        ? sizeof(TESRegionGrassObject::REGION_GRASS_OBJECT_FILE_DATA) * icount
-                        : SIZE_MAX
-                ));
-            apFile->GetChunkData(pdataArray, isize);
-            for (uint32_t i = 0; i < icount; ++i) {
-                TESRegionGrassObject* pobj;
-                if (apFile->QEndian()) {
-                    pdataArray[i].Endian();
-                }
-                TESRegionGrassObject* v6 = static_cast<TESRegionGrassObject*>(ourMalloc(sizeof(TESRegionGrassObject)));
-                if (v6) {
-                    pobj = ::new (v6) TESRegionGrassObject(&pdataArray[i]);
+
+    if (icount) {
+        TESRegionGrassObject::REGION_GRASS_OBJECT_FILE_DATA* pdataArray =
+            static_cast<TESRegionGrassObject::REGION_GRASS_OBJECT_FILE_DATA*>(ourMalloc(
+                icount <= SIZE_MAX / sizeof(TESRegionGrassObject::REGION_GRASS_OBJECT_FILE_DATA)
+                    ? sizeof(TESRegionGrassObject::REGION_GRASS_OBJECT_FILE_DATA) * icount
+                    : SIZE_MAX
+            ));
+        apFile->GetChunkData(pdataArray, isize);
+        for (uint32_t i = 0; i < icount; ++i) {
+            TESRegionGrassObject* pobj;
+            if (apFile->QEndian()) {
+                pdataArray[i].Endian();
+            }
+            TESRegionGrassObject* v6 = static_cast<TESRegionGrassObject*>(ourMalloc(sizeof(TESRegionGrassObject)));
+            if (v6) {
+                pobj = ::new (v6) TESRegionGrassObject(&pdataArray[i]);
+            }
+            else {
+                pobj = nullptr;
+            }
+            if (pobj) {
+                if (pobj->GetObject()) {
+                    TESRegionGrassObjectList* v3 = GetObjectList();
+                    v3->AddTailSimple(pobj);
                 }
                 else {
-                    pobj = nullptr;
-                }
-                if (pobj) {
-                    if (pobj->GetObject()) {
-                        TESRegionGrassObjectList* v3 = GetObjectList();
-                        v3->AddTailSimple(pobj);
-                    }
-                    else {
-                        delete pobj;
-                    }
+                    delete pobj;
                 }
             }
-            ourFree(pdataArray);
         }
-        return true;
+        ourFree(pdataArray);
     }
+    return true;
 }

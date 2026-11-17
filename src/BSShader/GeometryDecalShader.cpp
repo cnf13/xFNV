@@ -92,18 +92,13 @@ uint32_t GeometryDecalShader::SetupBoneMatrices(
     const NiTransform& a7,
     const NiBound& a8
 ) {
-    if (a2) {
-        if (a3) {
-            if (!m_uiCurrentPass) {
-                if (spVSCMEBoneMatrix) {
-                    BSShaderManager::pRenderer.m_pObject->CalculateBoneMatrices(a2, a7, false, 3u, true);
-                    NiD3DShader::m_spCurrentPass->m_spVertexShader.m_pObject->SetShaderConstantArray(
-                        spVSCMEBoneMatrix, a2->m_pvBoneMatrices, a3->m_usBones, 3u, a3->m_pusBones
-                    );
-                }
-            }
-        }
+    if ((a2) && (a3) && (!m_uiCurrentPass) && (spVSCMEBoneMatrix)) {
+        BSShaderManager::pRenderer.m_pObject->CalculateBoneMatrices(a2, a7, false, 3u, true);
+        NiD3DShader::m_spCurrentPass->m_spVertexShader.m_pObject->SetShaderConstantArray(
+            spVSCMEBoneMatrix, a2->m_pvBoneMatrices, a3->m_usBones, 3u, a3->m_pusBones
+        );
     }
+
     return 0;
 }
 

@@ -512,14 +512,12 @@ void BGSDistantTreeBlock::Attach() {
 void BGSDistantTreeBlock::UpdateShaderProperties() {
     for (uint32_t i = 0; i < TreeGroups.iSize; ++i) {
         BGSDistantTreeBlock::TreeGroup* pgroup = TreeGroups.GetAt(i);
-        if (!pgroup->bShaderPropertyUpToDate) {
-            if (pgroup->spGeometry.m_pObject) {
-                int32_t Type = NiShadeProperty::GetType();
-                BSDistantTreeShaderProperty* pprop =
-                    static_cast<BSDistantTreeShaderProperty*>(pgroup->spGeometry.m_pObject->GetProperty(Type));
-                if (pprop) {
-                    SetupShaderProperty(pprop, *pgroup);
-                }
+        if ((!pgroup->bShaderPropertyUpToDate) && (pgroup->spGeometry.m_pObject)) {
+            int32_t Type = NiShadeProperty::GetType();
+            BSDistantTreeShaderProperty* pprop =
+                static_cast<BSDistantTreeShaderProperty*>(pgroup->spGeometry.m_pObject->GetProperty(Type));
+            if (pprop) {
+                SetupShaderProperty(pprop, *pgroup);
             }
         }
     }

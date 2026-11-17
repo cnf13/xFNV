@@ -53,11 +53,10 @@ void NiD3DTextureStageArray_SetAt(
     NiD3DTextureStage* pkOld = pBase[auiIndex].m_pObject;
     NiPointer<NiD3DTextureStage>* pSlot = &pBase[auiIndex];
     if (pkOld != akElement.m_pObject) {
-        if (pkOld) {
-            if (pkOld->m_uiRefCount-- == 1) {
-                pkOld->ReturnStageToPool();
-            }
+        if ((pkOld) && (pkOld->m_uiRefCount-- == 1)) {
+            pkOld->ReturnStageToPool();
         }
+
         NiD3DTextureStage* pkNew = akElement.m_pObject;
         pSlot->m_pObject = akElement.m_pObject;
         if (pkNew) {

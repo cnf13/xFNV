@@ -234,44 +234,42 @@ void BarterMenu::DoClick(int32_t a1, Tile* a2) {
             break;
         }
         case 23: {
-            if (BarterMenu::pCurrItem) {
-                if (a2) {
-                    BarterMenu::bCrossFade = false;
-                    uint32_t FormHealth_0 = BarterMenu::pCurrItem->iNumber;
-                    int32_t v4 = Tile::TextToTrait("_NumBartered");
-                    float someFloat = a2->GetFloat(v4);
-                    int32_t iitemCount = FormHealth_0 - FloatToInt(someFloat);
-                    if (Interface::IsConsoleVisible()) {
-                        TESObjectREFR* poriginalRef;
-                        if (BarterMenu::pCurrItem->pExtraObjectList &&
-                            BarterMenu::pCurrItem->pExtraObjectList->m_item) {
-                            poriginalRef = BarterMenu::pCurrItem->pExtraObjectList->m_item->GetOriginalReference();
-                        }
-                        else {
-                            poriginalRef = nullptr;
-                        }
-                        if (poriginalRef) {
-                            int32_t someFloata = poriginalRef->iFormID;
-                            Interface::PrintLine(
-                                "Original Container Ref: '%s' (%08x)", poriginalRef->GetFormEditorID(), someFloata
-                            );
-                        }
-                        else {
-                            Interface::PrintLine("Original Container Ref: NONE");
-                        }
+            if ((BarterMenu::pCurrItem) && (a2)) {
+                BarterMenu::bCrossFade = false;
+                uint32_t FormHealth_0 = BarterMenu::pCurrItem->iNumber;
+                int32_t v4 = Tile::TextToTrait("_NumBartered");
+                float someFloat = a2->GetFloat(v4);
+                int32_t iitemCount = FormHealth_0 - FloatToInt(someFloat);
+                if (Interface::IsConsoleVisible()) {
+                    TESObjectREFR* poriginalRef;
+                    if (BarterMenu::pCurrItem->pExtraObjectList && BarterMenu::pCurrItem->pExtraObjectList->m_item) {
+                        poriginalRef = BarterMenu::pCurrItem->pExtraObjectList->m_item->GetOriginalReference();
                     }
                     else {
-                        if (iitemCount <= iInventoryAskQuantityAt.Int()) {
-                            BarterMenu::ItemSelectCallback(1);
-                        }
-                        else {
-                            plbCurrListbox->SaveListState();
-                            plbCurrListbox->Highlight(nullptr);
-                            QuantityMenu::Create(iitemCount, &BarterMenu::ItemSelectCallback, 0x7FFFFFFF);
-                        }
+                        poriginalRef = nullptr;
+                    }
+                    if (poriginalRef) {
+                        int32_t someFloata = poriginalRef->iFormID;
+                        Interface::PrintLine(
+                            "Original Container Ref: '%s' (%08x)", poriginalRef->GetFormEditorID(), someFloata
+                        );
+                    }
+                    else {
+                        Interface::PrintLine("Original Container Ref: NONE");
+                    }
+                }
+                else {
+                    if (iitemCount <= iInventoryAskQuantityAt.Int()) {
+                        BarterMenu::ItemSelectCallback(1);
+                    }
+                    else {
+                        plbCurrListbox->SaveListState();
+                        plbCurrListbox->Highlight(nullptr);
+                        QuantityMenu::Create(iitemCount, &BarterMenu::ItemSelectCallback, 0x7FFFFFFF);
                     }
                 }
             }
+
             break;
         }
         default: {
@@ -345,29 +343,27 @@ void BarterMenu::DoIdle() {
             );
         }
         else {
-            if (BarterMenu::pCurrItem) {
-                if (BarterMenu::pCurrItem->pContainerObj->GetFormType() == ARMO_ID) {
-                    Tile* pTileFade2;
-                    if (!BarterMenu::pCurrItem ||
-                        static_cast<TESObjectARMO*>(BarterMenu::pCurrItem->pContainerObj)
-                                ->TESObjectARMO::GetDamageThreshold() == 0.0) {
-                        pTileFade2 = nullptr;
-                    }
-                    else {
-                        pTileFade2 = pTiles[18];
-                    }
-                    if (!BarterMenu::pCurrItem ||
-                        static_cast<TESObjectARMO*>(BarterMenu::pCurrItem->pContainerObj)
-                                ->TESObjectARMO::GetArmorRating() == 0.0) {
-                        InterfaceManager::UpdatePipBoyInventoryEffects(
-                            nullptr, pTileFade2, nullptr, BarterMenu::pCurrItem, false
-                        );
-                    }
-                    else {
-                        InterfaceManager::UpdatePipBoyInventoryEffects(
-                            pTiles[17], pTileFade2, nullptr, BarterMenu::pCurrItem, false
-                        );
-                    }
+            if ((BarterMenu::pCurrItem) && (BarterMenu::pCurrItem->pContainerObj->GetFormType() == ARMO_ID)) {
+                Tile* pTileFade2;
+                if (!BarterMenu::pCurrItem ||
+                    static_cast<TESObjectARMO*>(BarterMenu::pCurrItem->pContainerObj)
+                            ->TESObjectARMO::GetDamageThreshold() == 0.0) {
+                    pTileFade2 = nullptr;
+                }
+                else {
+                    pTileFade2 = pTiles[18];
+                }
+                if (!BarterMenu::pCurrItem ||
+                    static_cast<TESObjectARMO*>(BarterMenu::pCurrItem->pContainerObj)
+                            ->TESObjectARMO::GetArmorRating() == 0.0) {
+                    InterfaceManager::UpdatePipBoyInventoryEffects(
+                        nullptr, pTileFade2, nullptr, BarterMenu::pCurrItem, false
+                    );
+                }
+                else {
+                    InterfaceManager::UpdatePipBoyInventoryEffects(
+                        pTiles[17], pTileFade2, nullptr, BarterMenu::pCurrItem, false
+                    );
                 }
             }
         }
@@ -398,25 +394,23 @@ bool BarterMenu::DoGamepad(int32_t a1, float a2) {
                 break;
             }
             case 13: {
-                if (!lbPlayerItems.IsEnabled()) {
-                    if (lbPlayerItems.NumItems()) {
-                        lbVendorItems.SaveListState();
-                        DoEnter(0, nullptr);
-                        lbPlayerItems.RestoreListState(true);
-                        bresult = true;
-                    }
+                if ((!lbPlayerItems.IsEnabled()) && (lbPlayerItems.NumItems())) {
+                    lbVendorItems.SaveListState();
+                    DoEnter(0, nullptr);
+                    lbPlayerItems.RestoreListState(true);
+                    bresult = true;
                 }
+
                 break;
             }
             case 14: {
-                if (!lbVendorItems.IsEnabled()) {
-                    if (lbVendorItems.NumItems()) {
-                        lbPlayerItems.SaveListState();
-                        DoEnter(1, nullptr);
-                        lbVendorItems.RestoreListState(true);
-                        bresult = true;
-                    }
+                if ((!lbVendorItems.IsEnabled()) && (lbVendorItems.NumItems())) {
+                    lbPlayerItems.SaveListState();
+                    DoEnter(1, nullptr);
+                    lbVendorItems.RestoreListState(true);
+                    bresult = true;
                 }
+
                 break;
             }
             default: {
@@ -429,11 +423,10 @@ bool BarterMenu::DoGamepad(int32_t a1, float a2) {
 
 void BarterMenu::UpdateLists(TESBoundObject* apUpdateObj) {
     int32_t pnewHighlight = 0;
-    if (plbCurrListbox) {
-        if (plbCurrListbox->GetHighlightedItem()) {
-            plbCurrListbox->SaveListState();
-        }
+    if ((plbCurrListbox) && (plbCurrListbox->GetHighlightedItem())) {
+        plbCurrListbox->SaveListState();
     }
+
     if (apUpdateObj) {
         BSSimpleList<ItemChange*> pnewItemGroup;
         InventoryChanges* pplayerInventory = InventoryChanges::GetInventoryChanges(pPlayer);
@@ -944,26 +937,20 @@ Tile* BarterMenu::Create(TESObjectREFR* apVendor, int32_t aiDiscount) {
                 BarterMenu::pMe->UpdateLists(nullptr);
                 return ptile;
             }
-            else {
-                Warning("MENUS: Barter Menu Creation Failed... Are your menu and art resources up to date?");
-                return nullptr;
-            }
-        }
-        else {
-            if (BarterMenu::pMe) {
-                if (BarterMenu::pMe->pMenu) {
-                    if (BarterMenu::pMe) {
-                        delete BarterMenu::pMe;
-                    }
-                }
-            }
+
+            Warning("MENUS: Barter Menu Creation Failed... Are your menu and art resources up to date?");
             return nullptr;
         }
-    }
-    else {
-        Warning(WARN_MENUS, "Barter menu called with NULL vendor!  Oh, noes!");
+
+        if ((BarterMenu::pMe) && (BarterMenu::pMe->pMenu) && (BarterMenu::pMe)) {
+            delete BarterMenu::pMe;
+        }
+
         return nullptr;
     }
+
+    Warning(WARN_MENUS, "Barter menu called with NULL vendor!  Oh, noes!");
+    return nullptr;
 }
 
 int32_t BarterMenu::GetClassStatic() {
@@ -1146,19 +1133,17 @@ void BarterMenu::RemoveStolenItems(Tile* apTile, ItemChange* apItem) {
     }
     BSSimpleList<ExtraDataList*> removeList;
     for (ExtraDataList* pextra : apItem->pExtraObjectList->ItemsUntilNull()) {
-        if (pactor) {
-            if (pextra->GetOwner()) {
-                TESObjectREFR ownedItem;
-                TESForm* Owner = pextra->GetOwner();
-                ownedItem.SetOwner(Owner);
-                TESGlobal* Global = pextra->GetGlobal();
-                ownedItem.SetGlobal(Global);
-                int32_t Rank = pextra->GetRank();
-                ownedItem.SetRank(Rank);
-                ownedItem.SetObjectReference(apItem->pContainerObj);
-                if (ownedItem.IsAnOwner(pactor, true)) {
-                    removeList.AddHead(pextra);
-                }
+        if ((pactor) && (pextra->GetOwner())) {
+            TESObjectREFR ownedItem;
+            TESForm* Owner = pextra->GetOwner();
+            ownedItem.SetOwner(Owner);
+            TESGlobal* Global = pextra->GetGlobal();
+            ownedItem.SetGlobal(Global);
+            int32_t Rank = pextra->GetRank();
+            ownedItem.SetRank(Rank);
+            ownedItem.SetObjectReference(apItem->pContainerObj);
+            if (ownedItem.IsAnOwner(pactor, true)) {
+                removeList.AddHead(pextra);
             }
         }
     }
@@ -1316,61 +1301,55 @@ void BarterMenu::InitFunc(Tile* apTile, ItemChange* apItem) {
 
 void BarterMenu::ItemSelectCallback(int32_t aiAmountSelected) {
     Tile* pcurrTile = BarterMenu::pMe->plbCurrListbox->GetTileFor(BarterMenu::pCurrItem);
-    if (aiAmountSelected) {
-        if (BarterMenu::pCurrItem) {
-            if (pcurrTile) {
-                BarterMenu::pMe->fTransactionAmount = BarterMenu::GetSortValue(pcurrTile, BarterMenu::pCurrItem) *
-                        static_cast<double>(2 * (BarterMenu::pMe->plbCurrListbox == &BarterMenu::pMe->lbPlayerItems) -
-                                            1) *
-                        static_cast<double>(aiAmountSelected) +
-                    BarterMenu::pMe->fTransactionAmount;
-                bool afValue = BarterMenu::pMe->plbCurrListbox == &BarterMenu::pMe->lbVendorItems;
-                TESBoundObject* FormFlags = BarterMenu::pCurrItem->pContainerObj;
-                pPlayer->PlayPickUpSound(FormFlags, afValue, false);
-                if (pcurrTile->IsTrue(BarterMenu::iUT_IsBarterSelected)) {
-                    BarterMenu::pMe->RemoveTransactItem(aiAmountSelected);
+    if ((aiAmountSelected) && (BarterMenu::pCurrItem) && (pcurrTile)) {
+        BarterMenu::pMe->fTransactionAmount = BarterMenu::GetSortValue(pcurrTile, BarterMenu::pCurrItem) *
+                static_cast<double>(2 * (BarterMenu::pMe->plbCurrListbox == &BarterMenu::pMe->lbPlayerItems) - 1) *
+                static_cast<double>(aiAmountSelected) +
+            BarterMenu::pMe->fTransactionAmount;
+        bool afValue = BarterMenu::pMe->plbCurrListbox == &BarterMenu::pMe->lbVendorItems;
+        TESBoundObject* FormFlags = BarterMenu::pCurrItem->pContainerObj;
+        pPlayer->PlayPickUpSound(FormFlags, afValue, false);
+        if (pcurrTile->IsTrue(BarterMenu::iUT_IsBarterSelected)) {
+            BarterMenu::pMe->RemoveTransactItem(aiAmountSelected);
+        }
+        else {
+            BarterMenu::pMe->AddTransactItem(aiAmountSelected);
+        }
+        TESBoundObject* X = BarterMenu::pCurrItem->pContainerObj;
+        BarterMenu::pMe->UpdateLists(X);
+        if (BarterMenu::pMe->ItemsToBuy.IsEmpty() && BarterMenu::pMe->ItemsToSell.IsEmpty()) {
+            BarterMenu::pMe->pTiles[13]->Set(4015, 0);
+            BarterMenu::pMe->pTiles[12]->Set(4003, 0);
+        }
+        else {
+            int32_t X_4;
+            char Src[16];
+            float Xa = std::floorf(BarterMenu::pMe->fTransactionAmount);
+            int32_t iwholeAmount = FloatToInt(Xa);
+            if (!(BarterMenu::pMe->fTransactionAmount > 0.0)) {
+                X_4 = 1;
+            }
+            else {
+                X_4 = 2;
+            }
+            BarterMenu::pMe->pMenu->Set(g_BarterMenu_Trait_ArrowDirection, X_4);
+            int32_t v1 = BSMIN(iwholeAmount, BarterMenu::pMe->iVendorCaps);
+            BSsprintf(Src, 16, "%d", BSAbs(v1));
+            BarterMenu::pMe->pTiles[12]->Set(g_BarterMenu_Trait_Value, Src, true);
+            BarterMenu::pMe->pTiles[12]->Set(4003, 1);
+            if (!(BarterMenu::pMe->fTransactionAmount > 0.0) &&
+                !(-BarterMenu::pMe->fTransactionAmount <= static_cast<double>(BarterMenu::pMe->iPlayerCaps))) {
+                BarterMenu::pMe->pTiles[13]->Set(4015, 0);
+                BarterMenu::pMe->pTiles[12]->Set(4009, 64.0f, true);
+            }
+            else {
+                BarterMenu::pMe->pTiles[13]->Set(4015, 1);
+                if (!(BarterMenu::pMe->fTransactionAmount > 0.0) ||
+                    !(BarterMenu::pMe->fTransactionAmount > static_cast<double>(BarterMenu::pMe->iVendorCaps))) {
+                    BarterMenu::pMe->pTiles[12]->Set(4009, 255.0f, true);
                 }
                 else {
-                    BarterMenu::pMe->AddTransactItem(aiAmountSelected);
-                }
-                TESBoundObject* X = BarterMenu::pCurrItem->pContainerObj;
-                BarterMenu::pMe->UpdateLists(X);
-                if (BarterMenu::pMe->ItemsToBuy.IsEmpty() && BarterMenu::pMe->ItemsToSell.IsEmpty()) {
-                    BarterMenu::pMe->pTiles[13]->Set(4015, 0);
-                    BarterMenu::pMe->pTiles[12]->Set(4003, 0);
-                }
-                else {
-                    int32_t X_4;
-                    char Src[16];
-                    float Xa = std::floorf(BarterMenu::pMe->fTransactionAmount);
-                    int32_t iwholeAmount = FloatToInt(Xa);
-                    if (!(BarterMenu::pMe->fTransactionAmount > 0.0)) {
-                        X_4 = 1;
-                    }
-                    else {
-                        X_4 = 2;
-                    }
-                    BarterMenu::pMe->pMenu->Set(g_BarterMenu_Trait_ArrowDirection, X_4);
-                    int32_t v1 = BSMIN(iwholeAmount, BarterMenu::pMe->iVendorCaps);
-                    BSsprintf(Src, 16, "%d", BSAbs(v1));
-                    BarterMenu::pMe->pTiles[12]->Set(g_BarterMenu_Trait_Value, Src, true);
-                    BarterMenu::pMe->pTiles[12]->Set(4003, 1);
-                    if (!(BarterMenu::pMe->fTransactionAmount > 0.0) &&
-                        !(-BarterMenu::pMe->fTransactionAmount <= static_cast<double>(BarterMenu::pMe->iPlayerCaps))) {
-                        BarterMenu::pMe->pTiles[13]->Set(4015, 0);
-                        BarterMenu::pMe->pTiles[12]->Set(4009, 64.0f, true);
-                    }
-                    else {
-                        BarterMenu::pMe->pTiles[13]->Set(4015, 1);
-                        if (!(BarterMenu::pMe->fTransactionAmount > 0.0) ||
-                            !(BarterMenu::pMe->fTransactionAmount >
-                              static_cast<double>(BarterMenu::pMe->iVendorCaps))) {
-                            BarterMenu::pMe->pTiles[12]->Set(4009, 255.0f, true);
-                        }
-                        else {
-                            BarterMenu::pMe->pTiles[12]->Set(4009, 64.0f, true);
-                        }
-                    }
+                    BarterMenu::pMe->pTiles[12]->Set(4009, 64.0f, true);
                 }
             }
         }

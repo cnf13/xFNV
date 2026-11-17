@@ -48,82 +48,79 @@ bool NavMeshSearchLOS::GetNodeConnections(
                 apNode->tNodeData.sTriangle, i, &potherMesh, &usotherTri, &iotherEdge
             )) {
             EdgeExtraInfo* pextra = apNode->tNodeData.pNavMesh->GetEdgeExtraInfo(apNode->tNodeData.sTriangle, i);
-            if (!pextra || pextra->eType != EIT_LEDGE_UP) {
-                if (potherMesh == apNode->tNodeData.pNavMesh ||
-                    spLOSMap.m_pObject->IsNavMeshInMap(potherMesh->iFormID)) {
-                    NiPoint3* Center;
-                    NiPoint3* a2a;
-                    double Range;
-                    double v18;
-                    NiPoint3 vec;
-                    float fdoorMultiplier = 1.0f;
-                    NavMeshTriangle* Triangle = potherMesh->GetTriangle(usotherTri);
-                    if (Triangle->GetFlag(NavMeshTriangle::NAV_TRI_CLOSED_DOOR)) {
-                        if (pCurrentRequest->bCantOpenDoors) {
+            if ((!pextra || pextra->eType != EIT_LEDGE_UP) &&
+                (potherMesh == apNode->tNodeData.pNavMesh || spLOSMap.m_pObject->IsNavMeshInMap(potherMesh->iFormID))) {
+                NiPoint3* Center;
+                NiPoint3* a2a;
+                double Range;
+                double v18;
+                NiPoint3 vec;
+                float fdoorMultiplier = 1.0f;
+                NavMeshTriangle* Triangle = potherMesh->GetTriangle(usotherTri);
+                if (Triangle->GetFlag(NavMeshTriangle::NAV_TRI_CLOSED_DOOR)) {
+                    if (pCurrentRequest->bCantOpenDoors) {
+                        continue;
+                    }
+                    uint32_t doorID = potherMesh->GetClosedDoorInfoForTriangle(usotherTri)->DoorFormID;
+                    TESObjectREFR* pdoor = static_cast<TESObjectREFR*>(TESForm::GetFormByNumericID(doorID));
+                    if (pdoor) {
+                        bool bmustPick;
+                        doorLock.~DoorLock();
+                        ::new (&doorLock) DoorLock(pdoor);
+                        const ActorLockData* lockData = &pCurrentRequest->LockData;
+                        if (!doorLock.CanActorUnlockDoorLock(lockData, pdoor, bmustPick)) {
                             continue;
                         }
-                        uint32_t doorID = potherMesh->GetClosedDoorInfoForTriangle(usotherTri)->DoorFormID;
-                        TESObjectREFR* pdoor = static_cast<TESObjectREFR*>(TESForm::GetFormByNumericID(doorID));
-                        if (pdoor) {
-                            bool bmustPick;
-                            doorLock.~DoorLock();
-                            ::new (&doorLock) DoorLock(pdoor);
-                            const ActorLockData* lockData = &pCurrentRequest->LockData;
-                            if (!doorLock.CanActorUnlockDoorLock(lockData, pdoor, bmustPick)) {
-                                continue;
-                            }
-                            if (static_cast<TESObjectDOOR*>(pdoor->GetObjectReference())
-                                    ->TESObjectDOOR::IsMinimalUse()) {
-                                fdoorMultiplier = 100.0f;
-                            }
+                        if (static_cast<TESObjectDOOR*>(pdoor->GetObjectReference())->TESObjectDOOR::IsMinimalUse()) {
+                            fdoorMultiplier = 100.0f;
                         }
                     }
-                    if (pCurrentRequest->fSearchCenterRadius == 0.0 ||
-                        (a2a = ::new (&result) NiPoint3(pCurrentRequest->GetSearchCenter()),
-                         (Center = ::new (&v23) NiPoint3(potherMesh->GetCenter(usotherTri)),
-                          (::new (&vec) NiPoint3(*Center - *a2a),
-                           (v18 = vec.SqrLength(),
-                            (Range = pCurrentRequest->fSearchCenterRadius,
-                             !(pCurrentRequest->fSearchCenterRadius * Range < v18))))))) {
-                        NavMeshTriangle* v7;
-                        double fActorRadius = pCurrentRequest->fActorRadius;
-                        double fLargeActorRadius = fPathingLargeActorRadius.Float();
-                        if (!(fLargeActorRadius < fActorRadius) ||
-                            (v7 = potherMesh->GetTriangle(usotherTri), !v7->GetFlag(16))) {
-                            NiPoint3 nodeCenter = potherMesh->GetCenter(usotherTri);
-                            float fcost = (aNodeCenter - nodeCenter).XYLength();
-                            float fnodescore = 0.0f;
-                            if (pCurrentRequest->GetAvoidNodeArray()) {
-                                PathingAvoidNodeArray* AvoidNodeArray = pCurrentRequest->GetAvoidNodeArray();
-                                fnodescore = AvoidNodeArray->GetCostForPoint(nodeCenter);
-                            }
-                            if (bHasGoalNode) {
-                                NiPoint3 deltaToGoal = aNodeCenter - *GoalNode.GetCenter(&v20);
-                                NiPoint3 deltaToNode = aNodeCenter - nodeCenter;
-                                deltaToGoal.Unitize();
-                                deltaToNode.Unitize();
-                                double v9 = deltaToGoal.Dot(deltaToNode);
-                                fcost = (1.0 - v9) * fcost;
-                                fcost = BSMAX(fcost, 0.0f);
-                            }
-                            fcost = (apNode->fCost + fcost) * (fnodescore + 1.0);
-                            fcost = fcost * fdoorMultiplier;
-                            float a1 = fcost;
-                            uint32_t KeyForNode = GetKeyForNode(potherMesh, usotherTri);
-                            int32_t v15 = AStarSearch_GetOrCreateAStarNode_6A7E00(this, KeyForNode, a1, &pnode);
-                            if (v15) {
-                                if (v15 != 1) {
-                                    continue;
-                                }
-                            }
-                            else {
-                                SetNodeData(pnode, potherMesh, usotherTri);
-                            }
-                            pnode->ParentLink.pNavMesh = apNode->tNodeData.pNavMesh;
-                            pnode->ParentLink.sTriangle = apNode->tNodeData.sTriangle;
-                            pnode->ParentLink.iEdgeIndex = i;
-                            apRetNodes->Add(pnode);
+                }
+                if (pCurrentRequest->fSearchCenterRadius == 0.0 ||
+                    (a2a = ::new (&result) NiPoint3(pCurrentRequest->GetSearchCenter()),
+                     (Center = ::new (&v23) NiPoint3(potherMesh->GetCenter(usotherTri)),
+                      (::new (&vec) NiPoint3(*Center - *a2a),
+                       (v18 = vec.SqrLength(),
+                        (Range = pCurrentRequest->fSearchCenterRadius,
+                         !(pCurrentRequest->fSearchCenterRadius * Range < v18))))))) {
+                    NavMeshTriangle* v7;
+                    double fActorRadius = pCurrentRequest->fActorRadius;
+                    double fLargeActorRadius = fPathingLargeActorRadius.Float();
+                    if (!(fLargeActorRadius < fActorRadius) ||
+                        (v7 = potherMesh->GetTriangle(usotherTri), !v7->GetFlag(16))) {
+                        NiPoint3 nodeCenter = potherMesh->GetCenter(usotherTri);
+                        float fcost = (aNodeCenter - nodeCenter).XYLength();
+                        float fnodescore = 0.0f;
+                        if (pCurrentRequest->GetAvoidNodeArray()) {
+                            PathingAvoidNodeArray* AvoidNodeArray = pCurrentRequest->GetAvoidNodeArray();
+                            fnodescore = AvoidNodeArray->GetCostForPoint(nodeCenter);
                         }
+                        if (bHasGoalNode) {
+                            NiPoint3 deltaToGoal = aNodeCenter - *GoalNode.GetCenter(&v20);
+                            NiPoint3 deltaToNode = aNodeCenter - nodeCenter;
+                            deltaToGoal.Unitize();
+                            deltaToNode.Unitize();
+                            double v9 = deltaToGoal.Dot(deltaToNode);
+                            fcost = (1.0 - v9) * fcost;
+                            fcost = BSMAX(fcost, 0.0f);
+                        }
+                        fcost = (apNode->fCost + fcost) * (fnodescore + 1.0);
+                        fcost = fcost * fdoorMultiplier;
+                        float a1 = fcost;
+                        uint32_t KeyForNode = GetKeyForNode(potherMesh, usotherTri);
+                        int32_t v15 = AStarSearch_GetOrCreateAStarNode_6A7E00(this, KeyForNode, a1, &pnode);
+                        if (v15) {
+                            if (v15 != 1) {
+                                continue;
+                            }
+                        }
+                        else {
+                            SetNodeData(pnode, potherMesh, usotherTri);
+                        }
+                        pnode->ParentLink.pNavMesh = apNode->tNodeData.pNavMesh;
+                        pnode->ParentLink.sTriangle = apNode->tNodeData.sTriangle;
+                        pnode->ParentLink.iEdgeIndex = i;
+                        apRetNodes->Add(pnode);
                     }
                 }
             }
@@ -157,27 +154,26 @@ bool NavMeshSearchLOS::IsGoalNode(const AStarNode<NavMeshSearchNode, NavMeshSear
         }
         return false;
     }
-    else {
-        const BSSimpleArray<NiPoint3, 1024>* ignoreLocations = &pCurrentRequest->IgnoreLocations;
-        for (uint32_t i = 0;; ++i) {
-            uint32_t FormFlags = ignoreLocations->iSize;
-            if (i >= FormFlags) {
-                return true;
-            }
-            apNode->tNodeData.GetCenter(&triangleCenter);
-            NiPoint3 vec = triangleCenter - ignoreLocations->GetAt(static_cast<int32_t>(i));
-            // The squared distance is kept as a double.
-            double fdistanceSquared = vec.SqrXYLength();
-            double fradius = pCurrentRequest->fIgnoreLocationRadius;
-            if (pCurrentRequest->fIgnoreLocationRadius * fradius > fdistanceSquared) {
-                break;
-            }
+
+    const BSSimpleArray<NiPoint3, 1024>* ignoreLocations = &pCurrentRequest->IgnoreLocations;
+    for (uint32_t i = 0;; ++i) {
+        uint32_t FormFlags = ignoreLocations->iSize;
+        if (i >= FormFlags) {
+            return true;
         }
-        if (!pFirstIgnoredGoal) {
-            pFirstIgnoredGoal = apNode;
+        apNode->tNodeData.GetCenter(&triangleCenter);
+        NiPoint3 vec = triangleCenter - ignoreLocations->GetAt(static_cast<int32_t>(i));
+        // The squared distance is kept as a double.
+        double fdistanceSquared = vec.SqrXYLength();
+        double fradius = pCurrentRequest->fIgnoreLocationRadius;
+        if (pCurrentRequest->fIgnoreLocationRadius * fradius > fdistanceSquared) {
+            break;
         }
-        return false;
     }
+    if (!pFirstIgnoredGoal) {
+        pFirstIgnoredGoal = apNode;
+    }
+    return false;
 }
 
 bool NavMeshSearchLOS::BuildNodePath(
@@ -240,10 +236,7 @@ bool NavMeshSearchLOS::BuildNodePath(
     }
     cMinLOSScore = BSMIN(spLOSMap.m_pObject->iMinScore + 1, -1);
     // goalLoc and then spgoalNodeMesh are destroyed after Search, on each return path, as the game does.
-    if (Search(apReturnNodeArray, apReturnLinkArray, false)) {
-        return true;
-    }
-    return false;
+    return Search(apReturnNodeArray, apReturnLinkArray, false);
 }
 
 void NavMeshSearchLOS::SetNodeData(

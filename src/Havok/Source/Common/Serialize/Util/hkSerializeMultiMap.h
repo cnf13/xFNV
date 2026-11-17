@@ -116,7 +116,7 @@ int32_t hkSerializeMultiMap<K, V>::removeByIndex(K key, int32_t removeIndex) {
         int32_t it = m_indexMap.findKey(key);
         int32_t headIndex = m_indexMap.getValue(it);
         if (headIndex == removeIndex) {
-            m_indexMap.m_map.m_elem[it].val = static_cast<typename hkPointerMap<K, int32_t>::Storage>(-1);
+            m_indexMap.m_map.m_elem[it].val = static_cast<hkPointerMap<K, int32_t>::Storage>(-1);
             freeIndex = removeIndex;
         }
         else if (m_valueChain.m_data[headIndex].next == removeIndex) {
@@ -126,7 +126,7 @@ int32_t hkSerializeMultiMap<K, V>::removeByIndex(K key, int32_t removeIndex) {
         else {
             // The head's value moves into the removed one's place and the head's entry is freed.
             m_indexMap.m_map.m_elem[it].val =
-                static_cast<typename hkPointerMap<K, int32_t>::Storage>(m_valueChain.m_data[headIndex].next);
+                static_cast<hkPointerMap<K, int32_t>::Storage>(m_valueChain.m_data[headIndex].next);
             m_valueChain.m_data[removeIndex].value = m_valueChain.m_data[headIndex].value;
             freeIndex = headIndex;
         }

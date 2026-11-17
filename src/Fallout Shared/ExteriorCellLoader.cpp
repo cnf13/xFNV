@@ -73,10 +73,8 @@ void ExteriorCellLoader::RemoveCell(int32_t aiCellX, int32_t aiCellY) {
 }
 
 void ExteriorCellLoader::AttachLoadedCell(TESObjectCELL* apCell) {
-    if (apCell) {
-        if (apCell->Get3D()) {
-            TES::pInstance->AddToBuffer(apCell);
-        }
+    if ((apCell) && (apCell->Get3D())) {
+        TES::pInstance->AddToBuffer(apCell);
     }
 }
 
@@ -261,23 +259,19 @@ void ExteriorCellLoaderTask::Finish() {
 }
 
 void ExteriorCellLoaderTask::PostProcess() {
-    if (!IsCancelled()) {
-        if (pCellData->pCell) {
-            if (pCellData->bLoaded) {
-                pLoader->AttachLoadedCell(pCellData->pCell);
-            }
-        }
+    if ((!IsCancelled()) && (pCellData->pCell) && (pCellData->bLoaded)) {
+        pLoader->AttachLoadedCell(pCellData->pCell);
     }
+
     pCellData->bLoaded = false;
     pLoader->RemoveCell(pCellData->iX, pCellData->iY);
 }
 
 void ExteriorCellLoaderTask::Cancel(BS_TASK_STATE aePreviousState, void* apTaskOwner) {
-    if (pCellData->pCell) {
-        if (TES::pInstance->IsCellLoaded(pCellData->pCell, false)) {
-            pDataHandler->UnloadCell(pCellData->pCell);
-        }
+    if ((pCellData->pCell) && (TES::pInstance->IsCellLoaded(pCellData->pCell, false))) {
+        pDataHandler->UnloadCell(pCellData->pCell);
     }
+
     pLoader->RemoveCell(pCellData->iX, pCellData->iY);
 }
 

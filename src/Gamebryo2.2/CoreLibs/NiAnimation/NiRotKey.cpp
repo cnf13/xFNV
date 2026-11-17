@@ -59,11 +59,10 @@ NiQuaternion NiRotKey::GenInterp(
 ) {
     // The asm also takes the single-key path when fTime is -NI_INFINITY (compared as the double -FLT_MAX), which the
     // reference source does not.
-    if (uiNumKeys == 1 || fTime == -3.4028234663852886e+38) {
-        if (eType != EULERKEY) {
-            return pkKeys->m_quat;
-        }
+    if ((uiNumKeys == 1 || fTime == -3.4028234663852886e+38) && (eType != EULERKEY)) {
+        return pkKeys->m_quat;
     }
+
     if (eType == EULERKEY) {
         InterpFunction interp = ms_interps[static_cast<uint32_t>(ROTKEY) * NUMKEYTYPES + eType];
         NiQuaternion kQuat;

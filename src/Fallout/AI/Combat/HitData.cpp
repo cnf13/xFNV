@@ -66,9 +66,8 @@ int32_t BSMAX_3(uint16_t a1, int32_t a2) {
     if (a1 <= a2) {
         return a2;
     }
-    else {
-        return a1;
-    }
+
+    return a1;
 }
 
 HitData::HitData() {
@@ -80,228 +79,214 @@ void HitData::ReduceDamage(bool abIgnoreBlocking) {
     double v7;
     float fIncreaseDT;
     float fDecreaseDT;
-    if (pTarget) {
-        if (pTarget->IsActor()) {
-            if (static_cast<MagicTarget&>(*pTarget).IsInvulnerable()) {
-                fTotalDamage = 0.0f;
-                fHealthDamage = 0.0f;
-                fFatigueDamage = 0.0f;
+    if ((pTarget) && (pTarget->IsActor())) {
+        if (static_cast<MagicTarget&>(*pTarget).IsInvulnerable()) {
+            fTotalDamage = 0.0f;
+            fHealthDamage = 0.0f;
+            fFatigueDamage = 0.0f;
+        }
+        else {
+            float v33;
+            fTotalDamage = fHealthDamage;
+            float fMinWeaponDamage = fHealthDamage * fMinDamMultiplier.Float();
+            if (pWeapon) {
+                double v3;
+                if (pWeapon->GetCurrentAmmo(pAggressor)) {
+                    TESAmmo* CurrentAmmo = pWeapon->GetCurrentAmmo(pAggressor);
+                    BSSimpleList<TESAmmoEffect*>* pEffectList = CurrentAmmo->GetAmmoEffectList();
+                    v3 = TESAmmoEffect::ApplyAmmoEffect(AMMO_EFFECT_FATIGUE, pEffectList, fFatigueDamage);
+                }
+                else {
+                    v3 = TESAmmoEffect::ApplyAmmoEffect(AMMO_EFFECT_FATIGUE, nullptr, fFatigueDamage);
+                }
+                fFatigueDamage = v3;
+            }
+            float a1 = pTarget->GetActorFloatValue(ActorValue::DAMAGE_RESISTANCE);
+            v4 = BSMIN(a1, 100.0f) / 100.0;
+            float farmorRating = v4;
+            if (pTarget->bPlayerTeammate) {
+                float afCharisma = pPlayer->GetClampedActorFloatValue(ActorValue::CHARISMA);
+                float fNerveDRbonus = afCharisma * 0.05000000074505806 + 1.0;
+                farmorRating = farmorRating * fNerveDRbonus;
+            }
+            if (pWeapon) {
+                double v6;
+                if (pWeapon->GetCurrentAmmo(pAggressor)) {
+                    TESAmmo* v5 = pWeapon->GetCurrentAmmo(pAggressor);
+                    BSSimpleList<TESAmmoEffect*>* AmmoEffectList = v5->GetAmmoEffectList();
+                    v6 = TESAmmoEffect::ApplyAmmoEffect(AMMO_EFFECT_DR, AmmoEffectList, farmorRating);
+                }
+                else {
+                    v6 = TESAmmoEffect::ApplyAmmoEffect(AMMO_EFFECT_DR, nullptr, farmorRating);
+                }
+                farmorRating = v6;
+            }
+            float fmax = fMaxArmorRating.Float() / 100.0;
+            if (fmax < static_cast<double>(farmorRating)) {
+                farmorRating = fmax;
+            }
+            if (!(fFatigueDamage > 0.0)) {
+                v33 = CombatFormulas::CalcDamageToArmor(fHealthDamage, farmorRating);
             }
             else {
-                float v33;
-                fTotalDamage = fHealthDamage;
-                float fMinWeaponDamage = fHealthDamage * fMinDamMultiplier.Float();
-                if (pWeapon) {
-                    double v3;
-                    if (pWeapon->GetCurrentAmmo(pAggressor)) {
-                        TESAmmo* CurrentAmmo = pWeapon->GetCurrentAmmo(pAggressor);
-                        BSSimpleList<TESAmmoEffect*>* pEffectList = CurrentAmmo->GetAmmoEffectList();
-                        v3 = TESAmmoEffect::ApplyAmmoEffect(AMMO_EFFECT_FATIGUE, pEffectList, fFatigueDamage);
-                    }
-                    else {
-                        v3 = TESAmmoEffect::ApplyAmmoEffect(AMMO_EFFECT_FATIGUE, nullptr, fFatigueDamage);
-                    }
-                    fFatigueDamage = v3;
-                }
-                float a1 = pTarget->GetActorFloatValue(ActorValue::DAMAGE_RESISTANCE);
-                v4 = BSMIN(a1, 100.0f) / 100.0;
-                float farmorRating = v4;
-                if (pTarget->bPlayerTeammate) {
-                    float afCharisma = pPlayer->GetClampedActorFloatValue(ActorValue::CHARISMA);
-                    float fNerveDRbonus = afCharisma * 0.05000000074505806 + 1.0;
-                    farmorRating = farmorRating * fNerveDRbonus;
-                }
-                if (pWeapon) {
-                    double v6;
-                    if (pWeapon->GetCurrentAmmo(pAggressor)) {
-                        TESAmmo* v5 = pWeapon->GetCurrentAmmo(pAggressor);
-                        BSSimpleList<TESAmmoEffect*>* AmmoEffectList = v5->GetAmmoEffectList();
-                        v6 = TESAmmoEffect::ApplyAmmoEffect(AMMO_EFFECT_DR, AmmoEffectList, farmorRating);
-                    }
-                    else {
-                        v6 = TESAmmoEffect::ApplyAmmoEffect(AMMO_EFFECT_DR, nullptr, farmorRating);
-                    }
-                    farmorRating = v6;
-                }
-                float fmax = fMaxArmorRating.Float() / 100.0;
-                if (fmax < static_cast<double>(farmorRating)) {
-                    farmorRating = fmax;
-                }
-                if (!(fFatigueDamage > 0.0)) {
-                    v33 = CombatFormulas::CalcDamageToArmor(fHealthDamage, farmorRating);
+                v33 = 0.0f;
+            }
+            fArmorDamage = v33;
+            fHealthDamage = (1.0 - farmorRating) * fHealthDamage;
+            float fRatioDDTtoDamage = pTarget->GetActorFloatValue(ActorValue::DAMAGE_THRESHOLD);
+            v7 = BSMAX(fRatioDDTtoDamage, 0.0f);
+            float fDDT_2 = v7;
+            if (pTarget->bPlayerTeammate) {
+                float v46 = pPlayer->GetClampedActorFloatValue(ActorValue::CHARISMA);
+                float v45 = v46 * 0.05000000074505806 + 1.0;
+                fDDT_2 = fDDT_2 * v45;
+            }
+            float fOldDDT = fDDT_2;
+            if (pWeapon) {
+                double fDDT;
+                if (pWeapon->GetCurrentAmmo(pAggressor)) {
+                    TESAmmo* v8 = pWeapon->GetCurrentAmmo(pAggressor);
+                    BSSimpleList<TESAmmoEffect*>* v32 = v8->GetAmmoEffectList();
+                    fDDT = TESAmmoEffect::ApplyAmmoEffect(AMMO_EFFECT_DT, v32, fDDT_2);
                 }
                 else {
-                    v33 = 0.0f;
+                    fDDT = TESAmmoEffect::ApplyAmmoEffect(AMMO_EFFECT_DT, nullptr, fDDT_2);
                 }
-                fArmorDamage = v33;
-                fHealthDamage = (1.0 - farmorRating) * fHealthDamage;
-                float fRatioDDTtoDamage = pTarget->GetActorFloatValue(ActorValue::DAMAGE_THRESHOLD);
-                v7 = BSMAX(fRatioDDTtoDamage, 0.0f);
-                float fDDT_2 = v7;
-                if (pTarget->bPlayerTeammate) {
-                    float v46 = pPlayer->GetClampedActorFloatValue(ActorValue::CHARISMA);
-                    float v45 = v46 * 0.05000000074505806 + 1.0;
-                    fDDT_2 = fDDT_2 * v45;
-                }
-                float fOldDDT = fDDT_2;
-                if (pWeapon) {
-                    double fDDT;
-                    if (pWeapon->GetCurrentAmmo(pAggressor)) {
-                        TESAmmo* v8 = pWeapon->GetCurrentAmmo(pAggressor);
-                        BSSimpleList<TESAmmoEffect*>* v32 = v8->GetAmmoEffectList();
-                        fDDT = TESAmmoEffect::ApplyAmmoEffect(AMMO_EFFECT_DT, v32, fDDT_2);
+                fDDT_2 = fDDT;
+            }
+            if (!abIgnoreBlocking) {
+                bool v31 = !pTarget->IsParalyzed() && pTarget->GetBlocked();
+                BaseProcess* CurrentAIProcess = pTarget->pCurrentProcess;
+                bool v29 = !CurrentAIProcess->GetCurrentWeapon() && v31;
+                if (v31) {
+                    bool IsTargetWithinStrikeAngle;
+                    if (pSourceRef) {
+                        IsTargetWithinStrikeAngle =
+                            CombatUtilities::IsTargetWithinStrikeAngle(pTarget, pSourceRef, nullptr);
                     }
                     else {
-                        fDDT = TESAmmoEffect::ApplyAmmoEffect(AMMO_EFFECT_DT, nullptr, fDDT_2);
+                        IsTargetWithinStrikeAngle =
+                            CombatUtilities::IsTargetWithinStrikeAngle(pTarget, pAggressor, nullptr);
                     }
-                    fDDT_2 = fDDT;
-                }
-                if (!abIgnoreBlocking) {
-                    bool v31 = !pTarget->IsParalyzed() && pTarget->GetBlocked();
-                    BaseProcess* CurrentAIProcess = pTarget->pCurrentProcess;
-                    bool v29 = !CurrentAIProcess->GetCurrentWeapon() && v31;
-                    if (v31) {
-                        bool IsTargetWithinStrikeAngle;
-                        if (pSourceRef) {
-                            IsTargetWithinStrikeAngle =
-                                CombatUtilities::IsTargetWithinStrikeAngle(pTarget, pSourceRef, nullptr);
+                    if (IsTargetWithinStrikeAngle) {
+                        TESObjectWEAP* pTargetWeap;
+                        BaseProcess* v28 = pTarget->pCurrentProcess;
+                        if (v28->GetCurrentWeapon()) {
+                            BaseProcess* v27 = pTarget->pCurrentProcess;
+                            pTargetWeap = static_cast<TESObjectWEAP*>(v27->GetCurrentWeapon()->pContainerObj);
                         }
                         else {
-                            IsTargetWithinStrikeAngle =
-                                CombatUtilities::IsTargetWithinStrikeAngle(pTarget, pAggressor, nullptr);
+                            pTargetWeap = nullptr;
                         }
-                        if (IsTargetWithinStrikeAngle) {
-                            TESObjectWEAP* pTargetWeap;
-                            BaseProcess* v28 = pTarget->pCurrentProcess;
-                            if (v28->GetCurrentWeapon()) {
-                                BaseProcess* v27 = pTarget->pCurrentProcess;
-                                pTargetWeap = static_cast<TESObjectWEAP*>(v27->GetCurrentWeapon()->pContainerObj);
-                            }
-                            else {
-                                pTargetWeap = nullptr;
-                            }
-                            SetFlag(HitData::HD_BLOCKED, 1);
-                            if (pPlayer == pTarget) {
-                                float* v11 = &fCounterAttackTimer.Float();
-                                pPlayer->SetBlockCounterTimer(*v11);
-                            }
-                            bool IsWeaponDrawn = false;
-                            if (pTargetWeap) {
-                                IsWeaponDrawn = pTarget->IsWeaponDrawn();
-                            }
-                            int32_t iSkill = 0;
-                            if (pWeapon &&
-                                (pTargetWeap &&
-                                 (pTargetWeap->GetWeaponType() == WEAPON_TWO_HAND_MELEE ||
-                                  pTargetWeap->GetWeaponType() == WEAPON_ONE_HAND_MELEE))) {
-                                iSkill = pTarget->GetActorValue(ActorValue::MELEE_WEAPONS);
-                            }
-                            else {
-                                if (!pWeapon || (pTargetWeap && pTargetWeap->GetWeaponType() == WEAPON_HAND_TO_HAND)) {
-                                    iSkill = pTarget->GetActorValue(ActorValue::UNARMED);
-                                }
-                            }
-                            if (v29 && ((pWeapon && !pWeapon->IsMeleeWeapon()) || pSourceRef)) {
-                                fPercentBlocked = 0.0f;
-                            }
-                            else {
-                                fPercentBlocked = CombatFormulas::CalcBlock(iSkill);
-                            }
-                            if (fPercentBlocked > 0.0) {
-                                fDDT_2 = fDDT_2 + fPercentBlocked;
-                            }
-                            SetFlag(HitData::HD_BLOCK_WITH_WEAPON, IsWeaponDrawn);
+                        SetFlag(HitData::HD_BLOCKED, 1);
+                        if (pPlayer == pTarget) {
+                            float* v11 = &fCounterAttackTimer.Float();
+                            pPlayer->SetBlockCounterTimer(*v11);
                         }
-                    }
-                }
-                fDecreaseDT = 0.0f;
-                if (pAggressor) {
-                    if (!pWeapon) {
-                        pWeapon = static_cast<TESObjectWEAP*>(TESForm::GetFormByNumericID(500u));
-                    }
-                    BGSEntryPoint::HandleEntryPoint(
-                        BGSEntryPoint::ADJUST_DAMAGE_THRESHOLD_ATTACKER, pAggressor, pWeapon, pTarget, &fDecreaseDT
-                    );
-                }
-                fIncreaseDT = 0.0f;
-                if (pTarget) {
-                    if (pWeapon) {
-                        BGSEntryPoint::HandleEntryPoint(
-                            BGSEntryPoint::ADJUST_DAMAGE_THRESHOLD_DEFENDER, pTarget, pAggressor, pWeapon, &fIncreaseDT
-                        );
-                    }
-                    else {
-                        BGSEntryPoint::HandleEntryPoint(
-                            BGSEntryPoint::ADJUST_DAMAGE_THRESHOLD_DEFENDER, pTarget, pAggressor, pFists, &fIncreaseDT
-                        );
-                    }
-                }
-                fDDT_2 = fDDT_2 - fDecreaseDT + fIncreaseDT;
-                bool bArmorPierced = false;
-                if (fOldDDT > 0.0) {
-                    bArmorPierced = fDDT_2 <= 0.0;
-                }
-                fDDT_2 = BSMAX(0.0f, fDDT_2);
-                if (pAggressor) {
-                    if (pAggressor->pCurrentProcess) {
-                        BaseProcess* v25 = pAggressor->pCurrentProcess;
-                        if (v25->GetCurrentWeapon()) {
-                            BaseProcess* v24 = pAggressor->pCurrentProcess;
-                            ItemChange* v12 = v24->GetCurrentWeapon();
-                            if (v12->HasModEffectActive(12) && fDDT_2 > 0.0) {
-                                int32_t NumProjectiles = pWeapon->GetNumProjectiles(true, false, pAggressor);
-                                fDDT_2 = fDDT_2 / static_cast<double>(NumProjectiles);
-                            }
+                        bool IsWeaponDrawn = false;
+                        if (pTargetWeap) {
+                            IsWeaponDrawn = pTarget->IsWeaponDrawn();
                         }
-                    }
-                }
-                if (pWeapon && (pWeapon->IsAutomaticWeapon() && pWeapon->IsMeleeWeapon())) {
-                    uint16_t v13 = static_cast<TESAttackDamageForm*>(pWeapon)->GetAttackDamage();
-                    float fDam = static_cast<float>(BSMAX_3(v13, 1));
-                    float fRatioDDTtoDamage_2 = 1.0 - fDDT_2 / fDam;
-                    float fRatioDDTtoDamage_3 = BSMAX(fRatioDDTtoDamage_2, 0.0f);
-                    fHealthDamage = fHealthDamage * fRatioDDTtoDamage_3;
-                }
-                else {
-                    fHealthDamage = fHealthDamage - fDDT_2;
-                }
-                if (pWeapon) {
-                    double v15;
-                    if (pWeapon->GetCurrentAmmo(pAggressor)) {
-                        TESAmmo* v14 = pWeapon->GetCurrentAmmo(pAggressor);
-                        BSSimpleList<TESAmmoEffect*>* v22 = v14->GetAmmoEffectList();
-                        v15 = TESAmmoEffect::ApplyAmmoEffect(AMMO_EFFECT_DAM, v22, fHealthDamage);
-                    }
-                    else {
-                        v15 = TESAmmoEffect::ApplyAmmoEffect(AMMO_EFFECT_DAM, nullptr, fHealthDamage);
-                    }
-                    fHealthDamage = v15;
-                }
-                if (pWeapon) {
-                    BGSEntryPoint::HandleEntryPoint(
-                        BGSEntryPoint::CALCULATE_WEAPON_DAMAGE, pAggressor, pWeapon, pTarget, &fHealthDamage
-                    );
-                }
-                if (fFatigueDamage <= 0.0) {
-                    float v21 = fHealthDamage - fMinWeaponDamage;
-                    double v20 = BSMIN(fDDT_2, v21);
-                    float fArmorDamageFromDT = fDamageToArmorPercentage.Float() * v20;
-                    fArmorDamage = fArmorDamage + fArmorDamageFromDT;
-                }
-                if (!(fMinWeaponDamage > static_cast<double>(fHealthDamage))) {
-                    if (bArmorPierced) {
-                        if (pTarget == pPlayer) {
-                            Interface::ShowDDTIcon(bArmorPierced);
+                        int32_t iSkill = 0;
+                        if (pWeapon &&
+                            (pTargetWeap &&
+                             (pTargetWeap->GetWeaponType() == WEAPON_TWO_HAND_MELEE ||
+                              pTargetWeap->GetWeaponType() == WEAPON_ONE_HAND_MELEE))) {
+                            iSkill = pTarget->GetActorValue(ActorValue::MELEE_WEAPONS);
                         }
                         else {
-                            if (pAggressor == pPlayer && !pTarget->IsDead(false)) {
-                                Interface::ShowEnemyDDTIcon(bArmorPierced);
+                            if (!pWeapon || (pTargetWeap && pTargetWeap->GetWeaponType() == WEAPON_HAND_TO_HAND)) {
+                                iSkill = pTarget->GetActorValue(ActorValue::UNARMED);
                             }
                         }
+                        if (v29 && ((pWeapon && !pWeapon->IsMeleeWeapon()) || pSourceRef)) {
+                            fPercentBlocked = 0.0f;
+                        }
+                        else {
+                            fPercentBlocked = CombatFormulas::CalcBlock(iSkill);
+                        }
+                        if (fPercentBlocked > 0.0) {
+                            fDDT_2 = fDDT_2 + fPercentBlocked;
+                        }
+                        SetFlag(HitData::HD_BLOCK_WITH_WEAPON, IsWeaponDrawn);
                     }
                 }
+            }
+            fDecreaseDT = 0.0f;
+            if (pAggressor) {
+                if (!pWeapon) {
+                    pWeapon = static_cast<TESObjectWEAP*>(TESForm::GetFormByNumericID(500u));
+                }
+                BGSEntryPoint::HandleEntryPoint(
+                    BGSEntryPoint::ADJUST_DAMAGE_THRESHOLD_ATTACKER, pAggressor, pWeapon, pTarget, &fDecreaseDT
+                );
+            }
+            fIncreaseDT = 0.0f;
+            if (pTarget) {
+                if (pWeapon) {
+                    BGSEntryPoint::HandleEntryPoint(
+                        BGSEntryPoint::ADJUST_DAMAGE_THRESHOLD_DEFENDER, pTarget, pAggressor, pWeapon, &fIncreaseDT
+                    );
+                }
                 else {
-                    fHealthDamage = fMinWeaponDamage;
+                    BGSEntryPoint::HandleEntryPoint(
+                        BGSEntryPoint::ADJUST_DAMAGE_THRESHOLD_DEFENDER, pTarget, pAggressor, pFists, &fIncreaseDT
+                    );
+                }
+            }
+            fDDT_2 = fDDT_2 - fDecreaseDT + fIncreaseDT;
+            bool bArmorPierced = false;
+            if (fOldDDT > 0.0) {
+                bArmorPierced = fDDT_2 <= 0.0;
+            }
+            fDDT_2 = BSMAX(0.0f, fDDT_2);
+            if ((pAggressor) && (pAggressor->pCurrentProcess)) {
+                BaseProcess* v25 = pAggressor->pCurrentProcess;
+                if (v25->GetCurrentWeapon()) {
+                    BaseProcess* v24 = pAggressor->pCurrentProcess;
+                    ItemChange* v12 = v24->GetCurrentWeapon();
+                    if (v12->HasModEffectActive(12) && fDDT_2 > 0.0) {
+                        int32_t NumProjectiles = pWeapon->GetNumProjectiles(true, false, pAggressor);
+                        fDDT_2 = fDDT_2 / static_cast<double>(NumProjectiles);
+                    }
+                }
+            }
+
+            if (pWeapon && (pWeapon->IsAutomaticWeapon() && pWeapon->IsMeleeWeapon())) {
+                uint16_t v13 = static_cast<TESAttackDamageForm*>(pWeapon)->GetAttackDamage();
+                float fDam = static_cast<float>(BSMAX_3(v13, 1));
+                float fRatioDDTtoDamage_2 = 1.0 - fDDT_2 / fDam;
+                float fRatioDDTtoDamage_3 = BSMAX(fRatioDDTtoDamage_2, 0.0f);
+                fHealthDamage = fHealthDamage * fRatioDDTtoDamage_3;
+            }
+            else {
+                fHealthDamage = fHealthDamage - fDDT_2;
+            }
+            if (pWeapon) {
+                double v15;
+                if (pWeapon->GetCurrentAmmo(pAggressor)) {
+                    TESAmmo* v14 = pWeapon->GetCurrentAmmo(pAggressor);
+                    BSSimpleList<TESAmmoEffect*>* v22 = v14->GetAmmoEffectList();
+                    v15 = TESAmmoEffect::ApplyAmmoEffect(AMMO_EFFECT_DAM, v22, fHealthDamage);
+                }
+                else {
+                    v15 = TESAmmoEffect::ApplyAmmoEffect(AMMO_EFFECT_DAM, nullptr, fHealthDamage);
+                }
+                fHealthDamage = v15;
+            }
+            if (pWeapon) {
+                BGSEntryPoint::HandleEntryPoint(
+                    BGSEntryPoint::CALCULATE_WEAPON_DAMAGE, pAggressor, pWeapon, pTarget, &fHealthDamage
+                );
+            }
+            if (fFatigueDamage <= 0.0) {
+                float v21 = fHealthDamage - fMinWeaponDamage;
+                double v20 = BSMIN(fDDT_2, v21);
+                float fArmorDamageFromDT = fDamageToArmorPercentage.Float() * v20;
+                fArmorDamage = fArmorDamage + fArmorDamageFromDT;
+            }
+            if (!(fMinWeaponDamage > static_cast<double>(fHealthDamage))) {
+                if (bArmorPierced) {
                     if (pTarget == pPlayer) {
                         Interface::ShowDDTIcon(bArmorPierced);
                     }
@@ -310,147 +295,149 @@ void HitData::ReduceDamage(bool abIgnoreBlocking) {
                             Interface::ShowEnemyDDTIcon(bArmorPierced);
                         }
                     }
-                    if (pAggressor) {
-                        if (pAggressor->bPlayerTeammate) {
-                            FollowerBarks::TriggerFollowerBark(pAggressor, FollowerBarks::BARK_WEAPON_INEFFECTIVE);
-                        }
+                }
+            }
+            else {
+                fHealthDamage = fMinWeaponDamage;
+                if (pTarget == pPlayer) {
+                    Interface::ShowDDTIcon(bArmorPierced);
+                }
+                else {
+                    if (pAggressor == pPlayer && !pTarget->IsDead(false)) {
+                        Interface::ShowEnemyDDTIcon(bArmorPierced);
                     }
                 }
-                if (pWeapon) {
-                    if (pWeapon->data.eResistance != ActorValue::VALUE_NONE) {
-                        ActorValue::Index WeaponEnchantmentVisuals = pWeapon->data.eResistance;
-                        float a1a = pTarget->GetActorFloatValue(WeaponEnchantmentVisuals);
-                        float fresistance = BSMIN(a1a, 100.0f) / 100.0;
-                        if (fresistance > 0.0 && fresistance <= 1.0) {
-                            fHealthDamage = (1.0 - fresistance) * fHealthDamage;
-                        }
-                    }
+                if ((pAggressor) && (pAggressor->bPlayerTeammate)) {
+                    FollowerBarks::TriggerFollowerBark(pAggressor, FollowerBarks::BARK_WEAPON_INEFFECTIVE);
                 }
-                if (fFatigueDamage > 0.0 && fTotalDamage > 0.0) {
-                    float fpercentHealthDamaged = fHealthDamage / fTotalDamage;
-                    fFatigueDamage = fFatigueDamage * fpercentHealthDamaged;
+            }
+            if ((pWeapon) && (pWeapon->data.eResistance != ActorValue::VALUE_NONE)) {
+                ActorValue::Index WeaponEnchantmentVisuals = pWeapon->data.eResistance;
+                float a1a = pTarget->GetActorFloatValue(WeaponEnchantmentVisuals);
+                float fresistance = BSMIN(a1a, 100.0f) / 100.0;
+                if (fresistance > 0.0 && fresistance <= 1.0) {
+                    fHealthDamage = (1.0 - fresistance) * fHealthDamage;
                 }
-                if (pTarget == pPlayer && pVATS.IsInVats()) {
-                    fHealthDamage = fHealthDamage * fVATSPlayerDamageMult.Float();
-                    fTotalDamage = fTotalDamage * fVATSPlayerDamageMult.Float();
-                    fFatigueDamage = fFatigueDamage * fVATSPlayerDamageMult.Float();
-                    fTargetedLimbDamage = fTargetedLimbDamage * fVATSPlayerDamageMult.Float();
-                    fArmorDamage = fArmorDamage * fVATSPlayerDamageMult.Float();
-                    fDamageToWeapon = fDamageToWeapon * fVATSPlayerDamageMult.Float();
-                }
+            }
+
+            if (fFatigueDamage > 0.0 && fTotalDamage > 0.0) {
+                float fpercentHealthDamaged = fHealthDamage / fTotalDamage;
+                fFatigueDamage = fFatigueDamage * fpercentHealthDamaged;
+            }
+            if (pTarget == pPlayer && pVATS.IsInVats()) {
+                fHealthDamage = fHealthDamage * fVATSPlayerDamageMult.Float();
+                fTotalDamage = fTotalDamage * fVATSPlayerDamageMult.Float();
+                fFatigueDamage = fFatigueDamage * fVATSPlayerDamageMult.Float();
+                fTargetedLimbDamage = fTargetedLimbDamage * fVATSPlayerDamageMult.Float();
+                fArmorDamage = fArmorDamage * fVATSPlayerDamageMult.Float();
+                fDamageToWeapon = fDamageToWeapon * fVATSPlayerDamageMult.Float();
             }
         }
     }
 }
 
 void HitData::DetermineOutcome() {
-    if (this->pTarget) {
-        // IsInvulnerable is called through the target's MagicTarget base, with no null test on the adjustment, as the
-        // game does.
-        if (this->pTarget->IsActor() && !static_cast<MagicTarget&>(*this->pTarget).IsInvulnerable()) {
-            if (fBonusMult > 0.0) {
-                if (fBonusMult >= 1.0 && IsFlagSet(HitData::HD_SNEAK_ATTACK)) {
-                    if (pWeapon && !pWeapon->IsMeleeWeapon()) {
-                        fBonusMult = fBonusMult * fCombatDamageBonusSneakingMult.Float();
-                    }
-                    else {
-                        fBonusMult = fBonusMult * fCombatDamageBonusMeleeSneakingMult.Float();
-                    }
-                }
-                fHealthDamage = fHealthDamage * fBonusMult;
-                if (pAggressor) {
-                    if (!pAggressor->IsCreature() && eAttackSkill == ActorValue::UNARMED) {
-                        fFatigueDamage = fFatigueDamage * fBonusMult;
-                    }
-                }
-                fTotalDamage = fTotalDamage * fBonusMult;
-            }
-            float fshotMultiplier = 1.0f;
-            if (pVATSCommand) {
-                if (pVATSCommand->cFireShots > 1u) {
-                    fshotMultiplier = static_cast<float>(pVATSCommand->cFireShots);
-                }
-            }
-            int32_t iexplodeChance = 0;
-            bool balwaysExplode = false;
-            bool bexplodeAbsolute = false;
-            if (eDamageLimb == BGSBodyPart::LIMB_WEAPON) {
-                TESObjectWEAP* ptargetWeapon;
-                BaseProcess* CurrentAIProcess = this->pTarget->pCurrentProcess;
-                ItemChange* ptargetWeaponItem = CurrentAIProcess->GetCurrentWeapon();
-                if (ptargetWeaponItem) {
-                    ptargetWeapon = static_cast<TESObjectWEAP*>(ptargetWeaponItem->pContainerObj);
+    if ((this->pTarget) && (this->pTarget->IsActor() && !static_cast<MagicTarget&>(*this->pTarget).IsInvulnerable()))
+    // IsInvulnerable is called through the target's MagicTarget base, with no null test on the adjustment, as the
+    // game does.
+    {
+        if (fBonusMult > 0.0) {
+            if (fBonusMult >= 1.0 && IsFlagSet(HitData::HD_SNEAK_ATTACK)) {
+                if (pWeapon && !pWeapon->IsMeleeWeapon()) {
+                    fBonusMult = fBonusMult * fCombatDamageBonusSneakingMult.Float();
                 }
                 else {
-                    ptargetWeapon = nullptr;
+                    fBonusMult = fBonusMult * fCombatDamageBonusMeleeSneakingMult.Float();
                 }
-                if (ptargetWeapon) {
-                    float fcurrentHealth = ptargetWeaponItem->GetItemHealth(false);
-                    if (fcurrentHealth - fTargetedLimbDamage <= 0.0) {
-                        if (this->pTarget->IsCreature() || ptargetWeapon->IsEmbeddedWeapon()) {
-                            SetFlag(HitData::HD_DISABLE_WEAPON, 1);
-                        }
-                        else {
-                            SetFlag(HitData::HD_DISARM, 1);
-                        }
-                    }
-                }
+            }
+            fHealthDamage = fHealthDamage * fBonusMult;
+            if ((pAggressor) && (!pAggressor->IsCreature() && eAttackSkill == ActorValue::UNARMED)) {
+                fFatigueDamage = fFatigueDamage * fBonusMult;
+            }
+
+            fTotalDamage = fTotalDamage * fBonusMult;
+        }
+        float fshotMultiplier = 1.0f;
+        if ((pVATSCommand) && (pVATSCommand->cFireShots > 1u)) {
+            fshotMultiplier = static_cast<float>(pVATSCommand->cFireShots);
+        }
+
+        int32_t iexplodeChance = 0;
+        bool balwaysExplode = false;
+        bool bexplodeAbsolute = false;
+        if (eDamageLimb == BGSBodyPart::LIMB_WEAPON) {
+            TESObjectWEAP* ptargetWeapon;
+            BaseProcess* CurrentAIProcess = this->pTarget->pCurrentProcess;
+            ItemChange* ptargetWeaponItem = CurrentAIProcess->GetCurrentWeapon();
+            if (ptargetWeaponItem) {
+                ptargetWeapon = static_cast<TESObjectWEAP*>(ptargetWeaponItem->pContainerObj);
             }
             else {
-                if (eDamageLimb != BGSBodyPart::LIMB_NONE) {
-                    TESActorBase* ActorBase = this->pTarget->GetActorBase();
-                    BGSBodyPartData* pbodyPartData = ActorBase->GetBodyPartData();
-                    if (pbodyPartData) {
-                        BGSBodyPart* pbodyPart = pbodyPartData->GetBodyPart(eDamageLimb);
-                        if (pbodyPart) {
-                            if (pbodyPart->IsExplodablePart()) {
-                                iexplodeChance = pbodyPart->GetExplosionChance();
-                                bexplodeAbsolute = pbodyPart->IsExplodeChanceAbsolute();
-                                bool v3 = bexplodeAbsolute && iexplodeChance >= 100;
-                                balwaysExplode = v3;
-                                ActorValue::Index econditionAV =
-                                    static_cast<ActorValue::Index>(pbodyPart->GetActorValue());
-                                float flimbCondition = this->pTarget->GetActorFloatValue(econditionAV);
-                                if (flimbCondition > 0.0 && flimbCondition - fTargetedLimbDamage <= 0.0) {
-                                    SetFlag(HitData::HD_CRIPPLE_LIMB, 1);
-                                }
-                            }
+                ptargetWeapon = nullptr;
+            }
+            if (ptargetWeapon) {
+                float fcurrentHealth = ptargetWeaponItem->GetItemHealth(false);
+                if (fcurrentHealth - fTargetedLimbDamage <= 0.0) {
+                    if (this->pTarget->IsCreature() || ptargetWeapon->IsEmbeddedWeapon()) {
+                        SetFlag(HitData::HD_DISABLE_WEAPON, 1);
+                    }
+                    else {
+                        SetFlag(HitData::HD_DISARM, 1);
+                    }
+                }
+            }
+        }
+        else {
+            if (eDamageLimb != BGSBodyPart::LIMB_NONE) {
+                TESActorBase* ActorBase = this->pTarget->GetActorBase();
+                BGSBodyPartData* pbodyPartData = ActorBase->GetBodyPartData();
+                if (pbodyPartData) {
+                    BGSBodyPart* pbodyPart = pbodyPartData->GetBodyPart(eDamageLimb);
+                    if ((pbodyPart) && (pbodyPart->IsExplodablePart())) {
+                        iexplodeChance = pbodyPart->GetExplosionChance();
+                        bexplodeAbsolute = pbodyPart->IsExplodeChanceAbsolute();
+                        bool v3 = bexplodeAbsolute && iexplodeChance >= 100;
+                        balwaysExplode = v3;
+                        ActorValue::Index econditionAV = static_cast<ActorValue::Index>(pbodyPart->GetActorValue());
+                        float flimbCondition = this->pTarget->GetActorFloatValue(econditionAV);
+                        if (flimbCondition > 0.0 && flimbCondition - fTargetedLimbDamage <= 0.0) {
+                            SetFlag(HitData::HD_CRIPPLE_LIMB, 1);
                         }
                     }
                 }
             }
-            float fcurrentHealth_2 = this->pTarget->GetActorFloatValue(ActorValue::HEALTH);
-            if (fcurrentHealth_2 - fHealthDamage * fshotMultiplier <= 0.0) {
-                SetFlag(HitData::HD_FATAL, 1);
-                if (eDamageLimb != BGSBodyPart::LIMB_NONE) {
-                    bool bdismember = false;
-                    bool bexplode = balwaysExplode;
-                    if (!balwaysExplode) {
-                        TESObjectWEAP* apWeapon;
-                        if (pWeapon) {
-                            apWeapon = pWeapon;
-                        }
-                        else {
-                            apWeapon = eAttackSkill != ActorValue::UNARMED ? nullptr : pFists;
-                        }
-                        Actor* pTarget = this->pTarget;
-                        if (pTarget) {
-                            CombatFormulas::CheckDismemberOrExplode(
-                                pTarget, apWeapon, iexplodeChance, 0, 0, bexplodeAbsolute, bdismember, bexplode
-                            );
-                        }
-                        else {
-                            CombatFormulas::CheckDismemberOrExplode(
-                                nullptr, apWeapon, iexplodeChance, 0, 0, bexplodeAbsolute, bdismember, bexplode
-                            );
-                        }
+        }
+        float fcurrentHealth_2 = this->pTarget->GetActorFloatValue(ActorValue::HEALTH);
+        if (fcurrentHealth_2 - fHealthDamage * fshotMultiplier <= 0.0) {
+            SetFlag(HitData::HD_FATAL, 1);
+            if (eDamageLimb != BGSBodyPart::LIMB_NONE) {
+                bool bdismember = false;
+                bool bexplode = balwaysExplode;
+                if (!balwaysExplode) {
+                    TESObjectWEAP* apWeapon;
+                    if (pWeapon) {
+                        apWeapon = pWeapon;
                     }
-                    if (bdismember) {
-                        SetFlag(HitData::HD_DISMEMBER_LIMB, 1);
+                    else {
+                        apWeapon = eAttackSkill != ActorValue::UNARMED ? nullptr : pFists;
                     }
-                    if (bexplode) {
-                        SetFlag(HitData::HD_EXPLODE_LIMB, 1);
+                    Actor* pTarget = this->pTarget;
+                    if (pTarget) {
+                        CombatFormulas::CheckDismemberOrExplode(
+                            pTarget, apWeapon, iexplodeChance, 0, 0, bexplodeAbsolute, bdismember, bexplode
+                        );
                     }
+                    else {
+                        CombatFormulas::CheckDismemberOrExplode(
+                            nullptr, apWeapon, iexplodeChance, 0, 0, bexplodeAbsolute, bdismember, bexplode
+                        );
+                    }
+                }
+                if (bdismember) {
+                    SetFlag(HitData::HD_DISMEMBER_LIMB, 1);
+                }
+                if (bexplode) {
+                    SetFlag(HitData::HD_EXPLODE_LIMB, 1);
                 }
             }
         }
@@ -530,216 +517,203 @@ void HitData::SetTargetedLimb(Projectile* apProjectile) {
     int32_t v79;
     void* retaddr;
     int32_t* v74 = &v79;
-    if (this->pTarget) {
-        if (this->pTarget->IsActor()) {
-            TESActorBase* ActorBase = this->pTarget->GetActorBase();
-            BGSBodyPartData* pbodyPartData = ActorBase->GetBodyPartData();
-            BGSBodyPart* pbodyPart = nullptr;
-            char v69 = 0;
-            if (this->pVATSCommand) {
-                if (this->pVATSCommand->eLimb == ActorValue::VALUE_NONE) {
-                    if (ActionPoints::IsMeleeAttackAction(this->pVATSCommand->eAction)) {
-                        if (this->IsFlagSet(HitData::HD_IGNORE_CRITICAL)) {
-                            this->eDamageLimb = BGSBodyPart::LIMB_TORSO;
-                        }
-                        else {
-                            v69 = 1;
-                        }
+    if ((this->pTarget) && (this->pTarget->IsActor())) {
+        TESActorBase* ActorBase = this->pTarget->GetActorBase();
+        BGSBodyPartData* pbodyPartData = ActorBase->GetBodyPartData();
+        BGSBodyPart* pbodyPart = nullptr;
+        char v69 = 0;
+        if (this->pVATSCommand) {
+            if (this->pVATSCommand->eLimb == ActorValue::VALUE_NONE) {
+                if (ActionPoints::IsMeleeAttackAction(this->pVATSCommand->eAction)) {
+                    if (this->IsFlagSet(HitData::HD_IGNORE_CRITICAL)) {
+                        this->eDamageLimb = BGSBodyPart::LIMB_TORSO;
                     }
                     else {
-                        this->eDamageLimb = BGSBodyPart::LIMB_WEAPON;
+                        v69 = 1;
                     }
                 }
                 else {
-                    if (pbodyPartData) {
-                        BGSBodyPart::LIMB_ENUM PartType;
-                        pbodyPart = pbodyPartData->GetBodyPart_005E5130(this->pVATSCommand->eLimb);
-                        if (pbodyPart) {
-                            PartType = pbodyPart->GetPartType();
-                        }
-                        else {
-                            PartType = BGSBodyPart::LIMB_WEAPON;
-                        }
-                        this->eDamageLimb = PartType;
-                    }
+                    this->eDamageLimb = BGSBodyPart::LIMB_WEAPON;
                 }
             }
             else {
-                if (apProjectile) {
-                    v69 = 0;
-                    Projectile::ImpactData* pimpactData = apProjectile->GetImpactData(this->pTarget);
-                    if (pimpactData) {
-                        this->eDamageLimb = pimpactData->eDamageLimb;
-                        pbodyPart = pbodyPartData->GetBodyPart(this->eDamageLimb);
-                        this->kHitLocation = pimpactData->kLocation;
-                        this->kHitDirection = apProjectile->GetMovementDirection();
-                        this->kHitDirection.Unitize();
-                        NiPoint3* fScalar = &(v65 = -pimpactData->kNormal);
-                        this->kHitDirection.operator+=(*fScalar);
-                        this->kHitDirection.Unitize();
-                    }
-                }
-                else {
-                    v69 = 1;
-                }
-            }
-            if (v69) {
-                NiPoint3 viewdir;
-                alignas(16) NiPoint3 eyepos;
-                NiPoint3 roughHitPos = this->pAggressor->GetWeaponPosition(true);
-                this->pAggressor->GetEyeVector(eyepos, viewdir, false);
-                NiPoint3 origin = eyepos;
-                NiPoint3 direction = viewdir * 200.0f;
-                float fdistance = 200.0f;
-                char v58 = 0;
-                alignas(16) BSWeightedRandom<BGSBodyPart*> bodyPartChooser;
-                TESObjectCELL* pcell = this->pAggressor->GetParentCell();
-                if (pcell) {
-                    HitCaster* phitCaster = HitCaster::GetInstance(
-                        static_cast<HitCaster::HitCasterSize>(this->pAggressor != pPlayer), true
-                    );
-                    bhkWorld* v3 = pcell->GetbhkWorld();
-                    phitCaster->Add(v3);
-                    phitCaster->CastShape(origin, viewdir, fdistance);
-                    hkpAllCdPointCollector* pcollector = phitCaster;
-                    hkBool* v4 = pcollector->hasHit(&v53);
-                    if (v4->operator bool()) {
-                        for (int32_t i = 0;; ++i) {
-                            int32_t FormHealth_0 = (&pcollector->getHits())->m_size;
-                            if (i >= FormHealth_0) {
-                                break;
-                            }
-                            const hkpRootCdPoint* v6 = &(&pcollector->getHits())->operator[]<hkpRootCdPoint>(i);
-                            hkpRootCdPoint hitPoint(*v6);
-                            NiAVObject* pav = GetAVObjectForCollidable(hitPoint.m_rootCollidableB);
-                            Actor* pref = static_cast<Actor*>(TESObjectREFR::FindReferenceFor3D(pav));
-                            if (pref) {
-                                if (pref == this->pTarget) {
-                                    HK2NI(roughHitPos, (&hitPoint.m_contact)->m_position);
-                                    if (hkpGetRigidBody(hitPoint.m_rootCollidableB)) {
-                                        BGSBodyPart::LIMB_ENUM elimb;
-                                        if (!v58) {
-                                            v58 = 1;
-                                            hkVector4* fScalara = &(&hitPoint.m_contact)->m_position;
-                                            HK2NI(this->kHitLocation, *fScalara);
-                                            this->kHitDirection = viewdir;
-                                        }
-                                        if (pav->IsNode()) {
-                                            NiNode* v7 = pav->IsNode();
-                                            elimb = this->pTarget->GetDamageLocation(v7);
-                                        }
-                                        else {
-                                            NiNode* fScalarb = pav->m_pkParent;
-                                            elimb = this->pTarget->GetDamageLocation(fScalarb);
-                                        }
-                                        BGSBodyPart::LIMB_ENUM elimb_2 = elimb;
-                                        if (elimb != BGSBodyPart::LIMB_NONE && elimb_2 != BGSBodyPart::LIMB_WEAPON) {
-                                            BGSBodyPart* ppossibleHit = pbodyPartData->GetBodyPart(elimb_2);
-                                            if (ppossibleHit) {
-                                                if (!bodyPartChooser.IsResultInSet(ppossibleHit)) {
-                                                    uint8_t WaitingForRayCasts = ppossibleHit->Data.cToHitChance;
-                                                    bodyPartChooser.AddWeightedResult(ppossibleHit, WaitingForRayCasts);
-                                                }
-                                            }
-                                        }
-                                    }
-                                }
-                            }
-                        }
-                    }
-                }
-                if (!v58) {
-                    if (this->pTarget->Get3D()) {
-                        if (this->pAggressor->Get3D()) {
-                            hkVector4 pos;
-                            NiNode* v9 = this->pTarget->Get3D();
-                            NiPoint3 victimPos = (&v9->GetWorldBound())->m_kCenter;
-                            NiNode* v10 = this->pAggressor->Get3D();
-                            alignas(16) NiPoint3 attackerPos = (&v10->GetWorldBound())->m_kCenter;
-                            this->kHitLocation =
-                                victimPos + (this->pAggressor->GetWeaponPosition(true) - victimPos) / 6.0f;
-                            this->kHitDirection = victimPos - attackerPos;
-                            ::new (&hitSphere) NiBound;
-                            NI2HK(pos, roughHitPos);
-                            hitSphere.setPosition(pos);
-                            hitSphere.setRadius(200.0f);
-                            NiNode* v16 = this->pTarget->Get3D();
-                            bhkRigidBody* prb = bhkUtilFunctions::GetClosestBody(v16, hitSphere, 0);
-                            if (prb) {
-                                v58 = 1;
-                                const hkpCollidable* Collidable = prb->GetCollidable();
-                                NiAVObject* pav_2 = GetAVObjectForCollidable(Collidable);
-                                if (pav_2) {
-                                    BGSBodyPart::LIMB_ENUM DamageLocation;
-                                    if (pav_2->IsNode()) {
-                                        NiNode* v18 = pav_2->IsNode();
-                                        DamageLocation = this->pTarget->GetDamageLocation(v18);
-                                    }
-                                    else {
-                                        NiNode* fScalarc = pav_2->m_pkParent;
-                                        DamageLocation = this->pTarget->GetDamageLocation(fScalarc);
-                                    }
-                                    if (DamageLocation != BGSBodyPart::LIMB_NONE) {
-                                        BGSBodyPart* ppossibleHit_2 = pbodyPartData->GetBodyPart(DamageLocation);
-                                        if (ppossibleHit_2) {
-                                            if (!bodyPartChooser.IsResultInSet(ppossibleHit_2)) {
-                                                uint8_t v19 = ppossibleHit_2->Data.cToHitChance;
-                                                bodyPartChooser.AddWeightedResult(ppossibleHit_2, v19);
-                                            }
-                                        }
-                                    }
-                                }
-                            }
-                        }
-                    }
-                }
-                if (v58) {
-                    BGSBodyPart::LIMB_ENUM v31;
-                    pbodyPart = bodyPartChooser.PickResult();
+                if (pbodyPartData) {
+                    BGSBodyPart::LIMB_ENUM PartType;
+                    pbodyPart = pbodyPartData->GetBodyPart_005E5130(this->pVATSCommand->eLimb);
                     if (pbodyPart) {
-                        v31 = pbodyPart->GetPartType();
+                        PartType = pbodyPart->GetPartType();
                     }
                     else {
-                        v31 = BGSBodyPart::LIMB_NONE;
+                        PartType = BGSBodyPart::LIMB_WEAPON;
                     }
-                    this->eDamageLimb = v31;
+                    this->eDamageLimb = PartType;
                 }
             }
-            if (this->eDamageLimb == BGSBodyPart::LIMB_WEAPON) {
-                this->fTargetedLimbDamage = this->fHealthDamage;
-                if (this->pVATSCommand) {
-                    float* v20 = &fVATSDamageToWeaponMult.Float();
-                    this->fTargetedLimbDamage = this->fTargetedLimbDamage * *v20;
+        }
+        else {
+            if (apProjectile) {
+                v69 = 0;
+                Projectile::ImpactData* pimpactData = apProjectile->GetImpactData(this->pTarget);
+                if (pimpactData) {
+                    this->eDamageLimb = pimpactData->eDamageLimb;
+                    pbodyPart = pbodyPartData->GetBodyPart(this->eDamageLimb);
+                    this->kHitLocation = pimpactData->kLocation;
+                    this->kHitDirection = apProjectile->GetMovementDirection();
+                    this->kHitDirection.Unitize();
+                    NiPoint3* fScalar = &(v65 = -pimpactData->kNormal);
+                    this->kHitDirection.operator+=(*fScalar);
+                    this->kHitDirection.Unitize();
                 }
-                this->fHealthDamage = 0.0f;
             }
             else {
-                if (pbodyPart) {
-                    double v21;
-                    BGSBodyPart::LIMB_ENUM v30 = pbodyPart->GetPartType();
-                    this->eDamageLimb = v30;
-                    Actor* pTarget = this->pTarget;
-                    if (pTarget) {
-                        v21 = CombatFormulas::CalcTargetedLimbDamage(pTarget, pbodyPart, this->fHealthDamage);
+                v69 = 1;
+            }
+        }
+        if (v69) {
+            NiPoint3 viewdir;
+            alignas(16) NiPoint3 eyepos;
+            NiPoint3 roughHitPos = this->pAggressor->GetWeaponPosition(true);
+            this->pAggressor->GetEyeVector(eyepos, viewdir, false);
+            NiPoint3 origin = eyepos;
+            NiPoint3 direction = viewdir * 200.0f;
+            float fdistance = 200.0f;
+            char v58 = 0;
+            alignas(16) BSWeightedRandom<BGSBodyPart*> bodyPartChooser;
+            TESObjectCELL* pcell = this->pAggressor->GetParentCell();
+            if (pcell) {
+                HitCaster* phitCaster =
+                    HitCaster::GetInstance(static_cast<HitCaster::HitCasterSize>(this->pAggressor != pPlayer), true);
+                bhkWorld* v3 = pcell->GetbhkWorld();
+                phitCaster->Add(v3);
+                phitCaster->CastShape(origin, viewdir, fdistance);
+                hkpAllCdPointCollector* pcollector = phitCaster;
+                hkBool* v4 = pcollector->hasHit(&v53);
+                if (v4->operator bool()) {
+                    for (int32_t i = 0;; ++i) {
+                        int32_t FormHealth_0 = (&pcollector->getHits())->m_size;
+                        if (i >= FormHealth_0) {
+                            break;
+                        }
+                        const hkpRootCdPoint* v6 = &(&pcollector->getHits())->operator[]<hkpRootCdPoint>(i);
+                        hkpRootCdPoint hitPoint(*v6);
+                        NiAVObject* pav = GetAVObjectForCollidable(hitPoint.m_rootCollidableB);
+                        Actor* pref = static_cast<Actor*>(TESObjectREFR::FindReferenceFor3D(pav));
+                        if ((pref) && (pref == this->pTarget)) {
+                            HK2NI(roughHitPos, (&hitPoint.m_contact)->m_position);
+                            if (hkpGetRigidBody(hitPoint.m_rootCollidableB)) {
+                                BGSBodyPart::LIMB_ENUM elimb;
+                                if (!v58) {
+                                    v58 = 1;
+                                    hkVector4* fScalara = &(&hitPoint.m_contact)->m_position;
+                                    HK2NI(this->kHitLocation, *fScalara);
+                                    this->kHitDirection = viewdir;
+                                }
+                                if (pav->IsNode()) {
+                                    NiNode* v7 = pav->IsNode();
+                                    elimb = this->pTarget->GetDamageLocation(v7);
+                                }
+                                else {
+                                    NiNode* fScalarb = pav->m_pkParent;
+                                    elimb = this->pTarget->GetDamageLocation(fScalarb);
+                                }
+                                BGSBodyPart::LIMB_ENUM elimb_2 = elimb;
+                                if (elimb != BGSBodyPart::LIMB_NONE && elimb_2 != BGSBodyPart::LIMB_WEAPON) {
+                                    BGSBodyPart* ppossibleHit = pbodyPartData->GetBodyPart(elimb_2);
+                                    if ((ppossibleHit) && (!bodyPartChooser.IsResultInSet(ppossibleHit))) {
+                                        uint8_t WaitingForRayCasts = ppossibleHit->Data.cToHitChance;
+                                        bodyPartChooser.AddWeightedResult(ppossibleHit, WaitingForRayCasts);
+                                    }
+                                }
+                            }
+                        }
                     }
-                    else {
-                        v21 = CombatFormulas::CalcTargetedLimbDamage(nullptr, pbodyPart, this->fHealthDamage);
-                    }
-                    this->fTargetedLimbDamage = v21;
-                    if (this->pTarget->IsPc()) {
-                        float* v22 = &fCombatPlayerLimbDamageMult.Float();
-                        this->fTargetedLimbDamage = this->fTargetedLimbDamage * *v22;
-                    }
-                    float fbonusMult = pbodyPart->Data.fDamageMult;
-                    if (!this->pWeapon || this->pWeapon->IsMeleeWeapon()) {
-                        fbonusMult = 1.0f;
-                    }
-                    if (this->pWeapon) {
-                        double LimbDamageMult = this->pWeapon->GetLimbDamageMult();
-                        this->fTargetedLimbDamage = LimbDamageMult * this->fTargetedLimbDamage;
-                    }
-                    this->SetBonusMult(fbonusMult);
                 }
+            }
+            if ((!v58) && (this->pTarget->Get3D()) && (this->pAggressor->Get3D())) {
+                hkVector4 pos;
+                NiNode* v9 = this->pTarget->Get3D();
+                NiPoint3 victimPos = (&v9->GetWorldBound())->m_kCenter;
+                NiNode* v10 = this->pAggressor->Get3D();
+                alignas(16) NiPoint3 attackerPos = (&v10->GetWorldBound())->m_kCenter;
+                this->kHitLocation = victimPos + (this->pAggressor->GetWeaponPosition(true) - victimPos) / 6.0f;
+                this->kHitDirection = victimPos - attackerPos;
+                ::new (&hitSphere) NiBound;
+                NI2HK(pos, roughHitPos);
+                hitSphere.setPosition(pos);
+                hitSphere.setRadius(200.0f);
+                NiNode* v16 = this->pTarget->Get3D();
+                bhkRigidBody* prb = bhkUtilFunctions::GetClosestBody(v16, hitSphere, 0);
+                if (prb) {
+                    v58 = 1;
+                    const hkpCollidable* Collidable = prb->GetCollidable();
+                    NiAVObject* pav_2 = GetAVObjectForCollidable(Collidable);
+                    if (pav_2) {
+                        BGSBodyPart::LIMB_ENUM DamageLocation;
+                        if (pav_2->IsNode()) {
+                            NiNode* v18 = pav_2->IsNode();
+                            DamageLocation = this->pTarget->GetDamageLocation(v18);
+                        }
+                        else {
+                            NiNode* fScalarc = pav_2->m_pkParent;
+                            DamageLocation = this->pTarget->GetDamageLocation(fScalarc);
+                        }
+                        if (DamageLocation != BGSBodyPart::LIMB_NONE) {
+                            BGSBodyPart* ppossibleHit_2 = pbodyPartData->GetBodyPart(DamageLocation);
+                            if ((ppossibleHit_2) && (!bodyPartChooser.IsResultInSet(ppossibleHit_2))) {
+                                uint8_t v19 = ppossibleHit_2->Data.cToHitChance;
+                                bodyPartChooser.AddWeightedResult(ppossibleHit_2, v19);
+                            }
+                        }
+                    }
+                }
+            }
+
+            if (v58) {
+                BGSBodyPart::LIMB_ENUM v31;
+                pbodyPart = bodyPartChooser.PickResult();
+                if (pbodyPart) {
+                    v31 = pbodyPart->GetPartType();
+                }
+                else {
+                    v31 = BGSBodyPart::LIMB_NONE;
+                }
+                this->eDamageLimb = v31;
+            }
+        }
+        if (this->eDamageLimb == BGSBodyPart::LIMB_WEAPON) {
+            this->fTargetedLimbDamage = this->fHealthDamage;
+            if (this->pVATSCommand) {
+                float* v20 = &fVATSDamageToWeaponMult.Float();
+                this->fTargetedLimbDamage = this->fTargetedLimbDamage * *v20;
+            }
+            this->fHealthDamage = 0.0f;
+        }
+        else {
+            if (pbodyPart) {
+                double v21;
+                BGSBodyPart::LIMB_ENUM v30 = pbodyPart->GetPartType();
+                this->eDamageLimb = v30;
+                Actor* pTarget = this->pTarget;
+                if (pTarget) {
+                    v21 = CombatFormulas::CalcTargetedLimbDamage(pTarget, pbodyPart, this->fHealthDamage);
+                }
+                else {
+                    v21 = CombatFormulas::CalcTargetedLimbDamage(nullptr, pbodyPart, this->fHealthDamage);
+                }
+                this->fTargetedLimbDamage = v21;
+                if (this->pTarget->IsPc()) {
+                    float* v22 = &fCombatPlayerLimbDamageMult.Float();
+                    this->fTargetedLimbDamage = this->fTargetedLimbDamage * *v22;
+                }
+                float fbonusMult = pbodyPart->Data.fDamageMult;
+                if (!this->pWeapon || this->pWeapon->IsMeleeWeapon()) {
+                    fbonusMult = 1.0f;
+                }
+                if (this->pWeapon) {
+                    double LimbDamageMult = this->pWeapon->GetLimbDamageMult();
+                    this->fTargetedLimbDamage = LimbDamageMult * this->fTargetedLimbDamage;
+                }
+                this->SetBonusMult(fbonusMult);
             }
         }
     }
@@ -876,11 +850,11 @@ void HitData::InitializeHitData(
             bapplyDamage = true;
         }
         bool v20 = bapplyDamage;
-        if (apData->pVATSCommand) {
-            if (!apData->pVATSCommand->bSuccess && (!apData->pWeapon || apData->pWeapon->IsMeleeWeapon())) {
-                v20 = true;
-            }
+        if ((apData->pVATSCommand) &&
+            (!apData->pVATSCommand->bSuccess && (!apData->pWeapon || apData->pWeapon->IsMeleeWeapon()))) {
+            v20 = true;
         }
+
         Animation* v5 = apAggressor->GetAnimation();
         uint16_t eanimGroup = v5->GetGroup(AGS_WEAPON);
         ANIM_GROUP_ENUM eattackGroup = TESAnimGroup::GetType(eanimGroup);
@@ -907,20 +881,20 @@ void HitData::InitializeHitData(
                     ModifiedAttackDamage = apWeaponItem->GetModifiedAttackDamage(nullptr, fdamageMultiplier, false);
                 }
                 apData->fHealthDamage = ModifiedAttackDamage;
-                if (apData->pVATSCommand) {
-                    if (apData->pVATSCommand->cFireShots > 1u && apData->IsFlagSet(HitData::HD_PREDICT_DAMAGE)) {
-                        int32_t cFireShots = apData->pVATSCommand->cFireShots;
-                        ModifiedAttackDamage =
-                            static_cast<double>(cFireShots / apData->pWeapon->GetAmmoPerShot()) * apData->fHealthDamage;
-                        apData->fHealthDamage = ModifiedAttackDamage;
-                    }
+                if ((apData->pVATSCommand) &&
+                    (apData->pVATSCommand->cFireShots > 1u && apData->IsFlagSet(HitData::HD_PREDICT_DAMAGE))) {
+                    int32_t cFireShots = apData->pVATSCommand->cFireShots;
+                    ModifiedAttackDamage =
+                        static_cast<double>(cFireShots / apData->pWeapon->GetAmmoPerShot()) * apData->fHealthDamage;
+                    apData->fHealthDamage = ModifiedAttackDamage;
                 }
-                if (apData->pVATSCommand) {
-                    if (apData->pWeapon->IsMeleeWeapon() && apData->pWeapon->IsAutomaticWeapon()) {
-                        ModifiedAttackDamage = apData->fHealthDamage * fVATSAutomaticMeleeDamageMult.Float();
-                        apData->fHealthDamage = ModifiedAttackDamage;
-                    }
+
+                if ((apData->pVATSCommand) &&
+                    (apData->pWeapon->IsMeleeWeapon() && apData->pWeapon->IsAutomaticWeapon())) {
+                    ModifiedAttackDamage = apData->fHealthDamage * fVATSAutomaticMeleeDamageMult.Float();
+                    apData->fHealthDamage = ModifiedAttackDamage;
                 }
+
                 if (apData->pVATSCommand) {
                     switch (apData->pVATSCommand->eAction) {
                         case ActionPoints::ACTION_PLAYER_SPECIAL_WEAPON_ATTACK: {
@@ -989,13 +963,9 @@ void HitData::InitializeHitData(
             if (apAggressor) {
                 ModifiedAttackDamage = apAggressor->fRefScale * apData->fHealthDamage;
                 apData->fHealthDamage = ModifiedAttackDamage;
-                if (apAggressor->IsPc()) {
-                    if (apData->pWeapon) {
-                        if (!apData->pWeapon->IsEmbeddedWeapon()) {
-                            ModifiedAttackDamage = CombatFormulas::CalcDamageToWeapon(apData->pAggressor);
-                            apData->fDamageToWeapon = ModifiedAttackDamage;
-                        }
-                    }
+                if ((apAggressor->IsPc()) && (apData->pWeapon) && (!apData->pWeapon->IsEmbeddedWeapon())) {
+                    ModifiedAttackDamage = CombatFormulas::CalcDamageToWeapon(apData->pAggressor);
+                    apData->fDamageToWeapon = ModifiedAttackDamage;
                 }
             }
             if (apAggressor->bPlayerTeammate) {
@@ -1053,23 +1023,19 @@ void HitData::InitializeHitData(
 }
 
 void HitData::InitializeHitData(HitData* apData, VATS_COMMAND* apCommand) {
-    if (apData) {
-        if (apCommand) {
-            if (apCommand->pTarget) {
-                Actor* apTarget;
-                apData->pVATSCommand = apCommand;
-                bool v5 = ActionPoints::IsMeleeAttackAction(apCommand->eAction) && apCommand->bSuccess;
-                if (apCommand->pTarget->IsActor()) {
-                    apTarget = static_cast<Actor*>(apCommand->pTarget);
-                }
-                else {
-                    apTarget = nullptr;
-                }
-                BaseProcess* CurrentAIProcess = pPlayer->GetCurrentAIProcess();
-                ItemChange* v2 = CurrentAIProcess->GetCurrentWeapon();
-                HitData::InitializeHitData(apData, pPlayer, apTarget, v2, v5);
-            }
+    if ((apData) && (apCommand) && (apCommand->pTarget)) {
+        Actor* apTarget;
+        apData->pVATSCommand = apCommand;
+        bool v5 = ActionPoints::IsMeleeAttackAction(apCommand->eAction) && apCommand->bSuccess;
+        if (apCommand->pTarget->IsActor()) {
+            apTarget = static_cast<Actor*>(apCommand->pTarget);
         }
+        else {
+            apTarget = nullptr;
+        }
+        BaseProcess* CurrentAIProcess = pPlayer->GetCurrentAIProcess();
+        ItemChange* v2 = CurrentAIProcess->GetCurrentWeapon();
+        HitData::InitializeHitData(apData, pPlayer, apTarget, v2, v5);
     }
 }
 
@@ -1099,9 +1065,8 @@ float HitData::PredictVATSCommandHealthDamage(VATS_COMMAND* apVATSCommand) {
         apVATSCommand->bSuccess = bsuccess;
         return hitData.fHealthDamage;
     }
-    else {
-        return 0.0f;
-    }
+
+    return 0.0f;
 }
 
 void HitData::InitializeHitData(
@@ -1131,36 +1096,35 @@ void HitData::InitializeExplosionData(
         apData->pAggressor = apAggressor;
         apData->pTarget = apTarget;
         apData->SetFlag(HitData::HD_EXPLOSION, 1);
-        if (apSourceRef) {
-            if (apSourceRef->IsExplosion()) {
-                apData->pWeapon = static_cast<Explosion*>(apSourceRef)->Explosion::GetSourceWeapon();
-                apData->fWeaponHealth = 1.0f;
-                if (static_cast<Explosion*>(apSourceRef)->GetOwner()) {
-                    TESObjectREFR* Owner = static_cast<Explosion*>(apSourceRef)->GetOwner();
-                    if (Owner->IsActor()) {
-                        Actor* pshooter = static_cast<Actor*>(static_cast<Explosion*>(apSourceRef)->GetOwner());
-                        if (pshooter->GetCurrentWeapon() == apData->pWeapon) {
-                            float ItemHealth;
-                            ItemChange* pcurrentWeaponItem;
-                            if (pshooter->pCurrentProcess) {
-                                BaseProcess* CurrentAIProcess = pshooter->pCurrentProcess;
-                                pcurrentWeaponItem = CurrentAIProcess->GetCurrentWeapon();
-                            }
-                            else {
-                                pcurrentWeaponItem = nullptr;
-                            }
-                            if (pcurrentWeaponItem) {
-                                ItemHealth = pcurrentWeaponItem->GetItemHealth(true);
-                            }
-                            else {
-                                ItemHealth = 1.0f;
-                            }
-                            apData->fWeaponHealth = ItemHealth;
+        if ((apSourceRef) && (apSourceRef->IsExplosion())) {
+            apData->pWeapon = static_cast<Explosion*>(apSourceRef)->Explosion::GetSourceWeapon();
+            apData->fWeaponHealth = 1.0f;
+            if (static_cast<Explosion*>(apSourceRef)->GetOwner()) {
+                TESObjectREFR* Owner = static_cast<Explosion*>(apSourceRef)->GetOwner();
+                if (Owner->IsActor()) {
+                    Actor* pshooter = static_cast<Actor*>(static_cast<Explosion*>(apSourceRef)->GetOwner());
+                    if (pshooter->GetCurrentWeapon() == apData->pWeapon) {
+                        float ItemHealth;
+                        ItemChange* pcurrentWeaponItem;
+                        if (pshooter->pCurrentProcess) {
+                            BaseProcess* CurrentAIProcess = pshooter->pCurrentProcess;
+                            pcurrentWeaponItem = CurrentAIProcess->GetCurrentWeapon();
                         }
+                        else {
+                            pcurrentWeaponItem = nullptr;
+                        }
+                        if (pcurrentWeaponItem) {
+                            ItemHealth = pcurrentWeaponItem->GetItemHealth(true);
+                        }
+                        else {
+                            ItemHealth = 1.0f;
+                        }
+                        apData->fWeaponHealth = ItemHealth;
                     }
                 }
             }
         }
+
         apData->pSourceRef = apSourceRef;
         apData->fHealthDamage = afDamage;
         apData->fTotalDamage = apData->fHealthDamage;

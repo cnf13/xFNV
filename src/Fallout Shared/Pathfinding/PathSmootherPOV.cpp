@@ -566,11 +566,10 @@ bool PathSmootherPOVSearch::CheckSegmentAgainstNavMesh(
         bool bfoundMatchingEdge = thisEdge.pNavMesh->GetMatchingEdge(thisEdge, &otherEdge);
         if (bfoundMatchingEdge) {
             EdgeExtraInfo* pextra = thisEdge.pNavMesh->GetEdgeExtraInfo(thisEdge.usTriangle, thisEdge.iEdgeIndex);
-            if (pextra) {
-                if (pextra->eType == EIT_LEDGE_UP) {
-                    bfoundMatchingEdge = false;
-                }
+            if ((pextra) && (pextra->eType == EIT_LEDGE_UP)) {
+                bfoundMatchingEdge = false;
             }
+
             double Speed = pRequest->fActorRadius;
             if (fPathingLargeActorRadius.Float() < Speed) {
                 NavMeshTriangle* v8 = otherEdge.pNavMesh->GetTriangle(otherEdge.usTriangle);
@@ -868,15 +867,14 @@ bool PathSmootherPOVSearch::SmoothPath(
         StartLocation.z = fStartZ;
     }
     bool bGoalUnderWater = false;
-    if (!(&apRequest->Destination)->QUnused()) {
-        if ((&aTriSolution.GetLast())->pNavMesh->pParentCell) {
-            NiPoint3* v10 = (&aTriSolution.GetLast())->GetCenter(&kGoalCenter);
-            TESObjectCELL* pCell = (&aTriSolution.GetLast())->pNavMesh->pParentCell;
-            if (v10->z < TES::pInstance->GetWaterHeight(aGoalLocation, pCell) + 50.0) {
-                bGoalUnderWater = true;
-            }
+    if ((!(&apRequest->Destination)->QUnused()) && ((&aTriSolution.GetLast())->pNavMesh->pParentCell)) {
+        NiPoint3* v10 = (&aTriSolution.GetLast())->GetCenter(&kGoalCenter);
+        TESObjectCELL* pCell = (&aTriSolution.GetLast())->pNavMesh->pParentCell;
+        if (v10->z < TES::pInstance->GetWaterHeight(aGoalLocation, pCell) + 50.0) {
+            bGoalUnderWater = true;
         }
     }
+
     if (!bGoalUnderWater) {
         fGoalZ = GoalLocation.z;
         (&aTriSolution.GetLast())
@@ -885,11 +883,10 @@ bool PathSmootherPOVSearch::SmoothPath(
             );
         GoalLocation.z = fGoalZ;
     }
-    if (bStartUnderWater) {
-        if (bGoalUnderWater) {
-            bUnderWaterPath = true;
-        }
+    if ((bStartUnderWater) && (bGoalUnderWater)) {
+        bUnderWaterPath = true;
     }
+
     LeftPOVs.SetReservedSize(aLinks.iSize);
     RightPOVs.SetReservedSize(aLinks.iSize);
     LeftVerts.SetReservedSize(aLinks.iSize);
@@ -1111,17 +1108,15 @@ void PathSmootherPOVSearch::CreatePathingNodes(bool abFailed) {
             }
             pSolution->AddPathingNode(exitLoc, exitTangent);
         }
-        if (bUnderWaterPath) {
-            if (i < Links.iSize - 1 || (pSolution->IsIncomplete() || abFailed)) {
-                TESObjectCELL* pCell = Links.GetAt(static_cast<int32_t>(i)).EntryLocation.pNavMesh->pParentCell;
-                float fwaterHeight_2 =
-                    TES::pInstance->GetWaterHeight(Links.GetAt(static_cast<int32_t>(i)).EntryLocation.Location, pCell);
-                if (Links.GetAt(static_cast<int32_t>(i)).EntryLocation.Location.z <=
-                    static_cast<double>(fwaterHeight_2)) {
-                    Links.GetAt(static_cast<int32_t>(i)).EntryLocation.Location.z = fwaterHeight_2;
-                }
+        if ((bUnderWaterPath) && (i < Links.iSize - 1 || (pSolution->IsIncomplete() || abFailed))) {
+            TESObjectCELL* pCell = Links.GetAt(static_cast<int32_t>(i)).EntryLocation.pNavMesh->pParentCell;
+            float fwaterHeight_2 =
+                TES::pInstance->GetWaterHeight(Links.GetAt(static_cast<int32_t>(i)).EntryLocation.Location, pCell);
+            if (Links.GetAt(static_cast<int32_t>(i)).EntryLocation.Location.z <= static_cast<double>(fwaterHeight_2)) {
+                Links.GetAt(static_cast<int32_t>(i)).EntryLocation.Location.z = fwaterHeight_2;
             }
         }
+
         NavMeshInfo* pEntryInfo = Links.GetAt(static_cast<int32_t>(i)).EntryLocation.pNavMesh->GetNavMeshInfo();
         PathingLocation entryLoc(&Links.GetAt(static_cast<int32_t>(i)).EntryLocation.Location, pEntryInfo);
         int32_t iEntryDirection = Nodes.GetAt(static_cast<int32_t>(i + 1)).Direction;
@@ -1151,21 +1146,19 @@ void PathSmootherPOVSearch::CreatePathingNodes(bool abFailed) {
         }
         pSolution->AddPathingNode(entryLoc, entryTangent);
     }
-    if (pRequest->GetFaceTargetAtGoal()) {
-        if (!Links.IsEmpty()) {
-            NiPoint3 lastTangent = pSolution->GetLastNode()->Tangent;
-            float flastTangentAngle = GetZAngleFromVector(lastTangent);
-            float fgoalAngle = pRequest->GetGoalAngleToFace();
-            float fangleDelta = fgoalAngle - flastTangentAngle;
-            BSWrap(fangleDelta, -3.1415927f, 3.1415927f);
-            if (std::fabs(fangleDelta) < 1.5707963267948966) {
-                float flength_4 = lastTangent.XYLength();
-                NiPoint3 newTangent;
-                newTangent.x = std::cos(fgoalAngle) * flength_4;
-                newTangent.y = std::sin(fgoalAngle) * flength_4;
-                newTangent.z = 0.0f;
-                pSolution->GetLastNode()->SetTangent(newTangent);
-            }
+    if ((pRequest->GetFaceTargetAtGoal()) && (!Links.IsEmpty())) {
+        NiPoint3 lastTangent = pSolution->GetLastNode()->Tangent;
+        float flastTangentAngle = GetZAngleFromVector(lastTangent);
+        float fgoalAngle = pRequest->GetGoalAngleToFace();
+        float fangleDelta = fgoalAngle - flastTangentAngle;
+        BSWrap(fangleDelta, -3.1415927f, 3.1415927f);
+        if (std::fabs(fangleDelta) < 1.5707963267948966) {
+            float flength_4 = lastTangent.XYLength();
+            NiPoint3 newTangent;
+            newTangent.x = std::cos(fgoalAngle) * flength_4;
+            newTangent.y = std::sin(fgoalAngle) * flength_4;
+            newTangent.z = 0.0f;
+            pSolution->GetLastNode()->SetTangent(newTangent);
         }
     }
 }
@@ -1708,7 +1701,6 @@ PathingNode* PathingSolution::GetLastNode() {
     if (CurrentPathingNodes.IsEmpty()) {
         return nullptr;
     }
-    else {
-        return static_cast<PathingNode*>(CurrentPathingNodes.GetTail());
-    }
+
+    return static_cast<PathingNode*>(CurrentPathingNodes.GetTail());
 }

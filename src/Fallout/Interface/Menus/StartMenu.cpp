@@ -286,9 +286,8 @@ uint32_t StartMenu::IdleTimer::GetElapsedTime() {
     if (static_cast<uint8_t>(GetPaused())) {
         return uiPaused - uiT0;
     }
-    else {
-        return BSGetTickCount() - uiT0;
-    }
+
+    return BSGetTickCount() - uiT0;
 }
 
 void StartMenu::IdleTimer::Stop() {
@@ -370,10 +369,8 @@ void StartMenu::AttachTileByID(int32_t aiID, Tile* apTile) {
 }
 
 void StartMenu::DoDownClick(int32_t aiID, Tile* apTarget) {
-    if (apTarget) {
-        if ((aiID == 100) || (aiID == 101)) {
-            apTarget->Set(4085, (-1));
-        }
+    if ((apTarget) && ((aiID == 100) || (aiID == 101))) {
+        apTarget->Set(4085, (-1));
     }
 }
 
@@ -494,18 +491,16 @@ void StartMenu::DoClick(int32_t aiID, Tile* apTarget) {
             LABEL_47:;
                 StartMenu::UserOption* puopt =
                     dynamic_cast<StartMenu::UserOption*>(lbOptions.GetDataFor(apTarget->pParent));
-                if (puopt) {
-                    if (aiID == 100 ||
-                        (aiID == 101 ||
-                         (puopt->eType == StartMenu::UserOption::UOPT_TOGGLE ||
-                          (puopt->eType == StartMenu::UserOption::UOPT_TOGGLE_NOWRAP &&
-                           puopt->iVal < puopt->iNumSettings - 1)))) {
-                        puopt->iVal =
-                            (2 * (aiID != 100) - 1 + (puopt->iNumSettings + puopt->iVal)) % puopt->iNumSettings;
-                        pDirtyOption = puopt;
-                        float afValuea = pMenu->GetFloat(Tile::kTileValue_Brightness);
-                        apTarget->Set(Tile::kTileValue_Brightness, afValuea, true);
-                    }
+                if ((puopt) &&
+                    (aiID == 100 ||
+                     (aiID == 101 ||
+                      (puopt->eType == StartMenu::UserOption::UOPT_TOGGLE ||
+                       (puopt->eType == StartMenu::UserOption::UOPT_TOGGLE_NOWRAP &&
+                        puopt->iVal < puopt->iNumSettings - 1))))) {
+                    puopt->iVal = (2 * (aiID != 100) - 1 + (puopt->iNumSettings + puopt->iVal)) % puopt->iNumSettings;
+                    pDirtyOption = puopt;
+                    float afValuea = pMenu->GetFloat(Tile::kTileValue_Brightness);
+                    apTarget->Set(Tile::kTileValue_Brightness, afValuea, true);
                 }
             }
         }
@@ -536,19 +531,16 @@ void StartMenu::DoEnter(int32_t aiID, Tile* apTarget) {
 
 void StartMenu::DoLeave(int32_t aiID, Tile* apTarget) {
     bool v4 = aiID == 100 || aiID == 101;
-    if (apTarget) {
-        if (v4) {
-            float afValue = pMenu->GetFloat(4085);
-            apTarget->Set(4085, afValue, true);
-        }
+    if ((apTarget) && (v4)) {
+        float afValue = pMenu->GetFloat(4085);
+        apTarget->Set(4085, afValue, true);
     }
+
     if (!InterfaceManager::Has360Controller() && lbSaveLoad.IsListItem(apTarget)) {
         UpdateHighlightedSaveGameInfo();
     }
-    if (!v4) {
-        if (pTiles[17]) {
-            pTiles[17]->Set(4003, 0);
-        }
+    if ((!v4) && (pTiles[17])) {
+        pTiles[17]->Set(4003, 0);
     }
 }
 
@@ -1484,17 +1476,15 @@ void StartMenu::FinishPrepSaveLoad() {
             // itself would be devirtualised.
             Tile* tTile = (&lbSaveLoad)->GetTileAt(static_cast<uint32_t>(i), false);
             BGSSaveLoadFileEntry* tSave = lbSaveLoad.GetDataAt(i, false);
-            if (tTile) {
-                if (tSave) {
-                    if (tSave->IsAutosave()) {
+            if ((tTile) && (tSave)) {
+                if (tSave->IsAutosave()) {
+                    lbSaveLoad.RemoveAt(static_cast<uint32_t>(i), false);
+                    --numitems;
+                }
+                else {
+                    if (tSave->IsSystemSave()) {
                         lbSaveLoad.RemoveAt(static_cast<uint32_t>(i), false);
                         --numitems;
-                    }
-                    else {
-                        if (tSave->IsSystemSave()) {
-                            lbSaveLoad.RemoveAt(static_cast<uint32_t>(i), false);
-                            --numitems;
-                        }
                     }
                 }
             }
@@ -1552,21 +1542,18 @@ void StartMenu::FinishPrepSaveLoad() {
 
 void StartMenu::DisplayOption(StartMenu::UserOption* apOption, Tile* apTile) {
     StartMenu::UserOption* aData;
-    if (apOption) {
-        if (!apTile) {
-            aData = apOption;
-            apTile = lbOptions.GetTileFor(aData);
-        }
+    if ((apOption) && (!apTile)) {
+        aData = apOption;
+        apTile = lbOptions.GetTileFor(aData);
     }
+
     if (apOption && apTile) {
         if (apOption->eType == StartMenu::UserOption::UOPT_METER) {
             apTile->Set(Tile::kTileValue_User0, apOption->iVal);
         }
         else {
-            if (apOption->pValueStrings) {
-                if (apOption->iVal >= 0 && apOption->iVal <= apOption->iNumSettings - 1) {
-                    apTile->Set(Tile::kTileValue_User0, apOption->pValueStrings[apOption->iVal], true);
-                }
+            if ((apOption->pValueStrings) && (apOption->iVal >= 0 && apOption->iVal <= apOption->iNumSettings - 1)) {
+                apTile->Set(Tile::kTileValue_User0, apOption->pValueStrings[apOption->iVal], true);
             }
         }
         if (apOption->eType == StartMenu::UserOption::UOPT_TOGGLE) {
@@ -1949,51 +1936,46 @@ bool StartMenu::SaveLoadFilterFn(BGSSaveLoadFileEntry* apSaveGame) {
 
 void StartMenu::Close(bool abDeleteOnFade) {
     NiTListItem<Tile*>* piter;
-    if (StartMenu::PauseMenuIsActive()) {
-        if (Interface::GetCurrentRenderedMenu()) {
-            FOPipboyManager* CurrentRenderedMenu = static_cast<FOPipboyManager*>(Interface::GetCurrentRenderedMenu());
-            if (CurrentRenderedMenu == Interface::GetPipboy()) {
-                FOPipboyManager* Pipboy = Interface::GetPipboy();
-                Pipboy->ResetColors();
-            }
+    if ((StartMenu::PauseMenuIsActive()) && (Interface::GetCurrentRenderedMenu())) {
+        FOPipboyManager* CurrentRenderedMenu = static_cast<FOPipboyManager*>(Interface::GetCurrentRenderedMenu());
+        if (CurrentRenderedMenu == Interface::GetPipboy()) {
+            FOPipboyManager* Pipboy = Interface::GetPipboy();
+            Pipboy->ResetColors();
         }
     }
-    if (StartMenu::pMe) {
-        if (!StartMenu::pMe->WaitingForControlRemapButtonPress()) {
-            if (Interface::InDialog()) {
-                Interface::SetDialogPause(false);
+
+    if ((StartMenu::pMe) && (!StartMenu::pMe->WaitingForControlRemapButtonPress())) {
+        if (Interface::InDialog()) {
+            Interface::SetDialogPause(false);
+        }
+        if (!StartMenu::pMe->IsFlagSet(StartMenu::FLAG_FORCE_RELOAD)) {
+            if (StartMenu::pMe->IsFlagSet(StartMenu::FLAG_ACTION_MAPPING)) {
+                StartMenu::pMe->lbOptions.Traverse(&StartMenu::DeleteOption, 0, 0x7FFFFFFF);
             }
-            if (!StartMenu::pMe->IsFlagSet(StartMenu::FLAG_FORCE_RELOAD)) {
-                if (StartMenu::pMe->IsFlagSet(StartMenu::FLAG_ACTION_MAPPING)) {
-                    StartMenu::pMe->lbOptions.Traverse(&StartMenu::DeleteOption, 0, 0x7FFFFFFF);
-                }
-                if (StartMenu::PauseMenuIsActive()) {
-                    MessageMenu::SetPauseMenuMode(false);
-                }
-                for (piter = StartMenu::xHiddenTiles.m_pkHead; piter;
-                     StartMenu::xHiddenTiles.GetNext(piter)->Set(4003, 1)) {
-                    ;
-                }
-                StartMenu::pMe->pMenu->Set(Tile::kTileValue_DeleteOnFade, static_cast<int32_t>(abDeleteOnFade));
-                StartMenu::pMe->StartFadeOut();
-                StartMenu::pMe = nullptr;
+            if (StartMenu::PauseMenuIsActive()) {
+                MessageMenu::SetPauseMenuMode(false);
             }
-            if (Interface::IsInRenderedMenu()) {
-                appMain->RenderMenuBackground();
+            for (piter = StartMenu::xHiddenTiles.m_pkHead; piter;
+                 StartMenu::xHiddenTiles.GetNext(piter)->Set(4003, 1)) {
+                ;
             }
+            StartMenu::pMe->pMenu->Set(Tile::kTileValue_DeleteOnFade, static_cast<int32_t>(abDeleteOnFade));
+            StartMenu::pMe->StartFadeOut();
+            StartMenu::pMe = nullptr;
+        }
+        if (Interface::IsInRenderedMenu()) {
+            appMain->RenderMenuBackground();
         }
     }
 }
 
 void StartMenu::ChooseUserAction() {
-    if (StartMenu::pMe) {
-        if (StartMenu::pMe->IsFlagSet(StartMenu::FLAG_ACTION_MAPPING)) {
-            const char* v0 = sPressControl.String();
-            StartMenu::pMe->pTiles[16]->Set(4036, v0, true);
-            StartMenu::pMe->pTiles[16]->Set(4003, 1);
-            if (InterfaceManager::Has360Controller() && StartMenu::pMe->uiCurrentControlsDevice == 3) {
-                StartMenu::pMe->pTiles[5]->Set(4015, 0);
-            }
+    if ((StartMenu::pMe) && (StartMenu::pMe->IsFlagSet(StartMenu::FLAG_ACTION_MAPPING))) {
+        const char* v0 = sPressControl.String();
+        StartMenu::pMe->pTiles[16]->Set(4036, v0, true);
+        StartMenu::pMe->pTiles[16]->Set(4003, 1);
+        if (InterfaceManager::Has360Controller() && StartMenu::pMe->uiCurrentControlsDevice == 3) {
+            StartMenu::pMe->pTiles[5]->Set(4015, 0);
         }
     }
 }
@@ -2047,15 +2029,13 @@ void StartMenu::SaveSettings() {
     if (v1->SaveAll(reinterpret_cast<char*>(v6))) {
         Controls* Controls_ = appMain->GetControls();
         Controls_->SaveControls();
-        if (StartMenu::pMe) {
-            if (StartMenu::pMe->IsFlagSet(StartMenu::FLAG_RESTART_REQUIRED)) {
-                const char* v3 = sOk.operator const char*();
-                Interface::CreateMessageMenu(
-                    sMustRestart.operator const char*(), static_cast<const char*>(nullptr),
-                    static_cast<const char*>(nullptr), static_cast<void (*)()>(nullptr), 0, 18, 0.0f, 0.0f, v3, nullptr
-                );
-                StartMenu::pMe->SetFlag(StartMenu::FLAG_RESTART_REQUIRED, 0);
-            }
+        if ((StartMenu::pMe) && (StartMenu::pMe->IsFlagSet(StartMenu::FLAG_RESTART_REQUIRED))) {
+            const char* v3 = sOk.operator const char*();
+            Interface::CreateMessageMenu(
+                sMustRestart.operator const char*(), static_cast<const char*>(nullptr),
+                static_cast<const char*>(nullptr), static_cast<void (*)()>(nullptr), 0, 18, 0.0f, 0.0f, v3, nullptr
+            );
+            StartMenu::pMe->SetFlag(StartMenu::FLAG_RESTART_REQUIRED, 0);
         }
     }
     else {
@@ -2906,28 +2886,24 @@ bool StartMenu::IsInPreIIS() {
 void StartMenu::ConfirmResetToDefaults() {
     Controls* controls;
     uint32_t uiCurrentControlsDevice;
-    if (StartMenu::pMe) {
-        if (Interface::GetMessageMenuResult() == 1) {
-            uiCurrentControlsDevice = StartMenu::pMe->uiCurrentControlsDevice;
-            controls = appMain->GetControls();
-            controls->InitDefaultKeybinds(uiCurrentControlsDevice);
-            StartMenu::pMe->SetFlag(FLAG_OPTIONS_DIRTY, 1);
-            (&StartMenu::pMe->lbOptions)
-                ->ListBox<StartMenu::Option*>::Traverse(&StartMenu::SetActionForDevice, 0, 2147483647);
-        }
+    if ((StartMenu::pMe) && (Interface::GetMessageMenuResult() == 1)) {
+        uiCurrentControlsDevice = StartMenu::pMe->uiCurrentControlsDevice;
+        controls = appMain->GetControls();
+        controls->InitDefaultKeybinds(uiCurrentControlsDevice);
+        StartMenu::pMe->SetFlag(FLAG_OPTIONS_DIRTY, 1);
+        (&StartMenu::pMe->lbOptions)
+            ->ListBox<StartMenu::Option*>::Traverse(&StartMenu::SetActionForDevice, 0, 2147483647);
     }
 }
 
 void StartMenu::ResetToDefaults(Tile* apTile, StartMenu::Option* apOption) {
     StartMenu::UserOption* puserOption = dynamic_cast<StartMenu::UserOption*>(apOption);
-    if (puserOption) {
-        if (puserOption->iVal != puserOption->iDefaultVal) {
-            puserOption->iVal = puserOption->iDefaultVal;
-            StartMenu::pMe->DisplayOption(puserOption, apTile);
-            if (puserOption->pfChangeFn) {
-                puserOption->pfChangeFn(puserOption);
-                StartMenu::pMe->SetFlag(StartMenu::FLAG_OPTIONS_DIRTY, 1);
-            }
+    if ((puserOption) && (puserOption->iVal != puserOption->iDefaultVal)) {
+        puserOption->iVal = puserOption->iDefaultVal;
+        StartMenu::pMe->DisplayOption(puserOption, apTile);
+        if (puserOption->pfChangeFn) {
+            puserOption->pfChangeFn(puserOption);
+            StartMenu::pMe->SetFlag(StartMenu::FLAG_OPTIONS_DIRTY, 1);
         }
     }
 }
@@ -3096,12 +3072,11 @@ void StartMenu::ChooseDownloads() {
         StartMenu::pMe->lbDownloads.AddItem(-1, v0, nullptr, nullptr);
         while (ecx0) {
             TESFile* v2 = ecx0->m_item;
-            if (v2) {
-                if (v2->GetMaybeShouldBeReloaded()) {
-                    char* v1 = v2->GetSummary()->pString;
-                    StartMenu::pMe->lbDownloads.AddItem(0, v1, nullptr, nullptr);
-                }
+            if ((v2) && (v2->GetMaybeShouldBeReloaded())) {
+                char* v1 = v2->GetSummary()->pString;
+                StartMenu::pMe->lbDownloads.AddItem(0, v1, nullptr, nullptr);
             }
+
             ecx0 = ecx0->m_pkNext;
         }
         StartMenu::pMe->lbDownloads.SetEnabled(true);
@@ -3638,11 +3613,10 @@ void StartMenu::ConfirmNewGame() {
         pPlayer->SetDisableFastTravelResetsOnCellChange(0);
         pPlayer->SetCanFastTravel(true);
     }
-    if (pform) {
-        if (pform->GetFormType() == QUST_ID) {
-            pcharGenQuest = dynamic_cast<TESQuest*>(pform);
-        }
+    if ((pform) && (pform->GetFormType() == QUST_ID)) {
+        pcharGenQuest = dynamic_cast<TESQuest*>(pform);
     }
+
     if (pcharGenQuest) {
         StartMenu::Close(false);
         ArchiveManager::CleanupArchiveStringsAfterStartup();
@@ -3675,37 +3649,29 @@ void StartMenu::ConfirmNewGame() {
 }
 
 void StartMenu::ConfirmLoadGame() {
-    if (StartMenu::pMe) {
-        if (StartMenu::pMe->pSaveGame) {
-            ArchiveManager::CleanupArchiveStringsAfterStartup();
-            BGSSaveLoadFileEntry* psavegame = StartMenu::pMe->pSaveGame;
-            if (pPlayer) {
-                if (StartMenu::PauseMenuIsActive()) {
-                    TESNPC* tempPlayer = dynamic_cast<TESNPC*>(pPlayer->GetObjectReference());
-                    if (tempPlayer) {
-                        if (tempPlayer->GetFullName()) {
-                            if (psavegame->GetPlayerName()) {
-                                const char* PlayerName = psavegame->GetPlayerName();
-                                if (BSstrcmp(tempPlayer->GetFullName(), PlayerName)) {
-                                    TES::pInstance->ShowLoadingMenu(true, nullptr, false);
-                                }
-                            }
-                        }
-                    }
+    if ((StartMenu::pMe) && (StartMenu::pMe->pSaveGame)) {
+        ArchiveManager::CleanupArchiveStringsAfterStartup();
+        BGSSaveLoadFileEntry* psavegame = StartMenu::pMe->pSaveGame;
+        if ((pPlayer) && (StartMenu::PauseMenuIsActive())) {
+            TESNPC* tempPlayer = dynamic_cast<TESNPC*>(pPlayer->GetObjectReference());
+            if ((tempPlayer) && (tempPlayer->GetFullName()) && (psavegame->GetPlayerName())) {
+                const char* PlayerName = psavegame->GetPlayerName();
+                if (BSstrcmp(tempPlayer->GetFullName(), PlayerName)) {
+                    TES::pInstance->ShowLoadingMenu(true, nullptr, false);
                 }
             }
-            bool bresult = psavegame->LoadGame();
-            if (StartMenu::pMe && (StartMenu::pMe->IsFlagSet(StartMenu::FLAG_INGAME) && bresult)) {
-                StartMenu::Close(true);
+        }
+
+        bool bresult = psavegame->LoadGame();
+        if (StartMenu::pMe && (StartMenu::pMe->IsFlagSet(StartMenu::FLAG_INGAME) && bresult)) {
+            StartMenu::Close(true);
+        }
+        else {
+            if ((!bresult) && (StartMenu::pMe)) {
+                StartMenu::pMe->IsFlagSet(StartMenu::FLAG_20000000);
             }
-            else {
-                if (!bresult) {
-                    if (StartMenu::pMe) {
-                        StartMenu::pMe->IsFlagSet(StartMenu::FLAG_20000000);
-                    }
-                }
-                StartMenu::ChooseBack();
-            }
+
+            StartMenu::ChooseBack();
         }
     }
 }
@@ -3720,88 +3686,80 @@ void StartMenu::ConfirmSaveGame() {
 }
 
 void StartMenu::ConfirmDeleteGm() {
-    if (StartMenu::pMe) {
-        if ((&StartMenu::pMe->lbSaveLoad)->GetHighlightedItem()) {
-            ListBox<BGSSaveLoadFileEntry*>* plb = &StartMenu::pMe->lbSaveLoad;
-            StartMenu::pMe->lbSaveLoad.GetHighlightedData()->DeleteGame();
-            Tile* v0 = static_cast<Tile*>(plb->GetHighlightedItem());
-            plb->RemoveItem(v0);
-            StartMenu::ChooseBack();
-            uint32_t numitems = -1;
-            uint32_t icnt = plb->NumUnfiltered();
-            uint32_t ivis = plb->NumVisible();
-            if (icnt) {
-                int32_t v1;
-                if (icnt >= ivis &&
-                    (v1 = Tile::AddUserTrait("_current_value", -1),
-                     StartMenu::pMe->fSaveLoadThreshold == plb->pScrollBar->GetFloat(v1))) {
-                    int32_t iindex =
-                        static_cast<int32_t>(static_cast<double>(ivis) + StartMenu::pMe->fSaveLoadThreshold - 1.0);
-                    plb->Traverse(&StartMenu::InitializeSaveLoadListItem, iindex, iindex + 1);
-                    numitems = StartMenu::pMe->lbSaveLoad.NumItems();
-                    if (StartMenu::pMe->IsFlagSet(StartMenu::FLAG_SAVE_MODE)) {
-                        for (int32_t i = 0; i < StartMenu::pMe->lbSaveLoad.NumItems(); ++i) {
-                            Tile* tTile = (&StartMenu::pMe->lbSaveLoad)->GetTileAt(static_cast<uint32_t>(i), false);
-                            BGSSaveLoadFileEntry* tSave = StartMenu::pMe->lbSaveLoad.GetDataAt(i, false);
-                            if (tTile) {
-                                if (tSave) {
-                                    if (tSave->IsAutosave()) {
-                                        StartMenu::pMe->lbSaveLoad.RemoveAt(static_cast<uint32_t>(i), false);
-                                        --numitems;
-                                    }
-                                    else {
-                                        if (tSave->IsSystemSave()) {
-                                            StartMenu::pMe->lbSaveLoad.RemoveAt(static_cast<uint32_t>(i), false);
-                                            --numitems;
-                                        }
-                                    }
+    if ((StartMenu::pMe) && ((&StartMenu::pMe->lbSaveLoad)->GetHighlightedItem())) {
+        ListBox<BGSSaveLoadFileEntry*>* plb = &StartMenu::pMe->lbSaveLoad;
+        StartMenu::pMe->lbSaveLoad.GetHighlightedData()->DeleteGame();
+        Tile* v0 = static_cast<Tile*>(plb->GetHighlightedItem());
+        plb->RemoveItem(v0);
+        StartMenu::ChooseBack();
+        uint32_t numitems = -1;
+        uint32_t icnt = plb->NumUnfiltered();
+        uint32_t ivis = plb->NumVisible();
+        if (icnt) {
+            int32_t v1;
+            if (icnt >= ivis &&
+                (v1 = Tile::AddUserTrait("_current_value", -1),
+                 StartMenu::pMe->fSaveLoadThreshold == plb->pScrollBar->GetFloat(v1))) {
+                int32_t iindex =
+                    static_cast<int32_t>(static_cast<double>(ivis) + StartMenu::pMe->fSaveLoadThreshold - 1.0);
+                plb->Traverse(&StartMenu::InitializeSaveLoadListItem, iindex, iindex + 1);
+                numitems = StartMenu::pMe->lbSaveLoad.NumItems();
+                if (StartMenu::pMe->IsFlagSet(StartMenu::FLAG_SAVE_MODE)) {
+                    for (int32_t i = 0; i < StartMenu::pMe->lbSaveLoad.NumItems(); ++i) {
+                        Tile* tTile = (&StartMenu::pMe->lbSaveLoad)->GetTileAt(static_cast<uint32_t>(i), false);
+                        BGSSaveLoadFileEntry* tSave = StartMenu::pMe->lbSaveLoad.GetDataAt(i, false);
+                        if ((tTile) && (tSave)) {
+                            if (tSave->IsAutosave()) {
+                                StartMenu::pMe->lbSaveLoad.RemoveAt(static_cast<uint32_t>(i), false);
+                                --numitems;
+                            }
+                            else {
+                                if (tSave->IsSystemSave()) {
+                                    StartMenu::pMe->lbSaveLoad.RemoveAt(static_cast<uint32_t>(i), false);
+                                    --numitems;
                                 }
                             }
                         }
-                    }
-                }
-                else {
-                    if (StartMenu::pMe->fSaveLoadThreshold != 0.0) {
-                        StartMenu::pMe->fSaveLoadThreshold = StartMenu::pMe->fSaveLoadThreshold - 1.0;
                     }
                 }
             }
             else {
-                StartMenu::pMe->ReturnToSaveLoad();
-                StartMenu::pMe->SetFlag(StartMenu::FLAG_SAVELOAD_BACKOUT, 0);
-                StartMenu::ChooseBack();
+                if (StartMenu::pMe->fSaveLoadThreshold != 0.0) {
+                    StartMenu::pMe->fSaveLoadThreshold = StartMenu::pMe->fSaveLoadThreshold - 1.0;
+                }
             }
-            if (StartMenu::pMe->IsFlagSet(StartMenu::FLAG_SAVE_MODE)) {
-                if (StartMenu::pMe->lbSaveLoad.NumItems()) {
-                    char Src[68];
-                    if (numitems == -1) {
-                        numitems = StartMenu::pMe->lbSaveLoad.NumItems();
-                        for (int32_t i_2 = 0; i_2 < StartMenu::pMe->lbSaveLoad.NumItems(); ++i_2) {
-                            Tile* tTile_2 = (&StartMenu::pMe->lbSaveLoad)->GetTileAt(static_cast<uint32_t>(i_2), false);
-                            BGSSaveLoadFileEntry* tSave_2 = StartMenu::pMe->lbSaveLoad.GetDataAt(i_2, false);
-                            if (tTile_2) {
-                                if (tSave_2) {
-                                    if (tSave_2->IsAutosave()) {
-                                        --numitems;
-                                    }
-                                    else {
-                                        if (tSave_2->IsSystemSave()) {
-                                            --numitems;
-                                        }
-                                    }
-                                }
+        }
+        else {
+            StartMenu::pMe->ReturnToSaveLoad();
+            StartMenu::pMe->SetFlag(StartMenu::FLAG_SAVELOAD_BACKOUT, 0);
+            StartMenu::ChooseBack();
+        }
+        if ((StartMenu::pMe->IsFlagSet(StartMenu::FLAG_SAVE_MODE)) && (StartMenu::pMe->lbSaveLoad.NumItems())) {
+            char Src[68];
+            if (numitems == -1) {
+                numitems = StartMenu::pMe->lbSaveLoad.NumItems();
+                for (int32_t i_2 = 0; i_2 < StartMenu::pMe->lbSaveLoad.NumItems(); ++i_2) {
+                    Tile* tTile_2 = (&StartMenu::pMe->lbSaveLoad)->GetTileAt(static_cast<uint32_t>(i_2), false);
+                    BGSSaveLoadFileEntry* tSave_2 = StartMenu::pMe->lbSaveLoad.GetDataAt(i_2, false);
+                    if ((tTile_2) && (tSave_2)) {
+                        if (tSave_2->IsAutosave()) {
+                            --numitems;
+                        }
+                        else {
+                            if (tSave_2->IsSystemSave()) {
+                                --numitems;
                             }
                         }
                     }
-                    --numitems;
-                    const char* v4 = sSavesRemaining.String();
-                    BSsprintf(Src, 64, "%s %u/%i %s", sNewSave.String(), numitems, 1000, v4);
-                    Tile* FirstItem = StartMenu::pMe->lbSaveLoad.GetFirstItem();
-                    FirstItem->Set(4036, Src, true);
-                    Tile* v3 = StartMenu::pMe->lbSaveLoad.GetFirstItem();
-                    v3->AddNeedsUpdate(8);
                 }
             }
+            --numitems;
+            const char* v4 = sSavesRemaining.String();
+            BSsprintf(Src, 64, "%s %u/%i %s", sNewSave.String(), numitems, 1000, v4);
+            Tile* FirstItem = StartMenu::pMe->lbSaveLoad.GetFirstItem();
+            FirstItem->Set(4036, Src, true);
+            Tile* v3 = StartMenu::pMe->lbSaveLoad.GetFirstItem();
+            v3->AddNeedsUpdate(8);
         }
     }
 }
@@ -3827,42 +3785,40 @@ void StartMenu::FailedSaveCallbackFunction() {
 }
 
 void StartMenu::InitializeSaveLoadListItem(Tile* apTile, BGSSaveLoadFileEntry* apSaveGame) {
-    if (apTile) {
-        if (apSaveGame) {
-            int32_t v2 = Tile::AddUserTrait("_initialized", -1);
-            if (!apTile->IsTrue(v2)) {
-                const char* Src;
-                if (apSaveGame->IsAutosave()) {
-                    const char* v3 = sAutosaveAbbrev.String();
-                    apTile->Set(Tile::kTileValue_User0, v3, true);
+    if ((apTile) && (apSaveGame)) {
+        int32_t v2 = Tile::AddUserTrait("_initialized", -1);
+        if (!apTile->IsTrue(v2)) {
+            const char* Src;
+            if (apSaveGame->IsAutosave()) {
+                const char* v3 = sAutosaveAbbrev.String();
+                apTile->Set(Tile::kTileValue_User0, v3, true);
+            }
+            else {
+                if (apSaveGame->IsQuicksave()) {
+                    const char* v4 = sQuicksaveAbbrev.String();
+                    apTile->Set(Tile::kTileValue_User0, v4, true);
                 }
                 else {
-                    if (apSaveGame->IsQuicksave()) {
-                        const char* v4 = sQuicksaveAbbrev.String();
-                        apTile->Set(Tile::kTileValue_User0, v4, true);
+                    if (apSaveGame->IsSystemSave()) {
+                        const char* v5 = gs_sSystemSaveAbbrev.String();
+                        apTile->Set(Tile::kTileValue_User0, v5, true);
                     }
                     else {
-                        if (apSaveGame->IsSystemSave()) {
-                            const char* v5 = gs_sSystemSaveAbbrev.String();
-                            apTile->Set(Tile::kTileValue_User0, v5, true);
-                        }
-                        else {
-                            BSStringT<char> strtmp;
-                            strtmp.SPrintF("#%04d", apSaveGame->GetSaveGameNumber());
-                            apTile->Set(Tile::kTileValue_User0, strtmp.pString, true);
-                        }
+                        BSStringT<char> strtmp;
+                        strtmp.SPrintF("#%04d", apSaveGame->GetSaveGameNumber());
+                        apTile->Set(Tile::kTileValue_User0, strtmp.pString, true);
                     }
                 }
-                if (apSaveGame->IsCorrupt()) {
-                    Src = sSaveGameCorrupt.String();
-                }
-                else {
-                    Src = apSaveGame->GetLocation();
-                }
-                apTile->Set(Tile::kTileValue_User1, Src, true);
-                int32_t v6 = Tile::AddUserTrait("_initialized", -1);
-                apTile->Set(v6, 1);
             }
+            if (apSaveGame->IsCorrupt()) {
+                Src = sSaveGameCorrupt.String();
+            }
+            else {
+                Src = apSaveGame->GetLocation();
+            }
+            apTile->Set(Tile::kTileValue_User1, Src, true);
+            int32_t v6 = Tile::AddUserTrait("_initialized", -1);
+            apTile->Set(v6, 1);
         }
     }
 }

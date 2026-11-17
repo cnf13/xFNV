@@ -295,23 +295,20 @@ NiPixelData* NiDevImageConverter::ConvertPixelData(
     bool bConverted = ConvertPixelDataFormat(*pkDest, *pkSrc, -1);
     // Releases spBumpTmp, spMipmapTmp and spCompressionTmp: decrement the count through InterlockedDecrement, then
     // delete through the virtual DeleteThis.
-    if (pkBump) {
-        if (!InterlockedDecrementInt32(reinterpret_cast<int32_t*>(&pkBump->m_uiRefCount))) {
-            pkBump->DeleteThis();
-        }
+    if ((pkBump) && (!InterlockedDecrementInt32(reinterpret_cast<int32_t*>(&pkBump->m_uiRefCount)))) {
+        pkBump->DeleteThis();
     }
+
     NiPixelData* pkMipmap = spMipmapTmp.m_pObject;
-    if (pkMipmap) {
-        if (!InterlockedDecrementInt32(reinterpret_cast<int32_t*>(&pkMipmap->m_uiRefCount))) {
-            pkMipmap->DeleteThis();
-        }
+    if ((pkMipmap) && (!InterlockedDecrementInt32(reinterpret_cast<int32_t*>(&pkMipmap->m_uiRefCount)))) {
+        pkMipmap->DeleteThis();
     }
+
     NiPixelData* pkCompression = spCompressionTmp.m_pObject;
-    if (pkCompression) {
-        if (!InterlockedDecrementInt32(reinterpret_cast<int32_t*>(&pkCompression->m_uiRefCount))) {
-            pkCompression->DeleteThis();
-        }
+    if ((pkCompression) && (!InterlockedDecrementInt32(reinterpret_cast<int32_t*>(&pkCompression->m_uiRefCount)))) {
+        pkCompression->DeleteThis();
     }
+
     return bConverted ? pkDest : nullptr;
 }
 
@@ -651,11 +648,10 @@ NiPixelData* NiDevImageConverter::GenerateMipmapPyramidFromFiles(
             &pkDest->m_pucPixels[pkDest->m_puiOffsetInBytes[i]], &pkLevel->m_pucPixels[pkLevel->m_puiOffsetInBytes[0]],
             uiSize
         );
-        if (!i) {
-            if (static_cast<uint8_t>(kFmt.GetPalettized())) {
-                pkDest->SetPalette(pkLevel->m_spPalette.m_pObject);
-            }
+        if ((!i) && (static_cast<uint8_t>(kFmt.GetPalettized()))) {
+            pkDest->SetPalette(pkLevel->m_spPalette.m_pObject);
         }
+
         spLevel.~NiPointer<NiPixelData>();
     }
     return pkDest;
@@ -689,7 +685,7 @@ bool NiDevImageConverter::ConvertPixelDataFormat(NiPixelData& kDest, const NiPix
         uiStart = uiEnd;
     }
 
-    auto CopyLevels = [&]() {
+    auto CopyLevels = [&] {
         for (uint32_t uiFace = 0; uiFace < uiFaces; uiFace++) {
             for (uint32_t i = uiStart; i <= uiEnd; i++) {
                 const uint32_t* puiSrcOffsets = kSrc.m_puiOffsetInBytes;
@@ -703,7 +699,7 @@ bool NiDevImageConverter::ConvertPixelDataFormat(NiPixelData& kDest, const NiPix
         }
     };
     // The source palette copied (or assigned) to akDest's; the first entry's alpha is then made opaque.
-    auto CopyPaletteOpaque = [&]() {
+    auto CopyPaletteOpaque = [&] {
         if (!kSrc.m_spPalette.m_pObject) {
             return false;
         }
@@ -1225,9 +1221,8 @@ const NiPixelFormat* NiDevImageConverter::FindClosestPixelFormatDX9(
         if (kFmtPrefs.m_eAlphaFmt) {
             return &NiPixelFormat_A8;
         }
-        else {
-            return &NiPixelFormat::L8;
-        }
+
+        return &NiPixelFormat::L8;
     }
     switch (m_ePixelLayout) {
         case NiTexture::FormatPrefs::SINGLE_COLOR_16: {
@@ -1253,9 +1248,8 @@ const NiPixelFormat* NiDevImageConverter::FindClosestPixelFormatDX9(
             if (kFmtPrefs.m_eAlphaFmt) {
                 return &NiPixelFormat_BGRA8888;
             }
-            else {
-                return &NiPixelFormat_BGRX8888;
-            }
+
+            return &NiPixelFormat_BGRX8888;
         }
         case NiTexture::FormatPrefs::HIGH_COLOR_16: {
             NiTexture::FormatPrefs::AlphaFormat m_eAlphaFmt = kFmtPrefs.m_eAlphaFmt;
@@ -1348,9 +1342,8 @@ const NiPixelFormat* NiDevImageConverter::FindClosestPixelFormatDX9(
     if (v13 == NiPixelFormat::FORMAT_DXT5 || kFmtPrefs.m_eAlphaFmt == NiTexture::FormatPrefs::SMOOTH) {
         return &NiPixelFormat_DXT5;
     }
-    else {
-        return &NiPixelFormat_DXT1;
-    }
+
+    return &NiPixelFormat_DXT1;
 }
 
 const NiPixelFormat* NiDevImageConverter::FindClosestPixelFormatXenon(
@@ -1559,9 +1552,8 @@ const NiPixelFormat* NiDevImageConverter::FindClosestPixelFormatPS3(
         (m_eAlphaFmt == NiTexture::FormatPrefs::SMOOTH || (m_eAlphaFmt && v13))) {
         return &NiPixelFormat_BGRA4444;
     }
-    else {
-        return &NiPixelFormat_BGR565;
-    }
+
+    return &NiPixelFormat_BGR565;
 }
 
 void ConvertPAL4To24(
@@ -1616,27 +1608,25 @@ void ConvertPAL4To24(
             }
         }
         else {
-            if (a6.m_uiRM == 0x00FF0000) {
-                if (a2) {
-                    uint8_t* v19 = a4;
-                    do {
-                        if (v10) {
-                            uint32_t v20 = v10;
-                            do {
-                                *v19 = m_pkPalette[*v15].m_ucBlue;
-                                uint8_t* v21 = v19 + 1;
-                                *v21++ = m_pkPalette[*v15].m_ucGreen;
-                                *v21 = m_pkPalette[*v15].m_ucRed;
-                                v19 = v21 + 1;
-                                ++v15;
-                                --v20;
-                            }
-                            while (v20);
+            if ((a6.m_uiRM == 0x00FF0000) && (a2)) {
+                uint8_t* v19 = a4;
+                do {
+                    if (v10) {
+                        uint32_t v20 = v10;
+                        do {
+                            *v19 = m_pkPalette[*v15].m_ucBlue;
+                            uint8_t* v21 = v19 + 1;
+                            *v21++ = m_pkPalette[*v15].m_ucGreen;
+                            *v21 = m_pkPalette[*v15].m_ucRed;
+                            v19 = v21 + 1;
+                            ++v15;
+                            --v20;
                         }
-                        --v9;
+                        while (v20);
                     }
-                    while (v9);
+                    --v9;
                 }
+                while (v9);
             }
         }
         _NiFree(pvMem);
@@ -1880,29 +1870,27 @@ void ConvertPAL8To24(
             }
         }
         else {
-            if (a6.m_uiRM == 0x00FF0000) {
-                if (a2) {
-                    const uint8_t* v14 = a7;
-                    uint32_t v15 = a2;
-                    uint8_t* v16 = a4;
-                    do {
-                        if (a1) {
-                            uint32_t v17 = a1;
-                            do {
-                                *v16 = m_pkPalette[*v14].m_ucBlue;
-                                uint8_t* v18 = v16 + 1;
-                                *v18++ = m_pkPalette[*v14].m_ucGreen;
-                                *v18 = m_pkPalette[*v14].m_ucRed;
-                                v16 = v18 + 1;
-                                ++v14;
-                                --v17;
-                            }
-                            while (v17);
+            if ((a6.m_uiRM == 0x00FF0000) && (a2)) {
+                const uint8_t* v14 = a7;
+                uint32_t v15 = a2;
+                uint8_t* v16 = a4;
+                do {
+                    if (a1) {
+                        uint32_t v17 = a1;
+                        do {
+                            *v16 = m_pkPalette[*v14].m_ucBlue;
+                            uint8_t* v18 = v16 + 1;
+                            *v18++ = m_pkPalette[*v14].m_ucGreen;
+                            *v18 = m_pkPalette[*v14].m_ucRed;
+                            v16 = v18 + 1;
+                            ++v14;
+                            --v17;
                         }
-                        --v15;
+                        while (v17);
                     }
-                    while (v15);
+                    --v15;
                 }
+                while (v15);
             }
         }
     }
@@ -2240,31 +2228,29 @@ void ConvertRGBA32To24(
             }
         }
         else {
-            if (a6.m_uiRM == 255) {
-                if (a2) {
-                    const uint8_t* v13 = a7;
-                    uint32_t v14 = a2;
-                    uint8_t* v15 = a4;
-                    do {
-                        if (a1) {
-                            uint32_t v16 = a1;
-                            do {
-                                *v15 = *v13;
-                                uint8_t v17 = v13[1];
-                                const uint8_t* v18 = v13 + 1;
-                                uint8_t* v19 = v15 + 1;
-                                *v19++ = v17;
-                                *v19 = v18[1];
-                                v15 = v19 + 1;
-                                v13 = v18 + 3;
-                                --v16;
-                            }
-                            while (v16);
+            if ((a6.m_uiRM == 255) && (a2)) {
+                const uint8_t* v13 = a7;
+                uint32_t v14 = a2;
+                uint8_t* v15 = a4;
+                do {
+                    if (a1) {
+                        uint32_t v16 = a1;
+                        do {
+                            *v15 = *v13;
+                            uint8_t v17 = v13[1];
+                            const uint8_t* v18 = v13 + 1;
+                            uint8_t* v19 = v15 + 1;
+                            *v19++ = v17;
+                            *v19 = v18[1];
+                            v15 = v19 + 1;
+                            v13 = v18 + 3;
+                            --v16;
                         }
-                        --v14;
+                        while (v16);
                     }
-                    while (v14);
+                    --v14;
                 }
+                while (v14);
             }
         }
     }

@@ -54,29 +54,27 @@ void FOIslandActivationListener::islandActivatedCallback(hkpSimulationIsland* ap
             else {
                 pobjectRef = nullptr;
             }
-            if (pobjectRef) {
-                if (!pobjectRef->IsActor()) {
-                    NiNode* pdynamicnode;
-                    pobjectRef->AddChange(4);
-                    TESObjectCELL* pcell = pobjectRef->GetParentCell();
-                    if (pcell) {
-                        pdynamicnode = static_cast<NiNode*>(pcell->GetDynamicNode());
+            if ((pobjectRef) && (!pobjectRef->IsActor())) {
+                NiNode* pdynamicnode;
+                pobjectRef->AddChange(4);
+                TESObjectCELL* pcell = pobjectRef->GetParentCell();
+                if (pcell) {
+                    pdynamicnode = static_cast<NiNode*>(pcell->GetDynamicNode());
+                }
+                else {
+                    pdynamicnode = nullptr;
+                }
+                if (pdynamicnode) {
+                    if (AILinearTaskThreadManager::ShouldQueue3DTask()) {
+                        TESObjectCELL::QueueAttachChild(pobjectRef, pdynamicnode);
                     }
                     else {
-                        pdynamicnode = nullptr;
+                        // abFirstAvail is passed as true.
+                        pdynamicnode->AttachChild(pobjectRef->Get3D(), true);
                     }
-                    if (pdynamicnode) {
-                        if (AILinearTaskThreadManager::ShouldQueue3DTask()) {
-                            TESObjectCELL::QueueAttachChild(pobjectRef, pdynamicnode);
-                        }
-                        else {
-                            // abFirstAvail is passed as true.
-                            pdynamicnode->AttachChild(pobjectRef->Get3D(), true);
-                        }
-                    }
-                    if (pobjectRef->GetMotionBlur()) {
-                        BSShaderManager::AddMotionBluredObject();
-                    }
+                }
+                if (pobjectRef->GetMotionBlur()) {
+                    BSShaderManager::AddMotionBluredObject();
                 }
             }
         }

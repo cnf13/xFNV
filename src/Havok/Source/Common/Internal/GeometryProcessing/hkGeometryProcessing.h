@@ -162,13 +162,13 @@ struct hkGeometryProcessing {
     // A FUNCTION_TYPE that is m_value everywhere.
     template <typename FUNCTION_TYPE>
     struct ConstFunction : FUNCTION_TYPE {
-        ConstFunction(const typename FUNCTION_TYPE::typeOut& value) : m_value(value) {}
+        ConstFunction(const FUNCTION_TYPE::typeOut& value) : m_value(value) {}
 
-        typename FUNCTION_TYPE::typeOut evaluate(const typename FUNCTION_TYPE::typeIn&) const override {
+        FUNCTION_TYPE::typeOut evaluate(const FUNCTION_TYPE::typeIn&) const override {
             return m_value;
         }
 
-        typename FUNCTION_TYPE::typeOut m_value;
+        FUNCTION_TYPE::typeOut m_value;
     };
 
     using IFunction_4_1 = IFunction<hkVector4, float>;
@@ -278,7 +278,7 @@ hkGeometryProcessing::PoolAllocator<T, N, ALLOCATOR>::~PoolAllocator() {
 // The SDK's allocateNewPool (hkGeometryProcessing.inl): a pool of N items from the heap, chained free from the first
 // item on, appended to m_pools and swapped to the front.
 template <typename T, int32_t N, typename ALLOCATOR>
-typename hkGeometryProcessing::PoolAllocator<T, N, ALLOCATOR>::Pool*
+hkGeometryProcessing::PoolAllocator<T, N, ALLOCATOR>::Pool*
 hkGeometryProcessing::PoolAllocator<T, N, ALLOCATOR>::allocateNewPool() {
     Pool* pPool =
         static_cast<Pool*>(hkMemoryRouter::getInstance().m_heap->blockAlloc(static_cast<int32_t>(sizeof(Pool))));

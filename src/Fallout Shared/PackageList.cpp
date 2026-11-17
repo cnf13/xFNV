@@ -228,73 +228,66 @@ TESPackage* PackageList::FindCurrentPackage(Actor* apActor) {
                             bOverlapmonth = true;
                         }
                     }
-                    if (pSchedule_2->PSData.eMonth == PSM_NONE ||
-                        pSchedule_2->PSData.eMonth == appCalendar.GetMonth() || bOverlapmonth) {
-                        if (!pSchedule_2->PSData.cDate || pSchedule_2->PSData.cDate == appCalendar.GetDay() ||
-                            bOverlapday) {
-                            if (pSchedule_2->GetStartDayOfWeek() == PSD_NONE ||
-                                (pPack->IsitDayofTheWeek(false) || bOverlapdayof)) {
-                                char v5;
-                                int32_t iDuration;
-                                float fCurrentHour;
-                                if (pSchedule_2->GetStartTime() == -1 ||
-                                    (fCurrentHour = appCalendar.GetHour(),
-                                     (iDuration = pSchedule_2->PSData.iDuration,
-                                      (v5 = pSchedule_2->GetStartTime(), TestHour(v5, iDuration, fCurrentHour))))) {
-                                    TESObjectREFR* pTargetRef = nullptr;
-                                    PackageTarget* pTarget = pPack->GetPackageTarget();
-                                    if (pTarget) {
-                                        pTargetRef = pTarget->GetTargReference();
-                                    }
-                                    if ((&pPack->packConditions)->IsTrue(apActor, pTargetRef)) {
-                                        if (Interface::GetConsoleSelection() == apActor) {
-                                            char Format[308];
-                                            const char* v6 = pPack->GetFormEditorID();
-                                            const void* fCurrentHoura = v6;
-                                            PACKAGE_TYPE PackType = pPack->GetPackType();
-                                            const void* CellOrCoords_0 = packageTypeToString[PackType];
-                                            std::sprintf(
-                                                Format, "%s Picked Package %s (%s)", apActor->GetFullName(),
-                                                CellOrCoords_0, fCurrentHoura
-                                            );
-                                            Interface::PrintLine(static_cast<const char*>(Format));
-                                        }
-                                        if (pPack->ePROCEDURE_TYPE == PACKAGE_PROCEDURE_NONE) {
-                                            TESObjectREFR* LinkedRef = apActor->GetLinkedRef();
-                                            pPack->CalculateProcedureType(LinkedRef);
-                                        }
-                                        if (apCurrentPack) {
-                                            if (apCurrentPack != pPack &&
-                                                apCurrentPack->GetPackType() == PACKAGE_TYPE_FOLLOW) {
-                                                BaseProcess* CurrentAIProcess = apActor->pCurrentProcess;
-                                                TESObjectREFR* v9 = CurrentAIProcess->GetTarget();
-                                                Actor* pact = dynamic_cast<Actor*>(v9);
-                                                if (pact) {
-                                                    (&pact->m_Extra)->RemoveFollower(apActor);
-                                                }
-                                            }
-                                        }
-                                        if (apCurrentPack) {
-                                            if (apCurrentPack != pPack) {
-                                                ExtraDataList* Extra = &apActor->m_Extra;
-                                                Script::SetActionFlag(
-                                                    apCurrentPack, Extra, SCRIPT_ACTION_ONPACKAGECHANGE
-                                                );
-                                                BaseProcess* v18 = apActor->pCurrentProcess;
-                                                v18->ChangePackage(apActor, apCurrentPack);
-                                                BaseProcess* v17 = apActor->pCurrentProcess;
-                                                v17->SetPackageDoneOnce(false);
-                                            }
-                                        }
-                                        if (pPack) {
-                                            if (pPack != apCurrentPack) {
-                                                ExtraDataList* v14 = &apActor->m_Extra;
-                                                Script::SetActionFlag(pPack, v14, SCRIPT_ACTION_ONPACKAGESTART);
-                                            }
-                                        }
-                                        return pPack;
+                    if ((pSchedule_2->PSData.eMonth == PSM_NONE ||
+                         pSchedule_2->PSData.eMonth == appCalendar.GetMonth() || bOverlapmonth) &&
+                        (!pSchedule_2->PSData.cDate || pSchedule_2->PSData.cDate == appCalendar.GetDay() ||
+                         bOverlapday) &&
+                        (pSchedule_2->GetStartDayOfWeek() == PSD_NONE ||
+                         (pPack->IsitDayofTheWeek(false) || bOverlapdayof))) {
+                        char v5;
+                        int32_t iDuration;
+                        float fCurrentHour;
+                        if (pSchedule_2->GetStartTime() == -1 ||
+                            (fCurrentHour = appCalendar.GetHour(),
+                             (iDuration = pSchedule_2->PSData.iDuration,
+                              (v5 = pSchedule_2->GetStartTime(), TestHour(v5, iDuration, fCurrentHour))))) {
+                            TESObjectREFR* pTargetRef = nullptr;
+                            PackageTarget* pTarget = pPack->GetPackageTarget();
+                            if (pTarget) {
+                                pTargetRef = pTarget->GetTargReference();
+                            }
+                            if ((&pPack->packConditions)->IsTrue(apActor, pTargetRef)) {
+                                if (Interface::GetConsoleSelection() == apActor) {
+                                    char Format[308];
+                                    const char* v6 = pPack->GetFormEditorID();
+                                    const void* fCurrentHoura = v6;
+                                    PACKAGE_TYPE PackType = pPack->GetPackType();
+                                    const void* CellOrCoords_0 = packageTypeToString[PackType];
+                                    std::sprintf(
+                                        Format, "%s Picked Package %s (%s)", apActor->GetFullName(), CellOrCoords_0,
+                                        fCurrentHoura
+                                    );
+                                    Interface::PrintLine(static_cast<const char*>(Format));
+                                }
+                                if (pPack->ePROCEDURE_TYPE == PACKAGE_PROCEDURE_NONE) {
+                                    TESObjectREFR* LinkedRef = apActor->GetLinkedRef();
+                                    pPack->CalculateProcedureType(LinkedRef);
+                                }
+                                if ((apCurrentPack) &&
+                                    (apCurrentPack != pPack && apCurrentPack->GetPackType() == PACKAGE_TYPE_FOLLOW)) {
+                                    BaseProcess* CurrentAIProcess = apActor->pCurrentProcess;
+                                    TESObjectREFR* v9 = CurrentAIProcess->GetTarget();
+                                    Actor* pact = dynamic_cast<Actor*>(v9);
+                                    if (pact) {
+                                        (&pact->m_Extra)->RemoveFollower(apActor);
                                     }
                                 }
+
+                                if ((apCurrentPack) && (apCurrentPack != pPack)) {
+                                    ExtraDataList* Extra = &apActor->m_Extra;
+                                    Script::SetActionFlag(apCurrentPack, Extra, SCRIPT_ACTION_ONPACKAGECHANGE);
+                                    BaseProcess* v18 = apActor->pCurrentProcess;
+                                    v18->ChangePackage(apActor, apCurrentPack);
+                                    BaseProcess* v17 = apActor->pCurrentProcess;
+                                    v17->SetPackageDoneOnce(false);
+                                }
+
+                                if ((pPack) && (pPack != apCurrentPack)) {
+                                    ExtraDataList* v14 = &apActor->m_Extra;
+                                    Script::SetActionFlag(pPack, v14, SCRIPT_ACTION_ONPACKAGESTART);
+                                }
+
+                                return pPack;
                             }
                         }
                     }
@@ -341,26 +334,21 @@ void PackageList::FindMissedPackages(
                 }
                 if (pPack->GetMustComplete() && pPack->HasActorCompletedPackage(apActor)) {
                     pSchedule = pPack->GetPackageSchedule();
-                    if (pSchedule) {
-                        if (pSchedule->PSData.eMonth == PSM_NONE || pSchedule->PSData.eMonth <= imonth) {
-                            if (!pSchedule->PSData.cDate || pSchedule->PSData.cDate <= iday) {
-                                PSDAYOFWEEK StartDayOfWeek;
-                                if (pSchedule->GetStartDayOfWeek() == PSD_NONE ||
-                                    (StartDayOfWeek = pSchedule->GetStartDayOfWeek(),
-                                     static_cast<int32_t>(StartDayOfWeek) <= appCalendar.GetDayOfTheWeek())) {
-                                    int32_t StartTime;
-                                    if (pSchedule->GetStartTime() == -1 ||
-                                        (StartTime = pSchedule->GetStartTime(),
-                                         fhour > static_cast<double>(StartTime))) {
-                                        if (pPack != apCurrentPack && !apPacks->IsInList(pPack)) {
-                                            if (pPack->ePROCEDURE_TYPE == PACKAGE_PROCEDURE_NONE) {
-                                                TESObjectREFR* LinkedRef = apActor->GetLinkedRef();
-                                                pPack->CalculateProcedureType(LinkedRef);
-                                            }
-                                            apPacks->AddTail(pPack);
-                                        }
-                                    }
+                    if ((pSchedule) && (pSchedule->PSData.eMonth == PSM_NONE || pSchedule->PSData.eMonth <= imonth) &&
+                        (!pSchedule->PSData.cDate || pSchedule->PSData.cDate <= iday)) {
+                        PSDAYOFWEEK StartDayOfWeek;
+                        if (pSchedule->GetStartDayOfWeek() == PSD_NONE ||
+                            (StartDayOfWeek = pSchedule->GetStartDayOfWeek(),
+                             static_cast<int32_t>(StartDayOfWeek) <= appCalendar.GetDayOfTheWeek())) {
+                            int32_t StartTime;
+                            if ((pSchedule->GetStartTime() == -1 ||
+                                 (StartTime = pSchedule->GetStartTime(), fhour > static_cast<double>(StartTime))) &&
+                                (pPack != apCurrentPack && !apPacks->IsInList(pPack))) {
+                                if (pPack->ePROCEDURE_TYPE == PACKAGE_PROCEDURE_NONE) {
+                                    TESObjectREFR* LinkedRef = apActor->GetLinkedRef();
+                                    pPack->CalculateProcedureType(LinkedRef);
                                 }
+                                apPacks->AddTail(pPack);
                             }
                         }
                     }

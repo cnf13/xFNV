@@ -78,16 +78,15 @@ bool TurnUndeadEffect::CheckTarget(MagicTarget* apTarget) {
         TargetAsActor = nullptr;
     }
     bool result = false;
-    if (TargetAsActor) {
-        if (!TargetAsActor->IsDead(false) && !TargetAsActor->IsDying()) {
-            float afMagnitude = GetMagnitude();
-            uint16_t Level = TargetAsActor->GetLevel();
-            if (MagicFormulas::CheckTargetLevelMagnitude(Level, afMagnitude) &&
-                (!dynamic_cast<Creature*>(apTarget) && TargetAsActor->IsReanimated())) {
-                return true;
-            }
+    if ((TargetAsActor) && (!TargetAsActor->IsDead(false) && !TargetAsActor->IsDying())) {
+        float afMagnitude = GetMagnitude();
+        uint16_t Level = TargetAsActor->GetLevel();
+        if (MagicFormulas::CheckTargetLevelMagnitude(Level, afMagnitude) &&
+            (!dynamic_cast<Creature*>(apTarget) && TargetAsActor->IsReanimated())) {
+            return true;
         }
     }
+
     return result;
 }
 
@@ -106,13 +105,9 @@ void TurnUndeadEffect::Start() {
     else {
         pcasterActor = nullptr;
     }
-    if (ptargetActor) {
-        if (pcasterActor) {
-            if (ptargetActor->GetCombatController()) {
-                ptargetActor->GetCombatController()->ForceFlee(pcasterActor, 0);
-                bTurned = true;
-            }
-        }
+    if ((ptargetActor) && (pcasterActor) && (ptargetActor->GetCombatController())) {
+        ptargetActor->GetCombatController()->ForceFlee(pcasterActor, 0);
+        bTurned = true;
     }
 }
 
@@ -137,18 +132,14 @@ void TurnUndeadEffect::Finish() {
         else {
             casterAsActor = nullptr;
         }
-        if (targetAsActor) {
-            if (targetAsActor->IsInCombat()) {
-                targetAsActor->StopCombat(casterAsActor);
-                if (casterAsActor) {
-                    if (targetAsActor->MobileObject::GetCurrentAIProcess()) {
-                        currentAIProcess = targetAsActor->MobileObject::GetCurrentAIProcess();
-                        currentAIProcess->EnterCombat(
-                            targetAsActor, casterAsActor, true, false, nullptr, false, false, false, false, false,
-                            false, true, nullptr
-                        );
-                    }
-                }
+        if ((targetAsActor) && (targetAsActor->IsInCombat())) {
+            targetAsActor->StopCombat(casterAsActor);
+            if ((casterAsActor) && (targetAsActor->MobileObject::GetCurrentAIProcess())) {
+                currentAIProcess = targetAsActor->MobileObject::GetCurrentAIProcess();
+                currentAIProcess->EnterCombat(
+                    targetAsActor, casterAsActor, true, false, nullptr, false, false, false, false, false, false, true,
+                    nullptr
+                );
             }
         }
     }
@@ -159,7 +150,6 @@ ActiveEffect* TurnUndeadEffect::Create(MagicCaster* a1, MagicItem* a2, EffectIte
     if (v5) {
         return ::new (v5) TurnUndeadEffect(a1, a2, a3);
     }
-    else {
-        return nullptr;
-    }
+
+    return nullptr;
 }

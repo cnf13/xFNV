@@ -118,15 +118,14 @@ void hkVisualDebugger::step(float frameTimeInMs) {
 void hkVisualDebugger::pollForNewClients() {
     FNVD_INLINED_LOCAL(hkErrStream, apThis, std::nullopt, std::nullopt);
     if (!s_SuppressPollForNewClients) {
-        if (m_amTimingFrame.m_bool) {
-            if (m_frameTimer.m_running_flag.m_bool) {
-                m_frameTimer.m_running_flag.m_bool = 0;
-                uint64_t TickCounter = hkStopwatch::getTickCounter();
-                m_frameTimer.m_ticks_total += TickCounter - m_frameTimer.m_ticks_at_start;
-                m_frameTimer.m_split_total += TickCounter - m_frameTimer.m_ticks_at_split;
-                ++m_frameTimer.m_num_timings;
-            }
+        if ((m_amTimingFrame.m_bool) && (m_frameTimer.m_running_flag.m_bool)) {
+            m_frameTimer.m_running_flag.m_bool = 0;
+            uint64_t TickCounter = hkStopwatch::getTickCounter();
+            m_frameTimer.m_ticks_total += TickCounter - m_frameTimer.m_ticks_at_start;
+            m_frameTimer.m_split_total += TickCounter - m_frameTimer.m_ticks_at_split;
+            ++m_frameTimer.m_num_timings;
         }
+
         if (m_server) {
             hkSocket* v3 = m_server->pollForNewClient();
             if (v3) {

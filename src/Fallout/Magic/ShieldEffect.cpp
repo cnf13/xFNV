@@ -119,22 +119,20 @@ void ShieldEffect::Finish() {
 }
 
 void ShieldEffect::ModifyAdditionalActorValue(Actor* apActor, float afModifier) {
-    if (apActor) {
-        if (eAdditionalActorValue != ActorValue::ACTOR_VALUE_COUNT) {
-            if (eSpellType == MagicSystem::ABILITY) {
-                ActorValue::Index Sound1 = eAdditionalActorValue;
-                apActor->ModActorBaseValue(Sound1, afModifier);
+    if ((apActor) && (eAdditionalActorValue != ActorValue::ACTOR_VALUE_COUNT)) {
+        if (eSpellType == MagicSystem::ABILITY) {
+            ActorValue::Index Sound1 = eAdditionalActorValue;
+            apActor->ModActorBaseValue(Sound1, afModifier);
+        }
+        else {
+            EffectSetting* Time = pEffect->GetEffectSetting();
+            if (Time->IsFlagSet(EffectSetting::RECOVER)) {
+                ActorValue::Index v5 = eAdditionalActorValue;
+                apActor->TempModActorValue(v5, afModifier, static_cast<Actor*>(nullptr));
             }
             else {
-                EffectSetting* Time = pEffect->GetEffectSetting();
-                if (Time->IsFlagSet(EffectSetting::RECOVER)) {
-                    ActorValue::Index v5 = eAdditionalActorValue;
-                    apActor->TempModActorValue(v5, afModifier, static_cast<Actor*>(nullptr));
-                }
-                else {
-                    ActorValue::Index v6 = eAdditionalActorValue;
-                    apActor->DamageModActorValue(v6, afModifier, static_cast<Actor*>(nullptr));
-                }
+                ActorValue::Index v6 = eAdditionalActorValue;
+                apActor->DamageModActorValue(v6, afModifier, static_cast<Actor*>(nullptr));
             }
         }
     }
@@ -145,7 +143,6 @@ ActiveEffect* ShieldEffect::Instantiate(MagicCaster* apCaster, MagicItem* apSpel
     if (v5) {
         return ::new (v5) ShieldEffect(apCaster, apSpell, apEffect);
     }
-    else {
-        return nullptr;
-    }
+
+    return nullptr;
 }

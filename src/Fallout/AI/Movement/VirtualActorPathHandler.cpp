@@ -44,9 +44,8 @@ ActorPathHandler::PATH_HANDLER_RESULT VirtualActorPathHandler::Init(float afPerc
     if (afPercentTraveled == 0.0) {
         return Update(afDeltaT);
     }
-    else {
-        return ActorPathHandler::PATH_HANDLER_RESULT_OK;
-    }
+
+    return ActorPathHandler::PATH_HANDLER_RESULT_OK;
 }
 
 ActorPathHandler::PATH_HANDLER_RESULT VirtualActorPathHandler::Update(float afDeltaT) {
@@ -176,9 +175,8 @@ NiPoint3 VirtualActorPathHandler::GetNextNodeLocation() {
         }
         return pNode->Location.GetLocation();
     }
-    else {
-        return pActor->GetLocationOnReference();
-    }
+
+    return pActor->GetLocationOnReference();
 }
 
 bool VirtualActorPathHandler::GetNodeLocation(uint32_t aiIndex, NiPoint3& arLocation) {
@@ -316,9 +314,8 @@ int32_t VirtualActorPathHandler::UseDoorAtNode(NiPoint3& aNewLoc) {
     if (this->pActor->GetDesiredProcessLevel() || pPlayer->IsSleepingorResting()) {
         return 0;
     }
-    else {
-        ++iCurrentNodeIndex;
-        fDistanceTraveled = 0.0f;
-        return 1;
-    }
+
+    ++iCurrentNodeIndex;
+    fDistanceTraveled = 0.0f;
+    return 1;
 }

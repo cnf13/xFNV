@@ -37,30 +37,28 @@ float EffectItemList::GetCost(Actor* apActor) {
     if (IsEmpty()) {
         return 0.0f;
     }
-    else {
-        float fcost = 0.0f;
-        while (plist) {
-            EffectItemList* p_m_pkNext;
-            EffectItem* pitem = plist->m_item;
-            if (!pitem->IsDisabled()) {
-                fcost = pitem->GetCost(apActor) + fcost;
-            }
-            BSSimpleList<EffectItem*>* pNext = plist->m_pkNext;
-            if (pNext) {
-                p_m_pkNext = static_cast<EffectItemList*>(pNext);
-            }
-            else {
-                p_m_pkNext = nullptr;
-            }
-            plist = p_m_pkNext;
+
+    float fcost = 0.0f;
+    while (plist) {
+        EffectItemList* p_m_pkNext;
+        EffectItem* pitem = plist->m_item;
+        if (!pitem->IsDisabled()) {
+            fcost = pitem->GetCost(apActor) + fcost;
         }
-        if (!(fcost < 0.0)) {
-            return FloatFloor(fcost);
+        BSSimpleList<EffectItem*>* pNext = plist->m_pkNext;
+        if (pNext) {
+            p_m_pkNext = static_cast<EffectItemList*>(pNext);
         }
         else {
-            return 0.0f;
+            p_m_pkNext = nullptr;
         }
+        plist = p_m_pkNext;
     }
+    if (!(fcost < 0.0)) {
+        return FloatFloor(fcost);
+    }
+
+    return 0.0f;
 }
 
 void EffectItemList::GetEffectsString(char* apBuffer, uint32_t auiSize) {
@@ -75,105 +73,104 @@ void EffectItemList::GetEffectsString(char* apBuffer, uint32_t auiSize) {
     Dst[0] = 0;
     BSSimpleList<EffectItem*>* pEffectNode = static_cast<BSSimpleList<EffectItem*>*>(this);
     while (pEffectNode && pEffectNode->m_item) {
-        if (!pEffectNode->m_item->IsUsageMonitorEffect()) {
-            if (pEffectNode->m_item->Conditions.IsTrueFull(pPlayer, nullptr, &bDispositionFailure, false)) {
-                if (pEffectNode->m_item->pEffectSetting->IsFlagSet(EffectSetting::DISPLAY_EFFECT_NAME)) {
-                    BSStringT<char>* EffectName = pEffectNode->m_item->GetEffectName(&apString);
-                    BSstrcpy(Dst, 128, EffectName->pString);
-                    apString.~BSStringT<char>();
-                    if (bAppended) {
-                        BSstrcat(apBuffer, static_cast<int32_t>(auiSize), "\n");
-                        BSstrcat(apBuffer, static_cast<int32_t>(auiSize), Dst);
-                    }
-                    else {
-                        BSstrcat(apBuffer, static_cast<int32_t>(auiSize), Dst);
-                        bAppended = 1;
-                    }
+        if ((!pEffectNode->m_item->IsUsageMonitorEffect()) &&
+            (pEffectNode->m_item->Conditions.IsTrueFull(pPlayer, nullptr, &bDispositionFailure, false))) {
+            if (pEffectNode->m_item->pEffectSetting->IsFlagSet(EffectSetting::DISPLAY_EFFECT_NAME)) {
+                BSStringT<char>* EffectName = pEffectNode->m_item->GetEffectName(&apString);
+                BSstrcpy(Dst, 128, EffectName->pString);
+                apString.~BSStringT<char>();
+                if (bAppended) {
+                    BSstrcat(apBuffer, static_cast<int32_t>(auiSize), "\n");
+                    BSstrcat(apBuffer, static_cast<int32_t>(auiSize), Dst);
                 }
                 else {
-                    kStatusList.Register(pEffectNode->m_item);
+                    BSstrcat(apBuffer, static_cast<int32_t>(auiSize), Dst);
+                    bAppended = 1;
                 }
             }
+            else {
+                kStatusList.Register(pEffectNode->m_item);
+            }
         }
+
         pEffectNode = pEffectNode->m_pkNext;
     }
     BSSimpleList<EffectItemData*>* pDataNode = static_cast<BSSimpleList<EffectItemData*>*>(&kStatusList);
     while (pDataNode && pDataNode->m_item) {
-        if (pDataNode->m_item->iMagnitude) {
-            if (pDataNode->m_item->iActorValue != ActorValue::VALUE_NONE) {
-                ActorValue::Index aiIndex = pDataNode->m_item->iActorValue;
-                int32_t iMagnitude = pDataNode->m_item->iMagnitude;
-                float fDuration = static_cast<float>(pDataNode->m_item->iDuration);
-                char cUnit = 's';
-                if (!(fDuration >= 3600.0)) {
-                    if (fDuration >= 60.0) {
-                        fDuration = fDuration / 60.0;
-                        cUnit = 'm';
-                    }
+        if ((pDataNode->m_item->iMagnitude) && (pDataNode->m_item->iActorValue != ActorValue::VALUE_NONE)) {
+            ActorValue::Index aiIndex = pDataNode->m_item->iActorValue;
+            int32_t iMagnitude = pDataNode->m_item->iMagnitude;
+            float fDuration = static_cast<float>(pDataNode->m_item->iDuration);
+            char cUnit = 's';
+            if (!(fDuration >= 3600.0)) {
+                if (fDuration >= 60.0) {
+                    fDuration = fDuration / 60.0;
+                    cUnit = 'm';
                 }
-                else {
-                    fDuration = fDuration / 3600.0;
-                    cUnit = 'h';
-                }
-                if (ActorValue::IsFlagSet(aiIndex, ActorValue::DAMAGE_IS_POSITIVE)) {
-                    iMagnitude = -iMagnitude;
-                }
-                if (bMedicine) {
-                    double dMagnitude = static_cast<double>(iMagnitude);
-                    float fMedicine = pPlayer->GetMedicineEffectivenessMultiplier() * dMagnitude;
-                    if (aiIndex == ActorValue::HEALTH) {
-                        BGSEntryPoint::HandleEntryPoint(BGSEntryPoint::MODIFY_RECOVERED_HEALTH, pPlayer, &fMedicine);
-                    }
-                    iMagnitude = static_cast<int32_t>(fMedicine);
-                }
-                if (bFood && aiIndex != ActorValue::RADIATION_RADS) {
-                    double dMagnitude = static_cast<double>(iMagnitude);
-                    float fSurvival = pPlayer->GetSurvivalEffectivenessMultiplier() * dMagnitude;
-                    if (aiIndex == ActorValue::HEALTH) {
-                        BGSEntryPoint::HandleEntryPoint(BGSEntryPoint::MODIFY_RECOVERED_HEALTH, pPlayer, &fSurvival);
-                    }
-                    iMagnitude = static_cast<int32_t>(fSurvival);
-                }
-                if (aiIndex == ActorValue::RADIATION_RADS && iMagnitude > 0) {
-                    double dMagnitude = static_cast<double>(iMagnitude);
-                    float fRads = pPlayer->GetRadiationResistanceMult() * dMagnitude;
-                    iMagnitude = static_cast<int32_t>(std::floor(fRads));
-                }
-                if (bFood && aiIndex == ActorValue::RADIATION_RADS) {
-                    float fBonus = 1.0f;
-                    BGSEntryPoint::HandleEntryPoint(BGSEntryPoint::RADIATION_INGESTIBLE_BONUS, pPlayer, &fBonus);
-                    iMagnitude = static_cast<int32_t>(static_cast<double>(iMagnitude) * fBonus);
-                }
-                if (!iMagnitude) {
-                    iMagnitude = 1;
-                }
-                if (*apBuffer) {
-                    BSstrcat(apBuffer, 128, ", ");
-                }
-                if (pDataNode->m_item->iDuration) {
-                    float fFloor = std::floor(fDuration);
-                    // Only an ordered equal prints the whole number.
-                    if (fDuration == fFloor) {
-                        int32_t iUnit = cUnit;
-                        int32_t iDuration = FloatToInt(fDuration);
-                        BSsprintf(
-                            Dst, 128, "%s %+i(%d%c)", ActorValue::GetActorValueAbbreviation(aiIndex), iMagnitude,
-                            iDuration, iUnit
-                        );
-                    }
-                    else {
-                        BSsprintf(
-                            Dst, 128, "%s %+i(%.1f%c)", ActorValue::GetActorValueAbbreviation(aiIndex), iMagnitude,
-                            static_cast<double>(fDuration), static_cast<int32_t>(cUnit)
-                        );
-                    }
-                }
-                else {
-                    BSsprintf(Dst, 128, "%s %+i", ActorValue::GetActorValueAbbreviation(aiIndex), iMagnitude);
-                }
-                BSstrcat(apBuffer, static_cast<int32_t>(auiSize), Dst);
             }
+            else {
+                fDuration = fDuration / 3600.0;
+                cUnit = 'h';
+            }
+            if (ActorValue::IsFlagSet(aiIndex, ActorValue::DAMAGE_IS_POSITIVE)) {
+                iMagnitude = -iMagnitude;
+            }
+            if (bMedicine) {
+                double dMagnitude = static_cast<double>(iMagnitude);
+                float fMedicine = pPlayer->GetMedicineEffectivenessMultiplier() * dMagnitude;
+                if (aiIndex == ActorValue::HEALTH) {
+                    BGSEntryPoint::HandleEntryPoint(BGSEntryPoint::MODIFY_RECOVERED_HEALTH, pPlayer, &fMedicine);
+                }
+                iMagnitude = static_cast<int32_t>(fMedicine);
+            }
+            if (bFood && aiIndex != ActorValue::RADIATION_RADS) {
+                double dMagnitude = static_cast<double>(iMagnitude);
+                float fSurvival = pPlayer->GetSurvivalEffectivenessMultiplier() * dMagnitude;
+                if (aiIndex == ActorValue::HEALTH) {
+                    BGSEntryPoint::HandleEntryPoint(BGSEntryPoint::MODIFY_RECOVERED_HEALTH, pPlayer, &fSurvival);
+                }
+                iMagnitude = static_cast<int32_t>(fSurvival);
+            }
+            if (aiIndex == ActorValue::RADIATION_RADS && iMagnitude > 0) {
+                double dMagnitude = static_cast<double>(iMagnitude);
+                float fRads = pPlayer->GetRadiationResistanceMult() * dMagnitude;
+                iMagnitude = static_cast<int32_t>(std::floor(fRads));
+            }
+            if (bFood && aiIndex == ActorValue::RADIATION_RADS) {
+                float fBonus = 1.0f;
+                BGSEntryPoint::HandleEntryPoint(BGSEntryPoint::RADIATION_INGESTIBLE_BONUS, pPlayer, &fBonus);
+                iMagnitude = static_cast<int32_t>(static_cast<double>(iMagnitude) * fBonus);
+            }
+            if (!iMagnitude) {
+                iMagnitude = 1;
+            }
+            if (*apBuffer) {
+                BSstrcat(apBuffer, 128, ", ");
+            }
+            if (pDataNode->m_item->iDuration) {
+                float fFloor = std::floor(fDuration);
+                // Only an ordered equal prints the whole number.
+                if (fDuration == fFloor) {
+                    int32_t iUnit = cUnit;
+                    int32_t iDuration = FloatToInt(fDuration);
+                    BSsprintf(
+                        Dst, 128, "%s %+i(%d%c)", ActorValue::GetActorValueAbbreviation(aiIndex), iMagnitude, iDuration,
+                        iUnit
+                    );
+                }
+                else {
+                    BSsprintf(
+                        Dst, 128, "%s %+i(%.1f%c)", ActorValue::GetActorValueAbbreviation(aiIndex), iMagnitude,
+                        static_cast<double>(fDuration), static_cast<int32_t>(cUnit)
+                    );
+                }
+            }
+            else {
+                BSsprintf(Dst, 128, "%s %+i", ActorValue::GetActorValueAbbreviation(aiIndex), iMagnitude);
+            }
+            BSstrcat(apBuffer, static_cast<int32_t>(auiSize), Dst);
         }
+
         pDataNode = pDataNode->m_pkNext;
     }
 }
@@ -187,11 +184,10 @@ bool EffectItemList::HasEffect(EffectSetting::EffectFlag aeFlag) {
     bool bFound = false;
     while (pIter && !bFound) {
         EffectItem* pItem = pIter->m_item;
-        if (pItem) {
-            if (pItem->pEffectSetting->IsFlagSet(aeFlag)) {
-                bFound = !pItem->IsDisabled();
-            }
+        if ((pItem) && (pItem->pEffectSetting->IsFlagSet(aeFlag))) {
+            bFound = !pItem->IsDisabled();
         }
+
         BSSimpleList<EffectItem*>* pNext = pIter->m_pkNext;
         pIter = pNext ? static_cast<EffectItemList*>(pNext) : nullptr;
     }
@@ -207,11 +203,10 @@ bool EffectItemList::HasSelfEffect() {
     bool bFound = false;
     while (pIter && !bFound) {
         EffectItem* pItem = pIter->m_item;
-        if (pItem) {
-            if (!pItem->data.iRange) {
-                bFound = !pItem->IsDisabled();
-            }
+        if ((pItem) && (!pItem->data.iRange)) {
+            bFound = !pItem->IsDisabled();
         }
+
         BSSimpleList<EffectItem*>* pNext = pIter->m_pkNext;
         pIter = pNext ? static_cast<EffectItemList*>(pNext) : nullptr;
     }
@@ -231,11 +226,10 @@ bool EffectItemList::HasTouchEffect() {
     uint8_t bEnabled = 0;
     while (pIter && (!bEnabled)) {
         v4 = static_cast<BSSimpleList<EffectItem*>*>(pIter)->m_item;
-        if (v4) {
-            if (((uint32_t)v4->EffectItem::GetRange()) == 1) {
-                bEnabled = (uint8_t)(!v4->IsDisabled());
-            }
+        if ((v4) && (((uint32_t)v4->EffectItem::GetRange()) == 1)) {
+            bEnabled = (uint8_t)(!v4->IsDisabled());
         }
+
         v3 = static_cast<BSSimpleList<EffectItem*>*>(pIter)->m_pkNext;
         if (v3) {
             v2 = static_cast<EffectItemList*>(v3);
@@ -461,11 +455,10 @@ bool EffectItemList::HasTargetEffect() {
     uint8_t v6 = 0;
     while (pIter && (!v6)) {
         v4 = static_cast<BSSimpleList<EffectItem*>*>(pIter)->m_item;
-        if (v4) {
-            if (((uint32_t)v4->EffectItem::GetRange()) == 2) {
-                v6 = (uint8_t)(!v4->IsDisabled());
-            }
+        if ((v4) && (((uint32_t)v4->EffectItem::GetRange()) == 2)) {
+            v6 = (uint8_t)(!v4->IsDisabled());
         }
+
         v3 = static_cast<BSSimpleList<EffectItem*>*>(pIter)->m_pkNext;
         if (v3) {
             v2 = static_cast<EffectItemList*>(v3);
@@ -671,11 +664,10 @@ bool EffectItemList::HasScript(Script* apScript) {
     bool bFound = false;
     while (pIter && !bFound) {
         EffectItem* pItem = pIter->m_item;
-        if (pItem) {
-            if (pItem->GetScript() == apScript) {
-                bFound = !pItem->IsDisabled();
-            }
+        if ((pItem) && (pItem->GetScript() == apScript)) {
+            bFound = !pItem->IsDisabled();
         }
+
         BSSimpleList<EffectItem*>* pNext = pIter->m_pkNext;
         pIter = pNext ? static_cast<EffectItemList*>(pNext) : nullptr;
     }

@@ -369,24 +369,22 @@ BSShaderProperty::RenderPassArray* WaterShaderProperty::GetRenderPasses(
                 pwaterPass->pGeometry, pwaterPass->usPassEnum, 1, 0, nullptr, nullptr, nullptr, nullptr
             );
         }
-        if (bSpecularLighting) {
-            if (LightList.m_uiCount) {
-                BSShaderProperty::RenderPassArray* v23 = this->pRenderPassList;
-                if (bDisplacement) {
-                    if (bHasVertexColors) {
-                        v23->Add(apGeom, 683, 1, 0, nullptr, nullptr, nullptr, nullptr);
-                    }
-                    else {
-                        v23->Add(apGeom, 666, 1, 0, nullptr, nullptr, nullptr, nullptr);
-                    }
+        if ((bSpecularLighting) && (LightList.m_uiCount)) {
+            BSShaderProperty::RenderPassArray* v23 = this->pRenderPassList;
+            if (bDisplacement) {
+                if (bHasVertexColors) {
+                    v23->Add(apGeom, 683, 1, 0, nullptr, nullptr, nullptr, nullptr);
                 }
                 else {
-                    if (bHasVertexColors) {
-                        v23->Add(apGeom, 718, 1, 0, nullptr, nullptr, nullptr, nullptr);
-                    }
-                    else {
-                        v23->Add(apGeom, 700, 1, 0, nullptr, nullptr, nullptr, nullptr);
-                    }
+                    v23->Add(apGeom, 666, 1, 0, nullptr, nullptr, nullptr, nullptr);
+                }
+            }
+            else {
+                if (bHasVertexColors) {
+                    v23->Add(apGeom, 718, 1, 0, nullptr, nullptr, nullptr, nullptr);
+                }
+                else {
+                    v23->Add(apGeom, 700, 1, 0, nullptr, nullptr, nullptr, nullptr);
                 }
             }
         }

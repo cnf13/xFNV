@@ -48,9 +48,8 @@ int32_t CBSAStream::Read(uint8_t* apBuffer, uint32_t auiLength, int32_t abAligne
         ullBytesRead.QuadPart += v7;
         return 0;
     }
-    else {
-        return 1;
-    }
+
+    return 1;
 }
 
 int64_t CBSAStream::GetFileSize(int64_t* apSizeAvailable) {
@@ -60,10 +59,9 @@ int64_t CBSAStream::GetFileSize(int64_t* apSizeAvailable) {
         *apSizeAvailable = ullFileSize.QuadPart;
         return ullFileSize.QuadPart;
     }
-    else {
-        *apSizeAvailable = 0;
-        return 0;
-    }
+
+    *apSizeAvailable = 0;
+    return 0;
 }
 
 // Reads need no alignment: one byte.

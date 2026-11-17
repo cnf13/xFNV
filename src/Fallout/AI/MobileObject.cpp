@@ -335,10 +335,8 @@ void MobileObject::InitLoadGame(uint32_t aiFlags, uint32_t aiCurrentFlags) {
     if (pCurrentProcess) {
         pCurrentProcess->InitLoadGame(aiFlags, aiCurrentFlags, this);
     }
-    if ((aiFlags & 0) || (aiCurrentFlags & 0)) {
-        if (GetDisabled() || GetDelete()) {
-            Set3D(nullptr, true);
-        }
+    if (((aiFlags & 0) || (aiCurrentFlags & 0)) && (GetDisabled() || GetDelete())) {
+        Set3D(nullptr, true);
     }
 }
 
@@ -372,11 +370,10 @@ void MobileObject::InitLoadGame(BGSLoadFormBuffer* apLoadGameBuffer) {
         pCurrentProcess = pProcess;
         SetProcessLevel(GetDesiredProcessLevel());
     }
-    if (TESObjectREFR::Get3D()) {
-        if (!pCurrentProcess || pCurrentProcess->GetProcessLevel() == PROCESS_TYPE_LOW ||
-            pCurrentProcess->GetProcessLevel() == PROCESS_TYPE_MIDDLE_LOW) {
-            Set3D(nullptr, true);
-        }
+    if ((TESObjectREFR::Get3D()) &&
+        (!pCurrentProcess || pCurrentProcess->GetProcessLevel() == PROCESS_TYPE_LOW ||
+         pCurrentProcess->GetProcessLevel() == PROCESS_TYPE_MIDDLE_LOW)) {
+        Set3D(nullptr, true);
     }
 }
 
@@ -536,11 +533,10 @@ void MobileObject::UpdateSoundCallBack() {
         if (cSoundCallBackSet == 1) {
             TESPackage* pPackage = GetCurrentPackage();
             DialoguePackage* pDialoguePackage = nullptr;
-            if (pPackage) {
-                if (pPackage->GetPackType() == PACKAGE_TYPE_IN_GAME_DIALOGUE) {
-                    pDialoguePackage = static_cast<DialoguePackage*>(pPackage);
-                }
+            if ((pPackage) && (pPackage->GetPackType() == PACKAGE_TYPE_IN_GAME_DIALOGUE)) {
+                pDialoguePackage = static_cast<DialoguePackage*>(pPackage);
             }
+
             if (pDialoguePackage) {
                 if (pDialoguePackage->pTalkingActor) {
                     pDialoguePackage->pTalkingActor->bVoiceFileDone = true;
@@ -571,25 +567,23 @@ void MobileObject::UpdateSoundCallBack() {
         TESTopic* pTopic = GetSayToTopic();
         uint32_t uiResponseID = GetSayToResponseID();
         bool bSayTo = true;
-        if (uiResponseID) {
-            if (pTopicInfo) {
-                ResponseListWrapper aResponseList;
-                pTopicInfo->CloneResponseList(&aResponseList);
-                if (uiResponseID != static_cast<uint32_t>(aResponseList.GetResponseID())) {
-                    bSayTo = false;
-                }
+        if ((uiResponseID) && (pTopicInfo)) {
+            ResponseListWrapper aResponseList;
+            pTopicInfo->CloneResponseList(&aResponseList);
+            if (uiResponseID != static_cast<uint32_t>(aResponseList.GetResponseID())) {
+                bSayTo = false;
             }
         }
+
         if (bSayTo) {
             SetSayToTopic(nullptr);
             ExtraDataList* pExtra = GetExtra();
             pExtra->RemoveSayToInfoExtra();
         }
-        if (pTopicInfo) {
-            if (!pTopicInfo->IsRunImmediately()) {
-                pTopicInfo->RunResult(TIRS_END, this);
-            }
+        if ((pTopicInfo) && (!pTopicInfo->IsRunImmediately())) {
+            pTopicInfo->RunResult(TIRS_END, this);
         }
+
         if (bSayTo) {
             ExtraDataList* pExtra = GetExtra();
             // 0x40000 is kEvent_SayToDone.
@@ -621,27 +615,26 @@ void MobileObject::UpdateSoundCallBack() {
             TESTopic* pSayToTopic = GetSayToTopic();
             BaseProcess* pSubtitleProcess = GetCurrentAIProcess();
             DialogueItem* pSubtitleItem = pSubtitleProcess->GetSubtitleItem();
-            if (pFaceData) {
-                if (IsActor()) {
-                    MobileObject* pMobile = this;
-                    if (BSFaceGenManager::GetUseEmotions()) {
-                        if (uiEmotion) {
-                            int32_t iExpression =
-                                BSFaceGenManager::GetExpressionFromEmotion(static_cast<DIALOGUE_EMOTION>(uiEmotion));
-                            float fAmount = static_cast<float>(iEmotionValue / 100.0);
-                            pFaceData->SetExpressionTarget(static_cast<BS_FACEGEN_EXPRESSION>(iExpression), fAmount);
-                        }
-                        else {
-                            int32_t iMood = static_cast<ActorValueOwner*>(static_cast<Actor*>(pMobile))
-                                                ->GetActorValue(ActorValue::MOOD);
-                            pFaceData->SetExpressionTargetFromMood(iMood, true);
-                        }
+            if ((pFaceData) && (IsActor())) {
+                MobileObject* pMobile = this;
+                if (BSFaceGenManager::GetUseEmotions()) {
+                    if (uiEmotion) {
+                        int32_t iExpression =
+                            BSFaceGenManager::GetExpressionFromEmotion(static_cast<DIALOGUE_EMOTION>(uiEmotion));
+                        float fAmount = static_cast<float>(iEmotionValue / 100.0);
+                        pFaceData->SetExpressionTarget(static_cast<BS_FACEGEN_EXPRESSION>(iExpression), fAmount);
                     }
                     else {
-                        pFaceData->ResetCurrentMorphs(0.0f, true, false, false, false, false);
+                        int32_t iMood = static_cast<ActorValueOwner*>(static_cast<Actor*>(pMobile))
+                                            ->GetActorValue(ActorValue::MOOD);
+                        pFaceData->SetExpressionTargetFromMood(iMood, true);
                     }
                 }
+                else {
+                    pFaceData->ResetCurrentMorphs(0.0f, true, false, false, false, false);
+                }
             }
+
             if (pSubtitleItem) {
                 const char* pText = pSubtitleItem->GetCurrentResponse()->cText.String();
                 if ((gs_bGeneralSubtitles_Gameplay.Bool() && pText) ||
@@ -673,32 +666,30 @@ void MobileObject::UpdateSoundCallBack() {
             if (pPackage && pPackage->GetPackType() == PACKAGE_TYPE_IN_GAME_DIALOGUE) {
                 pDialoguePackage = static_cast<DialoguePackage*>(pPackage);
             }
-            else if (pProcessPackage) {
-                if (pProcessPackage->GetPackType() == PACKAGE_TYPE_IN_GAME_DIALOGUE) {
-                    pDialoguePackage = static_cast<DialoguePackage*>(pProcessPackage);
-                }
+            else if ((pProcessPackage) && (pProcessPackage->GetPackType() == PACKAGE_TYPE_IN_GAME_DIALOGUE)) {
+                pDialoguePackage = static_cast<DialoguePackage*>(pProcessPackage);
             }
-            if (pFaceData) {
-                if (IsActor()) {
-                    MobileObject* pMobile = this;
-                    if (BSFaceGenManager::GetUseEmotions()) {
-                        if (uiEmotion) {
-                            int32_t iExpression =
-                                BSFaceGenManager::GetExpressionFromEmotion(static_cast<DIALOGUE_EMOTION>(uiEmotion));
-                            float fAmount = static_cast<float>(iEmotionValue / 100.0);
-                            pFaceData->SetExpressionTarget(static_cast<BS_FACEGEN_EXPRESSION>(iExpression), fAmount);
-                        }
-                        else {
-                            int32_t iMood = static_cast<ActorValueOwner*>(static_cast<Actor*>(pMobile))
-                                                ->GetActorValue(ActorValue::MOOD);
-                            pFaceData->SetExpressionTargetFromMood(iMood, true);
-                        }
+
+            if ((pFaceData) && (IsActor())) {
+                MobileObject* pMobile = this;
+                if (BSFaceGenManager::GetUseEmotions()) {
+                    if (uiEmotion) {
+                        int32_t iExpression =
+                            BSFaceGenManager::GetExpressionFromEmotion(static_cast<DIALOGUE_EMOTION>(uiEmotion));
+                        float fAmount = static_cast<float>(iEmotionValue / 100.0);
+                        pFaceData->SetExpressionTarget(static_cast<BS_FACEGEN_EXPRESSION>(iExpression), fAmount);
                     }
                     else {
-                        pFaceData->ResetCurrentMorphs(0.0f, true, false, false, false, false);
+                        int32_t iMood = static_cast<ActorValueOwner*>(static_cast<Actor*>(pMobile))
+                                            ->GetActorValue(ActorValue::MOOD);
+                        pFaceData->SetExpressionTargetFromMood(iMood, true);
                     }
                 }
+                else {
+                    pFaceData->ResetCurrentMorphs(0.0f, true, false, false, false, false);
+                }
             }
+
             if (pDialoguePackage) {
                 pPlayer->CheckForClosesConversation(
                     pDialoguePackage->GetActorStartedConversation(), pDialoguePackage->GetTargetOfConversation(),
@@ -706,22 +697,16 @@ void MobileObject::UpdateSoundCallBack() {
                 );
                 if (pDialoguePackage == pPlayer->pClosestConversation || ReferenceProcessLists.bShowSubtitle) {
                     Conversation* pConversation = pDialoguePackage->GetPackConversation();
-                    if (pConversation) {
-                        if (pConversation->GetCurrentItem()) {
-                            if (pConversation->GetCurrentItem()->GetCurrentResponse()) {
-                                const char* pText =
-                                    pConversation->GetCurrentItem()->GetCurrentResponse()->cText.String();
-                                if (pText) {
-                                    if (gs_bGeneralSubtitles_Gameplay.Bool() ||
-                                        (IsActor() && static_cast<Actor*>(this)->GetShowSubtitles())) {
-                                        BSSoundHandle kHandle =
-                                            GetCurrentAIProcess()->GetSoundHandle(ACTOR_SOUND_HANDLE_VOICE);
-                                        Interface::ShowSubtitle(
-                                            const_cast<char*>(pText), kHandle, GetLocationOnReference(), pPlayer, false
-                                        );
-                                    }
-                                }
-                            }
+                    if ((pConversation) && (pConversation->GetCurrentItem()) &&
+                        (pConversation->GetCurrentItem()->GetCurrentResponse())) {
+                        const char* pText = pConversation->GetCurrentItem()->GetCurrentResponse()->cText.String();
+                        if ((pText) &&
+                            (gs_bGeneralSubtitles_Gameplay.Bool() ||
+                             (IsActor() && static_cast<Actor*>(this)->GetShowSubtitles()))) {
+                            BSSoundHandle kHandle = GetCurrentAIProcess()->GetSoundHandle(ACTOR_SOUND_HANDLE_VOICE);
+                            Interface::ShowSubtitle(
+                                const_cast<char*>(pText), kHandle, GetLocationOnReference(), pPlayer, false
+                            );
                         }
                     }
                 }
@@ -747,194 +732,173 @@ bool MobileObject::DetachHavok() {
 void MobileObject::InitHavok() {
     Actor* pactor = static_cast<Actor*>(this);
     RemoveFromAllWater(false);
-    if (pactor->pCurrentProcess) {
-        if (!pactor->pCurrentProcess->eLevel || pactor->pCurrentProcess->eLevel == PROCESS_TYPE_MIDDLE_HIGH) {
-            TESObjectCELL* pcell = pactor->GetParentCell();
-            HighProcess* pBaseProc =
-                pactor->pCurrentProcess->eLevel ? nullptr : static_cast<HighProcess*>(pactor->pCurrentProcess);
-            if (!pcell || (pcell->GetAttached() || pcell->IsAttaching())) {
-                bool v40;
-                bhkWorld* pw;
-                if (pcell) {
-                    pw = pcell->GetbhkWorld();
+    if ((pactor->pCurrentProcess) &&
+        (!pactor->pCurrentProcess->eLevel || pactor->pCurrentProcess->eLevel == PROCESS_TYPE_MIDDLE_HIGH)) {
+        TESObjectCELL* pcell = pactor->GetParentCell();
+        HighProcess* pBaseProc =
+            pactor->pCurrentProcess->eLevel ? nullptr : static_cast<HighProcess*>(pactor->pCurrentProcess);
+        if (!pcell || (pcell->GetAttached() || pcell->IsAttaching())) {
+            bool v40;
+            bhkWorld* pw;
+            if (pcell) {
+                pw = pcell->GetbhkWorld();
+            }
+            else {
+                pw = nullptr;
+            }
+            Actor* pactor_2 = pactor->IsActor() ? pactor : nullptr;
+            if (pactor_2) {
+                ACTOR_CRITICAL_STAGE CriticalStage = pactor_2->eCriticalStage;
+                if (CriticalStage == ACS_GOO_END || CriticalStage == ACS_DISINTEGRATE_END) {
+                    return;
+                }
+                // All flags: any reason to keep the actor's Havok data.
+                v40 = pactor_2->GetLifeState() == ACTOR_LIFE_STATE_DEAD ||
+                    pactor_2->CheckShouldSaveHavokData(0xFFFFFFFFu);
+                NiNode* v1 = pactor->TESObjectREFR::Get3D();
+                bhkNiCollisionObject::SetRigidBodyName(v1);
+            }
+            else {
+                v40 = false;
+            }
+            ExtraDismemberedLimbs* pdismemberedLimbs = (&pactor->m_Extra)->GetDismembermentExtra();
+            if ((pdismemberedLimbs) && (pactor->pCurrentProcess) && (pactor->Get3D())) {
+                uint32_t uilimbCount = pdismemberedLimbs->GetDismemberedLimbCount();
+                for (uint32_t ui = 0; ui < uilimbCount; ++ui) {
+                    DismemberedLimb* plimb = pdismemberedLimbs->GetDismemberedLimb(ui);
+                    NiNode* plimbRoot =
+                        pactor->pCurrentProcess->GetDamageNode(static_cast<BGSBodyPart::LIMB_ENUM>(plimb->cLimb));
+                    NiNode* plimbParent = plimbRoot->m_pkParent;
+                    NiFixedString dismemberRootName(pLimbEnumNames[plimb->cLimb]);
+                    if (!plimbParent || !NiFixedString::HandlesEqual(plimbParent->GetName(), dismemberRootName)) {
+                        for (uint32_t i = 0; i < plimbRoot->GetArrayCount(); ++i) {
+                            NiAVObject* pchild = plimbRoot->GetAt(i);
+                            if (pchild) {
+                                bhkWorld::SetDisabled(pchild, true, true, true);
+                            }
+                        }
+                    }
+                }
+            }
+
+            bhkCharacterController* pcon = pactor->GetCharController();
+            if (!pcon) {
+                bhkCharacterController* pcon_2;
+                bhkCharacterControllerCinfo info(true);
+                info.pObject = pactor->TESObjectREFR::Get3D();
+                info.SetPosition(*pactor->QLocationOnReference());
+                info.SetWorld(nullptr);
+                info.SetAcrobatics(pactor->GetAcrobatics());
+                if (pactor_2 && (pactor->GetObjectReference() && pactor_2->IsCreature())) {
+                    bool TiltFrontBack =
+                        static_cast<TESCreature*>(pactor_2->GetObjectReference())->TESCreature::GetTiltFrontBack();
+                    info.SetPitch(TiltFrontBack);
+                    info.SetRoll(
+                        static_cast<TESCreature*>(pactor_2->GetObjectReference())->TESCreature::GetTiltLeftRight()
+                    );
+                    info.SetScale(pactor->GetScale());
                 }
                 else {
-                    pw = nullptr;
+                    info.SetUseDefaultShape(true);
                 }
-                Actor* pactor_2 = pactor->IsActor() ? pactor : nullptr;
-                if (pactor_2) {
-                    ACTOR_CRITICAL_STAGE CriticalStage = pactor_2->eCriticalStage;
-                    if (CriticalStage == ACS_GOO_END || CriticalStage == ACS_DISINTEGRATE_END) {
-                        return;
-                    }
-                    // All flags: any reason to keep the actor's Havok data.
-                    v40 = pactor_2->GetLifeState() == ACTOR_LIFE_STATE_DEAD ||
-                        pactor_2->CheckShouldSaveHavokData(0xFFFFFFFFu);
-                    NiNode* v1 = pactor->TESObjectREFR::Get3D();
-                    bhkNiCollisionObject::SetRigidBodyName(v1);
+                bhkCharacterController* v28 = static_cast<bhkCharacterController*>(
+                    bhkRagdollController::operator new(sizeof(bhkCharacterController))
+                );
+                if (v28) {
+                    pcon_2 = ::new (v28) bhkCharacterController(info);
                 }
                 else {
-                    v40 = false;
+                    pcon_2 = nullptr;
                 }
-                ExtraDismemberedLimbs* pdismemberedLimbs = (&pactor->m_Extra)->GetDismembermentExtra();
-                if (pdismemberedLimbs) {
-                    if (pactor->pCurrentProcess) {
-                        if (pactor->Get3D()) {
-                            uint32_t uilimbCount = pdismemberedLimbs->GetDismemberedLimbCount();
-                            for (uint32_t ui = 0; ui < uilimbCount; ++ui) {
-                                DismemberedLimb* plimb = pdismemberedLimbs->GetDismemberedLimb(ui);
-                                NiNode* plimbRoot = pactor->pCurrentProcess->GetDamageNode(
-                                    static_cast<BGSBodyPart::LIMB_ENUM>(plimb->cLimb)
-                                );
-                                NiNode* plimbParent = plimbRoot->m_pkParent;
-                                NiFixedString dismemberRootName(pLimbEnumNames[plimb->cLimb]);
-                                if (!plimbParent ||
-                                    !NiFixedString::HandlesEqual(plimbParent->GetName(), dismemberRootName)) {
-                                    for (uint32_t i = 0; i < plimbRoot->GetArrayCount(); ++i) {
-                                        NiAVObject* pchild = plimbRoot->GetAt(i);
-                                        if (pchild) {
-                                            bhkWorld::SetDisabled(pchild, true, true, true);
-                                        }
-                                    }
-                                }
-                            }
-                        }
-                    }
-                }
-                bhkCharacterController* pcon = pactor->GetCharController();
-                if (!pcon) {
-                    bhkCharacterController* pcon_2;
-                    bhkCharacterControllerCinfo info(true);
-                    info.pObject = pactor->TESObjectREFR::Get3D();
-                    info.SetPosition(*pactor->QLocationOnReference());
-                    info.SetWorld(nullptr);
-                    info.SetAcrobatics(pactor->GetAcrobatics());
-                    if (pactor_2 && (pactor->GetObjectReference() && pactor_2->IsCreature())) {
-                        bool TiltFrontBack =
-                            static_cast<TESCreature*>(pactor_2->GetObjectReference())->TESCreature::GetTiltFrontBack();
-                        info.SetPitch(TiltFrontBack);
-                        info.SetRoll(
-                            static_cast<TESCreature*>(pactor_2->GetObjectReference())->TESCreature::GetTiltLeftRight()
-                        );
-                        info.SetScale(pactor->GetScale());
-                    }
-                    else {
-                        info.SetUseDefaultShape(true);
-                    }
-                    bhkCharacterController* v28 = static_cast<bhkCharacterController*>(
-                        bhkRagdollController::operator new(sizeof(bhkCharacterController))
+                pcon = pcon_2;
+                if ((pactor_2) && (pactor->GetObjectReference())) {
+                    bool NotPushable = pactor->GetActorBase()->GetNotPushable();
+                    pcon->SetFlag(
+                        bhkCharacterController::NOTPUSHABLE_PERMANENT | bhkCharacterController::NOTPUSHABLE, NotPushable
                     );
-                    if (v28) {
-                        pcon_2 = ::new (v28) bhkCharacterController(info);
-                    }
-                    else {
-                        pcon_2 = nullptr;
-                    }
-                    pcon = pcon_2;
-                    if (pactor_2) {
-                        if (pactor->GetObjectReference()) {
-                            bool NotPushable = pactor->GetActorBase()->GetNotPushable();
-                            pcon->SetFlag(
-                                bhkCharacterController::NOTPUSHABLE_PERMANENT | bhkCharacterController::NOTPUSHABLE,
-                                NotPushable
-                            );
-                        }
-                    }
-                    // The by-value NiPointer argument is released by the callee.
-                    pactor->pCurrentProcess->SetCharController(pcon);
-                    pcon->SetMOBObject(pactor);
-                    pcon->SetScale(pactor->GetScale());
-                    bool IsComplex = Main::GetSceneIsComplex();
-                    pcon->SetQuickSimulate(IsComplex);
-                    pcon->SetFlag(bhkCharacterController::RECORD_HITS, true);
-                    if (pBaseProc) {
-                        bhkSimpleShapePhantom* pdoorPhantom =
-                            static_cast<bhkSimpleShapePhantom*>(pBaseProc->QDoorDetectionPhantom());
-                        if (pdoorPhantom) {
-                            CFilter ifilter;
-                            CFilter kControllerFilter;
-                            pdoorPhantom->GetCollisionFilter(&ifilter);
-                            CFilter* CollisionFilter = pcon->GetCollisionFilter(&kControllerFilter);
-                            uint32_t Group = CollisionFilter->GetGroup();
-                            ifilter.SetGroup(Group);
-                            pdoorPhantom->SetCollisionFilter(ifilter);
-                        }
+                }
+
+                // The by-value NiPointer argument is released by the callee.
+                pactor->pCurrentProcess->SetCharController(pcon);
+                pcon->SetMOBObject(pactor);
+                pcon->SetScale(pactor->GetScale());
+                bool IsComplex = Main::GetSceneIsComplex();
+                pcon->SetQuickSimulate(IsComplex);
+                pcon->SetFlag(bhkCharacterController::RECORD_HITS, true);
+                if (pBaseProc) {
+                    bhkSimpleShapePhantom* pdoorPhantom =
+                        static_cast<bhkSimpleShapePhantom*>(pBaseProc->QDoorDetectionPhantom());
+                    if (pdoorPhantom) {
+                        CFilter ifilter;
+                        CFilter kControllerFilter;
+                        pdoorPhantom->GetCollisionFilter(&ifilter);
+                        CFilter* CollisionFilter = pcon->GetCollisionFilter(&kControllerFilter);
+                        uint32_t Group = CollisionFilter->GetGroup();
+                        ifilter.SetGroup(Group);
+                        pdoorPhantom->SetCollisionFilter(ifilter);
                     }
                 }
-                if (pw) {
-                    if (pw->IsBatchingAdds()) {
-                        pcon->SetWaitForBatchAdd(true);
+            }
+            if ((pw) && (pw->IsBatchingAdds())) {
+                pcon->SetWaitForBatchAdd(true);
+            }
+
+            if ((pactor_2) && (v40)) {
+                // MobileObject::GetCollisionFilter writes the filter word; the group is read from the filter it
+                // returns.
+                CFilter kActorFilter;
+                pactor_2->GetCollisionFilter(&kActorFilter.iFilter);
+                uint32_t uiGroup = kActorFilter.GetGroup();
+                NiNode* v9 = pactor_2->Get3D();
+                pactor_2->pPenetrationDetection->Initialize(v9, static_cast<int32_t>(uiGroup));
+            }
+
+            NiAVObject* poldAV = pcon->GetNiObject();
+            NiAVObject* pav = pactor->TESObjectREFR::Get3D();
+            if (poldAV != pav) {
+                bhkWorld* pw_3;
+                pcon->SetNiObject(pav);
+                NiColorA color(0.0f, 0.0f, 0.0f, 0.0f);
+                color.r = 1.0f;
+                color.g = 0.0f;
+                color.b = 0.0f;
+                color.a = 0.25f;
+                TESObjectCELL* pcell_2 = pactor->GetParentCell();
+                if (pcell_2) {
+                    pw_3 = pcell_2->GetbhkWorld();
+                }
+                else {
+                    pw_3 = nullptr;
+                }
+                if ((pw_3) && (pw_3->QDebugDisplay())) {
+                    pcon->BuildDisplayGeometry(nullptr);
+                    NiAVObject* poldAV_2 = pcon->GetNiObject();
+                    BSShaderUtil::RecursiveSetPropertyWireframe(poldAV_2, true);
+                }
+
+                bhkWorld::SetMotion(
+                    pav, v40 ? hkpMotion::MOTION_DYNAMIC : hkpMotion::MOTION_KEYFRAMED, true, false, false
+                );
+                if ((pactor_2) && (!pactor_2->IsDead(false))) {
+                    pactor_2->CreateRagdollInstance(pav, true, true, false);
+                    if ((pactor == pPlayer) && (pactor_2->pRagdollController)) {
+                        pactor_2->pRagdollController->SetUsePhantomFootIKCasts(false);
+                        pactor_2->pRagdollController->SetUseFootEndCast(true);
                     }
                 }
-                if (pactor_2) {
-                    if (v40) {
-                        // MobileObject::GetCollisionFilter writes the filter word; the group is read from the filter it
-                        // returns.
-                        CFilter kActorFilter;
-                        pactor_2->GetCollisionFilter(&kActorFilter.iFilter);
-                        uint32_t uiGroup = kActorFilter.GetGroup();
-                        NiNode* v9 = pactor_2->Get3D();
-                        pactor_2->pPenetrationDetection->Initialize(v9, static_cast<int32_t>(uiGroup));
-                    }
+            }
+            if ((pactor->pCurrentProcess) && (!pactor->pCurrentProcess->eLevel && pactor != pPlayer) && (pactor_2) &&
+                (pactor_2->GetActorBase()) && (!pactor_2->GetTurretBehavior())) {
+                HighProcess* phigh = static_cast<HighProcess*>(pactor->pCurrentProcess);
+                if (!phigh->CheckPhantom()) {
+                    phigh->SetupPhantom(pactor_2);
                 }
-                NiAVObject* poldAV = pcon->GetNiObject();
-                NiAVObject* pav = pactor->TESObjectREFR::Get3D();
-                if (poldAV != pav) {
-                    bhkWorld* pw_3;
-                    pcon->SetNiObject(pav);
-                    NiColorA color(0.0f, 0.0f, 0.0f, 0.0f);
-                    color.r = 1.0f;
-                    color.g = 0.0f;
-                    color.b = 0.0f;
-                    color.a = 0.25f;
-                    TESObjectCELL* pcell_2 = pactor->GetParentCell();
-                    if (pcell_2) {
-                        pw_3 = pcell_2->GetbhkWorld();
-                    }
-                    else {
-                        pw_3 = nullptr;
-                    }
-                    if (pw_3) {
-                        if (pw_3->QDebugDisplay()) {
-                            pcon->BuildDisplayGeometry(nullptr);
-                            NiAVObject* poldAV_2 = pcon->GetNiObject();
-                            BSShaderUtil::RecursiveSetPropertyWireframe(poldAV_2, true);
-                        }
-                    }
-                    bhkWorld::SetMotion(
-                        pav, v40 ? hkpMotion::MOTION_DYNAMIC : hkpMotion::MOTION_KEYFRAMED, true, false, false
-                    );
-                    if (pactor_2) {
-                        if (!pactor_2->IsDead(false)) {
-                            pactor_2->CreateRagdollInstance(pav, true, true, false);
-                            if (pactor == pPlayer) {
-                                if (pactor_2->pRagdollController) {
-                                    pactor_2->pRagdollController->SetUsePhantomFootIKCasts(false);
-                                    pactor_2->pRagdollController->SetUseFootEndCast(true);
-                                }
-                            }
-                        }
-                    }
-                }
-                if (pactor->pCurrentProcess) {
-                    if (!pactor->pCurrentProcess->eLevel && pactor != pPlayer) {
-                        if (pactor_2) {
-                            if (pactor_2->GetActorBase()) {
-                                if (!pactor_2->GetTurretBehavior()) {
-                                    HighProcess* phigh = static_cast<HighProcess*>(pactor->pCurrentProcess);
-                                    if (!phigh->CheckPhantom()) {
-                                        phigh->SetupPhantom(pactor_2);
-                                    }
-                                }
-                            }
-                        }
-                    }
-                }
-                pactor->MoveHavok(false);
-                if (v40 && !(&pactor->m_Extra)->GetSavedHavokData() && !(&pactor->m_Extra)->GetRagDollData()) {
-                    NiPoint3 vel(0.0f, 0.0f, -1.0f);
-                    TESHavokUtilities::AddVelocity(pav, vel, true);
-                }
+            }
+
+            pactor->MoveHavok(false);
+            if (v40 && !(&pactor->m_Extra)->GetSavedHavokData() && !(&pactor->m_Extra)->GetRagDollData()) {
+                NiPoint3 vel(0.0f, 0.0f, -1.0f);
+                TESHavokUtilities::AddVelocity(pav, vel, true);
             }
         }
     }
@@ -1120,11 +1084,10 @@ bhkCharacterController* MobileObject::Move(float afDeltaTime, NiPoint3& arDeltaM
     Actor* pactor = IsActor() ? static_cast<Actor*>(this) : nullptr;
     bhkCharacterController* pcon = pactor_2->GetCharController();
     bool bIsProjectile = pactor_2->IsProjectile();
-    if (pactor) {
-        if (pactor->GetActorValue(ActorValue::TURBO) > 0) {
-            afDeltaTime = afDeltaTime / BSTimer::QGlobalTimeMultiplier();
-        }
+    if ((pactor) && (pactor->GetActorValue(ActorValue::TURBO) > 0)) {
+        afDeltaTime = afDeltaTime / BSTimer::QGlobalTimeMultiplier();
     }
+
     alignas(16) NiPoint3 pos = *pactor_2->QLocationOnReference();
     if (!std::isnan(arDeltaMove.x) && !std::isnan(arDeltaMove.y)) {
         std::isnan(arDeltaMove.z);
@@ -1257,27 +1220,26 @@ bhkCharacterController* MobileObject::Move(float afDeltaTime, NiPoint3& arDeltaM
                 md.Displacement = arDeltaMove;
                 md.iMoveDirection = aiMoveDir;
                 md.bVisible = true;
-                if (pactor_2 != pPlayer) {
-                    if (pactor) {
-                        bool isNotFadedOut;
-                        BSFadeNode* pfadeNode;
-                        NiAVObject* p3d = (NiAVObject*)pactor_2->Get3D();
-                        if (p3d) {
-                            pfadeNode = p3d->IsFadeNode();
-                        }
-                        else {
-                            pfadeNode = nullptr;
-                        }
-                        if (pfadeNode) {
-                            NiCamera* v13 = Main::WorldRootCamera();
-                            isNotFadedOut = pfadeNode->ShouldUpdate(v13, 0.8f);
-                        }
-                        else {
-                            isNotFadedOut = true;
-                        }
-                        md.bVisible = isNotFadedOut;
+                if ((pactor_2 != pPlayer) && (pactor)) {
+                    bool isNotFadedOut;
+                    BSFadeNode* pfadeNode;
+                    NiAVObject* p3d = (NiAVObject*)pactor_2->Get3D();
+                    if (p3d) {
+                        pfadeNode = p3d->IsFadeNode();
                     }
+                    else {
+                        pfadeNode = nullptr;
+                    }
+                    if (pfadeNode) {
+                        NiCamera* v13 = Main::WorldRootCamera();
+                        isNotFadedOut = pfadeNode->ShouldUpdate(v13, 0.8f);
+                    }
+                    else {
+                        isNotFadedOut = true;
+                    }
+                    md.bVisible = isNotFadedOut;
                 }
+
                 if (pcon->QChaseBip() && !v77) {
                     float v27;
                     NiPoint3 oldPos;
@@ -1391,71 +1353,66 @@ bhkCharacterController* MobileObject::Move(float afDeltaTime, NiPoint3& arDeltaM
         pactor_2->SetLocationOnReference(pos);
         return pcon;
     }
-    else {
-        if (pcon && pcon->GetState() == HK_CHARACTER_USER_STATE_0) {
-            if (pactor_2->pLoadedData->fRelevantWaterHeight == -3.4028234663852886e+38) {
-                const NiPoint3* v11 = &pactor_2->GetLocationOnReference();
-                double WaterHeight = TES::pInstance->GetWaterHeight(*v11, nullptr);
-                pactor_2->pLoadedData->fRelevantWaterHeight = WaterHeight;
+
+    if (pcon && pcon->GetState() == HK_CHARACTER_USER_STATE_0) {
+        if (pactor_2->pLoadedData->fRelevantWaterHeight == -3.4028234663852886e+38) {
+            const NiPoint3* v11 = &pactor_2->GetLocationOnReference();
+            double WaterHeight = TES::pInstance->GetWaterHeight(*v11, nullptr);
+            pactor_2->pLoadedData->fRelevantWaterHeight = WaterHeight;
+        }
+        float fheightWater = pactor_2->GetRelevantWaterHeight();
+        if (fheightWater == -3.4028234663852886e+38) {
+            if (pcon) {
+                if (pactor_2->DoesFly()) {
+                    pcon->SetWantState(HK_CHARACTER_IN_AIR);
+                }
+                else {
+                    pcon->SetWantState(HK_CHARACTER_ON_GROUND);
+                }
+                tmpLoc.z = fheightNavMesh;
             }
-            float fheightWater = pactor_2->GetRelevantWaterHeight();
-            if (fheightWater == -3.4028234663852886e+38) {
-                if (pcon) {
-                    if (pactor_2->DoesFly()) {
-                        pcon->SetWantState(HK_CHARACTER_IN_AIR);
-                    }
-                    else {
-                        pcon->SetWantState(HK_CHARACTER_ON_GROUND);
-                    }
+        }
+        else {
+            if (!(fheightWater < static_cast<double>(tmpLoc.z))) {
+                if (fheightNavMesh > static_cast<double>(tmpLoc.z) &&
+                    fheightWater > static_cast<double>(fheightNavMesh)) {
                     tmpLoc.z = fheightNavMesh;
                 }
             }
             else {
-                if (!(fheightWater < static_cast<double>(tmpLoc.z))) {
-                    if (fheightNavMesh > static_cast<double>(tmpLoc.z) &&
-                        fheightWater > static_cast<double>(fheightNavMesh)) {
-                        tmpLoc.z = fheightNavMesh;
-                    }
-                }
-                else {
-                    tmpLoc.z = fheightWater;
-                }
+                tmpLoc.z = fheightWater;
             }
         }
-        else {
-            if (eSitSleepState == SIT_SLEEP_NORMAL && !v77) {
-                tmpLoc.z = fheightNavMesh;
-            }
-        }
-        if (pcon) {
-            if (pcon->GetWorld()) {
-                if (!static_cast<uint8_t>(pcon->QFarAway()) &&
-                    (pcon->QCanPitch() || (pcon->QCanPitch() || pcon->QQuadruped()))) {
-                    hkVector4 supNorm;
-                    alignas(16) NiPoint3 hitNormal;
-                    PathingLocation loc(pactor_2);
-                    Pathing::GetNavmeshNormalForLocation(loc, hitNormal);
-                    NI2HK(supNorm, hitNormal);
-                    pcon->SetSupportNormal(supNorm);
-                    pcon->ResetCalculatePitchTimer();
-                    pcon->InitFrontBack();
-                    pcon->CalculatePitchAndRoll();
-                    float v58 = (&pactor_2->GetAngleOnReference())->z;
-                    hkrot.~hkQuaternion();
-                    ::new (&hkrot) hkQuaternion;
-                    hkrot.setAxisAngle(pcon->UpVec, -v58);
-                    pcon->ApplyPitchAndRoll(hkrot);
-                }
-            }
-        }
-        pactor_2->SetPosition(tmpLoc);
-        if (pcon) {
-            if (pcon->GetState() == HK_CHARACTER_IN_AIR) {
-                pcon->SetTrueState(HK_CHARACTER_ON_GROUND);
-            }
-        }
-        return pcon;
     }
+    else {
+        if (eSitSleepState == SIT_SLEEP_NORMAL && !v77) {
+            tmpLoc.z = fheightNavMesh;
+        }
+    }
+    if ((pcon) && (pcon->GetWorld()) &&
+        (!static_cast<uint8_t>(pcon->QFarAway()) && (pcon->QCanPitch() || (pcon->QCanPitch() || pcon->QQuadruped())))) {
+        hkVector4 supNorm;
+        alignas(16) NiPoint3 hitNormal;
+        PathingLocation loc(pactor_2);
+        Pathing::GetNavmeshNormalForLocation(loc, hitNormal);
+        NI2HK(supNorm, hitNormal);
+        pcon->SetSupportNormal(supNorm);
+        pcon->ResetCalculatePitchTimer();
+        pcon->InitFrontBack();
+        pcon->CalculatePitchAndRoll();
+        float v58 = (&pactor_2->GetAngleOnReference())->z;
+        hkrot.~hkQuaternion();
+        ::new (&hkrot) hkQuaternion;
+        hkrot.setAxisAngle(pcon->UpVec, -v58);
+        pcon->ApplyPitchAndRoll(hkrot);
+    }
+
+    pactor_2->SetPosition(tmpLoc);
+    if ((pcon) && (pcon->GetState() == HK_CHARACTER_IN_AIR)) {
+        pcon->SetTrueState(HK_CHARACTER_ON_GROUND);
+    }
+
+    return pcon;
 }
 
 // The jump height is fJumpHeightMin scaled by the reference's scale, times fJumpSwimmingMult when swimming. The setting
@@ -1517,68 +1474,64 @@ void MobileObject::UpdateInDialogue(float afDelta, DialogueResponse* pResponse, 
     DialoguePackage* pdia = nullptr;
     BaseProcess* CurrentAIProcess = pCurrentProcess;
     TESPackage* pbasepack = CurrentAIProcess->GetCurrentPackage();
-    if (pbasepack) {
-        if (pbasepack->GetPackType() == PACKAGE_TYPE_IN_GAME_DIALOGUE) {
-            pdia = static_cast<DialoguePackage*>(pbasepack);
-        }
+    if ((pbasepack) && (pbasepack->GetPackType() == PACKAGE_TYPE_IN_GAME_DIALOGUE)) {
+        pdia = static_cast<DialoguePackage*>(pbasepack);
     }
+
     bool bPlayIdle = false;
     bool btalkflag = false;
-    if (pResponse) {
-        if (pCurrentProcess) {
-            if (bSpeakingDone) {
-                BSSoundHandle phan;
-                btalkflag = true;
-                pTalkingToPlayer = static_cast<Actor*>(this);
-                bTalkingToPlayer = true;
-                bool bnosound = true;
-                if (pResponse->pVoiceSound) {
-                    uint32_t isoundFileID = pResponse->pVoiceSound->iFormID;
-                    BSSoundHandle handle;
-                    if (GetTalkingActivator()) {
-                        TESObjectREFR* pref = GetTalkingActivator();
-                        BSAudio* v4 = &BSAudio::QInstance();
-                        BSSoundHandle* arHandle = v4->GetSoundHandleByNumericID(&a1, isoundFileID, 261u);
-                        handle.operator=(*arHandle);
-                        handle.Play(false);
-                    }
-                    else {
-                        BSSoundHandle* v17 = PlaySound(&a2, isoundFileID, false, 0x40000102u, true);
-                        handle.operator=(*v17);
-                    }
-                    BSAudioManager* mgr = &BSAudioManager::QInstance();
-                    // The callback's context is the speaker's form ID.
-                    mgr->SetCompletionCallback(
-                        static_cast<uint32_t>(handle.iSoundID), &MobileObject::SoundFileCallBack,
-                        reinterpret_cast<void*>(static_cast<uintptr_t>(iFormID))
-                    );
-                    bnosound = false;
-                    bSoundFileDone = false;
-                    bSpeakingDone = false;
-                }
-                if (bSoundFileDone && bnosound) {
-                    PlayerCharacter* v10 = pPlayer;
-                    TESIdleForm* ListenerIdle = pResponse->pListenIdle;
-                    TESIdleForm* SpeakerIdle = pResponse->pSpeakerIdle;
-                    uint32_t Length = pResponse->cText.GetLength();
-                    uint32_t v6 = pResponse->uiEmotion;
-                    DIALOGUE_EMOTION FormFlags = pResponse->eEmotion;
-                    float fdelay = SpeakSoundFunction(
-                        pResponse->GetVoice()->pString, phan, FormFlags, v6, Length, SpeakerIdle, ListenerIdle, v10,
-                        true, true, false, true, true
-                    );
-                    BSAudioManager* mgr_2 = &BSAudioManager::QInstance();
-                    mgr_2->SetCompletionCallback(
-                        static_cast<uint32_t>(phan.iSoundID), &MobileObject::ChangeDialogueAnimation,
-                        reinterpret_cast<void*>(static_cast<uintptr_t>(iFormID))
-                    );
-                    bVoiceFileDone = false;
-                    BaseProcess* v16 = pCurrentProcess;
-                    v16->SetSoundDelay(fdelay);
-                }
+    if ((pResponse) && (pCurrentProcess) && (bSpeakingDone)) {
+        BSSoundHandle phan;
+        btalkflag = true;
+        pTalkingToPlayer = static_cast<Actor*>(this);
+        bTalkingToPlayer = true;
+        bool bnosound = true;
+        if (pResponse->pVoiceSound) {
+            uint32_t isoundFileID = pResponse->pVoiceSound->iFormID;
+            BSSoundHandle handle;
+            if (GetTalkingActivator()) {
+                TESObjectREFR* pref = GetTalkingActivator();
+                BSAudio* v4 = &BSAudio::QInstance();
+                BSSoundHandle* arHandle = v4->GetSoundHandleByNumericID(&a1, isoundFileID, 261u);
+                handle.operator=(*arHandle);
+                handle.Play(false);
             }
+            else {
+                BSSoundHandle* v17 = PlaySound(&a2, isoundFileID, false, 0x40000102u, true);
+                handle.operator=(*v17);
+            }
+            BSAudioManager* mgr = &BSAudioManager::QInstance();
+            // The callback's context is the speaker's form ID.
+            mgr->SetCompletionCallback(
+                static_cast<uint32_t>(handle.iSoundID), &MobileObject::SoundFileCallBack,
+                reinterpret_cast<void*>(static_cast<uintptr_t>(iFormID))
+            );
+            bnosound = false;
+            bSoundFileDone = false;
+            bSpeakingDone = false;
+        }
+        if (bSoundFileDone && bnosound) {
+            PlayerCharacter* v10 = pPlayer;
+            TESIdleForm* ListenerIdle = pResponse->pListenIdle;
+            TESIdleForm* SpeakerIdle = pResponse->pSpeakerIdle;
+            uint32_t Length = pResponse->cText.GetLength();
+            uint32_t v6 = pResponse->uiEmotion;
+            DIALOGUE_EMOTION FormFlags = pResponse->eEmotion;
+            float fdelay = SpeakSoundFunction(
+                pResponse->GetVoice()->pString, phan, FormFlags, v6, Length, SpeakerIdle, ListenerIdle, v10, true, true,
+                false, true, true
+            );
+            BSAudioManager* mgr_2 = &BSAudioManager::QInstance();
+            mgr_2->SetCompletionCallback(
+                static_cast<uint32_t>(phan.iSoundID), &MobileObject::ChangeDialogueAnimation,
+                reinterpret_cast<void*>(static_cast<uintptr_t>(iFormID))
+            );
+            bVoiceFileDone = false;
+            BaseProcess* v16 = pCurrentProcess;
+            v16->SetSoundDelay(fdelay);
         }
     }
+
     if (!abChangeAnimationEndVoice) {
         UpdateAnimation(afDelta);
     }
@@ -1586,11 +1539,10 @@ void MobileObject::UpdateInDialogue(float afDelta, DialogueResponse* pResponse, 
     if (!abChangeAnimationEndVoice) {
         Update(afDelta);
     }
-    if (btalkflag) {
-        if (pdia) {
-            pdia->pTalkingActor = this;
-        }
+    if ((btalkflag) && (pdia)) {
+        pdia->pTalkingActor = this;
     }
+
     TESObjectCELL* pcell = GetParentCell();
     if (pcell) {
         pcell->UpdateLights();
@@ -1660,18 +1612,13 @@ void MobileObject::SetDialoguewithPlayer(bool abFlag) {
         v6 = pCurrentProcess->GetFaceNode();
         v4 = pCurrentProcess->GetFaceSkinnedNode();
         v5 = static_cast<NiTriShape*>(pCurrentProcess->GetHeadAnims());
-        if (v5) {
-            if (v5->NiAVObject::GetParent()) {
-                if (v6) {
-                    if (v4) {
-                        parent = v5->NiAVObject::GetParent();
-                        parent->SetSelectiveUpdate(true);
-                        v6->SetSelectiveUpdate(true);
-                        v4->SetSelectiveUpdate(true);
-                    }
-                }
-            }
+        if ((v5) && (v5->NiAVObject::GetParent()) && (v6) && (v4)) {
+            parent = v5->NiAVObject::GetParent();
+            parent->SetSelectiveUpdate(true);
+            v6->SetSelectiveUpdate(true);
+            v4->SetSelectiveUpdate(true);
         }
+
         if (abFlag) {
             pCurrentProcess->ClearAllHeadTrackTargets();
             pCurrentProcess->SetDialogHeadTrackTarget(pPlayer);
@@ -1969,24 +1916,22 @@ float MobileObject::SpeakSoundFunction(
                         true, true
                     );
                 }
-                if (apTarget) {
-                    if (apTarget != this && (apTarget->IsMobileObject() || apTarget->IsActor())) {
-                        Actor* ptargact = static_cast<Actor*>(apTarget);
-                        bool v62 = true;
-                        if (apTarget->IsActor()) {
-                            TESPackage* ptargpack = ptargact->GetCurrentPackage();
-                            if (ptargpack) {
-                                v62 = ptargpack->pIdleCollection == nullptr;
-                            }
+                if ((apTarget) && (apTarget != this && (apTarget->IsMobileObject() || apTarget->IsActor()))) {
+                    Actor* ptargact = static_cast<Actor*>(apTarget);
+                    bool v62 = true;
+                    if (apTarget->IsActor()) {
+                        TESPackage* ptargpack = ptargact->GetCurrentPackage();
+                        if (ptargpack) {
+                            v62 = ptargpack->pIdleCollection == nullptr;
                         }
-                        if (apResponseListenerIdle || v62) {
-                            BaseProcess* v42 = ptargact->pCurrentProcess;
-                            v42->SetupSpecialIdle(
-                                ptargact, apResponseListenerIdle,
-                                apResponseListenerIdle ? AnimIdle::PLAY_TYPE_AUTO_EXCLUSIVE : AnimIdle::PLAY_TYPE_AUTO,
-                                false, true, true
-                            );
-                        }
+                    }
+                    if (apResponseListenerIdle || v62) {
+                        BaseProcess* v42 = ptargact->pCurrentProcess;
+                        v42->SetupSpecialIdle(
+                            ptargact, apResponseListenerIdle,
+                            apResponseListenerIdle ? AnimIdle::PLAY_TYPE_AUTO_EXCLUSIVE : AnimIdle::PLAY_TYPE_AUTO,
+                            false, true, true
+                        );
                     }
                 }
             }
@@ -1995,20 +1940,18 @@ float MobileObject::SpeakSoundFunction(
                 fSoundDuration = static_cast<double>(v41) / 30.0;
                 panim->ApplyToNode(panimdata, 0.2f);
             }
-            if (abSetEmotion) {
-                if (this->pCurrentProcess) {
-                    BaseProcess* v40 = this->pCurrentProcess;
-                    v40->SetLastSpeakingEmotion(aeEmotiontype);
-                }
+            if ((abSetEmotion) && (this->pCurrentProcess)) {
+                BaseProcess* v40 = this->pCurrentProcess;
+                v40->SetLastSpeakingEmotion(aeEmotiontype);
             }
+
             uint32_t isoundFlags = BSGameSound::SOUND_FLAG_ONE_SHOT | BSGameSound::SOUND_FLAG_VOICE;
             TESObjectREFR* ptalkingactivator = this->GetTalkingActivator();
-            if (ptalkingactivator) {
-                if (ptalkingactivator->GetObjectReference()) {
-                    [[maybe_unused]] BGSTalkingActivator* ptalker =
-                        static_cast<BGSTalkingActivator*>(ptalkingactivator->GetObjectReference());
-                }
+            if ((ptalkingactivator) && (ptalkingactivator->GetObjectReference())) {
+                [[maybe_unused]] BGSTalkingActivator* ptalker =
+                    static_cast<BGSTalkingActivator*>(ptalkingactivator->GetObjectReference());
             }
+
             if (v50) {
                 isoundFlags |= BSGameSound::SOUND_FLAG_IS_2D;
             }
@@ -2020,11 +1963,10 @@ float MobileObject::SpeakSoundFunction(
             aSoundHand.operator=(*SoundHandleByFilename);
             BSAudioManager* mgr = &BSAudioManager::QInstance();
             MobileObject* pact = this;
-            if (apTarget) {
-                if (apTarget->IsActor()) {
-                    pact = static_cast<MobileObject*>(apTarget);
-                }
+            if ((apTarget) && (apTarget->IsActor())) {
+                pact = static_cast<MobileObject*>(apTarget);
             }
+
             // The subtitle callback's context is the listener's (or the speaker's) form ID.
             mgr->SetPlayCallback(
                 static_cast<uint32_t>(aSoundHand.iSoundID), &MobileObject::DisplaySubTitleCallback,
@@ -2085,11 +2027,10 @@ float MobileObject::SpeakSoundFunction(
             if (panim) {
                 BaseProcess* v28 = this->pCurrentProcess;
                 LipSynchAnim* v22 = v28->GetCreatureLipSynchAnim();
-                if (panim != v22) {
-                    if (panim) {
-                        delete panim;
-                    }
+                if ((panim != v22) && (panim)) {
+                    delete panim;
                 }
+
                 BaseProcess* v26 = this->pCurrentProcess;
                 v26->SetLipAnim(nullptr);
                 BaseProcess* v25 = this->pCurrentProcess;
@@ -2097,13 +2038,11 @@ float MobileObject::SpeakSoundFunction(
             }
             return fdelay;
         }
-        else {
-            return 0.0f;
-        }
-    }
-    else {
+
         return 0.0f;
     }
+
+    return 0.0f;
 }
 
 void MobileObject::EndDialogue() {
@@ -2136,20 +2075,19 @@ void MobileObject::EndDialogue() {
                     v17->ClearDialogHeadTrackTarget(true);
                     pTarget->bVoiceFileDone = true;
                 }
-                if (pSubject) {
-                    if (pTarget) {
-                        BaseProcess* v16 = pSubject->pCurrentProcess;
-                        v16->SetDefaultHeadTrackTarget(pTarget);
-                        BaseProcess* v15 = pTarget->pCurrentProcess;
-                        v15->SetDefaultHeadTrackTarget(pSubject);
-                        pSubject->fUpdateTargetTimer = 1.0f;
-                        pTarget->fUpdateTargetTimer = 1.0f;
-                        BaseProcess* v14 = pSubject->pCurrentProcess;
-                        v14->SetLipFileFailed(false);
-                        BaseProcess* v13 = pTarget->pCurrentProcess;
-                        v13->SetLipFileFailed(false);
-                    }
+                if ((pSubject) && (pTarget)) {
+                    BaseProcess* v16 = pSubject->pCurrentProcess;
+                    v16->SetDefaultHeadTrackTarget(pTarget);
+                    BaseProcess* v15 = pTarget->pCurrentProcess;
+                    v15->SetDefaultHeadTrackTarget(pSubject);
+                    pSubject->fUpdateTargetTimer = 1.0f;
+                    pTarget->fUpdateTargetTimer = 1.0f;
+                    BaseProcess* v14 = pSubject->pCurrentProcess;
+                    v14->SetLipFileFailed(false);
+                    BaseProcess* v13 = pTarget->pCurrentProcess;
+                    v13->SetLipFileFailed(false);
                 }
+
                 Animation* v24 = pSubject->GetAnimation();
                 if (v24) {
                     v24->SpecialIdleFree(true, false);
@@ -2158,18 +2096,16 @@ void MobileObject::EndDialogue() {
                 if (v25) {
                     v25->SpecialIdleFree(true, false);
                 }
-                if (pSubject) {
-                    if (pSubject->pCurrentProcess) {
-                        BaseProcess* v12 = pSubject->pCurrentProcess;
-                        v12->SetLastSpeakingEmotion(DE_NEUTRAL);
-                    }
+                if ((pSubject) && (pSubject->pCurrentProcess)) {
+                    BaseProcess* v12 = pSubject->pCurrentProcess;
+                    v12->SetLastSpeakingEmotion(DE_NEUTRAL);
                 }
-                if (pTarget) {
-                    if (pTarget->pCurrentProcess) {
-                        BaseProcess* v11 = pTarget->pCurrentProcess;
-                        v11->SetLastSpeakingEmotion(DE_NEUTRAL);
-                    }
+
+                if ((pTarget) && (pTarget->pCurrentProcess)) {
+                    BaseProcess* v11 = pTarget->pCurrentProcess;
+                    v11->SetLastSpeakingEmotion(DE_NEUTRAL);
                 }
+
                 pSubject->GetCurrentPackage();
                 pTarget->GetCurrentPackage();
                 BaseProcess* v10 = pSubject->pCurrentProcess;
@@ -2181,18 +2117,15 @@ void MobileObject::EndDialogue() {
                         v8->CheckforNewPackage(pSubject, true);
                     }
                 }
-                if (pTarget) {
-                    if (pTarget->IsinDialogue()) {
-                        if (pTarget->pCurrentProcess) {
-                            BaseProcess* v7 = pTarget->pCurrentProcess;
-                            v7->LoadPackageFromExtraData(pTarget);
-                            if (!pDataHandler->GetClearingData() && pTarget->IsActor()) {
-                                BaseProcess* v6 = pTarget->pCurrentProcess;
-                                v6->CheckforNewPackage(pTarget, true);
-                            }
-                        }
+                if ((pTarget) && (pTarget->IsinDialogue()) && (pTarget->pCurrentProcess)) {
+                    BaseProcess* v7 = pTarget->pCurrentProcess;
+                    v7->LoadPackageFromExtraData(pTarget);
+                    if (!pDataHandler->GetClearingData() && pTarget->IsActor()) {
+                        BaseProcess* v6 = pTarget->pCurrentProcess;
+                        v6->CheckforNewPackage(pTarget, true);
                     }
                 }
+
                 MobileObject* TalkingActivator = pDialoguePackage->pTalkingActivator;
                 if (TalkingActivator) {
                     (&TalkingActivator->GetTalkingActivator()->m_Extra)->RemoveTalkingActorExtra();
@@ -2364,9 +2297,8 @@ MobileObject* MobileObject::SetUpTalkingActivatorActor(MobileObject* apTarget, M
     if (pactitalk->GetTempRef()) {
         return pactitalk->GetTempRef();
     }
-    else {
-        return this;
-    }
+
+    return this;
 }
 
 void MobileObject::AddSayOnceTopicInfo(TESTopicInfo* apTopicInfo) {
@@ -2421,11 +2353,9 @@ void MobileObject::StopCurrentDialogue() {
     }
     bVoiceFileDone = true;
     bSoundFileDone = true;
-    if (!IsTalkingActivator()) {
-        if (Get3D()) {
-            Actor* pactor = static_cast<Actor*>(this);
-            static_cast<Actor*>(this)->Actor::ResetFaceData();
-        }
+    if ((!IsTalkingActivator()) && (Get3D())) {
+        Actor* pactor = static_cast<Actor*>(this);
+        static_cast<Actor*>(this)->Actor::ResetFaceData();
     }
 }
 
@@ -2656,10 +2586,8 @@ bool MobileObject::IsInDialoguewithPlayer() {
 
 void MobileObject::HandleTextureUpgrade(bool abForceRecheck) {
     NiNode* pNode = static_cast<TESObjectREFR*>(this)->Get3D();
-    if (pNode && (!pNode->GetHighDetail() || abForceRecheck)) {
-        if (CheckHighDetail()) {
-            pModelLoader->UpgradeTextures(pNode);
-        }
+    if ((pNode && (!pNode->GetHighDetail() || abForceRecheck)) && (CheckHighDetail())) {
+        pModelLoader->UpgradeTextures(pNode);
     }
 }
 
@@ -2789,10 +2717,8 @@ void MobileObject::CleanUpOtherMobileObjects(bool abMagicCaster) {
                 v11->SetDesiredTarget(nullptr);
             }
         }
-        if (pPlayer) {
-            if (pPlayer->GetAutoAimActorSimple() == this) {
-                pPlayer->ClearAutoAim();
-            }
+        if ((pPlayer) && (pPlayer->GetAutoAimActorSimple() == this)) {
+            pPlayer->ClearAutoAim();
         }
     }
 }
@@ -2906,14 +2832,13 @@ MobileObject::PlaySound_0(BSSoundHandle* apResult, char* apSoundFileName, bool a
     BSAudio* v5 = &BSAudio::QInstance();
     BSSoundHandle* arHandle = v5->GetSoundHandleByFilename(&out, apSoundFileName, aiSoundType, nullptr);
     soundHand.operator=(*arHandle);
-    if (Get3D()) {
-        if ((aiSoundType & 2) != 0) {
-            NiPoint3 v11 = GetLocationOnReference();
-            soundHand.SetPosition(v11.x, v11.y, v11.z);
-            NiNode* v6 = Get3D();
-            soundHand.SetObjectToFollow(v6);
-        }
+    if ((Get3D()) && ((aiSoundType & 2) != 0)) {
+        NiPoint3 v11 = GetLocationOnReference();
+        soundHand.SetPosition(v11.x, v11.y, v11.z);
+        NiNode* v6 = Get3D();
+        soundHand.SetObjectToFollow(v6);
     }
+
     soundHand.Play(abLoop);
     apResult->operator=(soundHand);
     return apResult;
@@ -2956,15 +2881,13 @@ void MobileObject::SayToCallBack(void* apContext, bool abSucceeded) {
     MobileObject* pactor = static_cast<MobileObject*>(
         TESForm::GetFormByNumericID(static_cast<uint32_t>(reinterpret_cast<uintptr_t>(apContext)))
     );
-    if (pactor) {
-        if (pactor->IsMobileObject()) {
-            if (pactor->bDoNotRunSayToCallBack) {
-                pactor->bDoNotRunSayToCallBack = false;
-            }
-            else {
-                pactor->SetSoundCallBack(0);
-                pactor->SetSoundCallBackSuccess(abSucceeded);
-            }
+    if ((pactor) && (pactor->IsMobileObject())) {
+        if (pactor->bDoNotRunSayToCallBack) {
+            pactor->bDoNotRunSayToCallBack = false;
+        }
+        else {
+            pactor->SetSoundCallBack(0);
+            pactor->SetSoundCallBackSuccess(abSucceeded);
         }
     }
 }
@@ -2984,35 +2907,34 @@ void MobileObject::ChangeDialogueAnimation(void* apContext, bool abSucceeded) {
     MobileObject* pactor = static_cast<MobileObject*>(
         TESForm::GetFormByNumericID(static_cast<uint32_t>(reinterpret_cast<uintptr_t>(apContext)))
     );
-    if (pactor) {
-        if (pactor->IsMobileObject()) {
-            if (pTalkingToPlayer) {
-                pTalkingToPlayer->bTalkingToPlayer = false;
-                pTalkingToPlayer->bSpeakingDone = true;
-                if (pactor->IsTalkingActivator()) {
-                    TESObjectREFR* pref = pactor->GetTalkingActivator();
-                    NiNode* v2 = pref->Get3D();
-                    NiControllerManager* pmanager =
-                        static_cast<NiControllerManager*>(v2->GetController(&NiControllerManager::ms_RTTI));
-                    if (pmanager) {
-                        NiFixedString* v3 = &FixedStrings::QTalking();
-                        NiControllerSequence* pseq = pmanager->GetSequenceByName(*v3);
-                        if (pseq) {
-                            Animation::SetLipTime(0.0f, pmanager, pseq);
-                            pmanager->DeactivateSequence(pseq, 0.0f);
-                        }
+    if ((pactor) && (pactor->IsMobileObject())) {
+        if (pTalkingToPlayer) {
+            pTalkingToPlayer->bTalkingToPlayer = false;
+            pTalkingToPlayer->bSpeakingDone = true;
+            if (pactor->IsTalkingActivator()) {
+                TESObjectREFR* pref = pactor->GetTalkingActivator();
+                NiNode* v2 = pref->Get3D();
+                NiControllerManager* pmanager =
+                    static_cast<NiControllerManager*>(v2->GetController(&NiControllerManager::ms_RTTI));
+                if (pmanager) {
+                    NiFixedString* v3 = &FixedStrings::QTalking();
+                    NiControllerSequence* pseq = pmanager->GetSequenceByName(*v3);
+                    if (pseq) {
+                        Animation::SetLipTime(0.0f, pmanager, pseq);
+                        pmanager->DeactivateSequence(pseq, 0.0f);
                     }
-                    BaseProcess* CurrentAIProcess = pactor->pCurrentProcess;
-                    CurrentAIProcess->SetCreatureLipSynchAnim(nullptr);
-                    BaseProcess* v4 = pactor->pCurrentProcess;
-                    v4->SetCreatureLipSynchStartTime(0);
                 }
-            }
-            if (!abSucceeded) {
-                DialogMenu::fUseTimerNoVoice = fDialogSpeechDelaySeconds.Float();
+                BaseProcess* CurrentAIProcess = pactor->pCurrentProcess;
+                CurrentAIProcess->SetCreatureLipSynchAnim(nullptr);
+                BaseProcess* v4 = pactor->pCurrentProcess;
+                v4->SetCreatureLipSynchStartTime(0);
             }
         }
+        if (!abSucceeded) {
+            DialogMenu::fUseTimerNoVoice = fDialogSpeechDelaySeconds.Float();
+        }
     }
+
     pTalkingToPlayer = nullptr;
 }
 
@@ -3020,11 +2942,9 @@ void MobileObject::DialogueConversationCallBack(void* apContext, bool abSucceede
     MobileObject* pactor = static_cast<MobileObject*>(
         TESForm::GetFormByNumericID(static_cast<uint32_t>(reinterpret_cast<uintptr_t>(apContext)))
     );
-    if (pactor) {
-        if (pactor->IsMobileObject()) {
-            pactor->SetSoundCallBack(1);
-            pactor->SetSoundCallBackSuccess(abSucceeded);
-        }
+    if ((pactor) && (pactor->IsMobileObject())) {
+        pactor->SetSoundCallBack(1);
+        pactor->SetSoundCallBackSuccess(abSucceeded);
     }
 }
 
@@ -3032,26 +2952,23 @@ void MobileObject::SoundFileCallBack(void* apContext, bool abSucceeded) {
     MobileObject* pactor = static_cast<MobileObject*>(
         TESForm::GetFormByNumericID(static_cast<uint32_t>(reinterpret_cast<uintptr_t>(apContext)))
     );
-    if (pactor) {
-        if (pactor->IsMobileObject()) {
-            pactor->bSoundFileDone = true;
-            if (pactor->bTalkingToPlayer) {
-                pactor->bSpeakingDone = true;
+    if ((pactor) && (pactor->IsMobileObject())) {
+        pactor->bSoundFileDone = true;
+        if (pactor->bTalkingToPlayer) {
+            pactor->bSpeakingDone = true;
+        }
+        TESPackage* ppack = pactor->GetCurrentPackage();
+        DialoguePackage* pdial = nullptr;
+        if ((ppack) && (ppack->GetPackType() == PACKAGE_TYPE_IN_GAME_DIALOGUE)) {
+            pdial = static_cast<DialoguePackage*>(ppack);
+        }
+
+        if (pdial) {
+            if (pactor->bSoundFileDone) {
+                pdial->flistentimer = 0.3f;
             }
-            TESPackage* ppack = pactor->GetCurrentPackage();
-            DialoguePackage* pdial = nullptr;
-            if (ppack) {
-                if (ppack->GetPackType() == PACKAGE_TYPE_IN_GAME_DIALOGUE) {
-                    pdial = static_cast<DialoguePackage*>(ppack);
-                }
-            }
-            if (pdial) {
-                if (pactor->bSoundFileDone) {
-                    pdial->flistentimer = 0.3f;
-                }
-                else {
-                    pdial->flistentimer = 20.0f;
-                }
+            else {
+                pdial->flistentimer = 20.0f;
             }
         }
     }

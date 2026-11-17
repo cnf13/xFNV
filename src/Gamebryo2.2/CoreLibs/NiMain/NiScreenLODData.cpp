@@ -227,7 +227,6 @@ NiObject* NiScreenLODData::CreateObject() {
     if (v0) {
         return ::new (v0) NiScreenLODData;
     }
-    else {
-        return nullptr;
-    }
+
+    return nullptr;
 }

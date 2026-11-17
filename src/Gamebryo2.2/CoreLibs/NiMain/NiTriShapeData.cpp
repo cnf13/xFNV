@@ -273,11 +273,10 @@ uint16_t* NiTriShapeData::GetTriList() const {
 
 void NiTriShapeData::Replace(uint16_t usTriangles, uint16_t* pusTriList) {
     uint16_t* m_pusTriList = this->m_pusTriList;
-    if (pusTriList != m_pusTriList) {
-        if (m_pusTriList) {
-            _NiFree(this->m_pusTriList);
-        }
+    if ((pusTriList != m_pusTriList) && (m_pusTriList)) {
+        _NiFree(this->m_pusTriList);
     }
+
     m_usTriangles = usTriangles;
     this->m_pusTriList = pusTriList;
     m_uiTriListLength = 3 * usTriangles;

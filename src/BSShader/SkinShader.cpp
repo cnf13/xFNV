@@ -391,9 +391,8 @@ NiD3DShaderDeclaration* SkinShader::GetShaderDecl(NiGeometry* apGeometry, BSShad
     if (apGeometry->m_spSkinInstance.m_pObject) {
         return spSkinnedShaderDecl.m_pObject;
     }
-    else {
-        return spShaderDecl.m_pObject;
-    }
+
+    return spShaderDecl.m_pObject;
 }
 
 // Takes the shared constant maps of the lighting shader (shader 1).

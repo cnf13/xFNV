@@ -45,14 +45,13 @@ hkBool* hkpBoxBoxManifold::findInManifold(hkBool* apResult, const hkpFeatureCont
         apResult->m_bool = 0;
         return apResult;
     }
-    else {
-        while (m_contactPoints[v3].m_featureIdA != fcp.m_featureIdA ||
-               m_contactPoints[v3].m_featureIdB != fcp.m_featureIdB) {
-            if (--v3 < 0) {
-                goto LABEL_5;
-            }
+
+    while (m_contactPoints[v3].m_featureIdA != fcp.m_featureIdA ||
+           m_contactPoints[v3].m_featureIdB != fcp.m_featureIdB) {
+        if (--v3 < 0) {
+            goto LABEL_5;
         }
-        apResult->m_bool = 1;
-        return apResult;
     }
+    apResult->m_bool = 1;
+    return apResult;
 }

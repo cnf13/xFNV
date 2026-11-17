@@ -422,18 +422,15 @@ NiDX9DeviceDesc* NiDX9AdapterDesc::GetDevice(D3DDEVTYPE aeDevType) {
         if (m_pkHALDeviceDesc->IsDeviceValid()) {
             return m_pkHALDeviceDesc;
         }
-        else {
-            return nullptr;
-        }
+
+        return nullptr;
     }
-    else {
-        if (m_pkREFDeviceDesc->IsDeviceValid()) {
-            return m_pkREFDeviceDesc;
-        }
-        else {
-            return nullptr;
-        }
+
+    if (m_pkREFDeviceDesc->IsDeviceValid()) {
+        return m_pkREFDeviceDesc;
     }
+
+    return nullptr;
 }
 
 const NiDX9AdapterDesc::ModeDesc* NiDX9AdapterDesc::ValidateFullscreenMode(
@@ -448,12 +445,11 @@ const NiDX9AdapterDesc::ModeDesc* NiDX9AdapterDesc::ValidateFullscreenMode(
     if (m_kModeList.m_usSize) {
         do {
             NiDX9AdapterDesc::ModeDesc* v9 = static_cast<NiDX9AdapterDesc::ModeDesc*>(m_kModeList.m_pBase[v8]);
-            if (v9) {
-                if (v9->m_eD3DFormat == aeFormat && v9->m_uiWidth == auiWidth && v9->m_uiHeight == auiHeight) {
-                    v7 = static_cast<NiDX9AdapterDesc::ModeDesc*>(m_kModeList.m_pBase[v8]);
-                    aruiRefreshRate = v9->GetClosestRefreshRate(aruiRefreshRate);
-                }
+            if ((v9) && (v9->m_eD3DFormat == aeFormat && v9->m_uiWidth == auiWidth && v9->m_uiHeight == auiHeight)) {
+                v7 = static_cast<NiDX9AdapterDesc::ModeDesc*>(m_kModeList.m_pBase[v8]);
+                aruiRefreshRate = v9->GetClosestRefreshRate(aruiRefreshRate);
             }
+
             ++v8;
         }
         while (v8 < m_kModeList.m_usSize);
@@ -487,9 +483,8 @@ D3DCAPS9* NiDX9AdapterDesc::GetDeviceCaps(D3DDEVTYPE aeDevType) {
     if (Device) {
         return &Device->m_kD3DCaps9;
     }
-    else {
-        return nullptr;
-    }
+
+    return nullptr;
 }
 
 D3DADAPTER_IDENTIFIER9* NiDX9AdapterDesc::GetAdapterIdentifier() {
@@ -511,9 +506,8 @@ NiDX9AdapterDesc* NiDX9SystemDesc::GetAdapter(uint32_t a2) {
     if (a2 >= m_kAdapterList.m_usSize) {
         return nullptr;
     }
-    else {
-        return m_kAdapterList.operator[](a2);
-    }
+
+    return m_kAdapterList.operator[](a2);
 }
 
 // One adapter description per adapter, stored with the array's SetAt.
@@ -553,24 +547,23 @@ void NiDX9SystemDesc::FillAdapterInformation(IDirect3D9* pkD3D9, NiTPointerList<
 }
 
 NiDX9SystemDesc* NiDX9SystemDesc::Get() {
-    if (!NiDX9Renderer::ms_pkSystemDesc) {
-        if (NiDX9Renderer::IsD3D9Create()) {
-            // D3D_SDK_VERSION.
-            IDirect3D9* pkD3D9 = NiDX9Renderer::ms_pfnD3DCreate9(32);
-            if (pkD3D9) {
-                NiDX9SystemDesc* pkMemory =
-                    static_cast<NiDX9SystemDesc*>(NiMemObject::operator new(sizeof(NiDX9SystemDesc)));
-                if (pkMemory) {
-                    NiDX9Renderer::ms_pkSystemDesc =
-                        ::new (pkMemory) NiDX9SystemDesc(pkD3D9, &NiDX9Renderer::ms_kDisplayFormats);
-                    pkD3D9->Release();
-                    return NiDX9Renderer::ms_pkSystemDesc;
-                }
-                NiDX9Renderer::ms_pkSystemDesc = nullptr;
+    if ((!NiDX9Renderer::ms_pkSystemDesc) && (NiDX9Renderer::IsD3D9Create())) {
+        // D3D_SDK_VERSION.
+        IDirect3D9* pkD3D9 = NiDX9Renderer::ms_pfnD3DCreate9(32);
+        if (pkD3D9) {
+            NiDX9SystemDesc* pkMemory =
+                static_cast<NiDX9SystemDesc*>(NiMemObject::operator new(sizeof(NiDX9SystemDesc)));
+            if (pkMemory) {
+                NiDX9Renderer::ms_pkSystemDesc =
+                    ::new (pkMemory) NiDX9SystemDesc(pkD3D9, &NiDX9Renderer::ms_kDisplayFormats);
                 pkD3D9->Release();
+                return NiDX9Renderer::ms_pkSystemDesc;
             }
+            NiDX9Renderer::ms_pkSystemDesc = nullptr;
+            pkD3D9->Release();
         }
     }
+
     return NiDX9Renderer::ms_pkSystemDesc;
 }
 

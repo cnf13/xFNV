@@ -423,11 +423,10 @@ void BGSReconstructFormsInFileMap::ReconstructForms(TESFile* apFile, BGSReconstr
             uint32_t iformID = pcurrentForm->iFormID;
             pcurrentFormsMap->SetFlag(RECONSTRUCT_FLAG_CELL_FOUND);
             if (pcurrentFormsMap->GetAt(iformID, formData)) {
-                if (icurrentCellID) {
-                    if (!pLastLoadedCell || pLastLoadedCell->iFormID != icurrentCellID) {
-                        pLastLoadedCell = static_cast<TESObjectCELL*>(TESForm::GetFormByNumericID(icurrentCellID));
-                    }
+                if ((icurrentCellID) && (!pLastLoadedCell || pLastLoadedCell->iFormID != icurrentCellID)) {
+                    pLastLoadedCell = static_cast<TESObjectCELL*>(TESForm::GetFormByNumericID(icurrentCellID));
                 }
+
                 pDataHandler->ConstructObject(apFile, false, formData.pForm, true);
                 apFile->NextForm(true);
                 if (!formData.pForm) {
@@ -827,9 +826,8 @@ TESFile* BGSReconstructFormsInAllFilesMap::GetFileForFormID(BSSimpleList<TESFile
     if (pFile) {
         return pFile;
     }
-    else {
-        return pDataHandler->GetCompiledFile((uint8_t)(aiFormID >> 24));
-    }
+
+    return pDataHandler->GetCompiledFile((uint8_t)(aiFormID >> 24));
 }
 
 void BGSReconstructFormsInAllFilesMap::Clear() {
@@ -869,16 +867,14 @@ void BGSReconstructFormsInAllFilesMap::InitReconstructedForm(ReconstructFormData
         if (pref->IsMobileObject()) {
             MobileObject* pmob = static_cast<MobileObject*>(pref);
             if (pmob->GetDisabledOrDeleted()) {
-                if (apFormData->GetFlag(RECONSTRUCT_REVERT_ONLY)) {
-                    if (pmob->pCurrentProcess) {
-                        PROCESS_TYPE CurrentProcessType = pmob->GetCurrentProcessType();
-                        ReferenceProcessLists.RemoveReference(pmob, CurrentProcessType);
-                        BaseProcess* CurrentAIProcess = pmob->pCurrentProcess;
-                        if (CurrentAIProcess) {
-                            delete CurrentAIProcess;
-                        }
-                        pmob->SetCurrentAIProcess(nullptr);
+                if ((apFormData->GetFlag(RECONSTRUCT_REVERT_ONLY)) && (pmob->pCurrentProcess)) {
+                    PROCESS_TYPE CurrentProcessType = pmob->GetCurrentProcessType();
+                    ReferenceProcessLists.RemoveReference(pmob, CurrentProcessType);
+                    BaseProcess* CurrentAIProcess = pmob->pCurrentProcess;
+                    if (CurrentAIProcess) {
+                        delete CurrentAIProcess;
                     }
+                    pmob->SetCurrentAIProcess(nullptr);
                 }
             }
             else {
@@ -898,16 +894,14 @@ void BGSReconstructFormsInAllFilesMap::InitReconstructedForm(ReconstructFormData
             if (pmob->IsActor()) {
                 Actor* pactor = static_cast<Actor*>(pmob);
                 pSaveLoadGame->QueueInitPackageLocations(pactor);
-                if (apFormData->GetFlag(RECONSTRUCT_REVERT_ONLY)) {
-                    if (pactor->Get3D()) {
-                        if (pactor->IsCreature()) {
-                            static_cast<TESCreature*>(pactor->GetActorBase())
-                                ->TESCreature::InitDefaultWorn(pactor, true, true, true);
-                        }
-                        else {
-                            static_cast<TESNPC*>(pactor->GetActorBase())
-                                ->TESNPC::InitDefaultWorn(pactor, true, true, false, true);
-                        }
+                if ((apFormData->GetFlag(RECONSTRUCT_REVERT_ONLY)) && (pactor->Get3D())) {
+                    if (pactor->IsCreature()) {
+                        static_cast<TESCreature*>(pactor->GetActorBase())
+                            ->TESCreature::InitDefaultWorn(pactor, true, true, true);
+                    }
+                    else {
+                        static_cast<TESNPC*>(pactor->GetActorBase())
+                            ->TESNPC::InitDefaultWorn(pactor, true, true, false, true);
                     }
                 }
             }

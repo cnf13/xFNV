@@ -7,7 +7,7 @@
 class bhkBlendCollisionObjectAddRotation : public bhkBlendCollisionObject {
 public:
     bhkBlendCollisionObjectAddRotation();
-    virtual ~bhkBlendCollisionObjectAddRotation();
+    ~bhkBlendCollisionObjectAddRotation() override;
 
     const NiRTTI* GetRTTI() const override {
         return &bhkBlendCollisionObjectAddRotation::ms_RTTI;

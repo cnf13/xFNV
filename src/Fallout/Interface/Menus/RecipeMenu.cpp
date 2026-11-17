@@ -334,12 +334,11 @@ void RecipeMenu::DoIdle() {
         BSClamp(afValue, (float)0.0, 255.0f);
         aVal = (float)(255.0 - afValue);
         BSClamp(aVal, (float)0.0, 255.0f);
-        if (pCrossFadeTile2) {
-            if (pCrossFadeTile1) {
-                pCrossFadeTile2->Set(4009, aVal, true);
-                pCrossFadeTile1->Set(4009, afValue, true);
-            }
+        if ((pCrossFadeTile2) && (pCrossFadeTile1)) {
+            pCrossFadeTile2->Set(4009, aVal, true);
+            pCrossFadeTile1->Set(4009, afValue, true);
         }
+
         time = (&appTimer)->BSTimer::GetTime();
         v6 = time - uiLastIdleTime;
         uiLastIdleTime = time;
@@ -714,21 +713,16 @@ Tile* RecipeMenu::Create(TESObjectREFR* apVendor, TESForm* apCategory) {
             RecipeMenu::pMe->UpdateLists(nullptr, apCategory);
             return ptile;
         }
-        else {
-            if (RecipeMenu::pMe) {
-                if (RecipeMenu::pMe->pMenu) {
-                    if (RecipeMenu::pMe) {
-                        delete RecipeMenu::pMe;
-                    }
-                }
-            }
-            return nullptr;
+
+        if ((RecipeMenu::pMe) && (RecipeMenu::pMe->pMenu) && (RecipeMenu::pMe)) {
+            delete RecipeMenu::pMe;
         }
-    }
-    else {
-        Warning(WARN_MENUS, "Recipe menu called with NULL vendor!  Oh, noes!");
+
         return nullptr;
     }
+
+    Warning(WARN_MENUS, "Recipe menu called with NULL vendor!  Oh, noes!");
+    return nullptr;
 }
 
 void RecipeMenu::ForceRecipeUpdate(bool abUpdateNow) {
@@ -840,11 +834,10 @@ void RecipeMenu::ItemSelectCallback(int32_t aiAmountSelected) {
             }
             v23 = 1;
             iQuantity = pCompList->m_item->Quantity;
-            if (pForm) {
-                if (pForm->IsBoundObject()) {
-                    apObj = pForm;
-                }
+            if ((pForm) && (pForm->IsBoundObject())) {
+                apObj = pForm;
             }
+
             if (apObj) {
                 Actor* pactor;
                 bool bAmmo = false;
@@ -855,14 +848,13 @@ void RecipeMenu::ItemSelectCallback(int32_t aiAmountSelected) {
                     pactor = nullptr;
                 }
                 Actor* pactor_2 = pactor;
-                if (pactor) {
-                    if (pactor_2->GetCurrentWeapon()) {
-                        PlayerCharacter* a2 = pPlayer;
-                        TESObjectWEAP* CurrentWeapon = pactor_2->GetCurrentWeapon();
-                        TESAmmo* CurrentAmmo = CurrentWeapon->GetCurrentAmmo(a2);
-                        bAmmo = CurrentAmmo == pCompList->m_item->pInternalItem;
-                    }
+                if ((pactor) && (pactor_2->GetCurrentWeapon())) {
+                    PlayerCharacter* a2 = pPlayer;
+                    TESObjectWEAP* CurrentWeapon = pactor_2->GetCurrentWeapon();
+                    TESAmmo* CurrentAmmo = CurrentWeapon->GetCurrentAmmo(a2);
+                    bAmmo = CurrentAmmo == pCompList->m_item->pInternalItem;
                 }
+
                 if (apObj->GetFormType() == WEAP_ID &&
                     pactor_2->GetInventoryObjectCount(static_cast<TESBoundObject*>(apObj)) == 1 &&
                     apObj == pactor_2->GetCurrentWeapon()) {
@@ -893,11 +885,10 @@ void RecipeMenu::ItemSelectCallback(int32_t aiAmountSelected) {
             }
             pForm = pCompList->m_item->pInternalItem;
             iQuantity = pCompList->m_item->Quantity;
-            if (pForm) {
-                if (pForm->IsBoundObject()) {
-                    pobject = static_cast<TESBoundObject*>(pForm);
-                }
+            if ((pForm) && (pForm->IsBoundObject())) {
+                pobject = static_cast<TESBoundObject*>(pForm);
             }
+
             if (pobject) {
                 break;
             }

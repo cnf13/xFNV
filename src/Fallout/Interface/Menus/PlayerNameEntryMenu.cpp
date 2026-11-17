@@ -35,29 +35,27 @@ bool IsValidPlayerName(const char* a1) {
             bool v5 = acChar == 92 || acChar == 126;
             v9 = v5;
             Font* Font_ = FontManager::Instance()->GetFont(0);
-            if (Font_) {
-                if (Font_->pFontData) {
-                    if (Font_->pFontData->pFontLetters[acChar].fWidth == 0.0) {
-                        v9 = 1;
-                    }
-                    else {
-                        bool v4 = v10 || acChar != 32;
-                        v10 = v4;
-                    }
+            if ((Font_) && (Font_->pFontData)) {
+                if (Font_->pFontData->pFontLetters[acChar].fWidth == 0.0) {
+                    v9 = 1;
+                }
+                else {
+                    bool v4 = v10 || acChar != 32;
+                    v10 = v4;
                 }
             }
+
             Font* v7 = FontManager::Instance()->GetFont(6);
-            if (v7) {
-                if (v7->pFontData) {
-                    if (v7->pFontData->pFontLetters[acChar].fWidth == 0.0) {
-                        v9 = 1;
-                    }
-                    else {
-                        bool v3 = v10 || acChar != 32;
-                        v10 = v3;
-                    }
+            if ((v7) && (v7->pFontData)) {
+                if (v7->pFontData->pFontLetters[acChar].fWidth == 0.0) {
+                    v9 = 1;
+                }
+                else {
+                    bool v3 = v10 || acChar != 32;
+                    v10 = v3;
                 }
             }
+
             ++a1;
         }
     }

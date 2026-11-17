@@ -88,9 +88,8 @@ bool NavMeshSearchMaxCost::IsGoalNode(const AStarNode<NavMeshSearchNode, NavMesh
     if (bHasGoalNode) {
         return (bool)((int8_t)NavMeshSearch::IsGoalNode(apNode));
     }
-    else {
-        return false;
-    }
+
+    return false;
 }
 
 NiPoint3 NavMeshSearchMaxCost::FindClosestPoint(

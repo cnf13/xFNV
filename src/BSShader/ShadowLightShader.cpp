@@ -795,10 +795,8 @@ void ShadowLightShader::SetupGeometryConstants(const NiPropertyState* apState) {
         }
     }
     NiStencilProperty* v19 = static_cast<NiStencilProperty*>(apState->m_aspProps[4].m_pObject);
-    if (v19) {
-        if ((v19->m_uFlags & 1) != 0) {
-            m_pkD3DRenderState->ApplyStencil(static_cast<NiStencilProperty*>(apState->m_aspProps[4].m_pObject));
-        }
+    if ((v19) && ((v19->m_uFlags & 1) != 0)) {
+        m_pkD3DRenderState->ApplyStencil(static_cast<NiStencilProperty*>(apState->m_aspProps[4].m_pObject));
     }
 }
 
@@ -809,11 +807,10 @@ void ShadowLightShader::PostGeometry(const NiPropertyState* apState) {
         BSRenderState::SetZFunc(NiZBufferProperty::TEST_LESSEQUAL, BSRS_NOLOCK);
     }
     NiStencilProperty* m_pObject = static_cast<NiStencilProperty*>(apState->m_aspProps[4].m_pObject);
-    if (m_pObject) {
-        if ((m_pObject->m_uFlags & 1) != 0) {
-            BSRenderState::SetStencilEnable(false, BSRS_NOLOCK);
-        }
+    if ((m_pObject) && ((m_pObject->m_uFlags & 1) != 0)) {
+        BSRenderState::SetStencilEnable(false, BSRS_NOLOCK);
     }
+
     // The shade property slot holds the BSShaderProperty; its first flag word is tested.
     if ((v2 == BSShaderManager::BSSM_CONSTALPHA || v2 == BSShaderManager::BSSM_CONSTALPHA_S) &&
         (static_cast<BSShaderProperty*>(apState->m_aspProps[3].m_pObject)->ulFlags[0] & BSS1_Hair) != 0) {
@@ -6197,11 +6194,9 @@ void ShadowLightShader::SetupPass_ADT4_Opt() {
 
 void ShadowLightShader::SetClampMode(NiD3DTextureStage* textureStage, BSShaderPPLightingProperty* shaderProp) {
     int32_t v3;
-    if (textureStage) {
-        if (shaderProp) {
-            v3 = (int32_t)shaderProp->GetClampNI();
-            textureStage->SetClampMode(static_cast<NiTexturingProperty::ClampMode>(v3));
-        }
+    if ((textureStage) && (shaderProp)) {
+        v3 = (int32_t)shaderProp->GetClampNI();
+        textureStage->SetClampMode(static_cast<NiTexturingProperty::ClampMode>(v3));
     }
 }
 
@@ -6626,15 +6621,13 @@ void ShadowLightShader::Setup_ADT4_Opt(NiPropertyState* a1) {
     SetupGeometryOpt_WorldViewProj(pGeometry, pGeometry->m_kWorld);
     SetupGeometryOpt_Lights(pM, pGeometry->m_kWorld.m_fScale);
     NiD3DShaderConstantMap* v9 = m_spPixelConstantMap.m_pObject;
-    if (v9) {
-        if (NiD3DShader::m_spCurrentPass->m_spPixelShader.m_pObject) {
-            NiBound v10;
-            NiTransform v12;
-            v9->SetShaderConstants(
-                NiD3DShader::m_spCurrentPass->m_spPixelShader.m_pObject, nullptr, nullptr, nullptr, nullptr, nullptr,
-                nullptr, v12, v10, 0, true
-            );
-        }
+    if ((v9) && (NiD3DShader::m_spCurrentPass->m_spPixelShader.m_pObject)) {
+        NiBound v10;
+        NiTransform v12;
+        v9->SetShaderConstants(
+            NiD3DShader::m_spCurrentPass->m_spPixelShader.m_pObject, nullptr, nullptr, nullptr, nullptr, nullptr,
+            nullptr, v12, v10, 0, true
+        );
     }
 }
 
@@ -6763,17 +6756,15 @@ void ShadowLightShader::SetupGeometryConstants_Lights(
         goto LABEL_27;
     }
 LABEL_29:;
-    if (BSShaderManager::bHDR && (v7->ulFlags[0] & BSS1_FaceGen) != 0) {
-        if (apRenderPass->ucNumLights) {
-            if (!(*apRenderPass->ppSceneLights)->bPointLight) {
-                kDimmed.x = BSShaderLightingProperty::pShaderLightConstants[1].X() * BSShaderManager::fSkinDimmer;
-                kDimmed.y = BSShaderLightingProperty::pShaderLightConstants[1].Y() * BSShaderManager::fSkinDimmer;
-                kDimmed.z = BSShaderLightingProperty::pShaderLightConstants[1].Z() * BSShaderManager::fSkinDimmer;
-                kDimmed.w = BSShaderManager::fSkinDimmer * BSShaderLightingProperty::pShaderLightConstants[1].W();
-                BSShaderLightingProperty::pShaderLightConstants[1] = kDimmed;
-            }
-        }
+    if ((BSShaderManager::bHDR && (v7->ulFlags[0] & BSS1_FaceGen) != 0) && (apRenderPass->ucNumLights) &&
+        (!(*apRenderPass->ppSceneLights)->bPointLight)) {
+        kDimmed.x = BSShaderLightingProperty::pShaderLightConstants[1].X() * BSShaderManager::fSkinDimmer;
+        kDimmed.y = BSShaderLightingProperty::pShaderLightConstants[1].Y() * BSShaderManager::fSkinDimmer;
+        kDimmed.z = BSShaderLightingProperty::pShaderLightConstants[1].Z() * BSShaderManager::fSkinDimmer;
+        kDimmed.w = BSShaderManager::fSkinDimmer * BSShaderLightingProperty::pShaderLightConstants[1].W();
+        BSShaderLightingProperty::pShaderLightConstants[1] = kDimmed;
     }
+
     if (epass == 587) {
         void* pIterator = nullptr;
         if (BSShaderManager::eRenderMode == 10) {
@@ -6839,26 +6830,24 @@ void ShadowLightShader::SetupGeometryConstants_EyePos(
 
 void ShadowLightShader::SetupGeometryConstants_SkinToCube(const NiSkinInstance* apSkin) {
     alignas(16) D3DMATRIX kMatrix;
-    if (ShadowLightShader::spVertexConstantMapEntries[12]->m_bEnabled) {
-        if (apSkin) {
-            kMatrix._43 = 0.0f;
-            kMatrix._42 = 0.0f;
-            kMatrix._41 = 0.0f;
-            kMatrix._34 = 0.0f;
-            kMatrix._32 = 0.0f;
-            kMatrix._31 = 0.0f;
-            kMatrix._24 = 0.0f;
-            kMatrix._23 = 0.0f;
-            kMatrix._21 = 0.0f;
-            kMatrix._14 = 0.0f;
-            kMatrix._13 = 0.0f;
-            kMatrix._12 = 0.0f;
-            kMatrix._44 = 1.0f;
-            kMatrix._33 = 1.0f;
-            kMatrix._22 = 1.0f;
-            kMatrix._11 = 1.0f;
-            rt::memcpy(ShadowLightShader::kSkinWorldTranspose, &kMatrix, sizeof(kMatrix));
-        }
+    if ((ShadowLightShader::spVertexConstantMapEntries[12]->m_bEnabled) && (apSkin)) {
+        kMatrix._43 = 0.0f;
+        kMatrix._42 = 0.0f;
+        kMatrix._41 = 0.0f;
+        kMatrix._34 = 0.0f;
+        kMatrix._32 = 0.0f;
+        kMatrix._31 = 0.0f;
+        kMatrix._24 = 0.0f;
+        kMatrix._23 = 0.0f;
+        kMatrix._21 = 0.0f;
+        kMatrix._14 = 0.0f;
+        kMatrix._13 = 0.0f;
+        kMatrix._12 = 0.0f;
+        kMatrix._44 = 1.0f;
+        kMatrix._33 = 1.0f;
+        kMatrix._22 = 1.0f;
+        kMatrix._11 = 1.0f;
+        rt::memcpy(ShadowLightShader::kSkinWorldTranspose, &kMatrix, sizeof(kMatrix));
     }
 }
 
@@ -7077,11 +7066,10 @@ void ShadowLightShader::SetupGeometryConstants_Toggles(
             UpdateTogglesConstantLand(pgeometry, nullptr, pprop, 0);
         }
         double v10 = 0.0;
-        if (apRenderPass) {
-            if (!apRenderPass->bLastPass) {
-                BSShaderLightingProperty::pShaderLightConstants[33].y = 0.0f;
-            }
+        if ((apRenderPass) && (!apRenderPass->bLastPass)) {
+            BSShaderLightingProperty::pShaderLightConstants[33].y = 0.0f;
         }
+
         if ((pprop->ulFlags[0] & BSS1_Landscape) != 0 || (epass >= 584 && epass <= 587)) {
             if (epass - 584 <= 3) {
                 double v12;
@@ -7137,50 +7125,47 @@ void ShadowLightShader::SetupGeometryConstants_ShadowProj(
     if (ShadowLightShader::spVertexConstantMapEntries[3]->m_bEnabled) {
         BSShaderPPLightingProperty* m_pObject =
             static_cast<BSShaderPPLightingProperty*>(apState->m_aspProps[3].m_pObject);
-        if (m_pObject) {
-            if (m_pObject->iShaderPropertyType != -1) {
-                if (BSShaderManager::GetAccumulator()->pActiveShadowSceneNode) {
-                    double m_fScale;
-                    if (apSkin) {
-                        v6._11 = 1.0;
-                        v6._12 = 0.0;
-                        v6._13 = 0.0;
-                        v6._14 = NiRenderer::PosAdjust.x;
-                        v6._21 = 0.0;
-                        v6._23 = 0.0;
-                        v6._22 = 1.0;
-                        v6._24 = NiRenderer::PosAdjust.y;
-                        v6._31 = 0.0;
-                        v6._32 = 0.0;
-                        v6._33 = 1.0;
-                        v6._34 = NiRenderer::PosAdjust.z;
-                        m_fScale = 1.0;
-                        v6._41 = 0.0;
-                        v6._42 = 0.0;
-                        v6._43 = 0.0;
-                    }
-                    else {
-                        v6._11 = aWorld.m_Rotate.m_pEntry[0][0];
-                        v6._12 = aWorld.m_Rotate.m_pEntry[0][1];
-                        v6._13 = aWorld.m_Rotate.m_pEntry[0][2];
-                        v6._14 = aWorld.m_Translate.x;
-                        v6._21 = aWorld.m_Rotate.m_pEntry[1][0];
-                        v6._22 = aWorld.m_Rotate.m_pEntry[1][1];
-                        v6._23 = aWorld.m_Rotate.m_pEntry[1][2];
-                        v6._24 = aWorld.m_Translate.y;
-                        v6._31 = aWorld.m_Rotate.m_pEntry[2][0];
-                        v6._32 = aWorld.m_Rotate.m_pEntry[2][1];
-                        v6._33 = aWorld.m_Rotate.m_pEntry[2][2];
-                        v6._34 = aWorld.m_Translate.z;
-                        v6._41 = 0.0;
-                        v6._42 = 0.0;
-                        v6._43 = 0.0;
-                        m_fScale = aWorld.m_fScale;
-                    }
-                    v6._44 = m_fScale;
-                    ShadowLightShader::ShadowProjMatrix = v6;
-                }
+        if ((m_pObject) && (m_pObject->iShaderPropertyType != -1) &&
+            (BSShaderManager::GetAccumulator()->pActiveShadowSceneNode)) {
+            double m_fScale;
+            if (apSkin) {
+                v6._11 = 1.0;
+                v6._12 = 0.0;
+                v6._13 = 0.0;
+                v6._14 = NiRenderer::PosAdjust.x;
+                v6._21 = 0.0;
+                v6._23 = 0.0;
+                v6._22 = 1.0;
+                v6._24 = NiRenderer::PosAdjust.y;
+                v6._31 = 0.0;
+                v6._32 = 0.0;
+                v6._33 = 1.0;
+                v6._34 = NiRenderer::PosAdjust.z;
+                m_fScale = 1.0;
+                v6._41 = 0.0;
+                v6._42 = 0.0;
+                v6._43 = 0.0;
             }
+            else {
+                v6._11 = aWorld.m_Rotate.m_pEntry[0][0];
+                v6._12 = aWorld.m_Rotate.m_pEntry[0][1];
+                v6._13 = aWorld.m_Rotate.m_pEntry[0][2];
+                v6._14 = aWorld.m_Translate.x;
+                v6._21 = aWorld.m_Rotate.m_pEntry[1][0];
+                v6._22 = aWorld.m_Rotate.m_pEntry[1][1];
+                v6._23 = aWorld.m_Rotate.m_pEntry[1][2];
+                v6._24 = aWorld.m_Translate.y;
+                v6._31 = aWorld.m_Rotate.m_pEntry[2][0];
+                v6._32 = aWorld.m_Rotate.m_pEntry[2][1];
+                v6._33 = aWorld.m_Rotate.m_pEntry[2][2];
+                v6._34 = aWorld.m_Translate.z;
+                v6._41 = 0.0;
+                v6._42 = 0.0;
+                v6._43 = 0.0;
+                m_fScale = aWorld.m_fScale;
+            }
+            v6._44 = m_fScale;
+            ShadowLightShader::ShadowProjMatrix = v6;
         }
     }
 }
@@ -7476,15 +7461,13 @@ void ShadowLightShader::SetupPass_ADT_Opt() {
     SetupPassOpt_AmbientLight();
     SetupPassOpt_LightColor();
     NiD3DShaderConstantMap* m_pObject = m_spPixelConstantMap.m_pObject;
-    if (m_pObject) {
-        if (NiD3DShader::m_spCurrentPass->m_spPixelShader.m_pObject) {
-            NiBound v3;
-            NiTransform v4;
-            m_pObject->SetShaderConstants(
-                NiD3DShader::m_spCurrentPass->m_spPixelShader.m_pObject, nullptr, nullptr, nullptr, nullptr, nullptr,
-                nullptr, v4, v3, 0, true
-            );
-        }
+    if ((m_pObject) && (NiD3DShader::m_spCurrentPass->m_spPixelShader.m_pObject)) {
+        NiBound v3;
+        NiTransform v4;
+        m_pObject->SetShaderConstants(
+            NiD3DShader::m_spCurrentPass->m_spPixelShader.m_pObject, nullptr, nullptr, nullptr, nullptr, nullptr,
+            nullptr, v4, v3, 0, true
+        );
     }
 }
 
@@ -7521,14 +7504,12 @@ void ShadowLightShader::Setup_ADTS10_Opt(NiPropertyState* a2) {
         16, &(&pOut)->m_kCenter.x, 1
     );
     NiD3DShaderConstantMap* v10 = m_spPixelConstantMap.m_pObject;
-    if (v10) {
-        if (NiD3DShader::m_spCurrentPass->m_spPixelShader.m_pObject) {
-            NiTransform v14;
-            v10->SetShaderConstants(
-                NiD3DShader::m_spCurrentPass->m_spPixelShader.m_pObject, nullptr, nullptr, nullptr, nullptr, nullptr,
-                nullptr, v14, pOut, 0, true
-            );
-        }
+    if ((v10) && (NiD3DShader::m_spCurrentPass->m_spPixelShader.m_pObject)) {
+        NiTransform v14;
+        v10->SetShaderConstants(
+            NiD3DShader::m_spCurrentPass->m_spPixelShader.m_pObject, nullptr, nullptr, nullptr, nullptr, nullptr,
+            nullptr, v14, pOut, 0, true
+        );
     }
 }
 

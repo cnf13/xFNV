@@ -317,7 +317,9 @@ namespace d3dx {
                     const uint16_t us0 = Pack565(kLow);
                     const uint16_t us1 = Pack565(kHigh);
                     ColorPalette(us0, us1, !bTransparent, akPalette);
-                    float fAA = 0, fAB = 0, fBB = 0;
+                    float fAA = 0;
+                    float fAB = 0;
+                    float fBB = 0;
                     float fAX[3] = {0, 0, 0};
                     float fBX[3] = {0, 0, 0};
                     for (int32_t i = 0; i < 16; ++i) {
@@ -339,7 +341,8 @@ namespace d3dx {
                     if (std::fabs(fDet) < 1e-8f) {
                         break;
                     }
-                    float afLow[3], afHigh[3];
+                    float afLow[3];
+                    float afHigh[3];
                     for (int32_t c = 0; c < 3; ++c) {
                         afLow[c] = Clamp01((fAX[c] * fBB - fBX[c] * fAB) / fDet);
                         afHigh[c] = Clamp01((fBX[c] * fAA - fAX[c] * fAB) / fDet);
@@ -394,7 +397,10 @@ namespace d3dx {
             else if (auiFormat == D3DFMT_DXT4 || auiFormat == D3DFMT_DXT5) {
                 // Both alpha modes, the one with the smaller squared error: eight steps between the extremes, or six
                 // between the extremes other than 0 and 255, which the mode adds.
-                uint32_t uiMin = 255, uiMax = 0, uiMin6 = 255, uiMax6 = 0;
+                uint32_t uiMin = 255;
+                uint32_t uiMax = 0;
+                uint32_t uiMin6 = 255;
+                uint32_t uiMax6 = 0;
                 for (int32_t i = 0; i < 16; ++i) {
                     if (apValid[i]) {
                         const uint32_t uiAlpha = Quantize(apBlock[i].a, 255);

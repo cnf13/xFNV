@@ -91,15 +91,14 @@ bool NiPSysEmitter::IsEqual(NiObject* pkObject) {
     }
 
     NiPSysEmitter* pkOther = static_cast<NiPSysEmitter*>(pkObject);
-    if (m_fSpeed != pkOther->m_fSpeed || m_fSpeedVar != pkOther->m_fSpeedVar ||
+    return !(
+        m_fSpeed != pkOther->m_fSpeed || m_fSpeedVar != pkOther->m_fSpeedVar ||
         m_fDeclination != pkOther->m_fDeclination || m_fDeclinationVar != pkOther->m_fDeclinationVar ||
         m_fPlanarAngle != pkOther->m_fPlanarAngle || m_fPlanarAngleVar != pkOther->m_fPlanarAngleVar ||
         pkOther->m_kInitialColor != m_kInitialColor || m_fInitialRadius != pkOther->m_fInitialRadius ||
         m_fRadiusVar != pkOther->m_fRadiusVar || m_fLifeSpan != pkOther->m_fLifeSpan ||
-        m_fLifeSpanVar != pkOther->m_fLifeSpanVar) {
-        return false;
-    }
-    return true;
+        m_fLifeSpanVar != pkOther->m_fLifeSpanVar
+    );
 }
 
 void NiPSysEmitter::GetViewerStrings(NiTPrimitiveArray<char*>* pkStrings) {

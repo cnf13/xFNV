@@ -45,54 +45,52 @@ bool TESRegionPointList::Load(TESFile* apFile) {
         Warning("Invalid Region Point List data in file \"%s\".", &apFile->m_Filename);
         return false;
     }
-    else {
-        if (auiMaxSize && uiPoints) {
-            NiPoint2* pPoints;
-            void* ptr = ourMalloc(uiPoints <= SIZE_MAX / sizeof(NiPoint2) ? sizeof(NiPoint2) * uiPoints : SIZE_MAX);
-            if (ptr) {
-                rt::eh_vector_constructor_iterator(ptr, sizeof(NiPoint2), uiPoints, &emptyPointConstructor);
-                pPoints = static_cast<NiPoint2*>(ptr);
-            }
-            else {
-                pPoints = nullptr;
-            }
-            apFile->GetChunkData(pPoints, auiMaxSize);
-            iCount = 0;
-            for (uint32_t i = 0; i < uiPoints; ++i) {
-                TESRegionPoint* pPoint;
-                if (apFile->QEndian()) {
-                    ENDIAN<float>(pPoints[i].x, false);
-                    ENDIAN<float>(pPoints[i].y, false);
-                }
-                void* pMemory = ourMalloc(sizeof(TESRegionPoint));
-                if (pMemory) {
-                    pPoint = ::new (pMemory) TESRegionPoint(pPoints[i]);
-                }
-                else {
-                    pPoint = nullptr;
-                }
-                if (static_cast<double>(Minimums.x) > pPoint->Point.x) {
-                    Minimums.x = pPoint->Point.x;
-                }
-                if (static_cast<double>(Minimums.y) > pPoint->Point.y) {
-                    Minimums.y = pPoint->Point.y;
-                }
-                if (static_cast<double>(Maximums.x) < pPoint->Point.x) {
-                    Maximums.x = pPoint->Point.x;
-                }
-                if (static_cast<double>(Maximums.y) < pPoint->Point.y) {
-                    Maximums.y = pPoint->Point.y;
-                }
-                AddHead(pPoint);
-                ++iCount;
-            }
-            ourFree(pPoints);
-            return true;
+
+    if (auiMaxSize && uiPoints) {
+        NiPoint2* pPoints;
+        void* ptr = ourMalloc(uiPoints <= SIZE_MAX / sizeof(NiPoint2) ? sizeof(NiPoint2) * uiPoints : SIZE_MAX);
+        if (ptr) {
+            rt::eh_vector_constructor_iterator(ptr, sizeof(NiPoint2), uiPoints, &emptyPointConstructor);
+            pPoints = static_cast<NiPoint2*>(ptr);
         }
         else {
-            return false;
+            pPoints = nullptr;
         }
+        apFile->GetChunkData(pPoints, auiMaxSize);
+        iCount = 0;
+        for (uint32_t i = 0; i < uiPoints; ++i) {
+            TESRegionPoint* pPoint;
+            if (apFile->QEndian()) {
+                ENDIAN<float>(pPoints[i].x, false);
+                ENDIAN<float>(pPoints[i].y, false);
+            }
+            void* pMemory = ourMalloc(sizeof(TESRegionPoint));
+            if (pMemory) {
+                pPoint = ::new (pMemory) TESRegionPoint(pPoints[i]);
+            }
+            else {
+                pPoint = nullptr;
+            }
+            if (static_cast<double>(Minimums.x) > pPoint->Point.x) {
+                Minimums.x = pPoint->Point.x;
+            }
+            if (static_cast<double>(Minimums.y) > pPoint->Point.y) {
+                Minimums.y = pPoint->Point.y;
+            }
+            if (static_cast<double>(Maximums.x) < pPoint->Point.x) {
+                Maximums.x = pPoint->Point.x;
+            }
+            if (static_cast<double>(Maximums.y) < pPoint->Point.y) {
+                Maximums.y = pPoint->Point.y;
+            }
+            AddHead(pPoint);
+            ++iCount;
+        }
+        ourFree(pPoints);
+        return true;
     }
+
+    return false;
 }
 
 bool TESRegionPointList::Validate(bool abMinPointsTest) {
@@ -165,22 +163,21 @@ bool TESRegionPointList::Add(TESRegionPoint* apPoint, float afMaxDelta) {
         BSSimpleList<TESRegionPoint*>::RemoveHead();
         return false;
     }
-    else {
-        ++iCount;
-        if (((double)Minimums.x) > apPoint->GetX()) {
-            Minimums.x = apPoint->GetX();
-        }
-        if (((double)Minimums.y) > apPoint->GetY()) {
-            Minimums.y = apPoint->GetY();
-        }
-        if (((double)Maximums.x) < apPoint->GetX()) {
-            Maximums.x = apPoint->GetX();
-        }
-        if (((double)Maximums.y) < apPoint->GetY()) {
-            Maximums.y = apPoint->GetY();
-        }
-        return true;
+
+    ++iCount;
+    if (((double)Minimums.x) > apPoint->GetX()) {
+        Minimums.x = apPoint->GetX();
     }
+    if (((double)Minimums.y) > apPoint->GetY()) {
+        Minimums.y = apPoint->GetY();
+    }
+    if (((double)Maximums.x) < apPoint->GetX()) {
+        Maximums.x = apPoint->GetX();
+    }
+    if (((double)Maximums.y) < apPoint->GetY()) {
+        Maximums.y = apPoint->GetY();
+    }
+    return true;
 }
 
 bool TESRegionPointList::IsInsideRegion(TESRegionPoint* apTest) {
@@ -279,10 +276,8 @@ TESRegionPointList* TESRegionPointList::Clear() {
         TESRegionPoint* m_item = this->m_item;
         RemoveHead();
         --iCount;
-        if (m_item) {
-            if (bOwnsPointMemory) {
-                ourFree(m_item);
-            }
+        if ((m_item) && (bOwnsPointMemory)) {
+            ourFree(m_item);
         }
     }
     iCount = 0;
@@ -305,9 +300,8 @@ float TESRegionPointList::GetMinX() {
         }
         return fCurMinX;
     }
-    else {
-        return Minimums.x;
-    }
+
+    return Minimums.x;
 }
 
 float TESRegionPointList::GetMaxX() {
@@ -322,9 +316,8 @@ float TESRegionPointList::GetMaxX() {
         }
         return fCurMaxX;
     }
-    else {
-        return Maximums.x;
-    }
+
+    return Maximums.x;
 }
 
 float TESRegionPointList::GetMinY() {
@@ -339,9 +332,8 @@ float TESRegionPointList::GetMinY() {
         }
         return fCurMinY;
     }
-    else {
-        return Minimums.y;
-    }
+
+    return Minimums.y;
 }
 
 float TESRegionPointList::GetMaxY() {
@@ -356,9 +348,8 @@ float TESRegionPointList::GetMaxY() {
         }
         return fCurMaxY;
     }
-    else {
-        return Maximums.y;
-    }
+
+    return Maximums.y;
 }
 
 TESRegionPointList* TESRegionPointList::Copy(TESRegionPointList* apCopyInto) {
@@ -400,73 +391,70 @@ float TESRegionPointList::GetScaleBasedOnLocation(TESRegionPoint* apTest, float 
     if (pLastScaleResult && pLastScaleResult->Matches(apTest, afDistInsideAtMax)) {
         return pLastScaleResult->fscale;
     }
-    else {
-        bool bisInsideRegion = IsInsideRegion(apTest);
-        if (apTest && bisInsideRegion) {
-            if (!(afDistInsideAtMax < 1.0)) {
-                TESRegionPointList::ScaleResult* v5;
-                float freturn;
-                float fminDistPI = 3.4028235e+38f;
-                BSSimpleList<TESRegionPoint*>* pcurrent = this;
-                do {
-                    float fdistPI;
-                    BSSimpleList<TESRegionPoint*>* pnext = pcurrent->m_pkNext;
-                    if (!pnext) {
-                        pnext = this;
-                        bQuit = true;
-                    }
-                    float fdistsqPV1 = apTest->GetDistanceSquared(pcurrent->m_item);
-                    float fdistsqPV2 = apTest->GetDistanceSquared(pnext->m_item);
-                    float fdistV1V2 = pcurrent->m_item->GetDistance(pnext->m_item);
-                    float fdistsqV1V2 = pcurrent->m_item->GetDistanceSquared(pnext->m_item);
-                    float v9 = fdistsqV1V2 - fdistsqPV2 + fdistsqPV1;
-                    float fdistV1I = v9 / (fdistV1V2 * 2.0);
-                    if (!(fdistV1V2 <= static_cast<double>(fdistV1I))) {
-                        if (!(fdistV1I <= 0.0)) {
-                            fdistPI = fdistsqPV1 - fdistV1I * fdistV1I;
-                        }
-                        else {
-                            fdistPI = fdistsqPV1;
-                        }
+
+    bool bisInsideRegion = IsInsideRegion(apTest);
+    if (apTest && bisInsideRegion) {
+        if (!(afDistInsideAtMax < 1.0)) {
+            TESRegionPointList::ScaleResult* v5;
+            float freturn;
+            float fminDistPI = 3.4028235e+38f;
+            BSSimpleList<TESRegionPoint*>* pcurrent = this;
+            do {
+                float fdistPI;
+                BSSimpleList<TESRegionPoint*>* pnext = pcurrent->m_pkNext;
+                if (!pnext) {
+                    pnext = this;
+                    bQuit = true;
+                }
+                float fdistsqPV1 = apTest->GetDistanceSquared(pcurrent->m_item);
+                float fdistsqPV2 = apTest->GetDistanceSquared(pnext->m_item);
+                float fdistV1V2 = pcurrent->m_item->GetDistance(pnext->m_item);
+                float fdistsqV1V2 = pcurrent->m_item->GetDistanceSquared(pnext->m_item);
+                float v9 = fdistsqV1V2 - fdistsqPV2 + fdistsqPV1;
+                float fdistV1I = v9 / (fdistV1V2 * 2.0);
+                if (!(fdistV1V2 <= static_cast<double>(fdistV1I))) {
+                    if (!(fdistV1I <= 0.0)) {
+                        fdistPI = fdistsqPV1 - fdistV1I * fdistV1I;
                     }
                     else {
-                        fdistPI = fdistsqPV2;
+                        fdistPI = fdistsqPV1;
                     }
-                    if (fminDistPI > static_cast<double>(fdistPI)) {
-                        fminDistPI = fdistPI;
-                    }
-                    pcurrent = pnext;
-                }
-                while (!bQuit);
-                float fminDistPI_2 = std::sqrtf(fminDistPI);
-                if (!(afDistInsideAtMax <= static_cast<double>(fminDistPI_2))) {
-                    freturn = fminDistPI_2 / afDistInsideAtMax;
                 }
                 else {
-                    freturn = 1.0f;
+                    fdistPI = fdistsqPV2;
                 }
-                if (pLastScaleResult) {
-                    ourFree(pLastScaleResult);
+                if (fminDistPI > static_cast<double>(fdistPI)) {
+                    fminDistPI = fdistPI;
                 }
-                void* pMemory = ourMalloc(sizeof(TESRegionPointList::ScaleResult));
-                if (pMemory) {
-                    v5 = ::new (pMemory) TESRegionPointList::ScaleResult;
-                }
-                else {
-                    v5 = nullptr;
-                }
-                pLastScaleResult = v5;
-                apTest->Copy(&pLastScaleResult->point);
-                pLastScaleResult->fdist = afDistInsideAtMax;
-                pLastScaleResult->fscale = freturn;
-                return freturn;
+                pcurrent = pnext;
+            }
+            while (!bQuit);
+            float fminDistPI_2 = std::sqrtf(fminDistPI);
+            if (!(afDistInsideAtMax <= static_cast<double>(fminDistPI_2))) {
+                freturn = fminDistPI_2 / afDistInsideAtMax;
             }
             else {
-                return 1.0f;
+                freturn = 1.0f;
             }
+            if (pLastScaleResult) {
+                ourFree(pLastScaleResult);
+            }
+            void* pMemory = ourMalloc(sizeof(TESRegionPointList::ScaleResult));
+            if (pMemory) {
+                v5 = ::new (pMemory) TESRegionPointList::ScaleResult;
+            }
+            else {
+                v5 = nullptr;
+            }
+            pLastScaleResult = v5;
+            apTest->Copy(&pLastScaleResult->point);
+            pLastScaleResult->fdist = afDistInsideAtMax;
+            pLastScaleResult->fscale = freturn;
+            return freturn;
         }
-        else {
-            return 0.0f;
-        }
+
+        return 1.0f;
     }
+
+    return 0.0f;
 }

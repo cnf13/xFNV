@@ -196,15 +196,14 @@ void TESLevSpell::CalculateCurrentForm(
             TESForm* poutform = pdata_2->pForm;
             uint16_t soutcount = pdata_2->sCount;
             TESLevSpell* plevlist = dynamic_cast<TESLevSpell*>(pdata_2->pForm);
-            if (plevlist) {
-                if (abRecurse) {
-                    psubform = nullptr;
-                    ssubcount = 0;
-                    plevlist->CalculateCurrentForm(aeSchool, asLevel, psubform, ssubcount, abRecurse);
-                    poutform = psubform;
-                    soutcount *= ssubcount;
-                }
+            if ((plevlist) && (abRecurse)) {
+                psubform = nullptr;
+                ssubcount = 0;
+                plevlist->CalculateCurrentForm(aeSchool, asLevel, psubform, ssubcount, abRecurse);
+                poutform = psubform;
+                soutcount *= ssubcount;
             }
+
             apOutForm = poutform;
             asOutCount = soutcount;
         }

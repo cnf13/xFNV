@@ -44,11 +44,9 @@ void PatrolActorPackageData::HandleDeletedReference(TESObjectREFR* apDeletedObj)
                 --a3;
             }
         }
-        if (pActor) {
-            if (!pSaveLoadGame->GetSaveGameLoading() && !SetCurrentReference(iCurrentReference)) {
-                const NiPoint3* v2 = &pActor->GetLocationOnReference();
-                ResumeRepeatablePatrol(v2);
-            }
+        if ((pActor) && (!pSaveLoadGame->GetSaveGameLoading() && !SetCurrentReference(iCurrentReference))) {
+            const NiPoint3* v2 = &pActor->GetLocationOnReference();
+            ResumeRepeatablePatrol(v2);
         }
     }
 }
@@ -175,12 +173,11 @@ bool PatrolActorPackageData::Init(Actor* apActor, TESPackage* apPackage) {
     bPatrolDirection = true;
     iLoopAroundIndex = 0;
     bool bvalid = BuildReferenceArray();
-    if (bvalid) {
-        if (pPackageData->bRepeatable) {
-            const NiPoint3* v3 = &apActor->GetLocationOnReference();
-            ResumeRepeatablePatrol(v3);
-        }
+    if ((bvalid) && (pPackageData->bRepeatable)) {
+        const NiPoint3* v3 = &apActor->GetLocationOnReference();
+        ResumeRepeatablePatrol(v3);
     }
+
     return bvalid;
 }
 
@@ -288,9 +285,8 @@ TESObjectREFR* PatrolActorPackageData::GetCurrentReference() {
     if (vCondition1) {
         return nullptr;
     }
-    else {
-        return (&References)->GetAt(iCurrentReference);
-    }
+
+    return (&References)->GetAt(iCurrentReference);
 }
 
 bool PatrolActorPackageData::BuildReferenceArray() {
@@ -413,10 +409,9 @@ bool PatrolActorPackageData::SetCurrentReference(uint32_t aiRefIndex) {
         }
         return bsuccess;
     }
-    else {
-        iCurrentReference = aiRefIndex;
-        return true;
-    }
+
+    iCurrentReference = aiRefIndex;
+    return true;
 }
 
 TESObjectREFR* PatrolActorPackageData::GetInitialReferenceForSetup(Actor* apActor, TESPackage* apPack) {

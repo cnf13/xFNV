@@ -399,11 +399,10 @@ void TESSaveLoadGame::BuildChangesString(
         aiFlags = CheckFlags(apForm, aiFlags);
     }
     uint16_t ibaseSaveSize = 0;
-    if (!abVerbose) {
-        if (apForm) {
-            ibaseSaveSize = apForm->GetSaveSize(0);
-        }
+    if ((!abVerbose) && (apForm)) {
+        ibaseSaveSize = apForm->GetSaveSize(0);
     }
+
     TESObjectREFR* pref = dynamic_cast<TESObjectREFR*>(apForm);
     MobileObject* pmob = dynamic_cast<MobileObject*>(apForm);
     FNVD_DYNAMIC_CAST_VOID(Actor)(apForm, RTTI_TESForm, RTTI_Actor);
@@ -471,15 +470,13 @@ void TESSaveLoadGame::BuildChangesString(
         BSstrcat(apString, 500, Src);
     }
     else {
-        if (ibaseSaveSize) {
-            if (!abVerbose) {
-                BSsprintf(Src, 50, "Base(%i)", ibaseSaveSize);
-                while (BSstrlen(Src) < 25) {
-                    BSstrcat(Src, 50, " ");
-                }
+        if ((ibaseSaveSize) && (!abVerbose)) {
+            BSsprintf(Src, 50, "Base(%i)", ibaseSaveSize);
+            while (BSstrlen(Src) < 25) {
                 BSstrcat(Src, 50, " ");
-                BSstrcat(apString, 500, Src);
             }
+            BSstrcat(Src, 50, " ");
+            BSstrcat(apString, 500, Src);
         }
     }
     if ((aiFlags & 1) != 0) {
@@ -1599,10 +1596,8 @@ void TESSaveLoadGame::LoadInitialData(TESForm* apForm, uint32_t aiFlags) {
         }
     }
     else {
-        if (dynamic_cast<TESObjectCELL*>(apForm)) {
-            if (pSaveLoadGameOLD->GetCurrentVersion() < 91u) {
-                AdvanceBuffer(2u);
-            }
+        if ((dynamic_cast<TESObjectCELL*>(apForm)) && (pSaveLoadGameOLD->GetCurrentVersion() < 91u)) {
+            AdvanceBuffer(2u);
         }
     }
 }
@@ -1816,11 +1811,10 @@ bool TESSaveLoadGame::LoadNumericID(uint32_t* apFormID, uint32_t aiSize) {
     if (GetUseNumericIDArray()) {
         for (i = 0; i < (aiSize >> 2); ++i) {
             numericIDFromArray = GetNumericIDFromArray(apFormID[i]);
-            if (apFormID[i]) {
-                if (!numericIDFromArray) {
-                    v7 = 1;
-                }
+            if ((apFormID[i]) && (!numericIDFromArray)) {
+                v7 = 1;
             }
+
             apFormID[i] = numericIDFromArray;
         }
     }
@@ -2175,13 +2169,12 @@ TESForm* TESSaveLoadGame::CreateReferenceFromFile(uint32_t aiFormID, MovedRefere
         }
         return apObject;
     }
-    else {
-        Warning(
-            "CELLS: Reference %08X could not be loaded into location %08X at coordinates %i, %i", aiFormID, aiSearchID,
-            aiX, aiY
-        );
-        return nullptr;
-    }
+
+    Warning(
+        "CELLS: Reference %08X could not be loaded into location %08X at coordinates %i, %i", aiFormID, aiSearchID, aiX,
+        aiY
+    );
+    return nullptr;
 }
 
 uint32_t TESSaveLoadGame::AddNumericIDToArray(uint32_t aiFormID) {
@@ -2243,51 +2236,49 @@ bool TESSaveLoadGame::SaveGame(BSFile* pFile, const char* apFileName, bool abLog
             ChangeData* pchange = nullptr;
             uint32_t iformID = 0;
             m_pChanges->GetNext(it, iformID, pchange);
-            if (iformID) {
-                if (pchange) {
-                    m_pBuffer = pchange->pBuffer;
-                    SaveFormHeader kHeader;
-                    kHeader.iFormID = iformID;
-                    kHeader.iFlags = pchange->iFlags;
-                    kHeader.cVersion = GetCurrentVersion();
-                    if (m_pBuffer) {
-                        SaveBufferHeader kBufferHeader;
-                        pSaveLoadGameOLD->LoadGameDataOLD(&kBufferHeader, 4u);
-                        kHeader.cFormType = kBufferHeader.cFormType;
-                        kHeader.cVersion = kBufferHeader.cVersion;
+            if ((iformID) && (pchange)) {
+                m_pBuffer = pchange->pBuffer;
+                SaveFormHeader kHeader;
+                kHeader.iFormID = iformID;
+                kHeader.iFlags = pchange->iFlags;
+                kHeader.cVersion = GetCurrentVersion();
+                if (m_pBuffer) {
+                    SaveBufferHeader kBufferHeader;
+                    pSaveLoadGameOLD->LoadGameDataOLD(&kBufferHeader, 4u);
+                    kHeader.cFormType = kBufferHeader.cFormType;
+                    kHeader.cVersion = kBufferHeader.cVersion;
+                    pSaveLoadGameOLD->WriteFile(pNewFile, &kHeader, 10u);
+                    ++iformCount;
+                    WriteFile(pNewFile, &kBufferHeader, 2u);
+                    if (kBufferHeader.iSize) {
+                        WriteFile(pNewFile, m_pBuffer, kBufferHeader.iSize);
+                    }
+                    if (m_pSaveLoadStats) {
+                        m_pSaveLoadStats->AddStats(&kHeader, kBufferHeader.iSize);
+                    }
+                    m_pBuffer = nullptr;
+                }
+                else {
+                    TESForm* pform = TESForm::GetFormByNumericID(iformID);
+                    if (pform) {
+                        kHeader.cFormType = pform->GetFormType();
+                        kHeader.iFlags = CheckFlags(pform, kHeader.iFlags);
                         pSaveLoadGameOLD->WriteFile(pNewFile, &kHeader, 10u);
                         ++iformCount;
-                        WriteFile(pNewFile, &kBufferHeader, 2u);
-                        if (kBufferHeader.iSize) {
-                            WriteFile(pNewFile, m_pBuffer, kBufferHeader.iSize);
+                        m_pCurrentlySavingFormHeader = &kHeader;
+                        uint16_t isize = pform->GetSaveSize(kHeader.iFlags);
+                        isize += static_cast<uint16_t>(GetInitialDataSaveSize(pform, kHeader.iFlags));
+                        WriteFile(pNewFile, &isize, 2u);
+                        if (isize) {
+                            void* ptempBuffer = CreateBuffer(isize);
+                            SaveInitialData(pform, kHeader.iFlags);
+                            pform->SaveGame(kHeader.iFlags);
+                            SaveBuffer(pNewFile, ptempBuffer, isize);
+                            DestroyBuffer(ptempBuffer);
                         }
+                        m_pCurrentlySavingFormHeader = nullptr;
                         if (m_pSaveLoadStats) {
-                            m_pSaveLoadStats->AddStats(&kHeader, kBufferHeader.iSize);
-                        }
-                        m_pBuffer = nullptr;
-                    }
-                    else {
-                        TESForm* pform = TESForm::GetFormByNumericID(iformID);
-                        if (pform) {
-                            kHeader.cFormType = pform->GetFormType();
-                            kHeader.iFlags = CheckFlags(pform, kHeader.iFlags);
-                            pSaveLoadGameOLD->WriteFile(pNewFile, &kHeader, 10u);
-                            ++iformCount;
-                            m_pCurrentlySavingFormHeader = &kHeader;
-                            uint16_t isize = pform->GetSaveSize(kHeader.iFlags);
-                            isize += static_cast<uint16_t>(GetInitialDataSaveSize(pform, kHeader.iFlags));
-                            WriteFile(pNewFile, &isize, 2u);
-                            if (isize) {
-                                void* ptempBuffer = CreateBuffer(isize);
-                                SaveInitialData(pform, kHeader.iFlags);
-                                pform->SaveGame(kHeader.iFlags);
-                                SaveBuffer(pNewFile, ptempBuffer, isize);
-                                DestroyBuffer(ptempBuffer);
-                            }
-                            m_pCurrentlySavingFormHeader = nullptr;
-                            if (m_pSaveLoadStats) {
-                                m_pSaveLoadStats->AddStats(&kHeader, isize);
-                            }
+                            m_pSaveLoadStats->AddStats(&kHeader, isize);
                         }
                     }
                 }
@@ -2320,13 +2311,12 @@ bool TESSaveLoadGame::SaveGame(BSFile* pFile, const char* apFileName, bool abLog
         pIOManager->Resume();
         return true;
     }
-    else {
-        const char* v4 = sCantSaveNow.operator const char*();
-        Interface::ShowMessage(
-            v4, 0, "Interface\\Icons\\Message Icons\\glow_message_vaultboy_sad.dds", nullptr, 2.0f, false
-        );
-        return false;
-    }
+
+    const char* v4 = sCantSaveNow.operator const char*();
+    Interface::ShowMessage(
+        v4, 0, "Interface\\Icons\\Message Icons\\glow_message_vaultboy_sad.dds", nullptr, 2.0f, false
+    );
+    return false;
 }
 
 bool TESSaveLoadGame::ResetReferencePosition(TESObjectREFR* apRef, bool abTemporaryMove) {
@@ -2378,10 +2368,8 @@ bool TESSaveLoadGame::ResetReferencePosition(TESObjectREFR* apRef, bool abTempor
             MobileObject* pmob = dynamic_cast<MobileObject*>(apRef);
             if (pmob) {
                 bhkCharacterController* pcon = pmob->GetCharController();
-                if (pcon) {
-                    if (!pcon->QIsFlying()) {
-                        pcon->SetPosition(loc_2);
-                    }
+                if ((pcon) && (!pcon->QIsFlying())) {
+                    pcon->SetPosition(loc_2);
                 }
             }
             obj3D->SetTranslate(loc_2);
@@ -2542,12 +2530,11 @@ uint32_t TESSaveLoadGame::CheckFlags(TESForm* apForm, uint32_t aiFlags) {
                     BaseProcess* CurrentAIProcess = pactor->pCurrentProcess;
                     CurrentAIProcess->GetRunOncePackage();
                 }
-                if (pactor->pCurrentProcess) {
-                    if (pactor->pCurrentProcess->BaseProcess::GetPackageThatIsRunning()) {
-                        TESPackage* pPackage = pactor->pCurrentProcess->BaseProcess::GetPackageThatIsRunning();
-                        aiFlagsa |= pactor->GetPackageSaveFlags(pPackage);
-                    }
+                if ((pactor->pCurrentProcess) && (pactor->pCurrentProcess->BaseProcess::GetPackageThatIsRunning())) {
+                    TESPackage* pPackage = pactor->pCurrentProcess->BaseProcess::GetPackageThatIsRunning();
+                    aiFlagsa |= pactor->GetPackageSaveFlags(pPackage);
                 }
+
                 if (pactor->CheckShouldSaveHavokData(aiFlagsa)) {
                     aiFlagsa |= 4u;
                 }
@@ -2601,17 +2588,15 @@ uint32_t TESSaveLoadGame::CheckFlags(TESForm* apForm, uint32_t aiFlags) {
                     }
                 }
                 else {
-                    if (pref->GetParentCell()) {
-                        if (!pref->GetParentCell()->GetInterior()) {
-                            if (pactor_2) {
-                                Warning("EDITOR: Actor does not have an editor location.  This should never happen.");
-                            }
-                            NiPoint3 loc = pref->GetStartingLocation();
-                            int32_t icellX_2 = FloatToInt(loc.x) >> 12;
-                            int32_t icellY_2 = FloatToInt(loc.y) >> 12;
-                            pworld = pref->GetWorldSpace();
-                            TESObjectCELL* pcell_4 = pworld->GetCellFromCellCoord(icellX_2, icellY_2);
+                    if ((pref->GetParentCell()) && (!pref->GetParentCell()->GetInterior())) {
+                        if (pactor_2) {
+                            Warning("EDITOR: Actor does not have an editor location.  This should never happen.");
                         }
+                        NiPoint3 loc = pref->GetStartingLocation();
+                        int32_t icellX_2 = FloatToInt(loc.x) >> 12;
+                        int32_t icellY_2 = FloatToInt(loc.y) >> 12;
+                        pworld = pref->GetWorldSpace();
+                        TESObjectCELL* pcell_4 = pworld->GetCellFromCellCoord(icellX_2, icellY_2);
                     }
                 }
             }
@@ -2662,25 +2647,23 @@ void TESSaveLoadGame::SaveInitialData(TESForm* a1, uint32_t a2) {
                     );
                 }
                 MobileObject* v8 = dynamic_cast<MobileObject*>(v11);
-                if (v8) {
-                    if (v8->GetCurrentAIProcess()) {
-                        BaseProcess* CurrentAIProcess = v8->GetCurrentAIProcess();
-                        if (CurrentAIProcess->GetProcessLevel()) {
-                            BaseProcess* v6 = v8->GetCurrentAIProcess();
-                            if (v6->GetProcessLevel() == PROCESS_TYPE_MIDDLE_HIGH) {
-                                Warning(
-                                    "SAVELOAD: (Error saving actor %08X) Actor has a middle high process but no "
-                                    "parent cell",
-                                    v11->iFormID
-                                );
-                            }
-                        }
-                        else {
+                if ((v8) && (v8->GetCurrentAIProcess())) {
+                    BaseProcess* CurrentAIProcess = v8->GetCurrentAIProcess();
+                    if (CurrentAIProcess->GetProcessLevel()) {
+                        BaseProcess* v6 = v8->GetCurrentAIProcess();
+                        if (v6->GetProcessLevel() == PROCESS_TYPE_MIDDLE_HIGH) {
                             Warning(
-                                "SAVELOAD: (Error saving actor %08X) Actor has a high process but no parent cell",
+                                "SAVELOAD: (Error saving actor %08X) Actor has a middle high process but no "
+                                "parent cell",
                                 v11->iFormID
                             );
                         }
+                    }
+                    else {
+                        Warning(
+                            "SAVELOAD: (Error saving actor %08X) Actor has a high process but no parent cell",
+                            v11->iFormID
+                        );
                     }
                 }
             }
@@ -2883,20 +2866,18 @@ void TESSaveLoadGame::SetMostRecentSaveGame(BSFile* apFile) {
         ourFree(this->m_pMostRecentSaveGame);
         this->m_pMostRecentSaveGame = nullptr;
     }
-    if (apFile) {
-        if (apFile->m_bGood) {
-            char Dst[268];
-            char* pName = apFile->GetDevice();
-            for (char* i = std::strstr(pName, "\\"); i; i = std::strstr(pName, "\\")) {
-                pName = i + 1;
-            }
-            BSstrcpy(Dst, 260, pName);
-            uint32_t v8 = BSstrlen(Dst);
-            Dst[v8 - 4] = 0;
-            uint32_t Size = BSstrlen(Dst) + 1;
-            this->m_pMostRecentSaveGame = static_cast<char*>(ourMalloc(Size));
-            BSstrcpy(this->m_pMostRecentSaveGame, Size, Dst);
+    if ((apFile) && (apFile->m_bGood)) {
+        char Dst[268];
+        char* pName = apFile->GetDevice();
+        for (char* i = std::strstr(pName, "\\"); i; i = std::strstr(pName, "\\")) {
+            pName = i + 1;
         }
+        BSstrcpy(Dst, 260, pName);
+        uint32_t v8 = BSstrlen(Dst);
+        Dst[v8 - 4] = 0;
+        uint32_t Size = BSstrlen(Dst) + 1;
+        this->m_pMostRecentSaveGame = static_cast<char*>(ourMalloc(Size));
+        BSstrcpy(this->m_pMostRecentSaveGame, Size, Dst);
     }
 }
 
@@ -3179,9 +3160,8 @@ uint32_t TESSaveLoadGame::ReverseConvertNumericID(uint32_t aiFormID) {
     if (v3 == 255) {
         return 0;
     }
-    else {
-        return (v3 << 24) + (0xFFFFFFu & aiFormID);
-    }
+
+    return (v3 << 24) + (0xFFFFFFu & aiFormID);
 }
 
 // Saves the global variables: their count, then each global's form ID and value.
@@ -3347,13 +3327,12 @@ TESForm* TESSaveLoadGame::CreateReference(uint32_t aiFormID, CreatedReferenceDat
         }
         return pform;
     }
-    else {
-        Warning(
-            "SAVELOAD: Bound object %08X no longer exists.  Reference %08X will not be created.",
-            apCreatedData->iBoundID, aiFormID
-        );
-        return nullptr;
-    }
+
+    Warning(
+        "SAVELOAD: Bound object %08X no longer exists.  Reference %08X will not be created.", apCreatedData->iBoundID,
+        aiFormID
+    );
+    return nullptr;
 }
 
 int32_t TESSaveLoadGame::ComputeArmorHash(TESObjectREFR* apRef) {
@@ -3369,12 +3348,10 @@ int32_t TESSaveLoadGame::ComputeArmorHash(TESObjectREFR* apRef) {
         int32_t v8 = 5;
         for (int32_t i = 0; i < v8; ++i) {
             BIPOBJECT* BipObject = v9->GetBipObject(aeBipedObject[i]);
-            if (BipObject) {
-                if (BipObject->pParent) {
-                    uint32_t CastingType = BipObject->pParent->iFormID;
-                    uint32_t v5 = ReverseConvertNumericID(CastingType);
-                    v10 = (v10 << 16) + (v5 + (v10 << 6)) - v10;
-                }
+            if ((BipObject) && (BipObject->pParent)) {
+                uint32_t CastingType = BipObject->pParent->iFormID;
+                uint32_t v5 = ReverseConvertNumericID(CastingType);
+                v10 = (v10 << 16) + (v5 + (v10 << 6)) - v10;
             }
         }
     }
@@ -3396,11 +3373,10 @@ void TESSaveLoadGame::LoadAnimations() {
         else {
             pref = (TESObjectREFR*)pPlayer;
         }
-        if (pref) {
-            if (pref->TESObjectREFR::Get3D()) {
-                LoadAnimationForReference(pref, iformID, pbuffer);
-            }
+        if ((pref) && (pref->TESObjectREFR::Get3D())) {
+            LoadAnimationForReference(pref, iformID, pbuffer);
         }
+
         ourFree(pbuffer);
         m_pAnimationMap->RemoveAt(iformID);
     }
@@ -3424,15 +3400,14 @@ void TESSaveLoadGame::LoadAnimationForReference(TESObjectREFR* apRef, uint32_t a
     HighProcess* phighProcess = nullptr;
     ANIMATION_ACTION sanimAction = ANIM_ACTION_NONE;
     BSAnimGroupSequence* pseq = nullptr;
-    if (pmob) {
-        if (aiFormID) {
-            phighProcess = dynamic_cast<HighProcess*>(pmob->pCurrentProcess);
-            if (phighProcess) {
-                sanimAction = phighProcess->GetAnimAction();
-                pseq = phighProcess->GetAnimActionAnimSeq();
-            }
+    if ((pmob) && (aiFormID)) {
+        phighProcess = dynamic_cast<HighProcess*>(pmob->pCurrentProcess);
+        if (phighProcess) {
+            sanimAction = phighProcess->GetAnimAction();
+            pseq = phighProcess->GetAnimActionAnimSeq();
         }
     }
+
     void* ptempBuffer = m_pBuffer;
     m_pBuffer = apBuffer;
     pSaveLoadGameOLD->LoadGameDataOLD(apData, 2u);
@@ -3707,11 +3682,10 @@ NiRefObject* TESSaveLoadGame::GetSaveGameData(
         Save = PrepForLoadSave(apFile, nullptr, TESSaveLoadGame::ACTION_READ);
     }
     uint32_t aiSize = 0;
-    if (Save) {
-        if (Save->m_bGood) {
-            aiSize = LoadHeader(Save, false);
-        }
+    if ((Save) && (Save->m_bGood)) {
+        aiSize = LoadHeader(Save, false);
     }
+
     if (aiSize) {
         a5 = 0;
         v18 = 0.0f;
@@ -3738,36 +3712,35 @@ NiRefObject* TESSaveLoadGame::GetSaveGameData(
         }
         return v16;
     }
-    else {
-        if (a3) {
-            *a3 = 0;
-        }
-        if (Dst) {
-            BSstrcpy(Dst, 300, "");
-        }
-        if (apDest) {
-            BSstrcpy(apDest, 300, "");
-        }
-        if (a6) {
-            BSstrcpy(a6, 300, "");
-        }
-        if (a7) {
-            BSstrcpy(a7, 300, "");
-        }
-        if (a8) {
-            BSstrcpy(a8, 300, "");
-        }
-        if (a9) {
-            BSstrcpy(a9, 300, "");
-        }
-        if (a10) {
-            *a10 = 0;
-        }
-        if (!a11) {
-            CleanupLoadSave(Save, TESSaveLoadGame::ACTION_READ);
-        }
-        return nullptr;
+
+    if (a3) {
+        *a3 = 0;
     }
+    if (Dst) {
+        BSstrcpy(Dst, 300, "");
+    }
+    if (apDest) {
+        BSstrcpy(apDest, 300, "");
+    }
+    if (a6) {
+        BSstrcpy(a6, 300, "");
+    }
+    if (a7) {
+        BSstrcpy(a7, 300, "");
+    }
+    if (a8) {
+        BSstrcpy(a8, 300, "");
+    }
+    if (a9) {
+        BSstrcpy(a9, 300, "");
+    }
+    if (a10) {
+        *a10 = 0;
+    }
+    if (!a11) {
+        CleanupLoadSave(Save, TESSaveLoadGame::ACTION_READ);
+    }
+    return nullptr;
 }
 
 NiRefObject* TESSaveLoadGame::ReadSaveGameDataOLD(
@@ -3802,11 +3775,10 @@ NiRefObject* TESSaveLoadGame::ReadSaveGameDataOLD(
             *a3 = apData;
         }
     }
-    if (pSaveLoadGameOLD->GetCurrentVersion() < 56u) {
-        if (a3) {
-            *a3 = 0;
-        }
+    if ((pSaveLoadGameOLD->GetCurrentVersion() < 56u) && (a3)) {
+        *a3 = 0;
     }
+
     LoadGameDataOLD(&v31, 1u);
     if (a4) {
         LoadGameDataOLD(a4, v31);
@@ -4105,14 +4077,13 @@ void TESSaveLoadGame::SaveCreatedBaseObjects(BSFile* apFile) {
             SpellItem* pspell = dynamic_cast<SpellItem*>(pform);
             TESEnchantableForm* penchantable = dynamic_cast<TESEnchantableForm*>(pform);
             if (!penchantable || penchantable->pFormEnchanting) {
-                if (penchantable) {
-                    if (penchantable->pFormEnchanting) {
-                        uint32_t CastingType = penchantable->pFormEnchanting->iFormID;
-                        if (pDataHandler->IsFormIDCreated(CastingType)) {
-                            ++icount;
-                        }
+                if ((penchantable) && (penchantable->pFormEnchanting)) {
+                    uint32_t CastingType = penchantable->pFormEnchanting->iFormID;
+                    if (pDataHandler->IsFormIDCreated(CastingType)) {
+                        ++icount;
                     }
                 }
+
                 if (pbound || pspell) {
                     ++icount;
                 }
@@ -4205,9 +4176,8 @@ int32_t TESSaveLoadGame::GetWorldSpaceIDFromArray(uint16_t a1) {
     if (a1 <= m_pWorldSpaceIDArray->m_uiSize) {
         return m_pWorldSpaceIDArray->GetAt(a1);
     }
-    else {
-        return 0;
-    }
+
+    return 0;
 }
 
 void TESSaveLoadGame::RemoveFormFromInitFormArray(TESForm* apForm) {
@@ -4277,9 +4247,8 @@ int32_t TESSaveLoadGame::SaveGameCompare(SaveGameFile* apCompare1, SaveGameFile*
     if (time1.dwLowDateTime <= time2.dwLowDateTime) {
         return time1.dwLowDateTime < time2.dwLowDateTime;
     }
-    else {
-        return -1;
-    }
+
+    return -1;
 }
 
 ChangesMap::ChangesMap() : NiTPointerMap<uint32_t, ChangeData*>(0x13AFu) {}
@@ -4615,9 +4584,8 @@ int32_t SaveDataDebugInfo::LoadFormHeaderCompare(LoadFormHeader* apCompare1, Loa
     if (apCompare1->iSize <= static_cast<int32_t>(apCompare2->iSize)) {
         return apCompare1->iSize < static_cast<int32_t>(apCompare2->iSize);
     }
-    else {
-        return -1;
-    }
+
+    return -1;
 }
 
 uint32_t NiPixelData::GetSizeInBytes(uint32_t uiMipmapLevel, uint32_t uiFace) const {

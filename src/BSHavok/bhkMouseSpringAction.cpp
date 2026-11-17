@@ -305,9 +305,8 @@ hkpEntity* bhkMouseSpringAction::GetEntity() {
     if (pMouseSpringAction) {
         return static_cast<hkpEntity*>(pMouseSpringAction->GetEntity());
     }
-    else {
-        return nullptr;
-    }
+
+    return nullptr;
 }
 
 // Copies the unary action's fields, then the wrapped action's damping, elasticity and object damping through null-safe

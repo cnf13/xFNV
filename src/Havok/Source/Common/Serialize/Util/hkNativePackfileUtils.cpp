@@ -301,9 +301,8 @@ void* _getSectionDataByIndex(
     if (v4->m_localFixupsOffset) {
         return static_cast<char*>(base) + (v4->m_absoluteDataStart + offset);
     }
-    else {
-        return nullptr;
-    }
+
+    return nullptr;
 }
 
 // A header this build can load in place has the packfile magic (compared against a default-constructed header), the

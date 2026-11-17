@@ -347,40 +347,36 @@ NiObject* NiDefaultAVObjectPalette::CreateObject() {
 }
 
 void RecurseAndAddObjectsToPalette(NiAVObject* apObj3D, NiDefaultAVObjectPalette* apPalette) {
-    if (apObj3D) {
-        if (apPalette) {
-            if (apObj3D->m_kName.GetHandle()) {
-                apPalette->SetAVObject(apObj3D->m_kName, apObj3D);
-            }
-            NiNode* v2 = apObj3D->IsNode();
-            if (v2) {
-                uint32_t v4 = 0;
-                if (v2->m_kChildren.m_usSize) {
-                    do {
-                        RecurseAndAddObjectsToPalette(v2->m_kChildren.m_pBase[v4++].m_pObject, apPalette);
-                    }
-                    while (v4 < v2->m_kChildren.m_usSize);
+    if ((apObj3D) && (apPalette)) {
+        if (apObj3D->m_kName.GetHandle()) {
+            apPalette->SetAVObject(apObj3D->m_kName, apObj3D);
+        }
+        NiNode* v2 = apObj3D->IsNode();
+        if (v2) {
+            uint32_t v4 = 0;
+            if (v2->m_kChildren.m_usSize) {
+                do {
+                    RecurseAndAddObjectsToPalette(v2->m_kChildren.m_pBase[v4++].m_pObject, apPalette);
                 }
+                while (v4 < v2->m_kChildren.m_usSize);
             }
         }
     }
 }
 
 void RecurseAndRemoveObjectsFromPalette(NiAVObject* apObj3D, NiDefaultAVObjectPalette* apPalette) {
-    if (apObj3D) {
-        if (apPalette) {
-            if (apObj3D->m_kName.GetHandle()) {
-                apPalette->SetAVObject(apObj3D->m_kName, nullptr);
-            }
-            NiNode* v2 = apObj3D->IsNode();
-            if (v2) {
-                uint32_t v4 = 0;
-                if (v2->m_kChildren.m_usSize) {
-                    do {
-                        RecurseAndRemoveObjectsFromPalette(v2->m_kChildren.m_pBase[v4++].m_pObject, apPalette);
-                    }
-                    while (v4 < v2->m_kChildren.m_usSize);
+    if ((apObj3D) && (apPalette)) {
+        if (apObj3D->m_kName.GetHandle()) {
+            apPalette->SetAVObject(apObj3D->m_kName, nullptr);
+        }
+        NiNode* v2 = apObj3D->IsNode();
+        if (v2) {
+            uint32_t v4 = 0;
+            if (v2->m_kChildren.m_usSize) {
+                do {
+                    RecurseAndRemoveObjectsFromPalette(v2->m_kChildren.m_pBase[v4++].m_pObject, apPalette);
                 }
+                while (v4 < v2->m_kChildren.m_usSize);
             }
         }
     }

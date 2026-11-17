@@ -86,14 +86,12 @@ float NiSign(float fValue) {
     if (fValue > 0.0) {
         return (float)1.0;
     }
-    else {
-        if (!(fValue < 0.0)) {
-            return (float)0.0;
-        }
-        else {
-            return (-0x1p+0f);
-        }
+
+    if (!(fValue < 0.0)) {
+        return (float)0.0;
     }
+
+    return (-0x1p+0f);
 }
 
 WaterZone::WaterZone(TESObjectREFR* apRef, const hkpCollidable* apCol)
@@ -162,9 +160,8 @@ WaterTargetEntry* WaterTargetEntry::GetNextEntry() {
         // The next node is the next entry's node base: step back from it to its entry.
         return static_cast<WaterTargetEntry*>(pnext);
     }
-    else {
-        return nullptr;
-    }
+
+    return nullptr;
 }
 
 TESWaterListener::TESWaterListener() : fSplashTimer(1.0f), uiCellArrayWidth(uGridsToLoad.Int()) {
@@ -271,12 +268,10 @@ void TESWaterListener::Update(float afTime) {
         }
         HandleQueuedRemovals(nullptr, true, false);
     }
-    if (Main::WorldRootCamera()) {
-        if (pPlayer->GetParentCell()) {
-            const NiPoint3& rcameraPos = Main::WorldRootCamera()->GetWorldTranslate();
-            if (rcameraPos.z < pPlayer->GetParentCell()->GetWaterHeight()) {
-                TESWaterSystem::SetCurrentWaterType(pPlayer->GetParentCell()->GetWaterType());
-            }
+    if ((Main::WorldRootCamera()) && (pPlayer->GetParentCell())) {
+        const NiPoint3& rcameraPos = Main::WorldRootCamera()->GetWorldTranslate();
+        if (rcameraPos.z < pPlayer->GetParentCell()->GetWaterHeight()) {
+            TESWaterSystem::SetCurrentWaterType(pPlayer->GetParentCell()->GetWaterType());
         }
     }
 }
@@ -307,42 +302,36 @@ bool TESWaterListener::contactPointAddedCallback(hkpRootCdPoint& CPoint) {
                 HandleQueuedRemovals(apActor, false, true);
                 return true;
             }
-            else {
-                return false;
-            }
-        }
-        else {
+
             return false;
         }
+
+        return false;
     }
-    else {
-        bhkWorldObject* CameraRigidBody = static_cast<bhkWorldObject*>(pPlayer->GetCameraRigidBody());
-        if (CPoint.m_rootCollidableB == CameraRigidBody->GetCollidable()) {
-            TESObjectREFR* CollidableRef_0 = TESHavokUtilities::FindCollidableRef(CPoint.m_rootCollidableA);
-            if (CollidableRef_0) {
-                TESBoundObject* v4 = CollidableRef_0->GetObjectReference();
-                BGSPlaceableWater* pPlaceableWater = dynamic_cast<BGSPlaceableWater*>(v4);
-                if (bAutoWaterUsesHavokShapes.Bool() || !pPlaceableWater->IsAutomaticWater()) {
-                    const NiPoint3* v5 = &CollidableRef_0->GetLocationOnReference();
-                    TESWaterSystem::SetCameraRelevantWaterHeight(v5->z);
-                    TESWaterSystem::SetPlayerForceUnderwater(true);
-                    TESWaterSystem::SetCameraInPlaceableWater(true);
-                    TESWaterForm* v6 = pPlaceableWater->GetWaterType();
-                    TESWaterSystem::SetCurrentWaterType(v6);
-                    return true;
-                }
-                else {
-                    return false;
-                }
+
+    bhkWorldObject* CameraRigidBody = static_cast<bhkWorldObject*>(pPlayer->GetCameraRigidBody());
+    if (CPoint.m_rootCollidableB == CameraRigidBody->GetCollidable()) {
+        TESObjectREFR* CollidableRef_0 = TESHavokUtilities::FindCollidableRef(CPoint.m_rootCollidableA);
+        if (CollidableRef_0) {
+            TESBoundObject* v4 = CollidableRef_0->GetObjectReference();
+            BGSPlaceableWater* pPlaceableWater = dynamic_cast<BGSPlaceableWater*>(v4);
+            if (bAutoWaterUsesHavokShapes.Bool() || !pPlaceableWater->IsAutomaticWater()) {
+                const NiPoint3* v5 = &CollidableRef_0->GetLocationOnReference();
+                TESWaterSystem::SetCameraRelevantWaterHeight(v5->z);
+                TESWaterSystem::SetPlayerForceUnderwater(true);
+                TESWaterSystem::SetCameraInPlaceableWater(true);
+                TESWaterForm* v6 = pPlaceableWater->GetWaterType();
+                TESWaterSystem::SetCurrentWaterType(v6);
+                return true;
             }
-            else {
-                return false;
-            }
-        }
-        else {
+
             return false;
         }
+
+        return false;
     }
+
+    return false;
 }
 
 bool TESWaterListener::contactPointRemovedCallback(hkpRootCdPoint& CPoint) {
@@ -606,10 +595,9 @@ double TESWaterListener::GetWaterHeightForCoord(int32_t aiX, int32_t aiY) {
     if (v7 >= ((uint32_t)(((int32_t)uiCellArrayWidth) * ((int32_t)uiCellArrayWidth)))) {
         return (-0x1.fffffe0000000p+127f);
     }
-    else {
-        v3 = aiX + (((int32_t)uiCellArrayWidth) * aiY);
-        return pfWaterLevels[v7];
-    }
+
+    v3 = aiX + (((int32_t)uiCellArrayWidth) * aiY);
+    return pfWaterLevels[v7];
 }
 
 // The Havok locals are alignas(16). The arithmetic runs at double precision, so the mixed float/double expressions are
@@ -795,43 +783,41 @@ TESWaterListener::ProcessRigidBody(hkpRigidBody* phkBody, float fwaterHeight, fl
 void TESWaterListener::PlaySplashEffects(bhkRigidBody* apBody, float afWaterHeight) {
     CFilter a2;
     NiPoint3 velocity;
-    if (apBody) {
-        if (!(fSplashTimer > 0.0)) {
-            CFilter* CollisionFilter = apBody->GetCollisionFilter(&a2);
-            if (CollisionFilter->GetLayer() != L_BIPED) {
-                float fmass = apBody->GetMass();
-                apBody->GetLinearVelocityNi(&velocity);
-                float fverticalSpeed = NiAbs(velocity.z);
-                if (!(fverticalSpeed < 0.001)) {
-                    NiPoint3 location;
-                    float* v4 = &fSplashSoundVelocityMult.Float();
-                    float fsize = *v4 * fverticalSpeed + fmass;
-                    if (velocity.z > 0.0) {
-                        float* v5 = &fSplashSoundOutMult.Float();
-                        fsize = fsize * *v5;
+    if ((apBody) && (!(fSplashTimer > 0.0))) {
+        CFilter* CollisionFilter = apBody->GetCollisionFilter(&a2);
+        if (CollisionFilter->GetLayer() != L_BIPED) {
+            float fmass = apBody->GetMass();
+            apBody->GetLinearVelocityNi(&velocity);
+            float fverticalSpeed = NiAbs(velocity.z);
+            if (!(fverticalSpeed < 0.001)) {
+                NiPoint3 location;
+                float* v4 = &fSplashSoundVelocityMult.Float();
+                float fsize = *v4 * fverticalSpeed + fmass;
+                if (velocity.z > 0.0) {
+                    float* v5 = &fSplashSoundOutMult.Float();
+                    fsize = fsize * *v5;
+                }
+                apBody->GetPosition(location);
+                float flandHeight = afWaterHeight;
+                if (TES::pInstance->pInteriorCell ||
+                    (!TES::pInstance->GetLandHeight(location, flandHeight) ||
+                     !(afWaterHeight < static_cast<double>(flandHeight)))) {
+                    location.z = afWaterHeight;
+                    if (AILinearTaskThreadManager::ShouldQueue3DTask()) {
+                        TaskQueueInterface* Instance = TaskQueueInterface::GetInstance();
+                        Instance->QueueWaterSplashEffects(fsize, location);
                     }
-                    apBody->GetPosition(location);
-                    float flandHeight = afWaterHeight;
-                    if (TES::pInstance->pInteriorCell ||
-                        (!TES::pInstance->GetLandHeight(location, flandHeight) ||
-                         !(afWaterHeight < static_cast<double>(flandHeight)))) {
-                        location.z = afWaterHeight;
-                        if (AILinearTaskThreadManager::ShouldQueue3DTask()) {
-                            TaskQueueInterface* Instance = TaskQueueInterface::GetInstance();
-                            Instance->QueueWaterSplashEffects(fsize, location);
-                        }
-                        else {
-                            BGSWaterCollisionManager::PlaySplashEffects(fsize, location);
-                        }
-                        if (AILinearTaskThreadManager::ShouldQueue3DTask()) {
-                            TaskQueueInterface* v7 = TaskQueueInterface::GetInstance();
-                            v7->QueueAddRipple(0.01f, location);
-                        }
-                        else {
-                            TES::pInstance->GetWaterSystem()->AddRipple(location, 0.01f);
-                        }
-                        fSplashTimer = fSplashSoundTimer.Float();
+                    else {
+                        BGSWaterCollisionManager::PlaySplashEffects(fsize, location);
                     }
+                    if (AILinearTaskThreadManager::ShouldQueue3DTask()) {
+                        TaskQueueInterface* v7 = TaskQueueInterface::GetInstance();
+                        v7->QueueAddRipple(0.01f, location);
+                    }
+                    else {
+                        TES::pInstance->GetWaterSystem()->AddRipple(location, 0.01f);
+                    }
+                    fSplashTimer = fSplashSoundTimer.Float();
                 }
             }
         }

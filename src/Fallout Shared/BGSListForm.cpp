@@ -206,11 +206,9 @@ int32_t BGSListForm::GetItemIndex(TESForm* apForm) {
 }
 
 void BGSListForm::AddForm(TESForm* apForm) {
-    if (apForm) {
-        if (!(&ListOfForms)->IsInList(apForm)) {
-            (&ListOfForms)->AddHead(apForm);
-            ++iScriptAddedFormCount;
-            AddChange(CHANGE_FORM_LIST_ADDED_FORM);
-        }
+    if ((apForm) && (!(&ListOfForms)->IsInList(apForm))) {
+        (&ListOfForms)->AddHead(apForm);
+        ++iScriptAddedFormCount;
+        AddChange(CHANGE_FORM_LIST_ADDED_FORM);
     }
 }

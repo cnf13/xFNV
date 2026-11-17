@@ -151,9 +151,8 @@ const char* TESFullName::GetFullName() {
     if (cFullName.pString) {
         return cFullName.pString;
     }
-    else {
-        return "";
-    }
+
+    return "";
 }
 
 const char* TESFullName::GetFullName(TESForm* apObj) {
@@ -161,7 +160,6 @@ const char* TESFullName::GetFullName(TESForm* apObj) {
     if (pFullName) {
         return pFullName->GetFullName();
     }
-    else {
-        return "";
-    }
+
+    return "";
 }

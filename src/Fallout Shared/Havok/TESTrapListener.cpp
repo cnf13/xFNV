@@ -63,9 +63,8 @@ ZoneEntry* TESTrapListener::CreateZoneEntry(TESObjectREFR* apRef, const hkpColli
     if (v5) {
         return ::new (v5) TrapEntry(apRef, apCol);
     }
-    else {
-        return nullptr;
-    }
+
+    return nullptr;
 }
 
 void TESTrapListener::Update(float afDelta) {
@@ -137,13 +136,10 @@ bool TESTrapListener::contactPointAddedCallback(hkpRootCdPoint& arPoint) {
     bool bres = false;
     TESObjectREFR* ptrapRef = TESHavokUtilities::FindCollidableRef(arPoint.m_rootCollidableB);
     TESObjectREFR* pTargetRef = TESHavokUtilities::FindCollidableRef(arPoint.m_rootCollidableA);
-    if (ptrapRef) {
-        if (pTargetRef) {
-            if (pTargetRef->IsActor()) {
-                return AddZoneTargetPair(arPoint, ptrapRef, pTargetRef, 0, true) != nullptr;
-            }
-        }
+    if ((ptrapRef) && (pTargetRef) && (pTargetRef->IsActor())) {
+        return AddZoneTargetPair(arPoint, ptrapRef, pTargetRef, 0, true) != nullptr;
     }
+
     return bres;
 }
 
@@ -151,14 +147,11 @@ bool TESTrapListener::contactPointRemovedCallback(hkpRootCdPoint& arPoint) {
     bool bres = false;
     TESObjectREFR* ptrapRef = TESHavokUtilities::FindCollidableRef(arPoint.m_rootCollidableB);
     TESObjectREFR* pTargetRef = TESHavokUtilities::FindCollidableRef(arPoint.m_rootCollidableA);
-    if (ptrapRef) {
-        if (pTargetRef) {
-            if (pTargetRef->IsActor()) {
-                RemoveTargetFromZone_00620680(arPoint.m_rootCollidableB, pTargetRef);
-                return true;
-            }
-        }
+    if ((ptrapRef) && (pTargetRef) && (pTargetRef->IsActor())) {
+        RemoveTargetFromZone_00620680(arPoint.m_rootCollidableB, pTargetRef);
+        return true;
     }
+
     return bres;
 }
 
@@ -263,9 +256,8 @@ TriggerEntry::TriggerEvent* TriggerEntry::RefList::GetNewEvent() {
     if (EventList.IsEmpty()) {
         return nullptr;
     }
-    else {
-        return EventList.RemoveHead();
-    }
+
+    return EventList.RemoveHead();
 }
 
 void TriggerEntry::RefList::UpdateExitList() {

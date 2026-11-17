@@ -1645,10 +1645,8 @@ void hkpCharacterProxy::applySurfaceInteractions(
             pMotion->applyPointImpulse(output.m_objectImpulse, output.m_impulsePosition);
         }
     }
-    if (command != nullptr) {
-        if (interactions - command->m_objectInteraction < maxInteractions) {
-            interactions->m_collidingBody = nullptr;
-        }
+    if ((command != nullptr) && (interactions - command->m_objectInteraction < maxInteractions)) {
+        interactions->m_collidingBody = nullptr;
     }
 }
 

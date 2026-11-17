@@ -128,10 +128,9 @@ RAYCASTPATH_RESULT PathingSearchRayCast::BuildPath(RayCastPathRequest& aRequest,
                 CleanUpRayCasts();
                 return aRetPath.eResult;
             }
-            else {
-                aRetPath.eResult = RCP_FAILED;
-                return RCP_FAILED;
-            }
+
+            aRetPath.eResult = RCP_FAILED;
+            return RCP_FAILED;
         }
     }
     if (!InitRayCasts()) {

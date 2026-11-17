@@ -254,11 +254,10 @@ hkpStepResult hkpSimulation::stepDeltaTime(float physicsDeltaTime) {
     if (!v4 || v4 == 3) {
         advanceTime();
     }
-    if (this->m_previousStepResult) {
-        if (m_world->getMemoryWatchDog()) {
-            hkpWorldMemoryUtil::tryToRecoverFromMemoryErrors(m_world);
-        }
+    if ((this->m_previousStepResult) && (m_world->getMemoryWatchDog())) {
+        hkpWorldMemoryUtil::tryToRecoverFromMemoryErrors(m_world);
     }
+
     return static_cast<hkpStepResult>(this->m_previousStepResult);
 }
 
@@ -370,10 +369,8 @@ void hkpSimulation::collideEntitiesDiscrete(
         if (world->m_pendingOperationsCount) {
             world->internal_executePendingOperations();
         }
-        if (world->m_pendingOperationQueueCount == 1) {
-            if (world->m_pendingBodyOperationsCount) {
-                world->internal_executePendingBodyOperations();
-            }
+        if ((world->m_pendingOperationQueueCount == 1) && (world->m_pendingBodyOperationsCount)) {
+            world->internal_executePendingBodyOperations();
         }
     }
     if (apMemory.m_spareAgentSector) {
@@ -460,10 +457,8 @@ void hkpSimulation::reintegrateAndRecollideEntities(
         if (world->m_pendingOperationsCount) {
             world->internal_executePendingOperations();
         }
-        if (world->m_pendingOperationQueueCount == 1) {
-            if (world->m_pendingBodyOperationsCount) {
-                world->internal_executePendingBodyOperations();
-            }
+        if ((world->m_pendingOperationQueueCount == 1) && (world->m_pendingBodyOperationsCount)) {
+            world->internal_executePendingBodyOperations();
         }
     }
 }

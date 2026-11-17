@@ -86,14 +86,12 @@ void hkpWorldConstraintUtil::addConstraint(hkpWorld* world, hkpConstraintInstanc
     intern.m_priority.m_storage = constraint->m_priority.m_storage;
 
     // A fixed entity A is the slave; otherwise the islands of two non-fixed entities are merged.
-    if (intern.m_entities[0]->m_motion.m_type.m_storage != hkpMotion::MOTION_FIXED) {
-        if (intern.m_entities[1]->m_motion.m_type.m_storage != hkpMotion::MOTION_FIXED &&
-            intern.m_entities[0]->m_simulationIsland != intern.m_entities[1]->m_simulationIsland) {
-            hkpWorldOperationUtil::mergeIslands(
-                intern.m_entities[0]->m_world, intern.m_entities[0], intern.m_entities[1]
-            );
-        }
+    if ((intern.m_entities[0]->m_motion.m_type.m_storage != hkpMotion::MOTION_FIXED) &&
+        (intern.m_entities[1]->m_motion.m_type.m_storage != hkpMotion::MOTION_FIXED &&
+         intern.m_entities[0]->m_simulationIsland != intern.m_entities[1]->m_simulationIsland)) {
+        hkpWorldOperationUtil::mergeIslands(intern.m_entities[0]->m_world, intern.m_entities[0], intern.m_entities[1]);
     }
+
     intern.m_whoIsMaster = intern.m_entities[0]->m_motion.m_type.m_storage == hkpMotion::MOTION_FIXED;
     hkpEntity* master = intern.m_entities[intern.m_whoIsMaster];
     hkpSimulationIsland* island = master->m_simulationIsland;

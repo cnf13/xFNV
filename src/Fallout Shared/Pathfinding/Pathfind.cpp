@@ -287,9 +287,8 @@ float Pathing::ProfilePathing(TESObjectCELL* apCell, const NiPoint3& aLoc, uint3
         }
         return 0.0f;
     }
-    else {
-        return 0.0f;
-    }
+
+    return 0.0f;
 }
 
 bool Pathing::BuildLowPath(
@@ -357,31 +356,27 @@ bool Pathing::GetNavMeshZForLocation(PathingLocation& aLocation, float& aRetHeig
                     apMemory.~NiPointer<NavMesh>();
                     return true;
                 }
-                else {
-                    NiPoint3 v6;
-                    aRetHeight = (&(v6 = aLocation.GetLocation()))->z;
-                    apMemory.~NiPointer<NavMesh>();
-                    return false;
-                }
-            }
-            else {
-                NiPoint3 v8;
-                aRetHeight = (&(v8 = aLocation.GetLocation()))->z;
+
+                NiPoint3 v6;
+                aRetHeight = (&(v6 = aLocation.GetLocation()))->z;
                 apMemory.~NiPointer<NavMesh>();
                 return false;
             }
-        }
-        else {
-            NiPoint3 v9;
-            aRetHeight = (&(v9 = aLocation.GetLocation()))->z;
+
+            NiPoint3 v8;
+            aRetHeight = (&(v8 = aLocation.GetLocation()))->z;
+            apMemory.~NiPointer<NavMesh>();
             return false;
         }
-    }
-    else {
-        NiPoint3 result;
-        aRetHeight = (&(result = aLocation.GetLocation()))->z;
+
+        NiPoint3 v9;
+        aRetHeight = (&(v9 = aLocation.GetLocation()))->z;
         return false;
     }
+
+    NiPoint3 result;
+    aRetHeight = (&(result = aLocation.GetLocation()))->z;
+    return false;
 }
 
 bool Pathing::GetNavmeshNormalForLocation(PathingLocation& aLocation, NiPoint3& aRetNormal) {
@@ -399,10 +394,9 @@ bool Pathing::GetNavmeshNormalForLocation(PathingLocation& aLocation, NiPoint3& 
         apMemory.~NiPointer<NavMesh>();
         return true;
     }
-    else {
-        apMemory.~NiPointer<NavMesh>();
-        return false;
-    }
+
+    apMemory.~NiPointer<NavMesh>();
+    return false;
 }
 
 bool Pathing::FindConnectedNavmeshesForLocation(
@@ -578,13 +572,12 @@ bool Pathing::CheckLineOfSight(
         );
         return v10;
     }
-    else {
-        bool v12 = Pathing::CheckLineOfSight(
-            aStartLocation, aGoalLocation.GetLocation(), static_cast<NavMesh*>(nullptr), 0xFFFF,
-            apReturnIntersectionLocation, apFilter
-        );
-        return v12;
-    }
+
+    bool v12 = Pathing::CheckLineOfSight(
+        aStartLocation, aGoalLocation.GetLocation(), static_cast<NavMesh*>(nullptr), 0xFFFF,
+        apReturnIntersectionLocation, apFilter
+    );
+    return v12;
 }
 
 bool Pathing::CheckLineOfSight(
@@ -857,19 +850,16 @@ bool Pathing::BuildLOSPath(PathingRequestLOS* apRequest, PathingSolution* apSolu
                         losSearch.GetFirstIgnoredGoal();
                     busingIgnoredGoal = losSearch.GetPathToNode(FirstIgnoredGoal, &nodes, &links);
                 }
-                if (!busingIgnoredGoal) {
-                    if (losSearch.GetLastValidNode()) {
-                        const AStarNode<NavMeshSearchNode, NavMeshSearchLink>* LastValidNode =
-                            losSearch.GetLastValidNode();
-                        busingLastValidNode__busingIgnoredGoal = losSearch.GetPathToNode(LastValidNode, &nodes, &links);
-                    }
+                if ((!busingIgnoredGoal) && (losSearch.GetLastValidNode())) {
+                    const AStarNode<NavMeshSearchNode, NavMeshSearchLink>* LastValidNode = losSearch.GetLastValidNode();
+                    busingLastValidNode__busingIgnoredGoal = losSearch.GetPathToNode(LastValidNode, &nodes, &links);
                 }
-                if (!busingIgnoredGoal && !busingLastValidNode__busingIgnoredGoal) {
-                    if (losSearch.GetClosestNode()) {
-                        const AStarNode<NavMeshSearchNode, NavMeshSearchLink>* ClosestNode = losSearch.GetClosestNode();
-                        busingLastValidNode__busingIgnoredGoal = losSearch.GetPathToNode(ClosestNode, &nodes, &links);
-                    }
+
+                if ((!busingIgnoredGoal && !busingLastValidNode__busingIgnoredGoal) && (losSearch.GetClosestNode())) {
+                    const AStarNode<NavMeshSearchNode, NavMeshSearchLink>* ClosestNode = losSearch.GetClosestNode();
+                    busingLastValidNode__busingIgnoredGoal = losSearch.GetPathToNode(ClosestNode, &nodes, &links);
                 }
+
                 if (!busingIgnoredGoal && !busingLastValidNode__busingIgnoredGoal) {
                     bcanFit = false;
                     busingLastValidNode__busingIgnoredGoal = true;
@@ -911,13 +901,11 @@ bool Pathing::BuildLOSPath(PathingRequestLOS* apRequest, PathingSolution* apSolu
             }
             return bcanFit;
         }
-        else {
-            return false;
-        }
-    }
-    else {
+
         return false;
     }
+
+    return false;
 }
 
 bool Pathing::BuildHidePath(PathingRequestHide* apRequest, PathingSolution* apSolution) {
@@ -1184,9 +1172,8 @@ bool Pathing::BuildCoveredMovePath(PathingRequestCoveredMove* apRequest, Pathing
         apRequest->bFinished = true;
         return true;
     }
-    else {
-        return false;
-    }
+
+    return false;
 }
 
 bool Pathing::BuildTeleportDoorPath(
@@ -1624,13 +1611,11 @@ bool Pathing::FindClosePointViaNavMesh(PathingRequestClosePoint* apRequest, NiPo
             *apRetPt = *NavMeshMath::RandomPointOnTriangle(&apResult, *verts, verts[1], verts[2]);
             return true;
         }
-        else {
-            return false;
-        }
-    }
-    else {
+
         return false;
     }
+
+    return false;
 }
 
 // Each failure path computes the straight-line distance itself.
@@ -1992,27 +1977,26 @@ char Pathing::FindSafeStraightLinePathPoint(PathingRequestSafeStraightLine* a1, 
         apThis.GetGoalLocation(*a2);
         return 1;
     }
-    else {
-        PathingRequest arg0;
-        a1->PathingRequest::CopyTo(&arg0);
-        PathingSolution apSolution;
-        if (Pathing::Pathfind(&arg0, &apSolution)) {
-            float afDist = a1->fMinDistance;
-            float afCurrentParameter = static_cast<float>(apSolution.GetNodeCount() - 1);
-            if (apSolution.FindPointOnPath(afCurrentParameter, afDist, false, &arfNewSplineT, a2)) {
-                return 1;
-            }
-            PathingRequestClosePoint apTarget;
-            a1->PathingRequest::CopyTo(&apTarget);
-            apTarget.SetOrigin(*&a1->Destination);
-            apTarget.SetMinDistance(a1->fMinDistance);
-            apTarget.SetMaxDistance(a1->fMaxDistance);
-            if (Pathing::FindClosePointViaNavMesh(&apTarget, a2)) {
-                return 1;
-            }
+
+    PathingRequest arg0;
+    a1->PathingRequest::CopyTo(&arg0);
+    PathingSolution apSolution;
+    if (Pathing::Pathfind(&arg0, &apSolution)) {
+        float afDist = a1->fMinDistance;
+        float afCurrentParameter = static_cast<float>(apSolution.GetNodeCount() - 1);
+        if (apSolution.FindPointOnPath(afCurrentParameter, afDist, false, &arfNewSplineT, a2)) {
+            return 1;
         }
-        return 0;
+        PathingRequestClosePoint apTarget;
+        a1->PathingRequest::CopyTo(&apTarget);
+        apTarget.SetOrigin(*&a1->Destination);
+        apTarget.SetMinDistance(a1->fMinDistance);
+        apTarget.SetMaxDistance(a1->fMaxDistance);
+        if (Pathing::FindClosePointViaNavMesh(&apTarget, a2)) {
+            return 1;
+        }
     }
+    return 0;
 }
 
 Pathing::UPDATE_DETAILED_PATH_RESULT Pathing::UpdateSolution(
@@ -2039,10 +2023,9 @@ bool Pathing::ComputeLowPathDistance(
         *apReturnDistance = apMemory.ComputeLength();
         return true;
     }
-    else {
-        *apReturnDistance = 0.0;
-        return false;
-    }
+
+    *apReturnDistance = 0.0;
+    return false;
 }
 
 // newIntersection is left unset by NiPoint2's empty constructor, and FindInterectingEdge writes it only when it finds
@@ -2456,9 +2439,8 @@ uint32_t Pathing::FindTeleportDoorsForLocation(
     if (pcell) {
         return pcell->FindTeleportDoorsForLocation(arLocation, afRadius, apRetDoors);
     }
-    else {
-        return 0;
-    }
+
+    return 0;
 }
 
 bool Pathing::CheckSphere(PathingLocation& aSphereCenter, float afRadius) {
@@ -2599,20 +2581,17 @@ NiPoint3* Pathing::ComputeInitialTangentForActor(
                 ::new (apResult) NiPoint3(end - start);
                 return apResult;
             }
-            else {
-                *apResult = NiPoint3_ZERO;
-                return apResult;
-            }
-        }
-        else {
+
             *apResult = NiPoint3_ZERO;
             return apResult;
         }
-    }
-    else {
+
         *apResult = NiPoint3_ZERO;
         return apResult;
     }
+
+    *apResult = NiPoint3_ZERO;
+    return apResult;
 }
 
 NiPoint3* Pathing::ComputeFinalTangentForActor(

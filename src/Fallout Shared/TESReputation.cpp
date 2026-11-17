@@ -351,18 +351,16 @@ const float TESReputation::GetReputationPct(ReputationType RepType) {
     if (((int32_t)RepType) == 1) {
         return GetPositiveRatio();
     }
-    else {
-        return GetNegativeRatio();
-    }
+
+    return GetNegativeRatio();
 }
 
 float TESReputation::GetReputationValue(ReputationType RepType) {
     if (((int32_t)RepType) == 1) {
         return fPositiveValue;
     }
-    else {
-        return fNegativeValue;
-    }
+
+    return fNegativeValue;
 }
 
 void TESReputation::AddReputationExact(ReputationType aeType, float afAmount) {
@@ -794,7 +792,6 @@ const char* TESReputation::GetReputationMainIcon() {
     if (GetTextureNameLength()) {
         return GetTextureName();
     }
-    else {
-        return "";
-    }
+
+    return "";
 }

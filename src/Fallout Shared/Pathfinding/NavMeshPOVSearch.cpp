@@ -422,10 +422,9 @@ bool NavMeshPOVSearch::CheckArcAgainstNavMesh2(
         apReturnLocation->Copy(kReturnLocation);
         return true;
     }
-    else {
-        apReturnLocation->Copy(kReturnLocation);
-        return false;
-    }
+
+    apReturnLocation->Copy(kReturnLocation);
+    return false;
 }
 
 void NavMeshPOVSearch::SetNodeData(
@@ -947,18 +946,15 @@ double AngleSinCosArc::GetLength(float a1) {
         if (!(Angle < 0.0)) {
             return static_cast<float>((6.2831854820251465 - Angle) * a1);
         }
-        else {
-            return (-Angle * a1);
-        }
+
+        return (-Angle * a1);
     }
-    else {
-        if (!(Angle < 0.0)) {
-            return (Angle * a1);
-        }
-        else {
-            return static_cast<float>((Angle + 6.2831854820251465) * a1);
-        }
+
+    if (!(Angle < 0.0)) {
+        return (Angle * a1);
     }
+
+    return static_cast<float>((Angle + 6.2831854820251465) * a1);
 }
 
 int32_t NavMeshPOVEdge::QTriangle() {

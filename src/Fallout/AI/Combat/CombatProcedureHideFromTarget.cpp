@@ -77,12 +77,10 @@ void CombatProcedureHideFromTarget::Update() {
                     bool bcheckHiding = static_cast<double>(fhidingTime) < CombatTimer::GetTimer();
                     if (bcheckHiding) {
                         CombatLocationTarget* plocationTarget = pcombatState->pLocationTarget;
-                        if (plocationTarget) {
-                            if (plocationTarget->cType == 1) {
-                                BGSWorldLocation* WorldLocation = pattacker__ptarget->GetWorldLocation(&apLocation);
-                                if (plocationTarget->WorldLoc.GetDistanceSquared(*WorldLocation) < 4096.0) {
-                                    bcheckHiding = false;
-                                }
+                        if ((plocationTarget) && (plocationTarget->cType == 1)) {
+                            BGSWorldLocation* WorldLocation = pattacker__ptarget->GetWorldLocation(&apLocation);
+                            if (plocationTarget->WorldLoc.GetDistanceSquared(*WorldLocation) < 4096.0) {
+                                bcheckHiding = false;
                             }
                         }
                     }

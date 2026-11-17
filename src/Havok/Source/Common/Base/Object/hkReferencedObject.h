@@ -30,7 +30,7 @@ public:
     hkReferencedObject(const hkReferencedObject&) : hkBaseObject(), m_referenceCount(1) {}
     // The SDK's finish constructor: a loaded object keeps the fields the load wrote.
     hkReferencedObject(hkFinishLoadedObjectFlag) {}
-    virtual ~hkReferencedObject();
+    ~hkReferencedObject() override;
 
     // the class descriptor; the game's build carries none
     virtual const hkClass* getClassType() const {

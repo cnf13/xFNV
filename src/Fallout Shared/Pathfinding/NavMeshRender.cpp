@@ -704,50 +704,42 @@ NavMeshRender::NAVMESH_RENDER_COLOR_TYPE NavMeshRender::GetTriangleColor(const N
         if (apTri->GetFlag(256)) {
             return NAVMESH_RENDER_COLOR_TYPE_OBSTACLE_BOUNDS;
         }
-        else {
-            return NAVMESH_RENDER_COLOR_TYPE_OBSTACLE;
-        }
+
+        return NAVMESH_RENDER_COLOR_TYPE_OBSTACLE;
     }
-    else {
-        if (apTri->IsPreferred()) {
-            if (apTri->HasDoorPortal()) {
-                return NAVMESH_RENDER_COLOR_TYPE_DARK_BLUE_GREEN;
-            }
-            else {
-                if (apTri->IsWater()) {
-                    return NAVMESH_RENDER_COLOR_TYPE_CYAN;
-                }
-                else {
-                    return NAVMESH_RENDER_COLOR_TYPE_ORANGE;
-                }
-            }
+
+    if (apTri->IsPreferred()) {
+        if (apTri->HasDoorPortal()) {
+            return NAVMESH_RENDER_COLOR_TYPE_DARK_BLUE_GREEN;
         }
-        else {
-            if (apTri->IsWater()) {
-                return NAVMESH_RENDER_COLOR_TYPE_BLUE;
-            }
-            else {
-                if (apTri->IsNoLargeCreature()) {
-                    return NAVMESH_RENDER_COLOR_TYPE_NOLARGECREATURE;
-                }
-                else {
-                    if (apTri->HasDoorPortal()) {
-                        return NAVMESH_RENDER_COLOR_TYPE_BLUE_GREEN;
-                    }
-                    else {
-                        if (apTri->GetFlag(NavMeshTriangle::NAV_TRI_CLOSED_DOOR)) {
-                            return NAVMESH_RENDER_COLOR_TYPE_WHITE;
-                        }
-                        else {
-                            if (apTri->GetFlag(NavMeshTriangle::NAV_TRI_AVOID_NODE)) {
-                                return NAVMESH_RENDER_COLOR_TYPE_DARK_RED;
-                            }
-                        }
-                    }
-                }
-            }
+
+        if (apTri->IsWater()) {
+            return NAVMESH_RENDER_COLOR_TYPE_CYAN;
         }
+
+        return NAVMESH_RENDER_COLOR_TYPE_ORANGE;
     }
+
+    if (apTri->IsWater()) {
+        return NAVMESH_RENDER_COLOR_TYPE_BLUE;
+    }
+
+    if (apTri->IsNoLargeCreature()) {
+        return NAVMESH_RENDER_COLOR_TYPE_NOLARGECREATURE;
+    }
+
+    if (apTri->HasDoorPortal()) {
+        return NAVMESH_RENDER_COLOR_TYPE_BLUE_GREEN;
+    }
+
+    if (apTri->GetFlag(NavMeshTriangle::NAV_TRI_CLOSED_DOOR)) {
+        return NAVMESH_RENDER_COLOR_TYPE_WHITE;
+    }
+
+    if (apTri->GetFlag(NavMeshTriangle::NAV_TRI_AVOID_NODE)) {
+        return NAVMESH_RENDER_COLOR_TYPE_DARK_RED;
+    }
+
     return eret;
 }
 

@@ -272,13 +272,12 @@ hkpWorld* hkpPhysicsData::createWorld(hkBool registerAllAgents) {
         }
     }
     hkpWorldCinfo* v12 = this->m_worldCinfo;
-    if (v12) {
-        if (v12->m_collisionFilter) {
-            v7->updateCollisionFilterOnWorld(
-                HK_UPDATE_FILTER_ON_WORLD_FULL_CHECK, HK_UPDATE_COLLECTION_FILTER_PROCESS_SHAPE_COLLECTIONS
-            );
-        }
+    if ((v12) && (v12->m_collisionFilter)) {
+        v7->updateCollisionFilterOnWorld(
+            HK_UPDATE_FILTER_ON_WORLD_FULL_CHECK, HK_UPDATE_COLLECTION_FILTER_PROCESS_SHAPE_COLLECTIONS
+        );
     }
+
     return v7;
 }
 

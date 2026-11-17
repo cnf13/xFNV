@@ -48,9 +48,8 @@ TESRegionData* TESRegionDataLandscape::Copy() {
     if (v4) {
         return ::new (v4) TESRegionDataLandscape(this);
     }
-    else {
-        return nullptr;
-    }
+
+    return nullptr;
 }
 
 // A copy of this data with apRegionData blended into it.

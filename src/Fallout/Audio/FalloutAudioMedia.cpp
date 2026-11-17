@@ -295,40 +295,34 @@ void FalloutAudioMedia::Update() {
                 }
                 else {
                     FalloutAudioMedia::pCurrentMediaController = nullptr;
-                    if (FalloutAudio::pCurrentSpace) {
-                        if (FalloutAudio::pCurrentSpace->pSoundRegion) {
-                            TESRegionDataSound* pRSD;
-                            if (FalloutAudioMedia::MediaIsPlaying(MEDIA_LOCATION, true)) {
-                                FalloutAudioMedia::MediaFadeOut(1000, MEDIA_LOCATION);
-                            }
-                            if (FalloutAudioMedia::MediaIsPlaying(MEDIA_DUNGEON, true)) {
-                                FalloutAudioMedia::MediaFadeOut(1000, MEDIA_DUNGEON);
-                            }
-                            TESRegion* CombatStyle = FalloutAudio::pCurrentSpace->pSoundRegion;
-                            if (FalloutAudioMedia::pCurrentRegionSoundData) {
-                                pRSD = FalloutAudioMedia::pCurrentRegionSoundData;
-                            }
-                            else {
-                                pRSD = static_cast<TESRegionDataSound*>(
-                                    CombatStyle->pDataList->Find(REGION_DATA_SOUND_ID)
-                                );
-                            }
-                            if (pRSD) {
-                                if (bInCombat && !FalloutAudioMedia::pCurrentBattleMediaSet) {
-                                    FalloutAudioMedia::pCurrentBattleMediaSet = pRSD->GetMediaSetBattle();
-                                    if (FalloutAudioMedia::pCurrentBattleMediaSet) {
-                                        FalloutAudioMedia::pCurrentBattleMediaSet->Reset();
-                                    }
+                    if ((FalloutAudio::pCurrentSpace) && (FalloutAudio::pCurrentSpace->pSoundRegion)) {
+                        TESRegionDataSound* pRSD;
+                        if (FalloutAudioMedia::MediaIsPlaying(MEDIA_LOCATION, true)) {
+                            FalloutAudioMedia::MediaFadeOut(1000, MEDIA_LOCATION);
+                        }
+                        if (FalloutAudioMedia::MediaIsPlaying(MEDIA_DUNGEON, true)) {
+                            FalloutAudioMedia::MediaFadeOut(1000, MEDIA_DUNGEON);
+                        }
+                        TESRegion* CombatStyle = FalloutAudio::pCurrentSpace->pSoundRegion;
+                        if (FalloutAudioMedia::pCurrentRegionSoundData) {
+                            pRSD = FalloutAudioMedia::pCurrentRegionSoundData;
+                        }
+                        else {
+                            pRSD = static_cast<TESRegionDataSound*>(CombatStyle->pDataList->Find(REGION_DATA_SOUND_ID));
+                        }
+                        if (pRSD) {
+                            if (bInCombat && !FalloutAudioMedia::pCurrentBattleMediaSet) {
+                                FalloutAudioMedia::pCurrentBattleMediaSet = pRSD->GetMediaSetBattle();
+                                if (FalloutAudioMedia::pCurrentBattleMediaSet) {
+                                    FalloutAudioMedia::pCurrentBattleMediaSet->Reset();
                                 }
-                                if (!FalloutAudioMedia::pCurrentBattleMediaSet ||
-                                    !FalloutAudioMedia::pCurrentBattleMediaSet->Update(ticks, bInCombat, nullptr)) {
-                                    FalloutAudioMedia::pCurrentBattleMediaSet = nullptr;
-                                    if (pRSD->GetMediaSetIncidentals()) {
-                                        if (latestType == MEDIA_STANDBY) {
-                                            MediaSet* v1 = pRSD->GetMediaSetIncidentals();
-                                            v1->Update(ticks, false, nullptr);
-                                        }
-                                    }
+                            }
+                            if (!FalloutAudioMedia::pCurrentBattleMediaSet ||
+                                !FalloutAudioMedia::pCurrentBattleMediaSet->Update(ticks, bInCombat, nullptr)) {
+                                FalloutAudioMedia::pCurrentBattleMediaSet = nullptr;
+                                if ((pRSD->GetMediaSetIncidentals()) && (latestType == MEDIA_STANDBY)) {
+                                    MediaSet* v1 = pRSD->GetMediaSetIncidentals();
+                                    v1->Update(ticks, false, nullptr);
                                 }
                             }
                         }
@@ -446,10 +440,8 @@ uint32_t FalloutAudioMedia::MediaGetSubDuration(MEDIATYPE aeType) {
             v2 = FalloutAudioMedia::uiMediaASubDuration;
         }
         else {
-            if (!FalloutAudioMedia::eMediaNextTrack) {
-                if (FalloutAudioMedia::uiMediaBID) {
-                    v2 = FalloutAudioMedia::uiMediaBSubDuration;
-                }
+            if ((!FalloutAudioMedia::eMediaNextTrack) && (FalloutAudioMedia::uiMediaBID)) {
+                v2 = FalloutAudioMedia::uiMediaBSubDuration;
             }
         }
     }
@@ -458,12 +450,9 @@ uint32_t FalloutAudioMedia::MediaGetSubDuration(MEDIATYPE aeType) {
         v2 = FalloutAudioMedia::uiMediaASubDuration;
     }
     else {
-        if (!FalloutAudioMedia::eMediaNextTrack) {
-            if (FalloutAudioMedia::uiMediaBID) {
-                if (FalloutAudioMedia::eMediaBType == aeType) {
-                    v2 = FalloutAudioMedia::uiMediaBSubDuration;
-                }
-            }
+        if ((!FalloutAudioMedia::eMediaNextTrack) && (FalloutAudioMedia::uiMediaBID) &&
+            (FalloutAudioMedia::eMediaBType == aeType)) {
+            v2 = FalloutAudioMedia::uiMediaBSubDuration;
         }
     }
     FalloutAudioMedia::MediaAccessLeave();
@@ -478,10 +467,8 @@ uint32_t FalloutAudioMedia::MediaGetPosition(MEDIATYPE aeType) {
             v2 = FalloutAudioMedia::uiMediaACurrentPosition;
         }
         else {
-            if (!FalloutAudioMedia::eMediaNextTrack) {
-                if (FalloutAudioMedia::uiMediaBID) {
-                    v2 = FalloutAudioMedia::uiMediaBCurrentPosition;
-                }
+            if ((!FalloutAudioMedia::eMediaNextTrack) && (FalloutAudioMedia::uiMediaBID)) {
+                v2 = FalloutAudioMedia::uiMediaBCurrentPosition;
             }
         }
     }
@@ -490,12 +477,9 @@ uint32_t FalloutAudioMedia::MediaGetPosition(MEDIATYPE aeType) {
         v2 = FalloutAudioMedia::uiMediaACurrentPosition;
     }
     else {
-        if (!FalloutAudioMedia::eMediaNextTrack) {
-            if (FalloutAudioMedia::uiMediaBID) {
-                if (FalloutAudioMedia::eMediaBType == aeType) {
-                    v2 = FalloutAudioMedia::uiMediaBCurrentPosition;
-                }
-            }
+        if ((!FalloutAudioMedia::eMediaNextTrack) && (FalloutAudioMedia::uiMediaBID) &&
+            (FalloutAudioMedia::eMediaBType == aeType)) {
+            v2 = FalloutAudioMedia::uiMediaBCurrentPosition;
         }
     }
     FalloutAudioMedia::MediaAccessLeave();
@@ -539,10 +523,8 @@ uint32_t FalloutAudioMedia::MediaGetDuration(MEDIATYPE aeType) {
             v2 = FalloutAudioMedia::uiMediaADuration;
         }
         else {
-            if (!FalloutAudioMedia::eMediaNextTrack) {
-                if (FalloutAudioMedia::uiMediaBID) {
-                    v2 = FalloutAudioMedia::uiMediaBDuration;
-                }
+            if ((!FalloutAudioMedia::eMediaNextTrack) && (FalloutAudioMedia::uiMediaBID)) {
+                v2 = FalloutAudioMedia::uiMediaBDuration;
             }
         }
     }
@@ -551,12 +533,9 @@ uint32_t FalloutAudioMedia::MediaGetDuration(MEDIATYPE aeType) {
         v2 = FalloutAudioMedia::uiMediaADuration;
     }
     else {
-        if (!FalloutAudioMedia::eMediaNextTrack) {
-            if (FalloutAudioMedia::uiMediaBID) {
-                if (FalloutAudioMedia::eMediaBType == aeType) {
-                    v2 = FalloutAudioMedia::uiMediaBDuration;
-                }
-            }
+        if ((!FalloutAudioMedia::eMediaNextTrack) && (FalloutAudioMedia::uiMediaBID) &&
+            (FalloutAudioMedia::eMediaBType == aeType)) {
+            v2 = FalloutAudioMedia::uiMediaBDuration;
         }
     }
     FalloutAudioMedia::MediaAccessLeave();
@@ -897,35 +876,27 @@ uint32_t FalloutAudioMedia::ThreadProc(FalloutAudioMedia::MediaThreadInfo* input
             if (v20 > iDeltaTest && (v20 < 80000 || !v19)) {
                 Warning("FalloutAudioMedia Synch: %i = abs(-/+ %i +/- %i)", v20, i, v19);
                 uint32_t v23 = i + 50;
-                if (ppv) {
-                    if (pAudio) {
-                        pAudio->put_CurrentPosition(static_cast<double>(v23) / 1000.0);
-                    }
+                if ((ppv) && (pAudio)) {
+                    pAudio->put_CurrentPosition(static_cast<double>(v23) / 1000.0);
                 }
             }
         }
         if ((cTrackFlags & 2) != 0) {
-            if (v40) {
-                if (v38) {
-                    v38->Stop();
-                }
+            if ((v40) && (v38)) {
+                v38->Stop();
             }
         }
         else {
             BSAudio* v4;
             if ((cTrackFlags & 4) != 0 ||
                 (FalloutAudioMedia::bMediaMenuPaused || (v4 = &BSAudio::QInstance(), v4->IsSynchTimerPaused()))) {
-                if (v40) {
-                    if (v38) {
-                        v38->Pause();
-                    }
+                if ((v40) && (v38)) {
+                    v38->Pause();
                 }
             }
             else {
-                if (pAudio) {
-                    if (v38) {
-                        v38->Run();
-                    }
+                if ((pAudio) && (v38)) {
+                    v38->Run();
                 }
             }
         }
@@ -934,22 +905,16 @@ uint32_t FalloutAudioMedia::ThreadProc(FalloutAudioMedia::MediaThreadInfo* input
                 if (lEventCode > 0 && lEventCode <= 3) {
                     v51->FreeEventParams(lEventCode, lParam1, lParam2);
                     if ((cTrackFlags & 32) != 0) {
-                        if (v40) {
-                            if (v38) {
-                                v38->Stop();
-                            }
+                        if ((v40) && (v38)) {
+                            v38->Stop();
                         }
-                        if (ppv) {
-                            if (pAudio) {
-                                pAudio->put_CurrentPosition(0.0);
-                            }
+
+                        if ((ppv) && (pAudio)) {
+                            pAudio->put_CurrentPosition(0.0);
                         }
-                        if ((cTrackFlags & 2) == 0) {
-                            if (pAudio) {
-                                if (v38) {
-                                    v38->Run();
-                                }
-                            }
+
+                        if (((cTrackFlags & 2) == 0) && (pAudio) && (v38)) {
+                            v38->Run();
                         }
                     }
                     else {

@@ -23,11 +23,10 @@ hkDefaultError::~hkDefaultError() {}
 int32_t
 hkDefaultError::message(hkError::Message msg, int32_t id, const char* description, const char* file, int32_t line) {
     int32_t v6 = id;
-    if (id == -1) {
-        if (m_sectionIds.m_size) {
-            v6 = m_sectionIds.m_data[m_sectionIds.m_size - 1];
-        }
+    if ((id == -1) && (m_sectionIds.m_size)) {
+        v6 = m_sectionIds.m_data[m_sectionIds.m_size - 1];
     }
+
     hkBool bEnabled;
     if (!isEnabled(&bEnabled, v6)->m_bool) {
         return 0;

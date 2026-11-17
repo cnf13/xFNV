@@ -129,21 +129,20 @@ hkBool* hkpCachingShapePhantom::isOverlappingCollidableAdded(hkBool* arResult, c
         arResult->m_bool = 0;
         return arResult;
     }
-    else {
-        hkpCollidable** p_m_collidable =
-            &static_cast<hkArrayBase<hkpCachingShapePhantom::hkpCollisionDetail>&>(m_collisionDetails)
-                 .begin()
-                 ->m_collidable;
-        while (*p_m_collidable != apCollidable) {
-            ++v4;
-            p_m_collidable += 2;
-            if (v4 >= m_size) {
-                goto LABEL_5;
-            }
+
+    hkpCollidable** p_m_collidable =
+        &static_cast<hkArrayBase<hkpCachingShapePhantom::hkpCollisionDetail>&>(m_collisionDetails)
+             .begin()
+             ->m_collidable;
+    while (*p_m_collidable != apCollidable) {
+        ++v4;
+        p_m_collidable += 2;
+        if (v4 >= m_size) {
+            goto LABEL_5;
         }
-        arResult->m_bool = 1;
-        return arResult;
     }
+    arResult->m_bool = 1;
+    return arResult;
 }
 
 // The detail of collidable is looked for from the last; the listeners are told whether it was found; a found detail's

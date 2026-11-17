@@ -192,29 +192,27 @@ bool CombatDialogueManager::StartDialogue(
         ptimer->Reset(ftime);
     }
     Actor* pdialogueTarget = nullptr;
-    if (buseDialoguePackage_2) {
-        if (apCombatController) {
-            CombatGroup* pgroup = apCombatController->pCombatGroup;
-            float fmaxDistanceSquared = 1048576.0f;
-            uint32_t imemberCount = pgroup->GetMemberCount();
-            pspeaker->GetWorldLocation(&speakerWorldLoc);
-            for (uint32_t i = 0; i < imemberCount; ++i) {
-                Actor* pmember = pgroup->GetMember(i);
-                if (pmember != pspeaker && pmember != pPlayer) {
-                    BaseProcess* v26 = pmember->pCurrentProcess;
-                    if (!v26->GetGreetingFlag()) {
-                        BaseProcess* v25 = pmember->pCurrentProcess;
-                        TESPackage* ppack_4 = v25->GetCurrentPackage();
+    if ((buseDialoguePackage_2) && (apCombatController)) {
+        CombatGroup* pgroup = apCombatController->pCombatGroup;
+        float fmaxDistanceSquared = 1048576.0f;
+        uint32_t imemberCount = pgroup->GetMemberCount();
+        pspeaker->GetWorldLocation(&speakerWorldLoc);
+        for (uint32_t i = 0; i < imemberCount; ++i) {
+            Actor* pmember = pgroup->GetMember(i);
+            if (pmember != pspeaker && pmember != pPlayer) {
+                BaseProcess* v26 = pmember->pCurrentProcess;
+                if (!v26->GetGreetingFlag()) {
+                    BaseProcess* v25 = pmember->pCurrentProcess;
+                    TESPackage* ppack_4 = v25->GetCurrentPackage();
+                    if (!ppack_4 || ppack_4->GetPackType() != PACKAGE_TYPE_IN_GAME_DIALOGUE) {
+                        BaseProcess* v24 = pmember->pCurrentProcess;
+                        ppack_4 = v24->GetRunOncePackage();
                         if (!ppack_4 || ppack_4->GetPackType() != PACKAGE_TYPE_IN_GAME_DIALOGUE) {
-                            BaseProcess* v24 = pmember->pCurrentProcess;
-                            ppack_4 = v24->GetRunOncePackage();
-                            if (!ppack_4 || ppack_4->GetPackType() != PACKAGE_TYPE_IN_GAME_DIALOGUE) {
-                                pmember->GetWorldLocation(&memberWorldLoc);
-                                float fdistanceSquared = memberWorldLoc.GetDistanceSquared(speakerWorldLoc);
-                                if (fmaxDistanceSquared > static_cast<double>(fdistanceSquared)) {
-                                    pdialogueTarget = pmember;
-                                    fmaxDistanceSquared = fdistanceSquared;
-                                }
+                            pmember->GetWorldLocation(&memberWorldLoc);
+                            float fdistanceSquared = memberWorldLoc.GetDistanceSquared(speakerWorldLoc);
+                            if (fmaxDistanceSquared > static_cast<double>(fdistanceSquared)) {
+                                pdialogueTarget = pmember;
+                                fmaxDistanceSquared = fdistanceSquared;
                             }
                         }
                     }
@@ -222,6 +220,7 @@ bool CombatDialogueManager::StartDialogue(
             }
         }
     }
+
     if (!pdialogueTarget) {
         pdialogueTarget = pspeaker;
     }

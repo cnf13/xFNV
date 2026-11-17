@@ -409,9 +409,8 @@ BGSBodyPartData* TESActorBase::GetBodyPartData() {
     if (BGSBodyPartData::pPlayerBodyPartData && (this == pPlayer->Actor::GetActorBase())) {
         return BGSBodyPartData::pPlayerBodyPartData;
     }
-    else {
-        return BGSBodyPartData::pDefaultBodyPartData;
-    }
+
+    return BGSBodyPartData::pDefaultBodyPartData;
 }
 
 void TESActorBase::SetActorValue(ActorValue::Index aiWhich, int32_t aiValue) {
@@ -506,11 +505,9 @@ void TESActorBase::Reset3DForLoadedActors(uint8_t acResetFlags) {
         ReferenceProcessLists.IterateMobs(iterator);
         iterator.eType = PROCESS_TYPE_MIDDLE_HIGH;
         ReferenceProcessLists.IterateMobs(iterator);
-        if (pPlayer->GetActorBase() == this) {
-            if (pPlayer->pCurrentProcess) {
-                BaseProcess* CurrentAIProcess = pPlayer->pCurrentProcess;
-                CurrentAIProcess->Set3DUpdateFlag(static_cast<RESET_3D_FLAGS>(acResetFlags));
-            }
+        if ((pPlayer->GetActorBase() == this) && (pPlayer->pCurrentProcess)) {
+            BaseProcess* CurrentAIProcess = pPlayer->pCurrentProcess;
+            CurrentAIProcess->Set3DUpdateFlag(static_cast<RESET_3D_FLAGS>(acResetFlags));
         }
     }
 }
@@ -555,13 +552,12 @@ float TESActorBase::GetDesirability(TESForm* apForm) {
         switch (apForm->GetFormType()) {
             case ARMO_ID: {
                 TESObjectARMO* pArmor = dynamic_cast<TESObjectARMO*>(apForm);
-                if (pArmor) {
-                    if (TESHealthForm::GetFormHealth(pArmor)) {
-                        int32_t ArmorRating = static_cast<int32_t>(pArmor->GetArmorRating());
-                        double v6 = CombatFormulas::CalcArmorRating(ArmorRating, 1.0f);
-                        fRetVal = pArmor->GetDamageThreshold() + v6;
-                    }
+                if ((pArmor) && (TESHealthForm::GetFormHealth(pArmor))) {
+                    int32_t ArmorRating = static_cast<int32_t>(pArmor->GetArmorRating());
+                    double v6 = CombatFormulas::CalcArmorRating(ArmorRating, 1.0f);
+                    fRetVal = pArmor->GetDamageThreshold() + v6;
                 }
+
                 break;
             }
             case CLOT_ID: {
@@ -578,23 +574,22 @@ float TESActorBase::GetDesirability(TESForm* apForm) {
             }
             case WEAP_ID: {
                 TESObjectWEAP* pWeap = dynamic_cast<TESObjectWEAP*>(apForm);
-                if (pWeap) {
-                    if (TESHealthForm::GetFormHealth(pWeap)) {
-                        double fRetVal_2;
-                        float condition = 1.0f;
-                        if (this) {
-                            fRetVal_2 = CombatFormulas::CalcWeaponDamage(
-                                this, pWeap, condition, 1.0f, false, false, nullptr, false
-                            );
-                        }
-                        else {
-                            fRetVal_2 = CombatFormulas::CalcWeaponDamage(
-                                nullptr, pWeap, condition, 1.0f, false, false, nullptr, false
-                            );
-                        }
-                        fRetVal = fRetVal_2;
+                if ((pWeap) && (TESHealthForm::GetFormHealth(pWeap))) {
+                    double fRetVal_2;
+                    float condition = 1.0f;
+                    if (this) {
+                        fRetVal_2 = CombatFormulas::CalcWeaponDamage(
+                            this, pWeap, condition, 1.0f, false, false, nullptr, false
+                        );
                     }
+                    else {
+                        fRetVal_2 = CombatFormulas::CalcWeaponDamage(
+                            nullptr, pWeap, condition, 1.0f, false, false, nullptr, false
+                        );
+                    }
+                    fRetVal = fRetVal_2;
                 }
+
                 break;
             }
             case AMMO_ID: {
@@ -677,10 +672,10 @@ Reset3DMobIterator::Reset3DMobIterator() : MobIterOperator() {}
 
 void Reset3DMobIterator::Operate(MobileObject* apMob) {
     BaseProcess* currentAIProcess;
-    if (static_cast<const void*>(apMob->TESObjectREFR::GetObjectReference()) == static_cast<const void*>(pActorBase)) {
-        if (apMob->MobileObject::GetCurrentAIProcess()) {
-            currentAIProcess = apMob->MobileObject::GetCurrentAIProcess();
-            currentAIProcess->Set3DUpdateFlag(static_cast<RESET_3D_FLAGS>(cFlags));
-        }
+    if ((static_cast<const void*>(apMob->TESObjectREFR::GetObjectReference()) ==
+         static_cast<const void*>(pActorBase)) &&
+        (apMob->MobileObject::GetCurrentAIProcess())) {
+        currentAIProcess = apMob->MobileObject::GetCurrentAIProcess();
+        currentAIProcess->Set3DUpdateFlag(static_cast<RESET_3D_FLAGS>(cFlags));
     }
 }

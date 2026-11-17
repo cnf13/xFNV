@@ -6282,27 +6282,26 @@ hkVector4* hkgpMesh::getCenter(hkVector4* triangle) {
         }
         return triangle;
     }
-    else {
-        hkgpMeshBase::Vertex* m_used = m_vertices.m_used;
-        if (m_used) {
-            hkVector4 v9;
-            __m128 m_quad = triangle->m_quad;
-            do {
-                __m128 v8 = m_used->m_position.m_quad;
-                m_used = m_used->m_next;
-                v9.m_quad = _mm_add_ps(v8, m_quad);
-                m_quad = v9.m_quad;
-            }
-            while (m_used);
-            (*triangle).m_quad = v9.m_quad;
+
+    hkgpMeshBase::Vertex* m_used = m_vertices.m_used;
+    if (m_used) {
+        hkVector4 v9;
+        __m128 m_quad = triangle->m_quad;
+        do {
+            __m128 v8 = m_used->m_position.m_quad;
+            m_used = m_used->m_next;
+            v9.m_quad = _mm_add_ps(v8, m_quad);
+            m_quad = v9.m_quad;
         }
-        *reinterpret_cast<float*>(&v13) = 1.0 / static_cast<double>(v12);
-        triangle->m_quad = _mm_mul_ps(
-            _mm_shuffle_ps(_mm_set_ss(std::bit_cast<float>(v13)), _mm_set_ss(std::bit_cast<float>(v13)), 0),
-            triangle->m_quad
-        );
-        return triangle;
+        while (m_used);
+        (*triangle).m_quad = v9.m_quad;
     }
+    *reinterpret_cast<float*>(&v13) = 1.0 / static_cast<double>(v12);
+    triangle->m_quad = _mm_mul_ps(
+        _mm_shuffle_ps(_mm_set_ss(std::bit_cast<float>(v13)), _mm_set_ss(std::bit_cast<float>(v13)), 0),
+        triangle->m_quad
+    );
+    return triangle;
 }
 
 // The plane through a1, a2 and a3 into a4 (the cross product normalized, w the negated distance); with a5, each
@@ -7139,20 +7138,19 @@ float hkgpMesh::getVolume() {
 
 bool hkgpMesh::hasValidTopology(bool a1) const {
     int32_t v2 = this->checkTopology(1);
-    if (a1) {
-        if (v2) {
-            char buf[512];
-            hkErrStream apThis(buf, 512);
-            hkOstream* v4 = &apThis.operator<<("Invalid mesh topology (");
-            hkOstream* v5 = &v4->operator<<(v2);
-            v5->operator<<(")");
-            if (hkError::s_instance->message(
-                    hkError::MESSAGE_ERROR, 0x4C5C2AFA, buf, ".\\GeometryProcessing\\Mesh\\hkgpMesh.cpp", 2857
-                )) {
-                __builtin_debugtrap();
-            }
+    if ((a1) && (v2)) {
+        char buf[512];
+        hkErrStream apThis(buf, 512);
+        hkOstream* v4 = &apThis.operator<<("Invalid mesh topology (");
+        hkOstream* v5 = &v4->operator<<(v2);
+        v5->operator<<(")");
+        if (hkError::s_instance->message(
+                hkError::MESSAGE_ERROR, 0x4C5C2AFA, buf, ".\\GeometryProcessing\\Mesh\\hkgpMesh.cpp", 2857
+            )) {
+            __builtin_debugtrap();
         }
     }
+
     return v2 == 0;
 }
 
@@ -9772,7 +9770,7 @@ hkgpMesh::sResult* hkgpMesh::cutAndCap(hkgpMesh::sResult* apResult, const hkVect
             ::new (&triangulator) hkgpDefaultTriangulatorType;
             triangulator.setDomain(domainMin, domainMax, 0.0f, true);
             // EXE-INLINED none: hkgpTriangulatorType::~hkgpTriangulatorType, then the exe's leftover heap lookup
-            const auto destroyTriangulator = [&triangulator]() {
+            const auto destroyTriangulator = [&triangulator] {
                 triangulator.~hkgpDefaultTriangulatorType();
                 hkMemoryRouter::getInstance();
             };
@@ -10550,9 +10548,8 @@ float IConvexOverlapImpl::distance(
         )) {
         return -3.40282e+38f;
     }
-    else {
-        return _mm_shuffle_ps(apOut_.m_normalInA.m_quad, apOut_.m_normalInA.m_quad, 255)[0];
-    }
+
+    return _mm_shuffle_ps(apOut_.m_normalInA.m_quad, apOut_.m_normalInA.m_quad, 255)[0];
 }
 
 bool IConvexOverlapImpl::checkOverlap(

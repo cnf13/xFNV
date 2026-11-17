@@ -289,11 +289,10 @@ hkBool* hkString::beginsWith(hkBool* apResult, const char* a, const char* b) {
         apResult->m_bool = 0;
         return apResult;
     }
-    else {
-    LABEL_4:;
-        apResult->m_bool = 1;
-        return apResult;
-    }
+
+LABEL_4:;
+    apResult->m_bool = 1;
+    return apResult;
 }
 
 int32_t hkString::lastIndexOf(const char* str, char c) {
@@ -301,9 +300,8 @@ int32_t hkString::lastIndexOf(const char* str, char c) {
     if (v2) {
         return v2 - str;
     }
-    else {
-        return -1;
-    }
+
+    return -1;
 }
 
 // Compares byte by byte: the first differing byte gives -1 or 1, and 0 is returned when all n bytes are equal.

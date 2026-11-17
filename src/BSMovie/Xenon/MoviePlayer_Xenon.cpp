@@ -137,47 +137,38 @@ int32_t Round_up_to_next_2_power(uint32_t a1) {
             if (a1 <= 2) {
                 return a1;
             }
-            else {
-                return 4;
-            }
+
+            return 4;
         }
-        else {
-            if (a1 <= 8) {
-                return 8;
-            }
-            else {
-                return 16;
-            }
+
+        if (a1 <= 8) {
+            return 8;
         }
+
+        return 16;
     }
-    else {
-        if (a1 <= 64) {
-            if (a1 <= 32) {
-                return 32;
-            }
-            else {
-                return 64;
-            }
+
+    if (a1 <= 64) {
+        if (a1 <= 32) {
+            return 32;
         }
-        else {
-            if (a1 <= 128) {
-                return 128;
-            }
-            else {
-                if (a1 <= 256) {
-                    return 256;
-                }
-                else {
-                    if (a1 <= 512) {
-                        return 512;
-                    }
-                    else {
-                        return 1024;
-                    }
-                }
-            }
-        }
+
+        return 64;
     }
+
+    if (a1 <= 128) {
+        return 128;
+    }
+
+    if (a1 <= 256) {
+        return 256;
+    }
+
+    if (a1 <= 512) {
+        return 512;
+    }
+
+    return 1024;
 }
 
 void Close_RAD_3D_image_pow2(BINKTEXTURESET* Block) {
@@ -206,45 +197,44 @@ int32_t Lock_RAD_3D_image_pow2(
         a1->uiLockIndex = 0;
         return 0;
     }
-    else {
-        if (a2) {
-            *a2 = v13.pBits;
-        }
-        if (a3) {
-            *a3 = v13.Pitch;
-        }
-        uint32_t v10 = a1->uiColumns + (a1->uiRemnantWidth != 0);
-        uint32_t v11 = a1->uiLockIndex / v10;
-        uint32_t v12 = a1->uiLockIndex % v10;
-        if (a4) {
-            *a4 = a1->uiTextureSize * v12;
-        }
-        if (a5) {
-            *a5 = a1->uiTextureSize * v11;
-        }
-        if (a6) {
-            uint32_t uiTextureSize;
-            if (v12 < a1->uiColumns) {
-                uiTextureSize = a1->uiTextureSize;
-            }
-            else {
-                uiTextureSize = a1->uiRemnantWidth;
-            }
-            *a6 = uiTextureSize;
-        }
-        if (a7) {
-            uint32_t uiRemnantHeight;
-            if (v11 < a1->uiRows) {
-                uiRemnantHeight = a1->uiTextureSize;
-            }
-            else {
-                uiRemnantHeight = a1->uiRemnantHeight;
-            }
-            *a7 = uiRemnantHeight;
-        }
-        ++a1->uiLockIndex;
-        return 1;
+
+    if (a2) {
+        *a2 = v13.pBits;
     }
+    if (a3) {
+        *a3 = v13.Pitch;
+    }
+    uint32_t v10 = a1->uiColumns + (a1->uiRemnantWidth != 0);
+    uint32_t v11 = a1->uiLockIndex / v10;
+    uint32_t v12 = a1->uiLockIndex % v10;
+    if (a4) {
+        *a4 = a1->uiTextureSize * v12;
+    }
+    if (a5) {
+        *a5 = a1->uiTextureSize * v11;
+    }
+    if (a6) {
+        uint32_t uiTextureSize;
+        if (v12 < a1->uiColumns) {
+            uiTextureSize = a1->uiTextureSize;
+        }
+        else {
+            uiTextureSize = a1->uiRemnantWidth;
+        }
+        *a6 = uiTextureSize;
+    }
+    if (a7) {
+        uint32_t uiRemnantHeight;
+        if (v11 < a1->uiRows) {
+            uiRemnantHeight = a1->uiTextureSize;
+        }
+        else {
+            uiRemnantHeight = a1->uiRemnantHeight;
+        }
+        *a7 = uiRemnantHeight;
+    }
+    ++a1->uiLockIndex;
+    return 1;
 }
 
 int32_t Unlock_RAD_3D_image_pow2(BINKTEXTURESET* a1) {
@@ -572,10 +562,9 @@ bool Movie::Play(
         }
         return bfinishedPlaying;
     }
-    else {
-        bLoading = false;
-        return false;
-    }
+
+    bLoading = false;
+    return false;
 }
 
 // Bink opens its sound through DirectSound; the argument is 0.

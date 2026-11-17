@@ -257,9 +257,8 @@ NiObject* BSMultiBoundNode::CreateObject() {
     if (apMemory) {
         return ::new (apMemory) BSMultiBoundNode;
     }
-    else {
-        return nullptr;
-    }
+
+    return nullptr;
 }
 
 BSMultiBoundNode* BSMultiBoundNode::FindMultiboundNode(NiAVObject* apObject) {
@@ -276,7 +275,6 @@ BSMultiBoundNode* BSMultiBoundNode::FindMultiboundNode(NiAVObject* apObject) {
     if (pMultiBoundNode) {
         return static_cast<BSMultiBoundNode*>(apObject);
     }
-    else {
-        return nullptr;
-    }
+
+    return nullptr;
 }

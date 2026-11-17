@@ -1265,14 +1265,16 @@ bool NiDX9Renderer::PackSkinnedGeometryBuffer(NiGeometryBufferData* apBuffData, 
 	if (uiDirtyFlags & ~0x10u) {
 		for (uint32_t i = 0; i < uiStreams; ++i) {
 			NiVBChip* pkChip = i < apBuffData->m_uiStreamCount ? apBuffData->m_ppkVBChip[i] : nullptr;
-			if (!apShaderDecl ||
-				!apShaderDecl->PackUntransformedVB(apData, pkSkin, apPartition, static_cast<uint16_t>(uiDirtyFlags),
-					pkChip, i, nullptr, nullptr, nullptr)) {
-				if (uiStreams != 1 ||
-					!m_pkVBManager->PackSkinnedVB(apData, pkSkin, apPartition, uiDirtyFlags, pkChip, nullptr))
-					return false;
-			}
-		}
+            if ((!apShaderDecl ||
+                 !apShaderDecl->PackUntransformedVB(
+                     apData, pkSkin, apPartition, static_cast<uint16_t>(uiDirtyFlags), pkChip, i, nullptr, nullptr,
+                     nullptr
+                 )) &&
+                (uiStreams != 1 ||
+                 !m_pkVBManager->PackSkinnedVB(apData, pkSkin, apPartition, uiDirtyFlags, pkChip, nullptr))) {
+                return false;
+            }
+        }
 	}
 
 	if (!(uiDirtyFlags & 0x30))
@@ -1422,14 +1424,15 @@ bool NiDX9Renderer::PackGeometryBuffer(NiGeometryBufferData* apBuffData, NiGeome
 	if (uiDirtyFlags & ~0x10u) {
 		for (uint32_t i = 0; i < uiStreams; ++i) {
 			NiVBChip* pkChip = i < apBuffData->m_uiStreamCount ? apBuffData->m_ppkVBChip[i] : nullptr;
-			if (!apShaderDecl ||
-				!apShaderDecl->PackUntransformedVB(apData, apSkin, nullptr, static_cast<uint16_t>(uiDirtyFlags), pkChip,
-					i, nullptr, nullptr, nullptr)) {
-				if (uiStreams != 1 ||
-					!m_pkVBManager->PackUntransformedVB(apData, apSkin, uiDirtyFlags, pkChip, nullptr))
-					return false;
-			}
-		}
+            if ((!apShaderDecl ||
+                 !apShaderDecl->PackUntransformedVB(
+                     apData, apSkin, nullptr, static_cast<uint16_t>(uiDirtyFlags), pkChip, i, nullptr, nullptr, nullptr
+                 )) &&
+                (uiStreams != 1 ||
+                 !m_pkVBManager->PackUntransformedVB(apData, apSkin, uiDirtyFlags, pkChip, nullptr))) {
+                return false;
+            }
+        }
 	}
 
 	if (pusIndices && (uiDirtyFlags & 0x30)) {

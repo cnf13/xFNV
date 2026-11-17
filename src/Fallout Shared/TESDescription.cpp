@@ -56,9 +56,8 @@ const char* TESDescription::GetDescription(TESForm* apForm, CHUNK_ID aeChunk) {
     if ((&TESDescription::strCurrentDescription)->pString) {
         return (&TESDescription::strCurrentDescription)->pString;
     }
-    else {
-        return "";
-    }
+
+    return "";
 }
 
 // Walks the file the form came from for the aeChunk record and stores its text as the current description. An empty

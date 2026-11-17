@@ -92,13 +92,13 @@ NiObject* WeaponObject::CreateClone(NiCloningProcess& arCloneData) {
 void WeaponObject::UpdateWorldData(NiUpdateData& a2) {
     NiAVObject* m_pkSceneObject;
     m_pkSceneObject = this->m_pkSceneObject;
-    if (m_pkSceneObject) {
-        if ((&m_pkSceneObject->m_kLocal.m_Translate)->operator!=(NiPoint3_ZERO) ||
-            (!(&m_pkSceneObject->m_kLocal.m_Rotate)->operator==(NiMatrix3_IDENTITY))) {
-            __builtin_memcpy(&m_pkSceneObject->m_kLocal, &NiMatrix3_IDENTITY, 0x24u);
-            m_pkSceneObject->m_kLocal.m_Translate = NiPoint3_ZERO;
-        }
+    if ((m_pkSceneObject) &&
+        ((&m_pkSceneObject->m_kLocal.m_Translate)->operator!=(NiPoint3_ZERO) ||
+         (!(&m_pkSceneObject->m_kLocal.m_Rotate)->operator==(NiMatrix3_IDENTITY)))) {
+        __builtin_memcpy(&m_pkSceneObject->m_kLocal, &NiMatrix3_IDENTITY, 0x24u);
+        m_pkSceneObject->m_kLocal.m_Translate = NiPoint3_ZERO;
     }
+
     bhkBlendCollisionObject::UpdateWorldData(a2);
 }
 
@@ -286,11 +286,10 @@ void WeaponObject::UpdateConstraints(
     LABEL_11:;
         pweaponAttach = nullptr;
     }
-    if (pweaponBone) {
-        if (pweaponAttach) {
-            WeaponObject::Constrain(abEnable, aOwnerFilter, pweaponBone, pweaponAttach, abDefaultKeyframed);
-        }
+    if ((pweaponBone) && (pweaponAttach)) {
+        WeaponObject::Constrain(abEnable, aOwnerFilter, pweaponBone, pweaponAttach, abDefaultKeyframed);
     }
+
     static NiFixedString strBackpack("Backpack");
     NiAVObject* pbackpack = BSUtilities::GetObjectByName(apRoot3d, strBackpack, false);
     if (pbackpack) {
@@ -314,10 +313,8 @@ void WeaponObject::UpdateConstraints(
     LABEL_27:;
         pbackpackAttach = nullptr;
     }
-    if (pbackpack) {
-        if (pbackpackAttach) {
-            WeaponObject::Constrain(abEnable, aOwnerFilter, pbackpack, pbackpackAttach, abDefaultKeyframed);
-        }
+    if ((pbackpack) && (pbackpackAttach)) {
+        WeaponObject::Constrain(abEnable, aOwnerFilter, pbackpack, pbackpackAttach, abDefaultKeyframed);
     }
 }
 
@@ -436,40 +433,32 @@ LABEL_6:;
     else {
         pparentRB = nullptr;
     }
-    if (pweapRB) {
-        if (pparentRB) {
-            if (pweaponObject) {
-                if (apParent) {
-                    if (apParent->m_pkParent) {
-                        NiQuaternion niq;
-                        NiTransform parentTransform;
-                        NiTransform parentToWeaponTransform;
-                        hkQuaternion hkr;
-                        hkVector4 hkv;
-                        hkTransform hktrans;
-                        pparentRB->GetTransform(hktrans);
-                        HK2NI(parentTransform, hktrans);
-                        // HK2NI leaves the scale, so the parent's world scale is copied.
-                        parentTransform.m_fScale = apParent->m_kWorld.m_fScale;
-                        GetTransformRecursive(pweaponObject, apParent, parentToWeaponTransform);
-                        NiTransform weaponObjectTransform = parentTransform * parentToWeaponTransform;
-                        niq.FromRotation(weaponObjectTransform.m_Rotate);
-                        NI2HK(hkv, weaponObjectTransform.m_Translate);
-                        // EXE-INLINED none: NI2HK(hkQuaternion&, const NiQuaternion&), each lane copied with fld/fstp.
-                        hkr.m_vec.m_quad[0] = niq.m_fX;
-                        hkr.m_vec.m_quad[1] = niq.m_fY;
-                        hkr.m_vec.m_quad[2] = niq.m_fZ;
-                        hkr.m_vec.m_quad[3] = niq.m_fW;
-                        hkr.normalize();
-                        bhkNiCollisionObject::kKeyframeLock.Lock(nullptr);
-                        pweapRB->SetPosRot(hkv, hkr);
-                        // EXE-INLINED 0x40FBA0
-                        if (!--bhkNiCollisionObject::kKeyframeLock.uiLockCount) {
-                            bhkNiCollisionObject::kKeyframeLock.uiOwningThread = 0;
-                        }
-                    }
-                }
-            }
+    if ((pweapRB) && (pparentRB) && (pweaponObject) && (apParent) && (apParent->m_pkParent)) {
+        NiQuaternion niq;
+        NiTransform parentTransform;
+        NiTransform parentToWeaponTransform;
+        hkQuaternion hkr;
+        hkVector4 hkv;
+        hkTransform hktrans;
+        pparentRB->GetTransform(hktrans);
+        HK2NI(parentTransform, hktrans);
+        // HK2NI leaves the scale, so the parent's world scale is copied.
+        parentTransform.m_fScale = apParent->m_kWorld.m_fScale;
+        GetTransformRecursive(pweaponObject, apParent, parentToWeaponTransform);
+        NiTransform weaponObjectTransform = parentTransform * parentToWeaponTransform;
+        niq.FromRotation(weaponObjectTransform.m_Rotate);
+        NI2HK(hkv, weaponObjectTransform.m_Translate);
+        // EXE-INLINED none: NI2HK(hkQuaternion&, const NiQuaternion&), each lane copied with fld/fstp.
+        hkr.m_vec.m_quad[0] = niq.m_fX;
+        hkr.m_vec.m_quad[1] = niq.m_fY;
+        hkr.m_vec.m_quad[2] = niq.m_fZ;
+        hkr.m_vec.m_quad[3] = niq.m_fW;
+        hkr.normalize();
+        bhkNiCollisionObject::kKeyframeLock.Lock(nullptr);
+        pweapRB->SetPosRot(hkv, hkr);
+        // EXE-INLINED 0x40FBA0
+        if (!--bhkNiCollisionObject::kKeyframeLock.uiLockCount) {
+            bhkNiCollisionObject::kKeyframeLock.uiOwningThread = 0;
         }
     }
 }

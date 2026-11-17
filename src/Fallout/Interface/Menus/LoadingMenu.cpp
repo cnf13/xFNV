@@ -194,21 +194,20 @@ LoadingMenu::~LoadingMenu() {
     }
     Interface::bIsLoadingNewGame = false;
     NiRenderer::GetRenderer()->SetBackgroundColor(SaveBackgroundColor);
-    if (StartMenu::MainMenuIsActive() || (LoadingMenu::bInitialLoad && *sStartingCell.String())) {
-        if (BSAudio::QInstance().bAudioEnabled) {
-            FalloutAudioMedia::MediaFadeOut(4000, MEDIA_STANDBY);
-        }
+    if ((StartMenu::MainMenuIsActive() || (LoadingMenu::bInitialLoad && *sStartingCell.String())) &&
+        (BSAudio::QInstance().bAudioEnabled)) {
+        FalloutAudioMedia::MediaFadeOut(4000, MEDIA_STANDBY);
     }
+
     if (FalloutAudio::GetNewGameMusic()) {
         FalloutAudio::SetNewGameMusic(false);
         FalloutAudio::SetMainMenuMusic(false);
         FalloutAudioMedia::MediaFadeOut(4000, MEDIA_STANDBY);
     }
-    if (GetFlag(LoadingMenu::LM_AUDIO_THREADING)) {
-        if (BSAudio::QInstance().bMultiThread) {
-            BSAudio::QInstance().SetMultiThreaded(false);
-        }
+    if ((GetFlag(LoadingMenu::LM_AUDIO_THREADING)) && (BSAudio::QInstance().bMultiThread)) {
+        BSAudio::QInstance().SetMultiThreaded(false);
     }
+
     BSAudio::QInstance().UnMute(1000u);
     LoadingMenu::bInitialLoad = false;
     FlushLoadScreenList();
@@ -217,11 +216,9 @@ LoadingMenu::~LoadingMenu() {
     InitialSlideSound.Release();
     pLocation = nullptr;
     LoadingMenu::pMe = nullptr;
-    if (pPlayer) {
-        if (pPlayer->patch04DebugQuest) {
-            pPlayer->patch04DebugQuest->SetEnabled(1);
-            pPlayer->patch04DebugQuest = nullptr;
-        }
+    if ((pPlayer) && (pPlayer->patch04DebugQuest)) {
+        pPlayer->patch04DebugQuest->SetEnabled(1);
+        pPlayer->patch04DebugQuest = nullptr;
     }
 }
 
@@ -834,10 +831,8 @@ void LoadingMenu::Reset(TESForm* apLocation) {
             int32_t ClassStatic = StartMenu::GetClassStatic();
             Tile* MenuByClass = Menu::GetMenuByClass(ClassStatic);
             StartMenu* pstartMenu = static_cast<StartMenu*>(MenuByClass->GetMenu());
-            if (pstartMenu) {
-                if (!pstartMenu->IsFlagSet(StartMenu::FLAG_INGAME)) {
-                    delete pstartMenu;
-                }
+            if ((pstartMenu) && (!pstartMenu->IsFlagSet(StartMenu::FLAG_INGAME))) {
+                delete pstartMenu;
             }
         }
         if (appMain->GameReset()) {
@@ -933,10 +928,8 @@ void LoadingMenu::AdvanceScreen() {
     if (!pNextLoadScreen) {
         pNextLoadScreen = &LoadScreens;
     }
-    if (pNextLoadScreen) {
-        if (pNextLoadScreen->m_item) {
-            UpdatePlayerTileSettings(pCurrentLoadScreen);
-        }
+    if ((pNextLoadScreen) && (pNextLoadScreen->m_item)) {
+        UpdatePlayerTileSettings(pCurrentLoadScreen);
     }
 }
 
@@ -966,24 +959,22 @@ void LoadingMenu::FadeIn() {
 }
 
 void LoadingMenu::FadeIn(Tile* apTile, float afTime) {
-    if (apTile) {
-        if (apTile != pTiles[33]) {
-            float afAlphaa = BSMIN(afTime, 1.0f);
-            float afAlpha = BSMAX(afAlphaa, 0.0f);
-            if (apTile->GetType() == 904) {
-                FadeIn3D(apTile->GetModel(), afAlpha);
+    if ((apTile) && (apTile != pTiles[33])) {
+        float afAlphaa = BSMIN(afTime, 1.0f);
+        float afAlpha = BSMAX(afAlphaa, 0.0f);
+        if (apTile->GetType() == 904) {
+            FadeIn3D(apTile->GetModel(), afAlpha);
+        }
+        else {
+            if (apTile == pTiles[12]) {
+                afAlpha = 1.0 - afAlpha;
             }
-            else {
-                if (apTile == pTiles[12]) {
-                    afAlpha = 1.0 - afAlpha;
-                }
-                float v3 = afAlpha * 255.0;
-                apTile->Set(4009, v3, true);
-                LoadingMenu::bDoTileUpdate = true;
-                for (NiTListItem<Tile*>* piter = apTile->xChildren.m_pkHead; piter;
-                     FadeIn(apTile->xChildren.GetNext(piter), afAlpha)) {
-                    ;
-                }
+            float v3 = afAlpha * 255.0;
+            apTile->Set(4009, v3, true);
+            LoadingMenu::bDoTileUpdate = true;
+            for (NiTListItem<Tile*>* piter = apTile->xChildren.m_pkHead; piter;
+                 FadeIn(apTile->xChildren.GetNext(piter), afAlpha)) {
+                ;
             }
         }
     }
@@ -1068,23 +1059,21 @@ void LoadingMenu::InitStatsTilesSettings(LoadScreenType_Data* apData) {
     while (pLabelIter && pValIter) {
         Tile* pLabelChild = pTiles[17]->xChildren.GetPrev(pLabelIter);
         Tile* pValChild = pTiles[18]->xChildren.GetPrev(pValIter);
-        if (pLabelChild) {
-            if (pValChild) {
-                bool bIsVisible = true;
-                if (nRowCount > apData->uNumStatsToDisplay) {
-                    bIsVisible = false;
-                }
-                else {
-                    pLabelChild->Set(4002, fYOffset, true);
-                    pValChild->Set(4002, fYOffset, true);
-                    fYOffset = fYOffset + fStatRowHeight;
-                    pLabelChild->AddNeedsUpdate(8);
-                    pValChild->AddNeedsUpdate(8);
-                    ++nRowCount;
-                }
-                pLabelChild->Set(4003, static_cast<int32_t>(bIsVisible));
-                pValChild->Set(4003, static_cast<int32_t>(bIsVisible));
+        if ((pLabelChild) && (pValChild)) {
+            bool bIsVisible = true;
+            if (nRowCount > apData->uNumStatsToDisplay) {
+                bIsVisible = false;
             }
+            else {
+                pLabelChild->Set(4002, fYOffset, true);
+                pValChild->Set(4002, fYOffset, true);
+                fYOffset = fYOffset + fStatRowHeight;
+                pLabelChild->AddNeedsUpdate(8);
+                pValChild->AddNeedsUpdate(8);
+                ++nRowCount;
+            }
+            pLabelChild->Set(4003, static_cast<int32_t>(bIsVisible));
+            pValChild->Set(4003, static_cast<int32_t>(bIsVisible));
         }
     }
     pTiles[31]->Set(4090, apData->DisplayData1.fDisplayRotationRads, true);
@@ -1342,10 +1331,8 @@ void LoadingMenu::BuildCandidateList(BSSimpleArray<TESLoadScreen*, 1024>& aListO
         uint32_t nIndex = aListOut.Add(pnode->m_item);
         TESLoadScreen** v5 = &pnode->m_item;
         LOAD_SCREEN_DATA_TYPE eCurrentType = (*v5)->GetLoadScreenTypeDataType();
-        if ((Interface::bIsLoadingNewGame || appMain->GameReset()) && eCurrentType != LSDT_TIP) {
-            if (eCurrentType) {
-                aListOut.RemoveFast(nIndex, 1u);
-            }
+        if (((Interface::bIsLoadingNewGame || appMain->GameReset()) && eCurrentType != LSDT_TIP) && (eCurrentType)) {
+            aListOut.RemoveFast(nIndex, 1u);
         }
     }
 }
@@ -1393,83 +1380,78 @@ void LoadingMenu::InitPlayerTileSettings() {
 }
 
 void LoadingMenu::UpdatePlayerTileVisibilities(TESLoadScreen* pLoadScreen, bool bVisible) {
-    if (GetFlag(LoadingMenu::LM_SHOW_PLAYER_TILES)) {
-        if (pLoadScreen ||
-            (!pNextLoadScreen ? pLoadScreen = LoadScreens.m_item : pLoadScreen = pNextLoadScreen->m_item,
-             pLoadScreen)) {
-            if (bVisible) {
-                switch (pLoadScreen->GetLoadScreenTypeDataType()) {
-                    case LSDT_XP_PROGRESS: {
-                        UpdateObjectiveTilesVisibilities(!bVisible);
-                        UpdateStatsTilesVisibilities(!bVisible);
-                        UpdateTipTilesVisibilities(!bVisible);
-                        UpdateXPProgressTilesVisibilities(bVisible);
-                        break;
-                    }
-                    case LSDT_OBJECTIVE: {
-                        UpdateObjectiveTilesVisibilities(bVisible);
-                        UpdateStatsTilesVisibilities(!bVisible);
-                        UpdateTipTilesVisibilities(!bVisible);
-                        UpdateXPProgressTilesVisibilities(!bVisible);
-                        break;
-                    }
-                    case LSDT_TIP: {
-                        UpdateObjectiveTilesVisibilities(!bVisible);
-                        UpdateStatsTilesVisibilities(!bVisible);
-                        UpdateTipTilesVisibilities(bVisible);
-                        UpdateXPProgressTilesVisibilities(!bVisible);
-                        break;
-                    }
-                    case LSDT_STATS: {
-                        UpdateObjectiveTilesVisibilities(!bVisible);
-                        UpdateStatsTilesVisibilities(bVisible);
-                        UpdateTipTilesVisibilities(!bVisible);
-                        UpdateXPProgressTilesVisibilities(!bVisible);
-                        break;
-                    }
-                    default: {
-                        goto LABEL_13;
-                    }
+    if ((GetFlag(LoadingMenu::LM_SHOW_PLAYER_TILES)) &&
+        (pLoadScreen ||
+         (!pNextLoadScreen ? pLoadScreen = LoadScreens.m_item : pLoadScreen = pNextLoadScreen->m_item, pLoadScreen))) {
+        if (bVisible) {
+            switch (pLoadScreen->GetLoadScreenTypeDataType()) {
+                case LSDT_XP_PROGRESS: {
+                    UpdateObjectiveTilesVisibilities(!bVisible);
+                    UpdateStatsTilesVisibilities(!bVisible);
+                    UpdateTipTilesVisibilities(!bVisible);
+                    UpdateXPProgressTilesVisibilities(bVisible);
+                    break;
+                }
+                case LSDT_OBJECTIVE: {
+                    UpdateObjectiveTilesVisibilities(bVisible);
+                    UpdateStatsTilesVisibilities(!bVisible);
+                    UpdateTipTilesVisibilities(!bVisible);
+                    UpdateXPProgressTilesVisibilities(!bVisible);
+                    break;
+                }
+                case LSDT_TIP: {
+                    UpdateObjectiveTilesVisibilities(!bVisible);
+                    UpdateStatsTilesVisibilities(!bVisible);
+                    UpdateTipTilesVisibilities(bVisible);
+                    UpdateXPProgressTilesVisibilities(!bVisible);
+                    break;
+                }
+                case LSDT_STATS: {
+                    UpdateObjectiveTilesVisibilities(!bVisible);
+                    UpdateStatsTilesVisibilities(bVisible);
+                    UpdateTipTilesVisibilities(!bVisible);
+                    UpdateXPProgressTilesVisibilities(!bVisible);
+                    break;
+                }
+                default: {
+                    goto LABEL_13;
                 }
             }
-            else {
-            LABEL_13:;
-                UpdateObjectiveTilesVisibilities(false);
-                UpdateStatsTilesVisibilities(false);
-                UpdateTipTilesVisibilities(false);
-                UpdateXPProgressTilesVisibilities(false);
-            }
+        }
+        else {
+        LABEL_13:;
+            UpdateObjectiveTilesVisibilities(false);
+            UpdateStatsTilesVisibilities(false);
+            UpdateTipTilesVisibilities(false);
+            UpdateXPProgressTilesVisibilities(false);
         }
     }
 }
 
 void LoadingMenu::UpdatePlayerTileAlphas(TESLoadScreen* pLoadScreen, float afAlpha, int32_t anSlide) {
-    if (GetFlag(LoadingMenu::LM_SHOW_PLAYER_TILES)) {
-        if (pLoadScreen ||
-            (!pNextLoadScreen ? pLoadScreen = LoadScreens.m_item : pLoadScreen = pNextLoadScreen->m_item,
-             pLoadScreen)) {
-            if (pLoadScreen->GetLoadScreenType()) {
-                switch (pLoadScreen->GetLoadScreenTypeDataType()) {
-                    case LSDT_XP_PROGRESS: {
-                        UpdateXPProgressTilesAlphas(afAlpha, anSlide);
-                        break;
-                    }
-                    case LSDT_OBJECTIVE: {
-                        UpdateObjectiveTilesAlphas(afAlpha, anSlide);
-                        break;
-                    }
-                    case LSDT_TIP: {
-                        UpdateTipTilesAlphas(afAlpha, anSlide);
-                        break;
-                    }
-                    case LSDT_STATS: {
-                        UpdateStatsTilesAlphas(afAlpha, anSlide);
-                        break;
-                    }
-                    default: {
-                        return;
-                    }
-                }
+    if ((GetFlag(LoadingMenu::LM_SHOW_PLAYER_TILES)) &&
+        (pLoadScreen ||
+         (!pNextLoadScreen ? pLoadScreen = LoadScreens.m_item : pLoadScreen = pNextLoadScreen->m_item, pLoadScreen)) &&
+        (pLoadScreen->GetLoadScreenType())) {
+        switch (pLoadScreen->GetLoadScreenTypeDataType()) {
+            case LSDT_XP_PROGRESS: {
+                UpdateXPProgressTilesAlphas(afAlpha, anSlide);
+                break;
+            }
+            case LSDT_OBJECTIVE: {
+                UpdateObjectiveTilesAlphas(afAlpha, anSlide);
+                break;
+            }
+            case LSDT_TIP: {
+                UpdateTipTilesAlphas(afAlpha, anSlide);
+                break;
+            }
+            case LSDT_STATS: {
+                UpdateStatsTilesAlphas(afAlpha, anSlide);
+                break;
+            }
+            default: {
+                return;
             }
         }
     }

@@ -26,7 +26,7 @@ public:
 // Queries over an hkAabbTree.
 template <class BOUNDING_VOLUME, typename IDX>
 struct hkAabbTreeQueryUtils {
-    using Node = typename hkAabbTree<BOUNDING_VOLUME, IDX>::Node;
+    using Node = hkAabbTree<BOUNDING_VOLUME, IDX>::Node;
 
     // Two leaves a tree-tree query found overlapping, as nodes.
     struct NodePair {
@@ -55,7 +55,7 @@ struct hkAabbTreeQueryUtils {
     struct Collector {
         virtual ~Collector();
 
-        virtual float addLeaf(const typename hkAabbTree<BOUNDING_VOLUME, IDX>::Node* leaf) = 0;
+        virtual float addLeaf(const hkAabbTree<BOUNDING_VOLUME, IDX>::Node* leaf) = 0;
 
         static void operator delete(void* apMemory) {
             ourFree(apMemory);

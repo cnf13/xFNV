@@ -445,10 +445,9 @@ LABEL_27:;
         apResult->m_bool = 1;
         return apResult;
     }
-    else {
-        apResult->m_bool = 0;
-        return apResult;
-    }
+
+    apResult->m_bool = 0;
+    return apResult;
 }
 
 const hkClass& hkaKeyFrameHierarchyUtility::ControlData::staticClass() {

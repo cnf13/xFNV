@@ -158,30 +158,26 @@ Projectile::ImpactData::~ImpactData() {
 }
 
 void Projectile::ImpactData::FinishLoadGame(BGSLoadFormBuffer* apLoadGameBuffer) {
-    if (this->sTargetWorldObjectCount) {
-        if (this->sTargetWorldObjectIndex != -1) {
-            if (pCollidee) {
-                NiNode* v2 = pCollidee->Get3D();
-                int16_t scurrentWorldObjectCount = GetHavokWorldObjectCountInSceneGraph(v2);
-                if (this->sTargetWorldObjectCount == scurrentWorldObjectCount) {
-                    if (this->sTargetWorldObjectIndex != -1) {
-                        int32_t sTargetWorldObjectIndex = this->sTargetWorldObjectIndex;
-                        NiNode* v3 = pCollidee->Get3D();
-                        pTargetWorldObject = GetHavokWorldObjectByIndexInSceneGraph(v3, sTargetWorldObjectIndex);
-                        if (pTargetWorldObject) {
-                            pTargetWorldObject->addReference();
-                        }
-                    }
-                }
-                else {
-                    int32_t sTargetWorldObjectCount = this->sTargetWorldObjectCount;
-                    int32_t CastingType = pCollidee->iFormID;
-                    SaveGameWarning(
-                        "AI: World object count has changed on object %s %08 from %i to %i",
-                        pCollidee->GetFormEditorID(), CastingType, sTargetWorldObjectCount, scurrentWorldObjectCount
-                    );
+    if ((this->sTargetWorldObjectCount) && (this->sTargetWorldObjectIndex != -1) && (pCollidee)) {
+        NiNode* v2 = pCollidee->Get3D();
+        int16_t scurrentWorldObjectCount = GetHavokWorldObjectCountInSceneGraph(v2);
+        if (this->sTargetWorldObjectCount == scurrentWorldObjectCount) {
+            if (this->sTargetWorldObjectIndex != -1) {
+                int32_t sTargetWorldObjectIndex = this->sTargetWorldObjectIndex;
+                NiNode* v3 = pCollidee->Get3D();
+                pTargetWorldObject = GetHavokWorldObjectByIndexInSceneGraph(v3, sTargetWorldObjectIndex);
+                if (pTargetWorldObject) {
+                    pTargetWorldObject->addReference();
                 }
             }
+        }
+        else {
+            int32_t sTargetWorldObjectCount = this->sTargetWorldObjectCount;
+            int32_t CastingType = pCollidee->iFormID;
+            SaveGameWarning(
+                "AI: World object count has changed on object %s %08 from %i to %i", pCollidee->GetFormEditorID(),
+                CastingType, sTargetWorldObjectCount, scurrentWorldObjectCount
+            );
         }
     }
 }
@@ -194,15 +190,14 @@ void Projectile::ImpactData::SaveGame(BGSSaveFormBuffer* apSaveGameBuffer) {
     apSaveGameBuffer->SaveDataEndian(&bProcessed, 1u, 0);
     sTargetWorldObjectCount = 0;
     sTargetWorldObjectIndex = 0;
-    if (pCollidee) {
-        if (this->pTargetWorldObject) {
-            NiNode* v2 = pCollidee->Get3D();
-            sTargetWorldObjectCount = GetHavokWorldObjectCountInSceneGraph(v2);
-            hkpWorldObject* pTargetWorldObject = this->pTargetWorldObject;
-            NiNode* v3 = pCollidee->Get3D();
-            sTargetWorldObjectIndex = GetHavokWorldObjectIndexInSceneGraph(v3, pTargetWorldObject);
-        }
+    if ((pCollidee) && (this->pTargetWorldObject)) {
+        NiNode* v2 = pCollidee->Get3D();
+        sTargetWorldObjectCount = GetHavokWorldObjectCountInSceneGraph(v2);
+        hkpWorldObject* pTargetWorldObject = this->pTargetWorldObject;
+        NiNode* v3 = pCollidee->Get3D();
+        sTargetWorldObjectIndex = GetHavokWorldObjectIndexInSceneGraph(v3, pTargetWorldObject);
     }
+
     apSaveGameBuffer->SaveDataEndian(&sTargetWorldObjectCount, 2u, 0);
     apSaveGameBuffer->SaveDataEndian(&sTargetWorldObjectIndex, 2u, 0);
     apSaveGameBuffer->SaveFormID(pCollidee, 0);
@@ -949,18 +944,17 @@ bool Projectile::ChangeProcessLevel() {
                     SetDelete(true);
                     return false;
                 }
-                else {
-                    PROCESS_TYPE aWhichList = pCurrentProcess->eLevel;
-                    ReferenceProcessLists.kUpdateLock.Lock(nullptr);
-                    ReferenceProcessLists.RemoveReference(this, aWhichList);
-                    if (pCurrentProcess) {
-                        delete pCurrentProcess;
-                    }
-                    pCurrentProcess = nullptr;
-                    ReferenceProcessLists.kUpdateLock.Unlock();
-                    DetachCharController();
-                    CleanUpPointersOnDisable();
+
+                PROCESS_TYPE aWhichList = pCurrentProcess->eLevel;
+                ReferenceProcessLists.kUpdateLock.Lock(nullptr);
+                ReferenceProcessLists.RemoveReference(this, aWhichList);
+                if (pCurrentProcess) {
+                    delete pCurrentProcess;
                 }
+                pCurrentProcess = nullptr;
+                ReferenceProcessLists.kUpdateLock.Unlock();
+                DetachCharController();
+                CleanUpPointersOnDisable();
             }
         }
         else {
@@ -1100,12 +1094,11 @@ void Projectile::Initialize() {
     }
     SetInitialized(true);
     SetFlag(Projectile::PROJECTILE_INITIALIZED, true);
-    if (GetShooter()) {
-        if (!v11) {
-            TESObjectREFR* Shooter = GetShooter();
-            SetParentCell(Shooter->GetParentCell());
-        }
+    if ((GetShooter()) && (!v11)) {
+        TESObjectREFR* Shooter = GetShooter();
+        SetParentCell(Shooter->GetParentCell());
     }
+
     bSendAlarm = false;
     bool bcreateProcess = pCurrentProcess == nullptr;
     if (bcreateProcess) {
@@ -1119,29 +1112,26 @@ void Projectile::Initialize() {
         }
         pCurrentProcess = (BaseProcess*)v10;
     }
-    if (!IsFlagSet(Projectile::NO_3D)) {
-        if (pCurrentProcess) {
-            if (pCurrentProcess->eLevel <= PROCESS_TYPE_MIDDLE_HIGH) {
-                if (!Get3D()) {
-                    Init3D();
-                }
-                InitHavok();
-                if (Get3D()) {
-                    NiNode* v9 = Get3D();
-                    if (v9->IsFadeNode()) {
-                        NiNode* v8 = Get3D();
-                        BSFadeNode* v2 = v8->IsFadeNode();
-                        v2->TurnFadeNodeOn();
-                    }
-                    else {
-                        NiNode* v7 = Get3D();
-                        NiNode* v3 = v7->IsNode();
-                        BSShaderUtil::RecursiveSetPropertyFadeAlpha(v3, 1.0f);
-                    }
-                }
+    if ((!IsFlagSet(Projectile::NO_3D)) && (pCurrentProcess) && (pCurrentProcess->eLevel <= PROCESS_TYPE_MIDDLE_HIGH)) {
+        if (!Get3D()) {
+            Init3D();
+        }
+        InitHavok();
+        if (Get3D()) {
+            NiNode* v9 = Get3D();
+            if (v9->IsFadeNode()) {
+                NiNode* v8 = Get3D();
+                BSFadeNode* v2 = v8->IsFadeNode();
+                v2->TurnFadeNodeOn();
+            }
+            else {
+                NiNode* v7 = Get3D();
+                NiNode* v3 = v7->IsNode();
+                BSShaderUtil::RecursiveSetPropertyFadeAlpha(v3, 1.0f);
             }
         }
     }
+
     if (GetParentCell()) {
         GetParentCell()->AddReference(this, false);
     }
@@ -1161,20 +1151,14 @@ void Projectile::Initialize() {
         }
     }
     fRange = GetProjectileBase()->Data.fRange;
-    if (!v11) {
-        if (pShooter) {
-            if (pShooter->IsActor()) {
-                Actor* pshooterActor = static_cast<Actor*>(pShooter);
-                if (pshooterActor->IsPc() && pshooterActor->GetIronSights()) {
-                    if (pWeaponSource) {
-                        if (pWeaponSource->HasScope()) {
-                            fRange = fRange * fCombatIronSightsRangeMult.Float();
-                        }
-                    }
-                }
-            }
+    if ((!v11) && (pShooter) && (pShooter->IsActor())) {
+        Actor* pshooterActor = static_cast<Actor*>(pShooter);
+        if ((pshooterActor->IsPc() && pshooterActor->GetIronSights()) && (pWeaponSource) &&
+            (pWeaponSource->HasScope())) {
+            fRange = fRange * fCombatIronSightsRangeMult.Float();
         }
     }
+
     bool bbehindWall = false;
     if (!v11 && IsFlagSet(Projectile::CHECK_BEHIND_WALL)) {
         bbehindWall = CheckShotBehindWall();
@@ -1226,98 +1210,84 @@ bool Projectile::ProcessImpacts() {
             impactList = impactList->m_pkNext;
             bool b3dSwitched = false;
             TESObjectREFR* pcollidee = pdata->pCollidee;
-            if (pcollidee) {
-                if (fDamage > 0.0 && pdata->bDoDamage) {
-                    TESObjectREFR* v1;
-                    TESObjectREFR* v12;
-                    NiAVObject* pobj3D = pdata->pCollidee->TESObjectREFR::Get3D();
-                    if (GetShooter() &&
-                        ((v12 = GetShooter(), v12->IsActor()) &&
-                         (pcollidee->IsActor() && (v1 = GetShooter(), !v1->GetDisabledOrDeleted())))) {
-                        btargetWasAlive = !pcollidee->IsDead(false);
-                        CombatHit(static_cast<Actor*>(pcollidee), false);
+            if ((pcollidee) && (fDamage > 0.0 && pdata->bDoDamage)) {
+                TESObjectREFR* v1;
+                TESObjectREFR* v12;
+                NiAVObject* pobj3D = pdata->pCollidee->TESObjectREFR::Get3D();
+                if (GetShooter() &&
+                    ((v12 = GetShooter(), v12->IsActor()) &&
+                     (pcollidee->IsActor() && (v1 = GetShooter(), !v1->GetDisabledOrDeleted())))) {
+                    btargetWasAlive = !pcollidee->IsDead(false);
+                    CombatHit(static_cast<Actor*>(pcollidee), false);
+                }
+                else {
+                    Actor* pshooterActor;
+                    TESObjectREFR* Shooter;
+                    bhkRigidBody* pbody = static_cast<bhkRigidBody*>(bhkEntity::Getbhk(pdata->pTargetWorldObject));
+                    if ((pbody) && (pbody->GetMotionType() < 4)) {
+                        ActorCause* v2 = GetActorCause();
+                        pcollidee->SetActorCause(v2);
+                    }
+
+                    if (GetShooter() && (Shooter = GetShooter(), Shooter->IsActor())) {
+                        pshooterActor = static_cast<Actor*>(GetShooter());
                     }
                     else {
-                        Actor* pshooterActor;
-                        TESObjectREFR* Shooter;
-                        bhkRigidBody* pbody = static_cast<bhkRigidBody*>(bhkEntity::Getbhk(pdata->pTargetWorldObject));
-                        if (pbody) {
-                            if (pbody->GetMotionType() < 4) {
-                                ActorCause* v2 = GetActorCause();
-                                pcollidee->SetActorCause(v2);
-                            }
-                        }
-                        if (GetShooter() && (Shooter = GetShooter(), Shooter->IsActor())) {
-                            pshooterActor = static_cast<Actor*>(GetShooter());
-                        }
-                        else {
-                            pshooterActor = nullptr;
-                        }
-                        Actor* v20 = pshooterActor;
-                        float fextraDamage = 0.0f;
-                        if (pshooterActor) {
-                            if (v20->IsPc() && pVATS.IsInVats()) {
-                                if (pWeaponSource) {
-                                    fextraDamage = static_cast<float>(pWeaponSource->GetCriticalDamage());
-                                }
-                            }
-                        }
-                        double RunSpeedMult = fDamage;
-                        float fdamage = RunSpeedMult + fextraDamage;
-                        if (pcollidee->IsActor()) {
-                            HitData* v9;
-                            Actor* ptargetActor = static_cast<Actor*>(pcollidee);
-                            void* apMemory = ourMalloc(sizeof(HitData));
-                            if (apMemory) {
-                                v9 = ::new (apMemory) HitData;
-                            }
-                            else {
-                                v9 = nullptr;
-                            }
-                            HitData* apObject = v9;
-                            NiPointer<HitData> spdata(v9);
-                            HitData::InitializeHitData(spdata.m_pObject, nullptr, ptargetActor, nullptr, this);
-                            btargetWasAlive = !ptargetActor->IsDead(false);
-                            HitData* afTime = spdata.m_pObject;
-                            ptargetActor->HitMe(afTime, 0);
-                        }
-                        else {
-                            pdata->pCollidee->DamageObject(fdamage, false);
-                        }
-                        if (pcollidee->GetDestroyed() && GetShooter() == pPlayer) {
-                            pPlayer->AddPlayerAction(PLAYER_ACTION_DESTROY_OBJECT, 8.0f, nullptr);
-                        }
+                        pshooterActor = nullptr;
                     }
-                    NiNode* v4 = pcollidee->TESObjectREFR::Get3D();
-                    if (pobj3D != v4) {
-                        b3dSwitched = true;
+                    Actor* v20 = pshooterActor;
+                    float fextraDamage = 0.0f;
+                    if ((pshooterActor) && (v20->IsPc() && pVATS.IsInVats()) && (pWeaponSource)) {
+                        fextraDamage = static_cast<float>(pWeaponSource->GetCriticalDamage());
+                    }
+
+                    double RunSpeedMult = fDamage;
+                    float fdamage = RunSpeedMult + fextraDamage;
+                    if (pcollidee->IsActor()) {
+                        HitData* v9;
+                        Actor* ptargetActor = static_cast<Actor*>(pcollidee);
+                        void* apMemory = ourMalloc(sizeof(HitData));
+                        if (apMemory) {
+                            v9 = ::new (apMemory) HitData;
+                        }
+                        else {
+                            v9 = nullptr;
+                        }
+                        HitData* apObject = v9;
+                        NiPointer<HitData> spdata(v9);
+                        HitData::InitializeHitData(spdata.m_pObject, nullptr, ptargetActor, nullptr, this);
+                        btargetWasAlive = !ptargetActor->IsDead(false);
+                        HitData* afTime = spdata.m_pObject;
+                        ptargetActor->HitMe(afTime, 0);
+                    }
+                    else {
+                        pdata->pCollidee->DamageObject(fdamage, false);
+                    }
+                    if (pcollidee->GetDestroyed() && GetShooter() == pPlayer) {
+                        pPlayer->AddPlayerAction(PLAYER_ACTION_DESTROY_OBJECT, 8.0f, nullptr);
                     }
                 }
+                NiNode* v4 = pcollidee->TESObjectREFR::Get3D();
+                if (pobj3D != v4) {
+                    b3dSwitched = true;
+                }
             }
+
             if ((!pcollidee || (pcollidee->iFormFlags & 32) == 0) &&
                 (!GetProjectileBase()->GetHasExplosion() ||
                  (GetProjectileBase()->GetHasExplosionAltTrigger() ||
                   GetProjectileBase()->GetHasExplosionDetonates())) &&
                 !b3dSwitched) {
                 const hkpCollidable* ptargetCollidable;
-                if (VATS::pStranger) {
-                    if (VATS::pStranger == GetShooter()) {
-                        if (pcollidee) {
-                            if (pcollidee->IsActor()) {
-                                PlaySound_MUSMysteriousStrangerA02();
-                            }
-                        }
-                    }
+                if ((VATS::pStranger) && (VATS::pStranger == GetShooter()) && (pcollidee) && (pcollidee->IsActor())) {
+                    PlaySound_MUSMysteriousStrangerA02();
                 }
-                if (VATS::pMissFortune) {
-                    if (VATS::pMissFortune == GetShooter()) {
-                        if (pcollidee) {
-                            if (pcollidee->IsActor() && pcollidee->IsDead(false) && btargetWasAlive) {
-                                PlaySound_MUSMysteriousStrangerA02();
-                            }
-                        }
-                    }
+
+                if ((VATS::pMissFortune) && (VATS::pMissFortune == GetShooter()) && (pcollidee) &&
+                    (pcollidee->IsActor() && pcollidee->IsDead(false) && btargetWasAlive)) {
+                    PlaySound_MUSMysteriousStrangerA02();
                 }
+
                 if (pdata->pTargetWorldObject) {
                     ptargetCollidable = pdata->pTargetWorldObject->getCollidable();
                 }
@@ -1370,10 +1340,8 @@ bool Projectile::TurnOff(Actor* apActionActor, bool abSilent) {
         }
         else {
             TESForm* powner = GetOwner();
-            if (powner) {
-                if (powner->GetFormType() == FACT_ID) {
-                    pownerFaction = static_cast<TESFaction*>(powner);
-                }
+            if ((powner) && (powner->GetFormType() == FACT_ID)) {
+                pownerFaction = static_cast<TESFaction*>(powner);
             }
         }
         if (!abSilent &&
@@ -1631,40 +1599,37 @@ bool Projectile::AddImpact(
         pdata_2->pTargetWorldObject = Owner;
         if (pdata_2->pTargetWorldObject) {
             pdata_2->pTargetWorldObject->addReference();
-            if (apCollidee) {
-                if (apCollidee->IsActor() && apTargetCollidable->getType() == 1) {
-                    uint32_t afSize = apTargetCollidable->getCollisionFilterInfo();
-                    if (FNVD_RECONSTRUCT(CFilter)(&v45, afSize)->QBipLayer()) {
-                        NiAVObject* phitAVObject = GetAVObjectForCollidable(apTargetCollidable);
-                        Actor* pactor_2 = static_cast<Actor*>(apCollidee);
-                        NiNode* pclosestBone_2 = phitAVObject->IsNode();
-                        BGSBodyPart::LIMB_ENUM v10 = pactor_2->GetDamageLocation(pclosestBone_2);
-                        pdata_2->eDamageLimb = v10;
-                    }
+            if ((apCollidee) && (apCollidee->IsActor() && apTargetCollidable->getType() == 1)) {
+                uint32_t afSize = apTargetCollidable->getCollisionFilterInfo();
+                if (FNVD_RECONSTRUCT(CFilter)(&v45, afSize)->QBipLayer()) {
+                    NiAVObject* phitAVObject = GetAVObjectForCollidable(apTargetCollidable);
+                    Actor* pactor_2 = static_cast<Actor*>(apCollidee);
+                    NiNode* pclosestBone_2 = phitAVObject->IsNode();
+                    BGSBodyPart::LIMB_ENUM v10 = pactor_2->GetDamageLocation(pclosestBone_2);
+                    pdata_2->eDamageLimb = v10;
                 }
             }
         }
         HavokMaterialType emat = aeForceMaterial;
-        if (apTargetCollidable) {
-            if (aeForceMaterial == BHK_MATERIAL_MAX) {
-                uint32_t afSizea = apTargetCollidable->getCollisionFilterInfo();
-                uint32_t Group = FNVD_RECONSTRUCT(CFilter)(&v44, afSizea)->GetGroup();
-                bool bhitLandHeightField = Group == 1;
-                if (Group == 1) {
-                    emat = TES::pInstance->GetLandMaterialType(aContactPoint);
-                }
-                else {
-                    bhkShape* pshape = bhkShape::Getbhk(apTargetCollidable->m_shape);
-                    if (pshape) {
-                        emat = pshape->GetSubshapeMaterial(aiKey);
-                    }
-                }
-                uint32_t afSizeb = apTargetCollidable->getCollisionFilterInfo();
-                if (FNVD_RECONSTRUCT(CFilter)(&v43, afSizeb)->GetLayer() == L_WATER) {
-                    emat = BHK_MATERIAL_WATER;
+        if ((apTargetCollidable) && (aeForceMaterial == BHK_MATERIAL_MAX)) {
+            uint32_t afSizea = apTargetCollidable->getCollisionFilterInfo();
+            uint32_t Group = FNVD_RECONSTRUCT(CFilter)(&v44, afSizea)->GetGroup();
+            bool bhitLandHeightField = Group == 1;
+            if (Group == 1) {
+                emat = TES::pInstance->GetLandMaterialType(aContactPoint);
+            }
+            else {
+                bhkShape* pshape = bhkShape::Getbhk(apTargetCollidable->m_shape);
+                if (pshape) {
+                    emat = pshape->GetSubshapeMaterial(aiKey);
                 }
             }
+            uint32_t afSizeb = apTargetCollidable->getCollisionFilterInfo();
+            if (FNVD_RECONSTRUCT(CFilter)(&v43, afSizeb)->GetLayer() == L_WATER) {
+                emat = BHK_MATERIAL_WATER;
+            }
         }
+
         pdata_2->eMaterial = emat;
         if (emat == BHK_MATERIAL_WATER) {
             if (AILinearTaskThreadManager::ShouldQueue3DTask()) {
@@ -1677,76 +1642,75 @@ bool Projectile::AddImpact(
         }
     }
     bool bvatsSuccess = true;
-    if (bVATSProjectileDebug.Bool()) {
-        if (pTarget) {
-            const char* v25;
-            const char* v26;
-            int32_t CastingType;
-            const char* HandleString;
-            const char* FullName;
-            const char* v31;
-            NiAVObject* ptargetObject;
-            NiAVObject* phitAVObject_2 = GetAVObjectForCollidable(apTargetCollidable);
-            bhkCollisionObject* ptargetCol = FindFirstCollisionObject(pTarget->spPart.m_pObject);
-            if (ptargetCol) {
-                ptargetObject = ptargetCol->m_pkSceneObject;
-            }
-            else {
-                ptargetObject = nullptr;
-            }
-            TESObjectREFR* ptarget = pTarget->pReference;
-            bool v32 = apCollidee == ptarget && phitAVObject_2 == ptargetObject;
-            bvatsSuccess = v32;
-            if (v32) {
-                v31 = "SUCCESS";
-            }
-            else {
-                v31 = "FAILURE";
-            }
-            InitializationFlow("Targetted VATS Projectile Result: %s", v31);
-            if (ptarget->GetFormEditorIDLength()) {
-                FullName = ptarget->GetFormEditorID();
-            }
-            else {
-                FullName = ptarget->GetFullName();
-            }
-            InitializationFlow("Target Ref ID:\t%s %08X", FullName, ptarget->iFormID);
-            if (ptargetObject) {
-                HandleString = (&ptargetObject->m_kName)->GetHandleString();
-            }
-            else {
-                HandleString = "";
-            }
-            InitializationFlow("Target Part:\t%s", HandleString);
-            if (apCollidee) {
-                CastingType = apCollidee->iFormID;
-            }
-            else {
-                CastingType = 0;
-            }
-            if (apCollidee) {
-                const char* v27;
-                if (apCollidee->GetFormEditorIDLength()) {
-                    v27 = apCollidee->GetFormEditorID();
-                }
-                else {
-                    v27 = apCollidee->GetFullName();
-                }
-                v26 = v27;
-            }
-            else {
-                v26 = "Land";
-            }
-            InitializationFlow("Hit Ref ID:\t\t%s %08X", v26, CastingType);
-            if (phitAVObject_2) {
-                v25 = (&phitAVObject_2->m_kName)->GetHandleString();
-            }
-            else {
-                v25 = "";
-            }
-            InitializationFlow("Hit Part:\t\t%s\n", v25);
+    if ((bVATSProjectileDebug.Bool()) && (pTarget)) {
+        const char* v25;
+        const char* v26;
+        int32_t CastingType;
+        const char* HandleString;
+        const char* FullName;
+        const char* v31;
+        NiAVObject* ptargetObject;
+        NiAVObject* phitAVObject_2 = GetAVObjectForCollidable(apTargetCollidable);
+        bhkCollisionObject* ptargetCol = FindFirstCollisionObject(pTarget->spPart.m_pObject);
+        if (ptargetCol) {
+            ptargetObject = ptargetCol->m_pkSceneObject;
         }
+        else {
+            ptargetObject = nullptr;
+        }
+        TESObjectREFR* ptarget = pTarget->pReference;
+        bool v32 = apCollidee == ptarget && phitAVObject_2 == ptargetObject;
+        bvatsSuccess = v32;
+        if (v32) {
+            v31 = "SUCCESS";
+        }
+        else {
+            v31 = "FAILURE";
+        }
+        InitializationFlow("Targetted VATS Projectile Result: %s", v31);
+        if (ptarget->GetFormEditorIDLength()) {
+            FullName = ptarget->GetFormEditorID();
+        }
+        else {
+            FullName = ptarget->GetFullName();
+        }
+        InitializationFlow("Target Ref ID:\t%s %08X", FullName, ptarget->iFormID);
+        if (ptargetObject) {
+            HandleString = (&ptargetObject->m_kName)->GetHandleString();
+        }
+        else {
+            HandleString = "";
+        }
+        InitializationFlow("Target Part:\t%s", HandleString);
+        if (apCollidee) {
+            CastingType = apCollidee->iFormID;
+        }
+        else {
+            CastingType = 0;
+        }
+        if (apCollidee) {
+            const char* v27;
+            if (apCollidee->GetFormEditorIDLength()) {
+                v27 = apCollidee->GetFormEditorID();
+            }
+            else {
+                v27 = apCollidee->GetFullName();
+            }
+            v26 = v27;
+        }
+        else {
+            v26 = "Land";
+        }
+        InitializationFlow("Hit Ref ID:\t\t%s %08X", v26, CastingType);
+        if (phitAVObject_2) {
+            v25 = (&phitAVObject_2->m_kName)->GetHandleString();
+        }
+        else {
+            v25 = "";
+        }
+        InitializationFlow("Hit Part:\t\t%s\n", v25);
     }
+
     if (pdata_2->pCollidee) {
         pdata_2->pCollidee->SetTargeted(true);
     }
@@ -1774,12 +1738,11 @@ bool Projectile::AddImpact(
     }
     if (bProjectileDebug.Bool() || bVATSProjectileDebug.Bool()) {
         NiColorA color(0.0f, 0.0f, 1.0f, 0.1f);
-        if (pdata_2->pCollidee) {
-            if (pdata_2->pCollidee->IsActor()) {
-                NiColorA kActorColor(0.0f, 1.0f, 0.0f, 0.1f);
-                color = kActorColor;
-            }
+        if ((pdata_2->pCollidee) && (pdata_2->pCollidee->IsActor())) {
+            NiColorA kActorColor(0.0f, 1.0f, 0.0f, 0.1f);
+            color = kActorColor;
         }
+
         if (!bvatsSuccess) {
             NiColorA kFailureColor(1.0f, 0.0f, 0.0f, 0.65f);
             color = kFailureColor;
@@ -1807,11 +1770,11 @@ Projectile::~Projectile() {
         delete pSecondaryItemChange;
     }
     pSecondaryItemChange = nullptr;
-    if (TESObjectREFR::Get3D() && TESObjectREFR::Get3D()->IsNode()) {
-        if (TESObjectREFR::HasAddonFlags(TESObjectREFR::Get3D()->IsNode())) {
-            TESObjectREFR::RemoveMasterParticleAddonNodes(TESObjectREFR::Get3D()->IsNode());
-        }
+    if ((TESObjectREFR::Get3D() && TESObjectREFR::Get3D()->IsNode()) &&
+        (TESObjectREFR::HasAddonFlags(TESObjectREFR::Get3D()->IsNode()))) {
+        TESObjectREFR::RemoveMasterParticleAddonNodes(TESObjectREFR::Get3D()->IsNode());
     }
+
     TESObjectREFR::Set3D(nullptr, true);
     StopCountdownSound();
     if (GetProjectileBase() && !GetProjectileBase()->GetSupersonic()) {
@@ -1907,37 +1870,36 @@ void Projectile::Move(float afDeltaTime) {
 }
 
 void Projectile::Kill() {
-    if (bVATSProjectileDebug.Bool() && ImpactList.IsEmpty()) {
-        if (pTarget) {
-            const char* HandleString;
-            const char* FullName;
-            NiAVObject* ptargetObject;
-            NiAVObject* v2 = pTarget->spPart.m_pObject;
-            bhkCollisionObject* ptargetCol = FindFirstCollisionObject(v2);
-            if (ptargetCol) {
-                ptargetObject = ptargetCol->m_pkSceneObject;
-            }
-            else {
-                ptargetObject = nullptr;
-            }
-            TESObjectREFR* ptarget = pTarget->pReference;
-            InitializationFlow("Targetted VATS Projectile Result: %s", "FAILURE");
-            if (ptarget->GetFormEditorIDLength()) {
-                FullName = ptarget->GetFormEditorID();
-            }
-            else {
-                FullName = ptarget->GetFullName();
-            }
-            InitializationFlow("Target Ref ID:\t%s %08X", FullName, ptarget->iFormID);
-            if (ptargetObject) {
-                HandleString = (&ptargetObject->m_kName)->GetHandleString();
-            }
-            else {
-                HandleString = "";
-            }
-            InitializationFlow("Target Part:\t%s", HandleString);
+    if ((bVATSProjectileDebug.Bool() && ImpactList.IsEmpty()) && (pTarget)) {
+        const char* HandleString;
+        const char* FullName;
+        NiAVObject* ptargetObject;
+        NiAVObject* v2 = pTarget->spPart.m_pObject;
+        bhkCollisionObject* ptargetCol = FindFirstCollisionObject(v2);
+        if (ptargetCol) {
+            ptargetObject = ptargetCol->m_pkSceneObject;
         }
+        else {
+            ptargetObject = nullptr;
+        }
+        TESObjectREFR* ptarget = pTarget->pReference;
+        InitializationFlow("Targetted VATS Projectile Result: %s", "FAILURE");
+        if (ptarget->GetFormEditorIDLength()) {
+            FullName = ptarget->GetFormEditorID();
+        }
+        else {
+            FullName = ptarget->GetFullName();
+        }
+        InitializationFlow("Target Ref ID:\t%s %08X", FullName, ptarget->iFormID);
+        if (ptargetObject) {
+            HandleString = (&ptargetObject->m_kName)->GetHandleString();
+        }
+        else {
+            HandleString = "";
+        }
+        InitializationFlow("Target Part:\t%s", HandleString);
     }
+
     if (GetFormType() == PGRE_ID) {
         VATSMenu::RemoveTarget(this);
     }
@@ -2303,16 +2265,14 @@ void Projectile::StopCountdownSound() {
 void Projectile::CombatHit(Actor* apCollidee, bool abPowerAttack) {
     Actor* pSourceRef;
     uint8_t v5;
-    if (pShooter) {
-        if (pShooter->IsActor()) {
-            v5 = 1;
-            pSourceRef = static_cast<Actor*>(pShooter);
-            if ((!pSourceRef->IsPc()) && IsFlagSet(Projectile::SHOOTER_IN_COMBAT)) {
-                v5 = (uint8_t)pSourceRef->IsInCombatWithActor(apCollidee);
-            }
-            if (v5) {
-                pSourceRef->CombatHit(apCollidee, abPowerAttack, this, 0);
-            }
+    if ((pShooter) && (pShooter->IsActor())) {
+        v5 = 1;
+        pSourceRef = static_cast<Actor*>(pShooter);
+        if ((!pSourceRef->IsPc()) && IsFlagSet(Projectile::SHOOTER_IN_COMBAT)) {
+            v5 = (uint8_t)pSourceRef->IsInCombatWithActor(apCollidee);
+        }
+        if (v5) {
+            pSourceRef->CombatHit(apCollidee, abPowerAttack, this, 0);
         }
     }
 }
@@ -2389,22 +2349,20 @@ void Projectile::AimProjectile() {
         if (!apReleaseObj) {
             apReleaseObj = Get3D();
         }
-        if ((IsFlagSet(Projectile::WHOLE_BODY_TARGETED) || !IsFlagSet(Projectile::NO_CHARCONTROLLER)) &&
-            pVATS.GetMode() == VATS::VATS_PLAYBACK) {
-            if (pVATS.GetCurrentAction()) {
-                if (pVATS.GetCurrentAction()->bSuccess) {
-                    ProjectileTarget* v1;
-                    ProjectileTarget* apMemory = static_cast<ProjectileTarget*>(ourMalloc(sizeof(ProjectileTarget)));
-                    if (apMemory) {
-                        v1 = ::new (apMemory) ProjectileTarget;
-                    }
-                    else {
-                        v1 = nullptr;
-                    }
-                    SetProjectileTarget(v1);
-                }
+        if (((IsFlagSet(Projectile::WHOLE_BODY_TARGETED) || !IsFlagSet(Projectile::NO_CHARCONTROLLER)) &&
+             pVATS.GetMode() == VATS::VATS_PLAYBACK) &&
+            (pVATS.GetCurrentAction()) && (pVATS.GetCurrentAction()->bSuccess)) {
+            ProjectileTarget* v1;
+            ProjectileTarget* apMemory = static_cast<ProjectileTarget*>(ourMalloc(sizeof(ProjectileTarget)));
+            if (apMemory) {
+                v1 = ::new (apMemory) ProjectileTarget;
             }
+            else {
+                v1 = nullptr;
+            }
+            SetProjectileTarget(v1);
         }
+
         if (!spPickCache.m_pObject) {
             pPlayer->ApplyAutoAimActor(
                 this, apReleaseObj, data.kRotation.z, data.kRotation.x, &data.kPosition, 1.1754944e-38f, 1.1754944e-38f
@@ -2540,18 +2498,16 @@ bool Projectile::TestProjectileInTriggerZone() {
                 pbp = nullptr;
             }
             bhkPhantom* pbp_2 = pbp;
-            if (pbp) {
-                if (pref) {
-                    CFilter* v6;
-                    CFilter* CollisionFilter = pbp_2->GetCollisionFilter(&v12);
-                    if (CollisionFilter->GetLayer() == L_PROJECTILEZONE ||
-                        (v6 = pbp_2->GetCollisionFilter(&v11), v6->GetLayer() == L_GASTRAP)) {
-                        btriggerFound = true;
-                        ExtraDataList* scale = &pref->m_Extra;
-                        Script::SetActionFlag(this, scale, SCRIPT_ACTION_ONHIT);
-                        ExtraDataList* scalea = &pref->m_Extra;
-                        Script::SetActionFlag(pGasTrapDummyWeap, scalea, SCRIPT_ACTION_ONHITWITH);
-                    }
+            if ((pbp) && (pref)) {
+                CFilter* v6;
+                CFilter* CollisionFilter = pbp_2->GetCollisionFilter(&v12);
+                if (CollisionFilter->GetLayer() == L_PROJECTILEZONE ||
+                    (v6 = pbp_2->GetCollisionFilter(&v11), v6->GetLayer() == L_GASTRAP)) {
+                    btriggerFound = true;
+                    ExtraDataList* scale = &pref->m_Extra;
+                    Script::SetActionFlag(this, scale, SCRIPT_ACTION_ONHIT);
+                    ExtraDataList* scalea = &pref->m_Extra;
+                    Script::SetActionFlag(pGasTrapDummyWeap, scalea, SCRIPT_ACTION_ONHITWITH);
                 }
             }
         }
@@ -2667,10 +2623,8 @@ void Projectile::SpawnCollisionEffects(
                                             &arResult, prb, bhkPropertyKey(NiTriStrips::ms_RTTI)
                                         );
                                         pavobj = static_cast<NiAVObject*>(Property->getPtr());
-                                        if (pavobj) {
-                                            if (pavobj->m_pkParent) {
-                                                pavobj = (NiAVObject*)pavobj->m_pkParent;
-                                            }
+                                        if ((pavobj) && (pavobj->m_pkParent)) {
+                                            pavobj = (NiAVObject*)pavobj->m_pkParent;
                                         }
                                     }
                                 }
@@ -2753,16 +2707,15 @@ void Projectile::SpawnCollisionEffects(
             BSTempEffectParticle::Spawn(GetParentCell(), afLifetime, v15, arg4, v80, 1.0f, 7u, nullptr);
         LABEL_63:;
             ActorCause* pcause = GetActorCause();
-            if (pcause) {
-                if (pcause->pActor) {
-                    Actor* pact = pcause->pActor;
-                    if (pact->pCurrentProcess) {
-                        BaseProcess* CurrentAIProcess = pact->pCurrentProcess;
-                        int32_t SoundLevelValue = pimpactData->GetSoundLevelValue();
-                        CurrentAIProcess->SetActorsDetectionEvent(pact, aContactPoint, SoundLevelValue, 0, nullptr);
-                    }
+            if ((pcause) && (pcause->pActor)) {
+                Actor* pact = pcause->pActor;
+                if (pact->pCurrentProcess) {
+                    BaseProcess* CurrentAIProcess = pact->pCurrentProcess;
+                    int32_t SoundLevelValue = pimpactData->GetSoundLevelValue();
+                    CurrentAIProcess->SetActorsDetectionEvent(pact, aContactPoint, SoundLevelValue, 0, nullptr);
                 }
             }
+
             TESSound* pimpactSound1 = pimpactData->pSound1;
             if (pimpactSound1) {
                 const char* x = pimpactSound1->GetFilename();
@@ -2792,21 +2745,18 @@ void Projectile::SpawnCollisionEffects(
 }
 
 void Projectile::SpawnMuzzleFlash() {
-    if (GetProjectileBase()->GetHasMuzzleFlash()) {
-        if ((&GetProjectileBase()->GetMuzzleFlashModel())->GetModelLength()) {
-            Actor* pactor;
-            TESObjectREFR* pref = GetShooter();
-            if (pref && pref->IsActor()) {
-                pactor = static_cast<Actor*>(pref);
-            }
-            else {
-                pactor = nullptr;
-            }
-            if (pref) {
-                if (!pref->IsDead(false) && !pref->IsKnockedOut() && (!pactor || !pactor->IsReloading())) {
-                    MuzzleFlash::SpawnMuzzleFlash(pref, this);
-                }
-            }
+    if ((GetProjectileBase()->GetHasMuzzleFlash()) &&
+        ((&GetProjectileBase()->GetMuzzleFlashModel())->GetModelLength())) {
+        Actor* pactor;
+        TESObjectREFR* pref = GetShooter();
+        if (pref && pref->IsActor()) {
+            pactor = static_cast<Actor*>(pref);
+        }
+        else {
+            pactor = nullptr;
+        }
+        if ((pref) && (!pref->IsDead(false) && !pref->IsKnockedOut() && (!pactor || !pactor->IsReloading()))) {
+            MuzzleFlash::SpawnMuzzleFlash(pref, this);
         }
     }
 }
@@ -2836,11 +2786,10 @@ bool Projectile::GetMineReactsToTarget(Actor* apTarget, Actor* apShooterActor, T
 bool Projectile::CheckExplosionProximity() {
     float ftriggerChance;
     float fproximity = GetProjectileBase()->Data.fExplosionProximity;
-    if (GetParentCell()) {
-        if (!GetParentCell()->GetInterior()) {
-            fproximity = fproximity * fMineExteriorRadiusMult.Float();
-        }
+    if ((GetParentCell()) && (!GetParentCell()->GetInterior())) {
+        fproximity = fproximity * fMineExteriorRadiusMult.Float();
     }
+
     float fsqrProximity_2 = fproximity * fproximity;
     MobileObject* pmob = nullptr;
     bool bretVal = false;
@@ -2872,16 +2821,14 @@ bool Projectile::CheckExplosionProximity() {
             v12 = nullptr;
         }
         Actor* pactor = v12;
-        if (v12) {
-            if (!pactor->DoesFly() && !pactor->IsChild(false) && !pactor->GetGhost()) {
-                const NiPoint3* v9 = &GetLocationOnReference();
-                const NiPoint3* v2 = &pmob->GetLocationOnReference();
-                float fsqrDistance = (*v2 - *v9).SqrLength();
-                if (fsqrProximity_2 > static_cast<double>(fsqrDistance) &&
-                    GetMineReactsToTarget(pactor, ptestFightActor, pownerFaction)) {
-                    bretVal = true;
-                    break;
-                }
+        if ((v12) && (!pactor->DoesFly() && !pactor->IsChild(false) && !pactor->GetGhost())) {
+            const NiPoint3* v9 = &GetLocationOnReference();
+            const NiPoint3* v2 = &pmob->GetLocationOnReference();
+            float fsqrDistance = (*v2 - *v9).SqrLength();
+            if (fsqrProximity_2 > static_cast<double>(fsqrDistance) &&
+                GetMineReactsToTarget(pactor, ptestFightActor, pownerFaction)) {
+                bretVal = true;
+                break;
             }
         }
     }
@@ -2905,34 +2852,28 @@ bool Projectile::CheckExplosionProximity() {
             }
         }
     }
-    if (bretVal) {
-        if (pmob) {
-            if (pmob->IsNpc() || pmob == pPlayer) {
-                float* v6 = &fMinesDelayMin.Float();
-                double AltTimer = GetProjectileBase()->GetAltTimer();
-                // Only actors pass the test above, so pmob is treated as an Actor to reach its ActorValueOwner.
-                ActorValueOwner* pvalueOwner = static_cast<Actor*>(pmob);
-                fExplosionTimer =
-                    static_cast<double>(pvalueOwner->GetClampedActorValue(ActorValue::EXPLOSIVES)) * AltTimer / 100.0 +
-                    *v6;
-            }
-            else {
-                fExplosionTimer = fMinesDelayMin.Float();
-            }
+    if ((bretVal) && (pmob)) {
+        if (pmob->IsNpc() || pmob == pPlayer) {
+            float* v6 = &fMinesDelayMin.Float();
+            double AltTimer = GetProjectileBase()->GetAltTimer();
+            // Only actors pass the test above, so pmob is treated as an Actor to reach its ActorValueOwner.
+            ActorValueOwner* pvalueOwner = static_cast<Actor*>(pmob);
+            fExplosionTimer =
+                static_cast<double>(pvalueOwner->GetClampedActorValue(ActorValue::EXPLOSIVES)) * AltTimer / 100.0 + *v6;
+        }
+        else {
+            fExplosionTimer = fMinesDelayMin.Float();
         }
     }
+
     return bretVal;
 }
 
 void Projectile::AttachLight() {
-    if (Get3D()) {
-        if (GetProjectileBase()->Data.pLight) {
-            if (!GetDelete()) {
-                NiNode* v2 = Get3D();
-                TESObjectLIGH* v1 = GetProjectileBase()->Data.pLight;
-                spLight.operator=(v1->GenDynamic(this, v2, false));
-            }
-        }
+    if ((Get3D()) && (GetProjectileBase()->Data.pLight) && (!GetDelete())) {
+        NiNode* v2 = Get3D();
+        TESObjectLIGH* v1 = GetProjectileBase()->Data.pLight;
+        spLight.operator=(v1->GenDynamic(this, v2, false));
     }
 }
 
@@ -2971,30 +2912,25 @@ void Projectile::CheckRefDeleted(TESObjectREFR* apDeletedRef) {
     if (GetShooter() == apDeletedRef) {
         Kill();
     }
-    if (pTarget) {
-        if (pTarget->pReference == apDeletedRef) {
-            ProjectileTarget* apThis = pTarget;
-            if (apThis) {
-                delete apThis;
-            }
-            pTarget = nullptr;
+    if ((pTarget) && (pTarget->pReference == apDeletedRef)) {
+        ProjectileTarget* apThis = pTarget;
+        if (apThis) {
+            delete apThis;
         }
+        pTarget = nullptr;
     }
 }
 
 void Projectile::StartCountdownSound() {
     FNVD_INLINED_LOCAL(BSSoundHandle, a2, std::nullopt, std::nullopt);
-    if (!sndCountdown.IsValid()) {
-        if (GetProjectileBase()->Data.pCountdownSound) {
-            int32_t refID = GetProjectileBase()->Data.pCountdownSound->iFormID;
-            BSSoundHandle* arHandle = PlaySound(
-                &a2, refID, false,
-                BSGameSound::SOUND_FLAG_IS_3D | BSGameSound::SOUND_FLAG_ONE_SHOT |
-                    BSGameSound::SOUND_FLAG_ANIMATION_DRIVEN,
-                true
-            );
-            sndCountdown.operator=(*arHandle);
-        }
+    if ((!sndCountdown.IsValid()) && (GetProjectileBase()->Data.pCountdownSound)) {
+        int32_t refID = GetProjectileBase()->Data.pCountdownSound->iFormID;
+        BSSoundHandle* arHandle = PlaySound(
+            &a2, refID, false,
+            BSGameSound::SOUND_FLAG_IS_3D | BSGameSound::SOUND_FLAG_ONE_SHOT | BSGameSound::SOUND_FLAG_ANIMATION_DRIVEN,
+            true
+        );
+        sndCountdown.operator=(*arHandle);
     }
 }
 
@@ -3170,48 +3106,42 @@ Projectile* Projectile::Launch(
             }
         }
     }
-    if (apShooter == pPlayer) {
-        if (apFromWeapon) {
-            BaseProcess* CurrentAIProcess = pPlayer->pCurrentProcess;
-            ItemChange* pitem = CurrentAIProcess->GetCurrentWeapon();
-            if (pitem) {
-                if (pitem->HasModEffectActive(WEAPON_MOD_PROJECTILE_SPEED)) {
-                    double Time = pprojectile->fSpeedMult;
-                    float v41 = apFromWeapon->GetModEffectValue(WEAPON_MOD_PROJECTILE_SPEED, 0) * Time;
-                    pprojectile->SetSpeedMult(v41);
-                }
-            }
-            if (apFromWeapon->GetWeaponType() == WEAPON_ONE_HAND_THROWN) {
-                int32_t iStrReq = apFromWeapon->GetStrRequired();
-                int32_t playStr = pPlayer->GetActorValue(ActorValue::STRENGTH);
-                float fStrengthMult = fThrowingStrengthPenalty.Float() * static_cast<double>(playStr - iStrReq) + 1.0;
-                float v40 = pprojectile->fSpeedMult * fStrengthMult;
-                pprojectile->SetSpeedMult(v40);
-            }
+    if ((apShooter == pPlayer) && (apFromWeapon)) {
+        BaseProcess* CurrentAIProcess = pPlayer->pCurrentProcess;
+        ItemChange* pitem = CurrentAIProcess->GetCurrentWeapon();
+        if ((pitem) && (pitem->HasModEffectActive(WEAPON_MOD_PROJECTILE_SPEED))) {
+            double Time = pprojectile->fSpeedMult;
+            float v41 = apFromWeapon->GetModEffectValue(WEAPON_MOD_PROJECTILE_SPEED, 0) * Time;
+            pprojectile->SetSpeedMult(v41);
+        }
+
+        if (apFromWeapon->GetWeaponType() == WEAPON_ONE_HAND_THROWN) {
+            int32_t iStrReq = apFromWeapon->GetStrRequired();
+            int32_t playStr = pPlayer->GetActorValue(ActorValue::STRENGTH);
+            float fStrengthMult = fThrowingStrengthPenalty.Float() * static_cast<double>(playStr - iStrReq) + 1.0;
+            float v40 = pprojectile->fSpeedMult * fStrengthMult;
+            pprojectile->SetSpeedMult(v40);
         }
     }
-    if (pprojectile) {
-        if (apShooter) {
-            if (apShooter->IsActor()) {
-                Actor* actor = static_cast<Actor*>(apShooter);
-                fEntrySpeed = 1.0;
-                BGSEntryPoint::HandleEntryPoint(
-                    BGSEntryPoint::THROWING_VELOCITY_MODIFIER, static_cast<Actor*>(apShooter), apFromWeapon,
-                    &fEntrySpeed
-                );
-                if (fEntrySpeed != 1.0) {
-                    double v14 = pprojectile->fSpeedMult;
-                    float v39 = v14 * fEntrySpeed;
-                    pprojectile->SetSpeedMult(v39);
-                }
-                if (actor->GetActorValue(ActorValue::TURBO) > 0) {
-                    double v38 = pprojectile->fSpeedMult;
-                    float v37 = 1.0 / BSTimer::QGlobalTimeMultiplier() * v38;
-                    pprojectile->SetSpeedMult(v37);
-                }
-            }
+
+    if ((pprojectile) && (apShooter) && (apShooter->IsActor())) {
+        Actor* actor = static_cast<Actor*>(apShooter);
+        fEntrySpeed = 1.0;
+        BGSEntryPoint::HandleEntryPoint(
+            BGSEntryPoint::THROWING_VELOCITY_MODIFIER, static_cast<Actor*>(apShooter), apFromWeapon, &fEntrySpeed
+        );
+        if (fEntrySpeed != 1.0) {
+            double v14 = pprojectile->fSpeedMult;
+            float v39 = v14 * fEntrySpeed;
+            pprojectile->SetSpeedMult(v39);
+        }
+        if (actor->GetActorValue(ActorValue::TURBO) > 0) {
+            double v38 = pprojectile->fSpeedMult;
+            float v37 = 1.0 / BSTimer::QGlobalTimeMultiplier() * v38;
+            pprojectile->SetSpeedMult(v37);
         }
     }
+
     if (pprojectile) {
         pprojectile->SetAngularMomentumZ(afSpreadHeading);
         pprojectile->SetAngularMomentumX(afSpreadLooking);
@@ -3219,51 +3149,49 @@ Projectile* Projectile::Launch(
     if (pprojectile) {
         pprojectile->SetFlag(Projectile::FAKE_SHOT, abDoNoDamage);
     }
-    if (pprojectile) {
-        if (binitialize) {
-            if (apShooter) {
-                if (apShooter->IsActor()) {
-                    ActorCause* v36;
-                    ActorCause* v55 = static_cast<ActorCause*>(ourMalloc(sizeof(ActorCause)));
-                    if (v55) {
-                        v36 = ::new (v55) ActorCause(static_cast<Actor*>(apShooter));
-                    }
-                    else {
-                        v36 = nullptr;
-                    }
-                    pprojectile->SetActorCause(v36);
-                }
+    if ((pprojectile) && (binitialize)) {
+        if ((apShooter) && (apShooter->IsActor())) {
+            ActorCause* v36;
+            ActorCause* v55 = static_cast<ActorCause*>(ourMalloc(sizeof(ActorCause)));
+            if (v55) {
+                v36 = ::new (v55) ActorCause(static_cast<Actor*>(apShooter));
             }
-            pprojectile->SetPickCache(apPickCache);
-            if (apShooter == pPlayer) {
-                TESFaction* pfaction =
-                    static_cast<TESFaction*>(BGSDefaultObjectManager::GetDefaultObject(DO_PLAYER_FACTION));
-                if (pfaction) {
-                    pprojectile->SetOwner(pfaction);
-                }
-                if (apFromWeapon->IsThrownWeapon()) {
-                    float* v15 = &fArrowBowTimerBase.Float();
-                    float* v16 = &fArrowBowTimerMult.Float();
-                    float v35 = pPlayer->GetTimeGrenadeHeld() * *v16 + *v15;
-                    float y = BSMIN(1.0f, v35);
-                    pprojectile->SetPower(y);
-                }
+            else {
+                v36 = nullptr;
             }
-            if (apShooterCombatController) {
-                apShooterCombatController->FiredProjectile(pprojectile);
-            }
-            if (apHomingTarget) {
-                pprojectile->pDesiredTarget = apHomingTarget;
-            }
-            if (abAlwaysHit) {
-                pprojectile->SetFlag(Projectile::ALWAYS_HIT_TARGET, true);
-            }
-            if (apParentCell) {
-                pprojectile->SetParentCell(apParentCell);
-            }
-            pprojectile->Initialize();
+            pprojectile->SetActorCause(v36);
         }
+
+        pprojectile->SetPickCache(apPickCache);
+        if (apShooter == pPlayer) {
+            TESFaction* pfaction =
+                static_cast<TESFaction*>(BGSDefaultObjectManager::GetDefaultObject(DO_PLAYER_FACTION));
+            if (pfaction) {
+                pprojectile->SetOwner(pfaction);
+            }
+            if (apFromWeapon->IsThrownWeapon()) {
+                float* v15 = &fArrowBowTimerBase.Float();
+                float* v16 = &fArrowBowTimerMult.Float();
+                float v35 = pPlayer->GetTimeGrenadeHeld() * *v16 + *v15;
+                float y = BSMIN(1.0f, v35);
+                pprojectile->SetPower(y);
+            }
+        }
+        if (apShooterCombatController) {
+            apShooterCombatController->FiredProjectile(pprojectile);
+        }
+        if (apHomingTarget) {
+            pprojectile->pDesiredTarget = apHomingTarget;
+        }
+        if (abAlwaysHit) {
+            pprojectile->SetFlag(Projectile::ALWAYS_HIT_TARGET, true);
+        }
+        if (apParentCell) {
+            pprojectile->SetParentCell(apParentCell);
+        }
+        pprojectile->Initialize();
     }
+
     if (pprojectile && (apProjectileBase && apProjectileBase->Data.pActiveSoundLoop)) {
         if (!apProjectileBase->GetSupersonic() &&
             (!apProjectileBase->GetHasExplosionAltTrigger() || apProjectileBase->Data.fExplosionProximity <= 0.0)) {
@@ -3285,38 +3213,33 @@ Projectile* Projectile::Launch(
         }
     }
     else {
-        if (pprojectile) {
-            if (pprojectile->IsFlagSet(Projectile::HITSCAN_MODE)) {
-                pprojectile->bSoundFired = true;
-            }
+        if ((pprojectile) && (pprojectile->IsFlagSet(Projectile::HITSCAN_MODE))) {
+            pprojectile->bSoundFired = true;
         }
     }
-    if (bIsProjectileDebug) {
-        if (pprojectile) {
-            if (pprojectile->Get3D()) {
-                NiMatrix3 rot;
-                NiColorA color(1.0f, 0.0f, 0.0f, 0.6f);
-                NiAVObject* pdebug = (NiAVObject*)MakeTriPoint(4.0f, color, true);
-                pdebug->UpdateProperties();
-                const NiPoint3* xa = &pprojectile->Get3D()->GetWorldTranslate();
-                pdebug->SetTranslate(*xa);
-                float* v21 = &fProjectileDebugDuration.Float();
-                TES::pInstance->AddTempDebugObject(pdebug, *v21);
-                float angle = pprojectile->GetHeading(false);
-                rot.MakeZRotation(angle);
-                NiColorA kLineColor(1.0f, 1.0f, 0.0f, 0.6f);
-                color = kLineColor;
-                NiPoint3* v22 = ::new (&dst) NiPoint3(0.0f, 1000.0f, 0.0f);
-                NiPoint3* fR = ::new (&result) NiPoint3(rot * *v22);
-                NiNode* v23 = pprojectile->Get3D();
-                NiPoint3* fRa = ::new (&v50) NiPoint3(v23->GetWorldTranslate() + *fR);
-                NiNode* v24 = pprojectile->Get3D();
-                pdebug = (NiAVObject*)MakeLine(v24->GetWorldTranslate(), color, *fRa, color, true);
-                float* v25 = &fProjectileDebugDuration.Float();
-                TES::pInstance->AddTempDebugObject(pdebug, *v25);
-            }
-        }
+    if ((bIsProjectileDebug) && (pprojectile) && (pprojectile->Get3D())) {
+        NiMatrix3 rot;
+        NiColorA color(1.0f, 0.0f, 0.0f, 0.6f);
+        NiAVObject* pdebug = (NiAVObject*)MakeTriPoint(4.0f, color, true);
+        pdebug->UpdateProperties();
+        const NiPoint3* xa = &pprojectile->Get3D()->GetWorldTranslate();
+        pdebug->SetTranslate(*xa);
+        float* v21 = &fProjectileDebugDuration.Float();
+        TES::pInstance->AddTempDebugObject(pdebug, *v21);
+        float angle = pprojectile->GetHeading(false);
+        rot.MakeZRotation(angle);
+        NiColorA kLineColor(1.0f, 1.0f, 0.0f, 0.6f);
+        color = kLineColor;
+        NiPoint3* v22 = ::new (&dst) NiPoint3(0.0f, 1000.0f, 0.0f);
+        NiPoint3* fR = ::new (&result) NiPoint3(rot * *v22);
+        NiNode* v23 = pprojectile->Get3D();
+        NiPoint3* fRa = ::new (&v50) NiPoint3(v23->GetWorldTranslate() + *fR);
+        NiNode* v24 = pprojectile->Get3D();
+        pdebug = (NiAVObject*)MakeLine(v24->GetWorldTranslate(), color, *fRa, color, true);
+        float* v25 = &fProjectileDebugDuration.Float();
+        TES::pInstance->AddTempDebugObject(pdebug, *v25);
     }
+
     if (pprojectile) {
         pCombatManager->pThreatMap->AddProjectile(pprojectile);
     }
@@ -3459,30 +3382,27 @@ bool Projectile::IsValidImpact(
         }
         if (pfirstbody) {
             CFilter* v6 = pfirstbody->GetCollisionFilter(&apResult);
-            if (!v6->GetNoCollision()) {
-                if (pfirstbody->GethkWorld()) {
-                    return false;
-                }
+            if ((!v6->GetNoCollision()) && (pfirstbody->GethkWorld())) {
+                return false;
             }
         }
     }
     bool result = true;
-    if (apProjectileBase) {
-        if (apTargetCollidable) {
-            uint32_t v8;
-            uint32_t CollisionFilterInfo = apTargetCollidable->getCollisionFilterInfo();
-            if (FNVD_RECONSTRUCT(CFilter)(&v14, CollisionFilterInfo)->GetLayer() == L_TRANSPARENT_SMALL ||
-                (v8 = apTargetCollidable->getCollisionFilterInfo(),
-                 FNVD_RECONSTRUCT(CFilter)(&v13, v8)->GetLayer() == L_TRANSPARENT_SMALL_ANIM)) {
-                BGSProjectile::BGSProjectileFlags emotion = apProjectileBase->GetMotionType();
-                if (emotion != BGSProjectile::MOTION_GRENADE &&
-                    (emotion != BGSProjectile::MOTION_MISSILE ||
-                     (apProjectileBase->GetHitScan() || apProjectileBase->GetPassThroughSmTransp()))) {
-                    return false;
-                }
+    if ((apProjectileBase) && (apTargetCollidable)) {
+        uint32_t v8;
+        uint32_t CollisionFilterInfo = apTargetCollidable->getCollisionFilterInfo();
+        if (FNVD_RECONSTRUCT(CFilter)(&v14, CollisionFilterInfo)->GetLayer() == L_TRANSPARENT_SMALL ||
+            (v8 = apTargetCollidable->getCollisionFilterInfo(),
+             FNVD_RECONSTRUCT(CFilter)(&v13, v8)->GetLayer() == L_TRANSPARENT_SMALL_ANIM)) {
+            BGSProjectile::BGSProjectileFlags emotion = apProjectileBase->GetMotionType();
+            if (emotion != BGSProjectile::MOTION_GRENADE &&
+                (emotion != BGSProjectile::MOTION_MISSILE ||
+                 (apProjectileBase->GetHitScan() || apProjectileBase->GetPassThroughSmTransp()))) {
+                return false;
             }
         }
     }
+
     return result;
 }
 
@@ -3501,233 +3421,219 @@ NiAVObject* Projectile::ProcessTargetPick(
     CFilter v69;
     alignas(16) CFilter v70;
     CFilter v71;
-    if (!apProjectileBase) {
-        if (apProjectile) {
-            apProjectileBase = apProjectile->GetProjectileBase();
-        }
+    if ((!apProjectileBase) && (apProjectile)) {
+        apProjectileBase = apProjectile->GetProjectileBase();
     }
+
     bool v85 = false;
     NiAVObject* phitObject = nullptr;
-    if (apPickData) {
-        if (apPickData->pAllCollector) {
-            NiPoint3 pickLength;
-            NiPoint3 pickOrigin;
-            apPickData->GetFrom(pickOrigin);
-            apPickData->GetLength(pickLength);
-            char v81 = 0;
-            TESObjectREFR* ptargetRef = nullptr;
-            for (int32_t i = 0; !v85; ++i) {
-                int32_t FormHealth_0 = (&apPickData->pAllCollector->getHits())->m_size;
-                if (i >= FormHealth_0) {
-                    break;
-                }
-                const hkpWorldRayCastOutput* v7 =
-                    &(&apPickData->pAllCollector->getHits())->operator[]<hkpWorldRayCastOutput>(i);
-                hkpWorldRayCastOutput point(*v7);
-                if (!(afWaterHitRatio < static_cast<double>(point.m_hitFraction))) {
-                    NiAVObject* pav = GetAVObjectForCollidable(point.m_rootCollidable);
-                    TESObjectREFR* pref = TESObjectREFR::FindReferenceFor3D(pav);
-                    if (pav) {
-                        bhkPhantom* pbp;
-                        char v75 = 1;
-                        hkpPhantom* pphantom = hkpGetPhantom(point.m_rootCollidable);
-                        if (pphantom) {
-                            pbp = bhkPhantom::Getbhk(pphantom);
-                        }
-                        else {
-                            pbp = nullptr;
-                        }
-                        bhkPhantom* pbp_2 = pbp;
-                        if (pbp) {
-                            CFilter* v10;
-                            v75 = 0;
-                            if (apProjectile) {
-                                if (pref) {
-                                    CFilter* v9;
-                                    CFilter* CollisionFilter = pbp_2->GetCollisionFilter(&v71);
-                                    if (CollisionFilter->GetLayer() == L_PROJECTILEZONE ||
-                                        (v9 = pbp_2->GetCollisionFilter(&v70), v9->GetLayer() == L_GASTRAP)) {
-                                        Script::SetActionFlag(apProjectile, &pref->m_Extra, SCRIPT_ACTION_ONHIT);
-                                        if (apProjectile->pWeaponSource) {
-                                            Script::SetActionFlag(
-                                                apProjectile->pWeaponSource, &pref->m_Extra, SCRIPT_ACTION_ONHITWITH
-                                            );
-                                        }
-                                    }
-                                }
-                            }
-                            if (NiObject::IsKindOf_0(&bhkCollisionBox::ms_RTTI, pbp_2) ||
-                                (bUseCharacterController &&
-                                 (v10 = pbp_2->GetCollisionFilter(&v69), v10->GetLayer() == L_CHARCONTROLLER))) {
-                                bhkRigidBody* pfirstbody;
-                                v81 = 1;
-                                ptargetRef = pref;
-                                bhkCollisionObject* pcol = FindFirstCollisionObject(pav);
-                                if (pcol) {
-                                    pfirstbody = pcol->GetRigidBody();
-                                }
-                                else {
-                                    pfirstbody = nullptr;
-                                }
-                                bhkRigidBody* pfirstbody_2 = pfirstbody;
-                                if (pfirstbody) {
-                                    CFilter* v11 = pfirstbody_2->GetCollisionFilter(&v65);
-                                    if (v11->GetNoCollision() || !pfirstbody_2->GethkWorld()) {
-                                        NiPoint3 length;
-                                        NiPoint3 from;
-                                        bhkPickData pd;
-                                        apPickData->GetFrom(from);
-                                        apPickData->GetLength(length);
-                                        pickLength.operator*=(2.0f);
-                                        length.operator*=(2.0f);
-                                        CFilter* v12 = apPickData->GetFilter(&kPickFilter);
-                                        pd.SetFilter(*v12);
-                                        pd.NiSetFrom(from);
-                                        pd.NiSetLength(length);
-                                        hkpAllRayHitCollector collector;
-                                        pd.SetAllCollector(&collector);
-                                        if (Projectile::PickSceneGraph(&pd, pav, false, true) &&
-                                            (&pd.pAllCollector->getHits())->m_size > 0) {
-                                            const hkpWorldRayCastOutput* v13 =
-                                                &(&pd.pAllCollector->getHits())->operator[]<hkpWorldRayCastOutput>(0);
-                                            point.operator=(*v13);
-                                            v75 = 1;
-                                        }
-                                    }
+    if ((apPickData) && (apPickData->pAllCollector)) {
+        NiPoint3 pickLength;
+        NiPoint3 pickOrigin;
+        apPickData->GetFrom(pickOrigin);
+        apPickData->GetLength(pickLength);
+        char v81 = 0;
+        TESObjectREFR* ptargetRef = nullptr;
+        for (int32_t i = 0; !v85; ++i) {
+            int32_t FormHealth_0 = (&apPickData->pAllCollector->getHits())->m_size;
+            if (i >= FormHealth_0) {
+                break;
+            }
+            const hkpWorldRayCastOutput* v7 =
+                &(&apPickData->pAllCollector->getHits())->operator[]<hkpWorldRayCastOutput>(i);
+            hkpWorldRayCastOutput point(*v7);
+            if (!(afWaterHitRatio < static_cast<double>(point.m_hitFraction))) {
+                NiAVObject* pav = GetAVObjectForCollidable(point.m_rootCollidable);
+                TESObjectREFR* pref = TESObjectREFR::FindReferenceFor3D(pav);
+                if (pav) {
+                    bhkPhantom* pbp;
+                    char v75 = 1;
+                    hkpPhantom* pphantom = hkpGetPhantom(point.m_rootCollidable);
+                    if (pphantom) {
+                        pbp = bhkPhantom::Getbhk(pphantom);
+                    }
+                    else {
+                        pbp = nullptr;
+                    }
+                    bhkPhantom* pbp_2 = pbp;
+                    if (pbp) {
+                        CFilter* v10;
+                        v75 = 0;
+                        if ((apProjectile) && (pref)) {
+                            CFilter* v9;
+                            CFilter* CollisionFilter = pbp_2->GetCollisionFilter(&v71);
+                            if (CollisionFilter->GetLayer() == L_PROJECTILEZONE ||
+                                (v9 = pbp_2->GetCollisionFilter(&v70), v9->GetLayer() == L_GASTRAP)) {
+                                Script::SetActionFlag(apProjectile, &pref->m_Extra, SCRIPT_ACTION_ONHIT);
+                                if (apProjectile->pWeaponSource) {
+                                    Script::SetActionFlag(
+                                        apProjectile->pWeaponSource, &pref->m_Extra, SCRIPT_ACTION_ONHITWITH
+                                    );
                                 }
                             }
                         }
-                        if (!Projectile::IsValidImpact(pref, point.m_rootCollidable, apProjectile, apProjectileBase)) {
-                            v75 = 0;
-                        }
-                        if (v75) {
-                            if (apProjectile) {
-                                NiPoint3 normal;
-                                alignas(16) NiPoint3 length_2 = pickLength * point.m_hitFraction;
-                                NiPoint3 contact = pickOrigin + length_2;
-                                HK2NINS(normal, point.m_normal);
-                                if (apProjectile->IsFlagSet(Projectile::HITSCAN_MODE)) {
-                                    float arPos_8 = length_2.Length();
-                                    apProjectile->SetRange(arPos_8);
-                                    apProjectile->SetMovementDelta(length_2, false);
-                                }
-                                uint32_t outputShapeKey = -1;
-                                for (int32_t j = 0; j < 8 && point.m_shapeKeys[j] != -1; ++j) {
-                                    outputShapeKey = point.m_shapeKeys[j];
-                                }
-                                v85 = apProjectile->AddImpact(
-                                    pref, contact, normal, point.m_rootCollidable, outputShapeKey, BHK_MATERIAL_MAX
-                                );
-                                if (v85) {
-                                    phitObject = pav;
-                                }
+
+                        if (NiObject::IsKindOf_0(&bhkCollisionBox::ms_RTTI, pbp_2) ||
+                            (bUseCharacterController &&
+                             (v10 = pbp_2->GetCollisionFilter(&v69), v10->GetLayer() == L_CHARCONTROLLER))) {
+                            bhkRigidBody* pfirstbody;
+                            v81 = 1;
+                            ptargetRef = pref;
+                            bhkCollisionObject* pcol = FindFirstCollisionObject(pav);
+                            if (pcol) {
+                                pfirstbody = pcol->GetRigidBody();
                             }
                             else {
-                                v85 = true;
-                                phitObject = pav;
+                                pfirstbody = nullptr;
                             }
-                            if (v85) {
-                                if (apHitFraction) {
-                                    *apHitFraction = point.m_hitFraction;
+                            bhkRigidBody* pfirstbody_2 = pfirstbody;
+                            if (pfirstbody) {
+                                CFilter* v11 = pfirstbody_2->GetCollisionFilter(&v65);
+                                if (v11->GetNoCollision() || !pfirstbody_2->GethkWorld()) {
+                                    NiPoint3 length;
+                                    NiPoint3 from;
+                                    bhkPickData pd;
+                                    apPickData->GetFrom(from);
+                                    apPickData->GetLength(length);
+                                    pickLength.operator*=(2.0f);
+                                    length.operator*=(2.0f);
+                                    CFilter* v12 = apPickData->GetFilter(&kPickFilter);
+                                    pd.SetFilter(*v12);
+                                    pd.NiSetFrom(from);
+                                    pd.NiSetLength(length);
+                                    hkpAllRayHitCollector collector;
+                                    pd.SetAllCollector(&collector);
+                                    if (Projectile::PickSceneGraph(&pd, pav, false, true) &&
+                                        (&pd.pAllCollector->getHits())->m_size > 0) {
+                                        const hkpWorldRayCastOutput* v13 =
+                                            &(&pd.pAllCollector->getHits())->operator[]<hkpWorldRayCastOutput>(0);
+                                        point.operator=(*v13);
+                                        v75 = 1;
+                                    }
                                 }
                             }
+                        }
+                    }
+                    if (!Projectile::IsValidImpact(pref, point.m_rootCollidable, apProjectile, apProjectileBase)) {
+                        v75 = 0;
+                    }
+                    if (v75) {
+                        if (apProjectile) {
+                            NiPoint3 normal;
+                            alignas(16) NiPoint3 length_2 = pickLength * point.m_hitFraction;
+                            NiPoint3 contact = pickOrigin + length_2;
+                            HK2NINS(normal, point.m_normal);
+                            if (apProjectile->IsFlagSet(Projectile::HITSCAN_MODE)) {
+                                float arPos_8 = length_2.Length();
+                                apProjectile->SetRange(arPos_8);
+                                apProjectile->SetMovementDelta(length_2, false);
+                            }
+                            uint32_t outputShapeKey = -1;
+                            for (int32_t j = 0; j < 8 && point.m_shapeKeys[j] != -1; ++j) {
+                                outputShapeKey = point.m_shapeKeys[j];
+                            }
+                            v85 = apProjectile->AddImpact(
+                                pref, contact, normal, point.m_rootCollidable, outputShapeKey, BHK_MATERIAL_MAX
+                            );
+                            if (v85) {
+                                phitObject = pav;
+                            }
+                        }
+                        else {
+                            v85 = true;
+                            phitObject = pav;
+                        }
+                        if ((v85) && (apHitFraction)) {
+                            *apHitFraction = point.m_hitFraction;
                         }
                     }
                 }
             }
-            if (apProjectile) {
-                if (!v85 && afWaterHitRatio != 3.4028234663852886e+38) {
-                    NiPoint3 length_3 = pickLength * afWaterHitRatio;
-                    NiPoint3 contact_2 = pickOrigin + length_3;
-                    if (apProjectile->IsFlagSet(Projectile::HITSCAN_MODE)) {
-                        float arPos_8a = length_3.Length();
-                        apProjectile->SetRange(arPos_8a);
-                        apProjectile->SetMovementDelta(length_3, false);
-                    }
-                    apProjectile->AddImpact(
-                        nullptr, contact_2, NiPoint3_UNIT_Z, nullptr, HK_INVALID_SHAPE_KEY, BHK_MATERIAL_WATER
-                    );
+        }
+        if (apProjectile) {
+            if (!v85 && afWaterHitRatio != 3.4028234663852886e+38) {
+                NiPoint3 length_3 = pickLength * afWaterHitRatio;
+                NiPoint3 contact_2 = pickOrigin + length_3;
+                if (apProjectile->IsFlagSet(Projectile::HITSCAN_MODE)) {
+                    float arPos_8a = length_3.Length();
+                    apProjectile->SetRange(arPos_8a);
+                    apProjectile->SetMovementDelta(length_3, false);
                 }
-                if (v85 || !v81) {
-                    if (apProjectile->GetProjectileBase()->Data.pActiveSoundLoop) {
-                        if (((v85 && ptargetRef != pPlayer) || !v85) && apProjectile->GetShooter() != pPlayer) {
-                            if ((&BSAudio::QInstance())->pListener) {
-                                alignas(16) NiPoint3 toPt;
-                                NiPoint3 fromPt;
-                                BSAudioListener* v41 = (&BSAudio::QInstance())->pListener;
-                                NiPoint3 listenerPos = v41->GetPosition();
-                                if (ptargetRef) {
-                                    toPt = ptargetRef->GetLocationOnReference();
-                                }
-                                else {
-                                    apPickData->GetTo(toPt);
-                                }
-                                apPickData->GetFrom(fromPt);
-                                NiPoint3 projPath = toPt - fromPt;
-                                alignas(16) NiPoint3 kSourceDiff = listenerPos - fromPt;
-                                NiPoint3 toSource = kSourceDiff;
-                                float c1 = toSource.Dot(projPath);
-                                float c2 = projPath.Dot(projPath);
-                                float b = c1 / c2;
-                                NiPoint3 pointOnLine = fromPt + b * projPath;
-                                alignas(16) NiPoint3 toLine = listenerPos - pointOnLine;
-                                float dist = toLine.Length();
-                                if (dist < 600.0) {
-                                    uint32_t uiFlags_2 = 258;
-                                    TESSound* arPos_8c = apProjectile->GetProjectileBase()->Data.pActiveSoundLoop;
-                                    const char* arPosa =
-                                        apProjectile->GetProjectileBase()->Data.pActiveSoundLoop->GetFilename();
-                                    BSAudio* v19 = &BSAudio::QInstance();
-                                    v19->GetSoundHandleByFilename(&sound_2, arPosa, uiFlags_2, arPos_8c);
-                                    sound_2.SetPosition(pointOnLine.x, pointOnLine.y, pointOnLine.z);
-                                    sound_2.Play(false);
-                                    if (bIsProjectileDebug) {
-                                        NiColorA color_2(0.0f, 1.0f, 1.0f, 0.3f);
-                                        NiAVObject* pdebug_2 = (NiAVObject*)MakeTriPoint(5.0f, color_2, true);
-                                        pdebug_2->UpdateProperties();
-                                        pdebug_2->SetTranslate(pointOnLine);
-                                        float* v20 = &fProjectileDebugDuration.Float();
-                                        TES::pInstance->AddTempDebugObject(pdebug_2, *v20);
-                                    }
-                                }
-                            }
+                apProjectile->AddImpact(
+                    nullptr, contact_2, NiPoint3_UNIT_Z, nullptr, HK_INVALID_SHAPE_KEY, BHK_MATERIAL_WATER
+                );
+            }
+            if (v85 || !v81) {
+                if ((apProjectile->GetProjectileBase()->Data.pActiveSoundLoop) &&
+                    (((v85 && ptargetRef != pPlayer) || !v85) && apProjectile->GetShooter() != pPlayer) &&
+                    ((&BSAudio::QInstance())->pListener)) {
+                    alignas(16) NiPoint3 toPt;
+                    NiPoint3 fromPt;
+                    BSAudioListener* v41 = (&BSAudio::QInstance())->pListener;
+                    NiPoint3 listenerPos = v41->GetPosition();
+                    if (ptargetRef) {
+                        toPt = ptargetRef->GetLocationOnReference();
+                    }
+                    else {
+                        apPickData->GetTo(toPt);
+                    }
+                    apPickData->GetFrom(fromPt);
+                    NiPoint3 projPath = toPt - fromPt;
+                    alignas(16) NiPoint3 kSourceDiff = listenerPos - fromPt;
+                    NiPoint3 toSource = kSourceDiff;
+                    float c1 = toSource.Dot(projPath);
+                    float c2 = projPath.Dot(projPath);
+                    float b = c1 / c2;
+                    NiPoint3 pointOnLine = fromPt + b * projPath;
+                    alignas(16) NiPoint3 toLine = listenerPos - pointOnLine;
+                    float dist = toLine.Length();
+                    if (dist < 600.0) {
+                        uint32_t uiFlags_2 = 258;
+                        TESSound* arPos_8c = apProjectile->GetProjectileBase()->Data.pActiveSoundLoop;
+                        const char* arPosa = apProjectile->GetProjectileBase()->Data.pActiveSoundLoop->GetFilename();
+                        BSAudio* v19 = &BSAudio::QInstance();
+                        v19->GetSoundHandleByFilename(&sound_2, arPosa, uiFlags_2, arPos_8c);
+                        sound_2.SetPosition(pointOnLine.x, pointOnLine.y, pointOnLine.z);
+                        sound_2.Play(false);
+                        if (bIsProjectileDebug) {
+                            NiColorA color_2(0.0f, 1.0f, 1.0f, 0.3f);
+                            NiAVObject* pdebug_2 = (NiAVObject*)MakeTriPoint(5.0f, color_2, true);
+                            pdebug_2->UpdateProperties();
+                            pdebug_2->SetTranslate(pointOnLine);
+                            float* v20 = &fProjectileDebugDuration.Float();
+                            TES::pInstance->AddTempDebugObject(pdebug_2, *v20);
                         }
                     }
                 }
-                else {
-                    if (ptargetRef) {
-                        if (ptargetRef == pPlayer) {
-                            NiPoint3 hitPt;
-                            apPickData->NiCalcHitPoint(hitPt);
-                            if (apProjectile->GetProjectileBase()) {
-                                if (apProjectile->GetProjectileBase()->Data.pActiveSoundLoop) {
-                                    uint32_t uiFlags = 258;
-                                    TESSound* arPos_8b = apProjectile->GetProjectileBase()->Data.pActiveSoundLoop;
-                                    const char* arPos =
-                                        apProjectile->GetProjectileBase()->Data.pActiveSoundLoop->GetFilename();
-                                    BSAudio* v14 = &BSAudio::QInstance();
-                                    v14->GetSoundHandleByFilename(&sound, arPos, uiFlags, arPos_8b);
-                                    sound.SetPosition(hitPt.x, hitPt.y, hitPt.z);
-                                    sound.Play(false);
-                                    if (bIsProjectileDebug) {
-                                        if (apProjectile->Get3D()) {
-                                            NiColorA color(0.0f, 1.0f, 1.0f, 0.3f);
-                                            NiAVObject* pdebug = (NiAVObject*)MakeTriPoint(5.0f, color, true);
-                                            pdebug->UpdateProperties();
-                                            NiNode* v15 = apProjectile->Get3D();
-                                            pdebug->SetTranslate(v15->GetWorldTranslate());
-                                            float* v16 = &fProjectileDebugDuration.Float();
-                                            TES::pInstance->AddTempDebugObject(pdebug, *v16);
-                                        }
-                                    }
-                                }
-                            }
+            }
+            else {
+                if ((ptargetRef) && (ptargetRef == pPlayer)) {
+                    NiPoint3 hitPt;
+                    apPickData->NiCalcHitPoint(hitPt);
+                    if ((apProjectile->GetProjectileBase()) &&
+                        (apProjectile->GetProjectileBase()->Data.pActiveSoundLoop)) {
+                        uint32_t uiFlags = 258;
+                        TESSound* arPos_8b = apProjectile->GetProjectileBase()->Data.pActiveSoundLoop;
+                        const char* arPos = apProjectile->GetProjectileBase()->Data.pActiveSoundLoop->GetFilename();
+                        BSAudio* v14 = &BSAudio::QInstance();
+                        v14->GetSoundHandleByFilename(&sound, arPos, uiFlags, arPos_8b);
+                        sound.SetPosition(hitPt.x, hitPt.y, hitPt.z);
+                        sound.Play(false);
+                        if ((bIsProjectileDebug) && (apProjectile->Get3D())) {
+                            NiColorA color(0.0f, 1.0f, 1.0f, 0.3f);
+                            NiAVObject* pdebug = (NiAVObject*)MakeTriPoint(5.0f, color, true);
+                            pdebug->UpdateProperties();
+                            NiNode* v15 = apProjectile->Get3D();
+                            pdebug->SetTranslate(v15->GetWorldTranslate());
+                            float* v16 = &fProjectileDebugDuration.Float();
+                            TES::pInstance->AddTempDebugObject(pdebug, *v16);
                         }
                     }
                 }
             }
         }
     }
+
     return phitObject;
 }
 

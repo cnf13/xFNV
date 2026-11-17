@@ -54,24 +54,22 @@ bool LockEffect::CheckTarget(MagicTarget* apTarget) {
 
 void LockEffect::Start() {
     NonActorMagicTarget* pnaTarget = dynamic_cast<NonActorMagicTarget*>(pTarget);
-    if (pnaTarget) {
-        if (pnaTarget->GetTargetStatsObject()) {
-            TESObjectREFR* v1 = pnaTarget->GetTargetStatsObject();
-            LockData* plock = v1->GetLock();
-            if (plock && ((plock->cFlags & 2) == 0 || (plock->cFlags & 1) != 0)) {
-                Dispel(false);
-            }
-            else {
-                TESObjectREFR* v2 = pnaTarget->GetTargetStatsObject();
-                LockData* plock_2 = v2->AddLock();
-                plock_2->cLockLevel = static_cast<int32_t>(fMagnitude);
-                plock_2->pKey = nullptr;
-                plock_2->cFlags = 2;
-                TESObjectREFR* v3 = pnaTarget->GetTargetStatsObject();
-                v3->AddLockChange();
-                TESObjectREFR* v4 = pnaTarget->GetTargetStatsObject();
-                v4->Lock();
-            }
+    if ((pnaTarget) && (pnaTarget->GetTargetStatsObject())) {
+        TESObjectREFR* v1 = pnaTarget->GetTargetStatsObject();
+        LockData* plock = v1->GetLock();
+        if (plock && ((plock->cFlags & 2) == 0 || (plock->cFlags & 1) != 0)) {
+            Dispel(false);
+        }
+        else {
+            TESObjectREFR* v2 = pnaTarget->GetTargetStatsObject();
+            LockData* plock_2 = v2->AddLock();
+            plock_2->cLockLevel = static_cast<int32_t>(fMagnitude);
+            plock_2->pKey = nullptr;
+            plock_2->cFlags = 2;
+            TESObjectREFR* v3 = pnaTarget->GetTargetStatsObject();
+            v3->AddLockChange();
+            TESObjectREFR* v4 = pnaTarget->GetTargetStatsObject();
+            v4->Lock();
         }
     }
 }
@@ -81,7 +79,6 @@ ActiveEffect* LockEffect::Instantiate(MagicCaster* a1, MagicItem* a2, EffectItem
     if (v5) {
         return ::new (v5) LockEffect(a1, a2, a3);
     }
-    else {
-        return nullptr;
-    }
+
+    return nullptr;
 }

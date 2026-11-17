@@ -92,9 +92,8 @@ float BSFaceGenAnimationData::GetExpressionValue(BS_FACEGEN_EXPRESSION aeExpress
     if (((int32_t)aeExpression) >= 15) {
         return (float)0.0;
     }
-    else {
-        return (&CurrentExpressionData)->GetQuantity(aeExpression);
-    }
+
+    return (&CurrentExpressionData)->GetQuantity(aeExpression);
 }
 
 void BSFaceGenAnimationData::SetExpressionValue(BS_FACEGEN_EXPRESSION aeExpression, float afValue) {
@@ -175,9 +174,8 @@ float BSFaceGenAnimationData::GetPhonemeValue(BS_FACEGEN_PHONEME aePhoneme) {
     if (((int32_t)aePhoneme) >= 16) {
         return (float)0.0;
     }
-    else {
-        return (&CurrentPhonemeData)->GetQuantity(aePhoneme);
-    }
+
+    return (&CurrentPhonemeData)->GetQuantity(aePhoneme);
 }
 
 void BSFaceGenAnimationData::SetPhonemeValue(BS_FACEGEN_PHONEME aePhoneme, float afValue) {
@@ -190,9 +188,8 @@ float BSFaceGenAnimationData::GetCustomMorphValue(BS_FACEGEN_CUSTOM_MORPH aeCust
     if (((int32_t)aeCustomMorph) >= 1) {
         return (float)0.0;
     }
-    else {
-        return (&CurrentCustomMorphData)->GetQuantity(aeCustomMorph);
-    }
+
+    return (&CurrentCustomMorphData)->GetQuantity(aeCustomMorph);
 }
 
 void BSFaceGenAnimationData::SetCustomMorphValue(BS_FACEGEN_CUSTOM_MORPH aeCustomMorph, float afValue) {
@@ -505,49 +502,44 @@ void BSFaceGenAnimationData::ClearSpeechKeyframeLists(
     if (abClearExpression) {
         ClearExpressionTarget();
     }
-    if (abClearModifiers) {
-        if (SpeechModifierKeyframeList.m_uiCount) {
-            BSFaceGenKeyframe* pdelete_2;
-            for (BSFaceGenKeyframe* pdelete = SpeechModifierKeyframeList.GetHead(); pdelete; pdelete = pdelete_2) {
-                delete pdelete;
-                SpeechModifierKeyframeList.RemoveHead();
-                if (SpeechModifierKeyframeList.m_uiCount) {
-                    pdelete_2 = SpeechModifierKeyframeList.GetHead();
-                }
-                else {
-                    pdelete_2 = nullptr;
-                }
+    if ((abClearModifiers) && (SpeechModifierKeyframeList.m_uiCount)) {
+        BSFaceGenKeyframe* pdelete_2;
+        for (BSFaceGenKeyframe* pdelete = SpeechModifierKeyframeList.GetHead(); pdelete; pdelete = pdelete_2) {
+            delete pdelete;
+            SpeechModifierKeyframeList.RemoveHead();
+            if (SpeechModifierKeyframeList.m_uiCount) {
+                pdelete_2 = SpeechModifierKeyframeList.GetHead();
+            }
+            else {
+                pdelete_2 = nullptr;
             }
         }
     }
-    if (abClearPhonemes) {
-        if (SpeechPhonemeKeyframeList.m_uiCount) {
-            BSFaceGenKeyframe* pdelete_4;
-            for (BSFaceGenKeyframe* pdelete_3 = SpeechPhonemeKeyframeList.GetHead(); pdelete_3; pdelete_3 = pdelete_4) {
-                delete pdelete_3;
-                SpeechPhonemeKeyframeList.RemoveHead();
-                if (SpeechPhonemeKeyframeList.m_uiCount) {
-                    pdelete_4 = SpeechPhonemeKeyframeList.GetHead();
-                }
-                else {
-                    pdelete_4 = nullptr;
-                }
+
+    if ((abClearPhonemes) && (SpeechPhonemeKeyframeList.m_uiCount)) {
+        BSFaceGenKeyframe* pdelete_4;
+        for (BSFaceGenKeyframe* pdelete_3 = SpeechPhonemeKeyframeList.GetHead(); pdelete_3; pdelete_3 = pdelete_4) {
+            delete pdelete_3;
+            SpeechPhonemeKeyframeList.RemoveHead();
+            if (SpeechPhonemeKeyframeList.m_uiCount) {
+                pdelete_4 = SpeechPhonemeKeyframeList.GetHead();
+            }
+            else {
+                pdelete_4 = nullptr;
             }
         }
     }
-    if (abClearCustomMorphs) {
-        if (SpeechCustomMorphKeyframeList.m_uiCount) {
-            BSFaceGenKeyframe* pdelete_6;
-            for (BSFaceGenKeyframe* pdelete_5 = SpeechCustomMorphKeyframeList.GetHead(); pdelete_5;
-                 pdelete_5 = pdelete_6) {
-                delete pdelete_5;
-                SpeechCustomMorphKeyframeList.RemoveHead();
-                if (SpeechCustomMorphKeyframeList.m_uiCount) {
-                    pdelete_6 = SpeechCustomMorphKeyframeList.GetHead();
-                }
-                else {
-                    pdelete_6 = nullptr;
-                }
+
+    if ((abClearCustomMorphs) && (SpeechCustomMorphKeyframeList.m_uiCount)) {
+        BSFaceGenKeyframe* pdelete_6;
+        for (BSFaceGenKeyframe* pdelete_5 = SpeechCustomMorphKeyframeList.GetHead(); pdelete_5; pdelete_5 = pdelete_6) {
+            delete pdelete_5;
+            SpeechCustomMorphKeyframeList.RemoveHead();
+            if (SpeechCustomMorphKeyframeList.m_uiCount) {
+                pdelete_6 = SpeechCustomMorphKeyframeList.GetHead();
+            }
+            else {
+                pdelete_6 = nullptr;
             }
         }
     }
@@ -842,9 +834,8 @@ float BSFaceGenAnimationData::GetModifierValue(BS_FACEGEN_MODIFIER aeModifier) {
     if (((int32_t)aeModifier) >= 17) {
         return (float)0.0;
     }
-    else {
-        return (&CurrentModifierData)->GetQuantity(aeModifier);
-    }
+
+    return (&CurrentModifierData)->GetQuantity(aeModifier);
 }
 
 bool BSFaceGenAnimationData::UpdateEyeTracking(float afTime, NiNode* apHeadNode) {
@@ -1276,18 +1267,16 @@ float BSFaceGenAnimationData::GetExpressionTargetChangePerSec() {
     if (!((&BSFaceGenAnimationData::fExpressionChangePerSec)->Float() > 0.0)) {
         return (float)0.0;
     }
-    else {
-        return (&BSFaceGenAnimationData::fExpressionChangePerSec)->Float();
-    }
+
+    return (&BSFaceGenAnimationData::fExpressionChangePerSec)->Float();
 }
 
 float BSFaceGenAnimationData::GetExpressionStrengthAddPerSec() {
     if (!((&BSFaceGenAnimationData::fExpressionStrengthAdd)->Float() > 0.0)) {
         return (float)0.0;
     }
-    else {
-        return (&BSFaceGenAnimationData::fExpressionStrengthAdd)->Float();
-    }
+
+    return (&BSFaceGenAnimationData::fExpressionStrengthAdd)->Float();
 }
 
 float BSFaceGenAnimationData::GetSpeechDelay() {

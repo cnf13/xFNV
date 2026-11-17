@@ -162,70 +162,65 @@ void LightEffect::AttachLight() {
     else {
         ptargetActor = nullptr;
     }
-    if (!spPointLight.m_pObject) {
-        if (ptargetActor) {
-            if (!ptargetActor->GetSpellEffectLight()) {
-                int32_t* v1 = &iMagicLightMaxCount.Int();
-                if (LightEffect::iLightCount <= *v1) {
-                    TESObjectLIGH* plight = GetEffectSetting()->data.pLight;
-                    if (plight) {
-                        NiNode* v12;
-                        NiPointLight* v16;
-                        NiPointLight* apMemory =
-                            static_cast<NiPointLight*>(NiMemObject::operator new(sizeof(NiPointLight)));
-                        if (apMemory) {
-                            v16 = ::new (apMemory) NiPointLight;
-                        }
-                        else {
-                            v16 = nullptr;
-                        }
-                        spPointLight.operator=(v16);
-                        uint32_t ucolor = plight->GetColor();
-                        float b = static_cast<float>(static_cast<uint8_t>(ucolor >> 16));
-                        float g = static_cast<float>(static_cast<uint8_t>(ucolor >> 8));
-                        NiColor color(static_cast<float>(static_cast<uint8_t>(ucolor)), g, b);
-                        color.operator/=(255.0f);
-                        spPointLight.m_pObject->SetDiffuseColor(color);
-                        float* v2 = &fMagicLightRadiusBase.Float();
-                        double v15 = fMagnitude + *v2;
-                        float fradius = fMagicUnitsPerFoot.Float() * v15;
-                        NiColor fakeSpecular(fradius, 0.0f, 0.0f);
-                        spPointLight.m_pObject->SetSpecularColor(fakeSpecular);
-                        float ba = plight->fFade;
-                        spPointLight.m_pObject->SetDimmer(ba);
-                        ShadowSceneNode* pnode = BSShaderManager::GetShadowSceneNode(0);
-                        if (pnode) {
-                            pnode->AddLight(spPointLight.m_pObject, true);
-                        }
-                        float* v3 = &fMagicLightSideOffset.Float();
-                        float fX = ptargetActor->GetScale() * *v3;
-                        NiPoint3* v4 = ::new (&v19) NiPoint3(ptargetActor->GetBoundMax());
-                        double v14 = v4->y + fMagicLightForwardOffset.Float();
-                        float fY = ptargetActor->GetScale() * v14;
-                        double Height = ptargetActor->GetHeight();
-                        float* v5 = &fMagicLightHeightOffset.Float();
-                        float fZ = ptargetActor->GetScale() * *v5 + Height;
-                        spPointLight.m_pObject->SetTranslate(fX, fY, fZ);
-                        if (ptargetActor == pPlayer) {
-                            v12 = static_cast<NiNode*>(pPlayer->Get3D(false));
-                        }
-                        else {
-                            v12 = ptargetActor->Get3D();
-                        }
-                        NiPointer<NiNode> pparent(v12);
-                        NiNode* v11 = pparent.m_pObject;
-                        v11->AttachChild(spPointLight.m_pObject, 1);
-                        NiPointLight* bb = spPointLight.m_pObject;
-                        ptargetActor->SetSpellEffectLight(bb);
-                        ++LightEffect::iLightCount;
-                    }
-                    else {
-                        Warning(
-                            "EDITOR: Light Effect has no Light object associated with it. Use the editor to select "
-                            "a light in the Magic Effects window for the Light effect."
-                        );
-                    }
+    if ((!spPointLight.m_pObject) && (ptargetActor) && (!ptargetActor->GetSpellEffectLight())) {
+        int32_t* v1 = &iMagicLightMaxCount.Int();
+        if (LightEffect::iLightCount <= *v1) {
+            TESObjectLIGH* plight = GetEffectSetting()->data.pLight;
+            if (plight) {
+                NiNode* v12;
+                NiPointLight* v16;
+                NiPointLight* apMemory = static_cast<NiPointLight*>(NiMemObject::operator new(sizeof(NiPointLight)));
+                if (apMemory) {
+                    v16 = ::new (apMemory) NiPointLight;
                 }
+                else {
+                    v16 = nullptr;
+                }
+                spPointLight.operator=(v16);
+                uint32_t ucolor = plight->GetColor();
+                float b = static_cast<float>(static_cast<uint8_t>(ucolor >> 16));
+                float g = static_cast<float>(static_cast<uint8_t>(ucolor >> 8));
+                NiColor color(static_cast<float>(static_cast<uint8_t>(ucolor)), g, b);
+                color.operator/=(255.0f);
+                spPointLight.m_pObject->SetDiffuseColor(color);
+                float* v2 = &fMagicLightRadiusBase.Float();
+                double v15 = fMagnitude + *v2;
+                float fradius = fMagicUnitsPerFoot.Float() * v15;
+                NiColor fakeSpecular(fradius, 0.0f, 0.0f);
+                spPointLight.m_pObject->SetSpecularColor(fakeSpecular);
+                float ba = plight->fFade;
+                spPointLight.m_pObject->SetDimmer(ba);
+                ShadowSceneNode* pnode = BSShaderManager::GetShadowSceneNode(0);
+                if (pnode) {
+                    pnode->AddLight(spPointLight.m_pObject, true);
+                }
+                float* v3 = &fMagicLightSideOffset.Float();
+                float fX = ptargetActor->GetScale() * *v3;
+                NiPoint3* v4 = ::new (&v19) NiPoint3(ptargetActor->GetBoundMax());
+                double v14 = v4->y + fMagicLightForwardOffset.Float();
+                float fY = ptargetActor->GetScale() * v14;
+                double Height = ptargetActor->GetHeight();
+                float* v5 = &fMagicLightHeightOffset.Float();
+                float fZ = ptargetActor->GetScale() * *v5 + Height;
+                spPointLight.m_pObject->SetTranslate(fX, fY, fZ);
+                if (ptargetActor == pPlayer) {
+                    v12 = static_cast<NiNode*>(pPlayer->Get3D(false));
+                }
+                else {
+                    v12 = ptargetActor->Get3D();
+                }
+                NiPointer<NiNode> pparent(v12);
+                NiNode* v11 = pparent.m_pObject;
+                v11->AttachChild(spPointLight.m_pObject, 1);
+                NiPointLight* bb = spPointLight.m_pObject;
+                ptargetActor->SetSpellEffectLight(bb);
+                ++LightEffect::iLightCount;
+            }
+            else {
+                Warning(
+                    "EDITOR: Light Effect has no Light object associated with it. Use the editor to select "
+                    "a light in the Magic Effects window for the Light effect."
+                );
             }
         }
     }
@@ -265,9 +260,8 @@ ActiveEffect* LightEffect::Instantiate(MagicCaster* apCaster, MagicItem* apSpell
     if (v5) {
         return ::new (v5) LightEffect(apCaster, apSpell, apEffect);
     }
-    else {
-        return nullptr;
-    }
+
+    return nullptr;
 }
 
 NiColor& NiColor::operator/=(float fScalar) {

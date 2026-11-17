@@ -66,9 +66,8 @@ double BSMAX_0(double a1, float a2) {
     if (!(a2 < a1)) {
         return a2;
     }
-    else {
-        return a1;
-    }
+
+    return a1;
 }
 
 DecalVertex::DecalVertex() {}
@@ -100,16 +99,15 @@ BSTempEffectSimpleDecal::BSTempEffectSimpleDecal(
 BSTempEffectSimpleDecal::~BSTempEffectSimpleDecal() {
     spTargetNode = static_cast<NiAVObject*>(nullptr);
     pParentNode = nullptr;
-    if (!bPermanent) {
-        if (sp3D.m_pObject) {
-            ShadowSceneNode::RemoveLightsFromGeom(static_cast<NiTriBasedGeom*>(sp3D.m_pObject));
-            if (sp3D.m_pObject->m_pkParent) {
-                NiNode* pParent = sp3D.m_pObject->m_pkParent;
-                pParent->DetachChild(sp3D.m_pObject);
-            }
-            sp3D = static_cast<NiAVObject*>(nullptr);
+    if ((!bPermanent) && (sp3D.m_pObject)) {
+        ShadowSceneNode::RemoveLightsFromGeom(static_cast<NiTriBasedGeom*>(sp3D.m_pObject));
+        if (sp3D.m_pObject->m_pkParent) {
+            NiNode* pParent = sp3D.m_pObject->m_pkParent;
+            pParent->DetachChild(sp3D.m_pObject);
         }
+        sp3D = static_cast<NiAVObject*>(nullptr);
     }
+
     CleanUpMemory();
     if (bValidDecal) {
         --BGSDecalManager::iDecalCount;
@@ -139,11 +137,10 @@ bool BSTempEffectSimpleDecal::Update(float afTimeDelta) {
     float falpha = (1.0 - ftimer) / 1.0;
     int32_t Type = NiMaterialProperty::GetType();
     NiMaterialProperty* pMaterial = static_cast<NiMaterialProperty*>(sp3D.m_pObject->GetProperty(Type));
-    if (pMaterial) {
-        if (falpha != pMaterial->m_fAlpha) {
-            pMaterial->SetAlpha(falpha);
-        }
+    if ((pMaterial) && (falpha != pMaterial->m_fAlpha)) {
+        pMaterial->SetAlpha(falpha);
     }
+
     return true;
 }
 
@@ -308,18 +305,16 @@ bool BSTempEffectSimpleDecal::ProcessGeometry(NiAVObject* apAVObj) {
             bFinalize = true;
             return true;
         }
-        else {
-            bFinished = true;
-            if (BGSDecalManager::bDebugDecals.Bool()) {
-                Warning("DECAL: No Decal for : %s", (&spTargetNode.m_pObject->m_kName)->GetHandleString());
-            }
-            return false;
-        }
-    }
-    else {
+
         bFinished = true;
+        if (BGSDecalManager::bDebugDecals.Bool()) {
+            Warning("DECAL: No Decal for : %s", (&spTargetNode.m_pObject->m_kName)->GetHandleString());
+        }
         return false;
     }
+
+    bFinished = true;
+    return false;
 }
 
 // Clips against planes 0, 1, 2, 3, 5 and 4, in that order, between the caller's and the scratch arrays.
@@ -588,14 +583,13 @@ bool BSTempEffectSimpleDecal::FinalizeGeometry() {
             else {
                 pnolightingProp = nullptr;
             }
-            if (pTextureSet) {
-                if ((BGSDecalManager::iDecalDebugFlags & 32) == 0) {
-                    NiPointer<NiTexture> spTempTexture(static_cast<NiTexture*>(nullptr));
-                    pTextureSet->GetTexture(BSShaderProperty::TEXTYPE_DIFFUSE, spTempTexture);
-                    NiTexture* Xa = spTempTexture.m_pObject;
-                    pnolightingProp->SetBaseMap(Xa);
-                }
+            if ((pTextureSet) && ((BGSDecalManager::iDecalDebugFlags & 32) == 0)) {
+                NiPointer<NiTexture> spTempTexture(static_cast<NiTexture*>(nullptr));
+                pTextureSet->GetTexture(BSShaderProperty::TEXTYPE_DIFFUSE, spTempTexture);
+                NiTexture* Xa = spTempTexture.m_pObject;
+                pnolightingProp->SetBaseMap(Xa);
             }
+
             pnolightingProp->SetFlag(27u, 1);
             NiGeometry* pgeom = static_cast<NiGeometry*>(spTargetNode.m_pObject);
             NiPropertyState* ppropertyState = &pgeom->m_PropertyState;
@@ -703,15 +697,13 @@ bool BSTempEffectSimpleDecal::FinalizeGeometry() {
             bFinished = true;
             return true;
         }
-        else {
-            bFinished = true;
-            return false;
-        }
-    }
-    else {
+
         bFinished = true;
         return false;
     }
+
+    bFinished = true;
+    return false;
 }
 
 NiTriShapeData* BSTempEffectSimpleDecal::CreateTriData() {
@@ -724,9 +716,8 @@ NiTriShapeData* BSTempEffectSimpleDecal::CreateTriData() {
             pFinalIndexArray
         );
     }
-    else {
-        return nullptr;
-    }
+
+    return nullptr;
 }
 
 void BSTempEffectSimpleDecal::ClipMesh(NiAVObject* apAVObj) {
@@ -775,10 +766,8 @@ void BSTempEffectSimpleDecal::ClipMesh(NiAVObject* apAVObj) {
                         newNormal[1] = pnormals[i2];
                         newNormal[2] = pnormals[i3];
                         int32_t count = ClipPolygon(3, newIndex, newVertex, newNormal, newIndex, newVertex, newNormal);
-                        if (count) {
-                            if (!AddPolygon(count, newIndex, newVertex, newNormal)) {
-                                break;
-                            }
+                        if ((count) && (!AddPolygon(count, newIndex, newVertex, newNormal))) {
+                            break;
                         }
                     }
                 }

@@ -235,10 +235,8 @@ bool TESRegion::Validate() {
 
 void TESRegion::SetWorldSpace(TESWorldSpace* apWorldSpace) {
     pWorldSpace = apWorldSpace;
-    if (pWorldSpace) {
-        if (TESForm::GetHasSpokenFlag() && (!pDataHandler->GetLoadingFiles())) {
-            pWorldSpace->SetHasBorderRegion(true);
-        }
+    if ((pWorldSpace) && (TESForm::GetHasSpokenFlag() && (!pDataHandler->GetLoadingFiles()))) {
+        pWorldSpace->SetHasBorderRegion(true);
     }
 }
 
@@ -259,31 +257,28 @@ void TESRegion::UpdateHUDRegionIndicator(const HUDMainMenu::HUDRegionData& aRegi
     // The last region shown: UpdateHUDRegionIndicator stores
     // HUDRegionData::pRegion.
     static TESRegion* pLastRegion;
-    if (HUDMainMenu::pme) {
-        if (!aRegionData.bUpdateLastRegion || aRegionData.pRegion != pLastRegion) {
-            if (aRegionData.bUpdateLastRegion) {
-                pLastRegion = aRegionData.pRegion;
+    if ((HUDMainMenu::pme) && (!aRegionData.bUpdateLastRegion || aRegionData.pRegion != pLastRegion)) {
+        if (aRegionData.bUpdateLastRegion) {
+            pLastRegion = aRegionData.pRegion;
+        }
+        bool v5 = true;
+        if (HUDMainMenu::pme->pTiles[15]->GetFloat(4009) != 0.0) {
+            const char* String = HUDMainMenu::pme->pTiles[15]->GetString(4036);
+            if (BSstrcmp(aRegionData.strDisplayText, String)) {
+                v5 = false;
             }
-            bool v5 = true;
-            if (HUDMainMenu::pme->pTiles[15]->GetFloat(4009) != 0.0) {
-                const char* String = HUDMainMenu::pme->pTiles[15]->GetString(4036);
-                if (BSstrcmp(aRegionData.strDisplayText, String)) {
-                    v5 = false;
-                }
-            }
-            if (aRegionData.strDisplayText[0]) {
-                if (HUDMainMenu::pme->pTiles[16]->GetFloat(4009) == 0.0 &&
-                    HUDMainMenu::pme->pTiles[16]->GetFadeFinished(4009)) {
-                    int32_t v2 = Tile::TextToTrait("_Hold");
-                    HUDMainMenu::pme->pTiles[15]->Set(v2, 0);
-                    HUDMainMenu::pme->pTiles[15]->Set(4036, aRegionData.strDisplayText, true);
-                    if (!v5) {
-                        float afEnd = fHudOpacity.Float() * 255.0;
-                        HUDMainMenu::pme->pTiles[15]->AddFadeControl(4009, 0.0f, afEnd, 2.0f, Tile::TFCT_STANDARD);
-                        uint32_t Time = appTimer.iLastTime;
-                        HUDMainMenu::pme->pTiles[15]->Set(Tile::kTileValue_User0, Time);
-                    }
-                }
+        }
+        if ((aRegionData.strDisplayText[0]) &&
+            (HUDMainMenu::pme->pTiles[16]->GetFloat(4009) == 0.0 &&
+             HUDMainMenu::pme->pTiles[16]->GetFadeFinished(4009))) {
+            int32_t v2 = Tile::TextToTrait("_Hold");
+            HUDMainMenu::pme->pTiles[15]->Set(v2, 0);
+            HUDMainMenu::pme->pTiles[15]->Set(4036, aRegionData.strDisplayText, true);
+            if (!v5) {
+                float afEnd = fHudOpacity.Float() * 255.0;
+                HUDMainMenu::pme->pTiles[15]->AddFadeControl(4009, 0.0f, afEnd, 2.0f, Tile::TFCT_STANDARD);
+                uint32_t Time = appTimer.iLastTime;
+                HUDMainMenu::pme->pTiles[15]->Set(Tile::kTileValue_User0, Time);
             }
         }
     }

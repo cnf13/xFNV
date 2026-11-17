@@ -34,31 +34,26 @@
 
 void BSShaderUtil::AccumulateScene(NiCamera* apCamera, NiAVObject* apScene, BSCullingProcess& aCuller) {
     NiRenderer* v3 = NiRenderer::ms_pkRenderer;
-    if (NiRenderer::ms_pkRenderer) {
-        if (apCamera) {
-            if (apScene) {
-                if (!GetThreadTLSData()->iBatchRendererIndex) {
-                    NiAccumulator* spaccum = NiRenderer::ms_pkRenderer->m_spAccum.m_pObject;
-                    NiPointer<NiAccumulator> spaccum_2 = spaccum;
-                    v3->SetSorter(aCuller.spAccumulator.m_pObject);
-                }
-                BSShaderManager::SetAccumulator(static_cast<BSShaderAccumulator*>(aCuller.spAccumulator.m_pObject));
-                aCuller.Process(apCamera, apScene, nullptr);
-            }
+    if ((NiRenderer::ms_pkRenderer) && (apCamera) && (apScene)) {
+        if (!GetThreadTLSData()->iBatchRendererIndex) {
+            NiAccumulator* spaccum = NiRenderer::ms_pkRenderer->m_spAccum.m_pObject;
+            NiPointer<NiAccumulator> spaccum_2 = spaccum;
+            v3->SetSorter(aCuller.spAccumulator.m_pObject);
         }
+        BSShaderManager::SetAccumulator(static_cast<BSShaderAccumulator*>(aCuller.spAccumulator.m_pObject));
+        aCuller.Process(apCamera, apScene, nullptr);
     }
 }
 
 void BSShaderUtil::RenderScene(NiCamera* apCamera, BSShaderAccumulator* apAccumulator, bool abUseSPU) {
-    if (NiRenderer::ms_pkRenderer) {
-        if (apCamera) {
-            NiRenderer::ms_pkRenderer->SetCameraData(apCamera);
-            BSShaderManager::spCamera = apCamera;
-            BSShaderManager::SetCurrentAccumulator(apAccumulator);
-            apAccumulator->StartAccumulating(apCamera);
-            apAccumulator->FinishAccumulatingPreResolveDepth();
-        }
+    if ((NiRenderer::ms_pkRenderer) && (apCamera)) {
+        NiRenderer::ms_pkRenderer->SetCameraData(apCamera);
+        BSShaderManager::spCamera = apCamera;
+        BSShaderManager::SetCurrentAccumulator(apAccumulator);
+        apAccumulator->StartAccumulating(apCamera);
+        apAccumulator->FinishAccumulatingPreResolveDepth();
     }
+
     apAccumulator->FinishAccumulatingPostResolveDepth();
 }
 
@@ -332,13 +327,11 @@ void BSShaderUtil::KillSDM() {
 }
 
 void BSShaderUtil::RenderScenePreResolveDepth(NiCamera* apCamera, BSShaderAccumulator* apAccumulator, bool abUseSPU) {
-    if (NiRenderer::ms_pkRenderer) {
-        if (apCamera) {
-            NiRenderer::ms_pkRenderer->SetCameraData(apCamera);
-            BSShaderManager::spCamera = apCamera;
-            BSShaderManager::SetCurrentAccumulator(apAccumulator);
-            apAccumulator->StartAccumulating(apCamera);
-            apAccumulator->FinishAccumulatingPreResolveDepth();
-        }
+    if ((NiRenderer::ms_pkRenderer) && (apCamera)) {
+        NiRenderer::ms_pkRenderer->SetCameraData(apCamera);
+        BSShaderManager::spCamera = apCamera;
+        BSShaderManager::SetCurrentAccumulator(apAccumulator);
+        apAccumulator->StartAccumulating(apCamera);
+        apAccumulator->FinishAccumulatingPreResolveDepth();
     }
 }

@@ -122,17 +122,15 @@ NiTexture* BGSTerrainChunk::GetTexture(BGSTerrainChunk::ChunkTextureType aTexTyp
             if (aTexType) {
                 return pplp->GetNormalTexture(0);
             }
-            else {
-                return pplp->GetDiffuseTextures(0);
-            }
+
+            return pplp->GetDiffuseTextures(0);
         }
-        else {
-            // The cell coordinates are sign-extended.
-            Warning(
-                "MODELS: Terrain chunk at level %i coords %i,%i has a mesh but no PP lighting property.", pNode->iLevel,
-                static_cast<int32_t>(pNode->sBaseCellX), static_cast<int32_t>(pNode->sBaseCellY)
-            );
-        }
+
+        // The cell coordinates are sign-extended.
+        Warning(
+            "MODELS: Terrain chunk at level %i coords %i,%i has a mesh but no PP lighting property.", pNode->iLevel,
+            static_cast<int32_t>(pNode->sBaseCellX), static_cast<int32_t>(pNode->sBaseCellY)
+        );
     }
     return ptex;
 }
@@ -181,27 +179,25 @@ void BGSTerrainChunk::RemoveFromStaticList() {
 }
 
 void BGSTerrainChunk::Prepare() {
-    if (!bPrepared) {
-        if (spMesh.m_pObject) {
-            int32_t Type = NiShadeProperty::GetType();
-            BSShaderPPLightingProperty* pShaderProperty =
-                static_cast<BSShaderPPLightingProperty*>(spMesh.m_pObject->GetProperty(Type));
-            pShaderProperty->SetFlag(33u, 1);
-            pShaderProperty->SetTerrainTexParams(0.0f, 0.0f, 1.0f);
-            BSShaderManager::PrepareObject(spMesh.m_pObject, 0, 0);
-            spLightingProp.operator=(pShaderProperty);
-            spMesh.m_pObject->GetModelData()->m_ucKeepFlags = 0;
-            spMesh.m_pObject->GetModelData()->SetConsistency(NiGeometryData::STATIC);
-            spMesh.m_pObject->GetModelData()->SetCompressFlags(1u);
-            BSShader* Shader = spMesh.m_pObject->GetShader();
-            NiRenderer* Renderer_ = NiRenderer::GetRenderer();
-            NiD3DShaderDeclaration* v2 = Shader->GetShaderDecl(spMesh.m_pObject, pShaderProperty);
-            // This is a virtual of the platform renderer that NiRenderer does not declare.
-            static_cast<NiDX9Renderer*>(Renderer_)->PrecacheGeometry(spMesh.m_pObject, 0, 0, v2);
-            NiDX9Renderer* v3 = static_cast<NiDX9Renderer*>(NiRenderer::GetRenderer());
-            v3->PerformPrecache();
-            bPrepared = true;
-        }
+    if ((!bPrepared) && (spMesh.m_pObject)) {
+        int32_t Type = NiShadeProperty::GetType();
+        BSShaderPPLightingProperty* pShaderProperty =
+            static_cast<BSShaderPPLightingProperty*>(spMesh.m_pObject->GetProperty(Type));
+        pShaderProperty->SetFlag(33u, 1);
+        pShaderProperty->SetTerrainTexParams(0.0f, 0.0f, 1.0f);
+        BSShaderManager::PrepareObject(spMesh.m_pObject, 0, 0);
+        spLightingProp.operator=(pShaderProperty);
+        spMesh.m_pObject->GetModelData()->m_ucKeepFlags = 0;
+        spMesh.m_pObject->GetModelData()->SetConsistency(NiGeometryData::STATIC);
+        spMesh.m_pObject->GetModelData()->SetCompressFlags(1u);
+        BSShader* Shader = spMesh.m_pObject->GetShader();
+        NiRenderer* Renderer_ = NiRenderer::GetRenderer();
+        NiD3DShaderDeclaration* v2 = Shader->GetShaderDecl(spMesh.m_pObject, pShaderProperty);
+        // This is a virtual of the platform renderer that NiRenderer does not declare.
+        static_cast<NiDX9Renderer*>(Renderer_)->PrecacheGeometry(spMesh.m_pObject, 0, 0, v2);
+        NiDX9Renderer* v3 = static_cast<NiDX9Renderer*>(NiRenderer::GetRenderer());
+        v3->PerformPrecache();
+        bPrepared = true;
     }
 }
 
@@ -361,39 +357,36 @@ void BGSTerrainChunk::AddWaterToSystem(bool abForce) {
 
 void BGSTerrainChunk::RemoveWaterFromSystem(bool abForce) {
     if (BGSTerrainChunk::bLODWaterProcessing || abForce) {
-        if (spWater.m_pObject) {
+        if ((spWater.m_pObject) && (pLODWaterRef)) {
+            if (TES::pInstance->GetWaterSystem()) {
+                NiNode* WaterLODRoot = pNode->pManager->GetWaterLODRoot();
+                TESWorldSpace* World = pNode->pManager->pWorld;
+                TES::pInstance->GetWaterSystem()->RemoveLODWater(pLODWaterRef, World, WaterLODRoot);
+            }
+            if (spWaterNode.m_pObject) {
+                NiNode* v7 = pNode->pManager->GetWaterLODRoot();
+                v7->DetachChild(spWaterNode.m_pObject);
+            }
             if (pLODWaterRef) {
-                if (TES::pInstance->GetWaterSystem()) {
-                    NiNode* WaterLODRoot = pNode->pManager->GetWaterLODRoot();
-                    TESWorldSpace* World = pNode->pManager->pWorld;
-                    TES::pInstance->GetWaterSystem()->RemoveLODWater(pLODWaterRef, World, WaterLODRoot);
-                }
-                if (spWaterNode.m_pObject) {
-                    NiNode* v7 = pNode->pManager->GetWaterLODRoot();
-                    v7->DetachChild(spWaterNode.m_pObject);
-                }
-                if (pLODWaterRef) {
-                    delete pLODWaterRef;
-                }
-                pLODWaterRef = nullptr;
+                delete pLODWaterRef;
             }
+            pLODWaterRef = nullptr;
         }
-        if (spWaterAtReflectionHeight.m_pObject) {
-            if (pLODWaterAtReflectionHeightRef) {
-                if (TES::pInstance->GetWaterSystem()) {
-                    NiNode* v5 = pNode->pManager->GetWaterLODRoot();
-                    TESWorldSpace* v3 = pNode->pManager->pWorld;
-                    TES::pInstance->GetWaterSystem()->RemoveLODWater(pLODWaterAtReflectionHeightRef, v3, v5);
-                }
-                if (spWaterReflNode.m_pObject) {
-                    NiNode* v6 = pNode->pManager->GetWaterLODRoot();
-                    v6->DetachChild(spWaterReflNode.m_pObject);
-                }
-                if (pLODWaterAtReflectionHeightRef) {
-                    delete pLODWaterAtReflectionHeightRef;
-                }
-                pLODWaterAtReflectionHeightRef = nullptr;
+
+        if ((spWaterAtReflectionHeight.m_pObject) && (pLODWaterAtReflectionHeightRef)) {
+            if (TES::pInstance->GetWaterSystem()) {
+                NiNode* v5 = pNode->pManager->GetWaterLODRoot();
+                TESWorldSpace* v3 = pNode->pManager->pWorld;
+                TES::pInstance->GetWaterSystem()->RemoveLODWater(pLODWaterAtReflectionHeightRef, v3, v5);
             }
+            if (spWaterReflNode.m_pObject) {
+                NiNode* v6 = pNode->pManager->GetWaterLODRoot();
+                v6->DetachChild(spWaterReflNode.m_pObject);
+            }
+            if (pLODWaterAtReflectionHeightRef) {
+                delete pLODWaterAtReflectionHeightRef;
+            }
+            pLODWaterAtReflectionHeightRef = nullptr;
         }
     }
 }
@@ -454,23 +447,21 @@ void BGSTerrainChunk::operator delete(void* apMemory) {
 void BGSTerrainChunk::UpdateMultiBoundVisibility(NiCamera* apCamera, NiCullingProcess& aCullProc) {
     NiPoint3 kviewPoint = apCamera->GetWorldTranslate();
     for (BGSTerrainChunk* item : BGSTerrainChunk::ChunksLoaded) {
-        if (item) {
-            if (!item->pNode->QSplitNode()) {
-                BSMultiBoundNode* pnode = item->GetNode();
-                if (pnode) {
-                    ShadowSceneNode* ShadowSceneNode_ = BSShaderManager::GetShadowSceneNode(0);
-                    ShadowSceneNode_->UpdateMultiboundVisibility(pnode, kviewPoint, aCullProc);
-                }
-                BSMultiBoundNode* pnode_2 = item->spWaterNode.m_pObject;
-                if (pnode_2) {
-                    ShadowSceneNode* v3 = BSShaderManager::GetShadowSceneNode(0);
-                    v3->UpdateMultiboundVisibility(pnode_2, kviewPoint, aCullProc);
-                }
-                BSMultiBoundNode* pnode_3 = item->spWaterReflNode.m_pObject;
-                if (pnode_3) {
-                    ShadowSceneNode* v4 = BSShaderManager::GetShadowSceneNode(0);
-                    v4->UpdateMultiboundVisibility(pnode_3, kviewPoint, aCullProc);
-                }
+        if ((item) && (!item->pNode->QSplitNode())) {
+            BSMultiBoundNode* pnode = item->GetNode();
+            if (pnode) {
+                ShadowSceneNode* ShadowSceneNode_ = BSShaderManager::GetShadowSceneNode(0);
+                ShadowSceneNode_->UpdateMultiboundVisibility(pnode, kviewPoint, aCullProc);
+            }
+            BSMultiBoundNode* pnode_2 = item->spWaterNode.m_pObject;
+            if (pnode_2) {
+                ShadowSceneNode* v3 = BSShaderManager::GetShadowSceneNode(0);
+                v3->UpdateMultiboundVisibility(pnode_2, kviewPoint, aCullProc);
+            }
+            BSMultiBoundNode* pnode_3 = item->spWaterReflNode.m_pObject;
+            if (pnode_3) {
+                ShadowSceneNode* v4 = BSShaderManager::GetShadowSceneNode(0);
+                v4->UpdateMultiboundVisibility(pnode_3, kviewPoint, aCullProc);
             }
         }
     }

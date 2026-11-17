@@ -30,9 +30,8 @@ hkProcess* hkpInactiveContactPointViewer::create(const hkArray<hkProcessContext*
     if (v3) {
         return &static_cast<hkProcess&>(static_cast<hkpWorldViewerBase&>(static_cast<hkpContactPointViewer&>(*v3)));
     }
-    else {
-        return nullptr;
-    }
+
+    return nullptr;
 }
 
 void hkpInactiveContactPointViewer::registerViewer() {

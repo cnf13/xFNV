@@ -182,7 +182,6 @@ ActiveEffect* ChameleonEffect::Instantiate(MagicCaster* a1, MagicItem* a2, Effec
     if (v5) {
         return ::new (v5) ChameleonEffect(a1, a2, a3);
     }
-    else {
-        return nullptr;
-    }
+
+    return nullptr;
 }

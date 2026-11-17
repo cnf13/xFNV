@@ -166,9 +166,8 @@ hkBool* hkaDetectRagdollPenetration::detectPenetration(
         arResult->m_bool = 1;
         return arResult;
     }
-    else {
-        m_ragdollIsOut.m_bool = 1;
-        arResult->m_bool = 0;
-        return arResult;
-    }
+
+    m_ragdollIsOut.m_bool = 1;
+    arResult->m_bool = 0;
+    return arResult;
 }

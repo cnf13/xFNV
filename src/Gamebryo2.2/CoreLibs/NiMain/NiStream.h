@@ -63,7 +63,7 @@ public:
     public:
         ~BackgroundLoadProcedure() override;
 
-        virtual uint32_t ThreadProcedure(void* pvArg);
+        uint32_t ThreadProcedure(void* pvArg) override;
 
         NiStream* m_pkStream;
     };

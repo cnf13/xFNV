@@ -66,10 +66,8 @@ NiShader* NiSingleShaderMaterial::GetCurrentShader(
     }
     if (pkShaderFactory) {
         NiShader* pkShader = pkShaderFactory->RetrieveShader(m_kShaderName.GetHandle(), a5, true);
-        if (pkShader) {
-            if (pkShader->IsInitialized() || pkShader->Initialize()) {
-                return pkShader;
-            }
+        if ((pkShader) && (pkShader->IsInitialized() || pkShader->Initialize())) {
+            return pkShader;
         }
     }
     return nullptr;

@@ -363,23 +363,21 @@ void Model::InitModel(const char* apFilename, BSStream* apStream, bool abPrepare
             uint32_t iChild = 0;
             for (uint32_t iIndex = 0; iIndex < apStream->GetObjectCount(); ++iIndex) {
                 NiAVObject* pChild = static_cast<NiAVObject*>(apStream->GetObjectAt(iIndex));
-                if (pChild) {
-                    if (pChild->IsNode() || pChild->IsGeometry()) {
-                        if (!spObject3D.m_pObject) {
-                            NiObject* pNewObject_3;
-                            NiNode* v14 = static_cast<NiNode*>(NiMemObject::operator new(sizeof(NiNode)));
-                            if (v14) {
-                                pNewObject_3 = (NiObject*)::new (v14) NiNode(0);
-                            }
-                            else {
-                                pNewObject_3 = nullptr;
-                            }
-                            spObject3D.operator=(static_cast<NiNode*>(pNewObject_3));
+                if ((pChild) && (pChild->IsNode() || pChild->IsGeometry())) {
+                    if (!spObject3D.m_pObject) {
+                        NiObject* pNewObject_3;
+                        NiNode* v14 = static_cast<NiNode*>(NiMemObject::operator new(sizeof(NiNode)));
+                        if (v14) {
+                            pNewObject_3 = (NiObject*)::new (v14) NiNode(0);
                         }
-                        NiNode* v9 = spObject3D.m_pObject;
-                        v9->SetAt(iChild++, pChild);
-                        bLoaded = true;
+                        else {
+                            pNewObject_3 = nullptr;
+                        }
+                        spObject3D.operator=(static_cast<NiNode*>(pNewObject_3));
                     }
+                    NiNode* v9 = spObject3D.m_pObject;
+                    v9->SetAt(iChild++, pChild);
+                    bLoaded = true;
                 }
             }
         }
@@ -391,10 +389,8 @@ void Model::InitModel(const char* apFilename, BSStream* apStream, bool abPrepare
                 );
                 if (pman) {
                     NiAVObjectPalette* ppal = pman->GetObjectPalette();
-                    if (ppal) {
-                        if ((&spObject3D.m_pObject->m_kName)->GetHandleString()) {
-                            ppal->SetAVObject(*&spObject3D.m_pObject->m_kName, nullptr);
-                        }
+                    if ((ppal) && ((&spObject3D.m_pObject->m_kName)->GetHandleString())) {
+                        ppal->SetAVObject(*&spObject3D.m_pObject->m_kName, nullptr);
                     }
                 }
             }
@@ -513,10 +509,8 @@ void LoadedFile::DecRefCount() {
     }
     NiAtomicDecrement(iRefCount);
     LoadedFile::LSAccessCrit.Unlock();
-    if (!iRefCount) {
-        if (this) {
-            delete this;
-        }
+    if ((!iRefCount) && (this)) {
+        delete this;
     }
 }
 
@@ -686,40 +680,36 @@ void QueuedTexture::Finish() {
     NiTexture* v2;
     BSFileEntry* v3;
     BSFileEntry* location;
-    if (!GetAlreadyInPalette()) {
-        if ((&spTexture)->operator->()) {
-            if (QueuedFileEntry::GetFileEntry()) {
-                location = QueuedFileEntry::GetFileEntry();
-                v1 = (&spTexture)->operator->();
-                BSTexturePalette::SetTexture(v1, location);
-            }
-            else {
-                if (pFileName) {
-                    v2 = (&spTexture)->operator->();
-                    BSTexturePalette::SetTexture(v2, nullptr);
-                }
+    if ((!GetAlreadyInPalette()) && ((&spTexture)->operator->())) {
+        if (QueuedFileEntry::GetFileEntry()) {
+            location = QueuedFileEntry::GetFileEntry();
+            v1 = (&spTexture)->operator->();
+            BSTexturePalette::SetTexture(v1, location);
+        }
+        else {
+            if (pFileName) {
+                v2 = (&spTexture)->operator->();
+                BSTexturePalette::SetTexture(v2, nullptr);
             }
         }
     }
-    if (QueuedFileEntry::GetFileEntry()) {
-        if (GetTrackedFile()) {
-            SetInQueuedTextureMap(false);
-            v3 = QueuedFileEntry::GetFileEntry();
-            pModelLoader->RemoveQueuedTextureFromMap(v3);
-        }
+
+    if ((QueuedFileEntry::GetFileEntry()) && (GetTrackedFile())) {
+        SetInQueuedTextureMap(false);
+        v3 = QueuedFileEntry::GetFileEntry();
+        pModelLoader->RemoveQueuedTextureFromMap(v3);
     }
+
     QueuedFile::Finish();
 }
 
 void QueuedTexture::Cancel(BS_TASK_STATE aePreviousState, void* apTaskOwner) {
     BSFileEntry* location;
     QueuedFile::Cancel(aePreviousState, apTaskOwner);
-    if (QueuedFileEntry::GetFileEntry()) {
-        if (GetTrackedFile()) {
-            SetInQueuedTextureMap(false);
-            location = QueuedFileEntry::GetFileEntry();
-            pModelLoader->RemoveQueuedTextureFromMap(location);
-        }
+    if ((QueuedFileEntry::GetFileEntry()) && (GetTrackedFile())) {
+        SetInQueuedTextureMap(false);
+        location = QueuedFileEntry::GetFileEntry();
+        pModelLoader->RemoveQueuedTextureFromMap(location);
     }
 }
 
@@ -747,9 +737,8 @@ uint8_t QueuedTexture::GetFileIndex() {
          ((pArchive = ArchiveManager::GetArchiveForFileEntry(location, ARCHIVE_TYPE_TEXTURES)) != nullptr))) {
         return (uint8_t)(pArchive->GetRuntimeID() + 4);
     }
-    else {
-        return (uint8_t)0;
-    }
+
+    return (uint8_t)0;
 }
 
 QueuedTexture::~QueuedTexture() {}
@@ -983,11 +972,9 @@ void QueuedModel::QueueMe(TESTextureList* apTextureList) {
         TESModelTextureSwap* ptextureSwap = pTESModel->GetAsModelTextureSwap();
         if (ptextureSwap) {
             for (TEX_SWAP* pswap : *&ptextureSwap->TextureSwapList) {
-                if (pswap) {
-                    if (pswap->pNewTexture) {
-                        IO_TASK_PRIORITY v3 = GetIOTaskPriority();
-                        pswap->pNewTexture->QueueTextureSet(v3, this, false);
-                    }
+                if ((pswap) && (pswap->pNewTexture)) {
+                    IO_TASK_PRIORITY v3 = GetIOTaskPriority();
+                    pswap->pNewTexture->QueueTextureSet(v3, this, false);
                 }
             }
         }
@@ -1104,17 +1091,16 @@ void QueuedKF::Run() {
 }
 
 void QueuedKF::Finish() {
-    if (spKFModel.m_pObject) {
-        if (!GetAlreadyInPalette()) {
-            KFModel* v3 = spKFModel.m_pObject;
-            char* ProcessLevel = pFileName;
-            if (!pModelLoader->AddKF(ProcessLevel, v3)) {
-                char* v4 = pFileName;
-                KFModel* KFModel_ = pModelLoader->FindKFModel(v4);
-                spKFModel.operator=(KFModel_);
-            }
+    if ((spKFModel.m_pObject) && (!GetAlreadyInPalette())) {
+        KFModel* v3 = spKFModel.m_pObject;
+        char* ProcessLevel = pFileName;
+        if (!pModelLoader->AddKF(ProcessLevel, v3)) {
+            char* v4 = pFileName;
+            KFModel* KFModel_ = pModelLoader->FindKFModel(v4);
+            spKFModel.operator=(KFModel_);
         }
     }
+
     QueuedFile::Finish();
 }
 
@@ -1168,12 +1154,11 @@ bool QueuedAnimIdle::GetDescription(char* apDescription, uint32_t aiBufferSize) 
 
 // Hands a loaded animation to its idle unless the load was cancelled, then drops the idle from the queued map.
 void QueuedAnimIdle::PostProcess() {
-    if (spKFModel.operator->()) {
-        if (!IOTask::IsCancelled()) {
-            KFModel* pKFModel = spKFModel.operator->();
-            spAnimIdle.operator->()->Loaded(pKFModel);
-        }
+    if ((spKFModel.operator->()) && (!IOTask::IsCancelled())) {
+        KFModel* pKFModel = spKFModel.operator->();
+        spAnimIdle.operator->()->Loaded(pKFModel);
     }
+
     pModelLoader->RemoveAnimIdleFromMap(spAnimIdle.operator->());
 }
 
@@ -1273,104 +1258,90 @@ void QueuedHelmet::CheckFinished() {
             NiPointer<NiObject> spTempObject(static_cast<NiObject*>(nullptr));
             if (IsTaskFinished() && (GetAllChildrenFinished() && (!IsCancelled() && pRef != pPlayer))) {
                 for (BIPED_OBJECT n = BO_HEAD; n < BIPED_OBJECT_COUNT; n = static_cast<BIPED_OBJECT>(n + 1)) {
-                    if (spQueuedHelmetModel[n].m_pObject) {
-                        if (spQueuedHelmetModel[n].m_pObject->GetModel()) {
-                            Model* AdditionalGeometryData = spQueuedHelmetModel[n].m_pObject->GetModel();
-                            if (AdditionalGeometryData->GetModel()) {
-                                BIPED_OBJECT afAngle = n;
-                                Model* v2 = spQueuedHelmetModel[n].m_pObject->GetModel();
-                                NiNode* Controllers = v2->GetModel();
-                                NiNode* afAnglea =
-                                    pBipedAnim->CloneHelmet(spHelmetFaceGenModel[n].m_pObject, Controllers, afAngle);
-                                spClonedHelmetNode[n].operator=(afAnglea);
-                                if (spClonedHelmetNode[n].m_pObject) {
-                                    bool bskin = false;
-                                    for (int32_t i = 0;; ++i) {
-                                        uint32_t ArrayCount = spClonedHelmetNode[n].m_pObject->GetArrayCount();
-                                        if (i >= ArrayCount) {
+                    if ((spQueuedHelmetModel[n].m_pObject) && (spQueuedHelmetModel[n].m_pObject->GetModel())) {
+                        Model* AdditionalGeometryData = spQueuedHelmetModel[n].m_pObject->GetModel();
+                        if (AdditionalGeometryData->GetModel()) {
+                            BIPED_OBJECT afAngle = n;
+                            Model* v2 = spQueuedHelmetModel[n].m_pObject->GetModel();
+                            NiNode* Controllers = v2->GetModel();
+                            NiNode* afAnglea =
+                                pBipedAnim->CloneHelmet(spHelmetFaceGenModel[n].m_pObject, Controllers, afAngle);
+                            spClonedHelmetNode[n].operator=(afAnglea);
+                            if (spClonedHelmetNode[n].m_pObject) {
+                                bool bskin = false;
+                                for (int32_t i = 0;; ++i) {
+                                    uint32_t ArrayCount = spClonedHelmetNode[n].m_pObject->GetArrayCount();
+                                    if (i >= ArrayCount) {
+                                        break;
+                                    }
+                                    NiTriBasedGeom* ptri = static_cast<NiTriBasedGeom*>(
+                                        spClonedHelmetNode[n].m_pObject->GetAt(static_cast<uint32_t>(i))
+                                    );
+                                    if ((ptri) && (ptri->IsGeometry())) {
+                                        NiAVObject* pobj = (NiAVObject*)ptri;
+                                        if (ptri->GetSkinInstance()) {
+                                            bskin = true;
                                             break;
                                         }
-                                        NiTriBasedGeom* ptri = static_cast<NiTriBasedGeom*>(
-                                            spClonedHelmetNode[n].m_pObject->GetAt(static_cast<uint32_t>(i))
-                                        );
-                                        if (ptri) {
-                                            if (ptri->IsGeometry()) {
-                                                NiAVObject* pobj = (NiAVObject*)ptri;
-                                                if (ptri->GetSkinInstance()) {
-                                                    bskin = true;
-                                                    break;
-                                                }
-                                            }
-                                        }
                                     }
-                                    if (!bskin) {
-                                        BSFaceGenModel* pfgmodel;
-                                        if (spHelmetFaceGenModel[n].m_pObject) {
-                                            pfgmodel = spHelmetFaceGenModel[n].m_pObject;
-                                        }
-                                        else {
-                                            pfgmodel = pBipedAnim->LoadFaceGenModel(n);
-                                        }
-                                        BSFaceGenModel* pfgmodel_2 = pfgmodel;
-                                        if (pfgmodel) {
-                                            for (int32_t i_2 = 0;; ++i_2) {
-                                                uint32_t v4 = spClonedHelmetNode[n].m_pObject->GetArrayCount();
-                                                if (i_2 >= v4) {
-                                                    break;
-                                                }
-                                                NiAVObject* pobj_2 =
-                                                    spClonedHelmetNode[n].m_pObject->GetAt(static_cast<uint32_t>(i_2));
-                                                NiTriBasedGeom* ptri_2 = static_cast<NiTriBasedGeom*>(pobj_2);
-                                                if (pobj_2) {
-                                                    if (ptri_2->GetModelData()) {
-                                                        if (pBipedAnim->GetRequester()) {
-                                                            if (pBipedAnim->GetRequester()->GetObjectReference()) {
-                                                                TESObjectREFR* Requester = pBipedAnim->GetRequester();
-                                                                if (Requester->GetObjectReference()->GetFormType() ==
-                                                                    NPC__ID) {
-                                                                    FNVD_INLINED_LOCAL(
-                                                                        std::type_identity_t<FR2MatrixVTC<float>[2][2]>,
-                                                                        fgcoord, std::nullopt, std::nullopt
-                                                                    );
-                                                                    TESNPC* pnpc_2 = static_cast<TESNPC*>(
-                                                                        pBipedAnim->GetRequester()->GetObjectReference()
-                                                                    );
-                                                                    rt::eh_vector_constructor_iterator(
-                                                                        fgcoord, sizeof(FR2MatrixVTC<float>), 4,
-                                                                        &fnvd::constructElement<FR2MatrixVTC<float>>,
-                                                                        &fnvd::destructElement<FR2MatrixVTC<float>>
-                                                                    );
-                                                                    ::new (&spdata) NiPointer<NiGeometryData>(
-                                                                        static_cast<NiGeometryData*>(nullptr)
-                                                                    );
-                                                                    ptri_2->GetModelData()->CreateDeepCopy(
-                                                                        spTempObject
-                                                                    );
-                                                                    spdata.operator=(static_cast<NiGeometryData*>(
-                                                                        spTempObject.m_pObject
-                                                                    ));
-                                                                    NiGeometryData* afAngleb = spdata.m_pObject;
-                                                                    ptri_2->SetModelData(afAngleb);
-                                                                    pnpc_2->GetFaceCoord(fgcoord);
-                                                                    if (!BSFaceGenManager::GetUseFaceGenHeads() ||
-                                                                        pfgmodel_2->ApplyCoordinateToExistingMesh(
-                                                                            &fgcoord, ptri_2, false
-                                                                        )) {
-                                                                        NiMatrix3 matrot;
-                                                                        matrot.MakeYRotation(-1.5707964f);
-                                                                        ptri_2->SetRotate(
-                                                                            (&ptri_2->m_kLocal)->m_Rotate * matrot
-                                                                        );
-                                                                    }
-                                                                    spdata.~NiPointer<NiGeometryData>();
-                                                                    rt::eh_vector_destructor_iterator(
-                                                                        fgcoord, sizeof(FR2MatrixVTC<float>), 4,
-                                                                        &fnvd::destructElement<FR2MatrixVTC<float>>
-                                                                    );
-                                                                }
-                                                            }
-                                                        }
+                                }
+                                if (!bskin) {
+                                    BSFaceGenModel* pfgmodel;
+                                    if (spHelmetFaceGenModel[n].m_pObject) {
+                                        pfgmodel = spHelmetFaceGenModel[n].m_pObject;
+                                    }
+                                    else {
+                                        pfgmodel = pBipedAnim->LoadFaceGenModel(n);
+                                    }
+                                    BSFaceGenModel* pfgmodel_2 = pfgmodel;
+                                    if (pfgmodel) {
+                                        for (int32_t i_2 = 0;; ++i_2) {
+                                            uint32_t v4 = spClonedHelmetNode[n].m_pObject->GetArrayCount();
+                                            if (i_2 >= v4) {
+                                                break;
+                                            }
+                                            NiAVObject* pobj_2 =
+                                                spClonedHelmetNode[n].m_pObject->GetAt(static_cast<uint32_t>(i_2));
+                                            NiTriBasedGeom* ptri_2 = static_cast<NiTriBasedGeom*>(pobj_2);
+                                            if ((pobj_2) && (ptri_2->GetModelData()) && (pBipedAnim->GetRequester()) &&
+                                                (pBipedAnim->GetRequester()->GetObjectReference())) {
+                                                TESObjectREFR* Requester = pBipedAnim->GetRequester();
+                                                if (Requester->GetObjectReference()->GetFormType() == NPC__ID) {
+                                                    FNVD_INLINED_LOCAL(
+                                                        std::type_identity_t<FR2MatrixVTC<float>[2][2]>, fgcoord,
+                                                        std::nullopt, std::nullopt
+                                                    );
+                                                    TESNPC* pnpc_2 = static_cast<TESNPC*>(
+                                                        pBipedAnim->GetRequester()->GetObjectReference()
+                                                    );
+                                                    rt::eh_vector_constructor_iterator(
+                                                        fgcoord, sizeof(FR2MatrixVTC<float>), 4,
+                                                        &fnvd::constructElement<FR2MatrixVTC<float>>,
+                                                        &fnvd::destructElement<FR2MatrixVTC<float>>
+                                                    );
+                                                    ::new (&spdata) NiPointer<NiGeometryData>(
+                                                        static_cast<NiGeometryData*>(nullptr)
+                                                    );
+                                                    ptri_2->GetModelData()->CreateDeepCopy(spTempObject);
+                                                    spdata.operator=(
+                                                        static_cast<NiGeometryData*>(spTempObject.m_pObject)
+                                                    );
+                                                    NiGeometryData* afAngleb = spdata.m_pObject;
+                                                    ptri_2->SetModelData(afAngleb);
+                                                    pnpc_2->GetFaceCoord(fgcoord);
+                                                    if (!BSFaceGenManager::GetUseFaceGenHeads() ||
+                                                        pfgmodel_2->ApplyCoordinateToExistingMesh(
+                                                            &fgcoord, ptri_2, false
+                                                        )) {
+                                                        NiMatrix3 matrot;
+                                                        matrot.MakeYRotation(-1.5707964f);
+                                                        ptri_2->SetRotate((&ptri_2->m_kLocal)->m_Rotate * matrot);
                                                     }
+                                                    spdata.~NiPointer<NiGeometryData>();
+                                                    rt::eh_vector_destructor_iterator(
+                                                        fgcoord, sizeof(FR2MatrixVTC<float>), 4,
+                                                        &fnvd::destructElement<FR2MatrixVTC<float>>
+                                                    );
                                                 }
                                             }
                                         }
@@ -1419,21 +1390,20 @@ QueuedMagicItem::~QueuedMagicItem() {}
 void QueuedMagicItem::QueueMe() {
     EffectItemList* plist_2;
     bool beffectModelQueued = false;
-    if (this->pEffectSetting->GetModelLength()) {
-        if (!this->pEffectSetting->IsEffectQueued()) {
-            TESModel* apModel;
-            EffectSetting* pEffectSetting = this->pEffectSetting;
-            if (pEffectSetting) {
-                apModel = static_cast<TESModel*>(pEffectSetting);
-            }
-            else {
-                apModel = nullptr;
-            }
-            IO_TASK_PRIORITY IOTaskPriority = GetIOTaskPriority();
-            pModelLoader->QueueModel(apModel, IOTaskPriority, this, LOD_MULT_NONE, true, false, false);
-            beffectModelQueued = true;
+    if ((this->pEffectSetting->GetModelLength()) && (!this->pEffectSetting->IsEffectQueued())) {
+        TESModel* apModel;
+        EffectSetting* pEffectSetting = this->pEffectSetting;
+        if (pEffectSetting) {
+            apModel = static_cast<TESModel*>(pEffectSetting);
         }
+        else {
+            apModel = nullptr;
+        }
+        IO_TASK_PRIORITY IOTaskPriority = GetIOTaskPriority();
+        pModelLoader->QueueModel(apModel, IOTaskPriority, this, LOD_MULT_NONE, true, false, false);
+        beffectModelQueued = true;
     }
+
     this->pEffectSetting->QueueEffect();
     MagicItem* pMagicItem = this->pMagicItem;
     if (pMagicItem) {
@@ -1651,22 +1621,19 @@ void QueuedReference::QueueMe() {
     AutoMemContext tempMemContext(
         eContext, true, "D:\\_Fallout3\\Platforms\\Common\\Code\\Fallout Shared\\ModelLoader.cpp", 1834
     );
-    if (pRef) {
-        if (pRef->GetVisibleDistant() && !pRef->Get3D()) {
-            UseDistant3D();
-        }
+    if ((pRef) && (pRef->GetVisibleDistant() && !pRef->Get3D())) {
+        UseDistant3D();
     }
+
     if (pRef) {
         BSSimpleList<REF_DECAL_DATA*>* pdecallist = (&pRef->m_Extra)->GetDecalRefs();
         while (pdecallist && !pdecallist->IsEmpty()) {
             REF_DECAL_DATA* pdata = pdecallist->m_item;
             pdecallist = pdecallist->m_pkNext;
-            if (pdata->pDecalRef) {
-                if (pdata->pDecalRef->GetObjectReference()->GetFormType() == TXST_ID) {
-                    BGSTextureSet* ptexset_2 = static_cast<BGSTextureSet*>(pdata->pDecalRef->GetObjectReference());
-                    uint8_t Priority = GetPriority();
-                    ptexset_2->QueueTextureSet(static_cast<IO_TASK_PRIORITY>(Priority), this, false);
-                }
+            if ((pdata->pDecalRef) && (pdata->pDecalRef->GetObjectReference()->GetFormType() == TXST_ID)) {
+                BGSTextureSet* ptexset_2 = static_cast<BGSTextureSet*>(pdata->pDecalRef->GetObjectReference());
+                uint8_t Priority = GetPriority();
+                ptexset_2->QueueTextureSet(static_cast<IO_TASK_PRIORITY>(Priority), this, false);
             }
         }
     }
@@ -1679,21 +1646,19 @@ void QueuedReference::QueueMe() {
 
 void QueuedReference::CheckFinished() {
     if (IsTaskFinished() && GetAllChildrenFinished() && !IsCancelled()) {
-        if (spQueuedModel.m_pObject) {
-            if (!spModel.m_pObject) {
-                Model* AdditionalGeometryData = spQueuedModel.m_pObject->GetModel();
-                spModel.operator=(AdditionalGeometryData);
-            }
+        if ((spQueuedModel.m_pObject) && (!spModel.m_pObject)) {
+            Model* AdditionalGeometryData = spQueuedModel.m_pObject->GetModel();
+            spModel.operator=(AdditionalGeometryData);
         }
+
         bool bCanBeCloned = false;
-        if (spModel.m_pObject) {
-            if (pRef != pPlayer) {
-                TESObjectCELL* ParentCell = pRef->GetParentCell();
-                if (TES::pInstance->IsCellLoaded(ParentCell, false) && TES::pInstance->CanAttach3D(pRef)) {
-                    bCanBeCloned = pRef->TESObjectREFR::Get3D() == nullptr;
-                }
+        if ((spModel.m_pObject) && (pRef != pPlayer)) {
+            TESObjectCELL* ParentCell = pRef->GetParentCell();
+            if (TES::pInstance->IsCellLoaded(ParentCell, false) && TES::pInstance->CanAttach3D(pRef)) {
+                bCanBeCloned = pRef->TESObjectREFR::Get3D() == nullptr;
             }
         }
+
         if (pRef->IsProjectile() || pRef->IsExplosion()) {
             bCanBeCloned = false;
         }
@@ -1712,20 +1677,18 @@ void QueuedReference::QueueModels() {
     );
     TESForm* a2 = this->pRef->GetObjectReference();
     TESModel* TESModel_ = this->pRef->GetTESModel();
-    if (TESModel_) {
-        if (*TESModel_->GetModel()) {
-            TESObjectREFR* pRef = this->pRef;
-            IO_TASK_PRIORITY IOTaskPriority = GetIOTaskPriority();
-            pModelLoader->QueueBoundObject(static_cast<TESBoundObject*>(a2), spQueuedModel, IOTaskPriority, this, pRef);
-            if (!spQueuedModel.m_pObject) {
-                const char* v2 = TESModel_->GetModel();
-                pModelLoader->FindModel(v2, spModel);
-            }
-            BGSDestructibleObjectForm* DestructionForm = BGSDestructibleObjectForm::GetDestructionForm(a2);
-            if (DestructionForm) {
-                IO_TASK_PRIORITY v3 = GetIOTaskPriority();
-                DestructionForm->QueueFiles(static_cast<TESBoundObject*>(a2), v3, this);
-            }
+    if ((TESModel_) && (*TESModel_->GetModel())) {
+        TESObjectREFR* pRef = this->pRef;
+        IO_TASK_PRIORITY IOTaskPriority = GetIOTaskPriority();
+        pModelLoader->QueueBoundObject(static_cast<TESBoundObject*>(a2), spQueuedModel, IOTaskPriority, this, pRef);
+        if (!spQueuedModel.m_pObject) {
+            const char* v2 = TESModel_->GetModel();
+            pModelLoader->FindModel(v2, spModel);
+        }
+        BGSDestructibleObjectForm* DestructionForm = BGSDestructibleObjectForm::GetDestructionForm(a2);
+        if (DestructionForm) {
+            IO_TASK_PRIORITY v3 = GetIOTaskPriority();
+            DestructionForm->QueueFiles(static_cast<TESBoundObject*>(a2), v3, this);
         }
     }
 }
@@ -1737,23 +1700,22 @@ void QueuedReference::UseDistant3D() {
     TESModel::GetDistantModelName_(cPath, pRef->GetObjectReference());
     ::new (&spmodel) NiPointer<Model>(static_cast<Model*>(nullptr));
     pModelLoader->FindModel(cPath, spmodel);
-    if (spmodel.m_pObject) {
-        if (spmodel.m_pObject->GetModel()) {
-            NiObject* pclone = spmodel.m_pObject->GetModel()->Clone();
-            if (pclone) {
-                ptempnode = pclone->IsNode();
-                if (ptempnode) {
-                    if (ptempnode->IsFadeNode()) {
-                        static_cast<BSFadeNode*>(ptempnode)->BSFadeNode::SetLODMultType(LOD_MULT_DISTANTLOD);
-                    }
+    if ((spmodel.m_pObject) && (spmodel.m_pObject->GetModel())) {
+        NiObject* pclone = spmodel.m_pObject->GetModel()->Clone();
+        if (pclone) {
+            ptempnode = pclone->IsNode();
+            if (ptempnode) {
+                if (ptempnode->IsFadeNode()) {
+                    static_cast<BSFadeNode*>(ptempnode)->BSFadeNode::SetLODMultType(LOD_MULT_DISTANTLOD);
                 }
-                else {
-                    // A clone that is no node is released through a smart pointer.
-                    NiPointer<NiObject> pkiller(pclone);
-                }
+            }
+            else {
+                // A clone that is no node is released through a smart pointer.
+                NiPointer<NiObject> pkiller(pclone);
             }
         }
     }
+
     if (ptempnode) {
         AttachDistant3D(ptempnode);
     }
@@ -2113,16 +2075,14 @@ void QueuedTree::QueueModels() {
     TESForm* apObj = pRef->GetObjectReference();
     void* a3 = apObj;
     ENUM_LOD_MULT a7 = TES::GetLODMult(static_cast<TESObject*>(apObj));
-    if (pRef) {
-        if (pRef->GetVisibleDistant()) {
-            a7 = LOD_MULT_DISTANTLOD;
-        }
+    if ((pRef) && (pRef->GetVisibleDistant())) {
+        a7 = LOD_MULT_DISTANTLOD;
     }
-    if (pRef) {
-        if (pRef->GetIsImposter()) {
-            a7 = LOD_MULT_DIST_OVERRIDE;
-        }
+
+    if ((pRef) && (pRef->GetIsImposter())) {
+        a7 = LOD_MULT_DIST_OVERRIDE;
     }
+
     IO_TASK_PRIORITY IOTaskPriority = GetIOTaskPriority();
     pModelLoader->QueueTreeModel(pRef, static_cast<TESObjectTREE*>(a3), IOTaskPriority, this, a7);
 }
@@ -2218,11 +2178,10 @@ void QueuedCreature::QueueModels() {
     Actor* pactor = static_cast<Actor*>(this->pRef);
     bool bwearweapon = true;
     TESPackage* ppack = pactor->GetCurrentPackage();
-    if (ppack) {
-        if (ppack->GetForceUnequipWeapon()) {
-            bwearweapon = false;
-        }
+    if ((ppack) && (ppack->GetForceUnequipWeapon())) {
+        bwearweapon = false;
     }
+
     if (pcreature->ShouldRunInitDefaultWorn(this->pRef)) {
         pcreature->InitDefaultWorn(this->pRef, true, bwearweapon, false);
     }
@@ -2283,14 +2242,13 @@ bool QueuedCharacter::BackgroundClone() {
         eContext, true, "D:\\_Fallout3\\Platforms\\Common\\Code\\Fallout Shared\\ModelLoader.cpp", 2276
     );
     bool v6 = QueuedReference::BackgroundClone();
-    if (v6) {
-        if (GetCloned3D()) {
-            NiAVObject* VATSLight = GetCloned3D();
-            TESObjectREFR::SetBackgroundLoadingRef(pRef, VATSLight);
-            AttachHeadParts();
-            TESObjectREFR::ClearBackgroundLoadingRef();
-        }
+    if ((v6) && (GetCloned3D())) {
+        NiAVObject* VATSLight = GetCloned3D();
+        TESObjectREFR::SetBackgroundLoadingRef(pRef, VATSLight);
+        AttachHeadParts();
+        TESObjectREFR::ClearBackgroundLoadingRef();
     }
+
     return v6;
 }
 
@@ -2467,14 +2425,11 @@ ModelLoader::~ModelLoader() {
     while (!kKFIterator.GetFinished()) {
         const char* pfileName = nullptr;
         KFModel* pkfModel = nullptr;
-        if (pKFModelMap->GetNext(kKFIterator, pfileName, pkfModel, true)) {
+        if ((pKFModelMap->GetNext(kKFIterator, pfileName, pkfModel, true)) && (pkfModel) &&
+            (!pkfModel->GetAnimGroup() || pkfModel->GetAnimGroup()->IsPowerAttack())) {
+            pKFModelMap->RemoveAt(pfileName);
             if (pkfModel) {
-                if (!pkfModel->GetAnimGroup() || pkfModel->GetAnimGroup()->IsPowerAttack()) {
-                    pKFModelMap->RemoveAt(pfileName);
-                    if (pkfModel) {
-                        delete pkfModel;
-                    }
-                }
+                delete pkfModel;
             }
         }
     }
@@ -2569,12 +2524,11 @@ void ModelLoader::ReleaseKF(const char* apKFFileName, bool abDeleteIfUnreference
     KFModel* v4 = nullptr;
     if (pKFModelMap->GetAt(apKFFileName, v4)) {
         v4->DecUseCount();
-        if (pSaveLoadGame) {
-            if (pSaveLoadGame->GetSaveGameLoading()) {
-                abDeleteIfUnreferenced = false;
-                bHasDelayedFree = true;
-            }
+        if ((pSaveLoadGame) && (pSaveLoadGame->GetSaveGameLoading())) {
+            abDeleteIfUnreferenced = false;
+            bHasDelayedFree = true;
         }
+
         if (abDeleteIfUnreferenced && !v4->GetRefCount()) {
             pKFModelMap->RemoveAt(apKFFileName);
             if (v4) {
@@ -3848,16 +3802,12 @@ void ModelLoader::LoadAddons(NiNode* apNode) {
         if (NiObject::IsKindOf_0(&BSValueNode::ms_RTTI, apNode)) {
             BSValueNode* pvalueNode = static_cast<BSValueNode*>(apNode);
             BGSAddonNode* paddonNode = pDataHandler->GetAddonNode(pvalueNode->QValue());
-            if (paddonNode) {
-                if (!paddonNode->IsMasterParticleSystem()) {
-                    pcurrent = nullptr;
-                    if (!pModelMap->GetAt(paddonNode->GetModel(), pcurrent)) {
-                        if (LoadFile(paddonNode->GetModel(), LOD_MULT_NONE, true, false, false, false)) {
-                            if (pModelMap->GetAt(paddonNode->GetModel(), pcurrent)) {
-                                pcurrent->DecManualRefCount();
-                            }
-                        }
-                    }
+            if ((paddonNode) && (!paddonNode->IsMasterParticleSystem())) {
+                pcurrent = nullptr;
+                if ((!pModelMap->GetAt(paddonNode->GetModel(), pcurrent)) &&
+                    (LoadFile(paddonNode->GetModel(), LOD_MULT_NONE, true, false, false, false)) &&
+                    (pModelMap->GetAt(paddonNode->GetModel(), pcurrent))) {
+                    pcurrent->DecManualRefCount();
                 }
             }
         }
@@ -3945,78 +3895,76 @@ void ModelLoader::QueueReplacementKFList(
 ) {
     FNVD_INLINED_LOCAL(NiPointer<QueuedReplacementKF>, spqueuedKF, std::nullopt, std::nullopt);
     FNVD_INLINED_LOCAL(NiPointer<QueuedReplacementKFList>, spreplacementKFList, std::nullopt, std::nullopt);
-    if (apKFList) {
-        if (apAnim) {
-            BSSimpleList<const char*>* pfileList = apKFList;
-            if (pfileList && pfileList->GetItem()) {
-                AutoMemContext tempMemContext(
-                    MEM_CONTEXT_ANIMATION, true,
-                    "D:\\_Fallout3\\Platforms\\Common\\Code\\Fallout Shared\\ModelLoader.cpp", 3743
-                );
-                ::new (&spreplacementKFList) NiPointer<QueuedFile>(static_cast<QueuedFile*>(nullptr));
-                while (pfileList) {
-                    const char* pfileName = pfileList->GetItem();
-                    if (pfileName) {
-                        const char* pfileNameCopy = pfileName;
-                        char Dst[0x104];
-                        if (apBasePath) {
-                            BSstrcpy(Dst, 0x104, apBasePath);
-                            BSstrcat(Dst, 0x104, pfileName);
-                            pfileNameCopy = Dst;
-                        }
-                        KFModel* pkfModel = nullptr;
-                        if (pKFModelMap->GetAt(pfileNameCopy, pkfModel)) {
-                            apAnim->QueueReplacementAnimation(pkfModel);
-                        }
-                        else {
-                            QueuedReplacementKF* v9;
-                            if (!spreplacementKFList.m_pObject &&
-                                !pQueuedReplacementKFListMap->GetAt(apAnim, spreplacementKFList)) {
-                                QueuedReplacementKFList* v10;
-                                QueuedReplacementKFList* v13 =
-                                    static_cast<QueuedReplacementKFList*>(ourMalloc(sizeof(QueuedReplacementKFList)));
-                                if (v13) {
-                                    v10 = ::new (v13) QueuedReplacementKFList(apAnim, aePriority);
-                                }
-                                else {
-                                    v10 = nullptr;
-                                }
-                                spreplacementKFList.operator=(v10);
-                            }
-                            QueuedReplacementKF* v12 =
-                                static_cast<QueuedReplacementKF*>(ourMalloc(sizeof(QueuedReplacementKF)));
-                            if (v12) {
-                                QueuedReplacementKFList* v6 = spreplacementKFList.m_pObject;
-                                v9 = ::new (v12) QueuedReplacementKF(pfileNameCopy, aePriority, apAnim, v6);
-                            }
-                            else {
-                                v9 = nullptr;
-                            }
-                            ::new (static_cast<void*>(&spqueuedKF)) NiPointer<QueuedFile>(static_cast<QueuedFile*>(v9));
-                            spqueuedKF.m_pObject->SetParent(spreplacementKFList.m_pObject);
-                            QueuedReplacementKF* v8 = spqueuedKF.m_pObject;
-                            v8->QueueMe();
-                            spqueuedKF.~NiPointer<QueuedReplacementKF>();
-                        }
-                        ourFree(const_cast<char*>(pfileName));
-                        pfileList->RemoveHead();
+    if ((apKFList) && (apAnim)) {
+        BSSimpleList<const char*>* pfileList = apKFList;
+        if (pfileList && pfileList->GetItem()) {
+            AutoMemContext tempMemContext(
+                MEM_CONTEXT_ANIMATION, true, "D:\\_Fallout3\\Platforms\\Common\\Code\\Fallout Shared\\ModelLoader.cpp",
+                3743
+            );
+            ::new (&spreplacementKFList) NiPointer<QueuedFile>(static_cast<QueuedFile*>(nullptr));
+            while (pfileList) {
+                const char* pfileName = pfileList->GetItem();
+                if (pfileName) {
+                    const char* pfileNameCopy = pfileName;
+                    char Dst[0x104];
+                    if (apBasePath) {
+                        BSstrcpy(Dst, 0x104, apBasePath);
+                        BSstrcat(Dst, 0x104, pfileName);
+                        pfileNameCopy = Dst;
+                    }
+                    KFModel* pkfModel = nullptr;
+                    if (pKFModelMap->GetAt(pfileNameCopy, pkfModel)) {
+                        apAnim->QueueReplacementAnimation(pkfModel);
                     }
                     else {
-                        pfileList = pfileList->GetNext();
+                        QueuedReplacementKF* v9;
+                        if (!spreplacementKFList.m_pObject &&
+                            !pQueuedReplacementKFListMap->GetAt(apAnim, spreplacementKFList)) {
+                            QueuedReplacementKFList* v10;
+                            QueuedReplacementKFList* v13 =
+                                static_cast<QueuedReplacementKFList*>(ourMalloc(sizeof(QueuedReplacementKFList)));
+                            if (v13) {
+                                v10 = ::new (v13) QueuedReplacementKFList(apAnim, aePriority);
+                            }
+                            else {
+                                v10 = nullptr;
+                            }
+                            spreplacementKFList.operator=(v10);
+                        }
+                        QueuedReplacementKF* v12 =
+                            static_cast<QueuedReplacementKF*>(ourMalloc(sizeof(QueuedReplacementKF)));
+                        if (v12) {
+                            QueuedReplacementKFList* v6 = spreplacementKFList.m_pObject;
+                            v9 = ::new (v12) QueuedReplacementKF(pfileNameCopy, aePriority, apAnim, v6);
+                        }
+                        else {
+                            v9 = nullptr;
+                        }
+                        ::new (static_cast<void*>(&spqueuedKF)) NiPointer<QueuedFile>(static_cast<QueuedFile*>(v9));
+                        spqueuedKF.m_pObject->SetParent(spreplacementKFList.m_pObject);
+                        QueuedReplacementKF* v8 = spqueuedKF.m_pObject;
+                        v8->QueueMe();
+                        spqueuedKF.~NiPointer<QueuedReplacementKF>();
                     }
-                }
-                if (spreplacementKFList.m_pObject && spreplacementKFList.m_pObject->GetChildCount()) {
-                    spreplacementKFList.m_pObject->SetParent(apParent);
-                    pQueuedReplacementKFListMap->SetAt(apAnim, spreplacementKFList, true);
-                    spreplacementKFList.m_pObject->SetCompleted();
-                    QueuedReplacementKFList* v7 = spreplacementKFList.m_pObject;
-                    v7->CheckFinished();
+                    ourFree(const_cast<char*>(pfileName));
+                    pfileList->RemoveHead();
                 }
                 else {
-                    spreplacementKFList.operator=(static_cast<QueuedReplacementKFList*>(nullptr));
+                    pfileList = pfileList->GetNext();
                 }
-                spreplacementKFList.~NiPointer<QueuedReplacementKFList>();
             }
+            if (spreplacementKFList.m_pObject && spreplacementKFList.m_pObject->GetChildCount()) {
+                spreplacementKFList.m_pObject->SetParent(apParent);
+                pQueuedReplacementKFListMap->SetAt(apAnim, spreplacementKFList, true);
+                spreplacementKFList.m_pObject->SetCompleted();
+                QueuedReplacementKFList* v7 = spreplacementKFList.m_pObject;
+                v7->CheckFinished();
+            }
+            else {
+                spreplacementKFList.operator=(static_cast<QueuedReplacementKFList*>(nullptr));
+            }
+            spreplacementKFList.~NiPointer<QueuedReplacementKFList>();
         }
     }
 }
@@ -4095,21 +4043,19 @@ void ModelLoader::QueueMagicItem(
     IO_TASK_PRIORITY aePriority
 ) {
     FNVD_INLINED_LOCAL(NiPointer<QueuedMagicItem>, spqueuedMagicItem, std::nullopt, std::nullopt);
-    if (apMagicItem) {
-        if (apAVEffectSetting) {
-            QueuedMagicItem* v5;
-            QueuedMagicItem* apMemory = static_cast<QueuedMagicItem*>(ourMalloc(sizeof(QueuedMagicItem)));
-            if (apMemory) {
-                v5 = ::new (apMemory) QueuedMagicItem(apMagicItem, apAVEffectSetting, aePriority);
-            }
-            else {
-                v5 = nullptr;
-            }
-            ::new (static_cast<void*>(&spqueuedMagicItem)) NiPointer<QueuedFile>(static_cast<QueuedFile*>(v5));
-            QueuedMagicItem* v4 = spqueuedMagicItem.m_pObject;
-            v4->QueueMe();
-            spqueuedMagicItem.~NiPointer<QueuedMagicItem>();
+    if ((apMagicItem) && (apAVEffectSetting)) {
+        QueuedMagicItem* v5;
+        QueuedMagicItem* apMemory = static_cast<QueuedMagicItem*>(ourMalloc(sizeof(QueuedMagicItem)));
+        if (apMemory) {
+            v5 = ::new (apMemory) QueuedMagicItem(apMagicItem, apAVEffectSetting, aePriority);
         }
+        else {
+            v5 = nullptr;
+        }
+        ::new (static_cast<void*>(&spqueuedMagicItem)) NiPointer<QueuedFile>(static_cast<QueuedFile*>(v5));
+        QueuedMagicItem* v4 = spqueuedMagicItem.m_pObject;
+        v4->QueueMe();
+        spqueuedMagicItem.~NiPointer<QueuedMagicItem>();
     }
 }
 
@@ -4136,18 +4082,16 @@ void ModelLoader::CancelAnimIdle(AnimIdle* apAnimIdle) {
 void ModelLoader::CancelReferencesForCell(TESObjectCELL* apCell) {
     FNVD_INLINED_LOCAL(NiPointer<QueuedReference>, spqueuedReference, std::nullopt, std::nullopt);
     using iterator_t = LockFreeMap<TESObjectREFR*, NiPointer<QueuedReference>>::LockFreeMapIterator;
-    if (apCell) {
-        if (apCell->iQueuedRefCount) {
-            iterator_t iterator;
-            while (!iterator.GetFinished()) {
-                TESObjectREFR* pref = nullptr;
-                ::new (&spqueuedReference) NiPointer<QueuedFile>(static_cast<QueuedFile*>(nullptr));
-                if (pQueuedReferencesMap->GetNext(iterator, pref, spqueuedReference, true) &&
-                    pref->GetParentCell() == apCell) {
-                    CancelReference(pref);
-                }
-                spqueuedReference.~NiPointer<QueuedReference>();
+    if ((apCell) && (apCell->iQueuedRefCount)) {
+        iterator_t iterator;
+        while (!iterator.GetFinished()) {
+            TESObjectREFR* pref = nullptr;
+            ::new (&spqueuedReference) NiPointer<QueuedFile>(static_cast<QueuedFile*>(nullptr));
+            if (pQueuedReferencesMap->GetNext(iterator, pref, spqueuedReference, true) &&
+                pref->GetParentCell() == apCell) {
+                CancelReference(pref);
             }
+            spqueuedReference.~NiPointer<QueuedReference>();
         }
     }
 }
@@ -4368,9 +4312,8 @@ uint32_t QueuedFile::GetChildCount() {
     if (pChildren) {
         return pChildren->GetSize();
     }
-    else {
-        return 0;
-    }
+
+    return 0;
 }
 
 uint32_t QueuedChildren::GetChildCountFinished() {
@@ -4571,13 +4514,11 @@ QueuedReplacementKF::~QueuedReplacementKF() {}
 // A loaded replacement goes to the post-processing queue, counted by its owner list, unless it was cancelled.
 void QueuedReplacementKF::Finish() {
     QueuedKF::Finish();
-    if (spKFModel.operator->()) {
-        if (!IOTask::IsCancelled()) {
-            if (pOwner) {
-                pOwner->AddPostProcessingChild();
-            }
-            IOTask::AddToPostProcessQueue();
+    if ((spKFModel.operator->()) && (!IOTask::IsCancelled())) {
+        if (pOwner) {
+            pOwner->AddPostProcessingChild();
         }
+        IOTask::AddToPostProcessQueue();
     }
 }
 

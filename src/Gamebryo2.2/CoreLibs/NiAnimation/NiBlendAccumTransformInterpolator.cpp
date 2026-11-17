@@ -66,10 +66,9 @@ NiObject* NiBlendAccumTransformInterpolator::CreateClone(NiCloningProcess& kClon
         CopyMembers(v4, kCloning);
         return v4;
     }
-    else {
-        CopyMembers(nullptr, kCloning);
-        return nullptr;
-    }
+
+    CopyMembers(nullptr, kCloning);
+    return nullptr;
 }
 
 void NiBlendAccumTransformInterpolator::LoadBinary(NiStream& kStream) {
@@ -357,62 +356,61 @@ bool NiBlendAccumTransformInterpolator::BlendValues(float fTime, NiObjectNET* pk
     do {
         NiBlendInterpolator::InterpArrayItem* kItem = &m_pkInterpArray[uc_2];
         NiBlendAccumTransformInterpolator::AccumArrayItem* kAccumItem = &m_pkAccumArray[uc_2];
-        if (kItem->m_spInterpolator.m_pObject) {
-            if (kItem->m_fNormalizedWeight > 1e-05f) {
-                NiQuatTransform* p_m_kLastValue = &kAccumItem->m_kLastValue;
-                if (!v22) {
-                    p_m_kLastValue = &kAccumItem->m_kDeltaValue;
-                }
-                v41 = *p_m_kLastValue;
-                if (v41.m_kTranslate.x == v7) {
-                    v36 = v36 - kItem->m_fNormalizedWeight;
-                }
-                else {
-                    v20 = 1;
-                    float m_fNormalizedWeight = kItem->m_fNormalizedWeight;
-                    float v38 = v41.m_kTranslate.x * m_fNormalizedWeight;
-                    float v39 = v41.m_kTranslate.y * m_fNormalizedWeight;
-                    float v40 = m_fNormalizedWeight * v41.m_kTranslate.z;
-                    v31.x = v38 + v31.x;
-                    v31.y = v31.y + v39;
-                    v31.z = v31.z + v40;
-                }
-                if (v41.m_kRotate.m_fX != v7) {
-                    NiQuaternion kRotValue = v41.m_kRotate;
-                    if (v21) {
-                        v21 = 0;
-                    }
-                    else {
-                        float v25 = v41.m_kRotate.m_fX * kFinalRotate.m_fX + v41.m_kRotate.m_fW * kFinalRotate.m_fW +
-                            v41.m_kRotate.m_fY * kFinalRotate.m_fY + v41.m_kRotate.m_fZ * kFinalRotate.m_fZ;
-                        if (v25 < 0.0f) {
-                            kRotValue = -kRotValue;
-                        }
-                    }
-                    NiQuaternion kWeighted = kRotValue * kItem->m_fNormalizedWeight;
-                    kRotValue.m_fW = kWeighted.m_fW;
-                    kRotValue.m_fX = kWeighted.m_fX;
-                    kRotValue.m_fY = kWeighted.m_fY;
-                    float m_fZ = kWeighted.m_fZ;
-                    kFinalRotate.m_fW = kRotValue.m_fW + kFinalRotate.m_fW;
-                    kRotValue.m_fZ = m_fZ;
-                    uc_2 = uc;
-                    v18 = 1;
-                    kFinalRotate.m_fX = kFinalRotate.m_fX + kRotValue.m_fX;
-                    kFinalRotate.m_fY = kFinalRotate.m_fY + kRotValue.m_fY;
-                    kFinalRotate.m_fZ = kFinalRotate.m_fZ + kRotValue.m_fZ;
-                    v7 = -3.4028234663852886e+38;
-                }
-                p_m_kAccumulatedTransformValue = v32;
-                if (v41.m_fScale == v7) {
-                    v34 = v34 - kItem->m_fNormalizedWeight;
+        if ((kItem->m_spInterpolator.m_pObject) && (kItem->m_fNormalizedWeight > 1e-05f)) {
+            NiQuatTransform* p_m_kLastValue = &kAccumItem->m_kLastValue;
+            if (!v22) {
+                p_m_kLastValue = &kAccumItem->m_kDeltaValue;
+            }
+            v41 = *p_m_kLastValue;
+            if (v41.m_kTranslate.x == v7) {
+                v36 = v36 - kItem->m_fNormalizedWeight;
+            }
+            else {
+                v20 = 1;
+                float m_fNormalizedWeight = kItem->m_fNormalizedWeight;
+                float v38 = v41.m_kTranslate.x * m_fNormalizedWeight;
+                float v39 = v41.m_kTranslate.y * m_fNormalizedWeight;
+                float v40 = m_fNormalizedWeight * v41.m_kTranslate.z;
+                v31.x = v38 + v31.x;
+                v31.y = v31.y + v39;
+                v31.z = v31.z + v40;
+            }
+            if (v41.m_kRotate.m_fX != v7) {
+                NiQuaternion kRotValue = v41.m_kRotate;
+                if (v21) {
+                    v21 = 0;
                 }
                 else {
-                    v19 = 1;
-                    v35 = v41.m_fScale * kItem->m_fNormalizedWeight + v35;
+                    float v25 = v41.m_kRotate.m_fX * kFinalRotate.m_fX + v41.m_kRotate.m_fW * kFinalRotate.m_fW +
+                        v41.m_kRotate.m_fY * kFinalRotate.m_fY + v41.m_kRotate.m_fZ * kFinalRotate.m_fZ;
+                    if (v25 < 0.0f) {
+                        kRotValue = -kRotValue;
+                    }
                 }
+                NiQuaternion kWeighted = kRotValue * kItem->m_fNormalizedWeight;
+                kRotValue.m_fW = kWeighted.m_fW;
+                kRotValue.m_fX = kWeighted.m_fX;
+                kRotValue.m_fY = kWeighted.m_fY;
+                float m_fZ = kWeighted.m_fZ;
+                kFinalRotate.m_fW = kRotValue.m_fW + kFinalRotate.m_fW;
+                kRotValue.m_fZ = m_fZ;
+                uc_2 = uc;
+                v18 = 1;
+                kFinalRotate.m_fX = kFinalRotate.m_fX + kRotValue.m_fX;
+                kFinalRotate.m_fY = kFinalRotate.m_fY + kRotValue.m_fY;
+                kFinalRotate.m_fZ = kFinalRotate.m_fZ + kRotValue.m_fZ;
+                v7 = -3.4028234663852886e+38;
+            }
+            p_m_kAccumulatedTransformValue = v32;
+            if (v41.m_fScale == v7) {
+                v34 = v34 - kItem->m_fNormalizedWeight;
+            }
+            else {
+                v19 = 1;
+                v35 = v41.m_fScale * kItem->m_fNormalizedWeight + v35;
             }
         }
+
         uc = ++uc_2;
     }
     while (uc_2 < m_ucArraySize);
@@ -443,11 +441,10 @@ bool NiBlendAccumTransformInterpolator::BlendValues(float fTime, NiObjectNET* pk
         kFinalRotate.m_fZ = v29 * kFinalRotate.m_fZ;
         kFinalTransform.m_kRotate = kFinalRotate;
     }
-    if (v19) {
-        if (v34 > 1e-05f) {
-            kFinalTransform.m_fScale = v14 / v34 * v35;
-        }
+    if ((v19) && (v34 > 1e-05f)) {
+        kFinalTransform.m_fScale = v14 / v34 * v35;
     }
+
     NiQuatTransform* v16 = ::new (&v41) NiQuatTransform(*p_m_kAccumulatedTransformValue * kFinalTransform);
     *v32 = *v16;
     if (-3.4028234663852886e+38 == v32->m_fScale &&
@@ -638,9 +635,8 @@ NiObject* NiBlendAccumTransformInterpolator::CreateObject() {
     if (v0) {
         return ::new (v0) NiBlendAccumTransformInterpolator;
     }
-    else {
-        return nullptr;
-    }
+
+    return nullptr;
 }
 
 // Each component times fScalar, rounded to float, set through SetValues.

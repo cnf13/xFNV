@@ -139,11 +139,10 @@ float NiSqrDistance::Compute(
     if (!(fMin > static_cast<double>(fMin0_6))) {
         return fMin;
     }
-    else {
-        fTriParam0 = fTmpTriParam0;
-        fTriParam1 = fTmpTriParam1;
-        fPgmParam0 = 1.0f;
-        fPgmParam1 = fTmpPgmParam1;
-        return fMin0_6;
-    }
+
+    fTriParam0 = fTmpTriParam0;
+    fTriParam1 = fTmpTriParam1;
+    fPgmParam0 = 1.0f;
+    fPgmParam1 = fTmpPgmParam1;
+    return fMin0_6;
 }

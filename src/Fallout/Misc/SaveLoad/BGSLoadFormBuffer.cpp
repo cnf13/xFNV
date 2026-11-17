@@ -32,9 +32,8 @@ TESObjectREFR* BGSLoadFormBuffer::GetReference() {
     if (v2 && v2->IsReference()) {
         return static_cast<TESObjectREFR*>(v2);
     }
-    else {
-        return nullptr;
-    }
+
+    return nullptr;
 }
 
 Actor* BGSLoadFormBuffer::GetActor() {
@@ -42,9 +41,8 @@ Actor* BGSLoadFormBuffer::GetActor() {
     if (v2 && v2->IsActor()) {
         return v2;
     }
-    else {
-        return nullptr;
-    }
+
+    return nullptr;
 }
 
 void BGSLoadFormBuffer::SetReconstructedForm(bool abValue) {

@@ -214,9 +214,8 @@ const char* TESSound::GetFormEditorID() {
     if (strEditorID.pString) {
         return strEditorID.pString;
     }
-    else {
-        return "";
-    }
+
+    return "";
 }
 
 bool TESSound::SetFormEditorID(const char* apEditorID) {
@@ -228,9 +227,8 @@ char TESSound::GetRandomPercentChance() {
     if ((((int32_t)data.iFlags) & 2) != 0) {
         return (int8_t)((uint8_t)cRandomPercentChance);
     }
-    else {
-        return 0;
-    }
+
+    return 0;
 }
 
 uint8_t TESSound::GetMaxDistance() {

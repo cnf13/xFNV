@@ -213,9 +213,8 @@ BGSRadiationStage* BGSRadiationStage::GetStage(uint32_t aiIndex) {
     if (aiIndex >= BGSRadiationStage::iNumStages) {
         return nullptr;
     }
-    else {
-        return BGSRadiationStage::pStagesArray[aiIndex];
-    }
+
+    return BGSRadiationStage::pStagesArray[aiIndex];
 }
 
 BGSRadiationStage** BGSRadiationStage::AllocateStages(uint32_t aiStagesCount) {
@@ -236,10 +235,8 @@ BGSRadiationStage* BGSRadiationStage::FindStageForRadLevel(float afRads) {
     BGSRadiationStage* pstage = nullptr;
     for (uint32_t i = 0; i < BGSRadiationStage::iNumStages && !pstage; ++i) {
         BGSRadiationStage* pcurrentStage = GetStage(i);
-        if (pcurrentStage) {
-            if (afRads >= static_cast<double>(pcurrentStage->data.iRads)) {
-                pstage = pcurrentStage;
-            }
+        if ((pcurrentStage) && (afRads >= static_cast<double>(pcurrentStage->data.iRads))) {
+            pstage = pcurrentStage;
         }
     }
     return pstage;

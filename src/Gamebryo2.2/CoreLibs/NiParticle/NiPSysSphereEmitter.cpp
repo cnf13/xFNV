@@ -63,10 +63,7 @@ bool NiPSysSphereEmitter::IsEqual(NiObject* pkObject) {
     }
 
     NiPSysSphereEmitter* pkOther = static_cast<NiPSysSphereEmitter*>(pkObject);
-    if (m_fEmitterRadius != pkOther->m_fEmitterRadius) {
-        return false;
-    }
-    return true;
+    return m_fEmitterRadius == pkOther->m_fEmitterRadius;
 }
 
 void NiPSysSphereEmitter::GetViewerStrings(NiTPrimitiveArray<char*>* pkStrings) {

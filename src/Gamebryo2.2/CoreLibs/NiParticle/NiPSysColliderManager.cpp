@@ -28,10 +28,9 @@ NiObject* NiPSysColliderManager::CreateClone(NiCloningProcess& kCloning) {
         CopyMembers(pkObject, kCloning);
         return pkObject;
     }
-    else {
-        CopyMembers(nullptr, kCloning);
-        return nullptr;
-    }
+
+    CopyMembers(nullptr, kCloning);
+    return nullptr;
 }
 
 // The collider list's link id is only read here; LinkObject resolves it. NiPSysColorModifier shares this body.

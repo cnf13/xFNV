@@ -103,13 +103,12 @@ void* NiControllerSequence::InterpArrayItem::Free(int32_t aiFlags) {
         }
         return reinterpret_cast<size_t*>(this) - 1;
     }
-    else {
-        ReleaseRefs();
-        if ((aiFlags & 1) != 0) {
-            MemoryManager_Singleton.Deallocate(this);
-        }
-        return this;
+
+    ReleaseRefs();
+    if ((aiFlags & 1) != 0) {
+        MemoryManager_Singleton.Deallocate(this);
     }
+    return this;
 }
 
 bool NiControllerSequence::InterpArrayItem::IsEqual(const InterpArrayItem& kDest) const {
@@ -357,13 +356,12 @@ void* NiControllerSequence::IDTag::Free(char a1) {
         }
         return reinterpret_cast<size_t*>(this) - 1;
     }
-    else {
-        this->~IDTag();
-        if ((a1 & 1) != 0) {
-            MemoryManager_Singleton.Deallocate(this);
-        }
-        return this;
+
+    this->~IDTag();
+    if ((a1 & 1) != 0) {
+        MemoryManager_Singleton.Deallocate(this);
     }
+    return this;
 }
 
 // Files before 20.1.0.1 hold each name as an offset into the deprecated string palette, in the name's handle
@@ -1717,11 +1715,10 @@ bool NiControllerSequence::Activate(
     m_pkPartnerSequence = nullptr;
     if (pkTimeSyncSeq) {
         NiControllerSequence* pkPartner = pkTimeSyncSeq->m_pkPartnerSequence;
-        if (pkPartner) {
-            if (pkPartner == this || !VerifyDependencies(pkPartner)) {
-                return false;
-            }
+        if ((pkPartner) && (pkPartner == this || !VerifyDependencies(pkPartner))) {
+            return false;
         }
+
         if (!VerifyMatchingMorphKeys(pkTimeSyncSeq)) {
             return false;
         }
@@ -1807,11 +1804,10 @@ bool NiControllerSequence::CanSyncTo(NiControllerSequence* pkTargetSequence) {
         return false;
     }
     NiControllerSequence* pkPartner = pkTargetSequence->m_pkPartnerSequence;
-    if (pkPartner) {
-        if (pkPartner == this || !VerifyDependencies(pkPartner)) {
-            return false;
-        }
+    if ((pkPartner) && (pkPartner == this || !VerifyDependencies(pkPartner))) {
+        return false;
     }
+
     if (!VerifyMatchingMorphKeys(pkTargetSequence)) {
         return false;
     }
@@ -2201,13 +2197,12 @@ bool NiControllerSequence::ResolveTransformInterpolators(
     uint16_t usLinkCount = 0;
     for (uint32_t ui = 0; ui < m_uiArraySize; ++ui) {
         IDTag* pkID = &m_pkIDTagArray[ui];
-        if (pkID->m_kCtlrType.GetHandle() != NiGlobalStringTable::NULL_STRING) {
-            if (strBSTreadTransfController.GetHandle() == pkID->m_kCtlrType.GetHandle()) {
-                BSTreadTransfInterpolator* pkTreadInterp =
-                    static_cast<BSTreadTransfInterpolator*>(m_pkInterpArray[ui].m_spInterpolator.m_pObject);
-                usLinkCount += static_cast<uint16_t>(pkTreadInterp->uiNumLinks);
-                ++usTreadInterpCount;
-            }
+        if ((pkID->m_kCtlrType.GetHandle() != NiGlobalStringTable::NULL_STRING) &&
+            (strBSTreadTransfController.GetHandle() == pkID->m_kCtlrType.GetHandle())) {
+            BSTreadTransfInterpolator* pkTreadInterp =
+                static_cast<BSTreadTransfInterpolator*>(m_pkInterpArray[ui].m_spInterpolator.m_pObject);
+            usLinkCount += static_cast<uint16_t>(pkTreadInterp->uiNumLinks);
+            ++usTreadInterpCount;
         }
     }
 

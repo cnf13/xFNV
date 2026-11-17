@@ -273,11 +273,10 @@ void MiddleLowProcess::Update(MobileObject* apRef) {
                             if (!pTarget) {
                                 SetTargetForPackage(apActor__pact);
                             }
-                            if (pTarget) {
-                                if (pTarget != pPlayer) {
-                                    CreateFollowforEscort(apActor__pact, ppack, true);
-                                }
+                            if ((pTarget) && (pTarget != pPlayer)) {
+                                CreateFollowforEscort(apActor__pact, ppack, true);
                             }
+
                         LABEL_88:;
                             AddToProcedureIndexRunning(apActor__pact, 1);
                             break;
@@ -332,11 +331,10 @@ void MiddleLowProcess::Update(MobileObject* apRef) {
                         }
                         case PROCEDURE_DIALOGUE_ACTIVATE: {
                             Actor* pact = nullptr;
-                            if (pTarget) {
-                                if (pTarget->IsActor()) {
-                                    pact = static_cast<Actor*>(pTarget);
-                                }
+                            if ((pTarget) && (pTarget->IsActor())) {
+                                pact = static_cast<Actor*>(pTarget);
                             }
+
                             if (pact) {
                                 TESPackage* v55;
                                 TESPackage* v15 = GetCurrentPackage();
@@ -360,74 +358,72 @@ void MiddleLowProcess::Update(MobileObject* apRef) {
                             break;
                         }
                     }
-                    if (apActor__pact->GetCurrentProcessType() == PROCESS_TYPE_MIDDLE_LOW) {
-                        if (GetCurrentPackage()) {
-                            TESPackage* v23 = GetCurrentPackage();
-                            uint32_t v24 = v23->ePROCEDURE_TYPE;
-                            if (Procedure_Action[v24][GetProcedureIndexRunning()] == PROCEDURE_DONE) {
-                                if (!IsPackageDoneOnce()) {
-                                    ExtraDataList* a5 = &apActor__pact->m_Extra;
-                                    TESPackage* v25 = GetCurrentPackage();
-                                    Script::SetActionFlag(v25, a5, SCRIPT_ACTION_ONPACKAGEEND);
-                                    TESPackage* v26 = GetCurrentPackage();
-                                    PackageDone(apActor__pact, v26);
-                                    SetPackageDoneOnce(true);
-                                }
-                                SetIsAggressor(false);
-                                if (GetCurrentPackage()) {
-                                    TESPackage* v27 = GetCurrentPackage();
-                                    if (!v27->ePROCEDURE_TYPE) {
-                                        TESPackage* v54 = GetCurrentPackage();
-                                        if (!v54->IsActorAtLocation(apActor__pact, false, -1.0f, false)) {
-                                            AddToProcedureIndexRunning(apActor__pact, -1);
-                                            return;
-                                        }
+                    if ((apActor__pact->GetCurrentProcessType() == PROCESS_TYPE_MIDDLE_LOW) && (GetCurrentPackage())) {
+                        TESPackage* v23 = GetCurrentPackage();
+                        uint32_t v24 = v23->ePROCEDURE_TYPE;
+                        if (Procedure_Action[v24][GetProcedureIndexRunning()] == PROCEDURE_DONE) {
+                            if (!IsPackageDoneOnce()) {
+                                ExtraDataList* a5 = &apActor__pact->m_Extra;
+                                TESPackage* v25 = GetCurrentPackage();
+                                Script::SetActionFlag(v25, a5, SCRIPT_ACTION_ONPACKAGEEND);
+                                TESPackage* v26 = GetCurrentPackage();
+                                PackageDone(apActor__pact, v26);
+                                SetPackageDoneOnce(true);
+                            }
+                            SetIsAggressor(false);
+                            if (GetCurrentPackage()) {
+                                TESPackage* v27 = GetCurrentPackage();
+                                if (!v27->ePROCEDURE_TYPE) {
+                                    TESPackage* v54 = GetCurrentPackage();
+                                    if (!v54->IsActorAtLocation(apActor__pact, false, -1.0f, false)) {
+                                        AddToProcedureIndexRunning(apActor__pact, -1);
+                                        return;
                                     }
                                 }
-                                if (GetCurrentPackage()) {
-                                    TESPackage* v28 = GetCurrentPackage();
-                                    if (v28->GetOncePerDay()) {
-                                        // Takes the day before the package.
-                                        char cDay = appCalendar.GetDay();
-                                        TESPackage* v29 = GetCurrentPackage();
-                                        apActor__pact->SetRunOnceExtraPackage(v29, cDay);
-                                    }
+                            }
+                            if (GetCurrentPackage()) {
+                                TESPackage* v28 = GetCurrentPackage();
+                                if (v28->GetOncePerDay()) {
+                                    // Takes the day before the package.
+                                    char cDay = appCalendar.GetDay();
+                                    TESPackage* v29 = GetCurrentPackage();
+                                    apActor__pact->SetRunOnceExtraPackage(v29, cDay);
                                 }
-                                if (GetCurrentPackage()) {
-                                    TESPackage* v30 = GetCurrentPackage();
-                                    if (v30->GetIsCreated()) {
-                                        apActor__pact->EndInterruptPackage(false);
-                                    }
+                            }
+                            if (GetCurrentPackage()) {
+                                TESPackage* v30 = GetCurrentPackage();
+                                if (v30->GetIsCreated()) {
+                                    apActor__pact->EndInterruptPackage(false);
                                 }
-                                if (Interface::GetConsoleSelection() == apActor__pact) {
-                                    TESPackage* v31 = GetCurrentPackage();
-                                    PACKAGE_TYPE v32 = v31->GetPackType();
-                                    const void* v50 = packageTypeToString[v32];
-                                    std::sprintf(Format, "%s is done with %s", apActor__pact->GetFullName(), v50);
-                                    Interface::PrintLine(static_cast<const char*>(Format));
+                            }
+                            if (Interface::GetConsoleSelection() == apActor__pact) {
+                                TESPackage* v31 = GetCurrentPackage();
+                                PACKAGE_TYPE v32 = v31->GetPackType();
+                                const void* v50 = packageTypeToString[v32];
+                                std::sprintf(Format, "%s is done with %s", apActor__pact->GetFullName(), v50);
+                                Interface::PrintLine(static_cast<const char*>(Format));
+                            }
+                            ObjectstoAcquire* apThis = pAcquireObject;
+                            if (apThis) {
+                                apThis->Delete(1u);
+                            }
+                            pAcquireObject = nullptr;
+                            while (!ObjectList.IsEmpty()) {
+                                ObjectstoAcquire* pobj = (&ObjectList)->m_item;
+                                if (pobj) {
+                                    pobj->Delete(1u);
                                 }
-                                ObjectstoAcquire* apThis = pAcquireObject;
-                                if (apThis) {
-                                    apThis->Delete(1u);
-                                }
-                                pAcquireObject = nullptr;
-                                while (!ObjectList.IsEmpty()) {
-                                    ObjectstoAcquire* pobj = (&ObjectList)->m_item;
-                                    if (pobj) {
-                                        pobj->Delete(1u);
-                                    }
-                                    ObjectList.Remove(pobj);
-                                }
-                                if (GetCurrentPackage()) {
-                                    TESPackage* v33 = GetCurrentPackage();
-                                    if (!v33->GetPackageSchedule()->PSData.iDuration) {
-                                        TESPackage* ptemp = GetCurrentPackage();
-                                        CheckforNewPackage(apActor__pact, true);
-                                        ppack = GetCurrentPackage();
-                                        TESPackage* v34 = GetCurrentPackage();
-                                        if (ptemp != v34) {
-                                            SetProcedureIndexRunning(0);
-                                        }
+                                ObjectList.Remove(pobj);
+                            }
+                            if (GetCurrentPackage()) {
+                                TESPackage* v33 = GetCurrentPackage();
+                                if (!v33->GetPackageSchedule()->PSData.iDuration) {
+                                    TESPackage* ptemp = GetCurrentPackage();
+                                    CheckforNewPackage(apActor__pact, true);
+                                    ppack = GetCurrentPackage();
+                                    TESPackage* v34 = GetCurrentPackage();
+                                    if (ptemp != v34) {
+                                        SetProcedureIndexRunning(0);
                                     }
                                 }
                             }
@@ -743,22 +739,19 @@ void MiddleLowProcess::ProcessCombat(Actor* apActor) {
             while (iCombatRound2 && !apActor->IsDead(false)) {
                 apActor->PerformOneRoundofCombat();
                 pTarget = dynamic_cast<Actor*>(this->pTarget);
-                if (pTarget) {
-                    if (!pTarget->IsDead(false)) {
-                        BaseProcess* CurrentAIProcess = pTarget->GetCurrentAIProcess();
-                        if (CurrentAIProcess->GetProcessLevel() == PROCESS_TYPE_MIDDLE_LOW) {
-                            pTarget->PerformOneRoundofCombat();
-                            bRoundDone = true;
-                        }
+                if ((pTarget) && (!pTarget->IsDead(false))) {
+                    BaseProcess* CurrentAIProcess = pTarget->GetCurrentAIProcess();
+                    if (CurrentAIProcess->GetProcessLevel() == PROCESS_TYPE_MIDDLE_LOW) {
+                        pTarget->PerformOneRoundofCombat();
+                        bRoundDone = true;
                     }
                 }
+
                 --iCombatRound2;
             }
-            if (bRoundDone) {
-                if (pTarget) {
-                    BaseProcess* pProcess = pTarget->GetCurrentAIProcess();
-                    pProcess->ComputeLastTimeProcessed();
-                }
+            if ((bRoundDone) && (pTarget)) {
+                BaseProcess* pProcess = pTarget->GetCurrentAIProcess();
+                pProcess->ComputeLastTimeProcessed();
             }
         }
         else {
@@ -773,19 +766,17 @@ bool MiddleLowProcess::ProcessCombatOneHour(Actor* apActor, float afTimeDelta) {
     while (v6 && !apActor->IsDead(false)) {
         apActor->PerformOneRoundofCombat();
         pTarget = dynamic_cast<Actor*>(this->pTarget);
-        if (pTarget) {
-            if (!pTarget->IsDead(false)) {
-                pTarget->PerformOneRoundofCombat();
-            }
+        if ((pTarget) && (!pTarget->IsDead(false))) {
+            pTarget->PerformOneRoundofCombat();
         }
+
         --v6;
     }
-    if (pTarget) {
-        if (!pTarget->IsDead(false)) {
-            BaseProcess* CurrentAIProcess = pTarget->GetCurrentAIProcess();
-            CurrentAIProcess->ComputeLastTimeProcessed();
-        }
+    if ((pTarget) && (!pTarget->IsDead(false))) {
+        BaseProcess* CurrentAIProcess = pTarget->GetCurrentAIProcess();
+        CurrentAIProcess->ComputeLastTimeProcessed();
     }
+
     return false;
 }
 

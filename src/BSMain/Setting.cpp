@@ -330,10 +330,8 @@ uint32_t Setting::DataSize() {
 
 // Frees a key the setting owns (an 'S' string key); the key is freed through the engine's free, which takes void*.
 Setting::~Setting() {
-    if (pKey) {
-        if (*pKey == 'S') {
-            ourFree(const_cast<char*>(pKey));
-        }
+    if ((pKey) && (*pKey == 'S')) {
+        ourFree(const_cast<char*>(pKey));
     }
 }
 

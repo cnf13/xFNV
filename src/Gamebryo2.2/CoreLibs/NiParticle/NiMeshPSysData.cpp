@@ -39,10 +39,9 @@ NiObject* NiMeshPSysData::CreateClone(NiCloningProcess& kCloning) {
         CopyMembers(v4, kCloning);
         return v4;
     }
-    else {
-        CopyMembers(nullptr, kCloning);
-        return nullptr;
-    }
+
+    CopyMembers(nullptr, kCloning);
+    return nullptr;
 }
 
 // KEEP: niread: the stream reads fill locals nothing initialised: a short read (malformed data) leaves the pool count
@@ -239,7 +238,6 @@ NiObject* NiMeshPSysData::CreateObject() {
     if (v0) {
         return ::new (v0) NiMeshPSysData;
     }
-    else {
-        return nullptr;
-    }
+
+    return nullptr;
 }

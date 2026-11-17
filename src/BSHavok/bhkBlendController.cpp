@@ -163,95 +163,94 @@ bool bhkBlendController::CalculateGain(float afTime, float& arGain, float& arVel
         arVelGain = pBlendKeyA.m_pBase->fVelGain;
         return true;
     }
-    else {
-        double v12;
-        BLENDKEY* m_pBase = pBlendKeyA.m_pBase;
-        uint32_t v8 = m_uiESize - 1;
-        float fTime = m_pBase[iLastIndex].fTime;
-        double v9 = afTime;
-        if (fTime > static_cast<double>(afTime)) {
-            iLastIndex = 0;
-            fTime = m_pBase->fTime;
-        }
-        uint32_t v10 = iLastIndex + 1;
-        if (static_cast<int32_t>(v8 - iLastIndex) < 4) {
-            v12 = fTime;
-        LABEL_15:;
-            if (v10 <= v8) {
-                BLENDKEY* v15 = &pBlendKeyA.m_pBase[v10];
-                do {
-                    v12 = v15->fTime;
-                    if (v12 >= v9) {
-                        break;
-                    }
-                    ++iLastIndex;
-                    fTime = v12;
-                    ++v10;
-                    ++v15;
-                }
-                while (v10 <= v8);
-            }
-        }
-        else {
-            float* p_fTime = &m_pBase[v10 + 2].fTime;
-            while (true) {
-                v12 = *(p_fTime - 6);
+
+    double v12;
+    BLENDKEY* m_pBase = pBlendKeyA.m_pBase;
+    uint32_t v8 = m_uiESize - 1;
+    float fTime = m_pBase[iLastIndex].fTime;
+    double v9 = afTime;
+    if (fTime > static_cast<double>(afTime)) {
+        iLastIndex = 0;
+        fTime = m_pBase->fTime;
+    }
+    uint32_t v10 = iLastIndex + 1;
+    if (static_cast<int32_t>(v8 - iLastIndex) < 4) {
+        v12 = fTime;
+    LABEL_15:;
+        if (v10 <= v8) {
+            BLENDKEY* v15 = &pBlendKeyA.m_pBase[v10];
+            do {
+                v12 = v15->fTime;
                 if (v12 >= v9) {
                     break;
                 }
                 ++iLastIndex;
                 fTime = v12;
-                float afTimea = *(p_fTime - 3);
-                v12 = afTimea;
-                if (afTimea >= v9) {
-                    ++v10;
-                    break;
-                }
-                int32_t v13 = iLastIndex + 1;
-                fTime = afTimea;
-                iLastIndex = v13;
-                float afTimeb = *p_fTime;
-                v12 = afTimeb;
-                if (afTimeb >= v9) {
-                    v10 += 2;
-                    break;
-                }
-                int32_t v14 = v13 + 1;
-                fTime = afTimeb;
-                iLastIndex = v14;
-                float afTimec = p_fTime[3];
-                v12 = afTimec;
-                if (afTimec >= v9) {
-                    v10 += 3;
-                    break;
-                }
-                fTime = afTimec;
-                v10 += 4;
-                p_fTime += 12;
-                iLastIndex = v14 + 1;
-                if (v10 > m_uiESize - 4) {
-                    goto LABEL_15;
-                }
+                ++v10;
+                ++v15;
+            }
+            while (v10 <= v8);
+        }
+    }
+    else {
+        float* p_fTime = &m_pBase[v10 + 2].fTime;
+        while (true) {
+            v12 = *(p_fTime - 6);
+            if (v12 >= v9) {
+                break;
+            }
+            ++iLastIndex;
+            fTime = v12;
+            float afTimea = *(p_fTime - 3);
+            v12 = afTimea;
+            if (afTimea >= v9) {
+                ++v10;
+                break;
+            }
+            int32_t v13 = iLastIndex + 1;
+            fTime = afTimea;
+            iLastIndex = v13;
+            float afTimeb = *p_fTime;
+            v12 = afTimeb;
+            if (afTimeb >= v9) {
+                v10 += 2;
+                break;
+            }
+            int32_t v14 = v13 + 1;
+            fTime = afTimeb;
+            iLastIndex = v14;
+            float afTimec = p_fTime[3];
+            v12 = afTimec;
+            if (afTimec >= v9) {
+                v10 += 3;
+                break;
+            }
+            fTime = afTimec;
+            v10 += 4;
+            p_fTime += 12;
+            iLastIndex = v14 + 1;
+            if (v10 > m_uiESize - 4) {
+                goto LABEL_15;
             }
         }
-        BLENDKEY* v16 = pBlendKeyA.m_pBase;
-        double v17 = v12 - fTime;
-        double v18 = fTime;
-        BLENDKEY* v19 = &v16[iLastIndex];
-        float afTimed = v17;
-        float fP = v19->fGain;
-        float fVelGain = v19->fVelGain;
-        if (afTimed == 0.0) {
-            arGain = fP;
-            arVelGain = fVelGain;
-        }
-        else {
-            float afTimee = (v9 - v18) / afTimed;
-            arGain = NiInterpScalar::Linear(afTimee, fP, v16[v10].fGain);
-            arVelGain = NiInterpScalar::Linear(afTimee, fVelGain, pBlendKeyA.m_pBase[v10].fVelGain);
-        }
-        return true;
     }
+    BLENDKEY* v16 = pBlendKeyA.m_pBase;
+    double v17 = v12 - fTime;
+    double v18 = fTime;
+    BLENDKEY* v19 = &v16[iLastIndex];
+    float afTimed = v17;
+    float fP = v19->fGain;
+    float fVelGain = v19->fVelGain;
+    if (afTimed == 0.0) {
+        arGain = fP;
+        arVelGain = fVelGain;
+    }
+    else {
+        float afTimee = (v9 - v18) / afTimed;
+        arGain = NiInterpScalar::Linear(afTimee, fP, v16[v10].fGain);
+        arVelGain = NiInterpScalar::Linear(afTimee, fVelGain, pBlendKeyA.m_pBase[v10].fVelGain);
+    }
+    return true;
 }
 
 void bhkBlendController::RestoreOriginalGains(bhkBlendCollisionObject* apCol) {
@@ -743,46 +742,44 @@ void bhkBlendController::DoHit(NiAVObject* apObject, float afTime, int32_t abQua
                 }
                 bhkBlendController* pcon =
                     static_cast<bhkBlendController*>(apObject->GetController(&bhkBlendController::ms_RTTI));
-                if (pcon) {
-                    if (pcon->iPriority <= 1u) {
-                        pcon->ClearKeys();
-                        bool v16 = pcon->pBlendKeyA.m_uiESize == 0;
-                        pcon->iPriority = 1;
-                        if (v16) {
-                            // The three keys are built with BLENDKEY::BLENDKEY through the eh vector constructor
-                            // iterator, because keys is typed storage for which C++ runs no constructor.
-                            using BLENDKEYArray3 = BLENDKEY[3];
-                            FNVD_INLINED_LOCAL(BLENDKEYArray3, keys, std::nullopt, std::nullopt);
-                            rt::eh_vector_constructor_iterator(
-                                keys, sizeof(BLENDKEY), 3, &fnvd::constructElement<BLENDKEY>
-                            );
-                            keys[0].fGain = v26;
-                            float v27 = v13;
-                            keys[0].fVelGain = v27;
-                            keys[0].fTime = 0.0f;
-                            keys[1].fGain = fminGain;
-                            keys[1].fVelGain = v25;
-                            keys[1].fTime = 0.15f;
-                            keys[2].fGain = 1.0f;
-                            keys[2].fVelGain = 1.0f;
-                            keys[2].fTime = 0.5f;
-                            pcon->pBlendKeyA.SetSize(3u);
-                            BLENDKEY* v17 = keys;
-                            int32_t v18 = 3;
-                            do {
-                                pcon->AddKey(*v17++);
-                                --v18;
-                            }
-                            while (v18);
-                            uint16_t m_usFlags = pcon->m_usFlags;
-                            pcon->m_fLoKeyTime = 0.0f;
-                            pcon->m_fHiKeyTime = 1.0f;
-                            pcon->m_fFrequency = 1.0f;
-                            pcon->m_usFlags = static_cast<uint16_t>((m_usFlags & 0xFFF5) | 0x1C5);
-                            pcon->m_fPhase = 0.0f;
-                            NiTimeController* pkTimeController = pcon;
-                            pkTimeController->Start(-3.4028235e+38f);
+                if ((pcon) && (pcon->iPriority <= 1u)) {
+                    pcon->ClearKeys();
+                    bool v16 = pcon->pBlendKeyA.m_uiESize == 0;
+                    pcon->iPriority = 1;
+                    if (v16) {
+                        // The three keys are built with BLENDKEY::BLENDKEY through the eh vector constructor
+                        // iterator, because keys is typed storage for which C++ runs no constructor.
+                        using BLENDKEYArray3 = BLENDKEY[3];
+                        FNVD_INLINED_LOCAL(BLENDKEYArray3, keys, std::nullopt, std::nullopt);
+                        rt::eh_vector_constructor_iterator(
+                            keys, sizeof(BLENDKEY), 3, &fnvd::constructElement<BLENDKEY>
+                        );
+                        keys[0].fGain = v26;
+                        float v27 = v13;
+                        keys[0].fVelGain = v27;
+                        keys[0].fTime = 0.0f;
+                        keys[1].fGain = fminGain;
+                        keys[1].fVelGain = v25;
+                        keys[1].fTime = 0.15f;
+                        keys[2].fGain = 1.0f;
+                        keys[2].fVelGain = 1.0f;
+                        keys[2].fTime = 0.5f;
+                        pcon->pBlendKeyA.SetSize(3u);
+                        BLENDKEY* v17 = keys;
+                        int32_t v18 = 3;
+                        do {
+                            pcon->AddKey(*v17++);
+                            --v18;
                         }
+                        while (v18);
+                        uint16_t m_usFlags = pcon->m_usFlags;
+                        pcon->m_fLoKeyTime = 0.0f;
+                        pcon->m_fHiKeyTime = 1.0f;
+                        pcon->m_fFrequency = 1.0f;
+                        pcon->m_usFlags = static_cast<uint16_t>((m_usFlags & 0xFFF5) | 0x1C5);
+                        pcon->m_fPhase = 0.0f;
+                        NiTimeController* pkTimeController = pcon;
+                        pkTimeController->Start(-3.4028235e+38f);
                     }
                 }
             }

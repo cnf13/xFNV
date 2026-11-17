@@ -25,10 +25,9 @@ NiObject* NiPSysResetOnLoopCtlr::CreateClone(NiCloningProcess& kCloning) {
         CopyMembers(pkObject, kCloning);
         return pkObject;
     }
-    else {
-        CopyMembers(nullptr, kCloning);
-        return nullptr;
-    }
+
+    CopyMembers(nullptr, kCloning);
+    return nullptr;
 }
 
 void NiPSysResetOnLoopCtlr::LoadBinary(NiStream& kStream) {

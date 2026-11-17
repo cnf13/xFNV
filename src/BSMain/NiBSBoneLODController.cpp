@@ -106,10 +106,7 @@ void NiBSBoneLODController::LinkObject(NiStream& kStream) {
 
 // The bones belong to the scene graph, so nothing beyond the base is registered.
 bool NiBSBoneLODController::RegisterStreamables(NiStream& kStream) {
-    if (!NiTimeController::RegisterStreamables(kStream)) {
-        return false;
-    }
-    return true;
+    return NiTimeController::RegisterStreamables(kStream);
 }
 
 // An empty bone slot is saved as a set of zero bones. The signed values go through NiAnimationKey::SaveBinary, which
@@ -377,39 +374,32 @@ void NiBSBoneLODController::CollectMarkedBones(
         }
         if (pStringExtraData) {
             const char* pcString = pStringExtraData->m_kString.GetHandle();
-            if (pcString) {
-                if (std::strstr(pcString, "BSBoneLOD#Bone#")) {
-                    int32_t stDestSize = std::strlen(pcString) + 1;
-                    char* pcDest = static_cast<char*>(MemoryManager_Singleton.Allocate(stDestSize));
-                    strcpy_s(pcDest, stDestSize, pcString);
-                    char* String = strtok_s(pcDest, "#", &Context);
-                    if (String) {
-                        if (!std::strcmp(String, "BSBoneLOD")) {
-                            char* Stringa = strtok_s(nullptr, "#", &Context);
-                            if (Stringa) {
-                                if (!std::strcmp(Stringa, "Bone")) {
-                                    char* pcLOD = strtok_s(nullptr, "#", &Context);
-                                    if (pcLOD) {
-                                        uint32_t uiLOD = std::atoi(pcLOD);
-                                        kBoneToLOD.SetAt(pkBone, uiLOD);
-                                        kUsedLODs.SetAt(uiLOD, true);
-                                    }
-                                }
-                            }
+            if ((pcString) && (std::strstr(pcString, "BSBoneLOD#Bone#"))) {
+                int32_t stDestSize = std::strlen(pcString) + 1;
+                char* pcDest = static_cast<char*>(MemoryManager_Singleton.Allocate(stDestSize));
+                strcpy_s(pcDest, stDestSize, pcString);
+                char* String = strtok_s(pcDest, "#", &Context);
+                if ((String) && (!std::strcmp(String, "BSBoneLOD"))) {
+                    char* Stringa = strtok_s(nullptr, "#", &Context);
+                    if ((Stringa) && (!std::strcmp(Stringa, "Bone"))) {
+                        char* pcLOD = strtok_s(nullptr, "#", &Context);
+                        if (pcLOD) {
+                            uint32_t uiLOD = std::atoi(pcLOD);
+                            kBoneToLOD.SetAt(pkBone, uiLOD);
+                            kUsedLODs.SetAt(uiLOD, true);
                         }
                     }
-                    MemoryManager_Singleton.Deallocate(pcDest);
-                    break;
                 }
+
+                MemoryManager_Singleton.Deallocate(pcDest);
+                break;
             }
         }
     }
     for (i = 0; i < pkBone->m_kChildren.m_usSize; ++i) {
         NiAVObject* pkChild = pkBone->m_kChildren.m_pBase[i].m_pObject;
-        if (pkChild) {
-            if (pkChild->IsNode()) {
-                CollectMarkedBones(static_cast<NiNode*>(pkChild), kBoneToLOD, kUsedLODs);
-            }
+        if ((pkChild) && (pkChild->IsNode())) {
+            CollectMarkedBones(static_cast<NiNode*>(pkChild), kBoneToLOD, kUsedLODs);
         }
     }
 }
@@ -423,13 +413,11 @@ void NiBSBoneLODController::BuildBoneMap(
     uint32_t uiOrigLOD = uiCurrentLOD;
     for (uint32_t ui = 0; ui < pkBone->m_kChildren.m_usSize; ++ui) {
         NiAVObject* pkChild = pkBone->m_kChildren.m_pBase[ui].m_pObject;
-        if (pkChild) {
-            if (pkChild->IsNode()) {
-                uint32_t uiReturnedLOD = uiOrigLOD;
-                BuildBoneMap(static_cast<NiNode*>(pkChild), kBoneToLOD, uiReturnedLOD);
-                if (uiReturnedLOD > uiCurrentLOD) {
-                    uiCurrentLOD = uiReturnedLOD;
-                }
+        if ((pkChild) && (pkChild->IsNode())) {
+            uint32_t uiReturnedLOD = uiOrigLOD;
+            BuildBoneMap(static_cast<NiNode*>(pkChild), kBoneToLOD, uiReturnedLOD);
+            if (uiReturnedLOD > uiCurrentLOD) {
+                uiCurrentLOD = uiReturnedLOD;
             }
         }
     }
@@ -467,9 +455,8 @@ NiObject* NiBSBoneLODController::CreateObject() {
     if (v2) {
         return ::new (v2) NiBSBoneLODController;
     }
-    else {
-        return nullptr;
-    }
+
+    return nullptr;
 }
 
 bool NiBSBoneLODController::ProcessScene(NiNode* pkSceneRoot) {
@@ -500,10 +487,9 @@ bool NiBSBoneLODController::ProcessScene(NiNode* pkSceneRoot) {
         _NiFree(kBoneRootNodes.m_pBase);
         return true;
     }
-    else {
-        _NiFree(kBoneRootNodes.m_pBase);
-        return false;
-    }
+
+    _NiFree(kBoneRootNodes.m_pBase);
+    return false;
 }
 
 void NiBSBoneLODController::FindBoneRootNodes(NiNode* pkNode, NiTPrimitiveSet<NiNode*>& kBoneRootNodes) {
@@ -529,20 +515,16 @@ void NiBSBoneLODController::FindBoneRootNodes(NiNode* pkNode, NiTPrimitiveSet<Ni
         }
         if (pkStringExtra) {
             const char* pcString = pkStringExtra->m_kString.GetHandle();
-            if (pcString) {
-                if (std::strstr(pcString, "BSBoneLOD#BoneRoot#")) {
-                    kBoneRootNodes.Add(pkNode);
-                    return;
-                }
+            if ((pcString) && (std::strstr(pcString, "BSBoneLOD#BoneRoot#"))) {
+                kBoneRootNodes.Add(pkNode);
+                return;
             }
         }
     }
     for (uint32_t k = 0; k < pkNode->m_kChildren.m_usSize; ++k) {
         NiAVObject* pkChild = pkNode->m_kChildren.m_pBase[k].m_pObject;
-        if (pkChild) {
-            if (pkChild->IsNode()) {
-                NiBSBoneLODController::FindBoneRootNodes(static_cast<NiNode*>(pkChild), kBoneRootNodes);
-            }
+        if ((pkChild) && (pkChild->IsNode())) {
+            NiBSBoneLODController::FindBoneRootNodes(static_cast<NiNode*>(pkChild), kBoneRootNodes);
         }
     }
 }

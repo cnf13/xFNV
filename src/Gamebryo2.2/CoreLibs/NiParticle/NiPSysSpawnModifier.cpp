@@ -102,14 +102,13 @@ bool NiPSysSpawnModifier::IsEqual(NiObject* pkObject) {
     }
 
     NiPSysSpawnModifier* pkOther = static_cast<NiPSysSpawnModifier*>(pkObject);
-    if (pkOther->m_usNumSpawnGenerations != m_usNumSpawnGenerations ||
+    return !(
+        pkOther->m_usNumSpawnGenerations != m_usNumSpawnGenerations ||
         pkOther->m_fPercentageSpawned != m_fPercentageSpawned || pkOther->m_usMinNumToSpawn != m_usMinNumToSpawn ||
         pkOther->m_usMaxNumToSpawn != m_usMaxNumToSpawn || pkOther->m_fSpawnSpeedChaos != m_fSpawnSpeedChaos ||
         pkOther->m_fSpawnDirChaos != m_fSpawnDirChaos || pkOther->m_fLifeSpan != m_fLifeSpan ||
-        pkOther->m_fLifeSpanVar != m_fLifeSpanVar) {
-        return false;
-    }
-    return true;
+        pkOther->m_fLifeSpanVar != m_fLifeSpanVar
+    );
 }
 
 void NiPSysSpawnModifier::GetViewerStrings(NiTPrimitiveArray<char*>* pkStrings) {

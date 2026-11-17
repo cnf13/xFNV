@@ -170,9 +170,8 @@ hkProcess* hkpToiContactPointViewer::create(const hkArray<hkProcessContext*, hkC
     if (v3) {
         return &static_cast<hkProcess&>(static_cast<hkpWorldViewerBase&>(*v3));
     }
-    else {
-        return nullptr;
-    }
+
+    return nullptr;
 }
 
 void hkpToiContactPointViewer::registerViewer() {

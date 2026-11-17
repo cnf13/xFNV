@@ -21,7 +21,8 @@ namespace hkBinaryTagfile {
             uint8_t b[4];
             uint32_t v;
         };
-        union fmtU32 fDataIn, fDataOut;
+        union fmtU32 fDataIn;
+        union fmtU32 fDataOut;
 
         fDataIn.v = n;
         fDataOut.b[0] = fDataIn.b[3];

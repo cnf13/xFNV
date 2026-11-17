@@ -191,226 +191,215 @@ bool CombatState::FindCombatLocation(int32_t aiLocation) {
         pplannerData->SetUnk4Ptr(aiLocation);
         return true;
     }
+
+    if (3.4028235e+38f == pplannerData->GetCost(aiLocation)) {
+        return false;
+    }
+
+    CombatCoverLocation* pfoundCoverLocation;
+    CombatLocation* pfoundCombatLocation;
+    bool bfound = false;
+    CombatLocation* v16 = static_cast<CombatLocation*>(ourMalloc(sizeof(CombatLocation)));
+    if (v16) {
+        pfoundCombatLocation = ::new (v16) CombatLocation;
+    }
     else {
-        if (3.4028235e+38f == pplannerData->GetCost(aiLocation)) {
-            return false;
+        pfoundCombatLocation = nullptr;
+    }
+    CombatCoverLocation* v15 = static_cast<CombatCoverLocation*>(ourMalloc(sizeof(CombatCoverLocation)));
+    if (v15) {
+        pfoundCoverLocation = ::new (v15) CombatCoverLocation;
+    }
+    else {
+        pfoundCoverLocation = nullptr;
+    }
+    pfoundCombatLocation->iLocation = aiLocation;
+    pfoundCombatLocation->SetRadius(kCombatLocationTypeData[aiLocation].fRadius);
+    if ((pCombatLocation) && (pCombatLocation->iLocation == aiLocation)) {
+        pfoundCombatLocation->Copy(pCombatLocation);
+        if ((pCoverLocation) && (pCoverLocation->iLocation == aiLocation)) {
+            pfoundCoverLocation->Copy(pCoverLocation);
         }
-        else {
-            CombatCoverLocation* pfoundCoverLocation;
-            CombatLocation* pfoundCombatLocation;
-            bool bfound = false;
-            CombatLocation* v16 = static_cast<CombatLocation*>(ourMalloc(sizeof(CombatLocation)));
-            if (v16) {
-                pfoundCombatLocation = ::new (v16) CombatLocation;
-            }
-            else {
-                pfoundCombatLocation = nullptr;
-            }
-            CombatCoverLocation* v15 = static_cast<CombatCoverLocation*>(ourMalloc(sizeof(CombatCoverLocation)));
-            if (v15) {
-                pfoundCoverLocation = ::new (v15) CombatCoverLocation;
-            }
-            else {
-                pfoundCoverLocation = nullptr;
-            }
-            pfoundCombatLocation->iLocation = aiLocation;
-            pfoundCombatLocation->SetRadius(kCombatLocationTypeData[aiLocation].fRadius);
-            if (pCombatLocation) {
-                if (pCombatLocation->iLocation == aiLocation) {
-                    pfoundCombatLocation->Copy(pCombatLocation);
-                    if (pCoverLocation) {
-                        if (pCoverLocation->iLocation == aiLocation) {
-                            pfoundCoverLocation->Copy(pCoverLocation);
-                        }
-                    }
-                    if (!kCombatLocationTypeData[aiLocation].bRecheckLocation) {
-                        pfoundCombatLocation->UpdateRefLocation();
-                        bfound = true;
-                    }
-                }
-            }
-            bool bignoreCombatRadius = false;
-            if (aiLocation == HIDE_LOCATION || (aiLocation == FLEE_LOCATION || aiLocation == INVESTIGATE_LOCATION)) {
-                bignoreCombatRadius = true;
-            }
-            if (!bfound) {
-                switch (aiLocation) {
-                    case 0:
-                    case 1: {
-                        if (ptarget) {
-                            if (GetHasBufferedDetection()) {
-                                if (!GetTargetUnreachable()) {
-                                    pfoundCombatLocation->SetRef(ptarget);
-                                    bfound = true;
-                                }
-                            }
-                            else {
-                                BGSWorldLocation lastDetectedLocation;
-                                if (pgroup->GetTargetLastDetectedLocation(ptarget, lastDetectedLocation)) {
-                                    pfoundCombatLocation->SetLocation(lastDetectedLocation);
-                                    bfound = true;
-                                }
-                            }
-                        }
-                        break;
-                    }
-                    case 2:
-                    case 4:
-                    case 5: {
-                        bfound = FindBestCoverLocation(
-                            pCombatController->GetCurrentWeapon(), &CoverSearchInfo, pfoundCoverLocation,
-                            pfoundCombatLocation, aiLocation
-                        );
-                        break;
-                    }
-                    case 3: {
-                        bfound = FindBestDodgeLocation(pfoundCombatLocation, 3u, 15u, 128.0f, 128.0f);
-                        break;
-                    }
-                    case 6: {
-                        if (!pLocationTarget || pLocationTarget->cType) {
-                            if (pCombatController->GetTarget()) {
-                                Actor* Target = pCombatController->GetTarget();
-                                NiPoint3 advanceLocation = Target->GetLocationOnReference();
-                                bfound = FindBestAdvanceLocation(
-                                    &CoverSearchInfo, pfoundCoverLocation, pfoundCombatLocation, aiLocation,
-                                    advanceLocation, 0.0f, nullptr
-                                );
-                            }
-                        }
-                        else {
-                            bfound = FindBestAdvanceLocation(
-                                &CoverSearchInfo, pfoundCoverLocation, pfoundCombatLocation, aiLocation,
-                                pLocationTarget->WorldLoc.Point, 0.0f, nullptr
-                            );
-                        }
-                        break;
-                    }
-                    case 7:
-                    case 8:
-                    case 9:
-                    case 16: {
-                        if (pLocationTarget) {
-                            if (aiLocation != 8 || !GetLocationUnreachable(256)) {
-                                if (pLocationTarget->pRef) {
-                                    pfoundCombatLocation->SetRef(pLocationTarget->pRef);
-                                    if (pLocationTarget->pRef->IsActor()) {
-                                        Actor* pactor = static_cast<Actor*>(pLocationTarget->pRef);
-                                        double Radius = pactor->GetRadius();
-                                        float v9 = pattacker->GetRadius() + Radius;
-                                        pfoundCombatLocation->SetRadius(v9);
-                                    }
-                                }
-                                else {
-                                    pfoundCombatLocation->SetLocation(pLocationTarget->WorldLoc);
-                                }
-                                pfoundCombatLocation->SetRadius(pLocationTarget->fMinDistance);
-                                bfound = true;
-                            }
-                        }
-                        break;
-                    }
-                    case 10:
-                    case 12: {
-                        bfound = FindBestFleeLocation(pfoundCoverLocation, pfoundCombatLocation, aiLocation);
-                        break;
-                    }
-                    case 11: {
-                        bfound =
-                            FindGrenadeThrowLocation(pfoundCombatLocation, bGrenadeThrowHighArc, pCombatWeapons[3]);
-                        break;
-                    }
-                    case 13: {
-                        bfound = FindLOSLocation(pfoundCombatLocation, aiLocation);
-                        break;
-                    }
-                    case 14: {
-                        pfoundCombatLocation->SetFlag(1u, true);
-                        bfound = true;
-                        break;
-                    }
-                    case 15: {
-                        CombatSearchLocation* psearchLocation = pCombatController->pCombatGroup->FindSearchLocation(
-                            pattacker, 50, &pfoundCombatLocation->WorldLoc
-                        );
-                        if (psearchLocation) {
-                            pfoundCombatLocation->SetLocation(psearchLocation->WorldLoc);
+
+        if (!kCombatLocationTypeData[aiLocation].bRecheckLocation) {
+            pfoundCombatLocation->UpdateRefLocation();
+            bfound = true;
+        }
+    }
+
+    bool bignoreCombatRadius = false;
+    if (aiLocation == HIDE_LOCATION || (aiLocation == FLEE_LOCATION || aiLocation == INVESTIGATE_LOCATION)) {
+        bignoreCombatRadius = true;
+    }
+    if (!bfound) {
+        switch (aiLocation) {
+            case 0:
+            case 1: {
+                if (ptarget) {
+                    if (GetHasBufferedDetection()) {
+                        if (!GetTargetUnreachable()) {
+                            pfoundCombatLocation->SetRef(ptarget);
                             bfound = true;
                         }
-                        else if (pfoundCombatLocation->GetPoint() != NiPoint3_ZERO) {
+                    }
+                    else {
+                        BGSWorldLocation lastDetectedLocation;
+                        if (pgroup->GetTargetLastDetectedLocation(ptarget, lastDetectedLocation)) {
+                            pfoundCombatLocation->SetLocation(lastDetectedLocation);
                             bfound = true;
                         }
-                        if (bfound) {
-                            pfoundCombatLocation->SetFlag(2u, true);
-                        }
-                        break;
                     }
-                    case 17:
-                    case 18:
-                    case 19:
-                    case 20:
-                    case 21: {
-                        CombatState::TargetedObject* pcombatItem =
-                            GetTargetedObject(static_cast<uint32_t>(aiLocation - 17));
-                        if (pcombatItem) {
-                            if (pcombatItem->pRef) {
-                                pfoundCombatLocation->SetRef(static_cast<TESObjectREFR*>(pcombatItem->pRef));
-                                double ModelBoundSize =
-                                    static_cast<TESObjectREFR*>(pcombatItem->pRef)->TESObjectREFR::GetModelBoundSize();
-                                double v7 = pattacker->GetForwardLength() + ModelBoundSize;
-                                float v6 = fPickupItemDistanceFudge.Float() + v7;
-                                pfoundCombatLocation->SetRadius(v6);
-                                pfoundCombatLocation->SetFlag(2u, true);
-                                bfound = true;
-                            }
-                        }
-                        break;
-                    }
-                    default: {
-                        Warning(
-                            "COMBAT: Invalid combat location type %i passed to CombatState::FindCombatLocation()",
-                            aiLocation
+                }
+                break;
+            }
+            case 2:
+            case 4:
+            case 5: {
+                bfound = FindBestCoverLocation(
+                    pCombatController->GetCurrentWeapon(), &CoverSearchInfo, pfoundCoverLocation, pfoundCombatLocation,
+                    aiLocation
+                );
+                break;
+            }
+            case 3: {
+                bfound = FindBestDodgeLocation(pfoundCombatLocation, 3u, 15u, 128.0f, 128.0f);
+                break;
+            }
+            case 6: {
+                if (!pLocationTarget || pLocationTarget->cType) {
+                    if (pCombatController->GetTarget()) {
+                        Actor* Target = pCombatController->GetTarget();
+                        NiPoint3 advanceLocation = Target->GetLocationOnReference();
+                        bfound = FindBestAdvanceLocation(
+                            &CoverSearchInfo, pfoundCoverLocation, pfoundCombatLocation, aiLocation, advanceLocation,
+                            0.0f, nullptr
                         );
-                        break;
                     }
-                }
-            }
-            if (!bfound) {
-                goto LABEL_77;
-            }
-            if (!pfoundCombatLocation->GetSpace()) {
-                TESForm* Space = pattacker->GetSpace();
-                pfoundCombatLocation->SetSpace(Space);
-            }
-            worldLoc = pfoundCombatLocation->WorldLoc;
-            if ((worldLoc.Point == NiPoint3_ZERO) || CheckMovement(worldLoc, true, bignoreCombatRadius)) {
-                float fcost = 0.0f;
-                if (kCombatLocationTypeData[aiLocation].bUsesMovementCost) {
-                    pattacker->GetWorldLocation(&attackerLoc);
-                    fcost = CalculateCostForDistance(pCombatController, &attackerLoc, &worldLoc);
-                }
-                pplannerData->SetCombatLocation(aiLocation, pfoundCombatLocation, fcost);
-                if (pfoundCoverLocation->iCoverLocationKey) {
-                    pplannerData->SetCombatCoverLocation(aiLocation, pfoundCoverLocation);
                 }
                 else {
-                    if (pfoundCoverLocation) {
-                        delete pfoundCoverLocation;
-                    }
+                    bfound = FindBestAdvanceLocation(
+                        &CoverSearchInfo, pfoundCoverLocation, pfoundCombatLocation, aiLocation,
+                        pLocationTarget->WorldLoc.Point, 0.0f, nullptr
+                    );
                 }
-                return true;
+                break;
             }
-            else {
-            LABEL_77:;
-                ourFree(pfoundCombatLocation);
-                if (pfoundCoverLocation) {
-                    delete pfoundCoverLocation;
+            case 7:
+            case 8:
+            case 9:
+            case 16: {
+                if ((pLocationTarget) && (aiLocation != 8 || !GetLocationUnreachable(256))) {
+                    if (pLocationTarget->pRef) {
+                        pfoundCombatLocation->SetRef(pLocationTarget->pRef);
+                        if (pLocationTarget->pRef->IsActor()) {
+                            Actor* pactor = static_cast<Actor*>(pLocationTarget->pRef);
+                            double Radius = pactor->GetRadius();
+                            float v9 = pattacker->GetRadius() + Radius;
+                            pfoundCombatLocation->SetRadius(v9);
+                        }
+                    }
+                    else {
+                        pfoundCombatLocation->SetLocation(pLocationTarget->WorldLoc);
+                    }
+                    pfoundCombatLocation->SetRadius(pLocationTarget->fMinDistance);
+                    bfound = true;
                 }
-                pplannerData->SetCombatLocation(aiLocation, nullptr, 3.4028235e+38f);
-                return false;
+
+                break;
+            }
+            case 10:
+            case 12: {
+                bfound = FindBestFleeLocation(pfoundCoverLocation, pfoundCombatLocation, aiLocation);
+                break;
+            }
+            case 11: {
+                bfound = FindGrenadeThrowLocation(pfoundCombatLocation, bGrenadeThrowHighArc, pCombatWeapons[3]);
+                break;
+            }
+            case 13: {
+                bfound = FindLOSLocation(pfoundCombatLocation, aiLocation);
+                break;
+            }
+            case 14: {
+                pfoundCombatLocation->SetFlag(1u, true);
+                bfound = true;
+                break;
+            }
+            case 15: {
+                CombatSearchLocation* psearchLocation =
+                    pCombatController->pCombatGroup->FindSearchLocation(pattacker, 50, &pfoundCombatLocation->WorldLoc);
+                if (psearchLocation) {
+                    pfoundCombatLocation->SetLocation(psearchLocation->WorldLoc);
+                    bfound = true;
+                }
+                else if (pfoundCombatLocation->GetPoint() != NiPoint3_ZERO) {
+                    bfound = true;
+                }
+                if (bfound) {
+                    pfoundCombatLocation->SetFlag(2u, true);
+                }
+                break;
+            }
+            case 17:
+            case 18:
+            case 19:
+            case 20:
+            case 21: {
+                CombatState::TargetedObject* pcombatItem = GetTargetedObject(static_cast<uint32_t>(aiLocation - 17));
+                if ((pcombatItem) && (pcombatItem->pRef)) {
+                    pfoundCombatLocation->SetRef(static_cast<TESObjectREFR*>(pcombatItem->pRef));
+                    double ModelBoundSize =
+                        static_cast<TESObjectREFR*>(pcombatItem->pRef)->TESObjectREFR::GetModelBoundSize();
+                    double v7 = pattacker->GetForwardLength() + ModelBoundSize;
+                    float v6 = fPickupItemDistanceFudge.Float() + v7;
+                    pfoundCombatLocation->SetRadius(v6);
+                    pfoundCombatLocation->SetFlag(2u, true);
+                    bfound = true;
+                }
+
+                break;
+            }
+            default: {
+                Warning(
+                    "COMBAT: Invalid combat location type %i passed to CombatState::FindCombatLocation()", aiLocation
+                );
+                break;
             }
         }
     }
+    if (!bfound) {
+        goto LABEL_77;
+    }
+    if (!pfoundCombatLocation->GetSpace()) {
+        TESForm* Space = pattacker->GetSpace();
+        pfoundCombatLocation->SetSpace(Space);
+    }
+    worldLoc = pfoundCombatLocation->WorldLoc;
+    if ((worldLoc.Point == NiPoint3_ZERO) || CheckMovement(worldLoc, true, bignoreCombatRadius)) {
+        float fcost = 0.0f;
+        if (kCombatLocationTypeData[aiLocation].bUsesMovementCost) {
+            pattacker->GetWorldLocation(&attackerLoc);
+            fcost = CalculateCostForDistance(pCombatController, &attackerLoc, &worldLoc);
+        }
+        pplannerData->SetCombatLocation(aiLocation, pfoundCombatLocation, fcost);
+        if (pfoundCoverLocation->iCoverLocationKey) {
+            pplannerData->SetCombatCoverLocation(aiLocation, pfoundCoverLocation);
+        }
+        else {
+            if (pfoundCoverLocation) {
+                delete pfoundCoverLocation;
+            }
+        }
+        return true;
+    }
+
+LABEL_77:;
+    ourFree(pfoundCombatLocation);
+    if (pfoundCoverLocation) {
+        delete pfoundCoverLocation;
+    }
+    pplannerData->SetCombatLocation(aiLocation, nullptr, 3.4028235e+38f);
+    return false;
 }
 
 // Tries the requested directions in order (bit 1: the side the cross product gives, 2: the other side, 4: towards the
@@ -831,21 +820,19 @@ void CombatState::TargetChanged() {
     NiPoint3 result;
     uint8_t v5;
     Actor* a3 = pCombatController->GetTarget();
-    if (pCoverLocation) {
-        if (a3) {
-            v2 = a3;
-            location = &(result = (&pCoverLocation->CoverLocation)->GetLocation());
-            v5 = (uint8_t)CheckCoverSafe(pCoverLocation->CoverLocation, *location, v2, 0);
-            if ((!v5) || (!GetHasTarget360LineOfSight())) {
-                pCoverLocation->bDirtyFlag = true;
-            }
+    if ((pCoverLocation) && (a3)) {
+        v2 = a3;
+        location = &(result = (&pCoverLocation->CoverLocation)->GetLocation());
+        v5 = (uint8_t)CheckCoverSafe(pCoverLocation->CoverLocation, *location, v2, 0);
+        if ((!v5) || (!GetHasTarget360LineOfSight())) {
+            pCoverLocation->bDirtyFlag = true;
         }
     }
-    if (pCombatLocation) {
-        if (((uint32_t)pCombatLocation->iLocation) <= 1u) {
-            ClearCombatLocation();
-        }
+
+    if ((pCombatLocation) && (((uint32_t)pCombatLocation->iLocation) <= 1u)) {
+        ClearCombatLocation();
     }
+
     ClearTargetUnreachable();
     UpdateInventoryData();
 }
@@ -1323,11 +1310,11 @@ void CombatState::UpdatePeriodicData() {
     }
     else {
         bool v13 = true;
-        if (pCombatController->pCurrentGoal) {
-            if (pCombatController->pCurrentGoal->eType == CombatGoal::COMBAT_GOAL_GUARD) {
-                v13 = !CheckShouldFlee();
-            }
+        if ((pCombatController->pCurrentGoal) &&
+            (pCombatController->pCurrentGoal->eType == CombatGoal::COMBAT_GOAL_GUARD)) {
+            v13 = !CheckShouldFlee();
         }
+
         if (v13) {
             cFleeState = 0;
         }
@@ -1399,13 +1386,10 @@ void CombatState::UpdateImmediateData() {
         }
     }
     else {
-        if (pCoverLocation) {
-            if (pCoverLocation->iCoverLocationLastMovedTimeStamp != -1 &&
-                !pCoverLocation->CoverLocation.CheckDynamicCoverValid(
-                    pCoverLocation->iCoverLocationLastMovedTimeStamp
-                )) {
-                DynamicCoverLostTimer.Reset(2.0f);
-            }
+        if ((pCoverLocation) &&
+            (pCoverLocation->iCoverLocationLastMovedTimeStamp != -1 &&
+             !pCoverLocation->CoverLocation.CheckDynamicCoverValid(pCoverLocation->iCoverLocationLastMovedTimeStamp))) {
+            DynamicCoverLostTimer.Reset(2.0f);
         }
     }
     if (CombatGroup::bUseClustering) {
@@ -1422,13 +1406,10 @@ void CombatState::UpdateImmediateData() {
             }
             if (CombatGroup::bUseSimpleCombatGroupClustering) {
                 Actor* pcurrentPartner = nullptr;
-                if (pLocationTarget) {
-                    if (pLocationTarget->pRef) {
-                        if (pLocationTarget->pRef->IsActor()) {
-                            pcurrentPartner = static_cast<Actor*>(pLocationTarget->pRef);
-                        }
-                    }
+                if ((pLocationTarget) && (pLocationTarget->pRef) && (pLocationTarget->pRef->IsActor())) {
+                    pcurrentPartner = static_cast<Actor*>(pLocationTarget->pRef);
                 }
+
                 Actor* ppartner =
                     pCombatController->pCombatGroup->FindClusterPartner(pattacker, pcurrentPartner, fgatherDistance);
                 if (ppartner) {
@@ -1467,13 +1448,11 @@ LABEL_56:;
         BGSWorldLocation* WorldLocation = pattacker->GetWorldLocation(&kAttackerLocation);
         float fsquaredDistance = pLocationTarget->WorldLoc.GetModifiedDistanceSquared(*WorldLocation, coordMult);
         bool bignoreLocationTarget = false;
-        if (!pLocationTarget->cType || pLocationTarget->cType == 1) {
-            if (ptarget) {
-                if (pCombatController->GetPretendInCombat() && !pCombatController->GetContinueDuringCombat()) {
-                    bignoreLocationTarget = true;
-                }
-            }
+        if ((!pLocationTarget->cType || pLocationTarget->cType == 1) && (ptarget) &&
+            (pCombatController->GetPretendInCombat() && !pCombatController->GetContinueDuringCombat())) {
+            bignoreLocationTarget = true;
         }
+
         if (bignoreLocationTarget) {
             pLocationTarget->bNearTarget = true;
         }
@@ -1501,41 +1480,38 @@ LABEL_56:;
         }
         char cType = pLocationTarget->cType;
         if (cType) {
-            if (cType == 1 && pCombatController->GetAttackerCanSneak()) {
-                if (pLocationTarget->pRef) {
-                    if (pLocationTarget->pRef->IsActor()) {
-                        float* v3 = &fCombatFollowSneakFollowRadius.Float();
-                        float* v4 = &fCombatFollowSneakFollowRadius.Float();
-                        if (!(fsquaredDistance < *v3 * *v4)) {
-                            if (pCombatController->GetForceSneak()) {
-                                pCombatController->SetForceSneak(false);
+            if ((cType == 1 && pCombatController->GetAttackerCanSneak()) && (pLocationTarget->pRef) &&
+                (pLocationTarget->pRef->IsActor())) {
+                float* v3 = &fCombatFollowSneakFollowRadius.Float();
+                float* v4 = &fCombatFollowSneakFollowRadius.Float();
+                if (!(fsquaredDistance < *v3 * *v4)) {
+                    if (pCombatController->GetForceSneak()) {
+                        pCombatController->SetForceSneak(false);
+                    }
+                }
+                else {
+                    Actor* pguardActor = static_cast<Actor*>(pLocationTarget->pRef);
+                    bool bguardSneaking = pguardActor->IsSneaking();
+                    int32_t bguardSneaking_2 = bguardSneaking;
+                    if (bguardSneaking_2 == pattacker->IsSneaking()) {
+                        GuardSneakTimer.Clear();
+                    }
+                    else {
+                        if (GuardSneakTimer.IsSet()) {
+                            if (GuardSneakTimer.Check()) {
+                                pCombatController->SetForceSneak(bguardSneaking);
+                                GuardSneakTimer.Clear();
                             }
                         }
                         else {
-                            Actor* pguardActor = static_cast<Actor*>(pLocationTarget->pRef);
-                            bool bguardSneaking = pguardActor->IsSneaking();
-                            int32_t bguardSneaking_2 = bguardSneaking;
-                            if (bguardSneaking_2 == pattacker->IsSneaking()) {
-                                GuardSneakTimer.Clear();
+                            float z;
+                            if (pguardActor == pPlayer) {
+                                z = RandomFloat(0.5f, 1.0f);
                             }
                             else {
-                                if (GuardSneakTimer.IsSet()) {
-                                    if (GuardSneakTimer.Check()) {
-                                        pCombatController->SetForceSneak(bguardSneaking);
-                                        GuardSneakTimer.Clear();
-                                    }
-                                }
-                                else {
-                                    float z;
-                                    if (pguardActor == pPlayer) {
-                                        z = RandomFloat(0.5f, 1.0f);
-                                    }
-                                    else {
-                                        z = RandomFloat(0.1f, 0.5f);
-                                    }
-                                    GuardSneakTimer.Reset(z);
-                                }
+                                z = RandomFloat(0.1f, 0.5f);
                             }
+                            GuardSneakTimer.Reset(z);
                         }
                     }
                 }
@@ -1771,38 +1747,33 @@ void CombatState::BoostConfidence(bool abChangeFleeStatus) {
             ++cCurrentConfidence;
         }
         pCombatController->ForcePlanUpdate();
-        if (abChangeFleeStatus) {
-            if (pLocationTarget) {
-                if (pLocationTarget->cType == 1) {
-                    worldLocation = pCombatController->pAttacker->TESObjectREFR::GetWorldLocation(&v4);
-                    if ((&pLocationTarget->WorldLoc)->GetDistanceSquared(*worldLocation) < 4096.0) {
-                        abChangeFleeStatus = false;
-                    }
-                }
+        if ((abChangeFleeStatus) && (pLocationTarget) && (pLocationTarget->cType == 1)) {
+            worldLocation = pCombatController->pAttacker->TESObjectREFR::GetWorldLocation(&v4);
+            if ((&pLocationTarget->WorldLoc)->GetDistanceSquared(*worldLocation) < 4096.0) {
+                abChangeFleeStatus = false;
             }
         }
+
         if (abChangeFleeStatus) {
             cFleeState = (uint8_t)0;
         }
-        if (pCoverLocation) {
-            if (((uint32_t)pCoverLocation->iLocation) == 12) {
-                ClearCoverLocation(false);
-            }
+        if ((pCoverLocation) && (((uint32_t)pCoverLocation->iLocation) == 12)) {
+            ClearCoverLocation(false);
         }
     }
 }
 
 bool CombatState::CheckMovement(const BGSWorldLocation& apWorldLocation, bool abCheckUnreachable, bool abPassive) {
-    if (pLocationTarget) {
-        if ((pLocationTarget->cType == LOCATION_TARGET_GUARD && !GetLocationUnreachable(256)) ||
-            (pLocationTarget->cType == LOCATION_TARGET_CLUSTER ||
-             (pLocationTarget->cType == LOCATION_TARGET_COMBAT_AREA && !abPassive))) {
-            float fmaxDistance = GetLocationTargetCheckMovementDistance();
-            if (fmaxDistance * fmaxDistance < apWorldLocation.GetDistanceSquared(pLocationTarget->WorldLoc)) {
-                return false;
-            }
+    if ((pLocationTarget) &&
+        ((pLocationTarget->cType == LOCATION_TARGET_GUARD && !GetLocationUnreachable(256)) ||
+         (pLocationTarget->cType == LOCATION_TARGET_CLUSTER ||
+          (pLocationTarget->cType == LOCATION_TARGET_COMBAT_AREA && !abPassive)))) {
+        float fmaxDistance = GetLocationTargetCheckMovementDistance();
+        if (fmaxDistance * fmaxDistance < apWorldLocation.GetDistanceSquared(pLocationTarget->WorldLoc)) {
+            return false;
         }
     }
+
     return !abCheckUnreachable || !IsLocationUnreachable(apWorldLocation, -1.0f);
 }
 
@@ -1928,10 +1899,8 @@ void CombatState::ClearReferencePointer(TESObjectREFR* apRef, bool abSelf) {
     CombatState::TargetedObject* pObj4 = pCombatItems[4];
     for (i = 0; i < 5; ++i) {
         pTargetedObject = GetTargetedObject(i);
-        if (pTargetedObject) {
-            if (static_cast<const void*>(pTargetedObject->pRef) == static_cast<const void*>(apRef)) {
-                RemoveTargetedObject(i);
-            }
+        if ((pTargetedObject) && (static_cast<const void*>(pTargetedObject->pRef) == static_cast<const void*>(apRef))) {
+            RemoveTargetedObject(i);
         }
     }
     if ((!abSelf) &&
@@ -1940,16 +1909,14 @@ void CombatState::ClearReferencePointer(TESObjectREFR* apRef, bool abSelf) {
         RemoveTargetedObject(3);
         RemoveTargetedObject(4);
     }
-    if (pLocationTarget) {
-        if (pLocationTarget->pRef == apRef) {
-            ClearLocationTarget();
-        }
+    if ((pLocationTarget) && (pLocationTarget->pRef == apRef)) {
+        ClearLocationTarget();
     }
-    if (pCombatLocation) {
-        if (static_cast<const void*>(pCombatLocation->GetRef()) == static_cast<const void*>(apRef)) {
-            ClearCombatLocation();
-        }
+
+    if ((pCombatLocation) && (static_cast<const void*>(pCombatLocation->GetRef()) == static_cast<const void*>(apRef))) {
+        ClearCombatLocation();
     }
+
     if (static_cast<const void*>(pLastTarget) == static_cast<const void*>(apRef)) {
         pLastTarget = nullptr;
     }
@@ -1973,14 +1940,12 @@ double CombatState::GetMaxDPSForWeaponType(COMBAT_WEAPON_TYPE aeType) {
 }
 
 void CombatState::ChangeProcessLevel(PROCESS_TYPE aeOldLevel, PROCESS_TYPE aeNewLevel) {
-    if (((int32_t)aeOldLevel) == 0) {
-        if (aeNewLevel) {
-            ClearCoverLocation(false);
-            ClearCoverSearchInfo();
-            ClearSecondaryCoverLocation(false);
-            ClearSecondaryCoverSearchInfo();
-            ClearCombatLocation();
-        }
+    if ((((int32_t)aeOldLevel) == 0) && (aeNewLevel)) {
+        ClearCoverLocation(false);
+        ClearCoverSearchInfo();
+        ClearSecondaryCoverLocation(false);
+        ClearSecondaryCoverSearchInfo();
+        ClearCombatLocation();
     }
 }
 
@@ -2005,12 +1970,8 @@ void CombatState::CheckReferences() {
     CombatState::TargetedObject* v4 = pCombatItems[4];
     for (a2 = 0; a2 < 5; ++a2) {
         targetedObject = GetTargetedObject(a2);
-        if (targetedObject) {
-            if (targetedObject->pRef) {
-                if (targetedObject->pRef->GetDisabledOrDeleted()) {
-                    RemoveTargetedObject(a2);
-                }
-            }
+        if ((targetedObject) && (targetedObject->pRef) && (targetedObject->pRef->GetDisabledOrDeleted())) {
+            RemoveTargetedObject(a2);
         }
     }
     if ((static_cast<const void*>(v5) != static_cast<const void*>(GetTargetedObject(3))) ||
@@ -2021,15 +1982,12 @@ void CombatState::CheckReferences() {
 }
 
 void CombatState::ClearCovers() {
-    if (pCoverLocation) {
-        if (!pCoverLocation->bReserved) {
-            ClearCoverLocation(false);
-        }
+    if ((pCoverLocation) && (!pCoverLocation->bReserved)) {
+        ClearCoverLocation(false);
     }
-    if (pSecondaryCoverLocation) {
-        if (!pSecondaryCoverLocation->bReserved) {
-            ClearSecondaryCoverLocation(false);
-        }
+
+    if ((pSecondaryCoverLocation) && (!pSecondaryCoverLocation->bReserved)) {
+        ClearSecondaryCoverLocation(false);
     }
 }
 
@@ -2050,10 +2008,9 @@ float CombatState::GetLocationTargetNearTargetDistance() {
         pCombatLocationTarget = pLocationTarget;
         return (pCombatLocationTarget->fMaxDistance + (&fCombatGuardFollowBufferDistance)->Float());
     }
-    else {
-        return (float)(((pLocationTarget->fMaxDistance - pLocationTarget->fMinDistance) * 0.75) +
-                       pLocationTarget->fMinDistance);
-    }
+
+    return (float)(((pLocationTarget->fMaxDistance - pLocationTarget->fMinDistance) * 0.75) +
+                   pLocationTarget->fMinDistance);
 }
 
 bool CombatState::CheckUseLocationTargetMaxDistance() {
@@ -2091,10 +2048,8 @@ void CombatState::ReachedDestination(const BGSWorldLocation& arDestination, int3
         combatGroup = pCombatController->CombatController::GetCombatGroup();
         combatGroup->InvestigatedSearchLocation(arDestination);
     }
-    if (pCombatLocation) {
-        if (pCombatLocation->GetLocation() == ((uint32_t)aiLocation)) {
-            ClearCombatLocation();
-        }
+    if ((pCombatLocation) && (pCombatLocation->GetLocation() == ((uint32_t)aiLocation))) {
+        ClearCombatLocation();
     }
 }
 
@@ -2102,9 +2057,8 @@ double CombatState::GetLocationTargetMinDistance() {
     if (pLocationTarget) {
         return (float)(pLocationTarget->fMinDistance * 0.8999999761581421);
     }
-    else {
-        return (float)0.0;
-    }
+
+    return (float)0.0;
 }
 
 TESObjectWEAP* CombatState::GetBestCombatWeapon() {
@@ -2186,10 +2140,8 @@ bool CombatState::CheckShouldUpdateDetection(Actor* apAttacker, Actor* apTarget)
     if (iTargetDetectionLevel > 0) {
         CombatProcedureBeInCover* pProcedure =
             static_cast<CombatProcedureBeInCover*>(pCombatController->pMovementProcedure);
-        if (pProcedure) {
-            if (pProcedure->GetType() == CombatProcedure::BE_IN_COVER) {
-                return !pProcedure->GetBehindCover();
-            }
+        if ((pProcedure) && (pProcedure->GetType() == CombatProcedure::BE_IN_COVER)) {
+            return !pProcedure->GetBehindCover();
         }
     }
     return v5;
@@ -2545,18 +2497,17 @@ bool CombatState::FindBestAdvanceLocation(
         fminAdvanceDistance_2 = (*v10 - fCoveredAdvanceMinAdvanceDistanceMin.Float()) * v15 + *v8;
     }
     apCoverSearchInfo->uiPreviousCoverKey = 0;
-    if (apCombatCoverLocation->iCoverLocationKey) {
-        if (aiLocation == apCombatCoverLocation->iLocation) {
-            bool bLeftEdge = apCombatCoverLocation->ReservationInfo.bLeftEdge;
-            float fRadius = pattacker->GetRadius();
-            if (pCombatManager->pCoverMap->CanReserveCoverLocation(
-                    apCombatCoverLocation->iCoverLocationKey, &apCombatCoverLocation->CoverLocation, pCombatController,
-                    fRadius, &apCombatCoverLocation->ReservationInfo, true, bLeftEdge
-                )) {
-                return true;
-            }
+    if ((apCombatCoverLocation->iCoverLocationKey) && (aiLocation == apCombatCoverLocation->iLocation)) {
+        bool bLeftEdge = apCombatCoverLocation->ReservationInfo.bLeftEdge;
+        float fRadius = pattacker->GetRadius();
+        if (pCombatManager->pCoverMap->CanReserveCoverLocation(
+                apCombatCoverLocation->iCoverLocationKey, &apCombatCoverLocation->CoverLocation, pCombatController,
+                fRadius, &apCombatCoverLocation->ReservationInfo, true, bLeftEdge
+            )) {
+            return true;
         }
     }
+
     PathingRequestCoveredMove coveredMoveRequest;
     BuildCoveredMoveRequest(&coveredMoveRequest);
     PathingLocation attackerPathingLocation(pattacker);
@@ -2596,10 +2547,8 @@ void CombatState::BuildCoveredMoveRequest(PathingRequestCoveredMove* apCoveredMo
         BuildTargetLOSLocationsArray(apCoveredMoveRequest->GetTargetLocations());
     }
     BuildUnreachableCoverLocationsArray(apCoveredMoveRequest->GetUnreachableCoverLocations());
-    if (pCoverLocation) {
-        if (pCoverLocation->bReserved) {
-            apCoveredMoveRequest->GetUnreachableCoverLocations()->Add(pCoverLocation->iCoverLocationKey);
-        }
+    if ((pCoverLocation) && (pCoverLocation->bReserved)) {
+        apCoveredMoveRequest->GetUnreachableCoverLocations()->Add(pCoverLocation->iCoverLocationKey);
     }
 }
 
@@ -2631,10 +2580,9 @@ bool CombatState::FindCoveredMoveLocation(
         apCoverLocation->operator=(pSecondaryCoverLocation->CoverLocation);
         return true;
     }
-    else {
-        ClearSecondaryCoverLocation(false);
-        return false;
-    }
+
+    ClearSecondaryCoverLocation(false);
+    return false;
 }
 
 bool CombatState::FindOptimalLocation(
@@ -2682,14 +2630,12 @@ bool CombatState::FindOptimalLocation(
             apLocation.~PathingLocation();
             return true;
         }
-        else {
-            apLocation.~PathingLocation();
-            return false;
-        }
-    }
-    else {
+
+        apLocation.~PathingLocation();
         return false;
     }
+
+    return false;
 }
 
 bool CombatState::FindBestFleeLocation(CombatCoverLocation* arg0, CombatLocation* arg4, int32_t arg8) {
@@ -2718,19 +2664,18 @@ bool CombatState::FindBestFleeLocation(CombatCoverLocation* arg0, CombatLocation
                 phelper->GetWorldLocation(&helperWorldLoc);
                 float fsquaredDistance = attackerWorldLoc.GetDistanceSquared(helperWorldLoc);
                 float* v6 = &fCombatFleeMinAllyDistance.Float();
-                if (!(fsquaredDistance < *v6 * fCombatFleeMinAllyDistance.Float())) {
-                    if (!(fclosestHelperDistanceSquared < static_cast<double>(fsquaredDistance))) {
-                        FIGHT_REACTION ereaction;
-                        float ftargetHelperDistanceSquared = targetWorldLoc.GetDistanceSquared(helperWorldLoc);
-                        float ftargetAttackerDistanceSquared = targetWorldLoc.GetDistanceSquared(attackerWorldLoc);
-                        if (!(ftargetHelperDistanceSquared < static_cast<double>(ftargetAttackerDistanceSquared)) &&
-                            CheckMovement(helperWorldLoc, true, false) && !phelper->IsFleeing(false) &&
-                            (phelper->GetShouldAttackActor(ptarget, false, ereaction, false) ||
-                             pCombatManager->GetWanttoHelpGroup(phelper, pattacker)) &&
-                            !phelper->GetShouldAttackActor(pattacker, false, ereaction, false)) {
-                            pclosestHelper = phelper;
-                            fclosestHelperDistanceSquared = fsquaredDistance;
-                        }
+                if ((!(fsquaredDistance < *v6 * fCombatFleeMinAllyDistance.Float())) &&
+                    (!(fclosestHelperDistanceSquared < static_cast<double>(fsquaredDistance)))) {
+                    FIGHT_REACTION ereaction;
+                    float ftargetHelperDistanceSquared = targetWorldLoc.GetDistanceSquared(helperWorldLoc);
+                    float ftargetAttackerDistanceSquared = targetWorldLoc.GetDistanceSquared(attackerWorldLoc);
+                    if (!(ftargetHelperDistanceSquared < static_cast<double>(ftargetAttackerDistanceSquared)) &&
+                        CheckMovement(helperWorldLoc, true, false) && !phelper->IsFleeing(false) &&
+                        (phelper->GetShouldAttackActor(ptarget, false, ereaction, false) ||
+                         pCombatManager->GetWanttoHelpGroup(phelper, pattacker)) &&
+                        !phelper->GetShouldAttackActor(pattacker, false, ereaction, false)) {
+                        pclosestHelper = phelper;
+                        fclosestHelperDistanceSquared = fsquaredDistance;
                     }
                 }
             }
@@ -2745,67 +2690,64 @@ bool CombatState::FindBestFleeLocation(CombatCoverLocation* arg0, CombatLocation
         }
     }
     TESActorBase* pactorBase = pattacker->GetActorBase();
-    if (static_cast<uint8_t>(pactorBase->HasLowLevelProcessing())) {
-        if ((!pattacker->IsCreature() || !pactorBase->GetCantOpenDoors()) && arg8 != 10) {
-            if (!cFleeState) {
-                if (RandomBool(fCombatFleeInitialDoorRestrictChance.Float())) {
-                    CombatTimeStamp kTimeStamp(CombatTimer::GetTimer());
-                    fLastFleeDoorTimeStamp = kTimeStamp;
-                }
-            }
-            // ElapsedTime is called before the setting's Float, and its result is kept as a double.
-            double fElapsedTime = fLastFleeDoorTimeStamp.ElapsedTime();
-            if (fCombatFleeUseDoorRestrictTime.Float() < fElapsedTime) {
-                TESObjectREFR* pclosestDoor = nullptr;
-                NiPoint3 apArray_20 = pattacker->GetLocationOnReference();
-                float apArray_16 = fCombatFleeMaxDoorDistance.Float();
-                float fclosestDoorDistanceSquared = apArray_16 * apArray_16;
-                using DoorArray = BSSimpleArray<TESObjectREFR*, 1024>;
-                DoorArray v37;
-                TESForm* Space = pattacker->GetSpace();
-                if (Pathing::FindTeleportDoorsForLocation(Space, apArray_20, apArray_16, &v37)) {
-                    for (uint32_t i = 0;; ++i) {
-                        uint32_t FormFlags = v37.iSize;
-                        if (i >= FormFlags) {
-                            break;
-                        }
-                        TESObjectREFR* pdoor = v37.operator[](i);
-                        if (!pdoor->GetDisabledOrDeleted() && pdoor->iFormID != iLastFleeDoor) {
-                            DoorTeleportData* pteleportData = pdoor->GetTeleport();
-                            TESObjectREFR* plinkedDoor = pteleportData->pLinkedDoor;
-                            if (plinkedDoor->iFormID != iLastFleeDoor && !plinkedDoor->GetDisabledOrDeleted()) {
-                                BGSEncounterZone* pdoorZone;
-                                BGSEncounterZone* pactorZone;
-                                if (!bEncounterZoneTargetRestrict.Bool()) {
-                                    goto LABEL_44;
-                                }
-                                pdoorZone = plinkedDoor->GetEncounterZone();
-                                pactorZone = pattacker->GetEncounterZone();
-                                if (!pdoorZone) {
-                                    pdoorZone = BGSEncounterZone::GetNoZone();
-                                }
-                                if (!pactorZone) {
-                                    pactorZone = BGSEncounterZone::GetNoZone();
-                                }
-                                if (pdoorZone == pactorZone) {
-                                LABEL_44:;
-                                    pdoor->GetWorldLocation(&doorWorldLocation);
-                                    if (CheckMovement(doorWorldLocation, true, false)) {
-                                        BGSWorldLocation* TeleportWorldLocation =
-                                            pteleportData->GetTeleportWorldLocation(&apResult);
-                                        if (CheckMovement(*TeleportWorldLocation, true, true)) {
-                                            float* v12 = &fCombatFleeDoorTargetCheckDistance.Float();
-                                            if (!pCombatController->pCombatGroup->FindTargetNearLocation(
-                                                    doorWorldLocation, *v12, false
-                                                )) {
-                                                NiPoint3 doorLoc = pdoor->GetLocationOnReference();
-                                                NiPoint3 doorVec = doorLoc - apArray_20;
-                                                float fdistanceSquared_2 = doorVec.SqrLength();
-                                                if (fclosestDoorDistanceSquared >
-                                                    static_cast<double>(fdistanceSquared_2)) {
-                                                    fclosestDoorDistanceSquared = fdistanceSquared_2;
-                                                    pclosestDoor = pdoor;
-                                                }
+    if ((static_cast<uint8_t>(pactorBase->HasLowLevelProcessing())) &&
+        ((!pattacker->IsCreature() || !pactorBase->GetCantOpenDoors()) && arg8 != 10)) {
+        if ((!cFleeState) && (RandomBool(fCombatFleeInitialDoorRestrictChance.Float()))) {
+            CombatTimeStamp kTimeStamp(CombatTimer::GetTimer());
+            fLastFleeDoorTimeStamp = kTimeStamp;
+        }
+
+        // ElapsedTime is called before the setting's Float, and its result is kept as a double.
+        double fElapsedTime = fLastFleeDoorTimeStamp.ElapsedTime();
+        if (fCombatFleeUseDoorRestrictTime.Float() < fElapsedTime) {
+            TESObjectREFR* pclosestDoor = nullptr;
+            NiPoint3 apArray_20 = pattacker->GetLocationOnReference();
+            float apArray_16 = fCombatFleeMaxDoorDistance.Float();
+            float fclosestDoorDistanceSquared = apArray_16 * apArray_16;
+            using DoorArray = BSSimpleArray<TESObjectREFR*, 1024>;
+            DoorArray v37;
+            TESForm* Space = pattacker->GetSpace();
+            if (Pathing::FindTeleportDoorsForLocation(Space, apArray_20, apArray_16, &v37)) {
+                for (uint32_t i = 0;; ++i) {
+                    uint32_t FormFlags = v37.iSize;
+                    if (i >= FormFlags) {
+                        break;
+                    }
+                    TESObjectREFR* pdoor = v37.operator[](i);
+                    if (!pdoor->GetDisabledOrDeleted() && pdoor->iFormID != iLastFleeDoor) {
+                        DoorTeleportData* pteleportData = pdoor->GetTeleport();
+                        TESObjectREFR* plinkedDoor = pteleportData->pLinkedDoor;
+                        if (plinkedDoor->iFormID != iLastFleeDoor && !plinkedDoor->GetDisabledOrDeleted()) {
+                            BGSEncounterZone* pdoorZone;
+                            BGSEncounterZone* pactorZone;
+                            if (!bEncounterZoneTargetRestrict.Bool()) {
+                                goto LABEL_44;
+                            }
+                            pdoorZone = plinkedDoor->GetEncounterZone();
+                            pactorZone = pattacker->GetEncounterZone();
+                            if (!pdoorZone) {
+                                pdoorZone = BGSEncounterZone::GetNoZone();
+                            }
+                            if (!pactorZone) {
+                                pactorZone = BGSEncounterZone::GetNoZone();
+                            }
+                            if (pdoorZone == pactorZone) {
+                            LABEL_44:;
+                                pdoor->GetWorldLocation(&doorWorldLocation);
+                                if (CheckMovement(doorWorldLocation, true, false)) {
+                                    BGSWorldLocation* TeleportWorldLocation =
+                                        pteleportData->GetTeleportWorldLocation(&apResult);
+                                    if (CheckMovement(*TeleportWorldLocation, true, true)) {
+                                        float* v12 = &fCombatFleeDoorTargetCheckDistance.Float();
+                                        if (!pCombatController->pCombatGroup->FindTargetNearLocation(
+                                                doorWorldLocation, *v12, false
+                                            )) {
+                                            NiPoint3 doorLoc = pdoor->GetLocationOnReference();
+                                            NiPoint3 doorVec = doorLoc - apArray_20;
+                                            float fdistanceSquared_2 = doorVec.SqrLength();
+                                            if (fclosestDoorDistanceSquared > static_cast<double>(fdistanceSquared_2)) {
+                                                fclosestDoorDistanceSquared = fdistanceSquared_2;
+                                                pclosestDoor = pdoor;
                                             }
                                         }
                                     }
@@ -2814,18 +2756,19 @@ bool CombatState::FindBestFleeLocation(CombatCoverLocation* arg0, CombatLocation
                         }
                     }
                 }
-                if (pclosestDoor) {
-                    DoorTeleportData* pteleportData_2 = pclosestDoor->GetTeleport();
-                    TESForm* pspace = (TESForm*)pteleportData_2->GetTeleportWorldSpace();
-                    if (!pspace) {
-                        pspace = (TESForm*)pteleportData_2->GetTeleportCell();
-                    }
-                    arg4->SetPoint(*&pteleportData_2->position, pspace);
-                    return true;
+            }
+            if (pclosestDoor) {
+                DoorTeleportData* pteleportData_2 = pclosestDoor->GetTeleport();
+                TESForm* pspace = (TESForm*)pteleportData_2->GetTeleportWorldSpace();
+                if (!pspace) {
+                    pspace = (TESForm*)pteleportData_2->GetTeleportCell();
                 }
+                arg4->SetPoint(*&pteleportData_2->position, pspace);
+                return true;
             }
         }
     }
+
     if (arg0 && FindBestCoverLocation(nullptr, &CoverSearchInfo, arg0, arg4, arg8)) {
         return true;
     }
@@ -2844,10 +2787,9 @@ bool CombatState::FindBestFleeLocation(CombatCoverLocation* arg0, CombatLocation
         }
         return true;
     }
-    else {
-        arg4->SetFlag(1u, true);
-        return true;
-    }
+
+    arg4->SetFlag(1u, true);
+    return true;
 }
 
 bool CombatState::FindLOSLocation(CombatLocation* apRetLocation, int32_t a3) {
@@ -2936,16 +2878,14 @@ bool CombatState::FindBetterWeapon() {
     }
     BaseProcess* CurrentAIProcess = pattacker->pCurrentProcess;
     ItemChange* pcurrentWeaponItem = CurrentAIProcess->GetCurrentWeapon();
-    if (pcurrentWeaponItem) {
-        if (pcurrentWeaponItem->pExtraObjectList) {
-            if (pcurrentWeaponItem->pExtraObjectList->m_item) {
-                ExtraDataList** v2 = &pcurrentWeaponItem->pExtraObjectList->m_item;
-                if ((*v2)->GetCanNotWear()) {
-                    return false;
-                }
-            }
+    if ((pcurrentWeaponItem) && (pcurrentWeaponItem->pExtraObjectList) &&
+        (pcurrentWeaponItem->pExtraObjectList->m_item)) {
+        ExtraDataList** v2 = &pcurrentWeaponItem->pExtraObjectList->m_item;
+        if ((*v2)->GetCanNotWear()) {
+            return false;
         }
     }
+
     CombatAI_CombatItemSearch.Start();
     pattacker->GetWorldLocation(&attackerWorldLoc);
     TESObjectREFR* pnewWeapon = nullptr;
@@ -3079,14 +3019,11 @@ bool CombatState::FindBetterWeapon() {
                             if (!bhasAmmo) {
                                 bhasAmmo = pattacker->GetInventoryObjectCount(pammo) != 0;
                             }
-                            if (!bhasAmmo) {
-                                if (pweaponItemChange) {
-                                    if (pweaponRef->GetInventoryObjectCount(pammo)) {
-                                        bhasAmmo = true;
-                                        ptempNewAmmo = pweaponRef;
-                                    }
-                                }
+                            if ((!bhasAmmo) && (pweaponItemChange) && (pweaponRef->GetInventoryObjectCount(pammo))) {
+                                bhasAmmo = true;
+                                ptempNewAmmo = pweaponRef;
                             }
+
                             if (!bhasAmmo) {
                                 float fsquaredTotalDistance = 3.4028235e+38f;
                                 NiPoint3 weaponLoc = pweaponRef->GetLocationOnReference();
@@ -3145,9 +3082,8 @@ bool CombatState::FindBetterWeapon() {
         AddObjectToTarget(4u, pnewWeapon, pnewWeaponObject);
         return true;
     }
-    else {
-        return false;
-    }
+
+    return false;
 }
 
 bool CombatState::IsCoverLocationValid(CombatCoverLocation* apCoverLocation) {
@@ -3179,9 +3115,8 @@ double CombatState::GetLocationTargetDistance() {
     if (CheckUseLocationTargetMaxDistance()) {
         return pLocationTarget->fMaxDistance;
     }
-    else {
-        return GetLocationTargetMinDistance();
-    }
+
+    return GetLocationTargetMinDistance();
 }
 
 float CombatState::GetLocationTargetCheckMovementDistance() {
@@ -3194,10 +3129,9 @@ float CombatState::GetLocationTargetCheckMovementDistance() {
         (egoal == CombatGoal::COMBAT_GOAL_GUARD || egoal == CombatGoal::COMBAT_GOAL_STAY_IN_COMBAT_AREA)) {
         return this->pLocationTarget->fMaxDistance;
     }
-    else {
-        CombatLocationTarget* pLocationTarget = this->pLocationTarget;
-        return pLocationTarget->fMaxDistance + fCombatGuardFollowBufferDistance.Float();
-    }
+
+    CombatLocationTarget* pLocationTarget = this->pLocationTarget;
+    return pLocationTarget->fMaxDistance + fCombatGuardFollowBufferDistance.Float();
 }
 
 void CombatState::AddUnreachableCoverLocation(uint32_t aiCoverKey) {

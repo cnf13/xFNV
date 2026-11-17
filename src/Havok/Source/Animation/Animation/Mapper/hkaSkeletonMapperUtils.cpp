@@ -884,11 +884,11 @@ void hkaSkeletonMapperUtils::createMapping(
             // Bones match by name, or for a ragdoll mapping with a position tolerance and no compare function by
             // position.
             int32_t (*compareNames)(const char*, const char*) = params.m_compareNames;
-            if (!compareNames) {
-                if (type != hkaSkeletonMapperData::HK_RAGDOLL_MAPPING || !(params.m_positionMatchTolerance > 0.0f)) {
-                    compareNames = &hkString::strCasecmp;
-                }
+            if ((!compareNames) &&
+                (type != hkaSkeletonMapperData::HK_RAGDOLL_MAPPING || !(params.m_positionMatchTolerance > 0.0f))) {
+                compareNames = &hkString::strCasecmp;
             }
+
             const float fToleranceSq = params.m_positionMatchTolerance * params.m_positionMatchTolerance;
             for (int32_t a = 0; a < numBonesA; ++a) {
                 if (compareNames) {

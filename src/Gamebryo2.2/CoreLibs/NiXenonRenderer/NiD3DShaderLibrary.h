@@ -13,8 +13,8 @@ class NiD3DShaderLibrary : public NiShaderLibrary {
 public:
     // The description virtuals sit between ReleaseShader and SetRenderer. The class is never instantiated; only
     // SetRenderer is called.
-    virtual NiShaderLibraryDesc* GetShaderLibraryDesc();
-    virtual void SetShaderLibraryDesc(NiShaderLibraryDesc* apDesc);
+    NiShaderLibraryDesc* GetShaderLibraryDesc() override;
+    void SetShaderLibraryDesc(NiShaderLibraryDesc* apDesc) override;
     virtual void SetRenderer(NiDX9Renderer* apRenderer);
 
     NiDX9Renderer* GetRenderer();

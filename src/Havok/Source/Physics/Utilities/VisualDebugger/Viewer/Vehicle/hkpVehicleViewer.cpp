@@ -251,18 +251,16 @@ void hkpVehicleViewer::actionAddedCallback(hkpAction* action) {
     hkVtableClassRegistry* v6 = v2->getVtableClassRegistry();
     hkpVehicleInstance* v7 = static_cast<hkpVehicleInstance*>(action);
     const hkClass* v8 = v6->getClassFromVirtualInstance(action);
-    if (v5) {
-        if (v8) {
-            hkBool isVehicle;
-            if (v5->isSuperClass(&isVehicle, *v8)->m_bool) {
-                v7->addReference();
-                hkMemoryRouter* Instance = &hkMemoryRouter::getInstance();
-                if (m_vehicles.m_size ==
-                    (m_vehicles.m_capacityAndFlags & hkArrayBase<hkpVehicleInstance*>::CAPACITY_MASK)) {
-                    hkArrayUtil::_reserveMore(*Instance->m_heap, &m_vehicles, sizeof(hkpVehicleInstance*));
-                }
-                m_vehicles.m_data[m_vehicles.m_size++] = v7;
+    if ((v5) && (v8)) {
+        hkBool isVehicle;
+        if (v5->isSuperClass(&isVehicle, *v8)->m_bool) {
+            v7->addReference();
+            hkMemoryRouter* Instance = &hkMemoryRouter::getInstance();
+            if (m_vehicles.m_size ==
+                (m_vehicles.m_capacityAndFlags & hkArrayBase<hkpVehicleInstance*>::CAPACITY_MASK)) {
+                hkArrayUtil::_reserveMore(*Instance->m_heap, &m_vehicles, sizeof(hkpVehicleInstance*));
             }
+            m_vehicles.m_data[m_vehicles.m_size++] = v7;
         }
     }
 }
@@ -294,9 +292,8 @@ hkProcess* hkpVehicleViewer::create(const hkArray<hkProcessContext*, hkContainer
     if (v3) {
         return &static_cast<hkProcess&>(static_cast<hkpWorldViewerBase&>(*v3));
     }
-    else {
-        return nullptr;
-    }
+
+    return nullptr;
 }
 
 void hkpVehicleViewer::registerViewer() {

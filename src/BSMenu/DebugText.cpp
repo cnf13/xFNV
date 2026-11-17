@@ -337,24 +337,21 @@ void DebugText::HandleQueuedPrints() {
                         btext_is_the_same_2 = false;
                     }
                     else {
-                        if (pDebugTextList[a_2].spNode.m_pObject) {
-                            if (!pDebugTextList[a_2].pText.StrCmp(static_cast<const char*>(string.pString), true) &&
-                                (xPrintData.pBuffer[i]->pTextData->Color.r == pDebugTextList[a_2].Color.r &&
-                                 (xPrintData.pBuffer[i]->pTextData->Color.g == pDebugTextList[a_2].Color.g &&
-                                  (xPrintData.pBuffer[i]->pTextData->Color.b == pDebugTextList[a_2].Color.b &&
-                                   xPrintData.pBuffer[i]->pTextData->Color.a == pDebugTextList[a_2].Color.a)))) {
-                                btext_is_the_same_2 = true;
-                            }
+                        if ((pDebugTextList[a_2].spNode.m_pObject) &&
+                            (!pDebugTextList[a_2].pText.StrCmp(static_cast<const char*>(string.pString), true) &&
+                             (xPrintData.pBuffer[i]->pTextData->Color.r == pDebugTextList[a_2].Color.r &&
+                              (xPrintData.pBuffer[i]->pTextData->Color.g == pDebugTextList[a_2].Color.g &&
+                               (xPrintData.pBuffer[i]->pTextData->Color.b == pDebugTextList[a_2].Color.b &&
+                                xPrintData.pBuffer[i]->pTextData->Color.a == pDebugTextList[a_2].Color.a))))) {
+                            btext_is_the_same_2 = true;
                         }
                     }
-                    if (!btext_is_the_same_2) {
-                        if (pDebugTextList[a_2].spNode.m_pObject) {
-                            DebugText::Lock();
-                            NiNode* DebugTextRoot = Interface::GetDebugTextRoot();
-                            DebugTextRoot->DetachChild(pDebugTextList[a_2].spNode.m_pObject);
-                            pDebugTextList[a_2].spNode.operator=(static_cast<NiNode*>(nullptr));
-                            DebugText::Unlock();
-                        }
+                    if ((!btext_is_the_same_2) && (pDebugTextList[a_2].spNode.m_pObject)) {
+                        DebugText::Lock();
+                        NiNode* DebugTextRoot = Interface::GetDebugTextRoot();
+                        DebugTextRoot->DetachChild(pDebugTextList[a_2].spNode.m_pObject);
+                        pDebugTextList[a_2].spNode.operator=(static_cast<NiNode*>(nullptr));
+                        DebugText::Unlock();
                     }
                 }
                 if (!btext_is_the_same_2) {
@@ -676,10 +673,9 @@ NiNode* DebugText::CreateDebugText(
         GetThreadTLSData()->eMemContext = tempMemContext.iOldMemContext;
         return pnode;
     }
-    else {
-        GetThreadTLSData()->eMemContext = tempMemContext.iOldMemContext;
-        return nullptr;
-    }
+
+    GetThreadTLSData()->eMemContext = tempMemContext.iOldMemContext;
+    return nullptr;
 }
 
 bool DebugText::GetDebugText_0(char* apBuf, float afX, float afY, int32_t aiJustify) {
@@ -780,19 +776,17 @@ void DebugText::Idle() {
         for (int32_t a = 0; a < 200; ++a) {
             if (pme->pDebugTextList[a].fDie > 0.0) {
                 pme->pDebugTextList[a].fDie = pme->pDebugTextList[a].fDie - appTimer.fDelta;
-                if (pme->pDebugTextList[a].fDie <= 0.0) {
-                    if (pme->pDebugTextList[a].spNode.m_pObject) {
-                        DebugText::Lock();
-                        NiNode* DebugTextRoot = Interface::GetDebugTextRoot();
-                        DebugTextRoot->DetachChild(pme->pDebugTextList[a].spNode.m_pObject);
-                        pme->pDebugTextList[a].spNode.operator=(static_cast<NiNode*>(nullptr));
-                        pme->pDebugTextList[a].iJustify = 0;
-                        pme->pDebugTextList[a].fX = 0.0f;
-                        pme->pDebugTextList[a].fY = 0.0f;
-                        pme->pDebugTextList[a].pText.Set(nullptr, 0);
-                        pme->pDebugTextList[a].fDie = -1.0f;
-                        DebugText::Unlock();
-                    }
+                if ((pme->pDebugTextList[a].fDie <= 0.0) && (pme->pDebugTextList[a].spNode.m_pObject)) {
+                    DebugText::Lock();
+                    NiNode* DebugTextRoot = Interface::GetDebugTextRoot();
+                    DebugTextRoot->DetachChild(pme->pDebugTextList[a].spNode.m_pObject);
+                    pme->pDebugTextList[a].spNode.operator=(static_cast<NiNode*>(nullptr));
+                    pme->pDebugTextList[a].iJustify = 0;
+                    pme->pDebugTextList[a].fX = 0.0f;
+                    pme->pDebugTextList[a].fY = 0.0f;
+                    pme->pDebugTextList[a].pText.Set(nullptr, 0);
+                    pme->pDebugTextList[a].fDie = -1.0f;
+                    DebugText::Unlock();
                 }
             }
         }

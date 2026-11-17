@@ -68,9 +68,8 @@ TESObjectREFR* GetDialogMenuParterRef() {
           v3))) {
         return v3->pSpeaker;
     }
-    else {
-        return nullptr;
-    }
+
+    return nullptr;
 }
 
 DialogMenu::DialogMenu()
@@ -192,15 +191,13 @@ void DialogMenu::DoIdle() {
                 eDialogState = DialogMenu::eCameraZoomOut;
             }
         }
-        if (pSpeaker->pCurrentProcess) {
-            if (pSpeaker->pCurrentProcess->eLevel) {
-                if (eDialogState != DialogMenu::eCameraZoomOut) {
-                    DialogMenu::Close();
-                    fElapsedSecs = 0.0f;
-                    eDialogState = DialogMenu::eCameraZoomOut;
-                }
-            }
+        if ((pSpeaker->pCurrentProcess) && (pSpeaker->pCurrentProcess->eLevel) &&
+            (eDialogState != DialogMenu::eCameraZoomOut)) {
+            DialogMenu::Close();
+            fElapsedSecs = 0.0f;
+            eDialogState = DialogMenu::eCameraZoomOut;
         }
+
         switch (eDialogState) {
             case DialogMenu::eCameraZoomIn: {
                 if (bShowingTutorial && fElapsedSecs == 0.0) {
@@ -271,12 +268,10 @@ void DialogMenu::DoIdle() {
             }
             case DialogMenu::ePlaySpeech: {
                 if (!(DialogMenu::fUseTimerNoVoice > 0.0)) {
-                    if (pSpeaker) {
-                        if (pSpeaker->bSpeakingDone) {
-                            fElapsedSecs = 0.0f;
-                            eDialogState = DialogMenu::eLoadSpeech;
-                            uiIgnoreInputStartTime = appTimer.iLastTime;
-                        }
+                    if ((pSpeaker) && (pSpeaker->bSpeakingDone)) {
+                        fElapsedSecs = 0.0f;
+                        eDialogState = DialogMenu::eLoadSpeech;
+                        uiIgnoreInputStartTime = appTimer.iLastTime;
                     }
                 }
                 else {
@@ -675,18 +670,16 @@ DialogMenu::DialogState DialogMenu::LoadNextScreen(bool abShowChallengePrefix) {
 void DialogMenu::ServiceStart() {
     MenuTopic* currentTopic;
     DialogueResponse* currentResponse;
-    if (DialogMenu::pMe) {
-        if (!DialogMenu::pMe->eGoodbyeState) {
-            DialogMenu::pMe->bInServiceMenu = true;
-            DialogMenu::pMe->bDoServiceLoad = true;
-            if (DialogMenu::pMe->pTopicManager->GetCurrentTopic()) {
-                currentTopic = DialogMenu::pMe->pTopicManager->GetCurrentTopic();
-                currentResponse = currentTopic->GetCurrentResponse();
-                DialogMenu::pMe->pSpeaker->UpdateInDialogue((float)0.0, currentResponse, false);
-                DialogMenu::pMe->pSpeaker->bSpeakingDone = true;
-            }
-            DialogMenu::pMe->StartFadeOut();
+    if ((DialogMenu::pMe) && (!DialogMenu::pMe->eGoodbyeState)) {
+        DialogMenu::pMe->bInServiceMenu = true;
+        DialogMenu::pMe->bDoServiceLoad = true;
+        if (DialogMenu::pMe->pTopicManager->GetCurrentTopic()) {
+            currentTopic = DialogMenu::pMe->pTopicManager->GetCurrentTopic();
+            currentResponse = currentTopic->GetCurrentResponse();
+            DialogMenu::pMe->pSpeaker->UpdateInDialogue((float)0.0, currentResponse, false);
+            DialogMenu::pMe->pSpeaker->bSpeakingDone = true;
         }
+        DialogMenu::pMe->StartFadeOut();
     }
 }
 
@@ -734,10 +727,8 @@ Tile* DialogMenu::Create(MobileObject* apSpeaker, TESTopic* apGreetTopic, Mobile
                 if (apSpeaker->IsActor()) {
                     Actor* pact = static_cast<Actor*>(apSpeaker);
                     TESPackage* peditorpack = (&apSpeaker->m_Extra)->GetPackageExtra();
-                    if (peditorpack) {
-                        if (peditorpack->GetPackType() == PACKAGE_TYPE_DIALOGUE) {
-                            DialogMenu::fPackagePercentZoom = peditorpack->GetDialogueFOV();
-                        }
+                    if ((peditorpack) && (peditorpack->GetPackType() == PACKAGE_TYPE_DIALOGUE)) {
+                        DialogMenu::fPackagePercentZoom = peditorpack->GetDialogueFOV();
                     }
                 }
                 if (!ppack ||
@@ -817,29 +808,23 @@ Tile* DialogMenu::Create(MobileObject* apSpeaker, TESTopic* apGreetTopic, Mobile
                 Interface::SetGunScopeVisible(false);
                 return ptile;
             }
-            else {
-                Warning("MENUS: Dialogue Menu Creation Failed... Are your menu and art resources up to date?");
-                return nullptr;
-            }
-        }
-        else {
-            if (DialogMenu::pMe) {
-                if (DialogMenu::pMe->pMenu) {
-                    if (DialogMenu::pMe) {
-                        delete DialogMenu::pMe;
-                    }
-                }
-            }
+
+            Warning("MENUS: Dialogue Menu Creation Failed... Are your menu and art resources up to date?");
             return nullptr;
         }
-    }
-    else {
-        Warning(
-            "MENUS: DialogMenu::Create() called with a null speaker, which shouldn't happen.  Notify your friendly "
-            "Interface programmer!"
-        );
+
+        if ((DialogMenu::pMe) && (DialogMenu::pMe->pMenu) && (DialogMenu::pMe)) {
+            delete DialogMenu::pMe;
+        }
+
         return nullptr;
     }
+
+    Warning(
+        "MENUS: DialogMenu::Create() called with a null speaker, which shouldn't happen.  Notify your friendly "
+        "Interface programmer!"
+    );
+    return nullptr;
 }
 
 bool DialogMenu::IsDialogActive() {
@@ -901,51 +886,40 @@ void DialogMenu::Close() {
         if (pSpeaker->pCurrentProcess) {
             BaseProcess* CurrentAIProcess = pSpeaker->pCurrentProcess;
             CurrentAIProcess->SetLastSpeakingEmotion(DE_NEUTRAL);
-            if (v13) {
-                if (!v13->IsInCombat()) {
-                    BaseProcess* v9 = v13->pCurrentProcess;
-                    v9->CheckforNewPackage(v13, true);
-                }
+            if ((v13) && (!v13->IsInCombat())) {
+                BaseProcess* v9 = v13->pCurrentProcess;
+                v9->CheckforNewPackage(v13, true);
             }
         }
-        if (v13) {
-            if (v13->pCurrentProcess) {
-                BaseProcess* v8 = v13->pCurrentProcess;
-                v8->ClearDialogHeadTrackTarget(true);
-            }
+        if ((v13) && (v13->pCurrentProcess)) {
+            BaseProcess* v8 = v13->pCurrentProcess;
+            v8->ClearDialogHeadTrackTarget(true);
         }
-        if (pSpeaker->pCurrentProcess) {
-            if (v13) {
-                if (!v13->IsDead(false) && !v13->IsDying()) {
-                    BaseProcess* v7 = pSpeaker->pCurrentProcess;
-                    float* v2 = &fAIGreetingTimer.Float();
-                    v7->SetGreetingTimer(*v2);
-                }
-            }
+
+        if ((pSpeaker->pCurrentProcess) && (v13) && (!v13->IsDead(false) && !v13->IsDying())) {
+            BaseProcess* v7 = pSpeaker->pCurrentProcess;
+            float* v2 = &fAIGreetingTimer.Float();
+            v7->SetGreetingTimer(*v2);
         }
+
         if (v13) {
             v13->StopMoving();
         }
         pPlayer->ResetPlayerGreetFlag();
         BaseProcess* v6 = pPlayer->pCurrentProcess;
         v6->ClearDialogHeadTrackTarget(true);
-        if (v14) {
-            if (v11 && !v14->IsRunImmediately()) {
-                v14->RunResult(TIRS_END, pSpeaker);
-                v14->AddTopicList();
-                if (v13) {
-                    if (!v13->IsInCombat()) {
-                        if (v13->pCurrentProcess) {
-                            BaseProcess* v5 = v13->pCurrentProcess;
-                            if (v5->CheckforNewPackage(v13, true)) {
-                                BaseProcess* v4 = v13->pCurrentProcess;
-                                v4->ClearCurrentDataforProcess(v13);
-                            }
-                        }
-                    }
+        if ((v14) && (v11 && !v14->IsRunImmediately())) {
+            v14->RunResult(TIRS_END, pSpeaker);
+            v14->AddTopicList();
+            if ((v13) && (!v13->IsInCombat()) && (v13->pCurrentProcess)) {
+                BaseProcess* v5 = v13->pCurrentProcess;
+                if (v5->CheckforNewPackage(v13, true)) {
+                    BaseProcess* v4 = v13->pCurrentProcess;
+                    v4->ClearCurrentDataforProcess(v13);
                 }
             }
         }
+
         DialogMenu::pMe->pMenu->Set(4003, 1);
         DialogMenu::pMe->StartFadeOut();
     }

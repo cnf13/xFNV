@@ -70,11 +70,10 @@ hkAabb* hkAabbUtil::calcAabb(const hkVector4* vertices, int32_t numVertices, hkA
         aabbOut.m_max.m_quad = _mm_and_ps(rdata_10C4C10, v5);
         return &aabbOut;
     }
-    else {
-        aabbOut.m_min.m_quad = _mm_shuffle_ps(_mm_set_ss(rdata_104DA48), _mm_set_ss(rdata_104DA48), 0);
-        aabbOut.m_max.m_quad = _mm_shuffle_ps(_mm_set_ss(rdata_104E148), _mm_set_ss(rdata_104E148), 0);
-        return &aabbOut;
-    }
+
+    aabbOut.m_min.m_quad = _mm_shuffle_ps(_mm_set_ss(rdata_104DA48), _mm_set_ss(rdata_104DA48), 0);
+    aabbOut.m_max.m_quad = _mm_shuffle_ps(_mm_set_ss(rdata_104E148), _mm_set_ss(rdata_104E148), 0);
+    return &aabbOut;
 }
 
 // calcAabb over strided float points: min/max over each point's x, y and z, then the xyz mask (setXYZ0). The point's w

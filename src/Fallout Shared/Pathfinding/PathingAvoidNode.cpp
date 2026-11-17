@@ -54,9 +54,8 @@ LABEL_9:;
     if (!(v14 > static_cast<double>(v13))) {
         return 0.0f;
     }
-    else {
-        return (1.0 - v13 / v14) * fCost;
-    }
+
+    return (1.0 - v13 / v14) * fCost;
 }
 
 void PathingAvoidNode::SaveGame(BGSSaveFormBuffer* apSaveGameBuffer) {

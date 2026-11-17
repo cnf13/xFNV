@@ -460,9 +460,8 @@ RAYCASTPATH_RESULT PathManagerImpl::GetRayCastPathToNavmesh(
     if (prequestMap->GetAt(apRequest, ptaskletData)) {
         return ptaskletData->GetRayCastPathToNavmesh(aEdges, aGoalLocation, aRetPath, abStart);
     }
-    else {
-        return RCP_FAILED;
-    }
+
+    return RCP_FAILED;
 }
 
 RAYCASTPATH_RESULT PathManagerImpl::GetRayCastPath(
@@ -475,9 +474,8 @@ RAYCASTPATH_RESULT PathManagerImpl::GetRayCastPath(
     if (RequestToTaskletDataMap.GetAt(apRequest, ptaskletData)) {
         return ptaskletData->GetRayCastPath(aStartLocation, aGoalLocation, aRetPath);
     }
-    else {
-        return RCP_FAILED;
-    }
+
+    return RCP_FAILED;
 }
 
 void PathManagerImpl::ClearInventoryPointersFromCurrentRequests(InventoryChanges* apInventory) {

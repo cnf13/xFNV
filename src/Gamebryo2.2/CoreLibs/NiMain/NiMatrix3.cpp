@@ -18,7 +18,9 @@ NiMatrix3::NiMatrix3(const NiPoint3& col0, const NiPoint3& col1, const NiPoint3&
 
 // The three rotations are built inline, then multiplied together.
 void NiMatrix3::FromEulerAnglesZXY(float fZAngle, float fXAngle, float fYAngle) {
-    NiMatrix3 kXRot, kYRot, kZRot;
+    NiMatrix3 kXRot;
+    NiMatrix3 kYRot;
+    NiMatrix3 kZRot;
     float fSin;
     float fCos;
     // EXE-INLINED 0x524AC0
@@ -62,7 +64,9 @@ void NiMatrix3::FromEulerAnglesZXY(float fZAngle, float fXAngle, float fYAngle) 
 
 // The three rotations are built inline, then multiplied together.
 void NiMatrix3::FromEulerAnglesZYX(float fZAngle, float fYAngle, float fXAngle) {
-    NiMatrix3 kXRot, kYRot, kZRot;
+    NiMatrix3 kXRot;
+    NiMatrix3 kYRot;
+    NiMatrix3 kZRot;
     float fSin;
     float fCos;
     // EXE-INLINED 0x524AC0
@@ -297,21 +301,19 @@ bool NiMatrix3::ToEulerAnglesXYZ(float& rfXAngle, float& rfYAngle, float& rfZAng
         rfXAngle = 0.0 - rfYAngleb;
         return false;
     }
-    else {
-        if (!(-v6 < v11)) {
-            float rfYAnglea = NiFastATan2(m_pEntry[1][0], m_pEntry[1][1]);
-            rfZAngle = 0.0;
-            rfXAngle = rfYAnglea - 0.0;
-            return false;
-        }
-        else {
-            float fY = -m_pEntry[1][2];
-            rfXAngle = -NiFastATan2(fY, m_pEntry[2][2]);
-            float fYa = -m_pEntry[0][1];
-            rfZAngle = -NiFastATan2(fYa, m_pEntry[0][0]);
-            return true;
-        }
+
+    if (!(-v6 < v11)) {
+        float rfYAnglea = NiFastATan2(m_pEntry[1][0], m_pEntry[1][1]);
+        rfZAngle = 0.0;
+        rfXAngle = rfYAnglea - 0.0;
+        return false;
     }
+
+    float fY = -m_pEntry[1][2];
+    rfXAngle = -NiFastATan2(fY, m_pEntry[2][2]);
+    float fYa = -m_pEntry[0][1];
+    rfZAngle = -NiFastATan2(fYa, m_pEntry[0][0]);
+    return true;
 }
 
 bool NiMatrix3::ToEulerAnglesZXY(float& rfZAngle, float& rfXAngle, float& rfYAngle) const {
@@ -340,26 +342,26 @@ bool NiMatrix3::ToEulerAnglesZXY(float& rfZAngle, float& rfXAngle, float& rfYAng
         rfZAngle = 0.0 - xa;
         return false;
     }
-    else {
-        if (!(-v6 < v11)) {
-            float x = NiFastATan2(m_pEntry[0][2], m_pEntry[0][0]);
-            rfYAngle = 0.0;
-            rfZAngle = x - 0.0;
-            return false;
-        }
-        else {
-            float fY = -m_pEntry[0][1];
-            rfZAngle = -NiFastATan2(fY, m_pEntry[1][1]);
-            float fYa = -m_pEntry[2][0];
-            rfYAngle = -NiFastATan2(fYa, m_pEntry[2][2]);
-            return true;
-        }
+
+    if (!(-v6 < v11)) {
+        float x = NiFastATan2(m_pEntry[0][2], m_pEntry[0][0]);
+        rfYAngle = 0.0;
+        rfZAngle = x - 0.0;
+        return false;
     }
+
+    float fY = -m_pEntry[0][1];
+    rfZAngle = -NiFastATan2(fY, m_pEntry[1][1]);
+    float fYa = -m_pEntry[2][0];
+    rfYAngle = -NiFastATan2(fYa, m_pEntry[2][2]);
+    return true;
 }
 
 // The three rotations are built inline, then multiplied together.
 void NiMatrix3::FromEulerAnglesXYZ(float fXAngle, float fYAngle, float fZAngle) {
-    NiMatrix3 kXRot, kYRot, kZRot;
+    NiMatrix3 kXRot;
+    NiMatrix3 kYRot;
+    NiMatrix3 kZRot;
     float fSin;
     float fCos;
     // EXE-INLINED 0x524AC0
@@ -679,28 +681,27 @@ char NiMatrix3::Tridiagonal(float* a1, float* a2) {
         m_pEntry[2][2] = 1.0;
         return 0;
     }
-    else {
-        float a1b = v8 * v8 + v6 * v6;
-        float a1c = std::sqrt((double)a1b);
-        *a2 = a1c;
-        float a2a = 1.0 / a1c;
-        float v7 = a2a * v6;
-        float v9 = a2a * v8;
-        float a2b = (v7 + v7) * v12 + (v11 - v10) * v9;
-        a1[1] = v10 + a2b * v9;
-        a1[2] = v11 - a2b * v9;
-        a2[1] = v12 - a2b * v7;
-        m_pEntry[0][0] = 1.0;
-        m_pEntry[0][1] = 0.0;
-        m_pEntry[0][2] = 0.0;
-        m_pEntry[1][0] = 0.0;
-        m_pEntry[2][0] = 0.0;
-        m_pEntry[1][1] = v7;
-        m_pEntry[1][2] = v9;
-        m_pEntry[2][1] = v9;
-        m_pEntry[2][2] = -v7;
-        return 1;
-    }
+
+    float a1b = v8 * v8 + v6 * v6;
+    float a1c = std::sqrt((double)a1b);
+    *a2 = a1c;
+    float a2a = 1.0 / a1c;
+    float v7 = a2a * v6;
+    float v9 = a2a * v8;
+    float a2b = (v7 + v7) * v12 + (v11 - v10) * v9;
+    a1[1] = v10 + a2b * v9;
+    a1[2] = v11 - a2b * v9;
+    a2[1] = v12 - a2b * v7;
+    m_pEntry[0][0] = 1.0;
+    m_pEntry[0][1] = 0.0;
+    m_pEntry[0][2] = 0.0;
+    m_pEntry[1][0] = 0.0;
+    m_pEntry[2][0] = 0.0;
+    m_pEntry[1][1] = v7;
+    m_pEntry[1][2] = v9;
+    m_pEntry[2][1] = v9;
+    m_pEntry[2][2] = -v7;
+    return 1;
 }
 
 char NiMatrix3::QLAlgorithm(float* a1, float* a2) {

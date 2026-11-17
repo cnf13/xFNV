@@ -212,7 +212,6 @@ float TESAmmoEffect::ApplyAmmoEffect(
         }
         return fReturnValue;
     }
-    else {
-        return afOriginalValue;
-    }
+
+    return afOriginalValue;
 }

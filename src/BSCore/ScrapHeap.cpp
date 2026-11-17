@@ -175,9 +175,8 @@ uint32_t ScrapHeap::Size(void* apMem) {
         // The allocation's header sits directly before the block; its size word carries flags in its low bits.
         return (static_cast<Header*>(apMem) - 1)->uiSizeAndFlags & 0x7FFFFFFF;
     }
-    else {
-        return 0;
-    }
+
+    return 0;
 }
 
 void ScrapHeap::CheckForLeaks() {
@@ -251,13 +250,12 @@ char* ScrapHeapManager::RequestBuffer(uint32_t& ariRequestedInitialSize) {
         }
         return static_cast<char*>(static_cast<void*>(a1));
     }
-    else {
-        pNewMemory = AllocateBuffer(ariRequestedInitialSize);
-        if (!(--BufferLock.uiLockCount)) {
-            BufferLock.uiOwningThread = (uint32_t)0;
-        }
-        return pNewMemory;
+
+    pNewMemory = AllocateBuffer(ariRequestedInitialSize);
+    if (!(--BufferLock.uiLockCount)) {
+        BufferLock.uiOwningThread = (uint32_t)0;
     }
+    return pNewMemory;
 }
 
 void ScrapHeapManager::FreeBuffer(char* apBuffer, uint32_t aiCommittedSize) {

@@ -650,19 +650,18 @@ NiNode* TESObjectTREE::BuildDistant3D(bool abZUp) {
     if (spTempTexture.operator==(nullptr)) {
         return nullptr;
     }
-    else {
-        NiBillboardNode* pnode;
-        NiBillboardNode* v9 = static_cast<NiBillboardNode*>(NiMemObject::operator new(sizeof(NiBillboardNode)));
-        if (v9) {
-            pnode = ::new (v9) NiBillboardNode;
-        }
-        else {
-            pnode = nullptr;
-        }
-        pnode->SetMode(NiBillboardNode::BSROTATE_ABOUT_UP);
-        pnode->AttachChild(p3D, 1);
-        return pnode;
+
+    NiBillboardNode* pnode;
+    NiBillboardNode* v9 = static_cast<NiBillboardNode*>(NiMemObject::operator new(sizeof(NiBillboardNode)));
+    if (v9) {
+        pnode = ::new (v9) NiBillboardNode;
     }
+    else {
+        pnode = nullptr;
+    }
+    pnode->SetMode(NiBillboardNode::BSROTATE_ABOUT_UP);
+    pnode->AttachChild(p3D, 1);
+    return pnode;
 }
 
 BSTextureSet::BSTextureSet() {}

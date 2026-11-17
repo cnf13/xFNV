@@ -35,10 +35,9 @@ NiObject* NiColorExtraDataController::CreateClone(NiCloningProcess& kCloning) {
         NiExtraDataController::CopyMembers(v4, kCloning);
         return v4;
     }
-    else {
-        NiExtraDataController::CopyMembers(nullptr, kCloning);
-        return nullptr;
-    }
+
+    NiExtraDataController::CopyMembers(nullptr, kCloning);
+    return nullptr;
 }
 
 void NiColorExtraDataController::LoadBinary(NiStream& kStream) {

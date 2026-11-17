@@ -182,11 +182,7 @@ void BSFaceGenMorphDataHair::ApplyMorph(
     BSFaceGenBaseMorphExtraData* apExtraData,
     float afModifierValue
 ) {
-    if (pHairMorph) {
-        if (apGeom) {
-            if (!(afModifierValue < 0.0)) {
-                pHairMorph->ApplyMorph(apGeom, apExtraData, afModifierValue);
-            }
-        }
+    if ((pHairMorph) && (apGeom) && (!(afModifierValue < 0.0))) {
+        pHairMorph->ApplyMorph(apGeom, apExtraData, afModifierValue);
     }
 }

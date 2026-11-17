@@ -26,7 +26,7 @@ public:
 
     // The value at it, as the SDK's inline getValue: the map stores every V as an untyped pointer-sized integer
     // (hkUlong), converted back to V here.
-    V getValue(typename hkCachedHashMap<hkStringMapOperations, Allocator>::Iterator i) const {
+    V getValue(hkCachedHashMap<hkStringMapOperations, Allocator>::Iterator i) const {
         return reinterpret_cast<V>(m_map.getValue(i));
     }
 

@@ -453,20 +453,38 @@ void FalloutRadio::StartRadioConversation(TESObjectREFR* apTargetStation, TESTop
         else {
             ptopicToUse = TESTopic::GetTopic(DT_RADIO, 0);
         }
-        if (pstation) {
-            if (!pstation->pStation->GetDisabled()) {
-                bool bwasContBroadcast = pstation->CurrentState.IsContBroadcast();
-                FalloutRadio::RadioUpdateCriticalSection.Enter("FalloutRadio::StartRadioConversation");
-                if (pstation->CurrentState.pConvo) {
-                    while (pstation->CurrentState.pConvo->GetNext()) {
-                        ;
-                    }
+        if ((pstation) && (!pstation->pStation->GetDisabled())) {
+            bool bwasContBroadcast = pstation->CurrentState.IsContBroadcast();
+            FalloutRadio::RadioUpdateCriticalSection.Enter("FalloutRadio::StartRadioConversation");
+            if (pstation->CurrentState.pConvo) {
+                while (pstation->CurrentState.pConvo->GetNext()) {
+                    ;
                 }
-                if (pstation->CurrentState.IsTransmitting()) {
-                    pstation->CurrentState.SetContBroadcast(false);
-                    pstation->CurrentState.iCurrentItemDuration = 1;
-                    FalloutRadio::UpdateStation(pstation);
+            }
+            if (pstation->CurrentState.IsTransmitting()) {
+                pstation->CurrentState.SetContBroadcast(false);
+                pstation->CurrentState.iCurrentItemDuration = 1;
+                FalloutRadio::UpdateStation(pstation);
+            }
+            if (FalloutRadio::pCurrentPipboyStation == pstation && FalloutRadio::bPipboyRadioEnabled) {
+                FalloutRadio::PipboyVoiceHndl.Stop();
+                FalloutRadio::PipboyVoiceHndl.Release();
+                if (FalloutRadio::GetIsDialogueOnlyRadio()) {
+                    FalloutAudioMedia::MediaClose();
+                    FalloutAudioMedia::MediaSetRadio(true);
+                    FalloutAudioMedia::MediaOpen(MEDIA_RADIO, nullptr, 1000u, false, false, 0.0f, 0);
+                    FalloutAudioMedia::MediaPlay();
                 }
+            }
+            for (FalloutRadio::FORadioReceiver* puser : pstation->CurrentState.StationUsers.ItemsUntilNull()) {
+                puser->Hndl.Stop();
+                puser->Hndl.Release();
+            }
+            FalloutRadio::GetNextConversation(pstation, ptopicToUse);
+            pstation->CurrentState.iCurrentItemDuration = 0;
+            pstation->CurrentState.pConvo->PrecacheSounds();
+            pstation->CurrentState.pConvo->FirstItem();
+            if (pstation->CurrentState.pConvo->GetCurrentItem()) {
                 if (FalloutRadio::pCurrentPipboyStation == pstation && FalloutRadio::bPipboyRadioEnabled) {
                     FalloutRadio::PipboyVoiceHndl.Stop();
                     FalloutRadio::PipboyVoiceHndl.Release();
@@ -477,43 +495,23 @@ void FalloutRadio::StartRadioConversation(TESObjectREFR* apTargetStation, TESTop
                         FalloutAudioMedia::MediaPlay();
                     }
                 }
-                for (FalloutRadio::FORadioReceiver* puser : pstation->CurrentState.StationUsers.ItemsUntilNull()) {
-                    puser->Hndl.Stop();
-                    puser->Hndl.Release();
-                }
-                FalloutRadio::GetNextConversation(pstation, ptopicToUse);
-                pstation->CurrentState.iCurrentItemDuration = 0;
-                pstation->CurrentState.pConvo->PrecacheSounds();
-                pstation->CurrentState.pConvo->FirstItem();
-                if (pstation->CurrentState.pConvo->GetCurrentItem()) {
-                    if (FalloutRadio::pCurrentPipboyStation == pstation && FalloutRadio::bPipboyRadioEnabled) {
-                        FalloutRadio::PipboyVoiceHndl.Stop();
-                        FalloutRadio::PipboyVoiceHndl.Release();
-                        if (FalloutRadio::GetIsDialogueOnlyRadio()) {
-                            FalloutAudioMedia::MediaClose();
-                            FalloutAudioMedia::MediaSetRadio(true);
-                            FalloutAudioMedia::MediaOpen(MEDIA_RADIO, nullptr, 1000u, false, false, 0.0f, 0);
-                            FalloutAudioMedia::MediaPlay();
-                        }
-                    }
-                    pstation->CurrentState.pConvo->GetCurrentItem()->FirstResponse();
-                }
-                else {
-                    Conversation* apThis = pstation->CurrentState.pConvo;
-                    if (apThis) {
-                        delete apThis;
-                    }
-                    pstation->CurrentState.pConvo = nullptr;
-                    pstation->CurrentState.iCurrentItemDuration = 1;
-                }
-                if (pstation->CurrentState.iCurrentItemDuration > 1) {
-                    pstation->CurrentState.iCurrentItemDuration = 0;
-                }
-                pstation->CurrentState.iCurrentItemStartTime = BSAudio::QInstance().GetSynchTime() + 50;
-                pstation->CurrentState.SetPlayingBreakIn(true);
-                pstation->CurrentState.SetContBroadcast(bwasContBroadcast);
-                FalloutRadio::RadioUpdateCriticalSection.Leave();
+                pstation->CurrentState.pConvo->GetCurrentItem()->FirstResponse();
             }
+            else {
+                Conversation* apThis = pstation->CurrentState.pConvo;
+                if (apThis) {
+                    delete apThis;
+                }
+                pstation->CurrentState.pConvo = nullptr;
+                pstation->CurrentState.iCurrentItemDuration = 1;
+            }
+            if (pstation->CurrentState.iCurrentItemDuration > 1) {
+                pstation->CurrentState.iCurrentItemDuration = 0;
+            }
+            pstation->CurrentState.iCurrentItemStartTime = BSAudio::QInstance().GetSynchTime() + 50;
+            pstation->CurrentState.SetPlayingBreakIn(true);
+            pstation->CurrentState.SetContBroadcast(bwasContBroadcast);
+            FalloutRadio::RadioUpdateCriticalSection.Leave();
         }
     }
 }
@@ -694,15 +692,14 @@ bool FalloutRadio::Update(bool abForceStationUpdate) {
         v4 = true;
         FalloutRadio::iLastRadioUpdate = appTimer.GetTime();
     }
-    if (pPlayer) {
-        if (pPlayer->GetParentCell()) {
-            TESObjectCELL* ParentCell = pPlayer->GetParentCell();
-            if (ParentCell->GetInterior()) {
-                v4 = !FalloutRadio::bWasInInterior;
-                FalloutRadio::bWasInInterior = true;
-            }
+    if ((pPlayer) && (pPlayer->GetParentCell())) {
+        TESObjectCELL* ParentCell = pPlayer->GetParentCell();
+        if (ParentCell->GetInterior()) {
+            v4 = !FalloutRadio::bWasInInterior;
+            FalloutRadio::bWasInInterior = true;
         }
     }
+
     if (abForceStationUpdate) {
         v4 = true;
     }
@@ -735,11 +732,10 @@ void FalloutRadio::ActivateRadio(TESObjectREFR* apRadio, bool abOn) {
         a2[1] = nullptr;
         char v6 = 0;
         if (!a2[0] || ((!abOn || !a2[0]->bShouldBePlaying) && (abOn || a2[0]->bShouldBePlaying))) {
-            if (apRadio) {
-                if (apRadio->GetObjectReference()->GetFormType() == ACTI_ID) {
-                    prequestedStation = static_cast<TESObjectACTI*>(apRadio->GetObjectReference())->pRadioStation;
-                }
+            if ((apRadio) && (apRadio->GetObjectReference()->GetFormType() == ACTI_ID)) {
+                prequestedStation = static_cast<TESObjectACTI*>(apRadio->GetObjectReference())->pRadioStation;
             }
+
             if (prequestedStation) {
                 FalloutRadio::FORadioStation* pstation = FalloutRadio::GetActiveStation(prequestedStation);
                 if (abOn) {
@@ -1060,151 +1056,175 @@ void FalloutRadio::UpdateStation(FalloutRadio::FORadioStation* pStation) {
     char v58 = 100;
     bool bpipboyUpdated = false;
     bool bforcePipboyChange = false;
-    if (pStation) {
-        if (pStation->pStation) {
-            bool bdisabledStation = pStation->pStation->GetDisabled();
-            bool bsystemPausing = (FalloutRadio::iRadioState & 1) != 0;
-            bool v60 = (FalloutRadio::iRadioState & 2) != 0;
-            bool bpipboyStation = pStation == FalloutRadio::pCurrentPipboyStation;
-            float fmaxUpdateDistance = 3000.0f;
-            BSAudio* v1 = &BSAudio::QInstance();
-            v1->GetListenerPosition(&listenerLocation);
-            FalloutRadio::RadioUpdateCriticalSection.Enter("FalloutRadio::UpdateStation");
-            DialogueItem* pcurrentItem =
-                pStation->CurrentState.pConvo ? pStation->CurrentState.pConvo->GetCurrentItem() : nullptr;
-            DialogueItem* pcurrentItem_2 = pcurrentItem;
-            BSSimpleList<FalloutRadio::FORadioReceiver*>* pusers = &pStation->CurrentState.StationUsers;
-            if (!FalloutRadio::bShutdown) {
-                NiPoint3 loc;
-                // The station's sound template: the radio attenuation model unless the activator has its own.
-                TESSound* pTemplate;
-                if (!bpipboyStation && pStation->CurrentState.StationUsers.IsEmpty()) {
-                    goto LABEL_10;
+    if ((pStation) && (pStation->pStation)) {
+        bool bdisabledStation = pStation->pStation->GetDisabled();
+        bool bsystemPausing = (FalloutRadio::iRadioState & 1) != 0;
+        bool v60 = (FalloutRadio::iRadioState & 2) != 0;
+        bool bpipboyStation = pStation == FalloutRadio::pCurrentPipboyStation;
+        float fmaxUpdateDistance = 3000.0f;
+        BSAudio* v1 = &BSAudio::QInstance();
+        v1->GetListenerPosition(&listenerLocation);
+        FalloutRadio::RadioUpdateCriticalSection.Enter("FalloutRadio::UpdateStation");
+        DialogueItem* pcurrentItem =
+            pStation->CurrentState.pConvo ? pStation->CurrentState.pConvo->GetCurrentItem() : nullptr;
+        DialogueItem* pcurrentItem_2 = pcurrentItem;
+        BSSimpleList<FalloutRadio::FORadioReceiver*>* pusers = &pStation->CurrentState.StationUsers;
+        if (!FalloutRadio::bShutdown) {
+            NiPoint3 loc;
+            // The station's sound template: the radio attenuation model unless the activator has its own.
+            TESSound* pTemplate;
+            if (!bpipboyStation && pStation->CurrentState.StationUsers.IsEmpty()) {
+                goto LABEL_10;
+            }
+            pTemplate = static_cast<TESSound*>(FalloutRadio::pRadioAttenuationModel);
+            if (pStation->pStation) {
+                TESObjectACTI* pact = dynamic_cast<TESObjectACTI*>(pStation->pStation->GetObjectReference());
+                if ((pact) && (pact->pRadioTemplate)) {
+                    pTemplate = pact->pRadioTemplate;
                 }
-                pTemplate = static_cast<TESSound*>(FalloutRadio::pRadioAttenuationModel);
-                if (pStation->pStation) {
-                    TESObjectACTI* pact = dynamic_cast<TESObjectACTI*>(pStation->pStation->GetObjectReference());
-                    if (pact) {
-                        if (pact->pRadioTemplate) {
-                            pTemplate = pact->pRadioTemplate;
-                        }
-                    }
-                }
-                if (bdisabledStation || (bsystemPausing || v60)) {
-                    for (BSSimpleList<FalloutRadio::FORadioReceiver*>* puser = &pStation->CurrentState.StationUsers;
-                         puser && !puser->IsEmpty(); puser = puser->m_pkNext) {
-                        if (puser->m_item->Hndl.IsValid()) {
-                            if (bdisabledStation) {
-                                puser->m_item->Hndl.Stop();
-                                puser->m_item->Hndl.Release();
-                                puser->m_item->StaticHndl.Stop();
-                                puser->m_item->StaticHndl.Release();
-                            }
-                            else {
-                                if (bsystemPausing) {
-                                    puser->m_item->Hndl.Pause();
-                                    puser->m_item->StaticHndl.Pause();
-                                }
-                                else {
-                                    if (v60 && puser->m_item->bShouldBePlaying) {
-                                        puser->m_item->Hndl.Play(false);
-                                        puser->m_item->StaticHndl.Play(false);
-                                    }
-                                }
-                            }
-                        }
-                    }
-                    if (bpipboyStation) {
+            }
+            if (bdisabledStation || (bsystemPausing || v60)) {
+                for (BSSimpleList<FalloutRadio::FORadioReceiver*>* puser = &pStation->CurrentState.StationUsers;
+                     puser && !puser->IsEmpty(); puser = puser->m_pkNext) {
+                    if (puser->m_item->Hndl.IsValid()) {
                         if (bdisabledStation) {
-                            FalloutRadio::PipboyRadioEnable(false);
-                        }
-                        if (FalloutRadio::pCurrentPipboyStation &&
-                            FalloutRadio::pCurrentPipboyStation->CurrentState.IsPlayingSong()) {
-                            if (bsystemPausing) {
-                                FalloutRadio::PipboyStaticHndl.Pause();
-                                FalloutAudioMedia::MediaPause();
-                            }
-                            else {
-                                if (v60) {
-                                    FalloutRadio::PipboyStaticHndl.Play(false);
-                                    FalloutAudioMedia::MediaUnPause();
-                                }
-                            }
+                            puser->m_item->Hndl.Stop();
+                            puser->m_item->Hndl.Release();
+                            puser->m_item->StaticHndl.Stop();
+                            puser->m_item->StaticHndl.Release();
                         }
                         else {
                             if (bsystemPausing) {
-                                FalloutRadio::PipboyStaticHndl.Pause();
-                                FalloutRadio::PipboyVoiceHndl.Pause();
+                                puser->m_item->Hndl.Pause();
+                                puser->m_item->StaticHndl.Pause();
                             }
                             else {
-                                if (v60) {
-                                    FalloutRadio::PipboyStaticHndl.Play(false);
-                                    FalloutRadio::PipboyVoiceHndl.Play(false);
+                                if (v60 && puser->m_item->bShouldBePlaying) {
+                                    puser->m_item->Hndl.Play(false);
+                                    puser->m_item->StaticHndl.Play(false);
                                 }
                             }
                         }
                     }
-                LABEL_10:;
-                    FalloutRadio::RadioUpdateCriticalSection.Leave();
-                    return;
                 }
-                if (pStation->CurrentState.iCurrentItemDuration <= 0 &&
-                    pStation == FalloutRadio::pCurrentPipboyStation) {
-                    if (FalloutRadio::PipboyVoiceHndl.IsValid()) {
-                        pStation->CurrentState.iCurrentItemDuration = FalloutRadio::PipboyVoiceHndl.GetDuration();
+                if (bpipboyStation) {
+                    if (bdisabledStation) {
+                        FalloutRadio::PipboyRadioEnable(false);
+                    }
+                    if (FalloutRadio::pCurrentPipboyStation &&
+                        FalloutRadio::pCurrentPipboyStation->CurrentState.IsPlayingSong()) {
+                        if (bsystemPausing) {
+                            FalloutRadio::PipboyStaticHndl.Pause();
+                            FalloutAudioMedia::MediaPause();
+                        }
+                        else {
+                            if (v60) {
+                                FalloutRadio::PipboyStaticHndl.Play(false);
+                                FalloutAudioMedia::MediaUnPause();
+                            }
+                        }
                     }
                     else {
-                        if (pcurrentItem_2) {
-                            if (pcurrentItem_2->GetCurrentResponse()->pVoiceSound) {
-                                if (FalloutAudioMedia::MediaGetDuration(MEDIA_RADIO)) {
-                                    pStation->CurrentState.iCurrentItemDuration =
-                                        FalloutAudioMedia::MediaGetDuration(MEDIA_RADIO);
-                                }
+                        if (bsystemPausing) {
+                            FalloutRadio::PipboyStaticHndl.Pause();
+                            FalloutRadio::PipboyVoiceHndl.Pause();
+                        }
+                        else {
+                            if (v60) {
+                                FalloutRadio::PipboyStaticHndl.Play(false);
+                                FalloutRadio::PipboyVoiceHndl.Play(false);
                             }
                         }
                     }
                 }
-                uint32_t icurrentTime = (&BSAudio::QInstance())->GetSynchTime();
-                if (pStation->CurrentState.iCurrentItemStartTime > icurrentTime + 100) {
-                    pStation->CurrentState.iCurrentItemStartTime = icurrentTime;
+            LABEL_10:;
+                FalloutRadio::RadioUpdateCriticalSection.Leave();
+                return;
+            }
+            if (pStation->CurrentState.iCurrentItemDuration <= 0 && pStation == FalloutRadio::pCurrentPipboyStation) {
+                if (FalloutRadio::PipboyVoiceHndl.IsValid()) {
+                    pStation->CurrentState.iCurrentItemDuration = FalloutRadio::PipboyVoiceHndl.GetDuration();
                 }
-                if (pStation->CurrentState.iCurrentItemDuration > 0 &&
-                    pStation->CurrentState.iCurrentItemDuration + pStation->CurrentState.iCurrentItemStartTime <
-                        icurrentTime) {
-                    bool bisNext = false;
-                    if (pStation->CurrentState.pConvo) {
+                else {
+                    if ((pcurrentItem_2) && (pcurrentItem_2->GetCurrentResponse()->pVoiceSound) &&
+                        (FalloutAudioMedia::MediaGetDuration(MEDIA_RADIO))) {
+                        pStation->CurrentState.iCurrentItemDuration = FalloutAudioMedia::MediaGetDuration(MEDIA_RADIO);
+                    }
+                }
+            }
+            uint32_t icurrentTime = (&BSAudio::QInstance())->GetSynchTime();
+            if (pStation->CurrentState.iCurrentItemStartTime > icurrentTime + 100) {
+                pStation->CurrentState.iCurrentItemStartTime = icurrentTime;
+            }
+            if (pStation->CurrentState.iCurrentItemDuration > 0 &&
+                pStation->CurrentState.iCurrentItemDuration + pStation->CurrentState.iCurrentItemStartTime <
+                    icurrentTime) {
+                bool bisNext = false;
+                if ((pStation->CurrentState.pConvo) && (pStation->CurrentState.pConvo->GetCurrentItem())) {
+                    if (pStation->CurrentState.pConvo->GetNext()) {
+                        bisNext = true;
+                        if ((pStation->CurrentState.pConvo->GetCurrentItem()->pInfo) &&
+                            (!pStation->CurrentState.pConvo->GetCurrentItem()->pInfo->IsRunImmediately())) {
+                            pStation->CurrentState.pConvo->GetCurrentItem()->pInfo->RunResult(
+                                TIRS_BEGIN, pStation->pStation
+                            );
+                        }
+
+                        pStation->CurrentState.pConvo->GetCurrentItem()->FirstResponse();
+                        pStation->CurrentState.iCurrentItemStartTime = (&BSAudio::QInstance())->GetSynchTime() + 50;
+                        pStation->CurrentState.iCurrentItemDuration = 0;
+                        if (pStation->CurrentState.StationUsers.IsEmpty() && !FalloutRadio::pCurrentPipboyStation) {
+                            pStation->CurrentState.SetStartPaused(true);
+                        }
+                    }
+                    else {
+                        Conversation* pConvo = pStation->CurrentState.pConvo;
+                        if (pConvo) {
+                            delete pConvo;
+                        }
+                        pStation->CurrentState.pConvo = nullptr;
+                        pcurrentItem_2 = nullptr;
+                        pStation->CurrentState.iCurrentItemStartTime = 0;
+                        pStation->CurrentState.iCurrentItemDuration = 0;
+                        if (pStation->CurrentState.IsPlayingBreakIn()) {
+                            pStation->CurrentState.SetPlayingBreakIn(false);
+                        }
+                    }
+                    for (pusers = &pStation->CurrentState.StationUsers; pusers && !pusers->IsEmpty();
+                         pusers = pusers->m_pkNext) {
+                        pusers->m_item->Hndl.Stop();
+                        pusers->m_item->Hndl.Release();
+                    }
+                    if (pStation == FalloutRadio::pCurrentPipboyStation) {
+                        FalloutRadio::PipboyVoiceHndl.Stop();
+                        FalloutRadio::PipboyVoiceHndl.Release();
+                        if (!FalloutRadio::GetIsDialogueOnlyRadio()) {
+                            FalloutAudioMedia::MediaClose();
+                            FalloutAudioMedia::MediaSetRadio(true);
+                            FalloutAudioMedia::MediaOpen(MEDIA_RADIO, nullptr, 1000u, false, false, 0.0f, 0);
+                            FalloutAudioMedia::MediaPlay();
+                        }
+                    }
+                }
+
+                if (!pStation->CurrentState.pConvo || !pStation->CurrentState.pConvo->GetCurrentItem()) {
+                    if (pStation->CurrentState.IsContBroadcast()) {
+                        pStation->CurrentState.SetTransmitting(true);
+                        FalloutRadio::GetNextConversation(pStation, nullptr);
+                        pStation->CurrentState.pConvo->PrecacheSounds();
+                        pStation->CurrentState.pConvo->FirstItem();
                         if (pStation->CurrentState.pConvo->GetCurrentItem()) {
-                            if (pStation->CurrentState.pConvo->GetNext()) {
-                                bisNext = true;
-                                if (pStation->CurrentState.pConvo->GetCurrentItem()->pInfo) {
-                                    if (!pStation->CurrentState.pConvo->GetCurrentItem()->pInfo->IsRunImmediately()) {
-                                        pStation->CurrentState.pConvo->GetCurrentItem()->pInfo->RunResult(
-                                            TIRS_BEGIN, pStation->pStation
-                                        );
-                                    }
-                                }
-                                pStation->CurrentState.pConvo->GetCurrentItem()->FirstResponse();
-                                pStation->CurrentState.iCurrentItemStartTime =
-                                    (&BSAudio::QInstance())->GetSynchTime() + 50;
-                                pStation->CurrentState.iCurrentItemDuration = 0;
-                                if (pStation->CurrentState.StationUsers.IsEmpty() &&
-                                    !FalloutRadio::pCurrentPipboyStation) {
-                                    pStation->CurrentState.SetStartPaused(true);
-                                }
+                            pcurrentItem_2 = pStation->CurrentState.pConvo->GetCurrentItem();
+                            if ((pStation->CurrentState.pConvo->GetCurrentItem()->pInfo) &&
+                                (!pStation->CurrentState.pConvo->GetCurrentItem()->pInfo->IsRunImmediately())) {
+                                pStation->CurrentState.pConvo->GetCurrentItem()->pInfo->RunResult(
+                                    TIRS_BEGIN, pStation->pStation
+                                );
                             }
-                            else {
-                                Conversation* pConvo = pStation->CurrentState.pConvo;
-                                if (pConvo) {
-                                    delete pConvo;
-                                }
-                                pStation->CurrentState.pConvo = nullptr;
-                                pcurrentItem_2 = nullptr;
-                                pStation->CurrentState.iCurrentItemStartTime = 0;
-                                pStation->CurrentState.iCurrentItemDuration = 0;
-                                if (pStation->CurrentState.IsPlayingBreakIn()) {
-                                    pStation->CurrentState.SetPlayingBreakIn(false);
-                                }
-                            }
+
+                            pStation->CurrentState.pConvo->GetCurrentItem()->FirstResponse();
+                            pStation->CurrentState.iCurrentItemStartTime = (&BSAudio::QInstance())->GetSynchTime() + 50;
+                            pStation->CurrentState.iCurrentItemDuration = 0;
                             for (pusers = &pStation->CurrentState.StationUsers; pusers && !pusers->IsEmpty();
                                  pusers = pusers->m_pkNext) {
                                 pusers->m_item->Hndl.Stop();
@@ -1213,292 +1233,245 @@ void FalloutRadio::UpdateStation(FalloutRadio::FORadioStation* pStation) {
                             if (pStation == FalloutRadio::pCurrentPipboyStation) {
                                 FalloutRadio::PipboyVoiceHndl.Stop();
                                 FalloutRadio::PipboyVoiceHndl.Release();
-                                if (!FalloutRadio::GetIsDialogueOnlyRadio()) {
-                                    FalloutAudioMedia::MediaClose();
-                                    FalloutAudioMedia::MediaSetRadio(true);
-                                    FalloutAudioMedia::MediaOpen(MEDIA_RADIO, nullptr, 1000u, false, false, 0.0f, 0);
-                                    FalloutAudioMedia::MediaPlay();
-                                }
                             }
                         }
                     }
-                    if (!pStation->CurrentState.pConvo || !pStation->CurrentState.pConvo->GetCurrentItem()) {
-                        if (pStation->CurrentState.IsContBroadcast()) {
-                            pStation->CurrentState.SetTransmitting(true);
-                            FalloutRadio::GetNextConversation(pStation, nullptr);
-                            pStation->CurrentState.pConvo->PrecacheSounds();
-                            pStation->CurrentState.pConvo->FirstItem();
-                            if (pStation->CurrentState.pConvo->GetCurrentItem()) {
-                                pcurrentItem_2 = pStation->CurrentState.pConvo->GetCurrentItem();
-                                if (pStation->CurrentState.pConvo->GetCurrentItem()->pInfo) {
-                                    if (!pStation->CurrentState.pConvo->GetCurrentItem()->pInfo->IsRunImmediately()) {
-                                        pStation->CurrentState.pConvo->GetCurrentItem()->pInfo->RunResult(
-                                            TIRS_BEGIN, pStation->pStation
-                                        );
-                                    }
-                                }
-                                pStation->CurrentState.pConvo->GetCurrentItem()->FirstResponse();
-                                pStation->CurrentState.iCurrentItemStartTime =
-                                    (&BSAudio::QInstance())->GetSynchTime() + 50;
-                                pStation->CurrentState.iCurrentItemDuration = 0;
-                                for (pusers = &pStation->CurrentState.StationUsers; pusers && !pusers->IsEmpty();
-                                     pusers = pusers->m_pkNext) {
-                                    pusers->m_item->Hndl.Stop();
-                                    pusers->m_item->Hndl.Release();
-                                }
-                                if (pStation == FalloutRadio::pCurrentPipboyStation) {
-                                    FalloutRadio::PipboyVoiceHndl.Stop();
-                                    FalloutRadio::PipboyVoiceHndl.Release();
-                                }
-                            }
-                        }
-                        else {
-                            pStation->CurrentState.SetTransmitting(false);
-                        }
+                    else {
+                        pStation->CurrentState.SetTransmitting(false);
                     }
                 }
-                if (pStation->CurrentState.pConvo) {
-                    if (pStation->CurrentState.pConvo->GetCurrentItem()) {
-                        pcurrentItem_2 = pStation->CurrentState.pConvo->GetCurrentItem();
-                        if (!pcurrentItem_2->GetCurrentResponse() && !pcurrentItem_2->NextResponse()) {
+            }
+            if ((pStation->CurrentState.pConvo) && (pStation->CurrentState.pConvo->GetCurrentItem())) {
+                pcurrentItem_2 = pStation->CurrentState.pConvo->GetCurrentItem();
+                if (!pcurrentItem_2->GetCurrentResponse() && !pcurrentItem_2->NextResponse()) {
+                    pStation->CurrentState.iCurrentItemStartTime = (&BSAudio::QInstance())->GetSynchTime() + 50;
+                    pStation->CurrentState.iCurrentItemDuration = 1;
+                }
+            }
+
+            pStation->CurrentState.cStationPower = pStation->CurrentState.cTargetPower;
+            uint8_t isignalStrength = pStation->CurrentState.GetStationPower();
+            if (isignalStrength < 100u) {
+                bstaticPlaying = true;
+            }
+            pusers = &pStation->CurrentState.StationUsers;
+            while (true) {
+                while (true) {
+                    if (!pusers || pusers->IsEmpty()) {
+                        if (pStation == FalloutRadio::pCurrentPipboyStation && !bpipboyUpdated) {
+                            FalloutRadio::PipboyUpdate(false);
+                        }
+                        FalloutRadio::RadioUpdateCriticalSection.Leave();
+                        return;
+                    }
+                    if (pusers->m_item->bShouldBePlaying) {
+                        break;
+                    }
+                LABEL_104:;
+                    pusers = pusers->m_pkNext;
+                }
+                if ((pStation->CurrentState.iCurrentItemDuration <= 0 && pusers->m_item->Hndl.IsValid()) &&
+                    (pusers->m_item->Hndl.GetDuration())) {
+                    pStation->CurrentState.iCurrentItemDuration = pusers->m_item->Hndl.GetDuration();
+                }
+
+                loc.x = 3.4028235e+38f;
+                loc.y = 3.4028235e+38f;
+                loc.z = 3.4028235e+38f;
+                if ((pusers->m_item) && (pusers->m_item->pRadio)) {
+                    break;
+                }
+
+                if (!pusers->m_item || pusers->m_item->pRadio) {
+                    TESWorldSpace* WorldSpace;
+                    TESObjectCELL* ParentCell;
+                    char Str[268];
+                LABEL_115:;
+                    if ((pPlayer->GetWorldSpace() &&
+                         (WorldSpace = pPlayer->GetWorldSpace(),
+                          WorldSpace != pusers->m_item->pRadio->GetWorldSpace())) ||
+                        (pPlayer->GetParentCell()->GetInterior() &&
+                         (ParentCell = pusers->m_item->pRadio->GetParentCell(),
+                          ParentCell != pPlayer->GetParentCell()))) {
+                        pusers->m_item->Hndl.SetVolume(0.0f);
+                        pusers->m_item->bShouldBePlaying = false;
+                    }
+                    if ((pusers->m_item) && (pusers->m_item->Hndl.IsValid())) {
+                        pusers->m_item->Hndl.SetPosition(loc.x, loc.y, loc.z);
+                    }
+
+                    if (!bstaticPlaying || pusers->m_item->StaticHndl.IsValid()) {
+                        if (bstaticPlaying) {
+                            float v30 = static_cast<double>(100 - isignalStrength) / 100.0;
+                            float Ya = std::powf(v30, 0.75f);
+                            pusers->m_item->StaticHndl.SetVolume(Ya);
+                            pusers->m_item->StaticHndl.SetPosition(loc.x, loc.y, loc.z);
+                        }
+                        else {
+                            if (pusers->m_item->StaticHndl.IsValid()) {
+                                pusers->m_item->StaticHndl.Stop();
+                                pusers->m_item->StaticHndl.Release();
+                            }
+                        }
+                    }
+                    else {
+                        pusers->m_item->StaticHndl.Stop();
+                        pusers->m_item->StaticHndl.Release();
+                        BSAudio* v5 = &BSAudio::QInstance();
+                        BSSoundHandle* arHandle = v5->GetSoundHandleByName(
+                            &a1, "UIRadioStaticLP",
+                            BSGameSound::SOUND_FLAG_IS_3D | BSGameSound::SOUND_FLAG_LOOP | BSGameSound::SOUND_FLAG_RADIO
+                        );
+                        pusers->m_item->StaticHndl.operator=(*arHandle);
+                        pusers->m_item->StaticHndl.bAssumeSuccess = true;
+                        pusers->m_item->StaticHndl.SetPosition(loc.x, loc.y, loc.z);
+                        float v31 = static_cast<double>(100 - isignalStrength) / 100.0;
+                        float Y = std::powf(v31, 0.75f);
+                        pusers->m_item->StaticHndl.SetVolume(Y);
+                        pusers->m_item->StaticHndl.Play(false);
+                    }
+                    if (!pcurrentItem_2 ||
+                        (pusers->m_item->Hndl.IsValid() ||
+                         (!pStation->CurrentState.ShouldBePlaying() ||
+                          (!pusers->m_item->bShouldBePlaying || !pusers->m_item->pRadio)))) {
+                        if (!pusers->m_item->pRadio) {
+                            pusers->m_item->bShouldBePlaying = false;
+                        }
+                        goto LABEL_104;
+                    }
+                    if (!pcurrentItem_2 || !pcurrentItem_2->GetCurrentResponse()) {
+                        if ((pcurrentItem_2) && (!pcurrentItem_2->NextResponse() && !pcurrentItem_2->FirstResponse())) {
                             pStation->CurrentState.iCurrentItemStartTime = (&BSAudio::QInstance())->GetSynchTime() + 50;
                             pStation->CurrentState.iCurrentItemDuration = 1;
                         }
+
+                        goto LABEL_104;
                     }
-                }
-                pStation->CurrentState.cStationPower = pStation->CurrentState.cTargetPower;
-                uint8_t isignalStrength = pStation->CurrentState.GetStationPower();
-                if (isignalStrength < 100u) {
-                    bstaticPlaying = true;
-                }
-                pusers = &pStation->CurrentState.StationUsers;
-                while (true) {
-                    while (true) {
-                        if (!pusers || pusers->IsEmpty()) {
-                            if (pStation == FalloutRadio::pCurrentPipboyStation && !bpipboyUpdated) {
-                                FalloutRadio::PipboyUpdate(false);
+                    if (pcurrentItem_2->GetCurrentResponse()->pVoiceSound) {
+                        bsong = true;
+                    }
+                    if ((pcurrentItem_2->GetCurrentResponse()) &&
+                        ((&pcurrentItem_2->GetCurrentResponse()->cText)->pString)) {
+                        uint32_t ivoiceTextLength = BSstrlen((&pcurrentItem_2->GetCurrentResponse()->cText)->pString);
+                        bool v29 = ivoiceTextLength > 1 && pcurrentItem_2->GetCurrentResponse()->GetVoice()->pString;
+                        v61 = v29;
+                    }
+
+                    if (bsong) {
+                        const char* Filename = pcurrentItem_2->GetCurrentResponse()->pVoiceSound->GetFilename();
+                        BSstrcpy(Str, 260, Filename);
+                        if (!std::strstr(Str, "_mono.")) {
+                            char* pnamePt = std::strchr(Str, 46);
+                            if (pnamePt) {
+                                char Dst[4];
+                                BSstrcpy(Dst, 4, pnamePt + 1);
+                                *pnamePt = 0;
+                                BSstrcat(Str, 260, "_mono.");
+                                BSstrcat(Str, 260, Dst);
                             }
-                            FalloutRadio::RadioUpdateCriticalSection.Leave();
-                            return;
                         }
-                        if (pusers->m_item->bShouldBePlaying) {
-                            break;
-                        }
-                    LABEL_104:;
-                        pusers = pusers->m_pkNext;
+                        pStation->CurrentState.SetPlayingSong(true);
+                        goto LABEL_154;
                     }
-                    if (pStation->CurrentState.iCurrentItemDuration <= 0 && pusers->m_item->Hndl.IsValid()) {
-                        if (pusers->m_item->Hndl.GetDuration()) {
-                            pStation->CurrentState.iCurrentItemDuration = pusers->m_item->Hndl.GetDuration();
-                        }
-                    }
-                    loc.x = 3.4028235e+38f;
-                    loc.y = 3.4028235e+38f;
-                    loc.z = 3.4028235e+38f;
-                    if (pusers->m_item) {
+                    if (v61) {
+                        BSstrcpy(Str, 260, pcurrentItem_2->GetCurrentResponse()->GetVoice()->pString);
+                        pStation->CurrentState.SetPlayingSong(false);
+                    LABEL_154:;
+                        bool bthisActorIsSpeaking = false;
+                        bool bcreatureRadio = false;
+                        Actor* pact_2 = nullptr;
                         if (pusers->m_item->pRadio) {
-                            break;
-                        }
-                    }
-                    if (!pusers->m_item || pusers->m_item->pRadio) {
-                        TESWorldSpace* WorldSpace;
-                        TESObjectCELL* ParentCell;
-                        char Str[268];
-                    LABEL_115:;
-                        if ((pPlayer->GetWorldSpace() &&
-                             (WorldSpace = pPlayer->GetWorldSpace(),
-                              WorldSpace != pusers->m_item->pRadio->GetWorldSpace())) ||
-                            (pPlayer->GetParentCell()->GetInterior() &&
-                             (ParentCell = pusers->m_item->pRadio->GetParentCell(),
-                              ParentCell != pPlayer->GetParentCell()))) {
-                            pusers->m_item->Hndl.SetVolume(0.0f);
-                            pusers->m_item->bShouldBePlaying = false;
-                        }
-                        if (pusers->m_item) {
-                            if (pusers->m_item->Hndl.IsValid()) {
-                                pusers->m_item->Hndl.SetPosition(loc.x, loc.y, loc.z);
-                            }
-                        }
-                        if (!bstaticPlaying || pusers->m_item->StaticHndl.IsValid()) {
-                            if (bstaticPlaying) {
-                                float v30 = static_cast<double>(100 - isignalStrength) / 100.0;
-                                float Ya = std::powf(v30, 0.75f);
-                                pusers->m_item->StaticHndl.SetVolume(Ya);
-                                pusers->m_item->StaticHndl.SetPosition(loc.x, loc.y, loc.z);
-                            }
-                            else {
-                                if (pusers->m_item->StaticHndl.IsValid()) {
-                                    pusers->m_item->StaticHndl.Stop();
-                                    pusers->m_item->StaticHndl.Release();
+                            TESObjectREFR* pRadio = pusers->m_item->pRadio;
+                            if (pRadio->IsActor()) {
+                                pact_2 = static_cast<Actor*>(pusers->m_item->pRadio);
+                                if (pcurrentItem_2->pInfo) {
+                                    TESActorBase* ActorBase = pact_2->GetActorBase();
+                                    if (ActorBase == pcurrentItem_2->pInfo->GetSpeaker()) {
+                                        bthisActorIsSpeaking = true;
+                                    }
                                 }
+                                if (pact_2->IsCreature()) {
+                                    bcreatureRadio = true;
+                                }
+                            }
+                        }
+                        if (!pTemplate || bcreatureRadio) {
+                            if (bcreatureRadio) {
+                                fmaxUpdateDistance = fCreatureRadioMax.Float() * 1.100000023841858;
                             }
                         }
                         else {
-                            pusers->m_item->StaticHndl.Stop();
-                            pusers->m_item->StaticHndl.Release();
-                            BSAudio* v5 = &BSAudio::QInstance();
-                            BSSoundHandle* arHandle = v5->GetSoundHandleByName(
-                                &a1, "UIRadioStaticLP",
-                                BSGameSound::SOUND_FLAG_IS_3D | BSGameSound::SOUND_FLAG_LOOP |
-                                    BSGameSound::SOUND_FLAG_RADIO
-                            );
-                            pusers->m_item->StaticHndl.operator=(*arHandle);
-                            pusers->m_item->StaticHndl.bAssumeSuccess = true;
-                            pusers->m_item->StaticHndl.SetPosition(loc.x, loc.y, loc.z);
-                            float v31 = static_cast<double>(100 - isignalStrength) / 100.0;
-                            float Y = std::powf(v31, 0.75f);
-                            pusers->m_item->StaticHndl.SetVolume(Y);
-                            pusers->m_item->StaticHndl.Play(false);
+                            fmaxUpdateDistance = static_cast<double>(pTemplate->GetMaxDistance()) * 110.0;
                         }
-                        if (!pcurrentItem_2 ||
-                            (pusers->m_item->Hndl.IsValid() ||
-                             (!pStation->CurrentState.ShouldBePlaying() ||
-                              (!pusers->m_item->bShouldBePlaying || !pusers->m_item->pRadio)))) {
-                            if (!pusers->m_item->pRadio) {
-                                pusers->m_item->bShouldBePlaying = false;
-                            }
-                            goto LABEL_104;
-                        }
-                        if (!pcurrentItem_2 || !pcurrentItem_2->GetCurrentResponse()) {
-                            if (pcurrentItem_2) {
-                                if (!pcurrentItem_2->NextResponse() && !pcurrentItem_2->FirstResponse()) {
-                                    pStation->CurrentState.iCurrentItemStartTime =
-                                        (&BSAudio::QInstance())->GetSynchTime() + 50;
-                                    pStation->CurrentState.iCurrentItemDuration = 1;
-                                }
-                            }
-                            goto LABEL_104;
-                        }
-                        if (pcurrentItem_2->GetCurrentResponse()->pVoiceSound) {
-                            bsong = true;
-                        }
-                        if (pcurrentItem_2->GetCurrentResponse()) {
-                            if ((&pcurrentItem_2->GetCurrentResponse()->cText)->pString) {
-                                uint32_t ivoiceTextLength =
-                                    BSstrlen((&pcurrentItem_2->GetCurrentResponse()->cText)->pString);
-                                bool v29 =
-                                    ivoiceTextLength > 1 && pcurrentItem_2->GetCurrentResponse()->GetVoice()->pString;
-                                v61 = v29;
-                            }
-                        }
-                        if (bsong) {
-                            const char* Filename = pcurrentItem_2->GetCurrentResponse()->pVoiceSound->GetFilename();
-                            BSstrcpy(Str, 260, Filename);
-                            if (!std::strstr(Str, "_mono.")) {
-                                char* pnamePt = std::strchr(Str, 46);
-                                if (pnamePt) {
-                                    char Dst[4];
-                                    BSstrcpy(Dst, 4, pnamePt + 1);
-                                    *pnamePt = 0;
-                                    BSstrcat(Str, 260, "_mono.");
-                                    BSstrcat(Str, 260, Dst);
-                                }
-                            }
-                            pStation->CurrentState.SetPlayingSong(true);
-                            goto LABEL_154;
-                        }
-                        if (v61) {
-                            BSstrcpy(Str, 260, pcurrentItem_2->GetCurrentResponse()->GetVoice()->pString);
-                            pStation->CurrentState.SetPlayingSong(false);
-                        LABEL_154:;
-                            bool bthisActorIsSpeaking = false;
-                            bool bcreatureRadio = false;
-                            Actor* pact_2 = nullptr;
-                            if (pusers->m_item->pRadio) {
-                                TESObjectREFR* pRadio = pusers->m_item->pRadio;
-                                if (pRadio->IsActor()) {
-                                    pact_2 = static_cast<Actor*>(pusers->m_item->pRadio);
-                                    if (pcurrentItem_2->pInfo) {
-                                        TESActorBase* ActorBase = pact_2->GetActorBase();
-                                        if (ActorBase == pcurrentItem_2->pInfo->GetSpeaker()) {
-                                            bthisActorIsSpeaking = true;
-                                        }
-                                    }
-                                    if (pact_2->IsCreature()) {
-                                        bcreatureRadio = true;
-                                    }
-                                }
-                            }
-                            if (!pTemplate || bcreatureRadio) {
-                                if (bcreatureRadio) {
-                                    fmaxUpdateDistance = fCreatureRadioMax.Float() * 1.100000023841858;
-                                }
+                        double v9 = (listenerLocation - loc).Length();
+                        if (!(fmaxUpdateDistance < v9)) {
+                            uint32_t iseek =
+                                (&BSAudio::QInstance())->GetSynchTime() - pStation->CurrentState.iCurrentItemStartTime;
+                            if (pact_2 && bthisActorIsSpeaking) {
+                                TESObjectREFR* v18 = pusers->m_item->pRadio;
+                                TESIdleForm* ListenerIdle = pcurrentItem_2->GetCurrentResponse()->pListenIdle;
+                                TESIdleForm* SpeakerIdle = pcurrentItem_2->GetCurrentResponse()->pSpeakerIdle;
+                                uint32_t CastingType = pcurrentItem_2->GetCurrentResponse()->uiEmotion;
+                                DIALOGUE_EMOTION FormFlags = pcurrentItem_2->GetCurrentResponse()->eEmotion;
+                                BSSoundHandle* p_Hndl = &pusers->m_item->Hndl;
+                                pact_2->SpeakSoundFunction(
+                                    Str, *p_Hndl, FormFlags, CastingType, 150, SpeakerIdle, ListenerIdle, v18, false,
+                                    false, false, true, true
+                                );
                             }
                             else {
-                                fmaxUpdateDistance = static_cast<double>(pTemplate->GetMaxDistance()) * 110.0;
-                            }
-                            double v9 = (listenerLocation - loc).Length();
-                            if (!(fmaxUpdateDistance < v9)) {
-                                uint32_t iseek = (&BSAudio::QInstance())->GetSynchTime() -
-                                    pStation->CurrentState.iCurrentItemStartTime;
-                                if (pact_2 && bthisActorIsSpeaking) {
-                                    TESObjectREFR* v18 = pusers->m_item->pRadio;
-                                    TESIdleForm* ListenerIdle = pcurrentItem_2->GetCurrentResponse()->pListenIdle;
-                                    TESIdleForm* SpeakerIdle = pcurrentItem_2->GetCurrentResponse()->pSpeakerIdle;
-                                    uint32_t CastingType = pcurrentItem_2->GetCurrentResponse()->uiEmotion;
-                                    DIALOGUE_EMOTION FormFlags = pcurrentItem_2->GetCurrentResponse()->eEmotion;
-                                    BSSoundHandle* p_Hndl = &pusers->m_item->Hndl;
-                                    pact_2->SpeakSoundFunction(
-                                        Str, *p_Hndl, FormFlags, CastingType, 150, SpeakerIdle, ListenerIdle, v18,
-                                        false, false, false, true, true
-                                    );
+                                int32_t v41 = 0;
+                                if (bcreatureRadio) {
+                                    uint32_t X = v41 |
+                                        (BSGameSound::SOUND_FLAG_IS_3D | BSGameSound::SOUND_FLAG_ONE_SHOT |
+                                         BSGameSound::SOUND_FLAG_RADIO | BSGameSound::SOUND_FLAG_UNKBIT22);
+                                    BSAudio* v10 = &BSAudio::QInstance();
+                                    BSSoundHandle* SoundHandleByFilename =
+                                        v10->GetSoundHandleByFilename(&out, Str, X, nullptr);
+                                    pusers->m_item->Hndl.operator=(*SoundHandleByFilename);
+                                    float Yb = fCreatureRadioMax.Float();
+                                    float* v11 = &fCreatureRadioMin.Float();
+                                    pusers->m_item->Hndl.SetMinMax(*v11, Yb);
                                 }
                                 else {
-                                    int32_t v41 = 0;
-                                    if (bcreatureRadio) {
-                                        uint32_t X = v41 |
-                                            (BSGameSound::SOUND_FLAG_IS_3D | BSGameSound::SOUND_FLAG_ONE_SHOT |
-                                             BSGameSound::SOUND_FLAG_RADIO | BSGameSound::SOUND_FLAG_UNKBIT22);
-                                        BSAudio* v10 = &BSAudio::QInstance();
-                                        BSSoundHandle* SoundHandleByFilename =
-                                            v10->GetSoundHandleByFilename(&out, Str, X, nullptr);
-                                        pusers->m_item->Hndl.operator=(*SoundHandleByFilename);
-                                        float Yb = fCreatureRadioMax.Float();
-                                        float* v11 = &fCreatureRadioMin.Float();
-                                        pusers->m_item->Hndl.SetMinMax(*v11, Yb);
-                                    }
-                                    else {
-                                        uint32_t Xa = v41 |
-                                            (BSGameSound::SOUND_FLAG_IS_3D | BSGameSound::SOUND_FLAG_ONE_SHOT |
-                                             BSGameSound::SOUND_FLAG_RADIO | BSGameSound::SOUND_FLAG_UNKBIT22);
-                                        BSAudio* v12 = &BSAudio::QInstance();
-                                        BSSoundHandle* v26 = v12->GetSoundHandleByFilename(&th_s, Str, Xa, pTemplate);
-                                        pusers->m_item->Hndl.operator=(*v26);
-                                    }
-                                    pusers->m_item->Hndl.SetCompletionCallback(
-                                        &FalloutRadio::SoundCompletionCallback, pStation
-                                    );
-                                    pusers->m_item->Hndl.SetSynchStartTime(
-                                        pStation->CurrentState.iCurrentItemStartTime
-                                    );
-                                    pusers->m_item->Hndl.SetPosition(loc.x, loc.y, loc.z);
-                                    float v25 = static_cast<double>(isignalStrength) / 100.0;
-                                    pusers->m_item->Hndl.SetVolume(v25);
-                                    pusers->m_item->Hndl.Play(false);
+                                    uint32_t Xa = v41 |
+                                        (BSGameSound::SOUND_FLAG_IS_3D | BSGameSound::SOUND_FLAG_ONE_SHOT |
+                                         BSGameSound::SOUND_FLAG_RADIO | BSGameSound::SOUND_FLAG_UNKBIT22);
+                                    BSAudio* v12 = &BSAudio::QInstance();
+                                    BSSoundHandle* v26 = v12->GetSoundHandleByFilename(&th_s, Str, Xa, pTemplate);
+                                    pusers->m_item->Hndl.operator=(*v26);
                                 }
-                                if (bpipboyStation && !pusers->m_item->bJustStarted && !bpipboyUpdated) {
-                                    bpipboyUpdated = true;
-                                    FalloutRadio::PipboyUpdate(true);
-                                }
-                                if (pusers->m_item->bJustStarted) {
-                                    pusers->m_item->bJustStarted = false;
-                                }
+                                pusers->m_item->Hndl.SetCompletionCallback(
+                                    &FalloutRadio::SoundCompletionCallback, pStation
+                                );
+                                pusers->m_item->Hndl.SetSynchStartTime(pStation->CurrentState.iCurrentItemStartTime);
+                                pusers->m_item->Hndl.SetPosition(loc.x, loc.y, loc.z);
+                                float v25 = static_cast<double>(isignalStrength) / 100.0;
+                                pusers->m_item->Hndl.SetVolume(v25);
+                                pusers->m_item->Hndl.Play(false);
                             }
-                            goto LABEL_104;
+                            if (bpipboyStation && !pusers->m_item->bJustStarted && !bpipboyUpdated) {
+                                bpipboyUpdated = true;
+                                FalloutRadio::PipboyUpdate(true);
+                            }
+                            if (pusers->m_item->bJustStarted) {
+                                pusers->m_item->bJustStarted = false;
+                            }
                         }
-                        pStation->CurrentState.iCurrentItemDuration = 1;
-                        pusers = pusers->m_pkNext;
-                        pStation->CurrentState.SetPlayingSong(false);
+                        goto LABEL_104;
                     }
-                    else {
-                        pusers->m_item->bShouldBePlaying = false;
-                        pusers = pusers->m_pkNext;
-                    }
+                    pStation->CurrentState.iCurrentItemDuration = 1;
+                    pusers = pusers->m_pkNext;
+                    pStation->CurrentState.SetPlayingSong(false);
                 }
-                TESObjectREFR* v33 = pusers->m_item->pRadio;
-                loc = v33->GetLocationOnReference();
-                goto LABEL_115;
+                else {
+                    pusers->m_item->bShouldBePlaying = false;
+                    pusers = pusers->m_pkNext;
+                }
             }
+            TESObjectREFR* v33 = pusers->m_item->pRadio;
+            loc = v33->GetLocationOnReference();
+            goto LABEL_115;
         }
     }
 }
@@ -1550,10 +1523,8 @@ void FalloutRadio::DisableNPCRadio(TESObjectREFR* apNPCRadio) {
 // The context is the FORadioStation the sound plays for (both SetCompletionCallback callers): a failed sound ends the
 // station's current item by setting CurrentState.iCurrentItemDuration to 1.
 void FalloutRadio::SoundCompletionCallback(void* apUnused, bool abSucceeded) {
-    if (!abSucceeded) {
-        if (apUnused) {
-            static_cast<FORadioStation*>(apUnused)->CurrentState.iCurrentItemDuration = 1;
-        }
+    if ((!abSucceeded) && (apUnused)) {
+        static_cast<FORadioStation*>(apUnused)->CurrentState.iCurrentItemDuration = 1;
     }
 }
 
@@ -1638,12 +1609,11 @@ FalloutRadio::FORadioStation* FalloutRadio::InitStation(TESObjectREFR* pWorldRad
             FalloutRadio::ActiveStationList.AddHead(presult_2);
             return presult_2;
         }
-        else {
-            if (presult_2) {
-                delete presult_2;
-            }
-            return nullptr;
+
+        if (presult_2) {
+            delete presult_2;
         }
+        return nullptr;
     }
     if (presult_2) {
         delete presult_2;
@@ -1718,12 +1688,8 @@ bool FalloutRadio::TunePipboyToStation(TESObjectREFR* apTargetStation, bool abFo
         BSSimpleList<TESObjectREFR*> stationlist;
         BGSTalkingActivator::GetRadioStationsInRangeOfRef(pPlayer, &stationlist, nullptr);
         BSSimpleList<TESObjectREFR*>* stations = &stationlist;
-        if (&stationlist) {
-            if (stations->m_item) {
-                if (stations->m_item->GetObjectReference()) {
-                    apTargetStation = stations->m_item;
-                }
-            }
+        if ((&stationlist) && (stations->m_item) && (stations->m_item->GetObjectReference())) {
+            apTargetStation = stations->m_item;
         }
     }
     FalloutRadio::pCurrentPipboyStation =
@@ -1811,23 +1777,21 @@ void FalloutRadio::PipboyUpdate(bool abForceUpdate) {
         FalloutRadio::PipboyStaticHndl.SetVolume(fstaticVolume);
     }
     else {
-        if (FalloutRadio::pCurrentPipboyStation) {
-            if (FalloutRadio::pCurrentPipboyStation->CurrentState.GetStationPower() == 100 &&
-                FalloutRadio::PipboyStaticHndl.IsValid()) {
-                FalloutRadio::PipboyStaticHndl.Stop();
-                FalloutRadio::PipboyStaticHndl.Release();
-            }
+        if ((FalloutRadio::pCurrentPipboyStation) &&
+            (FalloutRadio::pCurrentPipboyStation->CurrentState.GetStationPower() == 100 &&
+             FalloutRadio::PipboyStaticHndl.IsValid())) {
+            FalloutRadio::PipboyStaticHndl.Stop();
+            FalloutRadio::PipboyStaticHndl.Release();
         }
     }
-    if (FalloutRadio::pCurrentPipboyStation) {
-        if (FalloutRadio::pCurrentPipboyStation->CurrentState.iCurrentItemDuration <= 0 &&
-            FalloutRadio::PipboyVoiceHndl.IsValid()) {
-            if (FalloutRadio::PipboyVoiceHndl.GetDuration()) {
-                FalloutRadio::pCurrentPipboyStation->CurrentState.iCurrentItemDuration =
-                    FalloutRadio::PipboyVoiceHndl.GetDuration();
-            }
-        }
+    if ((FalloutRadio::pCurrentPipboyStation) &&
+        (FalloutRadio::pCurrentPipboyStation->CurrentState.iCurrentItemDuration <= 0 &&
+         FalloutRadio::PipboyVoiceHndl.IsValid()) &&
+        (FalloutRadio::PipboyVoiceHndl.GetDuration())) {
+        FalloutRadio::pCurrentPipboyStation->CurrentState.iCurrentItemDuration =
+            FalloutRadio::PipboyVoiceHndl.GetDuration();
     }
+
     if (FalloutRadio::pCurrentPipboyStation &&
         (FalloutRadio::pCurrentPipboyStation->CurrentState.pConvo &&
          ((!FalloutAudioMedia::MediaIsPlaying(MEDIA_RADIO, true) && !FalloutRadio::PipboyVoiceHndl.IsValid()) ||
@@ -1853,22 +1817,19 @@ void FalloutRadio::PipboyUpdate(bool abForceUpdate) {
                 FalloutRadio::pCurrentPipboyStation->CurrentState.SetPlayingSong(false);
             }
         }
-        if (pcurrentItem->GetCurrentResponse()) {
-            if ((&pcurrentItem->GetCurrentResponse()->cText)->pString) {
-                uint32_t ivoiceTextLength = BSstrlen((&pcurrentItem->GetCurrentResponse()->cText)->pString);
-                int32_t v28 = ivoiceTextLength > 2 &&
-                    pcurrentItem->GetCurrentResponse()->GetVoice()->operator!=(static_cast<const char*>(nullptr));
-                v46 = v28;
-                if (!v28) {
-                    if (pcurrentItem->GetCurrentResponse()->pVoiceSound) {
-                        const char* Filename = pcurrentItem->GetCurrentResponse()->pVoiceSound->GetFilename();
-                        if (std::strstr(Filename, ".wav")) {
-                            v46 = 1;
-                        }
-                    }
+        if ((pcurrentItem->GetCurrentResponse()) && ((&pcurrentItem->GetCurrentResponse()->cText)->pString)) {
+            uint32_t ivoiceTextLength = BSstrlen((&pcurrentItem->GetCurrentResponse()->cText)->pString);
+            int32_t v28 = ivoiceTextLength > 2 &&
+                pcurrentItem->GetCurrentResponse()->GetVoice()->operator!=(static_cast<const char*>(nullptr));
+            v46 = v28;
+            if ((!v28) && (pcurrentItem->GetCurrentResponse()->pVoiceSound)) {
+                const char* Filename = pcurrentItem->GetCurrentResponse()->pVoiceSound->GetFilename();
+                if (std::strstr(Filename, ".wav")) {
+                    v46 = 1;
                 }
             }
         }
+
         uint32_t v45 = (&BSAudio::QInstance())->GetSynchTime() -
             FalloutRadio::pCurrentPipboyStation->CurrentState.iCurrentItemStartTime;
         if (v46) {
@@ -1936,11 +1897,10 @@ void FalloutRadio::PipboyUpdate(bool abForceUpdate) {
             );
             BSstrcpy(FalloutRadio::cLastPipboyFilename, 260, Src);
             FalloutRadio::pCurrentPipboyStation->CurrentState.SetPlayingSong(true);
-            if (FalloutRadio::pCurrentPipboyStation->CurrentState.iCurrentItemDuration <= 0) {
-                if (FalloutAudioMedia::MediaGetDuration(MEDIA_RADIO)) {
-                    FalloutRadio::pCurrentPipboyStation->CurrentState.iCurrentItemDuration =
-                        FalloutAudioMedia::MediaGetDuration(MEDIA_RADIO);
-                }
+            if ((FalloutRadio::pCurrentPipboyStation->CurrentState.iCurrentItemDuration <= 0) &&
+                (FalloutAudioMedia::MediaGetDuration(MEDIA_RADIO))) {
+                FalloutRadio::pCurrentPipboyStation->CurrentState.iCurrentItemDuration =
+                    FalloutAudioMedia::MediaGetDuration(MEDIA_RADIO);
             }
         }
         if (!bsong && !v46) {
@@ -2017,11 +1977,10 @@ void FalloutRadio::EnableNPCRadio(TESObjectREFR* apNPCRadio, TESObjectREFR* apTa
             return;
         }
         pstation = FalloutRadio::InitStation(apNPCRadio, apTargetStation);
-        if (pstation) {
-            if (!pstation->pStation) {
-                platform::DebuggerBreak();
-            }
+        if ((pstation) && (!pstation->pStation)) {
+            platform::DebuggerBreak();
         }
+
         if (pstation) {
             goto LABEL_8;
         }
@@ -2160,25 +2119,24 @@ bool FalloutRadio::GetNextConversation(FalloutRadio::FORadioStation* apStation, 
         pIOManager->AddTask(v4);
         return true;
     }
-    else {
-        Conversation* v3;
-        if (apStation->CurrentState.pConvo) {
-            Conversation* pConvo = apStation->CurrentState.pConvo;
-            if (pConvo) {
-                delete pConvo;
-            }
-            apStation->CurrentState.pConvo = nullptr;
+
+    Conversation* v3;
+    if (apStation->CurrentState.pConvo) {
+        Conversation* pConvo = apStation->CurrentState.pConvo;
+        if (pConvo) {
+            delete pConvo;
         }
-        Conversation* v6 = static_cast<Conversation*>(ourMalloc(sizeof(Conversation)));
-        if (v6) {
-            v3 = ::new (v6) Conversation(apStation->pStation, apStation->pStation, Topic);
-        }
-        else {
-            v3 = nullptr;
-        }
-        apStation->CurrentState.pConvo = v3;
-        return false;
+        apStation->CurrentState.pConvo = nullptr;
     }
+    Conversation* v6 = static_cast<Conversation*>(ourMalloc(sizeof(Conversation)));
+    if (v6) {
+        v3 = ::new (v6) Conversation(apStation->pStation, apStation->pStation, Topic);
+    }
+    else {
+        v3 = nullptr;
+    }
+    apStation->CurrentState.pConvo = v3;
+    return false;
 }
 
 RadioConvTask::RadioConvTask(FalloutRadio::FORadioStation* apStation)
@@ -2190,18 +2148,16 @@ void RadioConvTask::Run() {
     TESTopic* topic;
     Conversation* v2;
     void* v4;
-    if (pStation) {
-        if (!pStation->CurrentState.pNextConvo) {
-            v4 = ourMalloc(sizeof(Conversation));
-            if (v4) {
-                topic = TESTopic::GetTopic(DT_RADIO, 0);
-                v2 = ::new (v4) Conversation(pStation->pStation, pStation->pStation, topic);
-            }
-            else {
-                v2 = nullptr;
-            }
-            pStation->CurrentState.pNextConvo = v2;
+    if ((pStation) && (!pStation->CurrentState.pNextConvo)) {
+        v4 = ourMalloc(sizeof(Conversation));
+        if (v4) {
+            topic = TESTopic::GetTopic(DT_RADIO, 0);
+            v2 = ::new (v4) Conversation(pStation->pStation, pStation->pStation, topic);
         }
+        else {
+            v2 = nullptr;
+        }
+        pStation->CurrentState.pNextConvo = v2;
     }
 }
 

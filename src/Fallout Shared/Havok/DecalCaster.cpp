@@ -111,14 +111,12 @@ uint32_t DecalCaster::Pick(const NiPoint3& arFrom, const NiPoint3& arTo, float a
 }
 
 void DecalCaster::Add(bhkWorld* apWorld) {
-    if (spShapePhantom.m_pObject) {
-        if (GetWorld() != apWorld) {
-            bhkSimpleShapePhantom* v3 = spShapePhantom.m_pObject;
-            v3->Add(apWorld);
-            if (apWorld) {
-                uint32_t v2 = hkColor::rgbFromChars(255, 16, 16, 25);
-                apWorld->SetDebugObjectColor(spShapePhantom.m_pObject, v2);
-            }
+    if ((spShapePhantom.m_pObject) && (GetWorld() != apWorld)) {
+        bhkSimpleShapePhantom* v3 = spShapePhantom.m_pObject;
+        v3->Add(apWorld);
+        if (apWorld) {
+            uint32_t v2 = hkColor::rgbFromChars(255, 16, 16, 25);
+            apWorld->SetDebugObjectColor(spShapePhantom.m_pObject, v2);
         }
     }
 }
@@ -228,22 +226,21 @@ DecalCaster* DecalCaster::GetInstance(float afDecalRadius, bool abCreate) {
         }
         return DecalCaster::pSmallInstance;
     }
-    else {
-        if (!DecalCaster::pLargeInstance && abCreate) {
-            DecalCaster* v8;
-            DecalCaster* apMemory = static_cast<DecalCaster*>(bhkRagdollController::operator new(sizeof(DecalCaster)));
-            if (apMemory) {
-                uint32_t v5 = bhkCollisionFilter::GetNewSystemGroup();
-                float afRadius = DecalCaster::GetMaxDecalWidthLarge();
-                v8 = ::new (apMemory) DecalCaster(afRadius, v5);
-            }
-            else {
-                v8 = nullptr;
-            }
-            DecalCaster::pLargeInstance = v8;
+
+    if (!DecalCaster::pLargeInstance && abCreate) {
+        DecalCaster* v8;
+        DecalCaster* apMemory = static_cast<DecalCaster*>(bhkRagdollController::operator new(sizeof(DecalCaster)));
+        if (apMemory) {
+            uint32_t v5 = bhkCollisionFilter::GetNewSystemGroup();
+            float afRadius = DecalCaster::GetMaxDecalWidthLarge();
+            v8 = ::new (apMemory) DecalCaster(afRadius, v5);
         }
-        return DecalCaster::pLargeInstance;
+        else {
+            v8 = nullptr;
+        }
+        DecalCaster::pLargeInstance = v8;
     }
+    return DecalCaster::pLargeInstance;
 }
 
 void DecalCaster::operator delete(void* apMemory) {
@@ -263,10 +260,8 @@ void DecalCaster::ClearInstance() {
 
 void bhkShapePhantom::GetPenetrations(hkpCdBodyPairCollector* arCollector) {
     hkpSimpleShapePhantom* v3 = static_cast<hkpSimpleShapePhantom*>(operator*());
-    if (v3) {
-        if (v3->m_world) {
-            v3->getPenetrations(*arCollector, nullptr);
-        }
+    if ((v3) && (v3->m_world)) {
+        v3->getPenetrations(*arCollector, nullptr);
     }
 }
 

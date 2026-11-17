@@ -378,16 +378,15 @@ void NiGeometryData::SaveBinary(NiStream& kStream) {
     NiBinaryStream::NIBINARYSTREAMWRITEFN v15 = v14->m_pfnWrite;
     uiValue = 1;
     v14->m_uiAbsoluteCurrentPos += v15(v14, &bHasVertex, 1, &uiValue, 1);
-    if (bHasVertex) {
-        if (m_bSaveVertexData) {
-            NiBinaryStream* v16 = v2->Ostr();
-            int32_t v36 = 12 * *p_m_usVertices;
-            NiBinaryStream::NIBINARYSTREAMWRITEFN v17 = v16->m_pfnWrite;
-            NiPoint3* m_pkVertex = this->m_pkVertex;
-            uiValue = 4;
-            v16->m_uiAbsoluteCurrentPos += v17(v16, m_pkVertex, v36, &uiValue, 1);
-        }
+    if ((bHasVertex) && (m_bSaveVertexData)) {
+        NiBinaryStream* v16 = v2->Ostr();
+        int32_t v36 = 12 * *p_m_usVertices;
+        NiBinaryStream::NIBINARYSTREAMWRITEFN v17 = v16->m_pfnWrite;
+        NiPoint3* m_pkVertex = this->m_pkVertex;
+        uiValue = 4;
+        v16->m_uiAbsoluteCurrentPos += v17(v16, m_pkVertex, v36, &uiValue, 1);
     }
+
     if (!this->m_pkTexture) {
         m_usDataFlags &= ~1u;
     }
@@ -429,10 +428,8 @@ void NiGeometryData::SaveBinary(NiStream& kStream) {
     uint32_t uiQuantity = *p_m_usVertices * (m_usDataFlags & NiGeometryData::VERTEX_MASK);
     if (uiQuantity) {
         NiPoint2* m_pkTexture = this->m_pkTexture;
-        if (m_pkTexture) {
-            if (m_bSaveVertexData) {
-                NiPoint2::SaveBinary(*v2, m_pkTexture, uiQuantity);
-            }
+        if ((m_pkTexture) && (m_bSaveVertexData)) {
+            NiPoint2::SaveBinary(*v2, m_pkTexture, uiQuantity);
         }
     }
     NiBinaryStream* v31 = v2->Ostr();
@@ -1005,11 +1002,10 @@ void NiGeometryData::Replace(
     m_usVertices = usVertices;
     m_pkNormal = pkNormal;
     uint16_t usActiveVertices = GetActiveVertexCount();
-    if (usActiveVertices) {
-        if (m_pkVertex) {
-            m_kBound.ComputeFromData(usActiveVertices, m_pkVertex);
-        }
+    if ((usActiveVertices) && (m_pkVertex)) {
+        m_kBound.ComputeFromData(usActiveVertices, m_pkVertex);
     }
+
     uint16_t usDataFlags = m_usDataFlags;
     m_pkColor = pkColor;
     m_pkTexture = pkTexture;
@@ -1084,11 +1080,10 @@ void NiGeometryData::SetData(
     m_pkVertex = pkVertex;
     m_pkNormal = pkNormal;
     uint16_t usActiveVertices = GetActiveVertexCount();
-    if (usActiveVertices) {
-        if (m_pkVertex) {
-            m_kBound.ComputeFromData(usActiveVertices, m_pkVertex);
-        }
+    if ((usActiveVertices) && (m_pkVertex)) {
+        m_kBound.ComputeFromData(usActiveVertices, m_pkVertex);
     }
+
     uint16_t usDataFlags = m_usDataFlags;
     m_pkTexture = pkTexture;
     m_pkColor = pkColor;
@@ -1157,9 +1152,8 @@ int32_t NiGeometryData::ChoosePivot(uint16_t* pusIndex, int32_t mask, int32_t l,
             if (VertexCompare(la, v7, mask) >= 0) {
                 return la;
             }
-            else {
-                return v7;
-            }
+
+            return v7;
         }
         return v6;
     }

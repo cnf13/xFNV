@@ -206,10 +206,8 @@ BGSHungerStage* BGSHungerStage::FindStageForRadLevel(float afRads) {
     BGSHungerStage* pstage = nullptr;
     for (uint32_t i = 0; i < BGSHungerStage::iNumStages && !pstage; ++i) {
         BGSHungerStage* pcurrentStage = BGSHungerStage::GetStage(i);
-        if (pcurrentStage) {
-            if (afRads >= static_cast<double>(pcurrentStage->data.iFOOD)) {
-                pstage = pcurrentStage;
-            }
+        if ((pcurrentStage) && (afRads >= static_cast<double>(pcurrentStage->data.iFOOD))) {
+            pstage = pcurrentStage;
         }
     }
     return pstage;

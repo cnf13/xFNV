@@ -69,9 +69,8 @@ uint32_t BGSSaveLoadFile::GetFilePosition() {
     if (pSaveLoadManager->GetSimulatedMode()) {
         return iSimulatedFilePosition;
     }
-    else {
-        return pFile->Tell();
-    }
+
+    return pFile->Tell();
 }
 
 void BGSSaveLoadFile::SetSaveFileName(const char* apFileName) {
@@ -110,9 +109,8 @@ BGSSaveLoadFile* BGSSaveLoadFile::CreateFileA(const char* apFileName, bool abWri
     if (v5) {
         return ::new (v5) BGSSaveLoadFile(apFileName, abWrite, aiBufferSize);
     }
-    else {
-        return nullptr;
-    }
+
+    return nullptr;
 }
 
 BGSSaveLoadFileEntry::BGSSaveLoadFileEntry(char* apFileName, int32_t aiDeviceID)

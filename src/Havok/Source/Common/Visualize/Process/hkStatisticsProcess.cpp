@@ -209,7 +209,6 @@ hkProcess* hkStatisticsProcess::create(const hkArray<hkProcessContext*, hkContai
     if (v3) {
         return static_cast<hkProcess*>(v3);
     }
-    else {
-        return nullptr;
-    }
+
+    return nullptr;
 }

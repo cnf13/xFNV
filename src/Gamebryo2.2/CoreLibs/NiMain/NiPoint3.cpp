@@ -197,17 +197,16 @@ float NiPoint3::VectorLength(const NiPoint3* apPoint) {
     if (v4 == 0.0f) {
         return 0.0f;
     }
-    else {
-        int16_t v3 = (*reinterpret_cast<uint32_t*>(v5) >> 23) - 127;
-        *reinterpret_cast<uint32_t*>(v5) &= 0x7FFFFFu;
-        if ((v3 & 1) != 0) {
-            *reinterpret_cast<uint32_t*>(v5) |= 0x800000u;
-        }
-        *reinterpret_cast<uint32_t*>(v5) =
-            NiPoint3::ms_pSqrtTable[static_cast<uint16_t>((*reinterpret_cast<uint32_t*>(v5)) >> 16)] |
-            ((v3 >> 1) + 127) << 23;
-        return v4;
+
+    int16_t v3 = (*reinterpret_cast<uint32_t*>(v5) >> 23) - 127;
+    *reinterpret_cast<uint32_t*>(v5) &= 0x7FFFFFu;
+    if ((v3 & 1) != 0) {
+        *reinterpret_cast<uint32_t*>(v5) |= 0x800000u;
     }
+    *reinterpret_cast<uint32_t*>(v5) =
+        NiPoint3::ms_pSqrtTable[static_cast<uint16_t>((*reinterpret_cast<uint32_t*>(v5)) >> 16)] |
+        ((v3 >> 1) + 127) << 23;
+    return v4;
 }
 
 void NiPoint3::UnitizeVector(NiPoint3& v) {

@@ -76,10 +76,8 @@ void hkpMousePickingViewer::worldRemovedCallback(hkpWorld* world) {
 
 void hkpMousePickingViewer::dragObject(const hkVector4& newWorldSpacePoint) {
     hkpMouseSpringAction* m_mouseSpring = this->m_mouseSpring;
-    if (m_mouseSpring) {
-        if (m_mouseSpring->m_world) {
-            m_mouseSpring->setMousePosition(newWorldSpacePoint);
-        }
+    if ((m_mouseSpring) && (m_mouseSpring->m_world)) {
+        m_mouseSpring->setMousePosition(newWorldSpacePoint);
     }
 }
 
@@ -146,9 +144,8 @@ hkProcess* hkpMousePickingViewer::create(const hkArray<hkProcessContext*, hkCont
     if (v3) {
         return &static_cast<hkProcess&>(static_cast<hkpWorldViewerBase&>(*v3));
     }
-    else {
-        return nullptr;
-    }
+
+    return nullptr;
 }
 
 void hkpMousePickingViewer::registerViewer() {

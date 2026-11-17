@@ -75,19 +75,17 @@ TESRegionList::GetDerivedData(REGION_DATA_ID aeFind, TESRegionPoint* apPoint, TE
         TESRegion* pregion = pcurrent_2->m_item;
         if (!pregion->GetDelete() && (!apWorldSpace || apWorldSpace == pregion->pWorldSpace)) {
             TESRegionData* pfound = pregion->pDataList->Find(aeFind);
-            if (pfound) {
-                if (!pfound->bIgnore) {
-                    if (apPoint) {
-                        for (TESRegionPointList*& rpItem : pregion->pPointLists->ItemsUntilNull()) {
-                            if (rpItem->IsInsideRegion(apPoint)) {
-                                goto LABEL_24;
-                            }
+            if ((pfound) && (!pfound->bIgnore)) {
+                if (apPoint) {
+                    for (TESRegionPointList*& rpItem : pregion->pPointLists->ItemsUntilNull()) {
+                        if (rpItem->IsInsideRegion(apPoint)) {
+                            goto LABEL_24;
                         }
                     }
-                    else {
-                    LABEL_24:;
-                        pRegionsWithData->Add(pregion);
-                    }
+                }
+                else {
+                LABEL_24:;
+                    pRegionsWithData->Add(pregion);
                 }
             }
         }
@@ -102,73 +100,72 @@ TESRegionList::GetDerivedData(REGION_DATA_ID aeFind, TESRegionPoint* apPoint, TE
         }
         return TESRegionList::kCachedData[aeFind].pData;
     }
-    else {
-        BSSimpleList<TESRegion*>* pcurrent_3;
-        TESRegionData* pdataDelete = TESRegionList::kCachedData[aeFind].pData;
-        if (pdataDelete) {
-            TESRegionList::kCachedData[aeFind].pData = nullptr;
-            delete pdataDelete;
-        }
-        TESRegionList* plistDelete = TESRegionList::kCachedData[aeFind].pList;
-        if (plistDelete) {
-            TESRegionList::kCachedData[aeFind].pList = nullptr;
-            delete plistDelete;
-        }
-        if (pRegionsWithData) {
-            pcurrent_3 = static_cast<BSSimpleList<TESRegion*>*>(pRegionsWithData);
-        }
-        else {
-            pcurrent_3 = nullptr;
-        }
-        for (TESRegion*& rpItem : pcurrent_3->ItemsUntilNull()) {
-            TESRegionData* pfound_2 = rpItem->pDataList->Find(aeFind);
-            if (pfound_2) {
-                if (pfound_2->bOverride) {
-                    v12 = 1;
-                    if (pderived) {
-                        delete pderived;
-                        pderived = nullptr;
-                    }
-                    if (pfound_2->cPriority > static_cast<int32_t>(shighestOverride)) {
-                        phighestOverride = pfound_2;
-                        shighestOverride = pfound_2->cPriority;
-                    }
-                }
-                else {
-                    if (!v12) {
-                        if (pderived) {
-                            pderived->BlendInto(pfound_2, pRegionsWithData->ItemsInList());
-                        }
-                        else {
-                            pderived = pfound_2->Copy();
-                        }
-                    }
-                }
-            }
-        }
-        if (v12) {
-            pderived = phighestOverride->Copy();
-        }
-        if (pderived) {
-            if (TESRegionList::kCachedData[aeFind].pData) {
-                delete TESRegionList::kCachedData[aeFind].pData;
-            }
-            TESRegionList::kCachedData[aeFind].pData = pderived;
-            if (TESRegionList::kCachedData[aeFind].pList) {
-                TESRegionList::kCachedData[aeFind].pList->RemoveAll();
-                if (TESRegionList::kCachedData[aeFind].pList) {
-                    delete TESRegionList::kCachedData[aeFind].pList;
-                }
-            }
-            TESRegionList::kCachedData[aeFind].pList = pRegionsWithData;
-            pRegionsWithData_2 = nullptr;
-        }
-        if (pRegionsWithData_2) {
-            pRegionsWithData_2->RemoveAll();
-            delete pRegionsWithData_2;
-        }
-        return pderived;
+
+    BSSimpleList<TESRegion*>* pcurrent_3;
+    TESRegionData* pdataDelete = TESRegionList::kCachedData[aeFind].pData;
+    if (pdataDelete) {
+        TESRegionList::kCachedData[aeFind].pData = nullptr;
+        delete pdataDelete;
     }
+    TESRegionList* plistDelete = TESRegionList::kCachedData[aeFind].pList;
+    if (plistDelete) {
+        TESRegionList::kCachedData[aeFind].pList = nullptr;
+        delete plistDelete;
+    }
+    if (pRegionsWithData) {
+        pcurrent_3 = static_cast<BSSimpleList<TESRegion*>*>(pRegionsWithData);
+    }
+    else {
+        pcurrent_3 = nullptr;
+    }
+    for (TESRegion*& rpItem : pcurrent_3->ItemsUntilNull()) {
+        TESRegionData* pfound_2 = rpItem->pDataList->Find(aeFind);
+        if (pfound_2) {
+            if (pfound_2->bOverride) {
+                v12 = 1;
+                if (pderived) {
+                    delete pderived;
+                    pderived = nullptr;
+                }
+                if (pfound_2->cPriority > static_cast<int32_t>(shighestOverride)) {
+                    phighestOverride = pfound_2;
+                    shighestOverride = pfound_2->cPriority;
+                }
+            }
+            else {
+                if (!v12) {
+                    if (pderived) {
+                        pderived->BlendInto(pfound_2, pRegionsWithData->ItemsInList());
+                    }
+                    else {
+                        pderived = pfound_2->Copy();
+                    }
+                }
+            }
+        }
+    }
+    if (v12) {
+        pderived = phighestOverride->Copy();
+    }
+    if (pderived) {
+        if (TESRegionList::kCachedData[aeFind].pData) {
+            delete TESRegionList::kCachedData[aeFind].pData;
+        }
+        TESRegionList::kCachedData[aeFind].pData = pderived;
+        if (TESRegionList::kCachedData[aeFind].pList) {
+            TESRegionList::kCachedData[aeFind].pList->RemoveAll();
+            if (TESRegionList::kCachedData[aeFind].pList) {
+                delete TESRegionList::kCachedData[aeFind].pList;
+            }
+        }
+        TESRegionList::kCachedData[aeFind].pList = pRegionsWithData;
+        pRegionsWithData_2 = nullptr;
+    }
+    if (pRegionsWithData_2) {
+        pRegionsWithData_2->RemoveAll();
+        delete pRegionsWithData_2;
+    }
+    return pderived;
 }
 
 TESRegionData*

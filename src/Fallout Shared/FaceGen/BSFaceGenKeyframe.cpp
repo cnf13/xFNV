@@ -260,16 +260,14 @@ bool BSFaceGenKeyframeMultiple::MergeMorphDataFrom(BSFaceGenKeyframe* a1, BSFace
             }
         }
     }
-    if (v23) {
-        if (v25) {
-            delete v25;
-        }
+    if ((v23) && (v25)) {
+        delete v25;
     }
-    if (v21) {
-        if (v22) {
-            delete v22;
-        }
+
+    if ((v21) && (v22)) {
+        delete v22;
     }
+
     return v20;
 }
 
@@ -292,9 +290,8 @@ BSFaceGenKeyframe* BSFaceGenKeyframeMultiple::CreateCopy() {
     if (v4) {
         return ::new (v4) BSFaceGenKeyframeMultiple(this);
     }
-    else {
-        return nullptr;
-    }
+
+    return nullptr;
 }
 
 void BSFaceGenKeyframeMultiple::CopyFrom(BSFaceGenKeyframe* a1) {
@@ -469,9 +466,8 @@ float BSFaceGenKeyframeMultiple::GetQuantity(uint32_t aiWhichMorph) const {
     if (aiWhichMorph >= iNumQuantities) {
         return (float)0.0;
     }
-    else {
-        return pQuantities[aiWhichMorph];
-    }
+
+    return pQuantities[aiWhichMorph];
 }
 
 void BSFaceGenKeyframeMultiple::SetQuantityNoTest(uint32_t aiWhichMorph, float afQuantity) {

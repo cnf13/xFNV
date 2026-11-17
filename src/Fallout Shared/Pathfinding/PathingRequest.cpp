@@ -271,11 +271,10 @@ void PathingRequest::InitLoadGame(BGSLoadFormBuffer* apLoadGameBuffer) {
         Actor* pactor = apLoadGameBuffer->GetActor();
         if (pactor) {
             TESPackage* ppack = pactor->GetCurrentPackage();
-            if (ppack) {
-                if (ppack->ePROCEDURE_TYPE == PACKAGE_PROCEDURE_ESCORT_ACTOR &&
-                    ppack->GetEscortTargetForPackage(pactor, false) == pPlayer) {
-                    bWaitIfPlayerWaits = true;
-                }
+            if ((ppack) &&
+                (ppack->ePROCEDURE_TYPE == PACKAGE_PROCEDURE_ESCORT_ACTOR &&
+                 ppack->GetEscortTargetForPackage(pactor, false) == pPlayer)) {
+                bWaitIfPlayerWaits = true;
             }
         }
     }

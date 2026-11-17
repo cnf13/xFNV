@@ -156,7 +156,7 @@ public:
     };
 
     hkVersionPatchManager();
-    ~hkVersionPatchManager();
+    ~hkVersionPatchManager() override;
 
     // The uid of class name at version ver.
     hkUint64 getUid(const char* name, int32_t ver) const;

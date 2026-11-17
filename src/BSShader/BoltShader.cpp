@@ -428,36 +428,32 @@ BSShader* BoltShader::CreateShader() {
 }
 
 void BoltShader::Stop(NiNode* apNode, BoltShaderProperty* apProp) {
-    if (apNode) {
-        if (apProp) {
-            for (uint32_t i = 0; i < apNode->m_kChildren.m_usESize; ++i) {
-                NiShadeProperty* pprop;
-                int32_t v5;
-                NiAVObject* pObject = apNode->m_kChildren.m_pBase[i].m_pObject;
-                if (pObject) {
-                    pprop = static_cast<NiShadeProperty*>(pObject->GetProperty(3));
-                    if (pprop) {
-                        v5 = pprop->iShaderPropertyType == 15;
-                    }
-                    else {
-                        v5 = 0;
-                    }
+    if ((apNode) && (apProp)) {
+        for (uint32_t i = 0; i < apNode->m_kChildren.m_usESize; ++i) {
+            NiShadeProperty* pprop;
+            int32_t v5;
+            NiAVObject* pObject = apNode->m_kChildren.m_pBase[i].m_pObject;
+            if (pObject) {
+                pprop = static_cast<NiShadeProperty*>(pObject->GetProperty(3));
+                if (pprop) {
+                    v5 = pprop->iShaderPropertyType == 15;
                 }
                 else {
-                    pprop = nullptr;
                     v5 = 0;
                 }
-                BoltShaderProperty* v6 = v5 ? static_cast<BoltShaderProperty*>(pprop) : nullptr;
-                if (v6) {
-                    if (v6 == apProp) {
-                        apNode->DetachChildAt(i);
-                    }
-                }
             }
-            if (--BoltShader::iLoadedCount <= 0) {
-                BoltShader::spBaseGeometry = nullptr;
-                BoltShader::iLoadedCount = 0;
+            else {
+                pprop = nullptr;
+                v5 = 0;
             }
+            BoltShaderProperty* v6 = v5 ? static_cast<BoltShaderProperty*>(pprop) : nullptr;
+            if ((v6) && (v6 == apProp)) {
+                apNode->DetachChildAt(i);
+            }
+        }
+        if (--BoltShader::iLoadedCount <= 0) {
+            BoltShader::spBaseGeometry = nullptr;
+            BoltShader::iLoadedCount = 0;
         }
     }
 }

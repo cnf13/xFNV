@@ -25,7 +25,7 @@ public:
     // Copies nbytes from src to dst ELEMENTALIGN bytes at a time, front to back (hkArray's removeAtAndCopy calls it).
     template <int32_t ELEMENTALIGN>
     static void memCpy(void* dst, const void* src, int32_t n) {
-        using CopyType = typename TypeFromAlign<ELEMENTALIGN>::type;
+        using CopyType = TypeFromAlign<ELEMENTALIGN>::type;
         for (int32_t i = 0, j = 0; i < n; i += sizeof(CopyType), ++j) {
             static_cast<CopyType*>(dst)[j] = static_cast<const CopyType*>(src)[j];
         }
@@ -60,7 +60,7 @@ struct hkMemUtil::TypeFromAlign<8> {
 // (hkArray's removeAt calls it).
 template <int32_t ELEMENTSIZE, int32_t ALIGN>
 inline void hkMemUtil::memCpyOneAligned(void* dst, const void* src) {
-    using CopyType = typename TypeFromAlign<ALIGN>::type;
+    using CopyType = TypeFromAlign<ALIGN>::type;
     uint32_t i = 0;
     do {
         static_cast<CopyType*>(dst)[i] = static_cast<const CopyType*>(src)[i];

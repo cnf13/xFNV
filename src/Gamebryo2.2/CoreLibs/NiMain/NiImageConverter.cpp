@@ -131,9 +131,8 @@ NiPixelData* NiImageConverter::ConvertPixelData(
     if (v11) {
         return ::new (v11) NiPixelData(kSrc);
     }
-    else {
-        return nullptr;
-    }
+
+    return nullptr;
 }
 
 NiImageConverter* NiImageConverter::GetImageConverter() {

@@ -222,23 +222,18 @@ bool TutorialMenu::Create(BGSMessage* apMessage, bool abHelpManual) {
             TutorialMenu::pMe->PrepForVisibility(false);
             return true;
         }
-        else {
-            if (TutorialMenu::pMe) {
-                delete TutorialMenu::pMe;
-            }
-            return false;
-        }
-    }
-    else {
+
         if (TutorialMenu::pMe) {
-            if (TutorialMenu::pMe->pMenu) {
-                if (TutorialMenu::pMe) {
-                    delete TutorialMenu::pMe;
-                }
-            }
+            delete TutorialMenu::pMe;
         }
         return false;
     }
+
+    if ((TutorialMenu::pMe) && (TutorialMenu::pMe->pMenu) && (TutorialMenu::pMe)) {
+        delete TutorialMenu::pMe;
+    }
+
+    return false;
 }
 
 int32_t TutorialMenu::GetClassStatic() {

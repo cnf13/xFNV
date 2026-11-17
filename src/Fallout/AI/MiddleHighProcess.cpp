@@ -325,287 +325,278 @@ void MiddleHighProcess::Update(MobileObject* apRef, float fTimeDelta) {
     if (apRef) {
         Actor* apActor_2 = dynamic_cast<Actor*>(apRef);
         bool bevalflag = true;
-        if (apActor_2) {
-            if (apActor_2->GetRefPersists()) {
-                CheckforNewPackage(apActor_2, false);
-                TESPackage* pPack = GetPackageThatIsRunning();
-                ResetTarget();
-                if (pPack) {
-                    if (pPack->ePROCEDURE_TYPE != PACKAGE_PROCEDURE_NONE && !pPack->GetWaiting()) {
-                        while (bevalflag) {
-                            uint32_t Count = pPack->ePROCEDURE_TYPE;
-                            switch (Procedure_Action[Count][GetProcedureIndexRunning()]) {
-                                case PROCEDURE_TRAVEL: {
-                                    TESPackage* v4;
-                                    TESPackage* v14;
-                                    TESObjectREFR* pRef = nullptr;
-                                    if (pPack->pPackLoc) {
-                                        pRef = pPack->pPackLoc->GetLocReference();
-                                    }
-                                    if (pGenericLocation) {
-                                        if (!GetRunOncePackage()) {
-                                            pRef = pGenericLocation;
-                                        }
-                                    }
-                                    if (apActor_2->GetSitSleepState()) {
-                                        TESPackage* CurrentPackage = apActor_2->GetCurrentPackage();
-                                        if (!CurrentPackage->IsActorAtLocation(apActor_2, false, -1.0f, false)) {
-                                            ProcessGetUpOneHour(apActor_2);
-                                        }
-                                    }
-                                    ProcessTravel(apActor_2, true, true, 257, false);
-                                    bevalflag = apActor_2->GetSitSleepState() == SIT_SLEEP_NORMAL &&
-                                        (apActor_2->GetCurrentPackage() &&
-                                         ((v4 = apActor_2->GetCurrentPackage(),
-                                           v4->GetPackType() != PACKAGE_TYPE_TRAVEL) &&
-                                          ((v14 = apActor_2->GetCurrentPackage(),
-                                            v14->IsActorAtLocation(apActor_2, false, -1.0f, false)) &&
-                                           (apActor_2->pCurrentProcess->eLevel == PROCESS_TYPE_MIDDLE_HIGH &&
-                                            (!pRef || !pRef->IsFurniture())))));
-                                    break;
-                                }
-                                case PROCEDURE_WANDER: {
-                                    bevalflag = false;
-                                    break;
-                                }
-                                case PROCEDURE_ACTIVATE: {
-                                    bevalflag = ProcessActivateOneHour(apActor_2);
-                                    break;
-                                }
-                                case PROCEDURE_SLEEP: {
-                                    bevalflag = false;
-                                    break;
-                                }
-                                case PROCEDURE_EAT: {
-                                    bevalflag = ProcessEatOneHour(apActor_2);
-                                    break;
-                                }
-                                case PROCEDURE_FOLLOW: {
-                                    if (apActor_2->GetSitSleepState()) {
-                                        ProcessGetUpOneHour(apActor_2);
-                                    }
-                                    bevalflag = ProcessFollowOneHour(apActor_2, 3600.0f, true);
-                                    break;
-                                }
-                                case PROCEDURE_ESCORT: {
-                                    if (apActor_2->GetSitSleepState()) {
-                                        ProcessGetUpOneHour(apActor_2);
-                                    }
-                                    bevalflag = ProcessEscortOneHour(apActor_2);
-                                    break;
-                                }
-                                case PROCEDURE_ALARM: {
-                                    if (apActor_2->GetSitSleepState()) {
-                                        ProcessGetUpOneHour(apActor_2);
-                                    }
-                                    ProcessAlarm(apActor_2);
-                                    bevalflag = false;
-                                    break;
-                                }
-                                case PROCEDURE_COMBAT: {
-                                    bevalflag = ProcessCombatOneHour(apActor_2, fTimeDelta);
-                                    break;
-                                }
-                                case PROCEDURE_FLEE: {
-                                    if (apActor_2->GetSitSleepState()) {
-                                        ProcessGetUpOneHour(apActor_2);
-                                    }
-                                    ProcessFlee(apActor_2);
-                                    bevalflag = false;
-                                    break;
-                                }
-                                case PROCEDURE_DIALOGUE: {
-                                    ProcessDialogue(apActor_2);
-                                    bevalflag = false;
-                                    break;
-                                }
-                                case PROCEDURE_WAIT: {
-                                    TESPackage* v5;
-                                    int32_t ipadding;
-                                    if (!pTarget) {
-                                        SetTargetForPackage(apActor_2);
-                                    }
-                                    if (!pTarget ||
-                                        (pTarget->GetDelete() ||
-                                         (v5 = GetCurrentPackage(),
-                                          (ipadding = v5->GetLocationRadius(apActor_2) == 0 ? 400 : 0,
-                                           pPack->IsActorAtRefTarget(apActor_2, ipadding))))) {
-                                        AddToProcedureIndexRunning(apActor_2, 1);
-                                    }
-                                    bevalflag = false;
-                                    break;
-                                }
-                                case PROCEDURE_TRAVEL_TARGET: {
-                                    TESPackage* v13;
-                                    if (!pTarget) {
-                                        SetTargetForPackage(apActor_2);
-                                    }
-                                    if (!pTarget) {
-                                        AddToProcedureIndexRunning(apActor_2, 1);
-                                    }
-                                    if (pTarget) {
-                                        if (pTarget->IsActor() && pTarget != pPlayer &&
-                                            pPack->GetPackType() == PACKAGE_TYPE_ESCORT) {
-                                            TESPackage* v6 = GetCurrentPackage();
-                                            CreateFollowforEscort(apActor_2, v6, true);
-                                        }
-                                    }
-                                    ProcessActivateOneHour(apActor_2);
-                                    bevalflag = apActor_2->GetCurrentPackage() &&
-                                        ((v13 = apActor_2->GetCurrentPackage(),
-                                          v13->IsActorAtRefTarget(apActor_2, 0)) &&
-                                         apActor_2->pCurrentProcess->eLevel == PROCESS_TYPE_MIDDLE_HIGH);
-                                    break;
-                                }
-                                case PROCEDURE_PURSUE: {
-                                    if (apActor_2->GetSitSleepState()) {
-                                        ProcessGetUpOneHour(apActor_2);
-                                    }
-                                    ProcessPursue(apActor_2, false, true, 257);
-                                    bevalflag = false;
-                                    break;
-                                }
-                                case PROCEDURE_OBSERVE_COMBAT: {
-                                    AddToProcedureIndexRunning(apActor_2, 1);
-                                    goto LABEL_81;
-                                }
-                                case PROCEDURE_GET_UP: {
+        if ((apActor_2) && (apActor_2->GetRefPersists())) {
+            CheckforNewPackage(apActor_2, false);
+            TESPackage* pPack = GetPackageThatIsRunning();
+            ResetTarget();
+            if ((pPack) && (pPack->ePROCEDURE_TYPE != PACKAGE_PROCEDURE_NONE && !pPack->GetWaiting())) {
+                while (bevalflag) {
+                    uint32_t Count = pPack->ePROCEDURE_TYPE;
+                    switch (Procedure_Action[Count][GetProcedureIndexRunning()]) {
+                        case PROCEDURE_TRAVEL: {
+                            TESPackage* v4;
+                            TESPackage* v14;
+                            TESObjectREFR* pRef = nullptr;
+                            if (pPack->pPackLoc) {
+                                pRef = pPack->pPackLoc->GetLocReference();
+                            }
+                            if ((pGenericLocation) && (!GetRunOncePackage())) {
+                                pRef = pGenericLocation;
+                            }
+
+                            if (apActor_2->GetSitSleepState()) {
+                                TESPackage* CurrentPackage = apActor_2->GetCurrentPackage();
+                                if (!CurrentPackage->IsActorAtLocation(apActor_2, false, -1.0f, false)) {
                                     ProcessGetUpOneHour(apActor_2);
-                                    AddToProcedureIndexRunning(apActor_2, 1);
-                                    break;
-                                }
-                                case PROCEDURE_MOUNT_HORSE: {
-                                    AddToProcedureIndexRunning(apActor_2, 1);
-                                    bevalflag = false;
-                                    break;
-                                }
-                                case PROCEDURE_NOTIFY: {
-                                    ProcessNotify(apActor_2);
-                                    bevalflag = false;
-                                    break;
-                                }
-                                case PROCEDURE_ACCOMPANY: {
-                                    ProcessAccompanyOneHour(apActor_2);
-                                    bevalflag = false;
-                                    break;
-                                }
-                                case PROCEDURE_USE_ITEM_AT: {
-                                    ProcessUseItemAt(apActor_2);
-                                    bevalflag = false;
-                                    break;
-                                }
-                                case PROCEDURE_CHOOSE_CAST: {
-                                    bevalflag = false;
-                                    break;
-                                }
-                                case PROCEDURE_REMOVE_WORN_ITEMS: {
-                                    ProcessRemoveWorn(apActor_2, true, false);
-                                    bevalflag = false;
-                                    break;
-                                }
-                                case PROCEDURE_AVOID_RADIATION: {
-                                    ProcessAvoidArea(apActor_2);
-                                    bevalflag = false;
-                                    break;
-                                }
-                                case PROCEDURE_TAKE_BACK_ITEM: {
-                                    AddToProcedureIndexRunning(apActor_2, 2);
-                                    break;
-                                }
-                                case PROCEDURE_GUARD: {
-                                    bevalflag = false;
-                                    break;
-                                }
-                                case PROCEDURE_USE_WEAPON: {
-                                    ProcessUseWeapon(apActor_2);
-                                    bevalflag = false;
-                                    break;
-                                }
-                                case PROCEDURE_DONE: {
-                                LABEL_81:;
-                                    bevalflag = false;
-                                    break;
-                                }
-                                default: {
-                                    bevalflag = false;
-                                    break;
                                 }
                             }
-                            if (apActor_2->GetCurrentProcessType() == PROCESS_TYPE_MIDDLE_HIGH) {
-                                TESPackage* pPack_2 = GetPackageThatIsRunning();
-                                if (pPack_2) {
-                                    if (pPack_2->ePROCEDURE_TYPE != PACKAGE_PROCEDURE_NONE) {
-                                        uint32_t v7 = pPack_2->ePROCEDURE_TYPE;
-                                        if (Procedure_Action[v7][GetProcedureIndexRunning()] == PROCEDURE_DONE) {
-                                            if (pPack_2->ePROCEDURE_TYPE) {
-                                                if (pPack_2->ePROCEDURE_TYPE == PACKAGE_PROCEDURE_EXPLORE_ACQUIRE ||
-                                                    (pPack_2->GetPackType() == PACKAGE_TYPE_EAT ||
-                                                     pPack_2->GetPackType() == PACKAGE_TYPE_SLEEP)) {
-                                                LABEL_89:;
-                                                    AddToProcedureIndexRunning(apActor_2, -1);
-                                                    return;
-                                                }
-                                            }
-                                            else {
-                                                if (!pPack_2->IsActorAtLocation(apActor_2, false, -1.0f, false)) {
-                                                    goto LABEL_89;
-                                                }
-                                            }
-                                            EndMoveMessage(apActor_2);
-                                            if (pPack_2) {
-                                                if (pPack_2->GetOncePerDay()) {
-                                                    char Day = appCalendar.GetDay();
-                                                    apActor_2->SetRunOnceExtraPackage(pPack_2, Day);
-                                                }
-                                            }
-                                            if (!pPack_2->GetPackageSchedule()->PSData.iDuration) {
-                                                SetTarget(nullptr);
-                                                if (!GetRunOncePackage() || ContinuingPackageforPC()) {
-                                                    TESPackage* v9 = GetCurrentPackage();
-                                                    if (v9->GetIsCreated()) {
-                                                        // Fetches the package once more and does not use it, as the
-                                                        // game does.
-                                                        GetCurrentPackage();
-                                                        TESPackage* v10 = GetCurrentPackage();
-                                                        if (v10->IsInterruptPackage()) {
-                                                            LoadPackageFromExtraData(apActor_2);
-                                                        }
-                                                        else {
-                                                            ClearCurrentPackage();
-                                                        }
-                                                        if (!apActor_2->IsPathingComplete()) {
-                                                            EndMoveMessage(apActor_2);
-                                                        }
-                                                    }
-                                                }
-                                                else {
-                                                    ClearRunOncePackage();
-                                                }
-                                                if (pAcquireObject) {
-                                                    pAcquireObject->Delete(1u);
-                                                }
-                                                pAcquireObject = nullptr;
-                                                pItemBeingUsed = nullptr;
-                                                while (!ObjectList.IsEmpty()) {
-                                                    ObjectstoAcquire* pObject = ObjectList.m_item;
-                                                    if (pObject) {
-                                                        pObject->Delete(1u);
-                                                    }
-                                                    ObjectList.Remove(pObject);
-                                                }
-                                                pGenericLocation = nullptr;
-                                                GenericLocationsList.RemoveAll();
-                                            }
-                                        }
-                                    }
-                                }
+                            ProcessTravel(apActor_2, true, true, 257, false);
+                            bevalflag = apActor_2->GetSitSleepState() == SIT_SLEEP_NORMAL &&
+                                (apActor_2->GetCurrentPackage() &&
+                                 ((v4 = apActor_2->GetCurrentPackage(), v4->GetPackType() != PACKAGE_TYPE_TRAVEL) &&
+                                  ((v14 = apActor_2->GetCurrentPackage(),
+                                    v14->IsActorAtLocation(apActor_2, false, -1.0f, false)) &&
+                                   (apActor_2->pCurrentProcess->eLevel == PROCESS_TYPE_MIDDLE_HIGH &&
+                                    (!pRef || !pRef->IsFurniture())))));
+                            break;
+                        }
+                        case PROCEDURE_WANDER: {
+                            bevalflag = false;
+                            break;
+                        }
+                        case PROCEDURE_ACTIVATE: {
+                            bevalflag = ProcessActivateOneHour(apActor_2);
+                            break;
+                        }
+                        case PROCEDURE_SLEEP: {
+                            bevalflag = false;
+                            break;
+                        }
+                        case PROCEDURE_EAT: {
+                            bevalflag = ProcessEatOneHour(apActor_2);
+                            break;
+                        }
+                        case PROCEDURE_FOLLOW: {
+                            if (apActor_2->GetSitSleepState()) {
+                                ProcessGetUpOneHour(apActor_2);
                             }
-                            pPack = GetPackageThatIsRunning();
+                            bevalflag = ProcessFollowOneHour(apActor_2, 3600.0f, true);
+                            break;
+                        }
+                        case PROCEDURE_ESCORT: {
+                            if (apActor_2->GetSitSleepState()) {
+                                ProcessGetUpOneHour(apActor_2);
+                            }
+                            bevalflag = ProcessEscortOneHour(apActor_2);
+                            break;
+                        }
+                        case PROCEDURE_ALARM: {
+                            if (apActor_2->GetSitSleepState()) {
+                                ProcessGetUpOneHour(apActor_2);
+                            }
+                            ProcessAlarm(apActor_2);
+                            bevalflag = false;
+                            break;
+                        }
+                        case PROCEDURE_COMBAT: {
+                            bevalflag = ProcessCombatOneHour(apActor_2, fTimeDelta);
+                            break;
+                        }
+                        case PROCEDURE_FLEE: {
+                            if (apActor_2->GetSitSleepState()) {
+                                ProcessGetUpOneHour(apActor_2);
+                            }
+                            ProcessFlee(apActor_2);
+                            bevalflag = false;
+                            break;
+                        }
+                        case PROCEDURE_DIALOGUE: {
+                            ProcessDialogue(apActor_2);
+                            bevalflag = false;
+                            break;
+                        }
+                        case PROCEDURE_WAIT: {
+                            TESPackage* v5;
+                            int32_t ipadding;
+                            if (!pTarget) {
+                                SetTargetForPackage(apActor_2);
+                            }
+                            if (!pTarget ||
+                                (pTarget->GetDelete() ||
+                                 (v5 = GetCurrentPackage(),
+                                  (ipadding = v5->GetLocationRadius(apActor_2) == 0 ? 400 : 0,
+                                   pPack->IsActorAtRefTarget(apActor_2, ipadding))))) {
+                                AddToProcedureIndexRunning(apActor_2, 1);
+                            }
+                            bevalflag = false;
+                            break;
+                        }
+                        case PROCEDURE_TRAVEL_TARGET: {
+                            TESPackage* v13;
+                            if (!pTarget) {
+                                SetTargetForPackage(apActor_2);
+                            }
+                            if (!pTarget) {
+                                AddToProcedureIndexRunning(apActor_2, 1);
+                            }
+                            if ((pTarget) &&
+                                (pTarget->IsActor() && pTarget != pPlayer &&
+                                 pPack->GetPackType() == PACKAGE_TYPE_ESCORT)) {
+                                TESPackage* v6 = GetCurrentPackage();
+                                CreateFollowforEscort(apActor_2, v6, true);
+                            }
+
+                            ProcessActivateOneHour(apActor_2);
+                            bevalflag = apActor_2->GetCurrentPackage() &&
+                                ((v13 = apActor_2->GetCurrentPackage(), v13->IsActorAtRefTarget(apActor_2, 0)) &&
+                                 apActor_2->pCurrentProcess->eLevel == PROCESS_TYPE_MIDDLE_HIGH);
+                            break;
+                        }
+                        case PROCEDURE_PURSUE: {
+                            if (apActor_2->GetSitSleepState()) {
+                                ProcessGetUpOneHour(apActor_2);
+                            }
+                            ProcessPursue(apActor_2, false, true, 257);
+                            bevalflag = false;
+                            break;
+                        }
+                        case PROCEDURE_OBSERVE_COMBAT: {
+                            AddToProcedureIndexRunning(apActor_2, 1);
+                            goto LABEL_81;
+                        }
+                        case PROCEDURE_GET_UP: {
+                            ProcessGetUpOneHour(apActor_2);
+                            AddToProcedureIndexRunning(apActor_2, 1);
+                            break;
+                        }
+                        case PROCEDURE_MOUNT_HORSE: {
+                            AddToProcedureIndexRunning(apActor_2, 1);
+                            bevalflag = false;
+                            break;
+                        }
+                        case PROCEDURE_NOTIFY: {
+                            ProcessNotify(apActor_2);
+                            bevalflag = false;
+                            break;
+                        }
+                        case PROCEDURE_ACCOMPANY: {
+                            ProcessAccompanyOneHour(apActor_2);
+                            bevalflag = false;
+                            break;
+                        }
+                        case PROCEDURE_USE_ITEM_AT: {
+                            ProcessUseItemAt(apActor_2);
+                            bevalflag = false;
+                            break;
+                        }
+                        case PROCEDURE_CHOOSE_CAST: {
+                            bevalflag = false;
+                            break;
+                        }
+                        case PROCEDURE_REMOVE_WORN_ITEMS: {
+                            ProcessRemoveWorn(apActor_2, true, false);
+                            bevalflag = false;
+                            break;
+                        }
+                        case PROCEDURE_AVOID_RADIATION: {
+                            ProcessAvoidArea(apActor_2);
+                            bevalflag = false;
+                            break;
+                        }
+                        case PROCEDURE_TAKE_BACK_ITEM: {
+                            AddToProcedureIndexRunning(apActor_2, 2);
+                            break;
+                        }
+                        case PROCEDURE_GUARD: {
+                            bevalflag = false;
+                            break;
+                        }
+                        case PROCEDURE_USE_WEAPON: {
+                            ProcessUseWeapon(apActor_2);
+                            bevalflag = false;
+                            break;
+                        }
+                        case PROCEDURE_DONE: {
+                        LABEL_81:;
+                            bevalflag = false;
+                            break;
+                        }
+                        default: {
+                            bevalflag = false;
+                            break;
                         }
                     }
+                    if (apActor_2->GetCurrentProcessType() == PROCESS_TYPE_MIDDLE_HIGH) {
+                        TESPackage* pPack_2 = GetPackageThatIsRunning();
+                        if ((pPack_2) && (pPack_2->ePROCEDURE_TYPE != PACKAGE_PROCEDURE_NONE)) {
+                            uint32_t v7 = pPack_2->ePROCEDURE_TYPE;
+                            if (Procedure_Action[v7][GetProcedureIndexRunning()] == PROCEDURE_DONE) {
+                                if (pPack_2->ePROCEDURE_TYPE) {
+                                    if (pPack_2->ePROCEDURE_TYPE == PACKAGE_PROCEDURE_EXPLORE_ACQUIRE ||
+                                        (pPack_2->GetPackType() == PACKAGE_TYPE_EAT ||
+                                         pPack_2->GetPackType() == PACKAGE_TYPE_SLEEP)) {
+                                    LABEL_89:;
+                                        AddToProcedureIndexRunning(apActor_2, -1);
+                                        return;
+                                    }
+                                }
+                                else {
+                                    if (!pPack_2->IsActorAtLocation(apActor_2, false, -1.0f, false)) {
+                                        goto LABEL_89;
+                                    }
+                                }
+                                EndMoveMessage(apActor_2);
+                                if ((pPack_2) && (pPack_2->GetOncePerDay())) {
+                                    char Day = appCalendar.GetDay();
+                                    apActor_2->SetRunOnceExtraPackage(pPack_2, Day);
+                                }
+
+                                if (!pPack_2->GetPackageSchedule()->PSData.iDuration) {
+                                    SetTarget(nullptr);
+                                    if (!GetRunOncePackage() || ContinuingPackageforPC()) {
+                                        TESPackage* v9 = GetCurrentPackage();
+                                        if (v9->GetIsCreated()) {
+                                            // Fetches the package once more and does not use it, as the
+                                            // game does.
+                                            GetCurrentPackage();
+                                            TESPackage* v10 = GetCurrentPackage();
+                                            if (v10->IsInterruptPackage()) {
+                                                LoadPackageFromExtraData(apActor_2);
+                                            }
+                                            else {
+                                                ClearCurrentPackage();
+                                            }
+                                            if (!apActor_2->IsPathingComplete()) {
+                                                EndMoveMessage(apActor_2);
+                                            }
+                                        }
+                                    }
+                                    else {
+                                        ClearRunOncePackage();
+                                    }
+                                    if (pAcquireObject) {
+                                        pAcquireObject->Delete(1u);
+                                    }
+                                    pAcquireObject = nullptr;
+                                    pItemBeingUsed = nullptr;
+                                    while (!ObjectList.IsEmpty()) {
+                                        ObjectstoAcquire* pObject = ObjectList.m_item;
+                                        if (pObject) {
+                                            pObject->Delete(1u);
+                                        }
+                                        ObjectList.Remove(pObject);
+                                    }
+                                    pGenericLocation = nullptr;
+                                    GenericLocationsList.RemoveAll();
+                                }
+                            }
+                        }
+                    }
+                    pPack = GetPackageThatIsRunning();
                 }
             }
         }
+
         if (!apActor_2->IsWaitingOnPath()) {
             BaseProcess* CurrentAIProcess = apRef->pCurrentProcess;
             CurrentAIProcess->ComputeLastTimeProcessed();
@@ -828,13 +819,11 @@ void MiddleHighProcess::Update(MobileObject* apRef) {
                     PackageSchedule* psched = pPack->GetPackageSchedule();
                     if (!psched || static_cast<double>(psched->PSData.iDuration) <= 0.0) {
                         const TESPatrolPackageData* ppatrolData = pPack->GetPatrolPackageData();
-                        if (ppatrolData) {
-                            if (!ppatrolData->bRepeatable) {
-                                SetCurrentActionComplete(true);
-                                ClearCurrentDataforProcess(apActor);
-                                ClearCurrentPackage();
-                                CheckforNewPackage(apActor, true);
-                            }
+                        if ((ppatrolData) && (!ppatrolData->bRepeatable)) {
+                            SetCurrentActionComplete(true);
+                            ClearCurrentDataforProcess(apActor);
+                            ClearCurrentPackage();
+                            CheckforNewPackage(apActor, true);
                         }
                     }
                     return;
@@ -910,11 +899,10 @@ bool MiddleHighProcess::CheckforNewPackage(Actor* apActor, bool abFlag) {
     bool bnewPackage = false;
     TESPackage* prev = apActor->GetCurrentPackage();
     bool bRedress = false;
-    if (prev) {
-        if (prev->GetPackType() == PACKAGE_TYPE_SLEEP || prev->GetForceUnequipWeapon()) {
-            bRedress = true;
-        }
+    if ((prev) && (prev->GetPackType() == PACKAGE_TYPE_SLEEP || prev->GetForceUnequipWeapon())) {
+        bRedress = true;
     }
+
     if (abFlag || (!GetCurrentPackage() || iHourPackageEvaluated != static_cast<int32_t>(fhour))) {
         bnewPackage = LowProcess::CheckforNewPackage(apActor, abFlag);
         iHourPackageEvaluated = static_cast<int32_t>(fhour);
@@ -1008,19 +996,18 @@ bool MiddleHighProcess::SetTargetForPackage(Actor* apActor) {
         SetTarget(nullptr);
         return false;
     }
-    else {
-        if (pTarget->GetDelete()) {
-            extra = pTarget->TESObjectREFR::GetExtra();
-            if (extra->GetReferencePointer()) {
-                v5 = pTarget->TESObjectREFR::GetExtra();
-                referencePointer = v5->GetReferencePointer();
-                SetTarget(referencePointer);
-            }
+
+    if (pTarget->GetDelete()) {
+        extra = pTarget->TESObjectREFR::GetExtra();
+        if (extra->GetReferencePointer()) {
+            v5 = pTarget->TESObjectREFR::GetExtra();
+            referencePointer = v5->GetReferencePointer();
+            SetTarget(referencePointer);
         }
-        lastSeenPostion = pTarget->GetLocationOnReference();
-        pTarget->SetTargeted(true);
-        return true;
     }
+    lastSeenPostion = pTarget->GetLocationOnReference();
+    pTarget->SetTargeted(true);
+    return true;
 }
 
 TESObjectREFR* MiddleHighProcess::SetLocationForPackage(Actor* apActor, bool bSecondLoc) {
@@ -1322,10 +1309,8 @@ bool MiddleHighProcess::IsItemQueued(TESBoundObject* apObject, ExtraDataList* ap
     for (BSSimpleList<QueuedItem*>* plist = pListItemstoEquipUnequip; plist && (plist->m_item && !bflag);
          plist = plist->m_pkNext) {
         QueuedItem* pitem = plist->m_item;
-        if (pitem) {
-            if (pitem->bEquip == abEquipped && pitem->pObject == apObject) {
-                bflag = apExtra == pitem->pExtra;
-            }
+        if ((pitem) && (pitem->bEquip == abEquipped && pitem->pObject == apObject)) {
+            bflag = apExtra == pitem->pExtra;
         }
     }
     return bflag;
@@ -1505,11 +1490,10 @@ void MiddleHighProcess::ForceWeaponDrawnSheathed(bool abDrawn, BipedAnim* apBipe
     }
     if (pweaponBone) {
         NiAVObject* pobj = pweaponBone->GetAtChecked(0);
-        if (pobj) {
-            if (abDrawn) {
-                pobj->SetAppCulled(false);
-            }
+        if ((pobj) && (abDrawn)) {
+            pobj->SetAppCulled(false);
         }
+
         if (apActor == pPlayer) {
             ReparentWeapon(abDrawn, apBiped, apAnim, apActor);
         }
@@ -1553,47 +1537,40 @@ void MiddleHighProcess::ForceWeaponDrawnSheathed(bool abDrawn, BipedAnim* apBipe
     else {
         if (this->pWeapon && pSaveLoadGame->GetSaveGameLoading()) {
             TESObjectWEAP* pWeapon = static_cast<TESObjectWEAP*>(this->pWeapon->pContainerObj);
-            if (pWeapon) {
-                if (!pWeapon->IsEmbeddedWeapon()) {
-                    bNeedReparentWeapon = true;
-                    bDrawn = abDrawn;
-                }
+            if ((pWeapon) && (!pWeapon->IsEmbeddedWeapon())) {
+                bNeedReparentWeapon = true;
+                bDrawn = abDrawn;
             }
         }
         else {
             if (this->pWeapon) {
                 TESObjectWEAP* v32 = static_cast<TESObjectWEAP*>(this->pWeapon->pContainerObj);
-                if (v32) {
-                    if (!v32->IsEmbeddedWeapon()) {
-                        bNeedReparentWeapon = true;
-                        bDrawn = abDrawn;
-                    }
+                if ((v32) && (!v32->IsEmbeddedWeapon())) {
+                    bNeedReparentWeapon = true;
+                    bDrawn = abDrawn;
                 }
             }
         }
     }
-    if (apAnim) {
-        if (apAnim->pAccumRoot) {
-            if (!Interface::IsInPipboyMenu() && apAnim->GetGroup(AGS_IDLE) != 1) {
-                if (apActor == pPlayer) {
-                    ItemChange* apWeaponItem;
-                    bool v24 = abDrawn && this->pWeapon == nullptr;
-                    if (abDrawn) {
-                        apWeaponItem = this->pWeapon;
-                    }
-                    else {
-                        // -1 is GetAnimGroup's "no weapon" value.
-                        apWeaponItem = reinterpret_cast<ItemChange*>(static_cast<uintptr_t>(-1));
-                    }
-                    uint16_t AnimGroup = apActor->GetAnimGroup(ANIM_GROUP_IDLE, apWeaponItem, v24, apAnim);
-                    apAnim->PlayGroup(AnimGroup, ACTION_START, -1, AGS_NONE);
-                }
-                else {
-                    AddPostAnimationAction(BaseProcess::POSTANIM_ACTION_EQUIP_UNEQUIP_WEAPON);
-                }
+    if ((apAnim) && (apAnim->pAccumRoot) && (!Interface::IsInPipboyMenu() && apAnim->GetGroup(AGS_IDLE) != 1)) {
+        if (apActor == pPlayer) {
+            ItemChange* apWeaponItem;
+            bool v24 = abDrawn && this->pWeapon == nullptr;
+            if (abDrawn) {
+                apWeaponItem = this->pWeapon;
             }
+            else {
+                // -1 is GetAnimGroup's "no weapon" value.
+                apWeaponItem = reinterpret_cast<ItemChange*>(static_cast<uintptr_t>(-1));
+            }
+            uint16_t AnimGroup = apActor->GetAnimGroup(ANIM_GROUP_IDLE, apWeaponItem, v24, apAnim);
+            apAnim->PlayGroup(AnimGroup, ACTION_START, -1, AGS_NONE);
+        }
+        else {
+            AddPostAnimationAction(BaseProcess::POSTANIM_ACTION_EQUIP_UNEQUIP_WEAPON);
         }
     }
+
     if (abDrawn &&
         (GetCurrentWeapon() &&
          (apAnim &&
@@ -1613,15 +1590,11 @@ void MiddleHighProcess::ForceWeaponDrawnSheathed(bool abDrawn, BipedAnim* apBipe
         }
     }
     else {
-        if (!abDrawn || !GetCurrentWeapon()) {
-            if (apAnim) {
-                if (apAnim->GetCurrentSequence(AGS_LEFT_ARM)) {
-                    BSAnimGroupSequence* CurrentSequence = apAnim->GetCurrentSequence(AGS_LEFT_ARM);
-                    ANIM_GROUP_ENUM Type = CurrentSequence->GetAnimGroup()->GetType();
-                    if (Type >= ANIM_GROUP_HAND_GRIP_1 && Type <= ANIM_GROUP_HAND_GRIP_6) {
-                        apAnim->BlendOut(AGS_LEFT_ARM, false);
-                    }
-                }
+        if ((!abDrawn || !GetCurrentWeapon()) && (apAnim) && (apAnim->GetCurrentSequence(AGS_LEFT_ARM))) {
+            BSAnimGroupSequence* CurrentSequence = apAnim->GetCurrentSequence(AGS_LEFT_ARM);
+            ANIM_GROUP_ENUM Type = CurrentSequence->GetAnimGroup()->GetType();
+            if (Type >= ANIM_GROUP_HAND_GRIP_1 && Type <= ANIM_GROUP_HAND_GRIP_6) {
+                apAnim->BlendOut(AGS_LEFT_ARM, false);
             }
         }
     }
@@ -1635,47 +1608,46 @@ void MiddleHighProcess::ForceWeaponDrawnSheathed(bool abDrawn, BipedAnim* apBipe
     if (this->pWeapon) {
         pweapon = static_cast<TESObjectWEAP*>(this->pWeapon->pContainerObj);
     }
-    if (pweapon) {
-        if (pweapon->GetIdleSound()) {
-            TESSound* IdleSound = pweapon->GetIdleSound();
-            if (IdleSound->GetFilename()) {
-                BSSoundHandle hweapIdle;
-                (&apActor->m_Extra)->GetWeaponIdleSound(hweapIdle);
-                if (!hweapIdle.IsValid()) {
-                    TESSound* v11 = pweapon->GetIdleSound();
-                    uint32_t iloopFlags = TESSound::ConvertLoopFlag(v11->GetData().iFlags);
-                    uint32_t iplayerFlag = pPlayer != apActor
-                        ? 0
-                        : static_cast<BSGameSound::SoundFlags>(
-                              BSGameSound::SOUND_FLAG_FIRST_PERSON | BSGameSound::SOUND_FLAG_IGNORE_TIMESCALE
-                          );
-                    bool IsActually3rdPerson = pPlayer->IsActually3rdPerson();
-                    iplayerFlag ^= IsActually3rdPerson ? BSGameSound::SOUND_FLAG_FIRST_PERSON : 0;
-                    TESSound* v20 = pweapon->GetIdleSound();
-                    uint32_t v19 = iplayerFlag | (iloopFlags | BSGameSound::SOUND_FLAG_IS_3D);
-                    TESSound* v14 = pweapon->GetIdleSound();
-                    const char* Filename = v14->GetFilename();
-                    BSAudio* v15 = &BSAudio::QInstance();
-                    BSSoundHandle* arHandle = v15->GetSoundHandleByFilename(&out, Filename, v19, v20);
-                    hweapIdle.operator=(*arHandle);
-                    hweapIdle.bAssumeSuccess = true;
-                    NiNode* v16 = apActor->Get3D();
-                    hweapIdle.SetObjectToFollow(v16);
-                    const NiPoint3* v17 = &apActor->GetLocationOnReference();
-                    hweapIdle.SetPosition(*v17);
-                }
-                if (!abDrawn || hweapIdle.IsPlaying()) {
-                    if (!abDrawn && hweapIdle.IsPlaying()) {
-                        hweapIdle.Stop();
-                    }
-                }
-                else {
-                    hweapIdle.Play(false);
-                }
-                (&apActor->m_Extra)->SetWeaponIdleSound(hweapIdle);
+    if ((pweapon) && (pweapon->GetIdleSound())) {
+        TESSound* IdleSound = pweapon->GetIdleSound();
+        if (IdleSound->GetFilename()) {
+            BSSoundHandle hweapIdle;
+            (&apActor->m_Extra)->GetWeaponIdleSound(hweapIdle);
+            if (!hweapIdle.IsValid()) {
+                TESSound* v11 = pweapon->GetIdleSound();
+                uint32_t iloopFlags = TESSound::ConvertLoopFlag(v11->GetData().iFlags);
+                uint32_t iplayerFlag = pPlayer != apActor
+                    ? 0
+                    : static_cast<BSGameSound::SoundFlags>(
+                          BSGameSound::SOUND_FLAG_FIRST_PERSON | BSGameSound::SOUND_FLAG_IGNORE_TIMESCALE
+                      );
+                bool IsActually3rdPerson = pPlayer->IsActually3rdPerson();
+                iplayerFlag ^= IsActually3rdPerson ? BSGameSound::SOUND_FLAG_FIRST_PERSON : 0;
+                TESSound* v20 = pweapon->GetIdleSound();
+                uint32_t v19 = iplayerFlag | (iloopFlags | BSGameSound::SOUND_FLAG_IS_3D);
+                TESSound* v14 = pweapon->GetIdleSound();
+                const char* Filename = v14->GetFilename();
+                BSAudio* v15 = &BSAudio::QInstance();
+                BSSoundHandle* arHandle = v15->GetSoundHandleByFilename(&out, Filename, v19, v20);
+                hweapIdle.operator=(*arHandle);
+                hweapIdle.bAssumeSuccess = true;
+                NiNode* v16 = apActor->Get3D();
+                hweapIdle.SetObjectToFollow(v16);
+                const NiPoint3* v17 = &apActor->GetLocationOnReference();
+                hweapIdle.SetPosition(*v17);
             }
+            if (!abDrawn || hweapIdle.IsPlaying()) {
+                if (!abDrawn && hweapIdle.IsPlaying()) {
+                    hweapIdle.Stop();
+                }
+            }
+            else {
+                hweapIdle.Play(false);
+            }
+            (&apActor->m_Extra)->SetWeaponIdleSound(hweapIdle);
         }
     }
+
     apActor->SetWalkRunFlagDirty();
 }
 
@@ -1687,40 +1659,34 @@ void MiddleHighProcess::UpdateReparentWeapon(Actor* apActor) {
     BSSimpleList<const char*>* apFileList;
     uint32_t a5;
     TESObjectWEAP* formFlags;
-    if (bNeedReparentWeapon) {
-        if (apActor->Get3D()) {
-            if (pAnimation) {
-                if (pWeapon) {
-                    formFlags = static_cast<TESObjectWEAP*>(pWeapon->ItemChange::GetItemChangeObject());
-                    a5 = weaponToAnimGroupWeapon[formFlags->GetWeaponType()];
-                    if (!pAnimation->GetAnimsLoading()) {
-                        if (pAnimation->GetControllerManager()) {
-                            v2 = TESAnimGroup::AnimGroup(
-                                AGM_NONE, static_cast<ANIM_GROUP_WEAPON_ENUM>(a5), ANIM_GROUP_WEAPONS_START, false
-                            );
-                            if ((!pAnimation->GroupLoaded(v2)) && (!apActor->IsDead(true))) {
-                                model = apActor->GetModel();
-                                apFileList = pModelLoader->BuildKFFileList(
-                                    model, true, false, static_cast<ANIM_GROUP_WEAPON_ENUM>(a5)
-                                );
-                                pAnimation->AddAnimationsFromList(apFileList);
-                            }
-                        }
-                    }
+    if ((bNeedReparentWeapon) && (apActor->Get3D())) {
+        if ((pAnimation) && (pWeapon)) {
+            formFlags = static_cast<TESObjectWEAP*>(pWeapon->ItemChange::GetItemChangeObject());
+            a5 = weaponToAnimGroupWeapon[formFlags->GetWeaponType()];
+            if ((!pAnimation->GetAnimsLoading()) && (pAnimation->GetControllerManager())) {
+                v2 = TESAnimGroup::AnimGroup(
+                    AGM_NONE, static_cast<ANIM_GROUP_WEAPON_ENUM>(a5), ANIM_GROUP_WEAPONS_START, false
+                );
+                if ((!pAnimation->GroupLoaded(v2)) && (!apActor->IsDead(true))) {
+                    model = apActor->GetModel();
+                    apFileList =
+                        pModelLoader->BuildKFFileList(model, true, false, static_cast<ANIM_GROUP_WEAPON_ENUM>(a5));
+                    pAnimation->AddAnimationsFromList(apFileList);
                 }
             }
-            if ((!pAnimation) || (!pAnimation->GetAnimsLoading())) {
-                if (apActor->TESObjectREFR::IsDead(false)) {
-                    apActor->RemoveWeapon();
-                }
-                else {
-                    v5 = apActor->GetAnimation();
-                    v4 = apActor->GetBiped();
-                    ReparentWeapon(bWeaponDrawn, v4, v5, apActor);
-                }
-                bNeedReparentWeapon = false;
-                bDrawn = false;
+        }
+
+        if ((!pAnimation) || (!pAnimation->GetAnimsLoading())) {
+            if (apActor->TESObjectREFR::IsDead(false)) {
+                apActor->RemoveWeapon();
             }
+            else {
+                v5 = apActor->GetAnimation();
+                v4 = apActor->GetBiped();
+                ReparentWeapon(bWeaponDrawn, v4, v5, apActor);
+            }
+            bNeedReparentWeapon = false;
+            bDrawn = false;
         }
     }
 }
@@ -1799,18 +1765,16 @@ ActorPackageData* MiddleHighProcess::GetInstanceDataThatIsRunning() {
     if (GetRunOncePackage()) {
         return GetRunOncePackageInstanceData();
     }
-    else {
-        return BaseProcess::GetInstanceDataThatIsRunning();
-    }
+
+    return BaseProcess::GetInstanceDataThatIsRunning();
 }
 
 ActorPackage* MiddleHighProcess::GetActorPackageThatIsRunning() {
     if (GetRunOncePackage()) {
         return &RunOncePackage;
     }
-    else {
-        return &CurrentPackage;
-    }
+
+    return &CurrentPackage;
 }
 
 TESPackage* MiddleHighProcess::GetPackageThatIsRunning() {
@@ -1858,19 +1822,17 @@ void MiddleHighProcess::AddToProcedureIndexRunning(MobileObject* apActor, int32_
     if (GetProcedureIndexRunning() < 0) {
         SetProcedureIndexRunning(0);
     }
-    if (pPack) {
-        if (pPack->ePROCEDURE_TYPE != PACKAGE_PROCEDURE_NONE) {
-            PACKAGE_PROCEDURE_TYPE Count = pPack->ePROCEDURE_TYPE;
-            int32_t irange = Procedure::GetProcedureCount(Count);
-            if (GetProcedureIndexRunning() >= irange) {
-                SetProcedureIndexRunning(irange - 1);
-            }
-            uint32_t v4 = pPack->ePROCEDURE_TYPE;
-            if (Procedure_Action[v4][GetProcedureIndexRunning()] == PROCEDURE_DONE && !IsPackageDoneOnce()) {
-                Script::SetActionFlag(pPack, &apActor->m_Extra, SCRIPT_ACTION_ONPACKAGEEND);
-                PackageDone(static_cast<Actor*>(apActor), pPack);
-                SetPackageDoneOnce(true);
-            }
+    if ((pPack) && (pPack->ePROCEDURE_TYPE != PACKAGE_PROCEDURE_NONE)) {
+        PACKAGE_PROCEDURE_TYPE Count = pPack->ePROCEDURE_TYPE;
+        int32_t irange = Procedure::GetProcedureCount(Count);
+        if (GetProcedureIndexRunning() >= irange) {
+            SetProcedureIndexRunning(irange - 1);
+        }
+        uint32_t v4 = pPack->ePROCEDURE_TYPE;
+        if (Procedure_Action[v4][GetProcedureIndexRunning()] == PROCEDURE_DONE && !IsPackageDoneOnce()) {
+            Script::SetActionFlag(pPack, &apActor->m_Extra, SCRIPT_ACTION_ONPACKAGEEND);
+            PackageDone(static_cast<Actor*>(apActor), pPack);
+            SetPackageDoneOnce(true);
         }
     }
 }
@@ -1994,17 +1956,14 @@ void MiddleHighProcess::ProcessPursue(Actor* apActor, bool abNewpackage, bool ab
     if (!apActor->IsPathingComplete()) {
         EndMoveMessage(apActor);
     }
-    if (pTarget) {
-        if (dynamic_cast<HighProcess*>(apActor->pCurrentProcess)) {
-            if (apActor->pCurrentProcess) {
-                BaseProcess* CurrentAIProcess = apActor->pCurrentProcess;
-                if (CurrentAIProcess->GetSitSleepState() == SIT_SLEEP_NORMAL) {
-                    NiPoint3 v17 = pTarget->GetLocationOnReference();
-                    apActor->RequestRotate(v17, false);
-                }
-            }
+    if ((pTarget) && (dynamic_cast<HighProcess*>(apActor->pCurrentProcess)) && (apActor->pCurrentProcess)) {
+        BaseProcess* CurrentAIProcess = apActor->pCurrentProcess;
+        if (CurrentAIProcess->GetSitSleepState() == SIT_SLEEP_NORMAL) {
+            NiPoint3 v17 = pTarget->GetLocationOnReference();
+            apActor->RequestRotate(v17, false);
         }
     }
+
     if (pTresPack) {
         int32_t iwarning;
         Actor* pact = dynamic_cast<Actor*>(pTarget);
@@ -2012,14 +1971,14 @@ void MiddleHighProcess::ProcessPursue(Actor* apActor, bool abNewpackage, bool ab
             AddToProcedureIndexRunning(apActor, 2);
             return;
         }
-        if (!pTresPack->iwarninglevel ||
-            ((iwarning = pTresPack->iwarning, iwarning > pTresPack->iwarninglevel) &&
-             pTresPack->fwarningtimer <= 0.0)) {
-            if (apact) {
-                apact->TrespassAlarm(apActor, nullptr, -1);
-                return;
-            }
+        if ((!pTresPack->iwarninglevel ||
+             ((iwarning = pTresPack->iwarning, iwarning > pTresPack->iwarninglevel) &&
+              pTresPack->fwarningtimer <= 0.0)) &&
+            (apact)) {
+            apact->TrespassAlarm(apActor, nullptr, -1);
+            return;
         }
+
         if (pTresPack->fwarningtimer <= 0.0) {
             AddToProcedureIndexRunning(apActor, 1);
             return;
@@ -2034,34 +1993,31 @@ void MiddleHighProcess::ProcessPursue(Actor* apActor, bool abNewpackage, bool ab
     }
     Character* pchar = dynamic_cast<Character*>(pTarget);
     Actor* ptargetactor = dynamic_cast<Actor*>(pTarget);
-    if (apActor->IsAlarmed()) {
-        if (ptargetactor) {
-            if (pchar == pPlayer) {
-                if (pTarget == pPlayer && (pPlayer->IsSleepingorResting() && !pPlayer->btransporting)) {
-                    pPlayer->SetSleeping(0, true);
-                }
-                else {
-                    if (GetTalkingtoPC() || pPlayer->IsPlayerResistingArrest()) {
-                        if (pPlayer->IsPlayerResistingArrest()) {
-                            EnterCombat(
-                                apActor, pPlayer, false, false, nullptr, false, false, false, 0, false, false, true,
-                                nullptr
-                            );
-                        }
-                    }
-                    else {
-                        if (pPlayer->Activate(apActor, false, nullptr, 1)) {
-                            AddToProcedureIndexRunning(apActor, 1);
-                        }
-                    }
-                }
+    if ((apActor->IsAlarmed()) && (ptargetactor)) {
+        if (pchar == pPlayer) {
+            if (pTarget == pPlayer && (pPlayer->IsSleepingorResting() && !pPlayer->btransporting)) {
+                pPlayer->SetSleeping(0, true);
             }
             else {
-                AddToProcedureIndexRunning(apActor, 2);
-                EnterCombat(
-                    apActor, ptargetactor, false, false, nullptr, false, false, false, 0, false, false, true, nullptr
-                );
+                if (GetTalkingtoPC() || pPlayer->IsPlayerResistingArrest()) {
+                    if (pPlayer->IsPlayerResistingArrest()) {
+                        EnterCombat(
+                            apActor, pPlayer, false, false, nullptr, false, false, false, 0, false, false, true, nullptr
+                        );
+                    }
+                }
+                else {
+                    if (pPlayer->Activate(apActor, false, nullptr, 1)) {
+                        AddToProcedureIndexRunning(apActor, 1);
+                    }
+                }
             }
+        }
+        else {
+            AddToProcedureIndexRunning(apActor, 2);
+            EnterCombat(
+                apActor, ptargetactor, false, false, nullptr, false, false, false, 0, false, false, true, nullptr
+            );
         }
     }
 }
@@ -2235,14 +2191,14 @@ bool MiddleHighProcess::SitOrSleep(Actor* apActor) {
                 break;
             }
             HighProcess* phigh = dynamic_cast<HighProcess*>(this);
-            if (phigh) {
-                if (phigh->GetCurrentProcessIdle() ||
-                    (apActor->IsAnimIdleQuequed() || (panim->SpecialIdleWorking() || panim->SpecialIdlePlaying()))) {
-                    phigh->SetCurrentProcessIdle(nullptr);
-                    phigh->ClearPostAnimationActions();
-                    panim->SpecialIdleFree(true, true);
-                }
+            if ((phigh) &&
+                (phigh->GetCurrentProcessIdle() ||
+                 (apActor->IsAnimIdleQuequed() || (panim->SpecialIdleWorking() || panim->SpecialIdlePlaying())))) {
+                phigh->SetCurrentProcessIdle(nullptr);
+                phigh->ClearPostAnimationActions();
+                panim->SpecialIdleFree(true, true);
             }
+
             if (apActor->IsPc()) {
                 HUDMainMenu::SetMenuMode(HUDMainMenu::HMM_SIT_SLEEP_ANIM);
             }
@@ -2261,28 +2217,26 @@ bool MiddleHighProcess::SitOrSleep(Actor* apActor) {
                 SetSitSleepState(apActor, SIT_SLEEP_NORMAL, nullptr, 127);
                 return true;
             }
-            if (ppack) {
-                if (ppack->GetPackType() != PACKAGE_TYPE_SANDMAN) {
-                    uint32_t v4;
-                    if (bsleeping) {
-                        SetSitSleepState(apActor, SIT_SLEEP_LOAD_SLEEP_IDLE, pCurrentFurniture, cCurrentFurnitureIndex);
-                    }
-                    else {
-                        SetSitSleepState(apActor, SIT_SLEEP_LOAD_SIT_IDLE, pCurrentFurniture, cCurrentFurnitureIndex);
-                    }
-                    if (bsleeping || (v4 = FurnitureMarker.GetType(), TESFurniture::IsSitMarker(v4))) {
-                        if (!LoadDynamicIdle(apActor)) {
-                            int32_t a2 = cCurrentFurnitureIndex;
-                            const char* afWalkSpeed = pCurrentFurniture->GetFormEditorID();
-                            Warning(
-                                "AI: Missing furniture dynamic idle for marker %d in the editor's idle manager. '%s' "
-                                "index %d.",
-                                FurnitureMarker.GetType(), afWalkSpeed, a2
-                            );
-                        }
-                    }
+            if ((ppack) && (ppack->GetPackType() != PACKAGE_TYPE_SANDMAN)) {
+                uint32_t v4;
+                if (bsleeping) {
+                    SetSitSleepState(apActor, SIT_SLEEP_LOAD_SLEEP_IDLE, pCurrentFurniture, cCurrentFurnitureIndex);
+                }
+                else {
+                    SetSitSleepState(apActor, SIT_SLEEP_LOAD_SIT_IDLE, pCurrentFurniture, cCurrentFurnitureIndex);
+                }
+                if ((bsleeping || (v4 = FurnitureMarker.GetType(), TESFurniture::IsSitMarker(v4))) &&
+                    (!LoadDynamicIdle(apActor))) {
+                    int32_t a2 = cCurrentFurnitureIndex;
+                    const char* afWalkSpeed = pCurrentFurniture->GetFormEditorID();
+                    Warning(
+                        "AI: Missing furniture dynamic idle for marker %d in the editor's idle manager. '%s' "
+                        "index %d.",
+                        FurnitureMarker.GetType(), afWalkSpeed, a2
+                    );
                 }
             }
+
             SetCurrentProcessAnimIdleLoaded(nullptr, nullptr);
             RemovePostAnimationAction(BaseProcess::POSTANIM_ACTION_IDLE_LOADED);
             RemovePostAnimationAction(BaseProcess::POSTANIM_ACTION_PLAY_IDLE);
@@ -2342,14 +2296,12 @@ bool MiddleHighProcess::SitOrSleep(Actor* apActor) {
                 }
             }
             if (!panim->SpecialIdleDonePlaying()) {
-                if (!panim->GetSpecialIdleSequence()) {
-                    if (panim->spAnimIdle.m_pObject) {
-                        if (panim->spAnimIdle.m_pObject->eFlags == AnimIdle::ANIM_IDLE_DONE_PLAYING) {
-                            apActor->GetOutofFurnitureQuick();
-                            panim->SpecialIdleFree(true, false);
-                        }
-                    }
+                if ((!panim->GetSpecialIdleSequence()) && (panim->spAnimIdle.m_pObject) &&
+                    (panim->spAnimIdle.m_pObject->eFlags == AnimIdle::ANIM_IDLE_DONE_PLAYING)) {
+                    apActor->GetOutofFurnitureQuick();
+                    panim->SpecialIdleFree(true, false);
                 }
+
                 return true;
             }
             if (!apActor->GetSandman()) {
@@ -2450,168 +2402,164 @@ bool MiddleHighProcess::ProcessGetUp(Actor* apActor) {
         if (cSitSleepState == 4 && bsleeping) {
             return false;
         }
-        else {
-            if (cSitSleepState != 9 || bsleeping) {
-                switch (cSitSleepState) {
-                    case 3: {
-                        if (GetFurnitureMarkerID() > 20) {
-                            panim->SetLoopCount(AGS_MOVEMENT, 0);
-                            if (GetCurrentFurniture()) {
-                                uint32_t afWalkSpeed = GetCurrentFurnitureIndex();
-                                TESObjectREFR* v4 = GetCurrentFurniture();
-                                v4->SetMarkerUsed(afWalkSpeed, false);
+
+        if (cSitSleepState != 9 || bsleeping) {
+            switch (cSitSleepState) {
+                case 3: {
+                    if (GetFurnitureMarkerID() > 20) {
+                        panim->SetLoopCount(AGS_MOVEMENT, 0);
+                        if (GetCurrentFurniture()) {
+                            uint32_t afWalkSpeed = GetCurrentFurnitureIndex();
+                            TESObjectREFR* v4 = GetCurrentFurniture();
+                            v4->SetMarkerUsed(afWalkSpeed, false);
+                        }
+                        SetSitSleepState(apActor, SIT_SLEEP_WANT_TO_STAND, pCurrentFurniture, cCurrentFurnitureIndex);
+                    }
+                    goto LABEL_63;
+                }
+                case 4:
+                case 9: {
+                    if (apActor->IsPc()) {
+                        HUDMainMenu::SetMenuMode(HUDMainMenu::HMM_SIT_SLEEP_ANIM);
+                    }
+                    if (panim->SpecialIdleWorking()) {
+                        result = true;
+                    }
+                    else {
+                        TESIdleForm* pidle;
+                        if (bsleeping) {
+                            BSFaceGenAnimationData* panimData = apActor->GetFaceAnimationData();
+                            if (panimData) {
+                                panimData->SetDead(false, false);
                             }
+                            SetSitSleepState(
+                                apActor, SIT_SLEEP_WANT_TO_WAKE, pCurrentFurniture, cCurrentFurnitureIndex
+                            );
+                        }
+                        else {
                             SetSitSleepState(
                                 apActor, SIT_SLEEP_WANT_TO_STAND, pCurrentFurniture, cCurrentFurnitureIndex
                             );
                         }
-                        goto LABEL_63;
-                    }
-                    case 4:
-                    case 9: {
-                        if (apActor->IsPc()) {
-                            HUDMainMenu::SetMenuMode(HUDMainMenu::HMM_SIT_SLEEP_ANIM);
-                        }
-                        if (panim->SpecialIdleWorking()) {
+                        pidle = pIdleManager->GetIdleToPlay(apActor, pCurrentFurniture);
+                        if (pidle) {
+                            ANIM_GROUP_SECTION IdleAnimGroupSection;
+                            IdleAnimGroupSection = pidle->GetIdleAnimGroupSection();
+                            panim->SpecialIdleQueue(pidle, IdleAnimGroupSection);
+                        LABEL_63:;
                             result = true;
                         }
                         else {
-                            TESIdleForm* pidle;
-                            if (bsleeping) {
-                                BSFaceGenAnimationData* panimData = apActor->GetFaceAnimationData();
-                                if (panimData) {
-                                    panimData->SetDead(false, false);
-                                }
-                                SetSitSleepState(
-                                    apActor, SIT_SLEEP_WANT_TO_WAKE, pCurrentFurniture, cCurrentFurnitureIndex
-                                );
-                            }
-                            else {
-                                SetSitSleepState(
-                                    apActor, SIT_SLEEP_WANT_TO_STAND, pCurrentFurniture, cCurrentFurnitureIndex
-                                );
-                            }
-                            pidle = pIdleManager->GetIdleToPlay(apActor, pCurrentFurniture);
-                            if (pidle) {
-                                ANIM_GROUP_SECTION IdleAnimGroupSection;
-                                IdleAnimGroupSection = pidle->GetIdleAnimGroupSection();
-                                panim->SpecialIdleQueue(pidle, IdleAnimGroupSection);
-                            LABEL_63:;
-                                result = true;
-                            }
-                            else {
-                                int32_t blendAmount = cCurrentFurnitureIndex;
-                                const char* afWalkSpeeda = pCurrentFurniture->GetFormEditorID();
-                                Warning(
-                                    "AI: Missing furniture exit animation (index %d) for marker %d in the editor's "
-                                    "idle manager. '%s' index %d.",
-                                    cCurrentFurnitureIndex, FurnitureMarker.GetType(), afWalkSpeeda, blendAmount
-                                );
-                                pCurrentFurniture->SetMarkerUsed(cCurrentFurnitureIndex, false);
-                                panim->SkipNextBlend();
-                                panim->ClearGroup(AGS_IDLE, 0.0f);
-                                SetSitSleepState(apActor, SIT_SLEEP_NORMAL, pCurrentFurniture, 127);
-                                uint32_t v5 = FurnitureMarker.GetType();
-                                float blendAmounta =
-                                    -static_cast<TESFurniture*>(pCurrentFurniture->GetObjectReference())
-                                         ->TESFurniture::GetMarkerHeadingOffset(v5);
-                                apActor->ModHeading(blendAmounta);
-                                float fHeading = apActor->GetHeading(false) + 3.1415927410125732;
-                                apActor->SetHeading(fHeading);
-                                ClearFurniture(apActor);
-                                apActor->SetChaseBip(false);
-                                if (bsleeping) {
-                                    bool abwearweapon = true;
-                                    TESPackage* ppack = GetPackageThatIsRunning();
-                                    if (ppack) {
-                                        abwearweapon = !ppack->GetForceUnequipWeapon();
-                                    }
-                                    if (apActor->IsNpc()) {
-                                        TESNPC* pnpc = dynamic_cast<TESNPC*>(apActor->GetObjectReference());
-                                        if (pnpc) {
-                                            pnpc->InitDefaultWorn(apActor, true, abwearweapon, false, true);
-                                        }
-                                    }
-                                    else {
-                                        TESCreature* pcrea = dynamic_cast<TESCreature*>(apActor->GetObjectReference());
-                                        if (pcrea) {
-                                            pcrea->InitDefaultWorn(apActor, true, abwearweapon, true);
-                                        }
-                                    }
-                                }
-                                float v15 = (apActor->GetFatigue() + 10.0) * -1.0;
-                                apActor->DamageModActorValue(ActorValue::FATIGUE, v15, nullptr);
-                                AddToProcedureIndexRunning(apActor, 1);
-                                if (GetNeedTalkPlayer()) {
-                                    apActor->InitiateDialogue(
-                                        pPlayer, nullptr, nullptr, true, false, false, nullptr, false, false
-                                    );
-                                }
-                                result = false;
-                            }
-                        }
-                        break;
-                    }
-                    case 5:
-                    case 10: {
-                        BSAnimGroupSequence* CurrentSequence;
-                        if (panim->SpecialIdleLoaded() &&
-                            (!panim->GetCurrentSequence(AGS_MOVEMENT) ||
-                             (CurrentSequence = panim->GetCurrentSequence(AGS_MOVEMENT),
-                              CurrentSequence->GetState() == NiControllerSequence::kAnimating))) {
-                            SIT_SLEEP_STATE ecurrentState = static_cast<SIT_SLEEP_STATE>(cSitSleepState);
-                            SetSitSleepState(apActor, SIT_SLEEP_NORMAL, pCurrentFurniture, cCurrentFurnitureIndex);
-                            uint32_t v8 = FurnitureMarker.GetType();
-                            float blendAmountb = -static_cast<TESFurniture*>(pCurrentFurniture->GetObjectReference())
-                                                      ->TESFurniture::GetMarkerHeadingOffset(v8);
-                            apActor->ModHeading(blendAmountb);
-                            SetSitSleepState(apActor, ecurrentState, pCurrentFurniture, cCurrentFurnitureIndex);
+                            int32_t blendAmount = cCurrentFurnitureIndex;
+                            const char* afWalkSpeeda = pCurrentFurniture->GetFormEditorID();
+                            Warning(
+                                "AI: Missing furniture exit animation (index %d) for marker %d in the editor's "
+                                "idle manager. '%s' index %d.",
+                                cCurrentFurnitureIndex, FurnitureMarker.GetType(), afWalkSpeeda, blendAmount
+                            );
+                            pCurrentFurniture->SetMarkerUsed(cCurrentFurnitureIndex, false);
                             panim->SkipNextBlend();
-                            panim->SpecialIdlePlay(apActor);
-                        }
-                        else {
-                            if (panim->SpecialIdleDonePlaying()) {
-                                uint32_t imarkerID = GetFurnitureMarkerID();
-                                if (imarkerID <= 20) {
-                                    panim->SkipNextBlend();
+                            panim->ClearGroup(AGS_IDLE, 0.0f);
+                            SetSitSleepState(apActor, SIT_SLEEP_NORMAL, pCurrentFurniture, 127);
+                            uint32_t v5 = FurnitureMarker.GetType();
+                            float blendAmounta = -static_cast<TESFurniture*>(pCurrentFurniture->GetObjectReference())
+                                                      ->TESFurniture::GetMarkerHeadingOffset(v5);
+                            apActor->ModHeading(blendAmounta);
+                            float fHeading = apActor->GetHeading(false) + 3.1415927410125732;
+                            apActor->SetHeading(fHeading);
+                            ClearFurniture(apActor);
+                            apActor->SetChaseBip(false);
+                            if (bsleeping) {
+                                bool abwearweapon = true;
+                                TESPackage* ppack = GetPackageThatIsRunning();
+                                if (ppack) {
+                                    abwearweapon = !ppack->GetForceUnequipWeapon();
                                 }
-                                ClearFurniture(apActor);
-                                if (apActor->IsPc()) {
-                                    HUDMainMenu::SetMenuMode(HUDMainMenu::HMM_RUN_AND_GUN);
+                                if (apActor->IsNpc()) {
+                                    TESNPC* pnpc = dynamic_cast<TESNPC*>(apActor->GetObjectReference());
+                                    if (pnpc) {
+                                        pnpc->InitDefaultWorn(apActor, true, abwearweapon, false, true);
+                                    }
                                 }
-                                if (imarkerID <= 20) {
-                                    float v14 = apActor->GetHeading(false) + 3.1415927410125732;
-                                    apActor->SetHeading(v14);
-                                }
-                                apActor->PickAnimations(1.0f, 1.0f);
-                                apActor->SetChaseBip(false);
-                                bhkCharacterController* pcon = GetCharController();
-                                if (pcon) {
-                                    pcon->SetPosition(*apActor->QLocationOnReference());
-                                }
-                                if (GetNeedTalkPlayer()) {
-                                    apActor->InitiateDialogue(
-                                        pPlayer, nullptr, nullptr, true, false, false, nullptr, false, false
-                                    );
+                                else {
+                                    TESCreature* pcrea = dynamic_cast<TESCreature*>(apActor->GetObjectReference());
+                                    if (pcrea) {
+                                        pcrea->InitDefaultWorn(apActor, true, abwearweapon, true);
+                                    }
                                 }
                             }
+                            float v15 = (apActor->GetFatigue() + 10.0) * -1.0;
+                            apActor->DamageModActorValue(ActorValue::FATIGUE, v15, nullptr);
+                            AddToProcedureIndexRunning(apActor, 1);
+                            if (GetNeedTalkPlayer()) {
+                                apActor->InitiateDialogue(
+                                    pPlayer, nullptr, nullptr, true, false, false, nullptr, false, false
+                                );
+                            }
+                            result = false;
                         }
-                        goto LABEL_63;
                     }
-                    default: {
-                        if (bsleeping) {
-                            cSitSleepState = 9;
-                        }
-                        else {
-                            cSitSleepState = 4;
-                        }
-                        goto LABEL_63;
+                    break;
+                }
+                case 5:
+                case 10: {
+                    BSAnimGroupSequence* CurrentSequence;
+                    if (panim->SpecialIdleLoaded() &&
+                        (!panim->GetCurrentSequence(AGS_MOVEMENT) ||
+                         (CurrentSequence = panim->GetCurrentSequence(AGS_MOVEMENT),
+                          CurrentSequence->GetState() == NiControllerSequence::kAnimating))) {
+                        SIT_SLEEP_STATE ecurrentState = static_cast<SIT_SLEEP_STATE>(cSitSleepState);
+                        SetSitSleepState(apActor, SIT_SLEEP_NORMAL, pCurrentFurniture, cCurrentFurnitureIndex);
+                        uint32_t v8 = FurnitureMarker.GetType();
+                        float blendAmountb = -static_cast<TESFurniture*>(pCurrentFurniture->GetObjectReference())
+                                                  ->TESFurniture::GetMarkerHeadingOffset(v8);
+                        apActor->ModHeading(blendAmountb);
+                        SetSitSleepState(apActor, ecurrentState, pCurrentFurniture, cCurrentFurnitureIndex);
+                        panim->SkipNextBlend();
+                        panim->SpecialIdlePlay(apActor);
                     }
+                    else {
+                        if (panim->SpecialIdleDonePlaying()) {
+                            uint32_t imarkerID = GetFurnitureMarkerID();
+                            if (imarkerID <= 20) {
+                                panim->SkipNextBlend();
+                            }
+                            ClearFurniture(apActor);
+                            if (apActor->IsPc()) {
+                                HUDMainMenu::SetMenuMode(HUDMainMenu::HMM_RUN_AND_GUN);
+                            }
+                            if (imarkerID <= 20) {
+                                float v14 = apActor->GetHeading(false) + 3.1415927410125732;
+                                apActor->SetHeading(v14);
+                            }
+                            apActor->PickAnimations(1.0f, 1.0f);
+                            apActor->SetChaseBip(false);
+                            bhkCharacterController* pcon = GetCharController();
+                            if (pcon) {
+                                pcon->SetPosition(*apActor->QLocationOnReference());
+                            }
+                            if (GetNeedTalkPlayer()) {
+                                apActor->InitiateDialogue(
+                                    pPlayer, nullptr, nullptr, true, false, false, nullptr, false, false
+                                );
+                            }
+                        }
+                    }
+                    goto LABEL_63;
+                }
+                default: {
+                    if (bsleeping) {
+                        cSitSleepState = 9;
+                    }
+                    else {
+                        cSitSleepState = 4;
+                    }
+                    goto LABEL_63;
                 }
             }
-            else {
-                return false;
-            }
+        }
+        else {
+            return false;
         }
     }
     else {
@@ -2651,11 +2599,10 @@ void MiddleHighProcess::ProcessTravel(
         if (pPack->pPackLoc) {
             pRef = pPack->pPackLoc->GetLocReference();
         }
-        if (pGenericLocation) {
-            if (!GetRunOncePackage()) {
-                pRef = pGenericLocation;
-            }
+        if ((pGenericLocation) && (!GetRunOncePackage())) {
+            pRef = pGenericLocation;
         }
+
         if (pPack->GetPackType() == PACKAGE_TYPE_WANDER) {
             fdistance = 20.0f;
         }
@@ -2687,15 +2634,14 @@ void MiddleHighProcess::ProcessTravel(
                             v19, *v21, 5000.0f, *v23, 5000.0f, &LowProcess::UnLockDoorsatLocation, apActor
                         );
                     }
-                    if (pPack) {
-                        if (!bDoneClothesChange && pPack->GetForceUnequipWeapon()) {
-                            bDoneClothesChange = true;
-                            ItemChange* pweapon = GetCurrentWeapon();
-                            if (pweapon) {
-                                apActor->QueueUnEquipObject(pweapon->pContainerObj, 1, nullptr, false, false, true);
-                            }
+                    if ((pPack) && (!bDoneClothesChange && pPack->GetForceUnequipWeapon())) {
+                        bDoneClothesChange = true;
+                        ItemChange* pweapon = GetCurrentWeapon();
+                        if (pweapon) {
+                            apActor->QueueUnEquipObject(pweapon->pContainerObj, 1, nullptr, false, false, true);
                         }
                     }
+
                     if (pRef && pRef->IsFurniture()) {
                         if (apActor->GetSitSleepState() == SIT_SLEEP_IS_SITTING ||
                             apActor->GetSitSleepState() == SIT_SLEEP_IS_SLEEPING) {
@@ -2761,20 +2707,20 @@ void MiddleHighProcess::ProcessTravel(
                     }
                     else {
                         TESBoundObject* ObjectReference;
-                        if ((pRef &&
-                             (ObjectReference = pRef->GetObjectReference(), ObjectReference == pXMarkerHeading)) ||
-                            (pPack->pPackLoc && pPack->pPackLoc->GetLocType() == PLT_EDITORLOC)) {
-                            if (!DidPathingFail(apActor) && apActor->GetSitSleepState() == SIT_SLEEP_NORMAL) {
-                                float ftargetangle = 0.0f;
-                                if (pRef) {
-                                    ftargetangle = (&pRef->GetAngleOnReference())->z;
-                                }
-                                else {
-                                    ftargetangle = apActor->GetStartingAngle().z;
-                                }
-                                apActor->SetHeading(ftargetangle);
+                        if (((pRef &&
+                              (ObjectReference = pRef->GetObjectReference(), ObjectReference == pXMarkerHeading)) ||
+                             (pPack->pPackLoc && pPack->pPackLoc->GetLocType() == PLT_EDITORLOC)) &&
+                            (!DidPathingFail(apActor) && apActor->GetSitSleepState() == SIT_SLEEP_NORMAL)) {
+                            float ftargetangle = 0.0f;
+                            if (pRef) {
+                                ftargetangle = (&pRef->GetAngleOnReference())->z;
                             }
+                            else {
+                                ftargetangle = apActor->GetStartingAngle().z;
+                            }
+                            apActor->SetHeading(ftargetangle);
                         }
+
                         EndMoveMessage(apActor);
                         if (abInterateindex && (!DidPathingFail(apActor) || !pPack->GetMustComplete())) {
                             AddToProcedureIndexRunning(apActor, 1);
@@ -2815,12 +2761,11 @@ void MiddleHighProcess::ProcessTravel(
                                 }
                             }
                             else {
-                                if (pPack->pPackLoc) {
-                                    if (pPack->pPackLoc->GetLocReference()) {
-                                        TESObjectREFR* LocReference = pPack->pPackLoc->GetLocReference();
-                                        plocactor = dynamic_cast<Actor*>(LocReference);
-                                    }
+                                if ((pPack->pPackLoc) && (pPack->pPackLoc->GetLocReference())) {
+                                    TESObjectREFR* LocReference = pPack->pPackLoc->GetLocReference();
+                                    plocactor = dynamic_cast<Actor*>(LocReference);
                                 }
+
                                 if (plocactor) {
                                     const NiPoint3* v15 = &plocactor->GetLocationOnReference();
                                     float fdistancemoved = (lastSeenPostion - *v15).Length();
@@ -2898,16 +2843,13 @@ bool MiddleHighProcess::EnterCombat(
     }
     if (!apTarget ||
         (apActor->GetCombatController() || (bforcecombat || !pCombatManager->CheckShouldFlee(apActor, apTarget)))) {
-        if (apActor->GetCombatController()) {
-            if (apTarget) {
-                if (!apGroup) {
-                    CombatController* v16 = apActor->GetCombatController();
-                    if (v16->IsActoraCombatTarget(apTarget)) {
-                        return false;
-                    }
-                }
+        if ((apActor->GetCombatController()) && (apTarget) && (!apGroup)) {
+            CombatController* v16 = apActor->GetCombatController();
+            if (v16->IsActoraCombatTarget(apTarget)) {
+                return false;
             }
         }
+
         if (apTarget == pPlayer && !bforcecombat) {
             int32_t NumberActorsInCombat = pPlayer->GetNumberActorsInCombat();
             if (NumberActorsInCombat >= iNumberActorsInCombatPlayer.Int()) {
@@ -2925,33 +2867,27 @@ bool MiddleHighProcess::EnterCombat(
         }
         ClearMovementStoped();
         TESPackage* pPack = GetPackageThatIsRunning();
-        if (pPack) {
-            if (pPack->IsInterruptPackage()) {
-                pPack = (&apActor->m_Extra)->GetPackageExtra();
-            }
+        if ((pPack) && (pPack->IsInterruptPackage())) {
+            pPack = (&apActor->m_Extra)->GetPackageExtra();
         }
-        if (apTarget) {
-            if (pPack) {
-                if (pPack->GetDefensive() && !bforcecombat && !bIgnoreDefensivePackage) {
-                    NiPoint3 dest = GetCurrentDestinationCoordinate(apActor, false);
-                    // The package's radius, 600 when below 1.
-                    float fdistancepack = static_cast<float>(pPack->GetLocationRadius(apActor));
-                    if (fdistancepack < 1.0) {
-                        fdistancepack = 600.0f;
-                    }
-                    double DistanceFromPoint = apTarget->GetDistanceFromPoint(dest);
-                    if (fdistancepack < DistanceFromPoint) {
-                        if (apTarget->GetCombatController()) {
-                            CombatController* v19 = apTarget->GetCombatController();
-                            if (!v19->IsActoraCombatTarget(apActor)) {
-                                SetDetectAlert(true);
-                                return false;
-                            }
-                        }
-                    }
+
+        if ((apTarget) && (pPack) && (pPack->GetDefensive() && !bforcecombat && !bIgnoreDefensivePackage)) {
+            NiPoint3 dest = GetCurrentDestinationCoordinate(apActor, false);
+            // The package's radius, 600 when below 1.
+            float fdistancepack = static_cast<float>(pPack->GetLocationRadius(apActor));
+            if (fdistancepack < 1.0) {
+                fdistancepack = 600.0f;
+            }
+            double DistanceFromPoint = apTarget->GetDistanceFromPoint(dest);
+            if ((fdistancepack < DistanceFromPoint) && (apTarget->GetCombatController())) {
+                CombatController* v19 = apTarget->GetCombatController();
+                if (!v19->IsActoraCombatTarget(apActor)) {
+                    SetDetectAlert(true);
+                    return false;
                 }
             }
         }
+
         if (!apActor->GetCombatController()) {
             SetDetectAlert(false);
             apActor->EndDialogue();
@@ -2962,16 +2898,13 @@ bool MiddleHighProcess::EnterCombat(
         if (apActor->IsActoraGuard()) {
             baggressor = false;
         }
-        if (apTarget) {
-            if (apTarget->IsInCombat()) {
-                if (apTarget->GetCombatController()) {
-                    CombatController* v20 = apTarget->GetCombatController();
-                    if (v20->IsActoraCombatTarget(apActor)) {
-                        baggressor = false;
-                    }
-                }
+        if ((apTarget) && (apTarget->IsInCombat()) && (apTarget->GetCombatController())) {
+            CombatController* v20 = apTarget->GetCombatController();
+            if (v20->IsActoraCombatTarget(apActor)) {
+                baggressor = false;
             }
         }
+
         SetIsAggressor(baggressor);
         int32_t iPriority = 0;
         if (bforcecombat) {
@@ -3163,273 +3096,245 @@ void MiddleHighProcess::KnockExplosion(Actor* apActor, NiPoint3 aSourceLocation,
 void MiddleHighProcess::UpdateKnockState(Actor* apActor) {
     NiPoint3 dr;
     Animation* panim = apActor->GetAnimation();
-    if (panim) {
-        if (apActor != pPlayer || panim != pPlayer->GetAnimation(true)) {
-            if (apActor->CanKnockDown()) {
-                bool bunconscious = false;
-                if (GetCachedFlag(CachedValues::CVF_FATIGUE_DAMAGED)) {
-                    bunconscious = apActor->GetFatigue() < 0.0;
+    if ((panim) && (apActor != pPlayer || panim != pPlayer->GetAnimation(true))) {
+        if (apActor->CanKnockDown()) {
+            bool bunconscious = false;
+            if (GetCachedFlag(CachedValues::CVF_FATIGUE_DAMAGED)) {
+                bunconscious = apActor->GetFatigue() < 0.0;
+            }
+            if ((bunconscious ||
+                 (apActor->IsParalyzed() || apActor->GetLifeState() == ACTOR_LIFE_STATE_ESSENTIAL_DOWN)) &&
+                !cKnockState) {
+                if ((apActor->GetSitSleepState()) && (apActor->GetSitSleepState() != SIT_SLEEP_WANT_TO_STAND)) {
+                    apActor->GetOutofFurnitureQuick();
                 }
-                if ((bunconscious ||
-                     (apActor->IsParalyzed() || apActor->GetLifeState() == ACTOR_LIFE_STATE_ESSENTIAL_DOWN)) &&
-                    !cKnockState) {
-                    if (apActor->GetSitSleepState()) {
-                        if (apActor->GetSitSleepState() != SIT_SLEEP_WANT_TO_STAND) {
-                            apActor->GetOutofFurnitureQuick();
+
+                apActor->InterruptCast();
+                ClearMuzzleFlash();
+                apActor->AddChange(4);
+                if (apActor->IsParalyzed()) {
+                    cKnockState = 3;
+                    if (apActor->pRagdollController) {
+                        apActor->pRagdollController->EnableRagdollFeedback(false);
+                        apActor->pRagdollController->SyncRagdollTo3D();
+                        apActor->pRagdollController->DisableRagdollAnim(false);
+                    }
+                    NiNode* v2 = apActor->TESObjectREFR::Get3D();
+                    bhkWorld::SetMotion(v2, hkpMotion::MOTION_DYNAMIC, true, false, true);
+                    NiAVObject* pav = apActor->TESObjectREFR::Get3D();
+                    bhkRigidBody::SetFixed(pav, 1, 1);
+                    panim->ClearGroup(AGS_WHOLE_BODY, 0.0f);
+                    panim->ZeroGlobalTransform();
+                    EndMoveMessage(apActor);
+                }
+                else {
+                    if (apActor->IsPlayerTeammate()) {
+                        FollowerBarks::TriggerFollowerBark(apActor, FollowerBarks::BARK_KNOCKED_OUT);
+                    }
+                    cKnockState = 4;
+                    panim->GetDelta(&dr, apActor, true, false);
+                    float v20 = appTimer.fDelta * 50.0;
+                    dr = -dr / v20;
+                    if (apActor->pRagdollController) {
+                        apActor->pRagdollController->EnableRagdollFeedback(false);
+                        apActor->pRagdollController->DisableRagdollAnim(true);
+                    }
+                    apActor->SetHavokWeapon();
+                    NiNode* v5 = apActor->TESObjectREFR::Get3D();
+                    bhkBlendController::DoKnockDown(v5, dr, 0, 0.0f, 1);
+                    NiAVObject* pav_2 = apActor->TESObjectREFR::Get3D();
+                    bhkRigidBody::SetFixed(pav_2, 0, 1);
+                }
+            }
+            switch (cKnockState) {
+                case 1: {
+                    double fdif_2;
+                    float ftime = fHourLastProcessed;
+                    float fcurrent = appCalendar.GetHour();
+                    float fdif = 0.0f;
+                    if (!(ftime > static_cast<double>(fcurrent))) {
+                        fdif_2 = fcurrent - ftime;
+                    }
+                    else {
+                        fdif_2 = ftime + 23.0 - fcurrent;
+                    }
+                    fdif = fdif_2;
+                    double TimeScale = appCalendar.GetTimeScale();
+                    bool bmin = fdif > TimeScale * 0.0006600000197067857;
+                    double v10 = appCalendar.GetTimeScale();
+                    bool bmax = fdif > v10 * 0.001500000013038516;
+                    if (apActor->GetFatigue() >= 0.0 && !apActor->IsParalyzed() && bmin &&
+                        (bmax || apActor->IsNonAccumNearController(16.0f))) {
+                        char cKnockStateSave = cKnockState;
+                        cKnockState = 3;
+                        TESIdleForm* pidle_2 = pIdleManager->GetIdleToPlay(apActor, nullptr);
+                        cKnockState = cKnockStateSave;
+                        BSFaceGenAnimationData* panimData_4 = apActor->GetFaceAnimationData();
+                        if (panimData_4) {
+                            panimData_4->SetDead(false, false);
+                        }
+                        cKnockState = 5;
+                        if (pidle_2) {
+                            panim->SpecialIdleQueue(pidle_2, AGS_WHOLE_BODY);
+                        }
+                        else {
+                            Warning("AI: No 'GetUp' animation found for actor '%s'.", apActor->GetFullName());
+                            ClearKnockState(apActor);
                         }
                     }
-                    apActor->InterruptCast();
-                    ClearMuzzleFlash();
-                    apActor->AddChange(4);
-                    if (apActor->IsParalyzed()) {
-                        cKnockState = 3;
-                        if (apActor->pRagdollController) {
-                            apActor->pRagdollController->EnableRagdollFeedback(false);
-                            apActor->pRagdollController->SyncRagdollTo3D();
-                            apActor->pRagdollController->DisableRagdollAnim(false);
+                    break;
+                }
+                case 2:
+                case 4: {
+                    NiNode* proot = panim->pAccumRoot;
+                    if (!proot || bhkUtilFunctions::GetHeirGain(proot) <= 0.0) {
+                        apActor->StopCurrentDialogue();
+                        if (apActor == pPlayer && pPlayer->GetIronSights()) {
+                            pPlayer->SetIronSights(false, false, false);
                         }
-                        NiNode* v2 = apActor->TESObjectREFR::Get3D();
-                        bhkWorld::SetMotion(v2, hkpMotion::MOTION_DYNAMIC, true, false, true);
-                        NiAVObject* pav = apActor->TESObjectREFR::Get3D();
-                        bhkRigidBody::SetFixed(pav, 1, 1);
+                        if (cKnockState == 4) {
+                            cKnockState = 3;
+                        }
+                        else {
+                            cKnockState = 1;
+                        }
+                        BSFaceGenAnimationData* panimData = apActor->GetFaceAnimationData();
+                        if (panimData) {
+                            panimData->SetDead(true, false);
+                        }
                         panim->ClearGroup(AGS_WHOLE_BODY, 0.0f);
                         panim->ZeroGlobalTransform();
                         EndMoveMessage(apActor);
                     }
-                    else {
-                        if (apActor->IsPlayerTeammate()) {
-                            FollowerBarks::TriggerFollowerBark(apActor, FollowerBarks::BARK_KNOCKED_OUT);
-                        }
-                        cKnockState = 4;
-                        panim->GetDelta(&dr, apActor, true, false);
-                        float v20 = appTimer.fDelta * 50.0;
-                        dr = -dr / v20;
-                        if (apActor->pRagdollController) {
-                            apActor->pRagdollController->EnableRagdollFeedback(false);
-                            apActor->pRagdollController->DisableRagdollAnim(true);
-                        }
-                        apActor->SetHavokWeapon();
-                        NiNode* v5 = apActor->TESObjectREFR::Get3D();
-                        bhkBlendController::DoKnockDown(v5, dr, 0, 0.0f, 1);
-                        NiAVObject* pav_2 = apActor->TESObjectREFR::Get3D();
-                        bhkRigidBody::SetFixed(pav_2, 0, 1);
-                    }
+                    break;
                 }
-                switch (cKnockState) {
-                    case 1: {
-                        double fdif_2;
-                        float ftime = fHourLastProcessed;
-                        float fcurrent = appCalendar.GetHour();
-                        float fdif = 0.0f;
-                        if (!(ftime > static_cast<double>(fcurrent))) {
-                            fdif_2 = fcurrent - ftime;
-                        }
-                        else {
-                            fdif_2 = ftime + 23.0 - fcurrent;
-                        }
-                        fdif = fdif_2;
-                        double TimeScale = appCalendar.GetTimeScale();
-                        bool bmin = fdif > TimeScale * 0.0006600000197067857;
-                        double v10 = appCalendar.GetTimeScale();
-                        bool bmax = fdif > v10 * 0.001500000013038516;
-                        if (apActor->GetFatigue() >= 0.0 && !apActor->IsParalyzed() && bmin &&
-                            (bmax || apActor->IsNonAccumNearController(16.0f))) {
-                            char cKnockStateSave = cKnockState;
-                            cKnockState = 3;
-                            TESIdleForm* pidle_2 = pIdleManager->GetIdleToPlay(apActor, nullptr);
-                            cKnockState = cKnockStateSave;
-                            BSFaceGenAnimationData* panimData_4 = apActor->GetFaceAnimationData();
-                            if (panimData_4) {
-                                panimData_4->SetDead(false, false);
+                case 3: {
+                    if (!(apActor->GetFatigue() >= 0.0) ||
+                        (apActor->IsParalyzed() || apActor->GetLifeState() == ACTOR_LIFE_STATE_ESSENTIAL_DOWN)) {}
+                    else {
+                        TESIdleForm* pidle = pIdleManager->GetIdleToPlay(apActor, nullptr);
+                        if (pidle) {
+                            panim->SpecialIdleQueue(pidle, AGS_WHOLE_BODY);
+                            BSFaceGenAnimationData* panimData_2 = apActor->GetFaceAnimationData();
+                            if (panimData_2) {
+                                panimData_2->SetDead(false, false);
                             }
                             cKnockState = 5;
-                            if (pidle_2) {
-                                panim->SpecialIdleQueue(pidle_2, AGS_WHOLE_BODY);
-                            }
-                            else {
-                                Warning("AI: No 'GetUp' animation found for actor '%s'.", apActor->GetFullName());
-                                ClearKnockState(apActor);
-                            }
-                        }
-                        break;
-                    }
-                    case 2:
-                    case 4: {
-                        NiNode* proot = panim->pAccumRoot;
-                        if (!proot || bhkUtilFunctions::GetHeirGain(proot) <= 0.0) {
-                            apActor->StopCurrentDialogue();
-                            if (apActor == pPlayer && pPlayer->GetIronSights()) {
-                                pPlayer->SetIronSights(false, false, false);
-                            }
-                            if (cKnockState == 4) {
-                                cKnockState = 3;
-                            }
-                            else {
-                                cKnockState = 1;
-                            }
-                            BSFaceGenAnimationData* panimData = apActor->GetFaceAnimationData();
-                            if (panimData) {
-                                panimData->SetDead(true, false);
-                            }
-                            panim->ClearGroup(AGS_WHOLE_BODY, 0.0f);
-                            panim->ZeroGlobalTransform();
-                            EndMoveMessage(apActor);
-                        }
-                        break;
-                    }
-                    case 3: {
-                        if (!(apActor->GetFatigue() >= 0.0) ||
-                            (apActor->IsParalyzed() || apActor->GetLifeState() == ACTOR_LIFE_STATE_ESSENTIAL_DOWN)) {}
-                        else {
-                            TESIdleForm* pidle = pIdleManager->GetIdleToPlay(apActor, nullptr);
-                            if (pidle) {
-                                panim->SpecialIdleQueue(pidle, AGS_WHOLE_BODY);
-                                BSFaceGenAnimationData* panimData_2 = apActor->GetFaceAnimationData();
-                                if (panimData_2) {
-                                    panimData_2->SetDead(false, false);
-                                }
-                                cKnockState = 5;
-                            }
-                            else {
-                                Warning("AI: No 'GetUp' animation found for actor '%s'.", apActor->GetFullName());
-                                ClearKnockState(apActor);
-                            }
-                        }
-                        break;
-                    }
-                    case 5: {
-                        BSAnimGroupSequence* CurrentSequence;
-                        if (panim->SpecialIdleLoaded() &&
-                            (!panim->GetCurrentSequence(AGS_MOVEMENT) ||
-                             (CurrentSequence = panim->GetCurrentSequence(AGS_MOVEMENT),
-                              CurrentSequence->GetState() == NiControllerSequence::kAnimating))) {
-                            if (apActor->IsSwimming() || !panim->SpecialIdlePlay(apActor)) {
-                                panim->SpecialIdleFree(true, false);
-                            }
-                            NiAVObject* pav_3 = apActor->TESObjectREFR::Get3D();
-                            NiAVObject* pspine = panim->pAccumRoot;
-                            if (pspine) {
-                                pspine = static_cast<NiNode*>(pspine)->NiNode::GetAtChecked(0);
-                                NiFixedString* Bip01_Head = FixedStrings::GetBip01_Head();
-                                NiAVObject* phead = apActor->GetActorBone(pspine, *Bip01_Head);
-                                if (!phead) {
-                                    NiFixedString* v13 = &FixedStrings::QBip01Neck();
-                                    phead = BSUtilities::GetObjectByName(pspine, *v13);
-                                }
-                                if (!phead) {
-                                    NiFixedString* v14 = &FixedStrings::QBip01Spine1();
-                                    phead = BSUtilities::GetObjectByName(pspine, *v14);
-                                }
-                                if (phead) {
-                                    NiPoint3 movedir;
-                                    const NiPoint3* a2 = &pspine->GetWorldTranslate();
-                                    movedir = phead->GetWorldTranslate() - *a2;
-                                    bhkCharacterController* v15 = GetCharController();
-                                    if (!v15->QQuadruped()) {
-                                        NiFixedString* Bip01_Spine = FixedStrings::GetBip01_Spine();
-                                        NiAVObject* p180Test = apActor->GetActorBone(pav_3, *Bip01_Spine);
-                                        if (p180Test) {
-                                            if (bhkNiCollisionObject::GetFaceUp(
-                                                    static_cast<NiNode*>(p180Test), nullptr
-                                                )) {
-                                                movedir.operator*=(-1.0f);
-                                            }
-                                        }
-                                    }
-                                    float ftargetAngle = GetZAngleFromVector(movedir);
-                                    cKnockState = 0;
-                                    apActor->SetHeading(ftargetAngle);
-                                }
-                            }
-                            bhkRigidBody::SetFixed(pav_3, 0, 0);
-                            bhkBlendController::DoGetUp(pav_3, 0.0f);
-                            apActor->RemoveChange(4);
-                            (&apActor->m_Extra)->SetRagDollData(nullptr);
-                            cKnockState = 6;
                         }
                         else {
-                            if (!panim->spAnimIdle.m_pObject && !panim->spAnimIdleQueued.m_pObject) {
-                                cKnockState = 3;
-                            }
+                            Warning("AI: No 'GetUp' animation found for actor '%s'.", apActor->GetFullName());
+                            ClearKnockState(apActor);
                         }
-                        break;
                     }
-                    case 6: {
-                        if (panim->SpecialIdleDonePlaying()) {
-                            cKnockState = 0;
+                    break;
+                }
+                case 5: {
+                    BSAnimGroupSequence* CurrentSequence;
+                    if (panim->SpecialIdleLoaded() &&
+                        (!panim->GetCurrentSequence(AGS_MOVEMENT) ||
+                         (CurrentSequence = panim->GetCurrentSequence(AGS_MOVEMENT),
+                          CurrentSequence->GetState() == NiControllerSequence::kAnimating))) {
+                        if (apActor->IsSwimming() || !panim->SpecialIdlePlay(apActor)) {
                             panim->SpecialIdleFree(true, false);
-                            if (apActor->pRagdollController) {
-                                apActor->pRagdollController->EnableRagdollFeedback(true);
-                                apActor->pRagdollController->EnableRagdollAnim();
+                        }
+                        NiAVObject* pav_3 = apActor->TESObjectREFR::Get3D();
+                        NiAVObject* pspine = panim->pAccumRoot;
+                        if (pspine) {
+                            pspine = static_cast<NiNode*>(pspine)->NiNode::GetAtChecked(0);
+                            NiFixedString* Bip01_Head = FixedStrings::GetBip01_Head();
+                            NiAVObject* phead = apActor->GetActorBone(pspine, *Bip01_Head);
+                            if (!phead) {
+                                NiFixedString* v13 = &FixedStrings::QBip01Neck();
+                                phead = BSUtilities::GetObjectByName(pspine, *v13);
                             }
-                            apActor->SetHavokWeapon();
-                            if (pWeapon) {
-                                if (pWeaponBone) {
-                                    if (bWeaponGrenade || bWeaponThrown) {
-                                        if (pWeaponBone->GetAtChecked(0)) {
-                                            NiAVObject* v17 = pWeaponBone->GetAt(0);
-                                            v17->SetAppCulled(false);
-                                            if (apActor == pPlayer) {
-                                                if (MiddleHighProcess::pThirdPersonPlayerWeaponNode) {
-                                                    if (MiddleHighProcess::pThirdPersonPlayerWeaponNode->GetAtChecked(
-                                                            0
-                                                        )) {
-                                                        NiAVObject* v18 =
-                                                            MiddleHighProcess::pThirdPersonPlayerWeaponNode->GetAt(0);
-                                                        v18->SetAppCulled(false);
-                                                    }
-                                                }
-                                            }
-                                        }
+                            if (!phead) {
+                                NiFixedString* v14 = &FixedStrings::QBip01Spine1();
+                                phead = BSUtilities::GetObjectByName(pspine, *v14);
+                            }
+                            if (phead) {
+                                NiPoint3 movedir;
+                                const NiPoint3* a2 = &pspine->GetWorldTranslate();
+                                movedir = phead->GetWorldTranslate() - *a2;
+                                bhkCharacterController* v15 = GetCharController();
+                                if (!v15->QQuadruped()) {
+                                    NiFixedString* Bip01_Spine = FixedStrings::GetBip01_Spine();
+                                    NiAVObject* p180Test = apActor->GetActorBone(pav_3, *Bip01_Spine);
+                                    if ((p180Test) &&
+                                        (bhkNiCollisionObject::GetFaceUp(static_cast<NiNode*>(p180Test), nullptr))) {
+                                        movedir.operator*=(-1.0f);
                                     }
                                 }
+                                float ftargetAngle = GetZAngleFromVector(movedir);
+                                cKnockState = 0;
+                                apActor->SetHeading(ftargetAngle);
                             }
                         }
-                        break;
+                        bhkRigidBody::SetFixed(pav_3, 0, 0);
+                        bhkBlendController::DoGetUp(pav_3, 0.0f);
+                        apActor->RemoveChange(4);
+                        (&apActor->m_Extra)->SetRagDollData(nullptr);
+                        cKnockState = 6;
                     }
-                    default: {
-                        return;
+                    else {
+                        if (!panim->spAnimIdle.m_pObject && !panim->spAnimIdleQueued.m_pObject) {
+                            cKnockState = 3;
+                        }
                     }
+                    break;
+                }
+                case 6: {
+                    if (panim->SpecialIdleDonePlaying()) {
+                        cKnockState = 0;
+                        panim->SpecialIdleFree(true, false);
+                        if (apActor->pRagdollController) {
+                            apActor->pRagdollController->EnableRagdollFeedback(true);
+                            apActor->pRagdollController->EnableRagdollAnim();
+                        }
+                        apActor->SetHavokWeapon();
+                        if ((pWeapon) && (pWeaponBone) && (bWeaponGrenade || bWeaponThrown) &&
+                            (pWeaponBone->GetAtChecked(0))) {
+                            NiAVObject* v17 = pWeaponBone->GetAt(0);
+                            v17->SetAppCulled(false);
+                            if ((apActor == pPlayer) && (MiddleHighProcess::pThirdPersonPlayerWeaponNode) &&
+                                (MiddleHighProcess::pThirdPersonPlayerWeaponNode->GetAtChecked(0))) {
+                                NiAVObject* v18 = MiddleHighProcess::pThirdPersonPlayerWeaponNode->GetAt(0);
+                                v18->SetAppCulled(false);
+                            }
+                        }
+                    }
+                    break;
+                }
+                default: {
+                    return;
                 }
             }
-            else {
-                cKnockState = 0;
-            }
+        }
+        else {
+            cKnockState = 0;
         }
     }
 }
 
 void MiddleHighProcess::ClearKnockState(Actor* apActor) {
-    if (cKnockState) {
-        if (!(apActor->GetFatigue() < 0.0) && !apActor->IsParalyzed()) {
-            NiNode* apObject = apActor->TESObjectREFR::Get3D();
-            bhkRigidBody::SetFixed(apObject, 0, 1);
-            bhkBlendController::DoGetUp(apObject, 1.0);
-            ExtraDataList* Extra = apActor->GetExtra();
-            Extra->SetRagDollData(nullptr);
-            apActor->RemoveChange(4);
-            BSFaceGenAnimationData* FaceAnimationData = apActor->GetFaceAnimationData();
-            if (FaceAnimationData) {
-                FaceAnimationData->SetDead(false, false);
-            }
-            cKnockState = 0;
-            if (pWeapon) {
-                if (pWeaponBone) {
-                    if (bWeaponGrenade || bWeaponThrown) {
-                        if (pWeaponBone->GetAtChecked(0)) {
-                            NiAVObject* v3 = pWeaponBone->GetAt(0);
-                            v3->SetAppCulled(false);
-                            if (apActor == pPlayer) {
-                                if (MiddleHighProcess::pThirdPersonPlayerWeaponNode) {
-                                    if (MiddleHighProcess::pThirdPersonPlayerWeaponNode->GetAtChecked(0)) {
-                                        NiAVObject* v4 = MiddleHighProcess::pThirdPersonPlayerWeaponNode->GetAt(0);
-                                        v4->SetAppCulled(false);
-                                    }
-                                }
-                            }
-                        }
-                    }
-                }
+    if ((cKnockState) && (!(apActor->GetFatigue() < 0.0) && !apActor->IsParalyzed())) {
+        NiNode* apObject = apActor->TESObjectREFR::Get3D();
+        bhkRigidBody::SetFixed(apObject, 0, 1);
+        bhkBlendController::DoGetUp(apObject, 1.0);
+        ExtraDataList* Extra = apActor->GetExtra();
+        Extra->SetRagDollData(nullptr);
+        apActor->RemoveChange(4);
+        BSFaceGenAnimationData* FaceAnimationData = apActor->GetFaceAnimationData();
+        if (FaceAnimationData) {
+            FaceAnimationData->SetDead(false, false);
+        }
+        cKnockState = 0;
+        if ((pWeapon) && (pWeaponBone) && (bWeaponGrenade || bWeaponThrown) && (pWeaponBone->GetAtChecked(0))) {
+            NiAVObject* v3 = pWeaponBone->GetAt(0);
+            v3->SetAppCulled(false);
+            if ((apActor == pPlayer) && (MiddleHighProcess::pThirdPersonPlayerWeaponNode) &&
+                (MiddleHighProcess::pThirdPersonPlayerWeaponNode->GetAtChecked(0))) {
+                NiAVObject* v4 = MiddleHighProcess::pThirdPersonPlayerWeaponNode->GetAt(0);
+                v4->SetAppCulled(false);
             }
         }
     }
@@ -3475,11 +3380,9 @@ void MiddleHighProcess::UpdateAimSequences(Actor* apActor) {
         v10 = BSMIN(static_cast<float>(1.0), v5);
     }
     else {
-        if (v11 > 0.0) {
-            if (pAimSequence[2]) {
-                float v4 = v11 / (fAimDownDegrees.Float() * 0.01745329238474369);
-                v9 = BSMIN(static_cast<float>(1.0), v4);
-            }
+        if ((v11 > 0.0) && (pAimSequence[2])) {
+            float v4 = v11 / (fAimDownDegrees.Float() * 0.01745329238474369);
+            v9 = BSMIN(static_cast<float>(1.0), v4);
         }
     }
     float v3 = static_cast<float>(0.0) + static_cast<float>(0.0);
@@ -3961,11 +3864,10 @@ void MiddleHighProcess::ClearCurrentDataforProcess(Actor* apActor) {
     RefListChairBed.RemoveAll();
     GenericLocationsList.RemoveAll();
     pGenericLocation = nullptr;
-    if (apActor->GetSitSleepState() == SIT_SLEEP_NORMAL) {
-        if (GetCurrentFurniture()) {
-            ClearFurniture(apActor);
-        }
+    if ((apActor->GetSitSleepState() == SIT_SLEEP_NORMAL) && (GetCurrentFurniture())) {
+        ClearFurniture(apActor);
     }
+
     ClearUseWeaponHeadTrackTarget(true);
 }
 
@@ -3990,10 +3892,8 @@ void MiddleHighProcess::SetFurniture(TESObjectREFR* pref, uint8_t aiindex, Furni
         FurnitureMarker.Position.y = apMarker->Position.y;
         FurnitureMarker.Position.z = apMarker->Position.z;
         FurnitureMarker.sHeading = apMarker->sHeading;
-        if (pCurrentFurniture) {
-            if (!pSaveLoadGame->GetSaveGameLoading()) {
-                pCurrentFurniture->SetMarkerReserved(aiindex, true);
-            }
+        if ((pCurrentFurniture) && (!pSaveLoadGame->GetSaveGameLoading())) {
+            pCurrentFurniture->SetMarkerReserved(aiindex, true);
         }
     }
 }
@@ -4145,15 +4045,14 @@ void MiddleHighProcess::SaveGame(BGSSaveFormBuffer* apSaveGameBuffer) {
     }
     apSaveGameBuffer->SaveVariableSizedValue(iDeadCount, uiDeadPosition);
     RunOncePackage.SaveGame(apSaveGameBuffer);
-    if (pActor) {
-        if (apSaveGameBuffer->GetChangeFlags().CheckFlags(0x10000000)) {
-            uint32_t uiAnimPosition = apSaveGameBuffer->StartVariableSizedValue();
-            uint32_t uiAnimStart = apSaveGameBuffer->GetBufferPosition();
-            pAnimation->SaveGameBGS(apSaveGameBuffer);
-            uint32_t uiAnimEnd = apSaveGameBuffer->GetBufferPosition();
-            apSaveGameBuffer->SaveVariableSizedValue(uiAnimEnd - uiAnimStart, uiAnimPosition);
-        }
+    if ((pActor) && (apSaveGameBuffer->GetChangeFlags().CheckFlags(0x10000000))) {
+        uint32_t uiAnimPosition = apSaveGameBuffer->StartVariableSizedValue();
+        uint32_t uiAnimStart = apSaveGameBuffer->GetBufferPosition();
+        pAnimation->SaveGameBGS(apSaveGameBuffer);
+        uint32_t uiAnimEnd = apSaveGameBuffer->GetBufferPosition();
+        apSaveGameBuffer->SaveVariableSizedValue(uiAnimEnd - uiAnimStart, uiAnimPosition);
     }
+
     ActiveEffect::SaveActiveEffectList(
         apSaveGameBuffer, static_cast<BSSimpleList<ActiveEffect*>*>(static_cast<void*>(pActiveEffectList))
     );
@@ -4391,11 +4290,10 @@ void MiddleHighProcess::LoadGame(BGSLoadFormBuffer* apLoadGameBuffer) {
         DeadDetectList.AddHead(pDead);
     }
     RunOncePackage.LoadGame(apLoadGameBuffer);
-    if (pActor) {
-        if (apLoadGameBuffer->GetChangeFlags().CheckFlags(0x10000000)) {
-            pSaveLoadGame->QueueSubBuffer(QUEUED_SUB_BUFFER_ANIMATION, apLoadGameBuffer, nullptr);
-        }
+    if ((pActor) && (apLoadGameBuffer->GetChangeFlags().CheckFlags(0x10000000))) {
+        pSaveLoadGame->QueueSubBuffer(QUEUED_SUB_BUFFER_ANIMATION, apLoadGameBuffer, nullptr);
     }
+
     if (apLoadGameBuffer->GetChangeFlags().CheckFlags(0x8000020)) {
         InventoryChanges* pChanges = pActor->GetExtra()->GetContainerChanges();
         if (pChanges) {
@@ -4749,11 +4647,10 @@ void MiddleHighProcess::InitLoadGame(BGSLoadFormBuffer* apLoadGameBuffer) {
             }
         }
     }
-    if ((iReservationSlot & 0x80000000u) == 0) {
-        if (pTarget) {
-            pTarget->SetMarkerReserved(iReservationSlot, true);
-        }
+    if (((iReservationSlot & 0x80000000u) == 0) && (pTarget)) {
+        pTarget->SetMarkerReserved(iReservationSlot, true);
     }
+
     if (pactor) {
         SetWeaponFlags();
         UpdateArmorWorn(pactor);
@@ -4827,12 +4724,12 @@ void MiddleHighProcess::InitLoadGame(uint32_t aiFlags, uint32_t aiOldFlags, Mobi
     Actor* pActor = dynamic_cast<Actor*>(pmob);
     LowProcess::InitLoadGame(aiFlags, aiOldFlags, pmob);
     BaseProcess* pProcess = this;
-    if (pProcess->GetRunOncePackage()) {
-        // The second test masks with 0, so the package's TES init never runs, as the game does.
-        if ((aiFlags & 0) != 0) {
-            RunOncePackage.InitLoadGameTES(aiFlags, aiOldFlags);
-        }
+    if ((pProcess->GetRunOncePackage()) && ((aiFlags & 0) != 0))
+    // The second test masks with 0, so the package's TES init never runs, as the game does.
+    {
+        RunOncePackage.InitLoadGameTES(aiFlags, aiOldFlags);
     }
+
     // Each stored pointer's value is passed as the numeric form ID to resolve: the field holds the ID as untyped
     // memory, so the pointer is read as an integer here.
     if (pCommandingActor) {
@@ -4878,12 +4775,10 @@ void MiddleHighProcess::InitLoadGame(uint32_t aiFlags, uint32_t aiOldFlags, Mobi
             }
         }
     }
-    if (pSaveLoadGameOLD->GetCurrentVersion() >= 0x71) {
-        if (pCurrentPackageSpell) {
-            pCurrentPackageSpell = MagicItem::GetMagicItemByNumericID(
-                static_cast<uint32_t>(reinterpret_cast<uintptr_t>(pCurrentPackageSpell))
-            );
-        }
+    if ((pSaveLoadGameOLD->GetCurrentVersion() >= 0x71) && (pCurrentPackageSpell)) {
+        pCurrentPackageSpell = MagicItem::GetMagicItemByNumericID(
+            static_cast<uint32_t>(reinterpret_cast<uintptr_t>(pCurrentPackageSpell))
+        );
     }
 }
 
@@ -5116,11 +5011,10 @@ void MiddleHighProcess::Revert(BGSLoadFormBuffer* apLoadGameBuffer) {
     for (int32_t i = 0; i < 3; ++i) {
         pAimSequence[i] = nullptr;
     }
-    if (apLoadGameBuffer->GetOldChangeFlags().CheckFlags(0x10000000)) {
-        if (pAnimation) {
-            pAnimation->Revert(apLoadGameBuffer);
-        }
+    if ((apLoadGameBuffer->GetOldChangeFlags().CheckFlags(0x10000000)) && (pAnimation)) {
+        pAnimation->Revert(apLoadGameBuffer);
     }
+
     ActiveEffect::RevertActiveEffectList(
         apLoadGameBuffer, static_cast<BSSimpleList<ActiveEffect*>*>(static_cast<void*>(pActiveEffectList))
     );
@@ -5309,11 +5203,9 @@ void MiddleHighProcess::RefreshMagicShaderEffects(Actor* apActor) {
                     double ItemCharge = v3->GetItemCharge();
                     if (penchant->GetCost(apActor) <= ItemCharge) {
                         EffectSetting* pes = penchant->GetAVEffect(MagicSystem::SELF);
-                        if (pes) {
-                            if (pes->data.pEnchantEffect) {
-                                TESEffectShader* peffect_2 = pes->data.pEnchantEffect;
-                                SetWeaponEnchantmentVisuals(peffect_2);
-                            }
+                        if ((pes) && (pes->data.pEnchantEffect)) {
+                            TESEffectShader* peffect_2 = pes->data.pEnchantEffect;
+                            SetWeaponEnchantmentVisuals(peffect_2);
                         }
                     }
                 }
@@ -5349,48 +5241,43 @@ void MiddleHighProcess::RefreshMagicShaderEffects(Actor* apActor) {
                 }
             }
         }
-        if (apActor == pPlayer) {
-            if (pPlayer->GetInventory3D()) {
-                TESEffectShader* peffect_3 = GetWeaponEnchantmentVisuals();
-                MagicShaderHitEffect* pinventory = pPlayer->GetMagicShaderHitEffect();
-                if (peffect_3) {
-                    if (pinventory) {
-                        if (pinventory->pEffectData != peffect_3) {
-                            delete pinventory;
-                            pinventory = nullptr;
-                        }
+        if ((apActor == pPlayer) && (pPlayer->GetInventory3D())) {
+            TESEffectShader* peffect_3 = GetWeaponEnchantmentVisuals();
+            MagicShaderHitEffect* pinventory = pPlayer->GetMagicShaderHitEffect();
+            if (peffect_3) {
+                if ((pinventory) && (pinventory->pEffectData != peffect_3)) {
+                    delete pinventory;
+                    pinventory = nullptr;
+                }
+
+                if (!pinventory) {
+                    MagicShaderHitEffect* pinventory_2;
+                    MagicShaderHitEffect* v12 =
+                        static_cast<MagicShaderHitEffect*>(NiMemObject::operator new(sizeof(MagicShaderHitEffect)));
+                    if (v12) {
+                        pinventory_2 = ::new (v12) MagicShaderHitEffect(pPlayer, peffect_3, -1.0f);
                     }
-                    if (!pinventory) {
-                        MagicShaderHitEffect* pinventory_2;
-                        MagicShaderHitEffect* v12 =
-                            static_cast<MagicShaderHitEffect*>(NiMemObject::operator new(sizeof(MagicShaderHitEffect)));
-                        if (v12) {
-                            pinventory_2 = ::new (v12) MagicShaderHitEffect(pPlayer, peffect_3, -1.0f);
-                        }
-                        else {
-                            pinventory_2 = nullptr;
-                        }
-                        pinventory = pinventory_2;
-                        pinventory_2->bWeaponEnchantment = true;
-                        pPlayer->SetInventoryWeaponEffect(pinventory_2);
-                        if (!bcreated) {
-                            pinventory_2->SetLifeTime(100.0f);
-                        }
+                    else {
+                        pinventory_2 = nullptr;
+                    }
+                    pinventory = pinventory_2;
+                    pinventory_2->bWeaponEnchantment = true;
+                    pPlayer->SetInventoryWeaponEffect(pinventory_2);
+                    if (!bcreated) {
+                        pinventory_2->SetLifeTime(100.0f);
                     }
                 }
-                else {
-                    if (pinventory) {
-                        delete pinventory;
-                        pinventory = nullptr;
-                        pPlayer->SetInventoryWeaponEffect(nullptr);
-                    }
-                }
+            }
+            else {
                 if (pinventory) {
-                    if (!pinventory->Init()) {
-                        delete pinventory;
-                        pPlayer->SetInventoryWeaponEffect(nullptr);
-                    }
+                    delete pinventory;
+                    pinventory = nullptr;
+                    pPlayer->SetInventoryWeaponEffect(nullptr);
                 }
+            }
+            if ((pinventory) && (!pinventory->Init())) {
+                delete pinventory;
+                pPlayer->SetInventoryWeaponEffect(nullptr);
             }
         }
     }
@@ -5478,10 +5365,8 @@ void MiddleHighProcess::AddAttachedArrow(ArrowProjectile* apArrow) {
 }
 
 void MiddleHighProcess::RemoveAttachedArrow(ArrowProjectile* apArrow) {
-    if (apArrow) {
-        if (pAttachedArrowList) {
-            pAttachedArrowList->Remove(apArrow);
-        }
+    if ((apArrow) && (pAttachedArrowList)) {
+        pAttachedArrowList->Remove(apArrow);
     }
 }
 
@@ -5526,21 +5411,18 @@ void MiddleHighProcess::StoreDamageNodes(NiNode* apNode, BGSBodyPartData* apBody
     else {
         pheadPart = nullptr;
     }
-    if (pheadPart) {
-        if (pheadPart->GetTargetName()) {
-            pHeadNode = BSUtilities::GetObjectByName(apNode, pheadPart->GetTargetName());
-        }
+    if ((pheadPart) && (pheadPart->GetTargetName())) {
+        pHeadNode = BSUtilities::GetObjectByName(apNode, pheadPart->GetTargetName());
     }
+
     if (apBodyPartData) {
         ptorsoPart = apBodyPartData->GetBodyPart(BGSBodyPart::LIMB_TORSO);
     }
     else {
         ptorsoPart = nullptr;
     }
-    if (ptorsoPart) {
-        if (ptorsoPart->GetTargetName()) {
-            pTorsoNode = BSUtilities::GetObjectByName(apNode, ptorsoPart->GetTargetName());
-        }
+    if ((ptorsoPart) && (ptorsoPart->GetTargetName())) {
+        pTorsoNode = BSUtilities::GetObjectByName(apNode, ptorsoPart->GetTargetName());
     }
 }
 
@@ -5606,17 +5488,12 @@ void MiddleHighProcess::UpdateArmorWorn(Actor* apActor) {
             }
         }
     }
-    if (!pSaveLoadGame->GetSaveGameLoading() &&
-        (bwasWearingBP != bHasBackPackWorn || bwasWearingPA != bPowerArmorWorn) && !bWeaponDrawn) {
-        if (pWeapon) {
-            if (apActor->IsNpc()) {
-                Animation* Animation_ = apActor->Actor::GetAnimation();
-                // Calls Character's biped getter directly on the actor, not through the virtual.
-                ForceWeaponDrawnSheathed(
-                    false, static_cast<Character*>(apActor)->Character::GetBiped(), Animation_, apActor
-                );
-            }
-        }
+    if ((!pSaveLoadGame->GetSaveGameLoading() &&
+         (bwasWearingBP != bHasBackPackWorn || bwasWearingPA != bPowerArmorWorn) && !bWeaponDrawn) &&
+        (pWeapon) && (apActor->IsNpc())) {
+        Animation* Animation_ = apActor->Actor::GetAnimation();
+        // Calls Character's biped getter directly on the actor, not through the virtual.
+        ForceWeaponDrawnSheathed(false, static_cast<Character*>(apActor)->Character::GetBiped(), Animation_, apActor);
     }
 }
 
@@ -5638,54 +5515,45 @@ bool MiddleHighProcess::HasBackPackWorn() {
 
 void MiddleHighProcess::TryReserveProjectileClones(Actor* apActor) {
     FNVD_INLINED_LOCAL(NiPointer<Model>, spmodel, std::nullopt, std::nullopt);
-    if (!spReserveProjectileClones.m_pObject) {
-        if (spWeaponPreload.m_pObject) {
-            if (static_cast<QueuedFile*>(spWeaponPreload.m_pObject)->QueuedFile::GetAllChildrenFinished()) {
-                TESBoundObject* FormFlags;
-                TESObjectWEAP* pcurrentWeapon;
-                ItemChange* pweap = GetCurrentWeapon();
-                ItemChange* pammo = GetCurrentAmmo();
-                if (pweap) {
-                    pcurrentWeapon = static_cast<TESObjectWEAP*>(GetCurrentWeapon()->pContainerObj);
-                }
-                else {
-                    pcurrentWeapon = nullptr;
-                }
-                if (pammo) {
-                    FormFlags = GetCurrentAmmo()->pContainerObj;
-                }
-                else {
-                    FormFlags = nullptr;
-                }
-                if (pcurrentWeapon) {
-                    if (FormFlags) {
-                        if (pcurrentWeapon->GetProjectile(apActor)) {
-                            BGSProjectile* Projectile_ = pcurrentWeapon->GetProjectile(apActor);
-                            int32_t icloneCount = Projectile_->GetPreCloneCount(pcurrentWeapon);
-                            if (icloneCount > 0) {
-                                ::new (&spmodel) NiPointer<Model>(static_cast<Model*>(nullptr));
-                                TESModel* v5 = static_cast<TESModel*>(pcurrentWeapon->GetProjectile(apActor));
-                                const char* v3 = v5->GetModel();
-                                pModelLoader->FindModel(v3, spmodel);
-                                if (spmodel.m_pObject) {
-                                    if (spmodel.m_pObject->GetModel()) {
-                                        BSCloneReserver* v4;
-                                        BSCloneReserver* v9 =
-                                            static_cast<BSCloneReserver*>(ourMalloc(sizeof(BSCloneReserver)));
-                                        if (v9) {
-                                            v4 = ::new (v9) BSCloneReserver(spmodel.m_pObject->GetModel(), icloneCount);
-                                        }
-                                        else {
-                                            v4 = nullptr;
-                                        }
-                                        spReserveProjectileClones.operator=(v4);
-                                    }
-                                }
-                                NiPointer<Model>::Destroy(&spmodel);
-                            }
-                        }
+    if ((!spReserveProjectileClones.m_pObject) && (spWeaponPreload.m_pObject) &&
+        (static_cast<QueuedFile*>(spWeaponPreload.m_pObject)->QueuedFile::GetAllChildrenFinished())) {
+        TESBoundObject* FormFlags;
+        TESObjectWEAP* pcurrentWeapon;
+        ItemChange* pweap = GetCurrentWeapon();
+        ItemChange* pammo = GetCurrentAmmo();
+        if (pweap) {
+            pcurrentWeapon = static_cast<TESObjectWEAP*>(GetCurrentWeapon()->pContainerObj);
+        }
+        else {
+            pcurrentWeapon = nullptr;
+        }
+        if (pammo) {
+            FormFlags = GetCurrentAmmo()->pContainerObj;
+        }
+        else {
+            FormFlags = nullptr;
+        }
+        if ((pcurrentWeapon) && (FormFlags) && (pcurrentWeapon->GetProjectile(apActor))) {
+            BGSProjectile* Projectile_ = pcurrentWeapon->GetProjectile(apActor);
+            int32_t icloneCount = Projectile_->GetPreCloneCount(pcurrentWeapon);
+            if (icloneCount > 0) {
+                ::new (&spmodel) NiPointer<Model>(static_cast<Model*>(nullptr));
+                TESModel* v5 = static_cast<TESModel*>(pcurrentWeapon->GetProjectile(apActor));
+                const char* v3 = v5->GetModel();
+                pModelLoader->FindModel(v3, spmodel);
+                if ((spmodel.m_pObject) && (spmodel.m_pObject->GetModel())) {
+                    BSCloneReserver* v4;
+                    BSCloneReserver* v9 = static_cast<BSCloneReserver*>(ourMalloc(sizeof(BSCloneReserver)));
+                    if (v9) {
+                        v4 = ::new (v9) BSCloneReserver(spmodel.m_pObject->GetModel(), icloneCount);
                     }
+                    else {
+                        v4 = nullptr;
+                    }
+                    spReserveProjectileClones.operator=(v4);
                 }
+
+                NiPointer<Model>::Destroy(&spmodel);
             }
         }
     }
@@ -5931,19 +5799,17 @@ void MiddleHighProcess::ProcessEscort(Actor* apActor) {
         }
     }
     bool bIsActor = false;
-    if (pTarget) {
-        if (pTarget->IsActor() && pTarget != apActor) {
-            bIsActor = true;
-            Actor* pact = dynamic_cast<Actor*>(pTarget);
-            BaseProcess* CurrentAIProcess = pact->pCurrentProcess;
-            TESPackage* prun = CurrentAIProcess->GetCurrentPackage();
-            if (pTarget != pPlayer &&
-                (!prun || (prun->GetPackType() != PACKAGE_TYPE_FOLLOW && !prun->GetIsCreated()))) {
-                SetProcedureIndexRunning(0);
-                return;
-            }
+    if ((pTarget) && (pTarget->IsActor() && pTarget != apActor)) {
+        bIsActor = true;
+        Actor* pact = dynamic_cast<Actor*>(pTarget);
+        BaseProcess* CurrentAIProcess = pact->pCurrentProcess;
+        TESPackage* prun = CurrentAIProcess->GetCurrentPackage();
+        if (pTarget != pPlayer && (!prun || (prun->GetPackType() != PACKAGE_TYPE_FOLLOW && !prun->GetIsCreated()))) {
+            SetProcedureIndexRunning(0);
+            return;
         }
     }
+
     const NiPoint3* v21 = &apActor->GetLocationOnReference();
     const NiPoint3* v3 = &apActor->GetLocationOnReference();
     NiPoint3 distance = *v3 - *v21;
@@ -5984,12 +5850,11 @@ void MiddleHighProcess::ProcessEscort(Actor* apActor) {
                     plist = pitem->pExtraObjectList->m_item;
                 }
                 uint32_t id = 0;
-                if (plist) {
-                    if (plist->GetReferencePointer()) {
-                        TESObjectREFR* ReferencePointer = plist->GetReferencePointer();
-                        id = ReferencePointer->iFormID;
-                    }
+                if ((plist) && (plist->GetReferencePointer())) {
+                    TESObjectREFR* ReferencePointer = plist->GetReferencePointer();
+                    id = ReferencePointer->iFormID;
                 }
+
                 TESObjectREFR* pcont = pPack->pPackLoc->GetLocReference();
                 if (!pcont) {
                     pcont = pGenericLocation;
@@ -6091,23 +5956,22 @@ void MiddleHighProcess::ProcessEscort(Actor* apActor) {
             TESObjectCELL* LocationCell;
             TESWorldSpace* LocationWorld;
             NiPoint3 v70;
-            if (!apActor->IsPathingComplete() ||
-                ((bIsActor && (v16 = distance.Length(), !(fwaitdistance >= v16))) ||
-                 (LocationWorld = pPack->GetLocationWorld(apActor),
-                  (LocationCell = pPack->GetLocationCell(apActor),
-                   (v70 = pPack->GetLocationCoord(apActor),
-                    SetupPathFinding(apActor, v70, LocationCell, LocationWorld)))))) {
-                if (!apActor->IsPathingComplete()) {
-                    TESGlobal* ptimescale = static_cast<TESGlobal*>(TESForm::GetFormByNumericID(58u));
-                    float fhour = appCalendar.GetHour();
-                    if (fhour < fHourLastProcessed) {
-                        fhour = fhour + 24.0;
-                    }
-                    // Scales the elapsed hours to seconds of game time and never uses the result, as the game does.
-                    float ftimedelta = fhour - fHourLastProcessed;
-                    ftimedelta = 3600.0 / ptimescale->fValue * ftimedelta;
-                    (void)ftimedelta;
+            if ((!apActor->IsPathingComplete() ||
+                 ((bIsActor && (v16 = distance.Length(), !(fwaitdistance >= v16))) ||
+                  (LocationWorld = pPack->GetLocationWorld(apActor),
+                   (LocationCell = pPack->GetLocationCell(apActor),
+                    (v70 = pPack->GetLocationCoord(apActor),
+                     SetupPathFinding(apActor, v70, LocationCell, LocationWorld)))))) &&
+                (!apActor->IsPathingComplete())) {
+                TESGlobal* ptimescale = static_cast<TESGlobal*>(TESForm::GetFormByNumericID(58u));
+                float fhour = appCalendar.GetHour();
+                if (fhour < fHourLastProcessed) {
+                    fhour = fhour + 24.0;
                 }
+                // Scales the elapsed hours to seconds of game time and never uses the result, as the game does.
+                float ftimedelta = fhour - fHourLastProcessed;
+                ftimedelta = 3600.0 / ptimescale->fValue * ftimedelta;
+                (void)ftimedelta;
             }
         }
     }
@@ -6119,32 +5983,29 @@ void MiddleHighProcess::ProcessSleep(Actor* apActor) {
         FindBedChairs(apActor, false, nullptr);
     }
     if (apActor->GetSitSleepState() != SIT_SLEEP_IS_SLEEPING && apActor->IsNpc()) {
-        if (!pCurrentFurniture) {
-            if (RefListChairBed.ItemsInList()) {
-                if (TESObjectREFR::kFurnitureLock.TryLock()) {
-                    pCurrentFurniture = static_cast<TESObjectREFR*>((&RefListChairBed)->m_item);
-                    ClearFurnitureMarker();
-                    if (pCurrentFurniture->GetOwner()) {
-                        RefListChairBed.Remove(*reinterpret_cast<void**>(&pCurrentFurniture));
-                    }
-                    else {
-                        int32_t inumber = RefListChairBed.ItemsInList();
-                        uint32_t v2 = Random();
-                        int32_t irandom = v2 % inumber;
-                        if (irandom >= inumber) {
-                            irandom = inumber;
-                        }
-                        BSSimpleList<void*>* plist = &RefListChairBed;
-                        for (int32_t i = 0; i < irandom; ++i) {
-                            plist = plist->m_pkNext;
-                        }
-                        pCurrentFurniture = static_cast<TESObjectREFR*>(plist->m_item);
-                        ClearFurnitureMarker();
-                    }
-                    TESObjectREFR::kFurnitureLock.Unlock();
-                }
+        if ((!pCurrentFurniture) && (RefListChairBed.ItemsInList()) && (TESObjectREFR::kFurnitureLock.TryLock())) {
+            pCurrentFurniture = static_cast<TESObjectREFR*>((&RefListChairBed)->m_item);
+            ClearFurnitureMarker();
+            if (pCurrentFurniture->GetOwner()) {
+                RefListChairBed.Remove(*reinterpret_cast<void**>(&pCurrentFurniture));
             }
+            else {
+                int32_t inumber = RefListChairBed.ItemsInList();
+                uint32_t v2 = Random();
+                int32_t irandom = v2 % inumber;
+                if (irandom >= inumber) {
+                    irandom = inumber;
+                }
+                BSSimpleList<void*>* plist = &RefListChairBed;
+                for (int32_t i = 0; i < irandom; ++i) {
+                    plist = plist->m_pkNext;
+                }
+                pCurrentFurniture = static_cast<TESObjectREFR*>(plist->m_item);
+                ClearFurnitureMarker();
+            }
+            TESObjectREFR::kFurnitureLock.Unlock();
         }
+
         SetTarget(pCurrentFurniture);
         if (pCurrentFurniture) {
             ProcessActivate(apActor, false);
@@ -6174,33 +6035,30 @@ void MiddleHighProcess::ProcessEat(Actor* apActor, TESObjectREFR* apLocRef) {
             FindBedChairs(apActor, true, apLocRef);
         }
         if (apActor->IsNpc() && apActor->GetSitSleepState() != SIT_SLEEP_IS_SITTING) {
-            if (!pCurrentFurniture) {
-                if (RefListChairBed.ItemsInList()) {
-                    if (TESObjectREFR::kFurnitureLock.TryLock()) {
-                        pCurrentFurniture = static_cast<TESObjectREFR*>((&RefListChairBed)->m_item);
-                        ClearFurnitureMarker();
-                        if (pCurrentFurniture->GetOwner()) {
-                            RefListChairBed.Remove(*reinterpret_cast<void**>(&pCurrentFurniture));
-                        }
-                        else {
-                            int32_t inumber = RefListChairBed.ItemsInList();
-                            uint32_t v3 = Random();
-                            int32_t irandom = v3 % inumber;
-                            if (irandom >= inumber) {
-                                irandom = inumber;
-                            }
-                            BSSimpleList<void*>* plist = &RefListChairBed;
-                            for (int32_t i = 0; i < irandom; ++i) {
-                                plist = plist->m_pkNext;
-                            }
-                            pCurrentFurniture = static_cast<TESObjectREFR*>(plist->m_item);
-                            ClearFurnitureMarker();
-                            RefListChairBed.Remove(*reinterpret_cast<void**>(&pCurrentFurniture));
-                        }
-                        TESObjectREFR::kFurnitureLock.Unlock();
-                    }
+            if ((!pCurrentFurniture) && (RefListChairBed.ItemsInList()) && (TESObjectREFR::kFurnitureLock.TryLock())) {
+                pCurrentFurniture = static_cast<TESObjectREFR*>((&RefListChairBed)->m_item);
+                ClearFurnitureMarker();
+                if (pCurrentFurniture->GetOwner()) {
+                    RefListChairBed.Remove(*reinterpret_cast<void**>(&pCurrentFurniture));
                 }
+                else {
+                    int32_t inumber = RefListChairBed.ItemsInList();
+                    uint32_t v3 = Random();
+                    int32_t irandom = v3 % inumber;
+                    if (irandom >= inumber) {
+                        irandom = inumber;
+                    }
+                    BSSimpleList<void*>* plist = &RefListChairBed;
+                    for (int32_t i = 0; i < irandom; ++i) {
+                        plist = plist->m_pkNext;
+                    }
+                    pCurrentFurniture = static_cast<TESObjectREFR*>(plist->m_item);
+                    ClearFurnitureMarker();
+                    RefListChairBed.Remove(*reinterpret_cast<void**>(&pCurrentFurniture));
+                }
+                TESObjectREFR::kFurnitureLock.Unlock();
             }
+
             SetTarget(pCurrentFurniture);
             if (pCurrentFurniture) {
                 ProcessActivate(apActor, false);
@@ -6244,22 +6102,19 @@ void MiddleHighProcess::ProcessCombat(Actor* apActor) {
             while (iRoundAmound && !apActor->IsDead(false)) {
                 apActor->PerformOneRoundofCombat();
                 pTargetActor = dynamic_cast<Actor*>(pTarget);
-                if (pTargetActor) {
-                    if (!pTargetActor->IsDead(false)) {
-                        BaseProcess* CurrentAIProcess = pTargetActor->GetCurrentAIProcess();
-                        if (CurrentAIProcess->GetProcessLevel() == PROCESS_TYPE_MIDDLE_HIGH) {
-                            pTargetActor->PerformOneRoundofCombat();
-                            bRoundDone = true;
-                        }
+                if ((pTargetActor) && (!pTargetActor->IsDead(false))) {
+                    BaseProcess* CurrentAIProcess = pTargetActor->GetCurrentAIProcess();
+                    if (CurrentAIProcess->GetProcessLevel() == PROCESS_TYPE_MIDDLE_HIGH) {
+                        pTargetActor->PerformOneRoundofCombat();
+                        bRoundDone = true;
                     }
                 }
+
                 --iRoundAmound;
             }
-            if (bRoundDone) {
-                if (pTargetActor) {
-                    pProcess = pTargetActor->GetCurrentAIProcess();
-                    pProcess->ComputeLastTimeProcessed();
-                }
+            if ((bRoundDone) && (pTargetActor)) {
+                pProcess = pTargetActor->GetCurrentAIProcess();
+                pProcess->ComputeLastTimeProcessed();
             }
         }
         else {
@@ -6285,11 +6140,10 @@ void MiddleHighProcess::ProcessAlarm(Actor* apActor) {
                 uint32_t* v12 = nullptr;
                 Actor* pcrimeAct = nullptr;
                 TESObjectREFR* pcrimeRef = pcrime->pcrimetarget;
-                if (pcrimeRef) {
-                    if (pcrimeRef->IsActor()) {
-                        pcrimeAct = dynamic_cast<Actor*>(pcrimeRef);
-                    }
+                if ((pcrimeRef) && (pcrimeRef->IsActor())) {
+                    pcrimeAct = dynamic_cast<Actor*>(pcrimeRef);
                 }
+
                 if (!pcrime->breported) {
                     Crime* v8 = pcrime;
                     float afRadius2 = static_cast<float>(iCrimeAlarmRecDistance.Int());
@@ -6309,10 +6163,8 @@ void MiddleHighProcess::ProcessAlarm(Actor* apActor) {
                         }
                     }
                     else {
-                        if (pcrimeAct) {
-                            if (apActor->GetShouldAttackActor(pactor, false, ereaction, false)) {
-                                bcombatflag = true;
-                            }
+                        if ((pcrimeAct) && (apActor->GetShouldAttackActor(pactor, false, ereaction, false))) {
+                            bcombatflag = true;
                         }
                     }
                 }
@@ -6340,16 +6192,15 @@ bool MiddleHighProcess::ProcessActivate(Actor* apActor, bool abInterateindex) {
         return false;
     }
     TESObjectREFR* pref = pPack->GetLocationReference(apActor);
-    if (pref) {
-        if (pref->IsFurniture()) {
-            TESBoundObject* v4;
-            TESBoundObject* ObjectReference = pTarget->GetObjectReference();
-            if (ObjectReference == pXMarkerHeading || (v4 = pTarget->GetObjectReference(), v4 == pXMarker)) {
-                SetActionHeadTrackTarget(pref);
-                return true;
-            }
+    if ((pref) && (pref->IsFurniture())) {
+        TESBoundObject* v4;
+        TESBoundObject* ObjectReference = pTarget->GetObjectReference();
+        if (ObjectReference == pXMarkerHeading || (v4 = pTarget->GetObjectReference(), v4 == pXMarker)) {
+            SetActionHeadTrackTarget(pref);
+            return true;
         }
     }
+
     if (pPack->GetPackType() == PACKAGE_TYPE_AMBUSH && !pPack->IsTargetAtLocation(apActor, 300)) {
         AddToProcedureIndexRunning(apActor, -1);
     }
@@ -6656,10 +6507,8 @@ void MiddleHighProcess::ProcessFleeNonCombat(Actor* apActor) {
         TESPackage* ppackage_2 = GetPackageThatIsRunning();
         FleePackage* pPack = dynamic_cast<FleePackage*>(ppackage_2);
         Actor* pact = dynamic_cast<Actor*>(pTarget);
-        if (pPack) {
-            if (pact) {
-                pPack->AddAvoidedRef(pact);
-            }
+        if ((pPack) && (pact)) {
+            pPack->AddAvoidedRef(pact);
         }
     }
     else {
@@ -6708,18 +6557,16 @@ void MiddleHighProcess::ProcessSandBox(Actor* apActor) {
                         const PathingLocation* pathLoc = &preq.m_pObject->Destination;
                         TESWorldSpace* plocworld = pathLoc->pWorldSpace;
                         TESObjectCELL* plocintcell = pathLoc->GetCell();
-                        if (plocintcell) {
-                            if (!plocintcell->GetInterior()) {
-                                plocintcell = nullptr;
-                            }
+                        if ((plocintcell) && (!plocintcell->GetInterior())) {
+                            plocintcell = nullptr;
                         }
+
                         TESWorldSpace* psandboxWorld = ploc->GetWorldSpace();
                         TESObjectCELL* psandboxIntCell = ploc->GetParentCell();
-                        if (psandboxIntCell) {
-                            if (!psandboxIntCell->GetInterior()) {
-                                psandboxIntCell = nullptr;
-                            }
+                        if ((psandboxIntCell) && (!psandboxIntCell->GetInterior())) {
+                            psandboxIntCell = nullptr;
                         }
+
                         bool bsamespace = false;
                         if (psandboxIntCell || plocintcell) {
                             if (psandboxIntCell == plocintcell) {
@@ -6816,11 +6663,10 @@ void MiddleHighProcess::ProcessSandBox(Actor* apActor) {
                             break;
                         }
                         case SANDBOX_PROCEDURE_USE_IDLE_MARKER: {
-                            if (!apActor->IsPathing()) {
-                                if (pCurrentIdle) {
-                                    pdata->eState = SandBoxActorPackageData::SANDBOX_STATE_DOINGSTUFF;
-                                }
+                            if ((!apActor->IsPathing()) && (pCurrentIdle)) {
+                                pdata->eState = SandBoxActorPackageData::SANDBOX_STATE_DOINGSTUFF;
                             }
+
                             break;
                         }
                         default: {
@@ -6990,10 +6836,9 @@ bool MiddleHighProcess::CheckIfHasObject(Actor* apActor, int32_t ainumb) {
             TESBoundObject* TargObject = static_cast<TESBoundObject*>(ptarg->GetTargObject());
             return apActor->HasObjects(TargObject, POTYPE_NONE, ainumb, 0, eUseItem);
         }
-        else {
-            PACKAGE_OBJECT_TYPE TargObjectType = ptarg->GetTargObjectType();
-            return apActor->HasObjects(nullptr, TargObjectType, ainumb, 0, eUseItem);
-        }
+
+        PACKAGE_OBJECT_TYPE TargObjectType = ptarg->GetTargObjectType();
+        return apActor->HasObjects(nullptr, TargObjectType, ainumb, 0, eUseItem);
     }
     else {
         ActorPackage* pactorPack = GetActorPackageThatIsRunning();
@@ -7072,42 +6917,41 @@ TESObjectREFR* MiddleHighProcess::GetLocationForPackage(Actor* apActor, TESPacka
         if (pLoc->GetLocType() == PLT_LINKEDREF) {
             return apActor->GetLinkedRef();
         }
-        else {
-            if (pLoc->IsLocationGeneric()) {
-                if (GenericLocationsList.IsEmpty()) {
-                    TESObjectCELL* pCell = apActor->GetParentCell();
-                    NiPoint3 pointB = apActor->GetLocationOnReference();
-                    PACK_LOC_TYPE etype = pLoc->GetLocType();
-                    if (etype == PLT_OBJECT) {
-                        pObjectForLocation = static_cast<TESBoundObject*>(pLoc->GetLocObject());
-                        eFormType = POTYPE_NONE;
-                    }
-                    else {
-                        if (etype == PLT_TYPE) {
-                            pObjectForLocation = nullptr;
-                            eFormType = pLoc->GetLocObjectType();
-                        }
-                    }
-                    float facquireDist = 0.0f;
-                    if (!apPackage->GetAcquireRadius(apActor, facquireDist)) {
-                        facquireDist = fAIAcquireObjectDistance.Float();
-                    }
-                    float afRadius2 = facquireDist;
-                    const NiPoint3* v5 = &apActor->GetLocationOnReference();
-                    pDataHandler->EnumReferencesCloseToPoint(
-                        pCell, pointB, facquireDist, *v5, afRadius2, &EvaluateGenericLocation, apActor
-                    );
+
+        if (pLoc->IsLocationGeneric()) {
+            if (GenericLocationsList.IsEmpty()) {
+                TESObjectCELL* pCell = apActor->GetParentCell();
+                NiPoint3 pointB = apActor->GetLocationOnReference();
+                PACK_LOC_TYPE etype = pLoc->GetLocType();
+                if (etype == PLT_OBJECT) {
+                    pObjectForLocation = static_cast<TESBoundObject*>(pLoc->GetLocObject());
                     eFormType = POTYPE_NONE;
-                    pObjectForLocation = nullptr;
-                    for (BSSimpleList<TESObjectREFR*>* plist = &TempLocList; plist->m_item; plist->RemoveHead()) {
-                        GenericLocationsList.AddHead(plist->m_item);
+                }
+                else {
+                    if (etype == PLT_TYPE) {
+                        pObjectForLocation = nullptr;
+                        eFormType = pLoc->GetLocObjectType();
                     }
-                    TempLocList.RemoveAll();
                 }
-                if (!GenericLocationsList.IsEmpty()) {
-                    preturnlocationref = GenericLocationsList.m_item;
-                    GenericLocationsList.RemoveHead();
+                float facquireDist = 0.0f;
+                if (!apPackage->GetAcquireRadius(apActor, facquireDist)) {
+                    facquireDist = fAIAcquireObjectDistance.Float();
                 }
+                float afRadius2 = facquireDist;
+                const NiPoint3* v5 = &apActor->GetLocationOnReference();
+                pDataHandler->EnumReferencesCloseToPoint(
+                    pCell, pointB, facquireDist, *v5, afRadius2, &EvaluateGenericLocation, apActor
+                );
+                eFormType = POTYPE_NONE;
+                pObjectForLocation = nullptr;
+                for (BSSimpleList<TESObjectREFR*>* plist = &TempLocList; plist->m_item; plist->RemoveHead()) {
+                    GenericLocationsList.AddHead(plist->m_item);
+                }
+                TempLocList.RemoveAll();
+            }
+            if (!GenericLocationsList.IsEmpty()) {
+                preturnlocationref = GenericLocationsList.m_item;
+                GenericLocationsList.RemoveHead();
             }
         }
     }
@@ -7169,20 +7013,18 @@ void MiddleHighProcess::EvaluateOrderAcquireList(Actor* apActor) {
                             pbuyactor = ReferenceProcessLists.GetActorRefInHigh(pnpc, false);
                         }
                     }
-                    if (pbuyactor) {
-                        if (ballowBuying && pbuyactor->GetActorBase()->SellBuysItem(pObj)) {
-                            int32_t v5 = apActor->GetGoldAmount();
-                            if (v5 >= TESValueForm::GetFormValue(pObject->pObject)) {
-                                if (apActor->IsInCombat()) {
-                                    badd = false;
-                                }
-                                else {
-                                    pObject->eType = ACQUIRE_TYPE_BUY_NPC;
-                                    uint32_t DistanceFromReference =
-                                        static_cast<int32_t>(apActor->GetDistanceFromReference(pRef, false, false));
-                                    pObject->iWantValue = DistanceFromReference;
-                                    v26 = 1;
-                                }
+                    if ((pbuyactor) && (ballowBuying && pbuyactor->GetActorBase()->SellBuysItem(pObj))) {
+                        int32_t v5 = apActor->GetGoldAmount();
+                        if (v5 >= TESValueForm::GetFormValue(pObject->pObject)) {
+                            if (apActor->IsInCombat()) {
+                                badd = false;
+                            }
+                            else {
+                                pObject->eType = ACQUIRE_TYPE_BUY_NPC;
+                                uint32_t DistanceFromReference =
+                                    static_cast<int32_t>(apActor->GetDistanceFromReference(pRef, false, false));
+                                pObject->iWantValue = DistanceFromReference;
+                                v26 = 1;
                             }
                         }
                     }
@@ -7224,11 +7066,9 @@ void MiddleHighProcess::EvaluateOrderAcquireList(Actor* apActor) {
                             badd = false;
                         }
                         else {
-                            if (bbuyit) {
-                                if (!bbuyit->IsPlayerTeammate()) {
-                                    pObject->eType = ACQUIRE_TYPE_KILL;
-                                    badd = true;
-                                }
+                            if ((bbuyit) && (!bbuyit->IsPlayerTeammate())) {
+                                pObject->eType = ACQUIRE_TYPE_KILL;
+                                badd = true;
                             }
                         }
                     }
@@ -7260,10 +7100,8 @@ void MiddleHighProcess::EvaluateOrderAcquireList(Actor* apActor) {
                         if (pObject->eType == ACQUIRE_TYPE_NOOWNED_CONTAINER) {
                             PACKAGE_OBJECT_TYPE eUseItem = POTYPE_NONE;
                             pObject->eType = ACQUIRE_TYPE_PICKPOCKET;
-                            if (!apActor->HasObjects(pLockpick, POTYPE_NONE, 1, 0, eUseItem)) {
-                                if (pRef->GetLock()) {
-                                    badd = false;
-                                }
+                            if ((!apActor->HasObjects(pLockpick, POTYPE_NONE, 1, 0, eUseItem)) && (pRef->GetLock())) {
+                                badd = false;
                             }
                         }
                         else {
@@ -7314,19 +7152,17 @@ bool MiddleHighProcess::ProcessCombatOneHour(Actor* apActor, float afTimeDelta) 
         else {
             ProcessFollowOneHour(apActor, 3600.0f, false);
         }
-        if (ptarget) {
-            if (!ptarget->IsDead(false)) {
-                BaseProcess* CurrentAIProcess = ptarget->pCurrentProcess;
-                CurrentAIProcess->ComputeLastTimeProcessed();
-            }
+        if ((ptarget) && (!ptarget->IsDead(false))) {
+            BaseProcess* CurrentAIProcess = ptarget->pCurrentProcess;
+            CurrentAIProcess->ComputeLastTimeProcessed();
         }
+
         return false;
     }
-    else {
-        apActor->StopCombat(ptarget);
-        apActor->EndInterruptPackage(false);
-        return false;
-    }
+
+    apActor->StopCombat(ptarget);
+    apActor->EndInterruptPackage(false);
+    return false;
 }
 
 void MiddleHighProcess::SetAnimation(Animation* apAnimation) {
@@ -7508,41 +7344,38 @@ bool MiddleHighProcess::ProcessDialogueActivate(Actor* apActor) {
                 }
                 return true;
             }
+
+            if (th_s->IsActorAtLocation(ActorStartedConversation, false, -1.0f, true) &&
+                th_s->IsActorAtSecondLocation(a2, apActor, false, -1.0f, true)) {
+                if (a2 == pPlayer) {
+                    apActor->Activate(a2, false, nullptr, 1);
+                }
+                else {
+                    AddToProcedureIndexRunning(apActor, 2);
+                }
+            }
             else {
-                if (th_s->IsActorAtLocation(ActorStartedConversation, false, -1.0f, true) &&
-                    th_s->IsActorAtSecondLocation(a2, apActor, false, -1.0f, true)) {
-                    if (a2 == pPlayer) {
-                        apActor->Activate(a2, false, nullptr, 1);
-                    }
-                    else {
-                        AddToProcedureIndexRunning(apActor, 2);
+                if (a2 == apActor && a2->IsActor()) {
+                    if (a2 != pPlayer && !th_s->GetDialogueDoNotControlTarget()) {
+                        BaseProcess* CurrentAIProcess = a2->pCurrentProcess;
+                        CurrentAIProcess->ProcessTravel(a2, false, false, -1, true);
                     }
                 }
                 else {
-                    if (a2 == apActor && a2->IsActor()) {
-                        if (a2 != pPlayer && !th_s->GetDialogueDoNotControlTarget()) {
-                            BaseProcess* CurrentAIProcess = a2->pCurrentProcess;
-                            CurrentAIProcess->ProcessTravel(a2, false, false, -1, true);
-                        }
-                    }
-                    else {
-                        ProcessTravel(apActor, false, false, 257, false);
-                    }
+                    ProcessTravel(apActor, false, false, 257, false);
                 }
-                return true;
             }
+            return true;
         }
-        else {
-            AddToProcedureIndexRunning(apActor, 3);
-            return false;
-        }
-    }
-    else {
-        SetTargetForPackage(apActor);
+
         AddToProcedureIndexRunning(apActor, 3);
-        apActor->InitiateDialogue(pPackage);
-        return true;
+        return false;
     }
+
+    SetTargetForPackage(apActor);
+    AddToProcedureIndexRunning(apActor, 3);
+    apActor->InitiateDialogue(pPackage);
+    return true;
 }
 
 bool MiddleHighProcess::ProcessUseFurniture(Actor* apActor, TESObjectREFR* apFurniture) {
@@ -7584,17 +7417,14 @@ bool MiddleHighProcess::ProcessUseFurniture(Actor* apActor, TESObjectREFR* apFur
         AddToProcedureIndexRunning(apActor, (int32_t)1u);
         return false;
     }
-    else {
-        if (((int32_t)apActor->GetSitSleepState()) == 9) {
-            faceAnimationData = apActor->GetFaceAnimationData();
-            if (faceAnimationData) {
-                if (!faceAnimationData->GetDead()) {
-                    faceAnimationData->SetDead(true, false);
-                }
-            }
+
+    if (((int32_t)apActor->GetSitSleepState()) == 9) {
+        faceAnimationData = apActor->GetFaceAnimationData();
+        if ((faceAnimationData) && (!faceAnimationData->GetDead())) {
+            faceAnimationData->SetDead(true, false);
         }
-        return true;
     }
+    return true;
 }
 
 void MiddleHighProcess::ProcessRemoveWorn(Actor* apActor, bool bInterateindex, bool bOnlyifClothes) {
@@ -7624,12 +7454,11 @@ void MiddleHighProcess::ProcessRemoveWorn(Actor* apActor, bool bInterateindex, b
             bIsCreature->InitDefaultWorn(apActor, v12, v10, true);
         }
     }
-    if (apActor) {
-        if (apActor->MobileObject::GetCurrentAIProcess()) {
-            pBaseProcess = apActor->MobileObject::GetCurrentAIProcess();
-            pBaseProcess->Set3DUpdateFlag(RESET_MODEL);
-        }
+    if ((apActor) && (apActor->MobileObject::GetCurrentAIProcess())) {
+        pBaseProcess = apActor->MobileObject::GetCurrentAIProcess();
+        pBaseProcess->Set3DUpdateFlag(RESET_MODEL);
     }
+
     if (bInterateindex) {
         AddToProcedureIndexRunning(apActor, 1u);
     }
@@ -7953,54 +7782,51 @@ void MiddleHighProcess::LoadCharController(MobileObject* pmob) {
     hkpCharacterStateType charState;
     NiPoint3 linearVelocity;
     bhkCharacterController* pcon = GetCharController();
-    if (pcon) {
-        if (!pmob->IsDead(false)) {
-            pSaveLoadGameOLD->LoadGameDataOLD(&charState, 4u);
-            pcon->SetTrueState(charState);
-            pSaveLoadGameOLD->LoadGameDataOLD(&pcon->eWantState, 4u);
-            pSaveLoadGameOLD->LoadGameDataOLD(&iflags, 4u);
-            pcon->ClearFlag(0xFFFFFFFFu);
-            pcon->SetFlag(iflags, true);
-            if ((iflags & 2048) != 0 && pSaveLoadGameOLD->GetCurrentVersion() >= 35u) {
-                pSaveLoadGameOLD->LoadGameDataOLD(&pos, 12u);
-                if (GetSitSleepState()) {
-                    if (GetFurnitureMarker()) {
-                        MobileObject* pactor = nullptr;
-                        if (pmob->IsActor()) {
-                            pactor = pmob;
-                        }
-                        if (!pactor) {
-                            pos = GetFurnitureMarker()->Position;
-                        }
-                    }
+    if ((pcon) && (!pmob->IsDead(false))) {
+        pSaveLoadGameOLD->LoadGameDataOLD(&charState, 4u);
+        pcon->SetTrueState(charState);
+        pSaveLoadGameOLD->LoadGameDataOLD(&pcon->eWantState, 4u);
+        pSaveLoadGameOLD->LoadGameDataOLD(&iflags, 4u);
+        pcon->ClearFlag(0xFFFFFFFFu);
+        pcon->SetFlag(iflags, true);
+        if ((iflags & 2048) != 0 && pSaveLoadGameOLD->GetCurrentVersion() >= 35u) {
+            pSaveLoadGameOLD->LoadGameDataOLD(&pos, 12u);
+            if ((GetSitSleepState()) && (GetFurnitureMarker())) {
+                MobileObject* pactor = nullptr;
+                if (pmob->IsActor()) {
+                    pactor = pmob;
                 }
-                pcon->SetPosition(pos);
+                if (!pactor) {
+                    pos = GetFurnitureMarker()->Position;
+                }
             }
-            if (GetSitSleepState() == SIT_SLEEP_NORMAL) {
-                pmob->SetChaseBip(false);
-            }
-            pSaveLoadGameOLD->LoadGameDataOLD(&pcon->OutVelocity, 16u);
-            pSaveLoadGameOLD->LoadGameDataOLD(&pcon->VelocityMod, 16u);
-            pSaveLoadGameOLD->LoadGameDataOLD(&linearVelocity, 12u);
-            pcon->SetLinearVelocityNi(linearVelocity);
-            if (pmob->IsActor()) {
-                pSaveLoadGameOLD->LoadGameDataOLD(&pcon->fJumpHeight, 4u);
-                pSaveLoadGameOLD->LoadGameDataOLD(&pcon->fFallStartHeight, 4u);
+
+            pcon->SetPosition(pos);
+        }
+        if (GetSitSleepState() == SIT_SLEEP_NORMAL) {
+            pmob->SetChaseBip(false);
+        }
+        pSaveLoadGameOLD->LoadGameDataOLD(&pcon->OutVelocity, 16u);
+        pSaveLoadGameOLD->LoadGameDataOLD(&pcon->VelocityMod, 16u);
+        pSaveLoadGameOLD->LoadGameDataOLD(&linearVelocity, 12u);
+        pcon->SetLinearVelocityNi(linearVelocity);
+        if (pmob->IsActor()) {
+            pSaveLoadGameOLD->LoadGameDataOLD(&pcon->fJumpHeight, 4u);
+            pSaveLoadGameOLD->LoadGameDataOLD(&pcon->fFallStartHeight, 4u);
+            pSaveLoadGameOLD->LoadGameDataOLD(&pcon->fFallTime, 4u);
+        }
+        else {
+            if (pSaveLoadGameOLD->GetCurrentVersion() >= 32u) {
+                pSaveLoadGameOLD->LoadGameDataOLD(&pcon->fGravity, 4u);
                 pSaveLoadGameOLD->LoadGameDataOLD(&pcon->fFallTime, 4u);
             }
-            else {
-                if (pSaveLoadGameOLD->GetCurrentVersion() >= 32u) {
-                    pSaveLoadGameOLD->LoadGameDataOLD(&pcon->fGravity, 4u);
-                    pSaveLoadGameOLD->LoadGameDataOLD(&pcon->fFallTime, 4u);
-                }
-            }
-            if (charState == HK_CHARACTER_IN_AIR && (pcon->QSupported() || pcon->QSupported2())) {
-                pcon->fFallStartHeight = 0.0f;
-            }
-            if (pSaveLoadGameOLD->GetCurrentVersion() >= 119u) {
-                pSaveLoadGameOLD->LoadGameDataOLD(&pcon->fPitchAngle, 4u);
-                pSaveLoadGameOLD->LoadGameDataOLD(&pcon->fPitchMult, 4u);
-            }
+        }
+        if (charState == HK_CHARACTER_IN_AIR && (pcon->QSupported() || pcon->QSupported2())) {
+            pcon->fFallStartHeight = 0.0f;
+        }
+        if (pSaveLoadGameOLD->GetCurrentVersion() >= 119u) {
+            pSaveLoadGameOLD->LoadGameDataOLD(&pcon->fPitchAngle, 4u);
+            pSaveLoadGameOLD->LoadGameDataOLD(&pcon->fPitchMult, 4u);
         }
     }
 }
@@ -8011,33 +7837,31 @@ void MiddleHighProcess::SaveCharController(MobileObject* pmob) {
     hkpCharacterStateType charState;
     NiPoint3 linearVelocity;
     bhkCharacterController* pcon = GetCharController();
-    if (pcon) {
-        if (!pmob->IsDead(false)) {
-            charState = pcon->getState();
-            pSaveLoadGameOLD->SaveGameDataOLD(&charState, 4u);
-            pSaveLoadGameOLD->SaveGameDataOLD(&pcon->eWantState, 4u);
-            iflags = pcon->GetFlag(0xFFFFFFFFu);
-            pSaveLoadGameOLD->SaveGameDataOLD(&iflags, 4u);
-            if ((iflags & 2048) != 0) {
-                pcon->GetPosition(pos);
-                pSaveLoadGameOLD->SaveGameDataOLD(&pos, 12u);
-            }
-            pSaveLoadGameOLD->SaveGameDataOLD(&pcon->OutVelocity, 16u);
-            pSaveLoadGameOLD->SaveGameDataOLD(&pcon->VelocityMod, 16u);
-            pcon->GetLinearVelocity(linearVelocity);
-            pSaveLoadGameOLD->SaveGameDataOLD(&linearVelocity, 12u);
-            if (pmob->IsActor()) {
-                pSaveLoadGameOLD->SaveGameDataOLD(&pcon->fJumpHeight, 4u);
-                pSaveLoadGameOLD->SaveGameDataOLD(&pcon->fFallStartHeight, 4u);
-            }
-            else {
-                pSaveLoadGameOLD->SaveGameDataOLD(&pcon->fGravity, 4u);
-            }
-            pSaveLoadGameOLD->SaveGameDataOLD(&pcon->fFallTime, 4u);
-            if (pSaveLoadGameOLD->GetCurrentVersion() >= 119u) {
-                pSaveLoadGameOLD->SaveGameDataOLD(&pcon->fPitchAngle, 4u);
-                pSaveLoadGameOLD->SaveGameDataOLD(&pcon->fPitchMult, 4u);
-            }
+    if ((pcon) && (!pmob->IsDead(false))) {
+        charState = pcon->getState();
+        pSaveLoadGameOLD->SaveGameDataOLD(&charState, 4u);
+        pSaveLoadGameOLD->SaveGameDataOLD(&pcon->eWantState, 4u);
+        iflags = pcon->GetFlag(0xFFFFFFFFu);
+        pSaveLoadGameOLD->SaveGameDataOLD(&iflags, 4u);
+        if ((iflags & 2048) != 0) {
+            pcon->GetPosition(pos);
+            pSaveLoadGameOLD->SaveGameDataOLD(&pos, 12u);
+        }
+        pSaveLoadGameOLD->SaveGameDataOLD(&pcon->OutVelocity, 16u);
+        pSaveLoadGameOLD->SaveGameDataOLD(&pcon->VelocityMod, 16u);
+        pcon->GetLinearVelocity(linearVelocity);
+        pSaveLoadGameOLD->SaveGameDataOLD(&linearVelocity, 12u);
+        if (pmob->IsActor()) {
+            pSaveLoadGameOLD->SaveGameDataOLD(&pcon->fJumpHeight, 4u);
+            pSaveLoadGameOLD->SaveGameDataOLD(&pcon->fFallStartHeight, 4u);
+        }
+        else {
+            pSaveLoadGameOLD->SaveGameDataOLD(&pcon->fGravity, 4u);
+        }
+        pSaveLoadGameOLD->SaveGameDataOLD(&pcon->fFallTime, 4u);
+        if (pSaveLoadGameOLD->GetCurrentVersion() >= 119u) {
+            pSaveLoadGameOLD->SaveGameDataOLD(&pcon->fPitchAngle, 4u);
+            pSaveLoadGameOLD->SaveGameDataOLD(&pcon->fPitchMult, 4u);
         }
     }
 }
@@ -8075,16 +7899,13 @@ void MiddleHighProcess::ForceBoneScale() {}
 
 void MiddleHighProcess::ClearReservation() {
     if (!pDataHandler->GetClearingData()) {
-        if (pTarget) {
-            if (((int32_t)iReservationSlot) >= 0) {
-                pTarget->SetMarkerReserved(iReservationSlot, false);
-                iReservationSlot = (uint32_t)(-1);
-            }
+        if ((pTarget) && (((int32_t)iReservationSlot) >= 0)) {
+            pTarget->SetMarkerReserved(iReservationSlot, false);
+            iReservationSlot = (uint32_t)(-1);
         }
-        if (pCurrentFurniture) {
-            if (!pSaveLoadGame->GetSaveGameLoading()) {
-                pCurrentFurniture->SetMarkerReserved(cCurrentFurnitureIndex, false);
-            }
+
+        if ((pCurrentFurniture) && (!pSaveLoadGame->GetSaveGameLoading())) {
+            pCurrentFurniture->SetMarkerReserved(cCurrentFurnitureIndex, false);
         }
     }
 }
@@ -8220,100 +8041,91 @@ void MiddleHighProcess::MiddleHighCopy(MiddleHighProcess* apProcess) {
 }
 
 void MiddleHighProcess::ReparentWeapon(bool abDrawn, BipedAnim* apBiped, Animation* apAnim, Actor* apActor) {
-    if (apAnim) {
-        if (apAnim->GetControllerManager()) {
-            NiNode* pweaponBone = GetWeaponBone(apBiped);
-            BSAnimGroupSequence* pseq = apAnim->GetCurrentSequence(AGS_WEAPON);
-            ANIM_GROUP_ENUM egroup = static_cast<ANIM_GROUP_ENUM>(abDrawn + 23);
+    if ((apAnim) && (apAnim->GetControllerManager())) {
+        NiNode* pweaponBone = GetWeaponBone(apBiped);
+        BSAnimGroupSequence* pseq = apAnim->GetCurrentSequence(AGS_WEAPON);
+        ANIM_GROUP_ENUM egroup = static_cast<ANIM_GROUP_ENUM>(abDrawn + 23);
+        if (!pseq ||
+            (animGroupInfo[pseq->GetAnimGroup()->GetType()].eAction != AGAT_ATTACK_MINE &&
+             animGroupInfo[pseq->GetAnimGroup()->GetType()].eAction != AGAT_ATTACK_THROW)) {
             if (!pseq ||
-                (animGroupInfo[pseq->GetAnimGroup()->GetType()].eAction != AGAT_ATTACK_MINE &&
-                 animGroupInfo[pseq->GetAnimGroup()->GetType()].eAction != AGAT_ATTACK_THROW)) {
-                if (!pseq ||
-                    (pseq->GetAnimGroup()->GetType() != ANIM_GROUP_EQUIP &&
-                     pseq->GetAnimGroup()->GetType() != ANIM_GROUP_UNEQUIP)) {
-                    uint16_t sgroup = apActor->GetAnimGroup(egroup, pWeapon, pWeapon == nullptr, apAnim);
-                    if (TESAnimGroup::GetType(sgroup) == egroup) {
-                        pseq = apAnim->PlayGroup(sgroup, ACTION_START, -1, AGS_NONE);
-                        if (abDrawn) {
-                            SetAnimAction(ANIM_ACTION_EQUIP_WEAPON, pseq);
-                        }
+                (pseq->GetAnimGroup()->GetType() != ANIM_GROUP_EQUIP &&
+                 pseq->GetAnimGroup()->GetType() != ANIM_GROUP_UNEQUIP)) {
+                uint16_t sgroup = apActor->GetAnimGroup(egroup, pWeapon, pWeapon == nullptr, apAnim);
+                if (TESAnimGroup::GetType(sgroup) == egroup) {
+                    pseq = apAnim->PlayGroup(sgroup, ACTION_START, -1, AGS_NONE);
+                    if (abDrawn) {
+                        SetAnimAction(ANIM_ACTION_EQUIP_WEAPON, pseq);
                     }
                 }
-                if (pseq) {
-                    NiNode* p3d;
-                    if (apActor->TESObjectREFR::IsDead(false)) {
-                        float a2 = pseq->m_fEndKeyTime;
-                        pseq->SetOffset(a2);
-                        float a2a = pseq->m_fEndKeyTime;
-                        apAnim->Update(apActor, 0.0f, a2a);
-                        apAnim->UpdateMovement(apActor);
-                    }
-                    if (apBiped) {
-                        p3d = apBiped->root;
-                    }
-                    else {
-                        p3d = nullptr;
-                    }
-                    NiNode* p3d_2 = p3d;
-                    if (!p3d) {
-                        p3d_2 = apActor->Get3D();
-                    }
-                    if (p3d_2) {
-                        if (!pweaponBone) {
-                            if (pWeapon) {
-                                SetCurrentWeapon(pWeapon, p3d_2, false);
-                                pweaponBone = GetWeaponBone(apBiped);
-                            }
-                        }
-                    }
-                    TESAnimGroup* AnimGroup = pseq->GetAnimGroup();
-                    NiNode* pnewParent =
-                        static_cast<NiNode*>(BSUtilities::GetObjectByName(p3d_2, AnimGroup->pParentName));
-                    if (pnewParent) {
-                        pnewParent->AttachChild(pweaponBone, 1);
-                        apActor->SetHavokWeapon();
-                    }
-                    else {
-                        Warning(
-                            "ANIMATION: Animation '%s' doesn't have a 'prn: ...' to reparent the weapon bone.",
-                            (&pseq->m_kName)->GetHandleString()
-                        );
-                    }
+            }
+            if (pseq) {
+                NiNode* p3d;
+                if (apActor->TESObjectREFR::IsDead(false)) {
+                    float a2 = pseq->m_fEndKeyTime;
+                    pseq->SetOffset(a2);
+                    float a2a = pseq->m_fEndKeyTime;
+                    apAnim->Update(apActor, 0.0f, a2a);
+                    apAnim->UpdateMovement(apActor);
+                }
+                if (apBiped) {
+                    p3d = apBiped->root;
                 }
                 else {
-                    const char* v9;
-                    const char* FullName;
-                    if (pWeapon) {
-                        FullName = pWeapon->GetFullName();
-                    }
-                    else {
-                        FullName = "NONE";
-                    }
-                    if (abDrawn) {
-                        v9 = "Equip";
-                    }
-                    else {
-                        v9 = "Holster";
-                    }
-                    int32_t fSecondsPassed = apActor->iFormID;
+                    p3d = nullptr;
+                }
+                NiNode* p3d_2 = p3d;
+                if (!p3d) {
+                    p3d_2 = apActor->Get3D();
+                }
+                if ((p3d_2) && (!pweaponBone) && (pWeapon)) {
+                    SetCurrentWeapon(pWeapon, p3d_2, false);
+                    pweaponBone = GetWeaponBone(apBiped);
+                }
+
+                TESAnimGroup* AnimGroup = pseq->GetAnimGroup();
+                NiNode* pnewParent = static_cast<NiNode*>(BSUtilities::GetObjectByName(p3d_2, AnimGroup->pParentName));
+                if (pnewParent) {
+                    pnewParent->AttachChild(pweaponBone, 1);
+                    apActor->SetHavokWeapon();
+                }
+                else {
                     Warning(
-                        "AI: Missing %s animation for '%s' (%08X) weapon '%s'.", v9, apActor->GetFormEditorID(),
-                        fSecondsPassed, FullName
+                        "ANIMATION: Animation '%s' doesn't have a 'prn: ...' to reparent the weapon bone.",
+                        (&pseq->m_kName)->GetHandleString()
                     );
                 }
+            }
+            else {
+                const char* v9;
+                const char* FullName;
+                if (pWeapon) {
+                    FullName = pWeapon->GetFullName();
+                }
+                else {
+                    FullName = "NONE";
+                }
+                if (abDrawn) {
+                    v9 = "Equip";
+                }
+                else {
+                    v9 = "Holster";
+                }
+                int32_t fSecondsPassed = apActor->iFormID;
+                Warning(
+                    "AI: Missing %s animation for '%s' (%08X) weapon '%s'.", v9, apActor->GetFormEditorID(),
+                    fSecondsPassed, FullName
+                );
             }
         }
     }
 }
 
 void MiddleHighProcess::ClearFurnitureMarker() {
-    if (!pSaveLoadGame->GetSaveGameLoading()) {
-        if (pCurrentFurniture) {
-            if (!pDataHandler->GetClearingData()) {
-                pCurrentFurniture->SetMarkerReserved(cCurrentFurnitureIndex, false);
-            }
-        }
+    if ((!pSaveLoadGame->GetSaveGameLoading()) && (pCurrentFurniture) && (!pDataHandler->GetClearingData())) {
+        pCurrentFurniture->SetMarkerReserved(cCurrentFurnitureIndex, false);
     }
+
     cCurrentFurnitureIndex = (uint8_t)127;
     (&FurnitureMarker)->SetHeading(0.0);
     (&FurnitureMarker)->SetType(0);
@@ -8326,25 +8138,24 @@ uint16_t MiddleHighProcess::GetCharControllerSaveSize(MobileObject* pmob) {
     int16_t v6;
     int16_t v3 = 0;
     bhkCharacterController* v7 = GetCharController();
-    if (v7) {
-        if (!pmob->IsDead(false)) {
-            v4 = 12;
-            if ((static_cast<bhkCharacterListener*>(v7)->GetFlag(0xFFFFFFFFu) & 2048) != 0) {
-                v4 = 24;
-            }
-            v5 = (int16_t)(v4 + 44);
-            if (pmob->IsActor()) {
-                v6 = (int16_t)(v5 + 8);
-            }
-            else {
-                v6 = (int16_t)(v5 + 4);
-            }
-            v3 = (int16_t)(v6 + 4);
-            if (((uint32_t)((int32_t)pSaveLoadGameOLD->GetCurrentVersion())) >= 0x77u) {
-                v3 += 8;
-            }
+    if ((v7) && (!pmob->IsDead(false))) {
+        v4 = 12;
+        if ((static_cast<bhkCharacterListener*>(v7)->GetFlag(0xFFFFFFFFu) & 2048) != 0) {
+            v4 = 24;
+        }
+        v5 = (int16_t)(v4 + 44);
+        if (pmob->IsActor()) {
+            v6 = (int16_t)(v5 + 8);
+        }
+        else {
+            v6 = (int16_t)(v5 + 4);
+        }
+        v3 = (int16_t)(v6 + 4);
+        if (((uint32_t)((int32_t)pSaveLoadGameOLD->GetCurrentVersion())) >= 0x77u) {
+            v3 += 8;
         }
     }
+
     return (uint16_t)v3;
 }
 
@@ -8372,28 +8183,23 @@ bool MiddleHighProcess::ProcessEscortOneHour(Actor* apActor) {
             }
         }
     }
-    if (!pitem) {
-        if (this->pAcquireObject) {
-            if (this->pAcquireObject->pRef == apActor) {
-                pitem = apActor->GetInventoryItem(this->pAcquireObject->pObject, 0);
-                bManyflag = true;
-            }
-        }
+    if ((!pitem) && (this->pAcquireObject) && (this->pAcquireObject->pRef == apActor)) {
+        pitem = apActor->GetInventoryItem(this->pAcquireObject->pObject, 0);
+        bManyflag = true;
     }
+
     bool bIsActor = false;
-    if (pTarget) {
-        if (pTarget->IsActor() && pTarget != apActor) {
-            bIsActor = true;
-            Actor* pact = dynamic_cast<Actor*>(pTarget);
-            BaseProcess* CurrentAIProcess = pact->pCurrentProcess;
-            TESPackage* prun = CurrentAIProcess->GetCurrentPackage();
-            if (pTarget != pPlayer &&
-                (!prun || (prun->GetPackType() != PACKAGE_TYPE_FOLLOW && !prun->GetIsCreated()))) {
-                SetProcedureIndexRunning(0);
-                return false;
-            }
+    if ((pTarget) && (pTarget->IsActor() && pTarget != apActor)) {
+        bIsActor = true;
+        Actor* pact = dynamic_cast<Actor*>(pTarget);
+        BaseProcess* CurrentAIProcess = pact->pCurrentProcess;
+        TESPackage* prun = CurrentAIProcess->GetCurrentPackage();
+        if (pTarget != pPlayer && (!prun || (prun->GetPackType() != PACKAGE_TYPE_FOLLOW && !prun->GetIsCreated()))) {
+            SetProcedureIndexRunning(0);
+            return false;
         }
     }
+
     NiPoint3 distance = apActor->GetLocationOnReference();
     if (bIsActor) {
         const NiPoint3* v17 = &pTarget->GetLocationOnReference();
@@ -8438,12 +8244,11 @@ bool MiddleHighProcess::ProcessEscortOneHour(Actor* apActor) {
                     plist = pitem->pExtraObjectList->m_item;
                 }
                 uint32_t id = 0;
-                if (plist) {
-                    if (plist->GetReferencePointer()) {
-                        TESObjectREFR* ReferencePointer = plist->GetReferencePointer();
-                        id = ReferencePointer->iFormID;
-                    }
+                if ((plist) && (plist->GetReferencePointer())) {
+                    TESObjectREFR* ReferencePointer = plist->GetReferencePointer();
+                    id = ReferencePointer->iFormID;
                 }
+
                 TESObjectREFR* pcont = pPack->pPackLoc->GetLocReference();
                 if (!pcont) {
                     pcont = pGenericLocation;
@@ -8587,16 +8392,14 @@ bool MiddleHighProcess::ProcessEscortOneHour(Actor* apActor) {
         CheckforNewPackage(apActor, false);
         return false;
     }
-    else {
-        TESPackage* v16 = GetCurrentPackage();
-        int32_t idistance = static_cast<int32_t>(v16->GetPackageRadiusActorToRefTarget(apActor, false));
-        if (pTarget) {
-            if (pTarget->IsActor()) {
-                apActor->GetDistanceFromReference(pTarget, false, false);
-            }
-        }
-        return false;
+
+    TESPackage* v16 = GetCurrentPackage();
+    int32_t idistance = static_cast<int32_t>(v16->GetPackageRadiusActorToRefTarget(apActor, false));
+    if ((pTarget) && (pTarget->IsActor())) {
+        apActor->GetDistanceFromReference(pTarget, false, false);
     }
+
+    return false;
 }
 
 bool MiddleHighProcess::ProcessEatOneHour(Actor* apActor) {
@@ -8660,26 +8463,23 @@ bool MiddleHighProcess::ProcessActivateOneHour(Actor* apActor) {
         AddToProcedureIndexRunning(apActor, -2);
         return false;
     }
-    else {
-        if (pTarget->IsActor()) {
-            if (pTarget == pPlayer && (pPlayer->IsSleepingorResting() && !pPlayer->btransporting)) {
-                pPlayer->SetSleeping(0, true);
-                AddToProcedureIndexRunning(apActor, -1);
-                return false;
-            }
-            else {
-                SetTargetActivated(true);
-                AddToProcedureIndexRunning(apActor, 1);
-                return true;
-            }
+
+    if (pTarget->IsActor()) {
+        if (pTarget == pPlayer && (pPlayer->IsSleepingorResting() && !pPlayer->btransporting)) {
+            pPlayer->SetSleeping(0, true);
+            AddToProcedureIndexRunning(apActor, -1);
+            return false;
         }
-        else {
-            SetTargetActivated(true);
-            pTarget->Activate(apActor, false, nullptr, 1);
-            AddToProcedureIndexRunning(apActor, 1);
-            return true;
-        }
+
+        SetTargetActivated(true);
+        AddToProcedureIndexRunning(apActor, 1);
+        return true;
     }
+
+    SetTargetActivated(true);
+    pTarget->Activate(apActor, false, nullptr, 1);
+    AddToProcedureIndexRunning(apActor, 1);
+    return true;
 }
 
 void MiddleHighProcess::AlignToFurnitureAndAddPostAnimSitSleep(Actor* apActor) {
@@ -8751,11 +8551,10 @@ bool MiddleHighProcess::ShouldPickPackIdle(Actor* apActor) {
 void MiddleHighProcess::PickPackageIdles(Actor* apActor, bool abForceIdle) {
     using kArray_t = BSSimpleArray<TESIdleForm*, 1024>;
     TESPackage* pPackage = GetPackageThatIsRunning();
-    if (pPackage) {
-        if (pPackage->GetPackType() == PACKAGE_TYPE_IN_GAME_DIALOGUE) {
-            pPackage = (&apActor->m_Extra)->GetPackageExtra();
-        }
+    if ((pPackage) && (pPackage->GetPackType() == PACKAGE_TYPE_IN_GAME_DIALOGUE)) {
+        pPackage = (&apActor->m_Extra)->GetPackageExtra();
     }
+
     Animation* pAnimData = apActor->GetAnimation();
     if (pPackage) {
         if (bPickPackIdle) {
@@ -8764,68 +8563,63 @@ void MiddleHighProcess::PickPackageIdles(Actor* apActor, bool abForceIdle) {
         }
         if (ShouldPickPackIdle(apActor)) {
             BGSIdleCollection* pIdleCollection = pPackage->pIdleCollection;
-            if (pIdleCollection) {
-                if (pAnimData) {
-                    if ((pAnimData->SpecialIdleDonePlaying() || abForceIdle) && !apActor->IsParalyzed()) {
-                        if (!(fPackageIdleTimer <= 0.0)) {
-                            fPackageIdleTimer = fPackageIdleTimer - appTimer.fDelta;
-                        }
-                        else {
-                            bPickPackIdle = false;
-                            TESIdleForm* pLastIdle = pCurrentIdle;
-                            pCurrentIdle = nullptr;
-                            BGSIdleCollection::PICK_TYPE ePick = pIdleCollection->GetPickType();
-                            kArray_t kArray(10u);
-                            uint32_t uiIdleCount = pIdleCollection->GetIdlesForActor(apActor, pTarget, &kArray);
-                            if (uiIdleCount) {
-                                if (ePick) {
-                                    if (ePick == BGSIdleCollection::SEQUENCE) {
-                                        if (iPackageIdleNumber == -1 || iPackageIdleNumber + 1 >= uiIdleCount) {
-                                            iPackageIdleNumber = 0;
-                                        }
-                                        else {
-                                            ++iPackageIdleNumber;
-                                        }
-                                        pCurrentIdle = kArray.GetAt(static_cast<int32_t>(iPackageIdleNumber));
-                                        if (pPackage->GetOnBeginIdle() == pCurrentIdle) {
-                                            pCurrentIdle = nullptr;
-                                        }
-                                        if (iPackageIdleNumber + 1 >= uiIdleCount && pIdleCollection->GetDoOnce()) {
-                                            SetPackageIdleDone(true);
-                                        }
-                                        fPackageIdleTimer = -1.0f;
-                                    }
+            if ((pIdleCollection) && (pAnimData) &&
+                ((pAnimData->SpecialIdleDonePlaying() || abForceIdle) && !apActor->IsParalyzed())) {
+                if (!(fPackageIdleTimer <= 0.0)) {
+                    fPackageIdleTimer = fPackageIdleTimer - appTimer.fDelta;
+                }
+                else {
+                    bPickPackIdle = false;
+                    TESIdleForm* pLastIdle = pCurrentIdle;
+                    pCurrentIdle = nullptr;
+                    BGSIdleCollection::PICK_TYPE ePick = pIdleCollection->GetPickType();
+                    kArray_t kArray(10u);
+                    uint32_t uiIdleCount = pIdleCollection->GetIdlesForActor(apActor, pTarget, &kArray);
+                    if (uiIdleCount) {
+                        if (ePick) {
+                            if (ePick == BGSIdleCollection::SEQUENCE) {
+                                if (iPackageIdleNumber == -1 || iPackageIdleNumber + 1 >= uiIdleCount) {
+                                    iPackageIdleNumber = 0;
                                 }
                                 else {
-                                    pCurrentIdle = pLastIdle;
-                                    if (pLastIdle) {
-                                        while (pLastIdle == pCurrentIdle && uiIdleCount > 1) {
-                                            uint32_t uiIndex = static_cast<uint32_t>(rt::rand()) % uiIdleCount;
-                                            pCurrentIdle = kArray.GetAt(static_cast<int32_t>(uiIndex));
-                                            iPackageIdleNumber = uiIndex;
-                                        }
-                                    }
-                                    else {
-                                        uint32_t uiIndex = static_cast<uint32_t>(rt::rand()) % uiIdleCount;
-                                        pCurrentIdle = kArray.GetAt(static_cast<int32_t>(uiIndex));
-                                        iPackageIdleNumber = uiIndex;
-                                    }
-                                    if (pPackage->GetOnBeginIdle() == pCurrentIdle) {
-                                        pCurrentIdle = nullptr;
-                                    }
-                                    if (pCurrentIdle) {
-                                        fPackageIdleTimer = 0.8f;
-                                        if (pIdleCollection->GetDoOnce()) {
-                                            SetPackageIdleDone(true);
-                                        }
-                                    }
+                                    ++iPackageIdleNumber;
                                 }
-                                if (pCurrentIdle) {
-                                    SetupSpecialIdle(
-                                        apActor, pCurrentIdle, AnimIdle::PLAY_TYPE_AUTO, true, false, true
-                                    );
+                                pCurrentIdle = kArray.GetAt(static_cast<int32_t>(iPackageIdleNumber));
+                                if (pPackage->GetOnBeginIdle() == pCurrentIdle) {
+                                    pCurrentIdle = nullptr;
+                                }
+                                if (iPackageIdleNumber + 1 >= uiIdleCount && pIdleCollection->GetDoOnce()) {
+                                    SetPackageIdleDone(true);
+                                }
+                                fPackageIdleTimer = -1.0f;
+                            }
+                        }
+                        else {
+                            pCurrentIdle = pLastIdle;
+                            if (pLastIdle) {
+                                while (pLastIdle == pCurrentIdle && uiIdleCount > 1) {
+                                    uint32_t uiIndex = static_cast<uint32_t>(rt::rand()) % uiIdleCount;
+                                    pCurrentIdle = kArray.GetAt(static_cast<int32_t>(uiIndex));
+                                    iPackageIdleNumber = uiIndex;
                                 }
                             }
+                            else {
+                                uint32_t uiIndex = static_cast<uint32_t>(rt::rand()) % uiIdleCount;
+                                pCurrentIdle = kArray.GetAt(static_cast<int32_t>(uiIndex));
+                                iPackageIdleNumber = uiIndex;
+                            }
+                            if (pPackage->GetOnBeginIdle() == pCurrentIdle) {
+                                pCurrentIdle = nullptr;
+                            }
+                            if (pCurrentIdle) {
+                                fPackageIdleTimer = 0.8f;
+                                if (pIdleCollection->GetDoOnce()) {
+                                    SetPackageIdleDone(true);
+                                }
+                            }
+                        }
+                        if (pCurrentIdle) {
+                            SetupSpecialIdle(apActor, pCurrentIdle, AnimIdle::PLAY_TYPE_AUTO, true, false, true);
                         }
                     }
                 }
@@ -9087,11 +8881,10 @@ TESObjectREFR* MiddleHighProcess::SetTargetData(Actor* apActor, TESPackage* apPa
                 }
                 pownerform = pAcquireObject->pRef->GetOwner();
                 pnpc = nullptr;
-                if (pownerform) {
-                    if (pownerform->GetFormType() == NPC__ID) {
-                        pnpc = static_cast<TESNPC*>(pownerform);
-                    }
+                if ((pownerform) && (pownerform->GetFormType() == NPC__ID)) {
+                    pnpc = static_cast<TESNPC*>(pownerform);
                 }
+
                 if (pnpc) {
                     pacquireReference = (TESObjectREFR*)ReferenceProcessLists.GetActorRefInHigh(pnpc, false);
                 LABEL_84:;
@@ -9138,77 +8931,72 @@ void MiddleHighProcess::FindBedChairs(Actor* apActor, bool abSit, TESObjectREFR*
     TESObjectCELL* pCell = apActor->GetParentCell();
     NiPoint3 pointB = apActor->GetLocationOnReference();
     TESPackage* pPack = GetPackageThatIsRunning();
-    if (pPack) {
-        if (apActor) {
-            PackageLocation* pLocation = pPack->pPackLoc;
-            float facquireDist_2 = 0.0f;
-            if (pPack->GetPackType() == PACKAGE_TYPE_EAT) {
-                TESObjectCELL* LocCell;
+    if ((pPack) && (apActor)) {
+        PackageLocation* pLocation = pPack->pPackLoc;
+        float facquireDist_2 = 0.0f;
+        if (pPack->GetPackType() == PACKAGE_TYPE_EAT) {
+            TESObjectCELL* LocCell;
+            if (pLocation &&
+                (pLocation->GetLocType() == PLT_CELL && (LocCell = pLocation->GetLocCell(), LocCell->GetInterior()))) {
+                facquireDist_2 = 3.4028235e+38f;
+            }
+            else {
+                facquireDist_2 = static_cast<float>(pPack->GetLocationRadius(apActor));
+            }
+        }
+        else {
+            if (!pPack->GetAcquireRadius(apActor, facquireDist_2)) {
+                TESObjectCELL* v5;
                 if (pLocation &&
-                    (pLocation->GetLocType() == PLT_CELL &&
-                     (LocCell = pLocation->GetLocCell(), LocCell->GetInterior()))) {
+                    (pLocation->GetLocType() == PLT_CELL && (v5 = pLocation->GetLocCell(), v5->GetInterior()))) {
                     facquireDist_2 = 3.4028235e+38f;
                 }
                 else {
-                    facquireDist_2 = static_cast<float>(pPack->GetLocationRadius(apActor));
+                    facquireDist_2 = fAIFindBedChairsDistance.Float();
                 }
             }
-            else {
-                if (!pPack->GetAcquireRadius(apActor, facquireDist_2)) {
-                    TESObjectCELL* v5;
-                    if (pLocation &&
-                        (pLocation->GetLocType() == PLT_CELL && (v5 = pLocation->GetLocCell(), v5->GetInterior()))) {
-                        facquireDist_2 = 3.4028235e+38f;
-                    }
-                    else {
-                        facquireDist_2 = fAIFindBedChairsDistance.Float();
-                    }
-                }
-            }
-            if (apRefLoc) {
-                const NiPoint3* loc = (const NiPoint3*)&apRefLoc->GetLocationOnReference();
-                float afRadius2 = facquireDist_2;
-                float afRadius1 = facquireDist_2;
-                TESObjectCELL* ParentCell = apRefLoc->GetParentCell();
-                pDataHandler->EnumReferencesCloseToPoint(
-                    ParentCell, *loc, afRadius1, *loc, afRadius2, &MiddleHighProcess::EvaluateReferenceforSitSleep,
-                    apActor
-                );
-            }
-            else {
-                float afRadius2a = facquireDist_2;
-                pDataHandler->EnumReferencesCloseToPoint(
-                    pCell, pointB, facquireDist_2, pPack->GetLocationCoord(apActor), afRadius2a,
-                    &MiddleHighProcess::EvaluateReferenceforSitSleep, apActor
-                );
-            }
-            RefListChairBed.RemoveAll();
-            for (TESObjectREFR*& rpItem : MiddleHighTempRefListChairBed.ItemsUntilNull()) {
-                RefListChairBed.AddHead(*reinterpret_cast<void**>(&rpItem));
-            }
-            MiddleHighTempRefListChairBed.RemoveAll();
-            BSSimpleList<void*>* pFirst = &RefListChairBed;
-            NiPlane* v24 = nullptr;
-            int32_t iCount = pFirst->ItemsInList();
-            bool bSwappedItems = true;
-            while (iCount && bSwappedItems) {
-                bSwappedItems = false;
-                for (BSSimpleList<void*>* pSecond = pFirst; pSecond; pSecond = pSecond->m_pkNext) {
-                    void* pFirstData = pFirst->m_item;
-                    void* pSecondData = pSecond->m_item;
-                    if (!static_cast<TESObjectREFR*>(pFirstData)->GetOwner()) {
-                        if (static_cast<TESObjectREFR*>(pSecondData)->GetOwner()) {
-                            pFirst->SetItem(pSecondData);
-                            pSecond->SetItem(pFirstData);
-                            bSwappedItems = true;
-                        }
-                    }
-                }
-                pFirst = pFirst->m_pkNext;
-                --iCount;
-            }
-            nFurnitureListTimer = appTimer.iLastTime;
         }
+        if (apRefLoc) {
+            const NiPoint3* loc = (const NiPoint3*)&apRefLoc->GetLocationOnReference();
+            float afRadius2 = facquireDist_2;
+            float afRadius1 = facquireDist_2;
+            TESObjectCELL* ParentCell = apRefLoc->GetParentCell();
+            pDataHandler->EnumReferencesCloseToPoint(
+                ParentCell, *loc, afRadius1, *loc, afRadius2, &MiddleHighProcess::EvaluateReferenceforSitSleep, apActor
+            );
+        }
+        else {
+            float afRadius2a = facquireDist_2;
+            pDataHandler->EnumReferencesCloseToPoint(
+                pCell, pointB, facquireDist_2, pPack->GetLocationCoord(apActor), afRadius2a,
+                &MiddleHighProcess::EvaluateReferenceforSitSleep, apActor
+            );
+        }
+        RefListChairBed.RemoveAll();
+        for (TESObjectREFR*& rpItem : MiddleHighTempRefListChairBed.ItemsUntilNull()) {
+            RefListChairBed.AddHead(*reinterpret_cast<void**>(&rpItem));
+        }
+        MiddleHighTempRefListChairBed.RemoveAll();
+        BSSimpleList<void*>* pFirst = &RefListChairBed;
+        NiPlane* v24 = nullptr;
+        int32_t iCount = pFirst->ItemsInList();
+        bool bSwappedItems = true;
+        while (iCount && bSwappedItems) {
+            bSwappedItems = false;
+            for (BSSimpleList<void*>* pSecond = pFirst; pSecond; pSecond = pSecond->m_pkNext) {
+                void* pFirstData = pFirst->m_item;
+                void* pSecondData = pSecond->m_item;
+                if ((!static_cast<TESObjectREFR*>(pFirstData)->GetOwner()) &&
+                    (static_cast<TESObjectREFR*>(pSecondData)->GetOwner())) {
+                    pFirst->SetItem(pSecondData);
+                    pSecond->SetItem(pFirstData);
+                    bSwappedItems = true;
+                }
+            }
+            pFirst = pFirst->m_pkNext;
+            --iCount;
+        }
+        nFurnitureListTimer = appTimer.iLastTime;
     }
 }
 

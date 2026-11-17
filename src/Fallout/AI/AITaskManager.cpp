@@ -120,13 +120,11 @@ void ActorUpdateTaskData::HandleCountMessage(uint32_t aiCount) {
 }
 
 void ActorUpdateTaskData::HandleMobMessage(MobileObject* apMob) {
-    if (apMob) {
-        if (apMob->IsActor()) {
-            if (static_cast<Actor*>(apMob)->bProcessMe) {
-                apMob->Update(0.0f);
-            }
-            ++iUpdated;
+    if ((apMob) && (apMob->IsActor())) {
+        if (static_cast<Actor*>(apMob)->bProcessMe) {
+            apMob->Update(0.0f);
         }
+        ++iUpdated;
     }
 }
 
@@ -185,90 +183,82 @@ void PackageUpdateTaskData::HandleCountMessage(uint32_t uiCount) {
 
 void PackageUpdateTaskData::HandleMobMessage(MobileObject* apMob) {
     Actor* ptarget;
-    if (apMob) {
-        if (!apMob->IsStillLoading() && !apMob->GetDelete() && !apMob->GetDisabled()) {
-            if (apMob->pCurrentProcess) {
-                if (apMob->GetCurrentProcessType() == PROCESS_TYPE_HIGH) {
-                    Actor* pact = nullptr;
-                    bool updatefollower = true;
-                    if (apMob) {
-                        if (apMob->IsActor()) {
-                            pact = static_cast<Actor*>(apMob);
-                        }
+    if ((apMob) && (!apMob->IsStillLoading() && !apMob->GetDelete() && !apMob->GetDisabled()) &&
+        (apMob->pCurrentProcess) && (apMob->GetCurrentProcessType() == PROCESS_TYPE_HIGH)) {
+        Actor* pact = nullptr;
+        bool updatefollower = true;
+        if ((apMob) && (apMob->IsActor())) {
+            pact = static_cast<Actor*>(apMob);
+        }
+
+        if (!pact || pact->bProcessMe) {
+            if (pact && pact->CanSkipActorUpdate()) {
+                BaseProcess* CurrentAIProcess = pact->pCurrentProcess;
+                CurrentAIProcess->CheckforNewPackage(pact, false);
+                updatefollower = false;
+                ++iNotUpdated;
+                static_cast<HighProcess*>(pact->pCurrentProcess)->HighProcess::SetSkippedLastUpdate(true);
+            }
+            else {
+                apMob->Process(0.0f);
+                ++iUpdated;
+            }
+            if ((pact) && (pPlayer->IsSleepingorResting())) {
+                pact->RestoreHealth(2.0f);
+                pact->RestoreFatigue(2.0f);
+            }
+
+            if (apMob->GetCurrentProcessType()) {
+                pmoblist = nullptr;
+            }
+            if (updatefollower) {
+                ExtraFollower* pfollow;
+                // The address &apMob->m_Extra is never null.
+                pfollow = (&apMob->m_Extra)->GetFollowerExtra();
+                if (pfollow) {
+                    BSSimpleList<Actor*>* pTempList;
+                    void* pTempMemory = ourMalloc(sizeof(BSSimpleList<Actor*>));
+                    if (pTempMemory) {
+                        pTempList = ::new (pTempMemory) BSSimpleList<Actor*>;
                     }
-                    if (!pact || pact->bProcessMe) {
-                        if (pact && pact->CanSkipActorUpdate()) {
-                            BaseProcess* CurrentAIProcess = pact->pCurrentProcess;
-                            CurrentAIProcess->CheckforNewPackage(pact, false);
-                            updatefollower = false;
-                            ++iNotUpdated;
-                            static_cast<HighProcess*>(pact->pCurrentProcess)->HighProcess::SetSkippedLastUpdate(true);
+                    else {
+                        pTempList = nullptr;
+                    }
+                    BSSimpleList<Actor*>* pHead;
+                    void* pHeadMemory = ourMalloc(sizeof(BSSimpleList<Actor*>));
+                    if (pHeadMemory) {
+                        pHead = ::new (pHeadMemory) BSSimpleList<Actor*>;
+                    }
+                    else {
+                        pHead = nullptr;
+                    }
+                    BSSimpleList<Actor*>* plist = pHead;
+                    for (BSSimpleList<Actor*>* ptemp = pfollow->pActorlist; ptemp && ptemp->m_item;
+                         ptemp = ptemp->m_pkNext) {
+                        pHead->AddTail(ptemp->m_item);
+                    }
+                    while (plist && plist->m_item) {
+                        ptarget = plist->m_item;
+                        if ((ptarget) && (ptarget != pPlayer && !ptarget->IsFollowing(pact))) {
+                            pTempList->AddHead(ptarget);
                         }
-                        else {
-                            apMob->Process(0.0f);
-                            ++iUpdated;
-                        }
-                        if (pact) {
-                            if (pPlayer->IsSleepingorResting()) {
-                                pact->RestoreHealth(2.0f);
-                                pact->RestoreFatigue(2.0f);
-                            }
-                        }
-                        if (apMob->GetCurrentProcessType()) {
-                            pmoblist = nullptr;
-                        }
-                        if (updatefollower) {
-                            ExtraFollower* pfollow;
-                            // The address &apMob->m_Extra is never null.
-                            pfollow = (&apMob->m_Extra)->GetFollowerExtra();
-                            if (pfollow) {
-                                BSSimpleList<Actor*>* pTempList;
-                                void* pTempMemory = ourMalloc(sizeof(BSSimpleList<Actor*>));
-                                if (pTempMemory) {
-                                    pTempList = ::new (pTempMemory) BSSimpleList<Actor*>;
-                                }
-                                else {
-                                    pTempList = nullptr;
-                                }
-                                BSSimpleList<Actor*>* pHead;
-                                void* pHeadMemory = ourMalloc(sizeof(BSSimpleList<Actor*>));
-                                if (pHeadMemory) {
-                                    pHead = ::new (pHeadMemory) BSSimpleList<Actor*>;
-                                }
-                                else {
-                                    pHead = nullptr;
-                                }
-                                BSSimpleList<Actor*>* plist = pHead;
-                                for (BSSimpleList<Actor*>* ptemp = pfollow->pActorlist; ptemp && ptemp->m_item;
-                                     ptemp = ptemp->m_pkNext) {
-                                    pHead->AddTail(ptemp->m_item);
-                                }
-                                while (plist && plist->m_item) {
-                                    ptarget = plist->m_item;
-                                    if (ptarget) {
-                                        if (ptarget != pPlayer && !ptarget->IsFollowing(pact)) {
-                                            pTempList->AddHead(ptarget);
-                                        }
-                                    }
-                                    plist = plist->m_pkNext;
-                                }
-                                for (plist = pTempList; plist && plist->m_item; plist = plist->m_pkNext) {
-                                    Actor* m_item = plist->m_item;
-                                    (&apMob->m_Extra)->RemoveFollower(m_item);
-                                }
-                                pTempList->RemoveAllPointerList();
-                                if (pTempList) {
-                                    delete pTempList;
-                                }
-                                pHead->RemoveAllPointerList();
-                                if (pHead) {
-                                    delete pHead;
-                                }
-                                if (pfollow->pActorlist->IsEmpty()) {
-                                    (&apMob->m_Extra)->RemoveFollowerExtra();
-                                }
-                            }
-                        }
+
+                        plist = plist->m_pkNext;
+                    }
+                    for (plist = pTempList; plist && plist->m_item; plist = plist->m_pkNext) {
+                        Actor* m_item = plist->m_item;
+                        (&apMob->m_Extra)->RemoveFollower(m_item);
+                    }
+                    pTempList->RemoveAllPointerList();
+                    if (pTempList) {
+                        delete pTempList;
+                    }
+                    pHead->RemoveAllPointerList();
+                    if (pHead) {
+                        delete pHead;
+                    }
+                    if (pfollow->pActorlist->IsEmpty()) {
+                        (&apMob->m_Extra)->RemoveFollowerExtra();
                     }
                 }
             }
@@ -295,11 +285,9 @@ void ActorsScriptTaskData::HandleCountMessage(uint32_t auiCount) {
 }
 
 void ActorsScriptTaskData::HandleMobMessage(MobileObject* apMob) {
-    if (apMob) {
-        if (apMob->IsActor() && Script::GetProcessScripts()) {
-            apMob->RunScript();
-            ++iUpdated;
-        }
+    if ((apMob) && (apMob->IsActor() && Script::GetProcessScripts())) {
+        apMob->RunScript();
+        ++iUpdated;
     }
 }
 
@@ -328,74 +316,69 @@ void DetectionTaskData::HandleMobMessage(MobileObject* apMob) {
     ftime = BSMIN(ftime, 5.0f);
     ftime = RandomFloat(0.0f, ftime);
     Actor* toDetect = nullptr;
-    if (apMob) {
-        if (apMob->IsActor()) {
-            Actor* pmob = static_cast<Actor*>(apMob);
-            Actor* pdetectact = static_cast<Actor*>(apMob);
-            if (pdetectact->bProcessMe) {
-                TESActorBaseData* v5 = static_cast<TESActorBaseData*>(pdetectact->GetActorBase());
-                if (!v5->GetIsGhost()) {
-                    float fdistancefromplayer = pdetectact->GetDistanceFromReference(pPlayer, false, false);
-                    if (pdetectact != pPlayer && !pSaveLoadGameOLD->GetLoading()) {
-                        if (!(pmob->GetDetectionTimer() < 0.0) ||
-                            (pdetectact->IsUnConscious() || pmob->IsDead(false))) {
-                            if (pmob->GetDetectionTimer() < 0.0) {
-                                pPlayer->RemovePerceivedActor(pmob);
-                            }
-                            pmob->ReduceDetectionTimer();
+    if ((apMob) && (apMob->IsActor())) {
+        Actor* pmob = static_cast<Actor*>(apMob);
+        Actor* pdetectact = static_cast<Actor*>(apMob);
+        if (pdetectact->bProcessMe) {
+            TESActorBaseData* v5 = static_cast<TESActorBaseData*>(pdetectact->GetActorBase());
+            if (!v5->GetIsGhost()) {
+                float fdistancefromplayer = pdetectact->GetDistanceFromReference(pPlayer, false, false);
+                if (pdetectact != pPlayer && !pSaveLoadGameOLD->GetLoading()) {
+                    if (!(pmob->GetDetectionTimer() < 0.0) || (pdetectact->IsUnConscious() || pmob->IsDead(false))) {
+                        if (pmob->GetDetectionTimer() < 0.0) {
+                            pPlayer->RemovePerceivedActor(pmob);
                         }
-                        else {
-                            if (pFaderManager->GetFaderAlpha(FADER_TO_BLACK) <= 0.0) {
-                                pmob->EvaluateDetection(ftime);
-                                BaseProcess* CurrentAIProcess = pdetectact->pCurrentProcess;
-                                if (CurrentAIProcess->ShouldRunPlayerDetection(pdetectact)) {
-                                    bool blinesight = false;
-                                    bool bcombat = pmob->IsInCombat();
-                                    b360LineofSight = false;
-                                    int32_t iplayerdetect = pPlayer->GetDetectionLevelAgainstActor(
-                                        true, pmob, blinesight, bcombat, false, false, &b360LineofSight
-                                    );
-                                    bool battack = false;
-                                    FIGHT_REACTION ereaction = FIGHT_REACTION_NEUTRAL;
-                                    if (pmob->GetShouldAttackActor(pPlayer, false, ereaction, false) ||
-                                        pmob->IsInCombatWithActor(pPlayer)) {
+                        pmob->ReduceDetectionTimer();
+                    }
+                    else {
+                        if (pFaderManager->GetFaderAlpha(FADER_TO_BLACK) <= 0.0) {
+                            pmob->EvaluateDetection(ftime);
+                            BaseProcess* CurrentAIProcess = pdetectact->pCurrentProcess;
+                            if (CurrentAIProcess->ShouldRunPlayerDetection(pdetectact)) {
+                                bool blinesight = false;
+                                bool bcombat = pmob->IsInCombat();
+                                b360LineofSight = false;
+                                int32_t iplayerdetect = pPlayer->GetDetectionLevelAgainstActor(
+                                    true, pmob, blinesight, bcombat, false, false, &b360LineofSight
+                                );
+                                bool battack = false;
+                                FIGHT_REACTION ereaction = FIGHT_REACTION_NEUTRAL;
+                                if (pmob->GetShouldAttackActor(pPlayer, false, ereaction, false) ||
+                                    pmob->IsInCombatWithActor(pPlayer)) {
+                                    battack = true;
+                                }
+                                else {
+                                    if ((ereaction == FIGHT_REACTION_NEUTRAL || ereaction == FIGHT_REACTION_ENEMY) &&
+                                        (pmob->GetActorBase()->AIData.bAggroRadius) &&
+                                        (pmob->GetActorBase()->AIData.uiAggroRadius)) {
                                         battack = true;
                                     }
-                                    else {
-                                        if (ereaction == FIGHT_REACTION_NEUTRAL || ereaction == FIGHT_REACTION_ENEMY) {
-                                            if (pmob->GetActorBase()->AIData.bAggroRadius) {
-                                                if (pmob->GetActorBase()->AIData.uiAggroRadius) {
-                                                    battack = true;
-                                                }
-                                            }
-                                        }
+                                }
+                                if (pmob) {
+                                    float* v2 = &fShaderShadowUpdateDistance.Float();
+                                    if (*v2 > static_cast<double>(fdistancefromplayer)) {
+                                        ReferenceProcessLists.InsertActorCloseToPlayer(pdetectact);
                                     }
-                                    if (pmob) {
-                                        float* v2 = &fShaderShadowUpdateDistance.Float();
-                                        if (*v2 > static_cast<double>(fdistancefromplayer)) {
-                                            ReferenceProcessLists.InsertActorCloseToPlayer(pdetectact);
-                                        }
-                                    }
-                                    double v3 = static_cast<double>(iplayerdetect);
-                                    if (!(fPlayerDetectActorValue.Float() <= v3)) {
-                                        if (b360LineofSight || blinesight) {
-                                            pPlayer->InsertPerceivedActor(pmob, battack, true);
-                                        }
-                                        else {
-                                            pPlayer->RemovePerceivedActor(pmob);
-                                        }
+                                }
+                                double v3 = static_cast<double>(iplayerdetect);
+                                if (!(fPlayerDetectActorValue.Float() <= v3)) {
+                                    if (b360LineofSight || blinesight) {
+                                        pPlayer->InsertPerceivedActor(pmob, battack, true);
                                     }
                                     else {
-                                        pPlayer->InsertPerceivedActor(pmob, battack, false);
+                                        pPlayer->RemovePerceivedActor(pmob);
                                     }
+                                }
+                                else {
+                                    pPlayer->InsertPerceivedActor(pmob, battack, false);
                                 }
                             }
                         }
                     }
                 }
             }
-            ++iUpdated;
         }
+        ++iUpdated;
     }
 }
 
@@ -422,10 +405,8 @@ void AnimationTaskData::HandleMobMessage(MobileObject* apMob) {
         }
     }
     else {
-        if (apMob) {
-            if (apMob->IsTalkingActivator()) {
-                apMob->UpdateAnimation(0.0f);
-            }
+        if ((apMob) && (apMob->IsTalkingActivator())) {
+            apMob->UpdateAnimation(0.0f);
         }
     }
 }
@@ -538,114 +519,114 @@ void AITaskManager::UpdateTasks() {
         }
         AITaskManager::bFirstTime = false;
     }
-    if (ReferenceProcessLists.bRunScheduals) {
-        if ((&ReferenceProcessLists.MobProcessArray)->GetProcessLevelTail(PROCESS_TYPE_HIGH)) {
-            uint32_t uiItems_2;
-            uint32_t uiItems = (&ReferenceProcessLists.MobProcessArray)->GetProcessLevelTail(PROCESS_TYPE_HIGH);
+    if ((ReferenceProcessLists.bRunScheduals) &&
+        ((&ReferenceProcessLists.MobProcessArray)->GetProcessLevelTail(PROCESS_TYPE_HIGH))) {
+        uint32_t uiItems_2;
+        uint32_t uiItems = (&ReferenceProcessLists.MobProcessArray)->GetProcessLevelTail(PROCESS_TYPE_HIGH);
+        if (!bRunDetectionDuringRendering.Bool()) {
+            kOpenMsg.~MobileObjectMessage();
+            ::new (&kOpenMsg) MobileObjectMessage(uiItems);
+            TaskDataDetection.SendMessageTo(kOpenMsg);
+        }
+        apMemory.~MobileObjectMessage();
+        ::new (&apMemory) MobileObjectMessage(uiItems);
+        TaskDataPackagesUpdate.SendMessageTo(apMemory);
+        if (iNumHWThreads.UInt() == 1) {
+            aMessage.~MobileObjectMessage();
+            ::new (&aMessage) MobileObjectMessage(uiItems);
+            TaskDataActorUpdate.SendMessageTo(aMessage);
+            v12.~MobileObjectMessage();
+            ::new (&v12) MobileObjectMessage(uiItems);
+            TaskAnimationUpdate.SendMessageTo(v12);
+        }
+        v11.~MobileObjectMessage();
+        ::new (&v11) MobileObjectMessage(uiItems);
+        TaskDataActorsScript.SendMessageTo(v11);
+        if (!bRunActorMovementDuringRendering.Bool()) {
+            v10.~MobileObjectMessage();
+            ::new (&v10) MobileObjectMessage(uiItems);
+            TaskDataActorMovement.SendMessageTo(v10);
+        }
+        int32_t i = 0;
+        do {
             if (!bRunDetectionDuringRendering.Bool()) {
-                kOpenMsg.~MobileObjectMessage();
-                ::new (&kOpenMsg) MobileObjectMessage(uiItems);
-                TaskDataDetection.SendMessageTo(kOpenMsg);
+                FNVD_RECONSTRUCT_AS(Construct_008C9A50, MobileObjectMessage)(
+                    &kObjMsg, (&ReferenceProcessLists.MobProcessArray)->GetItem(i)
+                );
+                TaskDataDetection.SendMessageTo(kObjMsg);
             }
-            apMemory.~MobileObjectMessage();
-            ::new (&apMemory) MobileObjectMessage(uiItems);
-            TaskDataPackagesUpdate.SendMessageTo(apMemory);
+            FNVD_RECONSTRUCT_AS(Construct_008C9A50, MobileObjectMessage)(
+                &v8, (&ReferenceProcessLists.MobProcessArray)->GetItem(i)
+            );
+            TaskDataPackagesUpdate.SendMessageTo(v8);
             if (iNumHWThreads.UInt() == 1) {
-                aMessage.~MobileObjectMessage();
-                ::new (&aMessage) MobileObjectMessage(uiItems);
-                TaskDataActorUpdate.SendMessageTo(aMessage);
-                v12.~MobileObjectMessage();
-                ::new (&v12) MobileObjectMessage(uiItems);
-                TaskAnimationUpdate.SendMessageTo(v12);
+                FNVD_RECONSTRUCT_AS(Construct_008C9A50, MobileObjectMessage)(
+                    &v7, (&ReferenceProcessLists.MobProcessArray)->GetItem(i)
+                );
+                TaskDataActorUpdate.SendMessageTo(v7);
+                FNVD_RECONSTRUCT_AS(Construct_008C9A50, MobileObjectMessage)(
+                    &v6, (&ReferenceProcessLists.MobProcessArray)->GetItem(i)
+                );
+                TaskAnimationUpdate.SendMessageTo(v6);
             }
-            v11.~MobileObjectMessage();
-            ::new (&v11) MobileObjectMessage(uiItems);
-            TaskDataActorsScript.SendMessageTo(v11);
+            FNVD_RECONSTRUCT_AS(Construct_008C9A50, MobileObjectMessage)(
+                &v5, (&ReferenceProcessLists.MobProcessArray)->GetItem(i)
+            );
+            TaskDataActorsScript.SendMessageTo(v5);
             if (!bRunActorMovementDuringRendering.Bool()) {
-                v10.~MobileObjectMessage();
-                ::new (&v10) MobileObjectMessage(uiItems);
-                TaskDataActorMovement.SendMessageTo(v10);
-            }
-            int32_t i = 0;
-            do {
-                if (!bRunDetectionDuringRendering.Bool()) {
-                    FNVD_RECONSTRUCT_AS(Construct_008C9A50, MobileObjectMessage)(
-                        &kObjMsg, (&ReferenceProcessLists.MobProcessArray)->GetItem(i)
-                    );
-                    TaskDataDetection.SendMessageTo(kObjMsg);
-                }
                 FNVD_RECONSTRUCT_AS(Construct_008C9A50, MobileObjectMessage)(
-                    &v8, (&ReferenceProcessLists.MobProcessArray)->GetItem(i)
+                    &a2, (&ReferenceProcessLists.MobProcessArray)->GetItem(i)
                 );
-                TaskDataPackagesUpdate.SendMessageTo(v8);
-                if (iNumHWThreads.UInt() == 1) {
-                    FNVD_RECONSTRUCT_AS(Construct_008C9A50, MobileObjectMessage)(
-                        &v7, (&ReferenceProcessLists.MobProcessArray)->GetItem(i)
-                    );
-                    TaskDataActorUpdate.SendMessageTo(v7);
-                    FNVD_RECONSTRUCT_AS(Construct_008C9A50, MobileObjectMessage)(
-                        &v6, (&ReferenceProcessLists.MobProcessArray)->GetItem(i)
-                    );
-                    TaskAnimationUpdate.SendMessageTo(v6);
-                }
-                FNVD_RECONSTRUCT_AS(Construct_008C9A50, MobileObjectMessage)(
-                    &v5, (&ReferenceProcessLists.MobProcessArray)->GetItem(i)
-                );
-                TaskDataActorsScript.SendMessageTo(v5);
-                if (!bRunActorMovementDuringRendering.Bool()) {
-                    FNVD_RECONSTRUCT_AS(Construct_008C9A50, MobileObjectMessage)(
-                        &a2, (&ReferenceProcessLists.MobProcessArray)->GetItem(i)
-                    );
-                    TaskDataActorMovement.SendMessageTo(a2);
-                }
-                ++i;
-                uiItems_2 = (&ReferenceProcessLists.MobProcessArray)->GetProcessLevelTail(PROCESS_TYPE_HIGH);
+                TaskDataActorMovement.SendMessageTo(a2);
             }
-            while (i < uiItems_2);
+            ++i;
+            uiItems_2 = (&ReferenceProcessLists.MobProcessArray)->GetProcessLevelTail(PROCESS_TYPE_HIGH);
+        }
+        while (i < uiItems_2);
+        if (!bRunDetectionDuringRendering.Bool()) {
+            TaskDataDetection.SendEndMessage();
+        }
+        TaskDataPackagesUpdate.SendEndMessage();
+        if (iNumHWThreads.UInt() == 1) {
+            TaskAnimationUpdate.SendEndMessage();
+            TaskDataActorUpdate.SendEndMessage();
+        }
+        TaskDataActorsScript.SendEndMessage();
+        if (!bRunActorMovementDuringRendering.Bool()) {
+            TaskDataActorMovement.SendEndMessage();
+        }
+        if (bUseThreadedAI.Bool()) {
+            if (iNumHWThreads.UInt() == 1) {
+                AITaskQueue::kInstance.Enqueue(&TaskDataActorUpdate);
+            }
+            AITaskQueue::kInstance.Enqueue(&TaskDataPackagesUpdate);
+            AITaskQueue::kInstance.Enqueue(&TaskDataActorsScript);
             if (!bRunDetectionDuringRendering.Bool()) {
-                TaskDataDetection.SendEndMessage();
+                AITaskQueue::kInstance.Enqueue(&TaskDataDetection);
             }
-            TaskDataPackagesUpdate.SendEndMessage();
-            if (iNumHWThreads.UInt() == 1) {
-                TaskAnimationUpdate.SendEndMessage();
-                TaskDataActorUpdate.SendEndMessage();
-            }
-            TaskDataActorsScript.SendEndMessage();
             if (!bRunActorMovementDuringRendering.Bool()) {
-                TaskDataActorMovement.SendEndMessage();
+                AITaskQueue::kInstance.Enqueue(&TaskDataActorMovement);
+                AITaskQueue::kInstance.Enqueue(&TaskAnimationUpdate);
             }
-            if (bUseThreadedAI.Bool()) {
-                if (iNumHWThreads.UInt() == 1) {
-                    AITaskQueue::kInstance.Enqueue(&TaskDataActorUpdate);
-                }
-                AITaskQueue::kInstance.Enqueue(&TaskDataPackagesUpdate);
-                AITaskQueue::kInstance.Enqueue(&TaskDataActorsScript);
-                if (!bRunDetectionDuringRendering.Bool()) {
-                    AITaskQueue::kInstance.Enqueue(&TaskDataDetection);
-                }
-                if (!bRunActorMovementDuringRendering.Bool()) {
-                    AITaskQueue::kInstance.Enqueue(&TaskDataActorMovement);
-                    AITaskQueue::kInstance.Enqueue(&TaskAnimationUpdate);
-                }
-                AITaskThreadManager_kInstance.StartThreads();
-                AITaskThreadManager_kInstance.WaitForThreads();
+            AITaskThreadManager_kInstance.StartThreads();
+            AITaskThreadManager_kInstance.WaitForThreads();
+        }
+        else {
+            if (!bRunDetectionDuringRendering.Bool()) {
+                TaskDataDetection.RunToCompletion(0);
             }
-            else {
-                if (!bRunDetectionDuringRendering.Bool()) {
-                    TaskDataDetection.RunToCompletion(0);
-                }
-                TaskDataPackagesUpdate.RunToCompletion(0);
-                TaskDataActorsScript.RunToCompletion(0);
-                if (iNumHWThreads.UInt() == 1) {
-                    TaskAnimationUpdate.RunToCompletion(0);
-                    TaskDataActorUpdate.RunToCompletion(0);
-                }
-                if (!bRunActorMovementDuringRendering.Bool()) {
-                    TaskDataActorMovement.RunToCompletion(0);
-                }
+            TaskDataPackagesUpdate.RunToCompletion(0);
+            TaskDataActorsScript.RunToCompletion(0);
+            if (iNumHWThreads.UInt() == 1) {
+                TaskAnimationUpdate.RunToCompletion(0);
+                TaskDataActorUpdate.RunToCompletion(0);
+            }
+            if (!bRunActorMovementDuringRendering.Bool()) {
+                TaskDataActorMovement.RunToCompletion(0);
             }
         }
     }
+
     if (iNumHWThreads.UInt() == 1) {
         int32_t* v2 = &iActivatePickLength.Int();
         Interface::SetPickLength(*v2);
@@ -665,57 +646,57 @@ void AITaskManager::StartTasksDuringRendering() {
     MobileObjectMessage kObjMsg;
     MobileObjectMessage apMemory;
     MobileObjectMessage kOpenMsg;
-    if (iNumHWThreads.UInt() == 1 && (bRunDetectionDuringRendering.Bool() || bRunActorMovementDuringRendering.Bool()) &&
-        ReferenceProcessLists.bRunScheduals) {
-        if ((&ReferenceProcessLists.MobProcessArray)->GetProcessLevelTail(PROCESS_TYPE_HIGH)) {
-            uint32_t uiItems = (&ReferenceProcessLists.MobProcessArray)->GetProcessLevelTail(PROCESS_TYPE_HIGH);
+    if ((iNumHWThreads.UInt() == 1 &&
+         (bRunDetectionDuringRendering.Bool() || bRunActorMovementDuringRendering.Bool()) &&
+         ReferenceProcessLists.bRunScheduals) &&
+        ((&ReferenceProcessLists.MobProcessArray)->GetProcessLevelTail(PROCESS_TYPE_HIGH))) {
+        uint32_t uiItems = (&ReferenceProcessLists.MobProcessArray)->GetProcessLevelTail(PROCESS_TYPE_HIGH);
+        if (bRunDetectionDuringRendering.Bool()) {
+            kOpenMsg.~MobileObjectMessage();
+            ::new (&kOpenMsg) MobileObjectMessage(uiItems);
+            TaskDataDetection.SendMessageTo(kOpenMsg);
+        }
+        if (bRunActorMovementDuringRendering.Bool()) {
+            apMemory.~MobileObjectMessage();
+            ::new (&apMemory) MobileObjectMessage(uiItems);
+            TaskDataActorMovement.SendMessageTo(apMemory);
+        }
+        for (uint32_t i = 0; i < uiItems; ++i) {
             if (bRunDetectionDuringRendering.Bool()) {
-                kOpenMsg.~MobileObjectMessage();
-                ::new (&kOpenMsg) MobileObjectMessage(uiItems);
-                TaskDataDetection.SendMessageTo(kOpenMsg);
+                FNVD_RECONSTRUCT_AS(Construct_008C9A50, MobileObjectMessage)(
+                    &kObjMsg, (&ReferenceProcessLists.MobProcessArray)->GetItem(i)
+                );
+                TaskDataDetection.SendMessageTo(kObjMsg);
             }
             if (bRunActorMovementDuringRendering.Bool()) {
-                apMemory.~MobileObjectMessage();
-                ::new (&apMemory) MobileObjectMessage(uiItems);
-                TaskDataActorMovement.SendMessageTo(apMemory);
+                FNVD_RECONSTRUCT_AS(Construct_008C9A50, MobileObjectMessage)(
+                    &a2, (&ReferenceProcessLists.MobProcessArray)->GetItem(i)
+                );
+                TaskDataActorMovement.SendMessageTo(a2);
             }
-            for (uint32_t i = 0; i < uiItems; ++i) {
-                if (bRunDetectionDuringRendering.Bool()) {
-                    FNVD_RECONSTRUCT_AS(Construct_008C9A50, MobileObjectMessage)(
-                        &kObjMsg, (&ReferenceProcessLists.MobProcessArray)->GetItem(i)
-                    );
-                    TaskDataDetection.SendMessageTo(kObjMsg);
-                }
-                if (bRunActorMovementDuringRendering.Bool()) {
-                    FNVD_RECONSTRUCT_AS(Construct_008C9A50, MobileObjectMessage)(
-                        &a2, (&ReferenceProcessLists.MobProcessArray)->GetItem(i)
-                    );
-                    TaskDataActorMovement.SendMessageTo(a2);
-                }
-            }
+        }
+        if (bRunDetectionDuringRendering.Bool()) {
+            TaskDataDetection.SendEndMessage();
+        }
+        if (bRunActorMovementDuringRendering.Bool()) {
+            TaskDataActorMovement.SendEndMessage();
+        }
+        if (bUseThreadedAI.Bool()) {
             if (bRunDetectionDuringRendering.Bool()) {
-                TaskDataDetection.SendEndMessage();
+                AITaskQueue::kInstance.Enqueue(&TaskDataDetection);
             }
             if (bRunActorMovementDuringRendering.Bool()) {
-                TaskDataActorMovement.SendEndMessage();
+                AITaskQueue::kInstance.Enqueue(&TaskDataActorMovement);
             }
-            if (bUseThreadedAI.Bool()) {
-                if (bRunDetectionDuringRendering.Bool()) {
-                    AITaskQueue::kInstance.Enqueue(&TaskDataDetection);
-                }
-                if (bRunActorMovementDuringRendering.Bool()) {
-                    AITaskQueue::kInstance.Enqueue(&TaskDataActorMovement);
-                }
-                AITaskThreadManager_kInstance.StartThread(2u);
-                bWaitForThreads = true;
+            AITaskThreadManager_kInstance.StartThread(2u);
+            bWaitForThreads = true;
+        }
+        else {
+            if (bRunDetectionDuringRendering.Bool()) {
+                TaskDataDetection.RunToCompletion(0);
             }
-            else {
-                if (bRunDetectionDuringRendering.Bool()) {
-                    TaskDataDetection.RunToCompletion(0);
-                }
-                if (bRunActorMovementDuringRendering.Bool()) {
-                    TaskDataActorMovement.RunToCompletion(0);
-                }
+            if (bRunActorMovementDuringRendering.Bool()) {
+                TaskDataActorMovement.RunToCompletion(0);
             }
         }
     }

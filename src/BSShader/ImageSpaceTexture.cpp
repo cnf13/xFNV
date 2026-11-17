@@ -39,9 +39,8 @@ NiTexture* ImageSpaceTexture::GetTexture() const {
     if (bIsRenderedTexture) {
         return static_cast<BSRenderedTexture*>(spTexture)->GetTexture(0);
     }
-    else {
-        return static_cast<NiTexture*>(spTexture);
-    }
+
+    return static_cast<NiTexture*>(spTexture);
 }
 
 void ImageSpaceTexture::SetClampMode(NiTexturingProperty::ClampMode aiMode) {

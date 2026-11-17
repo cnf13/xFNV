@@ -132,11 +132,10 @@ bool TESFaction::Load(TESFile* apFile) {
 
 bool Cmd_GetPCFactionAttack(TESObjectREFR* apRefObject, void* apParam1, void* apParam2, double& afReturnValue) {
     afReturnValue = 0.0;
-    if (apParam1) {
-        if (static_cast<TESFaction*>(apParam1)->GetPCHasAttackedMember()) {
-            afReturnValue = 1.0;
-        }
+    if ((apParam1) && (static_cast<TESFaction*>(apParam1)->GetPCHasAttackedMember())) {
+        afReturnValue = 1.0;
     }
+
     if (Script::GetThreadSystemOutput()) {
         if (0.0 == afReturnValue) {
             Interface::PrintLine("PC did not attack a faction member.");
@@ -150,11 +149,10 @@ bool Cmd_GetPCFactionAttack(TESObjectREFR* apRefObject, void* apParam1, void* ap
 
 bool Cmd_GetPCEnemyofFaction(TESObjectREFR* apRefObject, void* apParam1, void* apParam2, double& afReturnValue) {
     afReturnValue = 0.0;
-    if (apParam1) {
-        if (static_cast<TESFaction*>(apParam1)->GetPCAnEnemy()) {
-            afReturnValue = 1.0;
-        }
+    if ((apParam1) && (static_cast<TESFaction*>(apParam1)->GetPCAnEnemy())) {
+        afReturnValue = 1.0;
     }
+
     if (GetThreadTLSData()->bSystemOutput) {
         if (0.0 == afReturnValue) {
             Interface::PrintLine("PC is not an enemy of this faction.");
@@ -485,11 +483,10 @@ void TESFaction::SetPCExpelled(bool abVal) {
 
 void TESFaction::AddMinorCrime(int32_t a2, uint8_t a3) {
     iMinorCrime += a2;
-    if (pReputation) {
-        if (a3) {
-            pReputation->RemoveReputationMinorOrMajorCrime(0);
-        }
+    if ((pReputation) && (a3)) {
+        pReputation->RemoveReputationMinorOrMajorCrime(0);
     }
+
     AddChange(0x80000000u);
 }
 
@@ -518,11 +515,10 @@ void TESFaction::SetFlag(uint32_t aiFlag, bool abVal) {
 
 void TESFaction::HandleMajorCrimeReputation(int32_t a2, char a3) {
     iMajorCrime += a2;
-    if (pReputation) {
-        if (a3) {
-            pReputation->RemoveReputationMinorOrMajorCrime(1);
-        }
+    if ((pReputation) && (a3)) {
+        pReputation->RemoveReputationMinorOrMajorCrime(1);
     }
+
     AddChange(CHANGE_FACTION_CRIME_COUNTS);
 }
 

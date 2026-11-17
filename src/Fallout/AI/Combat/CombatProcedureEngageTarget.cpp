@@ -118,11 +118,10 @@ void CombatProcedureEngageTarget::Update() {
                 if (!bLeftRightDodgeLostLOS) {
                     goto LABEL_29;
                 }
-                if (!HoldingTimer.Check()) {
-                    if (!(HoldingTimer.ElapsedTime() > 1.0)) {
-                        goto LABEL_29;
-                    }
+                if ((!HoldingTimer.Check()) && (!(HoldingTimer.ElapsedTime() > 1.0))) {
+                    goto LABEL_29;
                 }
+
                 bLeftRightDodgeCheckLOS = 0;
                 bLeftRightDodgeLostLOS = 0;
                 bLeftRightDodgeHadLOS = pcombatState->GetHasTarget360LineOfSight();
@@ -146,11 +145,10 @@ void CombatProcedureEngageTarget::Update() {
                 if (btooFar && boutsideAbsoluteRange) {
                     fcutoff = 0.1f;
                 }
-                if (!HoldingTimer.Check()) {
-                    if (!(fcutoff < HoldingTimer.ElapsedTime())) {
-                        goto LABEL_58;
-                    }
+                if ((!HoldingTimer.Check()) && (!(fcutoff < HoldingTimer.ElapsedTime()))) {
+                    goto LABEL_58;
                 }
+
                 if (CreateOptimalLocationPath(boutsideAbsoluteRange)) {
                     if (btooFar) {
                         this->eState = CombatProcedureEngageTarget::ENGAGE_STATE_MOVING_OPTIMAL_CLOSE;
@@ -683,43 +681,38 @@ bool CombatProcedureEngageTarget::CreateOptimalLocationPath(bool abOutsideAbsolu
             cCheckedOptimalPath = 0;
             return true;
         }
-        else {
+
+        return false;
+    }
+
+    Actor* pattacker_2 = GetAttacker();
+    Actor* ptarget_2 = GetTarget();
+    CombatLocation optimalLocation;
+    CombatState* pcombatState = pCombatController->pCombatState;
+    float v12 = fMinOptimalRange * 0.5;
+    if (pcombatState->FindOptimalLocation(
+            fMinOptimalRange, fMaxOptimalRange, v12, fAbsoluteMaxRange, &optimalLocation, true
+        )) {
+        if (pcombatState->CheckMovement(optimalLocation.WorldLoc, true, false)) {
+            PathingRequest request_2;
+            TESWorldSpace* a5b = pattacker_2->GetWorldSpace();
+            TESObjectCELL* a4a = pattacker_2->GetParentCell();
+            const NiPoint3* Pos = &optimalLocation.GetPoint();
+            pattacker_2->BuildRequest(&request_2, *Pos, a4a, a5b, 16.0f, nullptr);
+            if (pattacker_2->SetPathfindingGoal(&request_2)) {
+                Destination = optimalLocation.WorldLoc;
+                TargetOptimalWorldLoc = *ptarget_2->GetWorldLocation(&v15);
+                SetMoveMode(abOutsideAbsoluteRange ? 3 : 1);
+                return true;
+            }
+
             return false;
         }
+
+        return false;
     }
-    else {
-        Actor* pattacker_2 = GetAttacker();
-        Actor* ptarget_2 = GetTarget();
-        CombatLocation optimalLocation;
-        CombatState* pcombatState = pCombatController->pCombatState;
-        float v12 = fMinOptimalRange * 0.5;
-        if (pcombatState->FindOptimalLocation(
-                fMinOptimalRange, fMaxOptimalRange, v12, fAbsoluteMaxRange, &optimalLocation, true
-            )) {
-            if (pcombatState->CheckMovement(optimalLocation.WorldLoc, true, false)) {
-                PathingRequest request_2;
-                TESWorldSpace* a5b = pattacker_2->GetWorldSpace();
-                TESObjectCELL* a4a = pattacker_2->GetParentCell();
-                const NiPoint3* Pos = &optimalLocation.GetPoint();
-                pattacker_2->BuildRequest(&request_2, *Pos, a4a, a5b, 16.0f, nullptr);
-                if (pattacker_2->SetPathfindingGoal(&request_2)) {
-                    Destination = optimalLocation.WorldLoc;
-                    TargetOptimalWorldLoc = *ptarget_2->GetWorldLocation(&v15);
-                    SetMoveMode(abOutsideAbsoluteRange ? 3 : 1);
-                    return true;
-                }
-                else {
-                    return false;
-                }
-            }
-            else {
-                return false;
-            }
-        }
-        else {
-            return false;
-        }
-    }
+
+    return false;
 }
 
 void CombatState::ClearLastDodgeDirection() {

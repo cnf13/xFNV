@@ -55,31 +55,29 @@ void BSCullingProcess::Process(NiAVObject* pkObject) {
 }
 
 void BSCullingProcess::Process(const NiCamera* pkCamera, NiAVObject* pkScene, NiVisibleArray* pkVisibleSet) {
-    if (pkCamera) {
-        if (pkScene) {
-            // m_pkCamera is declared NiCamera* rather than const NiCamera* (its users span many files), so the const is
-            // cast away here, as in NiCullingProcess::Process.
-            m_pkCamera = const_cast<NiCamera*>(pkCamera);
-            SetFrustum(m_pkCamera->m_kViewFrustum);
-            NiVisibleArray* pOrgVisibleSet = nullptr;
-            if (pkVisibleSet) {
-                pOrgVisibleSet = m_pkVisibleSet;
-                m_pkVisibleSet = pkVisibleSet;
+    if ((pkCamera) && (pkScene)) {
+        // m_pkCamera is declared NiCamera* rather than const NiCamera* (its users span many files), so the const is
+        // cast away here, as in NiCullingProcess::Process.
+        m_pkCamera = const_cast<NiCamera*>(pkCamera);
+        SetFrustum(m_pkCamera->m_kViewFrustum);
+        NiVisibleArray* pOrgVisibleSet = nullptr;
+        if (pkVisibleSet) {
+            pOrgVisibleSet = m_pkVisibleSet;
+            m_pkVisibleSet = pkVisibleSet;
+        }
+        NiPointer<NiAccumulator> spSorter;
+        if (!m_pkVisibleSet) {
+            spSorter.SetPointer_(&spAccumulator);
+            if (!spSorter.m_pObject) {
+                spSorter.operator=(NiRenderer::ms_pkRenderer->m_spAccum.m_pObject);
             }
-            NiPointer<NiAccumulator> spSorter;
-            if (!m_pkVisibleSet) {
-                spSorter.SetPointer_(&spAccumulator);
-                if (!spSorter.m_pObject) {
-                    spSorter.operator=(NiRenderer::ms_pkRenderer->m_spAccum.m_pObject);
-                }
-                if (spSorter.m_pObject) {
-                    spSorter.m_pObject->StartAccumulating(pkCamera);
-                }
+            if (spSorter.m_pObject) {
+                spSorter.m_pObject->StartAccumulating(pkCamera);
             }
-            pkScene->Cull(*this);
-            if (pkVisibleSet) {
-                m_pkVisibleSet = pOrgVisibleSet;
-            }
+        }
+        pkScene->Cull(*this);
+        if (pkVisibleSet) {
+            m_pkVisibleSet = pOrgVisibleSet;
         }
     }
 }

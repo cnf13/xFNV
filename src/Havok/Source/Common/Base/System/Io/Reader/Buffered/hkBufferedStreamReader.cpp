@@ -36,20 +36,19 @@ int32_t hkBufferedStreamReader::read(void* buf, int32_t nbytes) {
         m_buf.current += v3;
         return nbytes;
     }
-    else {
-        while (true) {
-            hkString::memCpy(buf, &m_buf.begin[current], v7);
-            m_buf.current += v7;
-            buf = static_cast<char*>(buf) + v7;
-            v3 -= v7;
-            if (this->refillBuffer()) {
-                return nbytes - v3;
-            }
-            current = m_buf.current;
-            v7 = m_buf.size - current;
-            if (v3 <= v7) {
-                goto LABEL_4;
-            }
+
+    while (true) {
+        hkString::memCpy(buf, &m_buf.begin[current], v7);
+        m_buf.current += v7;
+        buf = static_cast<char*>(buf) + v7;
+        v3 -= v7;
+        if (this->refillBuffer()) {
+            return nbytes - v3;
+        }
+        current = m_buf.current;
+        v7 = m_buf.size - current;
+        if (v3 <= v7) {
+            goto LABEL_4;
         }
     }
 }
@@ -62,16 +61,15 @@ int32_t hkBufferedStreamReader::skip(int32_t nbytes) {
         m_buf.current += v4;
         return nbytes;
     }
-    else {
-        while (true) {
-            v4 -= v3;
-            if (refillBuffer()) {
-                return nbytes - v4;
-            }
-            v3 = m_buf.size - m_buf.current;
-            if (v4 <= v3) {
-                goto LABEL_4;
-            }
+
+    while (true) {
+        v4 -= v3;
+        if (refillBuffer()) {
+            return nbytes - v4;
+        }
+        v3 = m_buf.size - m_buf.current;
+        if (v4 <= v3) {
+            goto LABEL_4;
         }
     }
 }
@@ -83,10 +81,9 @@ hkBool* hkBufferedStreamReader::isOk(hkBool* arResult) const {
         arResult->m_bool = 1;
         return arResult;
     }
-    else {
-        arResult->m_bool = 0;
-        return arResult;
-    }
+
+    arResult->m_bool = 0;
+    return arResult;
 }
 
 hkBool* hkBufferedStreamReader::markSupported(hkBool* arResult) const {
@@ -127,9 +124,8 @@ int32_t hkBufferedStreamReader::tell() const {
     if (v2 < 0) {
         return -1;
     }
-    else {
-        return v2 + (m_buf.current - m_buf.size);
-    }
+
+    return v2 + (m_buf.current - m_buf.size);
 }
 
 hkResult hkBufferedStreamReader::refillBuffer() {

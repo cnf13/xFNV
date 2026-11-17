@@ -521,43 +521,42 @@ void BGSDestructibleObjectForm::DamageObject(TESObjectREFR* apRef, float afDamag
         else if (uiOldModelStage) {
             uiModelStage = uiOldModelStage;
         }
-        if (pStage->pDebris && pStage->iDebrisCount) {
-            if (!SpawnDebrisAtDebrisNodes(
-                    spRoot.operator->(), pStage->pDebris, uiModelStage, apRef, pStage->iDebrisCount
-                )) {
-                NiPoint3 kLocation = apRef->GetLocationOnReference();
-                float fScale = apRef->GetScale();
-                TESObjectCELL* pCell = apRef->GetParentCell();
-                pStage->pDebris->SpawnDebris(pCell, kLocation, pStage->iDebrisCount, fScale);
-            }
+        if ((pStage->pDebris && pStage->iDebrisCount) &&
+            (!SpawnDebrisAtDebrisNodes(
+                spRoot.operator->(), pStage->pDebris, uiModelStage, apRef, pStage->iDebrisCount
+            ))) {
+            NiPoint3 kLocation = apRef->GetLocationOnReference();
+            float fScale = apRef->GetScale();
+            TESObjectCELL* pCell = apRef->GetParentCell();
+            pStage->pDebris->SpawnDebris(pCell, kLocation, pStage->iDebrisCount, fScale);
         }
-        if (pStage->pExplosion) {
-            if (!SpawnExplosionsAtBlastNodes(spRoot.operator->(), pStage->pExplosion, uiModelStage, apRef)) {
-                // No blast nodes: the explosion goes off at a random point of the lower half of the bound.
-                NiMatrix3 kRotation = apRef->GetOrientation();
-                NiBound kBound = spRoot->GetWorldBound();
-                NiPoint3 kOffset;
-                kOffset.~NiPoint3();
-                ::new (&kOffset) NiPoint3;
-                kOffset.x = RandomFloat(-1.0f, 1.0f);
-                kOffset.y = RandomFloat(-1.0f, 1.0f);
-                kOffset.z = RandomFloat(-1.0f, 0.0f);
-                kOffset *= kBound.m_fRadius;
-                NiPoint3 kOrigin = kBound.GetCenter() + kOffset;
-                if (apRef->IsProjectile()) {
-                    Projectile* pProjectile = static_cast<Projectile*>(static_cast<MobileObject*>(apRef));
-                    TESObjectCELL* pCell = apRef->GetParentCell();
-                    TESObjectREFR* pShooter = pProjectile->GetShooter();
-                    Explosion* pExplosion =
-                        Explosion::SpawnExplosion(pStage->pExplosion, pShooter, nullptr, pCell, kOrigin, kRotation);
-                    if (pExplosion && pProjectile->GetWeaponSource()) {
-                        pExplosion->SetWeaponSource(pProjectile->GetWeaponSource());
-                    }
+
+        if ((pStage->pExplosion) &&
+            (!SpawnExplosionsAtBlastNodes(spRoot.operator->(), pStage->pExplosion, uiModelStage, apRef))) {
+            // No blast nodes: the explosion goes off at a random point of the lower half of the bound.
+            NiMatrix3 kRotation = apRef->GetOrientation();
+            NiBound kBound = spRoot->GetWorldBound();
+            NiPoint3 kOffset;
+            kOffset.~NiPoint3();
+            ::new (&kOffset) NiPoint3;
+            kOffset.x = RandomFloat(-1.0f, 1.0f);
+            kOffset.y = RandomFloat(-1.0f, 1.0f);
+            kOffset.z = RandomFloat(-1.0f, 0.0f);
+            kOffset *= kBound.m_fRadius;
+            NiPoint3 kOrigin = kBound.GetCenter() + kOffset;
+            if (apRef->IsProjectile()) {
+                Projectile* pProjectile = static_cast<Projectile*>(static_cast<MobileObject*>(apRef));
+                TESObjectCELL* pCell = apRef->GetParentCell();
+                TESObjectREFR* pShooter = pProjectile->GetShooter();
+                Explosion* pExplosion =
+                    Explosion::SpawnExplosion(pStage->pExplosion, pShooter, nullptr, pCell, kOrigin, kRotation);
+                if (pExplosion && pProjectile->GetWeaponSource()) {
+                    pExplosion->SetWeaponSource(pProjectile->GetWeaponSource());
                 }
-                else {
-                    TESObjectCELL* pCell = apRef->GetParentCell();
-                    Explosion::SpawnExplosion(pStage->pExplosion, apRef, apRef, pCell, kOrigin, kRotation);
-                }
+            }
+            else {
+                TESObjectCELL* pCell = apRef->GetParentCell();
+                Explosion::SpawnExplosion(pStage->pExplosion, apRef, apRef, pCell, kOrigin, kRotation);
             }
         }
     }
@@ -603,9 +602,8 @@ uint32_t BGSDestructibleObjectForm::GetMaxHealth(TESObjectREFR* apRef) {
         ActorValueOwner& rOwner = *static_cast<Actor*>(apRef);
         return static_cast<int64_t>(rOwner.GetBaseActorFloatValue(ActorValue::HEALTH));
     }
-    else {
-        return pData->iHealth;
-    }
+
+    return pData->iHealth;
 }
 
 uint32_t BGSDestructibleObjectForm::SpawnExplosionsAtBlastNodes(
@@ -687,11 +685,10 @@ float BGSDestructibleObjectForm::CalculateDangerousExplosionHealth(
         v10 = pData->pStagesArray[i];
         if (v10->cHealthPercentage < static_cast<int32_t>(acCurrentHealthPercentage)) {
             DestructibleObjectStage* v5 = pData->pStagesArray[i];
-            if (v10->pExplosion) {
-                if (static_cast<double>(afRequiredRadius) <= v10->pExplosion->GetRadiusBSUnits() &&
-                    static_cast<double>(afRequiredDamage) <= v10->pExplosion->GetDamage()) {
-                    break;
-                }
+            if ((v10->pExplosion) &&
+                (static_cast<double>(afRequiredRadius) <= v10->pExplosion->GetRadiusBSUnits() &&
+                 static_cast<double>(afRequiredDamage) <= v10->pExplosion->GetDamage())) {
+                break;
             }
         }
     }
@@ -936,12 +933,10 @@ void BGSDestructibleObjectForm::ApplyTerminalDamage(TESObjectREFR* apRef) {
 }
 
 void BGSDestructibleObjectForm::UnloadReplacementModels() {
-    if (pData) {
-        if (pData->spPreloadedReplacementModels.m_pObject) {
-            NiAtomicDecrement(pData->iReplacementModelRefCount);
-            if (pData->iReplacementModelRefCount <= 0) {
-                pData->spPreloadedReplacementModels.operator=(static_cast<QueuedFile*>(nullptr));
-            }
+    if ((pData) && (pData->spPreloadedReplacementModels.m_pObject)) {
+        NiAtomicDecrement(pData->iReplacementModelRefCount);
+        if (pData->iReplacementModelRefCount <= 0) {
+            pData->spPreloadedReplacementModels.operator=(static_cast<QueuedFile*>(nullptr));
         }
     }
 }
@@ -973,9 +968,8 @@ DestructibleObjectStage* BGSDestructibleObjectForm::GetStage(uint32_t aiIndex) {
     if (pData && (aiIndex < ((uint32_t)((int32_t)pData->cNumStages)))) {
         return pData->pStagesArray[aiIndex];
     }
-    else {
-        return nullptr;
-    }
+
+    return nullptr;
 }
 
 float BGSDestructibleObjectForm::CalculateDangerousExplosionTerminalTime(
@@ -1004,11 +998,10 @@ float BGSDestructibleObjectForm::CalculateDangerousExplosionTerminalTime(
             v12 = (float)(((v13 - v9) / ((double)((uint32_t)iSelfDamagePerSecond))) + v12);
             v13 = v9;
             v5 = pData->pStagesArray[i];
-            if (v10->pExplosion) {
-                if ((((double)afRequiredRadius) <= v10->pExplosion->GetRadiusBSUnits()) &&
-                    (((double)afRequiredDamage) <= v10->pExplosion->BGSExplosion::GetDamage())) {
-                    break;
-                }
+            if ((v10->pExplosion) &&
+                ((((double)afRequiredRadius) <= v10->pExplosion->GetRadiusBSUnits()) &&
+                 (((double)afRequiredDamage) <= v10->pExplosion->BGSExplosion::GetDamage()))) {
+                break;
             }
         }
         iSelfDamagePerSecond = v10->iSelfDamagePerSecond;
@@ -1065,23 +1058,21 @@ void BGSDestructibleObjectForm::UpdateDestructibleObjects() {
         TESObjectREFR* pref = nullptr;
         uint32_t idamagePerSecond = 0;
         BGSDestructibleObjectForm::DestructibleObjects.GetNext(it, pref, idamagePerSecond);
-        if (pref) {
-            if (!pref->GetDisabled() && !pref->GetDelete()) {
-                float fdamage = static_cast<double>(idamagePerSecond) * fsecondsPassed;
-                if (iNumHWThreads.Int() == 1) {
-                    if (pref->IsActor()) {
-                        // Actor::DoDamage (vtable +0x338): the damage as health damage, no fatigue damage, no source.
-                        static_cast<Actor*>(pref)->DoDamage(fdamage, 0.0f, nullptr);
-                    }
-                    else {
-                        pref->DamageObject(fdamage, true);
-                    }
+        if ((pref) && (!pref->GetDisabled() && !pref->GetDelete())) {
+            float fdamage = static_cast<double>(idamagePerSecond) * fsecondsPassed;
+            if (iNumHWThreads.Int() == 1) {
+                if (pref->IsActor()) {
+                    // Actor::DoDamage (vtable +0x338): the damage as health damage, no fatigue damage, no source.
+                    static_cast<Actor*>(pref)->DoDamage(fdamage, 0.0f, nullptr);
                 }
                 else {
-                    TESObjectREFR* v1 = pref;
-                    TaskQueueInterface* Instance = TaskQueueInterface::GetInstance();
-                    Instance->QueueUpdateDestructibleObject(v1, fdamage, true);
+                    pref->DamageObject(fdamage, true);
                 }
+            }
+            else {
+                TESObjectREFR* v1 = pref;
+                TaskQueueInterface* Instance = TaskQueueInterface::GetInstance();
+                Instance->QueueUpdateDestructibleObject(v1, fdamage, true);
             }
         }
     }
@@ -1420,9 +1411,8 @@ float FloatCeil(float aIn) {
     if (!(v5 - aIn >= 0.0)) {
         return v5 + 1.0;
     }
-    else {
-        return v5;
-    }
+
+    return v5;
 }
 
 const NiPoint3& NiBound::GetCenter() const {

@@ -1223,12 +1223,11 @@ hkpCollisionAgent* hkpBvTreeAgent::createBvBvAgent(
         v8->m_memSizeAndFlags = sizeof(hkpSymmetricAgent<hkpBvTreeAgent>);
         return ::new (v8) hkpSymmetricAgent<hkpBvTreeAgent>(mgr);
     }
-    else {
-        hkMemoryRouter* v4 = &hkMemoryRouter::getInstance();
-        hkpBvTreeAgent* v5 = static_cast<hkpBvTreeAgent*>(v4->m_heap->blockAlloc(sizeof(hkpBvTreeAgent)));
-        v5->m_memSizeAndFlags = sizeof(hkpBvTreeAgent);
-        return ::new (v5) hkpBvTreeAgent(mgr);
-    }
+
+    hkMemoryRouter* v4 = &hkMemoryRouter::getInstance();
+    hkpBvTreeAgent* v5 = static_cast<hkpBvTreeAgent*>(v4->m_heap->blockAlloc(sizeof(hkpBvTreeAgent)));
+    v5->m_memSizeAndFlags = sizeof(hkpBvTreeAgent);
+    return ::new (v5) hkpBvTreeAgent(mgr);
 }
 
 uint8_t* hkpBvTreeAgent::getUseAabbCaching(uint8_t* a1) {

@@ -11,7 +11,7 @@
 class ahkpWorld : public hkpWorld {
 public:
     ahkpWorld(const hkpWorldCinfo& arInfo, uint32_t aiVersion) : hkpWorld(arInfo, aiVersion), m_userData(nullptr) {}
-    virtual ~ahkpWorld();
+    ~ahkpWorld() override;
 
     void* getUserData();
     void setUserData(void* apData) {

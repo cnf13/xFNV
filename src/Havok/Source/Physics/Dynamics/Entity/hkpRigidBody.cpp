@@ -263,9 +263,8 @@ hkpMotion* hkpRigidBody::getStoredDynamicMotion() {
     if ((m_type == 4) || (m_type == 5)) {
         return m_motion.m_savedMotion;
     }
-    else {
-        return nullptr;
-    }
+
+    return nullptr;
 }
 
 const hkVector4& hkpRigidBody::getTranslation() const {
@@ -575,9 +574,8 @@ hkpMotion* hkpRigidBody::getStoredDynamicMotion_0() {
     if (m_type == 4 || m_type == 5) {
         return m_motion.m_savedMotion;
     }
-    else {
-        return nullptr;
-    }
+
+    return nullptr;
 }
 
 // Stores in *apResult whether the body's shape is small enough: false
@@ -592,12 +590,12 @@ char* hkpRigidBody::checkPerformance(char* apResult) {
     uint8_t ucMotionType = m_motion.m_type.m_storage;
     uint32_t uiShapeType = pShape->m_type.m_storage;
     char cResult = 1;
-    if (ucMotionType != hkpMotion::MOTION_FIXED && ucMotionType != hkpMotion::MOTION_KEYFRAMED &&
-        (uiShapeType == HK_SHAPE_MOPP || uiShapeType == HK_SHAPE_BV_TREE)) {
-        if (pShape->getContainer()->getNumChildShapes() > 100) {
-            cResult = 0;
-        }
+    if ((ucMotionType != hkpMotion::MOTION_FIXED && ucMotionType != hkpMotion::MOTION_KEYFRAMED &&
+         (uiShapeType == HK_SHAPE_MOPP || uiShapeType == HK_SHAPE_BV_TREE)) &&
+        (pShape->getContainer()->getNumChildShapes() > 100)) {
+        cResult = 0;
     }
+
     const hkpShapeContainer* pContainer;
     switch (uiShapeType) {
         case HK_SHAPE_TRIANGLE_COLLECTION:
@@ -706,11 +704,11 @@ void hkpRigidBody::updateBroadphaseAndResetCollisionInformationOfWarpedBody(hkpE
         hkpSimulation::collideEntitiesBroadPhaseDiscrete(&pEntity, 1, pWorld);
     }
     if (!entity->isActive().m_bool) {
-        if (pWorld->m_shouldActivateOnRigidBodyTransformChange.m_bool) {
-            if (entity->m_motion.m_type.m_storage != hkpMotion::MOTION_FIXED) {
-                entity->activate();
-            }
+        if ((pWorld->m_shouldActivateOnRigidBodyTransformChange.m_bool) &&
+            (entity->m_motion.m_type.m_storage != hkpMotion::MOTION_FIXED)) {
+            entity->activate();
         }
+
         hkpWorldCallbackUtil::fireInactiveEntityMoved(pWorld, entity);
     }
     hkpTreeWorldManager* pKdTreeManager = pWorld->m_kdTreeManager;
@@ -722,10 +720,8 @@ void hkpRigidBody::updateBroadphaseAndResetCollisionInformationOfWarpedBody(hkpE
         if (pWorld->m_pendingOperationsCount) {
             pWorld->internal_executePendingOperations();
         }
-        if (pWorld->m_pendingOperationQueueCount == 1) {
-            if (pWorld->m_pendingBodyOperationsCount) {
-                pWorld->internal_executePendingBodyOperations();
-            }
+        if ((pWorld->m_pendingOperationQueueCount == 1) && (pWorld->m_pendingBodyOperationsCount)) {
+            pWorld->internal_executePendingBodyOperations();
         }
     }
 }

@@ -62,11 +62,10 @@ hkBool* hkStdioStreamWriter::markSupported(hkBool* arResult) const {
 }
 
 void hkStdioStreamWriter::close() {
-    if (m_handle) {
-        if (m_owned.m_bool) {
-            std::fclose(m_handle);
-        }
+    if ((m_handle) && (m_owned.m_bool)) {
+        std::fclose(m_handle);
     }
+
     m_handle = nullptr;
 }
 

@@ -40,10 +40,9 @@ NiObject* BSStripPSysData::CreateClone(NiCloningProcess& kCloning) {
         CopyMembers(pkObject_2, kCloning);
         return pkObject_2;
     }
-    else {
-        CopyMembers(nullptr, kCloning);
-        return nullptr;
-    }
+
+    CopyMembers(nullptr, kCloning);
+    return nullptr;
 }
 
 // Each vertex gets a strip of usMaxPointCount points; the point buffers are not constructed.
@@ -95,12 +94,10 @@ bool BSStripPSysData::IsEqual(NiObject* pkObject) {
     }
 
     BSStripPSysData* pkOther = static_cast<BSStripPSysData*>(pkObject);
-    if (pkOther->usMaxPointCount != usMaxPointCount || pkOther->fStartCapSize != fStartCapSize ||
-        pkOther->fEndCapSize != fEndCapSize || pkOther->bDoZPrePass != bDoZPrePass) {
-        return false;
-    }
-
-    return true;
+    return !(
+        pkOther->usMaxPointCount != usMaxPointCount || pkOther->fStartCapSize != fStartCapSize ||
+        pkOther->fEndCapSize != fEndCapSize || pkOther->bDoZPrePass != bDoZPrePass
+    );
 }
 
 void BSStripPSysData::GetViewerStrings(NiTPrimitiveArray<char*>* pkStrings) {
@@ -181,9 +178,8 @@ const NiColorA* BSStripPSysData::GetPointColor(uint16_t ausParticle, uint16_t au
     if (m_pkColor) {
         return &pStripList[ausParticle].pPointList[ausPoint].kColor;
     }
-    else {
-        return &NiColorA_WHITE;
-    }
+
+    return &NiColorA_WHITE;
 }
 
 void BSStripPSysData::UpdatePoints(uint16_t ausParticle, float) {

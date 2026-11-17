@@ -123,10 +123,8 @@ void MagicTarget::RemoveEffects(bool abNow) {
             }
             else {
                 EnchantmentItem* penchantment = dynamic_cast<EnchantmentItem*>(Spell);
-                if (penchantment) {
-                    if (penchantment->GetCastingType() == MagicSystem::CAST_ONCE) {
-                        m_item->Dispel(abNow);
-                    }
+                if ((penchantment) && (penchantment->GetCastingType() == MagicSystem::CAST_ONCE)) {
+                    m_item->Dispel(abNow);
                 }
             }
         }
@@ -236,32 +234,31 @@ bool MagicTarget::StackEffectDuration(MagicItem* apSpell, MagicCaster* apCaster,
                 bspellCheck = pthisPotion->eEquipType == BGSEquipType::ET_ALCOHOL;
             }
         }
-        if (peffect) {
-            if (!peffect->bDone && bspellCheck) {
-                int32_t v8;
-                if (apCaster) {
-                    v8 = peffect->pCaster == apCaster;
+        if ((peffect) && (!peffect->bDone && bspellCheck)) {
+            int32_t v8;
+            if (apCaster) {
+                v8 = peffect->pCaster == apCaster;
+            }
+            else {
+                v8 = 1;
+            }
+            if (v8) {
+                int32_t v7;
+                if (apActiveEffect) {
+                    v7 = !peffect->pEffect->MatchesEffect(apActiveEffect->pEffect);
                 }
                 else {
-                    v8 = 1;
+                    v7 = 1;
                 }
-                if (v8) {
-                    int32_t v7;
-                    if (apActiveEffect) {
-                        v7 = !peffect->pEffect->MatchesEffect(apActiveEffect->pEffect);
-                    }
-                    else {
-                        v7 = 1;
-                    }
-                    if (v7) {
-                        double LastTimeProcessed = peffect->fDuration;
-                        float v5 = apActiveEffect->fDuration + LastTimeProcessed;
-                        peffect->SetDuration(v5);
-                        bresult = true;
-                    }
+                if (v7) {
+                    double LastTimeProcessed = peffect->fDuration;
+                    float v5 = apActiveEffect->fDuration + LastTimeProcessed;
+                    peffect->SetDuration(v5);
+                    bresult = true;
                 }
             }
         }
+
         plist = pnext;
     }
     return bresult;
@@ -274,27 +271,25 @@ bool MagicTarget::ResetEffectElapsedTime(MagicItem* apSpell, MagicCaster* apCast
          plist = pnext) {
         ActiveEffect* peffect = plist->m_item;
         pnext = plist->m_pkNext;
-        if (peffect) {
-            if (!peffect->bDone && peffect->pSpell == apSpell) {
-                int32_t v6;
-                if (apCaster) {
-                    v6 = peffect->pCaster == apCaster;
+        if ((peffect) && (!peffect->bDone && peffect->pSpell == apSpell)) {
+            int32_t v6;
+            if (apCaster) {
+                v6 = peffect->pCaster == apCaster;
+            }
+            else {
+                v6 = 1;
+            }
+            if (v6) {
+                int32_t v5;
+                if (apActiveEffect) {
+                    v5 = !peffect->pEffect->MatchesEffect(apActiveEffect->pEffect);
                 }
                 else {
-                    v6 = 1;
+                    v5 = 1;
                 }
-                if (v6) {
-                    int32_t v5;
-                    if (apActiveEffect) {
-                        v5 = !peffect->pEffect->MatchesEffect(apActiveEffect->pEffect);
-                    }
-                    else {
-                        v5 = 1;
-                    }
-                    if (v5) {
-                        peffect->SetElapsedTime(0.0f);
-                        bresult = true;
-                    }
+                if (v5) {
+                    peffect->SetElapsedTime(0.0f);
+                    bresult = true;
                 }
             }
         }
@@ -308,10 +303,8 @@ void MagicTarget::Dispel(TESBoundObject* apEnchantmentSource, bool abNow) {
         while (ecx0a && !ecx0a->IsEmpty()) {
             ActiveEffect* v3 = ecx0a->m_item;
             ecx0a = ecx0a->m_pkNext;
-            if (v3) {
-                if (!v3->bDone && v3->GetEnchantmentSource() == apEnchantmentSource) {
-                    v3->Dispel(abNow);
-                }
+            if ((v3) && (!v3->bDone && v3->GetEnchantmentSource() == apEnchantmentSource)) {
+                v3->Dispel(abNow);
             }
         }
     }
@@ -353,35 +346,34 @@ void MagicTarget::Dispel(MagicItem* apSpell, MagicCaster* apCaster, ActiveEffect
     for (BSSimpleList<ActiveEffect*>* ecx0 = GetActiveEffectList(); ecx0 && !ecx0->IsEmpty(); ecx0 = FormHealth_0) {
         ActiveEffect* pEffect = ecx0->m_item;
         FormHealth_0 = ecx0->m_pkNext;
-        if (pEffect) {
-            if (!pEffect->bDone && pEffect->pSpell == apSpell && (!apCaster || pEffect->pCaster == apCaster)) {
-                int32_t v5;
+        if ((pEffect) &&
+            (!pEffect->bDone && pEffect->pSpell == apSpell && (!apCaster || pEffect->pCaster == apCaster))) {
+            int32_t v5;
+            if (apActiveEffect) {
+                TESBoundObject* EnchantmentSource = apActiveEffect->GetEnchantmentSource();
+                v5 = EnchantmentSource == pEffect->GetEnchantmentSource();
+            }
+            else {
+                v5 = 1;
+            }
+            if (v5) {
                 if (apActiveEffect) {
-                    TESBoundObject* EnchantmentSource = apActiveEffect->GetEnchantmentSource();
-                    v5 = EnchantmentSource == pEffect->GetEnchantmentSource();
-                }
-                else {
-                    v5 = 1;
-                }
-                if (v5) {
-                    if (apActiveEffect) {
-                        if (!pEffect->pEffect->MatchesEffect(apActiveEffect->pEffect)) {
-                            if (bUpdating) {
-                                QueueSpellDispel(apSpell, apCaster, pEffect);
-                            }
-                            else {
-                                pEffect->Dispel(true);
-                            }
-                            return;
-                        }
-                    }
-                    else {
+                    if (!pEffect->pEffect->MatchesEffect(apActiveEffect->pEffect)) {
                         if (bUpdating) {
                             QueueSpellDispel(apSpell, apCaster, pEffect);
                         }
                         else {
                             pEffect->Dispel(true);
                         }
+                        return;
+                    }
+                }
+                else {
+                    if (bUpdating) {
+                        QueueSpellDispel(apSpell, apCaster, pEffect);
+                    }
+                    else {
+                        pEffect->Dispel(true);
                     }
                 }
             }
@@ -394,20 +386,16 @@ void MagicTarget::Dispel(EffectItem* apEffect, MagicItem* apSpell, MagicCaster* 
     for (BSSimpleList<ActiveEffect*>* plist = GetActiveEffectList(); plist && !plist->IsEmpty(); plist = pnext) {
         ActiveEffect* peffect = plist->m_item;
         pnext = plist->m_pkNext;
-        if (peffect) {
-            if (!peffect->bDone && peffect->pSpell == apSpell) {
-                int32_t v4;
-                if (apCaster) {
-                    v4 = peffect->pCaster == apCaster;
-                }
-                else {
-                    v4 = 1;
-                }
-                if (v4) {
-                    if (peffect->pEffect == apEffect) {
-                        peffect->Dispel(true);
-                    }
-                }
+        if ((peffect) && (!peffect->bDone && peffect->pSpell == apSpell)) {
+            int32_t v4;
+            if (apCaster) {
+                v4 = peffect->pCaster == apCaster;
+            }
+            else {
+                v4 = 1;
+            }
+            if ((v4) && (peffect->pEffect == apEffect)) {
+                peffect->Dispel(true);
             }
         }
     }
@@ -418,12 +406,12 @@ bool MagicTarget::IsSpellTarget(MagicItem* apSpell, bool abIncludeInactiveSpells
     bool bfound = false;
     while (plist && !bfound) {
         ActiveEffect* pitem = plist->m_item;
-        if (pitem) {
-            if (pitem->pSpell == apSpell && (abIncludeInactiveSpells || pitem->bActive) &&
-                !pitem->pEffect->IsUsageMonitorEffect()) {
-                bfound = true;
-            }
+        if ((pitem) &&
+            (pitem->pSpell == apSpell && (abIncludeInactiveSpells || pitem->bActive) &&
+             !pitem->pEffect->IsUsageMonitorEffect())) {
+            bfound = true;
         }
+
         plist = plist->m_pkNext;
     }
     return bfound;
@@ -455,62 +443,50 @@ void MagicTarget::UpdateTarget(float afSecondsElapsed) {
                 if (bshouldUpdate_2) {
                     peffect->UpdateEffect(afSecondsElapsed);
                 }
-                if (!bdead) {
-                    if (peffect->bDone) {
-                        MagicItem* pspell = peffect->pSpell;
-                        MagicTarget* ptarget_2 = peffect->pTarget;
-                        peffect->SetQueuedForRemoval(1);
-                        if (peffect->bActive) {
-                            if (!peffect->WasDispeled()) {
-                                MagicTarget* v4;
-                                if (pPlayer) {
-                                    v4 = &static_cast<MagicTarget&>(
-                                        static_cast<Actor&>(static_cast<Character&>(*pPlayer))
-                                    );
+                if ((!bdead) && (peffect->bDone)) {
+                    MagicItem* pspell = peffect->pSpell;
+                    MagicTarget* ptarget_2 = peffect->pTarget;
+                    peffect->SetQueuedForRemoval(1);
+                    if ((peffect->bActive) && (!peffect->WasDispeled())) {
+                        MagicTarget* v4;
+                        if (pPlayer) {
+                            v4 = &static_cast<MagicTarget&>(static_cast<Actor&>(static_cast<Character&>(*pPlayer)));
+                        }
+                        else {
+                            v4 = nullptr;
+                        }
+                        if (ptarget_2 == v4 && pspell->GetSpellType() == MagicSystem::POTION &&
+                            ptarget_2->IsLastEffect(pspell, peffect)) {
+                            char cMessage[268];
+                            bool bshowMessage = true;
+                            if (ptarget_2->IsAddicted(pspell, true)) {
+                                if (pPlayer->GetActorValue(ActorValue::IGNORE_CRIPPLED_LIMBS)) {
+                                    bshowMessage = false;
                                 }
                                 else {
-                                    v4 = nullptr;
+                                    BSsprintf(cMessage, 260, sChemsWithdrawal.String(), pspell->GetFullName());
                                 }
-                                if (ptarget_2 == v4 && pspell->GetSpellType() == MagicSystem::POTION &&
-                                    ptarget_2->IsLastEffect(pspell, peffect)) {
-                                    char cMessage[268];
-                                    bool bshowMessage = true;
-                                    if (ptarget_2->IsAddicted(pspell, true)) {
-                                        if (pPlayer->GetActorValue(ActorValue::IGNORE_CRIPPLED_LIMBS)) {
-                                            bshowMessage = false;
-                                        }
-                                        else {
-                                            BSsprintf(cMessage, 260, sChemsWithdrawal.String(), pspell->GetFullName());
-                                        }
-                                    }
-                                    else {
-                                        BSsprintf(cMessage, 260, sChemsWornOff.String(), pspell->GetFullName());
-                                    }
-                                    if (bshowMessage) {
-                                        Interface::ShowMessage(
-                                            cMessage, 0, nullptr, "UIHealthChemsWearOff", 2.0f, false
-                                        );
-                                        AlchemyItem* ppotion = dynamic_cast<AlchemyItem*>(pspell);
-                                        if (ppotion) {
-                                            if (ppotion->GetAddictionItem()) {
-                                                TESForm* DefaultObject = BGSDefaultObjectManager::GetDefaultObject(
-                                                    DO_DRUG_EXPIRE_IMAGE_SPACE
-                                                );
-                                                TESImageSpaceModifier* pwearOffMod =
-                                                    dynamic_cast<TESImageSpaceModifier*>(DefaultObject);
-                                                if (pwearOffMod) {
-                                                    ImageSpaceModifierInstanceForm::TriggerIfNotActive(
-                                                        pwearOffMod, 1.0f, nullptr
-                                                    );
-                                                }
-                                            }
-                                        }
+                            }
+                            else {
+                                BSsprintf(cMessage, 260, sChemsWornOff.String(), pspell->GetFullName());
+                            }
+                            if (bshowMessage) {
+                                Interface::ShowMessage(cMessage, 0, nullptr, "UIHealthChemsWearOff", 2.0f, false);
+                                AlchemyItem* ppotion = dynamic_cast<AlchemyItem*>(pspell);
+                                if ((ppotion) && (ppotion->GetAddictionItem())) {
+                                    TESForm* DefaultObject =
+                                        BGSDefaultObjectManager::GetDefaultObject(DO_DRUG_EXPIRE_IMAGE_SPACE);
+                                    TESImageSpaceModifier* pwearOffMod =
+                                        dynamic_cast<TESImageSpaceModifier*>(DefaultObject);
+                                    if (pwearOffMod) {
+                                        ImageSpaceModifierInstanceForm::TriggerIfNotActive(pwearOffMod, 1.0f, nullptr);
                                     }
                                 }
                             }
                         }
                     }
                 }
+
                 if (peffect->IsQueuedForRemoval()) {
                     if (plist == plistHead) {
                         pnext = plist;
@@ -601,20 +577,18 @@ void MagicTarget::Dispel_4(int32_t a1) {
         for (BSSimpleList<ActiveEffect*>* plist = GetActiveEffectList(); plist && !plist->IsEmpty(); plist = pnext_2) {
             ActiveEffect* peffect = plist->m_item;
             pnext_2 = plist->m_pkNext;
-            if (peffect) {
-                if (!peffect->bDone) {
-                    bool bpoisonPotion;
-                    AlchemyItem* ppotion = dynamic_cast<AlchemyItem*>(peffect->pSpell);
-                    if (ppotion) {
-                        bpoisonPotion = ppotion->CanBePoison();
-                    }
-                    else {
-                        bpoisonPotion = false;
-                    }
-                    MagicItem* Spell = peffect->pSpell;
-                    if (Spell->GetSpellType() == a1 || (bpoisonPotion && a1 == 5)) {
-                        peffect->Dispel(false);
-                    }
+            if ((peffect) && (!peffect->bDone)) {
+                bool bpoisonPotion;
+                AlchemyItem* ppotion = dynamic_cast<AlchemyItem*>(peffect->pSpell);
+                if (ppotion) {
+                    bpoisonPotion = ppotion->CanBePoison();
+                }
+                else {
+                    bpoisonPotion = false;
+                }
+                MagicItem* Spell = peffect->pSpell;
+                if (Spell->GetSpellType() == a1 || (bpoisonPotion && a1 == 5)) {
+                    peffect->Dispel(false);
                 }
             }
         }
@@ -696,14 +670,12 @@ bool MagicTarget::CheckAddiction(AlchemyItem* apSpell) {
             ImageSpaceModifierInstanceForm::Trigger(paddictionMod, 1.0f, nullptr);
             return true;
         }
-        else {
-            return false;
-        }
-    }
-    else {
-        EvaluateSpellConditions();
+
         return false;
     }
+
+    EvaluateSpellConditions();
+    return false;
 }
 
 bool MagicTarget::CheckAddEffect(MagicCaster* apCaster, MagicItem* apSpell, ActiveEffect* apActiveEffect) {
@@ -813,15 +785,16 @@ bool MagicTarget::CheckAddEffect(MagicCaster* apCaster, MagicItem* apSpell, Acti
             apActiveEffect->SetDuration(fDuration);
         }
     }
-    else if (apSpell->GetSpellType() == MagicSystem::POTION) {
-        if (dynamic_cast<AlchemyItem*>(apSpell) && !apActiveEffect->GetEffectItem()->IsHostile()) {
-            // EXE-INLINED 0x822B40
-            Actor* pActor = MagicTargetIsActor() ? static_cast<Actor*>(this) : nullptr;
-            if (pActor) {
-                float fDuration = apActiveEffect->GetDuration();
-                BGSEntryPoint::HandleEntryPoint(BGSEntryPoint::MODIFY_POSITIVE_CHEM_DURATION, pActor, &fDuration);
-                apActiveEffect->SetDuration(fDuration);
-            }
+    else if (
+        (apSpell->GetSpellType() == MagicSystem::POTION) &&
+        (dynamic_cast<AlchemyItem*>(apSpell) && !apActiveEffect->GetEffectItem()->IsHostile())
+    ) {
+        // EXE-INLINED 0x822B40
+        Actor* pActor = MagicTargetIsActor() ? static_cast<Actor*>(this) : nullptr;
+        if (pActor) {
+            float fDuration = apActiveEffect->GetDuration();
+            BGSEntryPoint::HandleEntryPoint(BGSEntryPoint::MODIFY_POSITIVE_CHEM_DURATION, pActor, &fDuration);
+            apActiveEffect->SetDuration(fDuration);
         }
     }
 
@@ -961,13 +934,13 @@ bool MagicTarget::IsAddicted(MagicItem* apAddictedToSpell, bool abIncludeInactiv
         else {
             formFlags = nullptr;
         }
-        if (formFlags) {
-            if (((((int32_t)formFlags->GetSpellType()) == 10) &&
-                 ((!apAddictedToSpell) || (v5->ActiveEffect::GetDisplacementSpell() == apAddictedToSpell))) &&
-                (abIncludeInactiveAddictionEffects || v5->bActive)) {
-                v7 = 1;
-            }
+        if ((formFlags) &&
+            (((((int32_t)formFlags->GetSpellType()) == 10) &&
+              ((!apAddictedToSpell) || (v5->ActiveEffect::GetDisplacementSpell() == apAddictedToSpell))) &&
+             (abIncludeInactiveAddictionEffects || v5->bActive))) {
+            v7 = 1;
         }
+
         ecx0 = ecx0->m_pkNext;
     }
     return (bool)v7;
@@ -982,16 +955,13 @@ bool MagicTarget::IsLastEffect(MagicItem* apSpell, ActiveEffect* apLastEffect) {
     int32_t v9 = 0;
     while (ecx0) {
         ActiveEffect* v7 = ecx0->m_item;
-        if (v7) {
-            if (v7->GetSpell() == apSpell) {
-                if (v7->bActive) {
-                    EffectItem* v5 = v7->GetEffectItem();
-                    if (!v5->IsUsageMonitorEffect() && v7 != apLastEffect) {
-                        ++v9;
-                    }
-                }
+        if ((v7) && (v7->GetSpell() == apSpell) && (v7->bActive)) {
+            EffectItem* v5 = v7->GetEffectItem();
+            if (!v5->IsUsageMonitorEffect() && v7 != apLastEffect) {
+                ++v9;
             }
         }
+
         ecx0 = ecx0->m_pkNext;
     }
     return v9 == 0;
@@ -1035,19 +1005,16 @@ double MagicTarget::GetSpellUsageCount(MagicItem* a1) {
     else {
         UsageMonitorEffect = nullptr;
     }
-    if (UsageMonitorEffect) {
-        if (IsSpellTarget(a1, true)) {
-            for (BSSimpleList<ActiveEffect*>* ecx0 = GetActiveEffectList(); ecx0 && !ecx0->IsEmpty();
-                 ecx0 = ecx0->m_pkNext) {
-                ActiveEffect* m_item = ecx0->m_item;
-                if (m_item) {
-                    if (m_item->pEffect == UsageMonitorEffect) {
-                        v7 = m_item->fMagnitude + v7;
-                    }
-                }
+    if ((UsageMonitorEffect) && (IsSpellTarget(a1, true))) {
+        for (BSSimpleList<ActiveEffect*>* ecx0 = GetActiveEffectList(); ecx0 && !ecx0->IsEmpty();
+             ecx0 = ecx0->m_pkNext) {
+            ActiveEffect* m_item = ecx0->m_item;
+            if ((m_item) && (m_item->pEffect == UsageMonitorEffect)) {
+                v7 = m_item->fMagnitude + v7;
             }
         }
     }
+
     return v7;
 }
 
@@ -1083,9 +1050,8 @@ MagicTarget* MagicTarget::GetMagicTargetByNumericID(uint32_t aiFormID) {
     if (formByNumericID && formByNumericID->IsReference()) {
         return static_cast<TESObjectREFR*>(formByNumericID)->GetMagicTarget();
     }
-    else {
-        return nullptr;
-    }
+
+    return nullptr;
 }
 
 int32_t MagicTarget::ActiveEffectListCompareFn(ActiveEffect* apCompare1, ActiveEffect* apCompare2) {

@@ -204,12 +204,11 @@ hkResult hkBaseSystem::quit() {
     if (hkBaseSystemIsInitialized.m_bool) {
         hkReferencedObject::setLockMode(hkReferencedObject::LOCK_MODE_NONE);
         hkBaseSystem::quitSingletons();
-        if (hkSocket::s_platformNetInitialized.m_bool) {
-            if (s_platformNetQuit) {
-                s_platformNetQuit();
-                hkSocket::s_platformNetInitialized.m_bool = 0;
-            }
+        if ((hkSocket::s_platformNetInitialized.m_bool) && (s_platformNetQuit)) {
+            s_platformNetQuit();
+            hkSocket::s_platformNetInitialized.m_bool = 0;
         }
+
         if (hkError::s_instance) {
             hkError::s_instance->removeReferenceLockUnchecked();
         }

@@ -824,13 +824,12 @@ float CombatFormulas::CalcDamageToWeapon(Actor* apActor) {
     float fDamageToWeaponValue = ::fDamageToWeaponValue.Float();
     BaseProcess* CurrentAIProcess = apActor->pCurrentProcess;
     TESObjectWEAP* FormFlags = static_cast<TESObjectWEAP*>(CurrentAIProcess->GetCurrentWeapon()->pContainerObj);
-    if (FormFlags) {
-        if (FormFlags->GetCurrentAmmo(apActor)) {
-            TESAmmo* CurrentAmmo = FormFlags->GetCurrentAmmo(apActor);
-            BSSimpleList<TESAmmoEffect*>* AmmoEffectList = CurrentAmmo->GetAmmoEffectList();
-            return TESAmmoEffect::ApplyAmmoEffect(AMMO_EFFECT_CONDITION, AmmoEffectList, fDamageToWeaponValue);
-        }
+    if ((FormFlags) && (FormFlags->GetCurrentAmmo(apActor))) {
+        TESAmmo* CurrentAmmo = FormFlags->GetCurrentAmmo(apActor);
+        BSSimpleList<TESAmmoEffect*>* AmmoEffectList = CurrentAmmo->GetAmmoEffectList();
+        return TESAmmoEffect::ApplyAmmoEffect(AMMO_EFFECT_CONDITION, AmmoEffectList, fDamageToWeaponValue);
     }
+
     return fDamageToWeaponValue;
 }
 
@@ -1047,23 +1046,23 @@ float CombatFormulas::GetVATSChanceToHit(
         }
     }
 
-    if (pTargetOwner) {
-        if (pTargetOwner->GetActorValue(ActorValue::CHAMELEON) > 0 ||
-            apActor->GetActorValue(ActorValue::INVISIBILITY) > 0) {
-            if (apDebugText) {
-                float fStealthMult = fVATSStealthMult.Float();
-                apDebugText->PrintLine(
-                    DTL_RIGHT, DTJ_RIGHT, "Stealth bonus: %f becomes %f", (double)fFinalChance,
-                    (double)fFinalChance * fStealthMult
-                );
-            }
-            float fDetectionBoost = 0.0f;
-            BGSEntryPoint::HandleEntryPoint(BGSEntryPoint::HAS_IMPROVED_DETECTION, pPlayer, &fDetectionBoost);
-            if (fDetectionBoost <= 0.0) {
-                fFinalChance = (float)((double)fFinalChance * fVATSStealthMult.Float());
-            }
+    if ((pTargetOwner) &&
+        (pTargetOwner->GetActorValue(ActorValue::CHAMELEON) > 0 ||
+         apActor->GetActorValue(ActorValue::INVISIBILITY) > 0)) {
+        if (apDebugText) {
+            float fStealthMult = fVATSStealthMult.Float();
+            apDebugText->PrintLine(
+                DTL_RIGHT, DTJ_RIGHT, "Stealth bonus: %f becomes %f", (double)fFinalChance,
+                (double)fFinalChance * fStealthMult
+            );
+        }
+        float fDetectionBoost = 0.0f;
+        BGSEntryPoint::HandleEntryPoint(BGSEntryPoint::HAS_IMPROVED_DETECTION, pPlayer, &fDetectionBoost);
+        if (fDetectionBoost <= 0.0) {
+            fFinalChance = (float)((double)fFinalChance * fVATSStealthMult.Float());
         }
     }
+
     float fMaxChance = fVATSMaxChance.Float();
     float fChance = BSMIN(fFinalChance, fMaxChance);
     return (float)((double)fChance / 100.0);
@@ -1238,20 +1237,18 @@ float CombatFormulas::CalcWeaponDamageForDisplay(
     if (!v11) {
         v11 = apWeapon->GetCurrentAmmo(nullptr);
     }
-    if (v11) {
-        if (apWeapon) {
-            // A thrown weapon is its own ammo: the forms are compared as TESForm pointers.
-            if (static_cast<TESForm*>(v11) != static_cast<TESForm*>(apWeapon)) {
-                BSSimpleList<TESAmmoEffect*>* AmmoEffectList = v11->GetAmmoEffectList();
-                fresult = TESAmmoEffect::ApplyAmmoEffect(AMMO_EFFECT_DAM, AmmoEffectList, fresult);
-            }
-        }
+    if ((v11) && (apWeapon) && (static_cast<TESForm*>(v11) != static_cast<TESForm*>(apWeapon)))
+
+    // A thrown weapon is its own ammo: the forms are compared as TESForm pointers.
+    {
+        BSSimpleList<TESAmmoEffect*>* AmmoEffectList = v11->GetAmmoEffectList();
+        fresult = TESAmmoEffect::ApplyAmmoEffect(AMMO_EFFECT_DAM, AmmoEffectList, fresult);
     }
-    if (apItem) {
-        if (apItem->HasModEffectActive(12)) {
-            fresult = fresult * 1.3;
-        }
+
+    if ((apItem) && (apItem->HasModEffectActive(12))) {
+        fresult = fresult * 1.3;
     }
+
     BGSEntryPoint::HandleEntryPoint(BGSEntryPoint::CALCULATE_WEAPON_DAMAGE, pPlayer, apWeapon, pPlayer, &fresult);
     return fresult;
 }
@@ -1267,54 +1264,52 @@ float CombatFormulas::CalcCombatWeaponDPS(
     if (apWeapon && apWeapon->GetPreventUseInNormalCombat()) {
         return 0.0f;
     }
-    else {
-        COMBAT_WEAPON_TYPE ecombatWeaponType;
-        float fdamagePerSecond;
-        if (apActorForm->GetFormType() == CREA_ID || apActorForm->GetFormType() == NPC__ID) {
-            TESActorBase* pActorBase = static_cast<TESActorBase*>(apActorForm);
-            fdamagePerSecond = CombatUtilities::CalculateItemDPS(
-                pActorBase, apWeapon, afCondition, false, apItem, false, false, -1, 0.0f, 0.0f, false, false, apAmmo
-            );
-            if (!apCombatStyle) {
-                apCombatStyle = pActorBase->GetCombatStyle();
-            }
+
+    COMBAT_WEAPON_TYPE ecombatWeaponType;
+    float fdamagePerSecond;
+    if (apActorForm->GetFormType() == CREA_ID || apActorForm->GetFormType() == NPC__ID) {
+        TESActorBase* pActorBase = static_cast<TESActorBase*>(apActorForm);
+        fdamagePerSecond = CombatUtilities::CalculateItemDPS(
+            pActorBase, apWeapon, afCondition, false, apItem, false, false, -1, 0.0f, 0.0f, false, false, apAmmo
+        );
+        if (!apCombatStyle) {
+            apCombatStyle = pActorBase->GetCombatStyle();
         }
-        else {
-            Actor* pActor = static_cast<Actor*>(apActorForm);
-            fdamagePerSecond = CombatUtilities::CalculateItemDPS(
-                pActor, apWeapon, afCondition, false, apItem, false, false, -1, 0.0f, 0.0f, false, false, apAmmo
-            );
-            if (!apCombatStyle) {
-                apCombatStyle = pActor->Actor::GetCombatStyle();
-            }
-        }
-        if (apWeapon) {
-            ecombatWeaponType = apWeapon->GetCombatWeaponType();
-        }
-        else {
-            ecombatWeaponType = COMBAT_WEAPON_TYPE_COUNT;
-        }
-        if (ecombatWeaponType == COMBAT_WEAPON_GRENADE) {
-            fdamagePerSecond = fdamagePerSecond / 10.0;
-        }
-        else {
-            if (ecombatWeaponType == COMBAT_WEAPON_MINE) {
-                fdamagePerSecond = 0.0f;
-            }
-        }
-        if (apCombatStyle) {
-            int8_t cWeaponRestrictions = apCombatStyle->SimpleData.cWeaponRestrictions;
-            if (cWeaponRestrictions == 1 && (apWeapon && apWeapon->IsRangedWeapon())) {
-                return fdamagePerSecond / 10000.0;
-            }
-            else {
-                if (cWeaponRestrictions == 2 && (!apWeapon || !apWeapon->IsRangedWeapon())) {
-                    return fdamagePerSecond / 10000.0;
-                }
-            }
-        }
-        return fdamagePerSecond;
     }
+    else {
+        Actor* pActor = static_cast<Actor*>(apActorForm);
+        fdamagePerSecond = CombatUtilities::CalculateItemDPS(
+            pActor, apWeapon, afCondition, false, apItem, false, false, -1, 0.0f, 0.0f, false, false, apAmmo
+        );
+        if (!apCombatStyle) {
+            apCombatStyle = pActor->Actor::GetCombatStyle();
+        }
+    }
+    if (apWeapon) {
+        ecombatWeaponType = apWeapon->GetCombatWeaponType();
+    }
+    else {
+        ecombatWeaponType = COMBAT_WEAPON_TYPE_COUNT;
+    }
+    if (ecombatWeaponType == COMBAT_WEAPON_GRENADE) {
+        fdamagePerSecond = fdamagePerSecond / 10.0;
+    }
+    else {
+        if (ecombatWeaponType == COMBAT_WEAPON_MINE) {
+            fdamagePerSecond = 0.0f;
+        }
+    }
+    if (apCombatStyle) {
+        int8_t cWeaponRestrictions = apCombatStyle->SimpleData.cWeaponRestrictions;
+        if (cWeaponRestrictions == 1 && (apWeapon && apWeapon->IsRangedWeapon())) {
+            return fdamagePerSecond / 10000.0;
+        }
+
+        if (cWeaponRestrictions == 2 && (!apWeapon || !apWeapon->IsRangedWeapon())) {
+            return fdamagePerSecond / 10000.0;
+        }
+    }
+    return fdamagePerSecond;
 }
 
 float CombatFormulas::CalcWeaponDamage(
@@ -1381,21 +1376,20 @@ float CombatFormulas::CalcWeaponDamage(
     }
     v11 = 1.0;
     float fmeleeConditionSkillMult = 1.0f;
-    if (apActor) {
-        if (!apWeapon || apWeapon->IsMeleeWeapon()) {
-            WEAPON_TYPE aeWeaponType;
-            if (apWeapon) {
-                aeWeaponType = apWeapon->GetWeaponType();
-            }
-            else {
-                aeWeaponType = WEAPON_HAND_TO_HAND;
-            }
-            double ArmCondition = CombatFormulas::GetArmCondition(apActor, aeWeaponType);
-            double v23 = fDamageArmConditionMult.Float() * ArmCondition;
-            v11 = fDamageArmConditionBase.Float() + v23;
-            fmeleeConditionSkillMult = v11;
+    if ((apActor) && (!apWeapon || apWeapon->IsMeleeWeapon())) {
+        WEAPON_TYPE aeWeaponType;
+        if (apWeapon) {
+            aeWeaponType = apWeapon->GetWeaponType();
         }
+        else {
+            aeWeaponType = WEAPON_HAND_TO_HAND;
+        }
+        double ArmCondition = CombatFormulas::GetArmCondition(apActor, aeWeaponType);
+        double v23 = fDamageArmConditionMult.Float() * ArmCondition;
+        v11 = fDamageArmConditionBase.Float() + v23;
+        fmeleeConditionSkillMult = v11;
     }
+
     if (apActor) {
         fskill = apActor->GetClampedActorFloatValue(iskill);
     }
@@ -1403,59 +1397,50 @@ float CombatFormulas::CalcWeaponDamage(
         fskill = 100.0f;
     }
     float fdamageSkill = fmeleeConditionSkillMult;
-    if (apWeapon) {
-        if (apWeapon->GetWeaponType()) {
-            float* v12 = &fDamageSkillBase.Float();
-            float* v13 = &fDamageSkillMult.Float();
-            fdamageSkill = fskill * 0.009999999776482582 * *v13 * fmeleeConditionSkillMult + *v12;
-        }
+    if ((apWeapon) && (apWeapon->GetWeaponType())) {
+        float* v12 = &fDamageSkillBase.Float();
+        float* v13 = &fDamageSkillMult.Float();
+        fdamageSkill = fskill * 0.009999999776482582 * *v13 * fmeleeConditionSkillMult + *v12;
     }
+
     float fdamageMult = fdamageSkill * afDamageMultiplier;
     float v31 = 0.0f;
-    if (!abIgnoreExplosion) {
-        if (apWeapon) {
-            if (apWeapon->GetProjectile_(abUseCurrentAmmo ? apActor : nullptr)) {
-                if (apWeapon->GetProjectile_(abUseCurrentAmmo ? apActor : nullptr)->GetExplosion()) {
-                    bool HasModEffectActive_0;
-                    Actor* apWeaponHolder;
-                    if (abUseCurrentAmmo) {
-                        apWeaponHolder = dynamic_cast<Actor*>(apActor);
-                    }
-                    else {
-                        apWeaponHolder = nullptr;
-                    }
-                    if (apItem) {
-                        HasModEffectActive_0 = apItem->HasModEffectActive(12);
-                    }
-                    else {
-                        HasModEffectActive_0 = false;
-                    }
-                    BGSProjectile* Projectile_ = apWeapon->GetProjectile_(abUseCurrentAmmo ? apActor : nullptr);
-                    double v19 = CombatFormulas::CalcExplosionDamage(Projectile_->GetExplosion());
-                    v31 =
-                        static_cast<double>(apWeapon->GetNumProjectiles(HasModEffectActive_0, false, apWeaponHolder)) *
-                        v19;
-                }
-            }
+    if ((!abIgnoreExplosion) && (apWeapon) && (apWeapon->GetProjectile_(abUseCurrentAmmo ? apActor : nullptr)) &&
+        (apWeapon->GetProjectile_(abUseCurrentAmmo ? apActor : nullptr)->GetExplosion())) {
+        bool HasModEffectActive_0;
+        Actor* apWeaponHolder;
+        if (abUseCurrentAmmo) {
+            apWeaponHolder = dynamic_cast<Actor*>(apActor);
         }
+        else {
+            apWeaponHolder = nullptr;
+        }
+        if (apItem) {
+            HasModEffectActive_0 = apItem->HasModEffectActive(12);
+        }
+        else {
+            HasModEffectActive_0 = false;
+        }
+        BGSProjectile* Projectile_ = apWeapon->GetProjectile_(abUseCurrentAmmo ? apActor : nullptr);
+        double v19 = CombatFormulas::CalcExplosionDamage(Projectile_->GetExplosion());
+        v31 = static_cast<double>(apWeapon->GetNumProjectiles(HasModEffectActive_0, false, apWeaponHolder)) * v19;
     }
+
     float ftimeMult = 1.0f;
     float v33 = 1.0f;
     float fconditionMod = CombatFormulas::ApplyWeaponConditionScaling(afCondition);
     float fNerveBonus = 1.0f;
     Actor* pActorReal = dynamic_cast<Actor*>(apActor);
-    if (pActorReal) {
-        if (pActorReal->bPlayerTeammate) {
-            float afCharisma = pPlayer->GetClampedActorFloatValue(ActorValue::CHARISMA);
-            fNerveBonus = afCharisma * 0.05000000074505806 + 1.0;
-        }
+    if ((pActorReal) && (pActorReal->bPlayerTeammate)) {
+        float afCharisma = pPlayer->GetClampedActorFloatValue(ActorValue::CHARISMA);
+        fNerveBonus = afCharisma * 0.05000000074505806 + 1.0;
     }
-    if (apWeapon) {
-        if (apWeapon->IsAutomaticWeapon() && apWeapon->IsMeleeWeapon() &&
-            (!pVATS.IsInVats() || pActorReal != pPlayer)) {
-            ftimeMult = appTimer.fDelta;
-        }
+
+    if ((apWeapon) &&
+        (apWeapon->IsAutomaticWeapon() && apWeapon->IsMeleeWeapon() && (!pVATS.IsInVats() || pActorReal != pPlayer))) {
+        ftimeMult = appTimer.fDelta;
     }
+
     return ((fWeaponDamage + v31) * fdamageMult + fdamageBonus) * fconditionMod * ftimeMult * fNerveBonus;
 }
 
@@ -1537,9 +1522,8 @@ float CombatFormulas::CalcExplosionDamageDistance(
     if (!(fDamageRatio > 1.0)) {
         return CombatFormulas::CalcExplosionPowerDistance(afExplosionRadius, fDamageRatio);
     }
-    else {
-        return 0.0;
-    }
+
+    return 0.0;
 }
 
 float CombatFormulas::CalcDamageToArmor(float afHealthDamage, float afArmorRatingPercent) {
@@ -1718,29 +1702,27 @@ float CombatFormulas::ApplyArmorConditionScaling(float fArmorHealthPercent) {
     if (!(fArmorHealthPercent > 0.5)) {
         return (float)(1.0 - ((0.5 - fArmorHealthPercent) * 1.0));
     }
-    else {
-        return (float)1.0;
-    }
+
+    return (float)1.0;
 }
 
 float CombatFormulas::CalcTargetedLimbDamage(ActorValueOwner* apTarget, BGSBodyPart* apBodyPart, float afHealthDamage) {
     float v5;
     float v6;
     float v7 = (float)0.0;
-    if (apTarget) {
-        if (apBodyPart) {
-            v6 = (float)(((double)apBodyPart->GetHealthPercent()) * 0.009999999776482582);
-            v5 = apTarget->GetBaseActorFloatValue(ActorValue::HEALTH);
-            if (!(v5 <= 0.0)) {
-                if (v6 > 0.0) {
-                    return (float)((afHealthDamage / (v6 * v5)) * 100.0);
-                }
-            }
-            else {
-                return afHealthDamage;
+    if ((apTarget) && (apBodyPart)) {
+        v6 = (float)(((double)apBodyPart->GetHealthPercent()) * 0.009999999776482582);
+        v5 = apTarget->GetBaseActorFloatValue(ActorValue::HEALTH);
+        if (!(v5 <= 0.0)) {
+            if (v6 > 0.0) {
+                return (float)((afHealthDamage / (v6 * v5)) * 100.0);
             }
         }
+        else {
+            return afHealthDamage;
+        }
     }
+
     return v7;
 }
 
@@ -1748,11 +1730,10 @@ float CombatFormulas::GetCriticalChance(ActorValueOwner* apActor, TESObjectWEAP*
     float v4;
     if (apWeapon) {}
     float TurnSpeed = 1.0;
-    if (apWeapon) {
-        if (apWeapon->IsAutomaticWeapon()) {
-            TurnSpeed = apWeapon->GetShotsPerSecond();
-        }
+    if ((apWeapon) && (apWeapon->IsAutomaticWeapon())) {
+        TurnSpeed = apWeapon->GetShotsPerSecond();
     }
+
     if (TurnSpeed == 0.0) {
         TurnSpeed = 1.0;
     }
@@ -1763,11 +1744,10 @@ float CombatFormulas::GetCriticalChance(ActorValueOwner* apActor, TESObjectWEAP*
         v4 = 0.0;
     }
     float v6 = v4 / TurnSpeed;
-    if (apWeapon) {
-        if (apWeapon->GetCriticalChanceMult() >= 0.0) {
-            return apWeapon->GetCriticalChanceMult() * v6;
-        }
+    if ((apWeapon) && (apWeapon->GetCriticalChanceMult() >= 0.0)) {
+        return apWeapon->GetCriticalChanceMult() * v6;
     }
+
     return v6;
 }
 
@@ -1900,9 +1880,8 @@ float CombatFormulas::ApplyWeaponConditionScaling(float fWeapHealthPercent) {
     if (!(fWeapHealthPercent > 0.75)) {
         return 1.0 - (0.75 - fWeapHealthPercent) * 0.6700000166893005;
     }
-    else {
-        return 1.0;
-    }
+
+    return 1.0;
 }
 
 void CombatFormulas::CheckDismemberOrExplode(
@@ -1937,21 +1916,19 @@ void CombatFormulas::CheckDismemberOrExplode(
     else {
         abExplode = true;
     }
-    if (apWeapon) {
-        if (abExplode || abDismember) {
-            WEAPONHITBEHAVIOR eHitBehavior = apWeapon->data.eHitBehavior;
-            if (eHitBehavior == WHB_DISMEMBER_ONLY) {
-                abExplode = false;
-                abDismember = true;
-            }
-            else if (eHitBehavior == WHB_EXPLODE_ONLY) {
-                abExplode = true;
-                abDismember = false;
-            }
-            else if (eHitBehavior == WHB_NO_DISMEMBER_OR_EXPLODE) {
-                abExplode = false;
-                abDismember = false;
-            }
+    if ((apWeapon) && (abExplode || abDismember)) {
+        WEAPONHITBEHAVIOR eHitBehavior = apWeapon->data.eHitBehavior;
+        if (eHitBehavior == WHB_DISMEMBER_ONLY) {
+            abExplode = false;
+            abDismember = true;
+        }
+        else if (eHitBehavior == WHB_EXPLODE_ONLY) {
+            abExplode = true;
+            abDismember = false;
+        }
+        else if (eHitBehavior == WHB_NO_DISMEMBER_OR_EXPLODE) {
+            abExplode = false;
+            abDismember = false;
         }
     }
 }

@@ -61,10 +61,9 @@ NiObject* NiCamera::CreateClone(NiCloningProcess& kCloning) {
         CopyMembers(v4, kCloning);
         return v4;
     }
-    else {
-        CopyMembers(nullptr, kCloning);
-        return nullptr;
-    }
+
+    CopyMembers(nullptr, kCloning);
+    return nullptr;
 }
 
 // Files before 4.1.0.4 and between 10.0.1.7 and 10.0.1.15 carry links (scene, screen polygons, screen textures) the
@@ -873,7 +872,6 @@ NiObject* NiCamera::CreateObject() {
     if (v0) {
         return ::new (v0) NiCamera;
     }
-    else {
-        return nullptr;
-    }
+
+    return nullptr;
 }

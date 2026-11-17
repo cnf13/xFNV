@@ -92,33 +92,31 @@ void CLeafGeometry::SetTextureCoords(uint32_t nLeafMapIndex, const float* pTexCo
     float fSign;
     float* v5;
     float* v6;
-    if (m_pLeafTexCoords) {
-        if (pTexCoords) {
-            if (CSpeedTreeRT::GetTextureFlip()) {
-                fSign = (-0x1p+0f);
-            }
-            else {
-                fSign = (float)1.0;
-            }
-            v5 = &m_pLeafTexCoords[16 * nLeafMapIndex];
-            *(v5++) = (float)(*pTexCoords);
-            *(v5++) = (fSign * pTexCoords[1]);
-            *(v5++) = pTexCoords[2];
-            *(v5++) = (fSign * pTexCoords[3]);
-            *(v5++) = pTexCoords[4];
-            *(v5++) = (fSign * pTexCoords[5]);
-            *v5 = pTexCoords[6];
-            v5[1] = (fSign * pTexCoords[7]);
-            v6 = &m_pLeafTexCoords[(16 * nLeafMapIndex) + 8];
-            *(v6++) = pTexCoords[2];
-            *(v6++) = (fSign * pTexCoords[1]);
-            *(v6++) = (float)(*pTexCoords);
-            *(v6++) = (fSign * pTexCoords[3]);
-            *(v6++) = pTexCoords[6];
-            *(v6++) = (fSign * pTexCoords[5]);
-            *v6 = pTexCoords[4];
-            v6[1] = (fSign * pTexCoords[7]);
+    if ((m_pLeafTexCoords) && (pTexCoords)) {
+        if (CSpeedTreeRT::GetTextureFlip()) {
+            fSign = (-0x1p+0f);
         }
+        else {
+            fSign = (float)1.0;
+        }
+        v5 = &m_pLeafTexCoords[16 * nLeafMapIndex];
+        *(v5++) = (float)(*pTexCoords);
+        *(v5++) = (fSign * pTexCoords[1]);
+        *(v5++) = pTexCoords[2];
+        *(v5++) = (fSign * pTexCoords[3]);
+        *(v5++) = pTexCoords[4];
+        *(v5++) = (fSign * pTexCoords[5]);
+        *v5 = pTexCoords[6];
+        v5[1] = (fSign * pTexCoords[7]);
+        v6 = &m_pLeafTexCoords[(16 * nLeafMapIndex) + 8];
+        *(v6++) = pTexCoords[2];
+        *(v6++) = (fSign * pTexCoords[1]);
+        *(v6++) = (float)(*pTexCoords);
+        *(v6++) = (fSign * pTexCoords[3]);
+        *(v6++) = pTexCoords[6];
+        *(v6++) = (fSign * pTexCoords[5]);
+        *v6 = pTexCoords[4];
+        v6[1] = (fSign * pTexCoords[7]);
     }
 }
 
@@ -350,123 +348,119 @@ void CLeafGeometry::Init(
 }
 
 void CLeafGeometry::ComputeExtents(CRegion& cExtents) const {
-    if (m_pLeafOrigins) {
-        if (m_pLeafDimensions) {
-            if (m_pLods) {
-                using apMemory_t = std::vector<float, std::allocator<float>>;
-                apMemory_t apMemory;
-                for (int32_t i = 0; i < m_usNumTextures; ++i) {
-                    CVec3 v36;
-                    CVec3 v38;
-                    CVec3 v40;
-                    CVec3 a2;
-                    CVec3 cScaledOrigin;
-                    float v20 = m_pLeafDimensions[i].m_afData[0] * m_pLeafOrigins[i].m_afData[0];
-                    float v21 = m_pLeafDimensions[i].m_afData[1] * m_pLeafOrigins[i].m_afData[1];
-                    cScaledOrigin.m_afData[0] = v20;
-                    cScaledOrigin.m_afData[1] = v21;
-                    cScaledOrigin.m_afData[2] = 0.0f;
-                    float fLongest = 0.0f;
-                    a2.m_afData[0] = 0.0f;
-                    a2.m_afData[1] = 0.0f;
-                    a2.m_afData[2] = 0.0f;
-                    double v2 = cScaledOrigin.Distance(a2);
-                    if (fLongest < v2) {
-                        CVec3 cVec;
-                        cVec.m_afData[0] = 0.0f;
-                        cVec.m_afData[1] = 0.0f;
-                        cVec.m_afData[2] = 0.0f;
-                        fLongest = cScaledOrigin.Distance(cVec);
-                    }
-                    v40.m_afData[0] = m_pLeafDimensions[i].m_afData[0];
-                    v40.m_afData[1] = 0.0f;
-                    v40.m_afData[2] = 0.0f;
-                    double v3 = cScaledOrigin.Distance(v40);
-                    if (fLongest < v3) {
-                        CVec3 v39;
-                        v39.m_afData[0] = m_pLeafDimensions[i].m_afData[0];
-                        v39.m_afData[1] = 0.0f;
-                        v39.m_afData[2] = 0.0f;
-                        fLongest = cScaledOrigin.Distance(v39);
-                    }
-                    float v19 = m_pLeafDimensions[i].m_afData[1];
-                    v38.m_afData[0] = m_pLeafDimensions[i].m_afData[0];
-                    v38.m_afData[1] = v19;
-                    v38.m_afData[2] = 0.0f;
-                    double v4 = cScaledOrigin.Distance(v38);
-                    if (fLongest < v4) {
-                        CVec3 v37;
-                        float v18 = m_pLeafDimensions[i].m_afData[1];
-                        v37.m_afData[0] = m_pLeafDimensions[i].m_afData[0];
-                        v37.m_afData[1] = v18;
-                        v37.m_afData[2] = 0.0f;
-                        fLongest = cScaledOrigin.Distance(v37);
-                    }
-                    float v17 = m_pLeafDimensions[i].m_afData[1];
-                    v36.m_afData[0] = 0.0f;
-                    v36.m_afData[1] = v17;
-                    v36.m_afData[2] = 0.0f;
-                    double v5 = cScaledOrigin.Distance(v36);
-                    if (fLongest < v5) {
-                        CVec3 v35;
-                        float v16 = m_pLeafDimensions[i].m_afData[1];
-                        v35.m_afData[0] = 0.0f;
-                        v35.m_afData[1] = v16;
-                        v35.m_afData[2] = 0.0f;
-                        fLongest = cScaledOrigin.Distance(v35);
-                    }
-                    apMemory.push_back(fLongest);
-                }
-                for (int32_t nLod = 0; nLod < m_usNumLods; ++nLod) {
-                    CLeafGeometry::SLodGeometry* pLod = &m_pLods[nLod];
-                    for (uint32_t j = 0; j < pLod->m_usLeafCount; ++j) {
-                        CVec3 v24;
-                        CVec3 v26;
-                        CVec3 v28;
-                        CVec3 v30;
-                        CVec3 v32;
-                        CVec3 v34;
-                        CRegion cLeafSwingExtents;
-                        const float* v43 = &pLod->m_pCenterCoords[3 * j];
-                        float v14 = v43[1];
-                        float v15 = v43[2];
-                        float _Val_24 = *v43;
-                        float _Val_28 = v14;
-                        float _Val_32 = v15;
-                        float v44 = apMemory[pLod->m_pLeafMapIndices[j] / 2];
-                        float v12 = v44 + _Val_24;
-                        v34.m_afData[0] = v12;
-                        v34.m_afData[1] = _Val_28;
-                        v34.m_afData[2] = _Val_32;
-                        cLeafSwingExtents = cLeafSwingExtents ^ v34;
-                        float v11 = _Val_24 - v44;
-                        v32.m_afData[0] = v11;
-                        v32.m_afData[1] = _Val_28;
-                        v32.m_afData[2] = _Val_32;
-                        cLeafSwingExtents = cLeafSwingExtents ^ v32;
-                        float v10 = v44 + _Val_28;
-                        v30.m_afData[0] = _Val_24;
-                        v30.m_afData[1] = v10;
-                        v30.m_afData[2] = _Val_32;
-                        cLeafSwingExtents = cLeafSwingExtents ^ v30;
-                        float v9 = _Val_28 - v44;
-                        v28.m_afData[0] = _Val_24;
-                        v28.m_afData[1] = v9;
-                        v28.m_afData[2] = _Val_32;
-                        cLeafSwingExtents = cLeafSwingExtents ^ v28;
-                        float v8 = v44 + _Val_32;
-                        v26.m_afData[0] = _Val_24;
-                        v26.m_afData[1] = _Val_28;
-                        v26.m_afData[2] = v8;
-                        cLeafSwingExtents = cLeafSwingExtents ^ v26;
-                        float v7 = _Val_32 - v44;
-                        v24.m_afData[0] = _Val_24;
-                        v24.m_afData[1] = _Val_28;
-                        v24.m_afData[2] = v7;
-                        cLeafSwingExtents = cLeafSwingExtents ^ v24;
-                        cExtents = cExtents + cLeafSwingExtents;
-                    }
-                }
+    if ((m_pLeafOrigins) && (m_pLeafDimensions) && (m_pLods)) {
+        using apMemory_t = std::vector<float, std::allocator<float>>;
+        apMemory_t apMemory;
+        for (int32_t i = 0; i < m_usNumTextures; ++i) {
+            CVec3 v36;
+            CVec3 v38;
+            CVec3 v40;
+            CVec3 a2;
+            CVec3 cScaledOrigin;
+            float v20 = m_pLeafDimensions[i].m_afData[0] * m_pLeafOrigins[i].m_afData[0];
+            float v21 = m_pLeafDimensions[i].m_afData[1] * m_pLeafOrigins[i].m_afData[1];
+            cScaledOrigin.m_afData[0] = v20;
+            cScaledOrigin.m_afData[1] = v21;
+            cScaledOrigin.m_afData[2] = 0.0f;
+            float fLongest = 0.0f;
+            a2.m_afData[0] = 0.0f;
+            a2.m_afData[1] = 0.0f;
+            a2.m_afData[2] = 0.0f;
+            double v2 = cScaledOrigin.Distance(a2);
+            if (fLongest < v2) {
+                CVec3 cVec;
+                cVec.m_afData[0] = 0.0f;
+                cVec.m_afData[1] = 0.0f;
+                cVec.m_afData[2] = 0.0f;
+                fLongest = cScaledOrigin.Distance(cVec);
+            }
+            v40.m_afData[0] = m_pLeafDimensions[i].m_afData[0];
+            v40.m_afData[1] = 0.0f;
+            v40.m_afData[2] = 0.0f;
+            double v3 = cScaledOrigin.Distance(v40);
+            if (fLongest < v3) {
+                CVec3 v39;
+                v39.m_afData[0] = m_pLeafDimensions[i].m_afData[0];
+                v39.m_afData[1] = 0.0f;
+                v39.m_afData[2] = 0.0f;
+                fLongest = cScaledOrigin.Distance(v39);
+            }
+            float v19 = m_pLeafDimensions[i].m_afData[1];
+            v38.m_afData[0] = m_pLeafDimensions[i].m_afData[0];
+            v38.m_afData[1] = v19;
+            v38.m_afData[2] = 0.0f;
+            double v4 = cScaledOrigin.Distance(v38);
+            if (fLongest < v4) {
+                CVec3 v37;
+                float v18 = m_pLeafDimensions[i].m_afData[1];
+                v37.m_afData[0] = m_pLeafDimensions[i].m_afData[0];
+                v37.m_afData[1] = v18;
+                v37.m_afData[2] = 0.0f;
+                fLongest = cScaledOrigin.Distance(v37);
+            }
+            float v17 = m_pLeafDimensions[i].m_afData[1];
+            v36.m_afData[0] = 0.0f;
+            v36.m_afData[1] = v17;
+            v36.m_afData[2] = 0.0f;
+            double v5 = cScaledOrigin.Distance(v36);
+            if (fLongest < v5) {
+                CVec3 v35;
+                float v16 = m_pLeafDimensions[i].m_afData[1];
+                v35.m_afData[0] = 0.0f;
+                v35.m_afData[1] = v16;
+                v35.m_afData[2] = 0.0f;
+                fLongest = cScaledOrigin.Distance(v35);
+            }
+            apMemory.push_back(fLongest);
+        }
+        for (int32_t nLod = 0; nLod < m_usNumLods; ++nLod) {
+            CLeafGeometry::SLodGeometry* pLod = &m_pLods[nLod];
+            for (uint32_t j = 0; j < pLod->m_usLeafCount; ++j) {
+                CVec3 v24;
+                CVec3 v26;
+                CVec3 v28;
+                CVec3 v30;
+                CVec3 v32;
+                CVec3 v34;
+                CRegion cLeafSwingExtents;
+                const float* v43 = &pLod->m_pCenterCoords[3 * j];
+                float v14 = v43[1];
+                float v15 = v43[2];
+                float _Val_24 = *v43;
+                float _Val_28 = v14;
+                float _Val_32 = v15;
+                float v44 = apMemory[pLod->m_pLeafMapIndices[j] / 2];
+                float v12 = v44 + _Val_24;
+                v34.m_afData[0] = v12;
+                v34.m_afData[1] = _Val_28;
+                v34.m_afData[2] = _Val_32;
+                cLeafSwingExtents = cLeafSwingExtents ^ v34;
+                float v11 = _Val_24 - v44;
+                v32.m_afData[0] = v11;
+                v32.m_afData[1] = _Val_28;
+                v32.m_afData[2] = _Val_32;
+                cLeafSwingExtents = cLeafSwingExtents ^ v32;
+                float v10 = v44 + _Val_28;
+                v30.m_afData[0] = _Val_24;
+                v30.m_afData[1] = v10;
+                v30.m_afData[2] = _Val_32;
+                cLeafSwingExtents = cLeafSwingExtents ^ v30;
+                float v9 = _Val_28 - v44;
+                v28.m_afData[0] = _Val_24;
+                v28.m_afData[1] = v9;
+                v28.m_afData[2] = _Val_32;
+                cLeafSwingExtents = cLeafSwingExtents ^ v28;
+                float v8 = v44 + _Val_32;
+                v26.m_afData[0] = _Val_24;
+                v26.m_afData[1] = _Val_28;
+                v26.m_afData[2] = v8;
+                cLeafSwingExtents = cLeafSwingExtents ^ v26;
+                float v7 = _Val_32 - v44;
+                v24.m_afData[0] = _Val_24;
+                v24.m_afData[1] = _Val_28;
+                v24.m_afData[2] = v7;
+                cLeafSwingExtents = cLeafSwingExtents ^ v24;
+                cExtents = cExtents + cLeafSwingExtents;
             }
         }
     }

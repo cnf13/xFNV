@@ -389,9 +389,8 @@ int32_t getSectorSize(hkpAgentNnTrack* apThis, [[maybe_unused]] void* apEdx, int
     if (((uint32_t)(a2 + 1)) == apThis->m_sectors.m_size) {
         return (int32_t)apThis->m_bytesUsedInLastSector;
     }
-    else {
-        return static_cast<int32_t>(sizeof(hkpAgentNnSector));
-    }
+
+    return static_cast<int32_t>(sizeof(hkpAgentNnSector));
 }
 
 void hkpWorldOperationUtil::markIslandInactive(hkpWorld* world, hkpSimulationIsland* island) {
@@ -455,10 +454,8 @@ hkpConstraintInstance* hkpWorldOperationUtil::addConstraintImmediately(
         if (world->m_pendingOperationsCount != 0) {
             world->internal_executePendingOperations();
         }
-        if (world->m_pendingOperationQueueCount == 1) {
-            if (world->m_pendingBodyOperationsCount != 0) {
-                world->internal_executePendingBodyOperations();
-            }
+        if ((world->m_pendingOperationQueueCount == 1) && (world->m_pendingBodyOperationsCount != 0)) {
+            world->internal_executePendingBodyOperations();
         }
     }
     return constraint;
@@ -1425,10 +1422,8 @@ void hkpWorldOperationUtil::internalMergeTwoIslands(
         if (world->m_pendingOperationsCount) {
             world->internal_executePendingOperations();
         }
-        if (world->m_pendingOperationQueueCount == 1) {
-            if (world->m_pendingBodyOperationsCount) {
-                world->internal_executePendingBodyOperations();
-            }
+        if ((world->m_pendingOperationQueueCount == 1) && (world->m_pendingBodyOperationsCount)) {
+            world->internal_executePendingBodyOperations();
         }
     }
 }

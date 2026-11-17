@@ -203,342 +203,328 @@ void Character::Update(float afDelta) {
     Actor::Update(afDelta);
     if (this != pPlayer || pPlayer->Is3rdPerson()) {
         NiAVObject* proot = Get3D();
-        if (proot) {
-            if (pCurrentProcess) {
-                BSFaceGenNiNode* pfacenode = pCurrentProcess->GetFaceNode();
-                BSFaceGenNiNode* pfacenodeSkinned = pCurrentProcess->GetFaceSkinnedNode();
-                NiAVObject* panimFace = pCurrentProcess->GetHeadAnims();
-                if (!pfacenode) {
-                    NiFixedString* v2 = &FixedStrings::QRaceHeadBiped();
-                    NiAVObject* ObjectByName_1 = BSUtilities::GetObjectByName(proot, *v2);
-                    pfacenode = static_cast<BSFaceGenNiNode*>(
-                        NiObject::DynamicCastStatic(&BSFaceGenNiNode::ms_RTTI, ObjectByName_1)
+        if ((proot) && (pCurrentProcess)) {
+            BSFaceGenNiNode* pfacenode = pCurrentProcess->GetFaceNode();
+            BSFaceGenNiNode* pfacenodeSkinned = pCurrentProcess->GetFaceSkinnedNode();
+            NiAVObject* panimFace = pCurrentProcess->GetHeadAnims();
+            if (!pfacenode) {
+                NiFixedString* v2 = &FixedStrings::QRaceHeadBiped();
+                NiAVObject* ObjectByName_1 = BSUtilities::GetObjectByName(proot, *v2);
+                pfacenode = static_cast<BSFaceGenNiNode*>(
+                    NiObject::DynamicCastStatic(&BSFaceGenNiNode::ms_RTTI, ObjectByName_1)
+                );
+                pCurrentProcess->SetFaceNode(pfacenode);
+            }
+            if (!pfacenodeSkinned) {
+                NiFixedString* v4 = &FixedStrings::QRaceHeadSkinned();
+                NiAVObject* v5 = BSUtilities::GetObjectByName(proot, *v4);
+                pfacenodeSkinned =
+                    static_cast<BSFaceGenNiNode*>(NiObject::DynamicCastStatic(&BSFaceGenNiNode::ms_RTTI, v5));
+                pCurrentProcess->SetFaceSkinnedNode(pfacenodeSkinned);
+            }
+            if (!panimFace) {
+                NiFixedString* v6 = &FixedStrings::QHeadAnims();
+                panimFace = BSUtilities::GetObjectByName(proot, *v6);
+                pCurrentProcess->SetHeadAnims(panimFace);
+            }
+            if (((!pfacenode || pfacenode->GetSelectiveUpdate()) &&
+                 (!pfacenodeSkinned || !pfacenodeSkinned->GetAppCulled())) &&
+                (panimFace) && (pfacenode) && (pfacenodeSkinned)) {
+                bool bheadAnimsCulled = panimFace->m_pkParent->GetAppCulled();
+                BSFaceGenAnimationData* v7 = pfacenode->GetAnimationData();
+                v7->SetAnimHeadCulled(bheadAnimsCulled);
+                BSFaceGenAnimationData* v8 = pfacenodeSkinned->GetAnimationData();
+                v8->SetAnimHeadCulled(bheadAnimsCulled);
+                if (!bheadAnimsCulled) {
+                    NiGeomMorpherController* panimMorph = static_cast<NiGeomMorpherController*>(
+                        panimFace->GetController(&NiGeomMorpherController::ms_RTTI)
                     );
-                    pCurrentProcess->SetFaceNode(pfacenode);
-                }
-                if (!pfacenodeSkinned) {
-                    NiFixedString* v4 = &FixedStrings::QRaceHeadSkinned();
-                    NiAVObject* v5 = BSUtilities::GetObjectByName(proot, *v4);
-                    pfacenodeSkinned =
-                        static_cast<BSFaceGenNiNode*>(NiObject::DynamicCastStatic(&BSFaceGenNiNode::ms_RTTI, v5));
-                    pCurrentProcess->SetFaceSkinnedNode(pfacenodeSkinned);
-                }
-                if (!panimFace) {
-                    NiFixedString* v6 = &FixedStrings::QHeadAnims();
-                    panimFace = BSUtilities::GetObjectByName(proot, *v6);
-                    pCurrentProcess->SetHeadAnims(panimFace);
-                }
-                if ((!pfacenode || pfacenode->GetSelectiveUpdate()) &&
-                    (!pfacenodeSkinned || !pfacenodeSkinned->GetAppCulled())) {
-                    if (panimFace) {
-                        if (pfacenode) {
-                            if (pfacenodeSkinned) {
-                                bool bheadAnimsCulled = panimFace->m_pkParent->GetAppCulled();
-                                BSFaceGenAnimationData* v7 = pfacenode->GetAnimationData();
-                                v7->SetAnimHeadCulled(bheadAnimsCulled);
-                                BSFaceGenAnimationData* v8 = pfacenodeSkinned->GetAnimationData();
-                                v8->SetAnimHeadCulled(bheadAnimsCulled);
-                                if (!bheadAnimsCulled) {
-                                    NiGeomMorpherController* panimMorph = static_cast<NiGeomMorpherController*>(
-                                        panimFace->GetController(&NiGeomMorpherController::ms_RTTI)
-                                    );
-                                    uint32_t icount = panimMorph->GetNumTargets();
-                                    for (uint32_t n = 0; n < icount; ++n) {
-                                        NiMorphData::MorphTarget* ptarget = panimMorph->GetTarget(n);
-                                        NiInterpolator* pinterp = panimMorph->GetInterpolator(n);
-                                        NiBlendFloatInterpolator* pfloatInterp = nullptr;
-                                        if (NiObject::IsExactKindOf(&NiBlendFloatInterpolator::ms_RTTI, pinterp)) {
-                                            pfloatInterp = static_cast<NiBlendFloatInterpolator*>(pinterp);
+                    uint32_t icount = panimMorph->GetNumTargets();
+                    for (uint32_t n = 0; n < icount; ++n) {
+                        NiMorphData::MorphTarget* ptarget = panimMorph->GetTarget(n);
+                        NiInterpolator* pinterp = panimMorph->GetInterpolator(n);
+                        NiBlendFloatInterpolator* pfloatInterp = nullptr;
+                        if (NiObject::IsExactKindOf(&NiBlendFloatInterpolator::ms_RTTI, pinterp)) {
+                            pfloatInterp = static_cast<NiBlendFloatInterpolator*>(pinterp);
+                        }
+                        if (pfloatInterp) {
+                            float fvalue = pfloatInterp->m_fFloatValue;
+                            const NiFixedString* Name = &ptarget->GetName();
+                            NiFixedString pname(*Name);
+                            if ((fvalue >= 0.0) && (*pname.GetHandleString())) {
+                                BS_FACEGEN_EXPRESSION eexp = BS_FG_EXPRESSION_NONE;
+                                BS_FACEGEN_MODIFIER emod = BS_FG_MODIFIER_NONE;
+                                BS_FACEGEN_PHONEME ephon = BS_FG_PHONEME_NONE;
+                                switch (*pname.GetHandleString()) {
+                                    case 65: {
+                                        if (pname.GetHandleString()[1] == 110) {
+                                            eexp = BS_FG_EXPRESSION_ANGER;
                                         }
-                                        if (pfloatInterp) {
-                                            float fvalue = pfloatInterp->m_fFloatValue;
-                                            const NiFixedString* Name = &ptarget->GetName();
-                                            NiFixedString pname(*Name);
-                                            if (fvalue >= 0.0) {
-                                                if (*pname.GetHandleString()) {
-                                                    BS_FACEGEN_EXPRESSION eexp = BS_FG_EXPRESSION_NONE;
-                                                    BS_FACEGEN_MODIFIER emod = BS_FG_MODIFIER_NONE;
-                                                    BS_FACEGEN_PHONEME ephon = BS_FG_PHONEME_NONE;
-                                                    switch (*pname.GetHandleString()) {
-                                                        case 65: {
-                                                            if (pname.GetHandleString()[1] == 110) {
-                                                                eexp = BS_FG_EXPRESSION_ANGER;
-                                                            }
-                                                            else {
-                                                                ephon = BS_FG_PHONEME_AAH;
-                                                            }
-                                                            break;
-                                                        }
-                                                        case 66: {
-                                                            switch (pname.GetHandleString()[1]) {
-                                                                case 77: {
-                                                                    ephon = BS_FG_PHONEME_B_M_P;
-                                                                    break;
-                                                                }
-                                                                case 105: {
-                                                                    ephon = BS_FG_PHONEME_BIG_AAH;
-                                                                    break;
-                                                                }
-                                                                case 108: {
-                                                                    emod = static_cast<BS_FACEGEN_MODIFIER>(
-                                                                        pname.GetHandleString()[5] != 76
-                                                                    );
-                                                                    break;
-                                                                }
-                                                                case 114: {
-                                                                    char v17 = pname.GetHandleString()[4];
-                                                                    switch (v17) {
-                                                                        case 68: {
-                                                                            if (pname.GetHandleString()[8] == 76) {
-                                                                                emod = BS_FG_MODIFIER_BROW_DOWN_LEFT;
-                                                                            }
-                                                                            else {
-                                                                                emod = BS_FG_MODIFIER_BROW_DOWN_RIGHT;
-                                                                            }
-                                                                            break;
-                                                                        }
-                                                                        case 73: {
-                                                                            if (pname.GetHandleString()[6] == 76) {
-                                                                                emod = BS_FG_MODIFIER_BROW_IN_LEFT;
-                                                                            }
-                                                                            else {
-                                                                                emod = BS_FG_MODIFIER_BROW_IN_RIGHT;
-                                                                            }
-                                                                            break;
-                                                                        }
-                                                                        case 85: {
-                                                                            if (pname.GetHandleString()[6] == 76) {
-                                                                                emod = BS_FG_MODIFIER_BROW_UP_LEFT;
-                                                                            }
-                                                                            else {
-                                                                                emod = BS_FG_MODIFIER_BROW_UP_RIGHT;
-                                                                            }
-                                                                            break;
-                                                                        }
-                                                                    }
-                                                                    break;
-                                                                }
-                                                                default: {
-                                                                    goto LABEL_101;
-                                                                }
-                                                            }
-                                                            break;
-                                                        }
-                                                        case 67: {
-                                                            if (pname.GetHandleString()[1] == 111) {
-                                                                eexp = BS_FG_EXPRESSION_COMBAT_ANGRY;
-                                                            }
-                                                            else {
-                                                                ephon = BS_FG_PHONEME_CH_J_SH;
-                                                            }
-                                                            break;
-                                                        }
-                                                        case 68: {
-                                                            ephon = BS_FG_PHONEME_D_S_T;
-                                                            break;
-                                                        }
-                                                        case 69: {
-                                                            if (pname.GetHandleString()[1] == 101) {
-                                                                ephon = BS_FG_PHONEME_EEE;
-                                                            }
-                                                            else {
-                                                                ephon = BS_FG_PHONEME_EH;
-                                                            }
-                                                            break;
-                                                        }
-                                                        case 70: {
-                                                            if (pname.GetHandleString()[1] == 101) {
-                                                                eexp = BS_FG_EXPRESSION_FEAR;
-                                                            }
-                                                            else {
-                                                                ephon = BS_FG_PHONEME_F_V;
-                                                            }
-                                                            break;
-                                                        }
-                                                        case 72: {
-                                                            switch (pname.GetHandleString()[4]) {
-                                                                case 80: {
-                                                                    emod = BS_FG_MODIFIER_HEAD_PITCH;
-                                                                    break;
-                                                                }
-                                                                case 82: {
-                                                                    emod = BS_FG_MODIFIER_HEAD_ROLL;
-                                                                    break;
-                                                                }
-                                                                case 89: {
-                                                                    emod = BS_FG_MODIFIER_HEAD_YAW;
-                                                                    break;
-                                                                }
-                                                                case 121: {
-                                                                    eexp = BS_FG_EXPRESSION_HAPPY;
-                                                                    break;
-                                                                }
-                                                                default: {
-                                                                    goto LABEL_101;
-                                                                }
-                                                            }
-                                                            break;
-                                                        }
-                                                        case 73: {
-                                                            ephon = BS_FG_PHONEME_I;
-                                                            break;
-                                                        }
-                                                        case 75: {
-                                                            ephon = BS_FG_PHONEME_K;
-                                                            break;
-                                                        }
-                                                        case 76: {
-                                                            switch (pname.GetHandleString()[4]) {
-                                                                case 68: {
-                                                                    emod = BS_FG_MODIFIER_LOOK_DOWN;
-                                                                    break;
-                                                                }
-                                                                case 76: {
-                                                                    emod = BS_FG_MODIFIER_LOOK_LEFT;
-                                                                    break;
-                                                                }
-                                                                case 82: {
-                                                                    emod = BS_FG_MODIFIER_LOOK_RIGHT;
-                                                                    break;
-                                                                }
-                                                                case 85: {
-                                                                    emod = BS_FG_MODIFIER_LOOK_UP;
-                                                                    break;
-                                                                }
-                                                                default: {
-                                                                    goto LABEL_101;
-                                                                }
-                                                            }
-                                                            break;
-                                                        }
-                                                        case 77: {
-                                                            switch (pname.GetHandleString()[5]) {
-                                                                case 97: {
-                                                                    eexp = BS_FG_EXPRESSION_MOOD_SAD;
-                                                                    break;
-                                                                }
-                                                                case 101: {
-                                                                    eexp = BS_FG_EXPRESSION_MOOD_NEUTRAL;
-                                                                    break;
-                                                                }
-                                                                case 102: {
-                                                                    eexp = BS_FG_EXPRESSION_MOOD_AFRAID;
-                                                                    break;
-                                                                }
-                                                                case 108: {
-                                                                    eexp = BS_FG_EXPRESSION_MOOD_PLEASANT;
-                                                                    break;
-                                                                }
-                                                                case 110: {
-                                                                    if (pname.GetHandleString()[6] == 110) {
-                                                                        eexp = BS_FG_EXPRESSION_MOOD_ANNOYED;
-                                                                    }
-                                                                    else {
-                                                                        eexp = BS_FG_EXPRESSION_MOOD_ANGRY;
-                                                                    }
-                                                                    break;
-                                                                }
-                                                                case 111: {
-                                                                    eexp = BS_FG_EXPRESSION_MOOD_COCKY;
-                                                                    break;
-                                                                }
-                                                                case 114: {
-                                                                    eexp = BS_FG_EXPRESSION_MOOD_DRUGGED;
-                                                                    break;
-                                                                }
-                                                                default: {
-                                                                    goto LABEL_101;
-                                                                }
-                                                            }
-                                                            break;
-                                                        }
-                                                        case 78: {
-                                                            ephon = BS_FG_PHONEME_N;
-                                                            break;
-                                                        }
-                                                        case 79: {
-                                                            if (pname.GetHandleString()[1] == 104) {
-                                                                ephon = BS_FG_PHONEME_OH;
-                                                            }
-                                                            else {
-                                                                ephon = BS_FG_PHONEME_OOH_Q;
-                                                            }
-                                                            break;
-                                                        }
-                                                        case 80: {
-                                                            eexp = BS_FG_EXPRESSION_MOOD_PAINED;
-                                                            break;
-                                                        }
-                                                        case 82: {
-                                                            ephon = BS_FG_PHONEME_R;
-                                                            break;
-                                                        }
-                                                        case 83: {
-                                                            char v16 = pname.GetHandleString()[1];
-                                                            switch (v16) {
-                                                                case 97: {
-                                                                    eexp = BS_FG_EXPRESSION_SAD;
-                                                                    break;
-                                                                }
-                                                                case 113: {
-                                                                    if (pname.GetHandleString()[6] == 76) {
-                                                                        emod = BS_FG_MODIFIER_SQUINT_LEFT;
-                                                                    }
-                                                                    else {
-                                                                        emod = BS_FG_MODIFIER_SQUINT_RIGHT;
-                                                                    }
-                                                                    break;
-                                                                }
-                                                                case 117: {
-                                                                    eexp = BS_FG_EXPRESSION_SURPRISE;
-                                                                    break;
-                                                                }
-                                                            }
-                                                            break;
-                                                        }
-                                                        case 84: {
-                                                            ephon = BS_FG_PHONEME_TH;
-                                                            break;
-                                                        }
-                                                        case 87: {
-                                                            ephon = BS_FG_PHONEME_W;
-                                                            break;
-                                                        }
-                                                        default: {
-                                                            break;
-                                                        }
-                                                    }
-                                                LABEL_101:;
-                                                    if (eexp == BS_FG_EXPRESSION_NONE) {
-                                                        if (emod == BS_FG_MODIFIER_NONE) {
-                                                            if (ephon != BS_FG_PHONEME_NONE) {
-                                                                BSFaceGenAnimationData* v11 =
-                                                                    pfacenode->GetAnimationData();
-                                                                v11->SetAnimPhonemeValue(ephon, fvalue);
-                                                                BSFaceGenAnimationData* v10 =
-                                                                    pfacenodeSkinned->GetAnimationData();
-                                                                v10->SetAnimPhonemeValue(ephon, fvalue);
-                                                            }
+                                        else {
+                                            ephon = BS_FG_PHONEME_AAH;
+                                        }
+                                        break;
+                                    }
+                                    case 66: {
+                                        switch (pname.GetHandleString()[1]) {
+                                            case 77: {
+                                                ephon = BS_FG_PHONEME_B_M_P;
+                                                break;
+                                            }
+                                            case 105: {
+                                                ephon = BS_FG_PHONEME_BIG_AAH;
+                                                break;
+                                            }
+                                            case 108: {
+                                                emod =
+                                                    static_cast<BS_FACEGEN_MODIFIER>(pname.GetHandleString()[5] != 76);
+                                                break;
+                                            }
+                                            case 114: {
+                                                char v17 = pname.GetHandleString()[4];
+                                                switch (v17) {
+                                                    case 68: {
+                                                        if (pname.GetHandleString()[8] == 76) {
+                                                            emod = BS_FG_MODIFIER_BROW_DOWN_LEFT;
                                                         }
                                                         else {
-                                                            BSFaceGenAnimationData* v13 = pfacenode->GetAnimationData();
-                                                            v13->SetAnimModifierValue(emod, fvalue);
-                                                            BSFaceGenAnimationData* v12 =
-                                                                pfacenodeSkinned->GetAnimationData();
-                                                            v12->SetAnimModifierValue(emod, fvalue);
+                                                            emod = BS_FG_MODIFIER_BROW_DOWN_RIGHT;
                                                         }
+                                                        break;
                                                     }
-                                                    else {
-                                                        BSFaceGenAnimationData* v15 = pfacenode->GetAnimationData();
-                                                        v15->SetAnimExpressionValue(eexp, fvalue);
-                                                        BSFaceGenAnimationData* v14 =
-                                                            pfacenodeSkinned->GetAnimationData();
-                                                        v14->SetAnimExpressionValue(eexp, fvalue);
+                                                    case 73: {
+                                                        if (pname.GetHandleString()[6] == 76) {
+                                                            emod = BS_FG_MODIFIER_BROW_IN_LEFT;
+                                                        }
+                                                        else {
+                                                            emod = BS_FG_MODIFIER_BROW_IN_RIGHT;
+                                                        }
+                                                        break;
+                                                    }
+                                                    case 85: {
+                                                        if (pname.GetHandleString()[6] == 76) {
+                                                            emod = BS_FG_MODIFIER_BROW_UP_LEFT;
+                                                        }
+                                                        else {
+                                                            emod = BS_FG_MODIFIER_BROW_UP_RIGHT;
+                                                        }
+                                                        break;
                                                     }
                                                 }
+                                                break;
+                                            }
+                                            default: {
+                                                goto LABEL_101;
                                             }
                                         }
+                                        break;
                                     }
+                                    case 67: {
+                                        if (pname.GetHandleString()[1] == 111) {
+                                            eexp = BS_FG_EXPRESSION_COMBAT_ANGRY;
+                                        }
+                                        else {
+                                            ephon = BS_FG_PHONEME_CH_J_SH;
+                                        }
+                                        break;
+                                    }
+                                    case 68: {
+                                        ephon = BS_FG_PHONEME_D_S_T;
+                                        break;
+                                    }
+                                    case 69: {
+                                        if (pname.GetHandleString()[1] == 101) {
+                                            ephon = BS_FG_PHONEME_EEE;
+                                        }
+                                        else {
+                                            ephon = BS_FG_PHONEME_EH;
+                                        }
+                                        break;
+                                    }
+                                    case 70: {
+                                        if (pname.GetHandleString()[1] == 101) {
+                                            eexp = BS_FG_EXPRESSION_FEAR;
+                                        }
+                                        else {
+                                            ephon = BS_FG_PHONEME_F_V;
+                                        }
+                                        break;
+                                    }
+                                    case 72: {
+                                        switch (pname.GetHandleString()[4]) {
+                                            case 80: {
+                                                emod = BS_FG_MODIFIER_HEAD_PITCH;
+                                                break;
+                                            }
+                                            case 82: {
+                                                emod = BS_FG_MODIFIER_HEAD_ROLL;
+                                                break;
+                                            }
+                                            case 89: {
+                                                emod = BS_FG_MODIFIER_HEAD_YAW;
+                                                break;
+                                            }
+                                            case 121: {
+                                                eexp = BS_FG_EXPRESSION_HAPPY;
+                                                break;
+                                            }
+                                            default: {
+                                                goto LABEL_101;
+                                            }
+                                        }
+                                        break;
+                                    }
+                                    case 73: {
+                                        ephon = BS_FG_PHONEME_I;
+                                        break;
+                                    }
+                                    case 75: {
+                                        ephon = BS_FG_PHONEME_K;
+                                        break;
+                                    }
+                                    case 76: {
+                                        switch (pname.GetHandleString()[4]) {
+                                            case 68: {
+                                                emod = BS_FG_MODIFIER_LOOK_DOWN;
+                                                break;
+                                            }
+                                            case 76: {
+                                                emod = BS_FG_MODIFIER_LOOK_LEFT;
+                                                break;
+                                            }
+                                            case 82: {
+                                                emod = BS_FG_MODIFIER_LOOK_RIGHT;
+                                                break;
+                                            }
+                                            case 85: {
+                                                emod = BS_FG_MODIFIER_LOOK_UP;
+                                                break;
+                                            }
+                                            default: {
+                                                goto LABEL_101;
+                                            }
+                                        }
+                                        break;
+                                    }
+                                    case 77: {
+                                        switch (pname.GetHandleString()[5]) {
+                                            case 97: {
+                                                eexp = BS_FG_EXPRESSION_MOOD_SAD;
+                                                break;
+                                            }
+                                            case 101: {
+                                                eexp = BS_FG_EXPRESSION_MOOD_NEUTRAL;
+                                                break;
+                                            }
+                                            case 102: {
+                                                eexp = BS_FG_EXPRESSION_MOOD_AFRAID;
+                                                break;
+                                            }
+                                            case 108: {
+                                                eexp = BS_FG_EXPRESSION_MOOD_PLEASANT;
+                                                break;
+                                            }
+                                            case 110: {
+                                                if (pname.GetHandleString()[6] == 110) {
+                                                    eexp = BS_FG_EXPRESSION_MOOD_ANNOYED;
+                                                }
+                                                else {
+                                                    eexp = BS_FG_EXPRESSION_MOOD_ANGRY;
+                                                }
+                                                break;
+                                            }
+                                            case 111: {
+                                                eexp = BS_FG_EXPRESSION_MOOD_COCKY;
+                                                break;
+                                            }
+                                            case 114: {
+                                                eexp = BS_FG_EXPRESSION_MOOD_DRUGGED;
+                                                break;
+                                            }
+                                            default: {
+                                                goto LABEL_101;
+                                            }
+                                        }
+                                        break;
+                                    }
+                                    case 78: {
+                                        ephon = BS_FG_PHONEME_N;
+                                        break;
+                                    }
+                                    case 79: {
+                                        if (pname.GetHandleString()[1] == 104) {
+                                            ephon = BS_FG_PHONEME_OH;
+                                        }
+                                        else {
+                                            ephon = BS_FG_PHONEME_OOH_Q;
+                                        }
+                                        break;
+                                    }
+                                    case 80: {
+                                        eexp = BS_FG_EXPRESSION_MOOD_PAINED;
+                                        break;
+                                    }
+                                    case 82: {
+                                        ephon = BS_FG_PHONEME_R;
+                                        break;
+                                    }
+                                    case 83: {
+                                        char v16 = pname.GetHandleString()[1];
+                                        switch (v16) {
+                                            case 97: {
+                                                eexp = BS_FG_EXPRESSION_SAD;
+                                                break;
+                                            }
+                                            case 113: {
+                                                if (pname.GetHandleString()[6] == 76) {
+                                                    emod = BS_FG_MODIFIER_SQUINT_LEFT;
+                                                }
+                                                else {
+                                                    emod = BS_FG_MODIFIER_SQUINT_RIGHT;
+                                                }
+                                                break;
+                                            }
+                                            case 117: {
+                                                eexp = BS_FG_EXPRESSION_SURPRISE;
+                                                break;
+                                            }
+                                        }
+                                        break;
+                                    }
+                                    case 84: {
+                                        ephon = BS_FG_PHONEME_TH;
+                                        break;
+                                    }
+                                    case 87: {
+                                        ephon = BS_FG_PHONEME_W;
+                                        break;
+                                    }
+                                    default: {
+                                        break;
+                                    }
+                                }
+                            LABEL_101:;
+                                if (eexp == BS_FG_EXPRESSION_NONE) {
+                                    if (emod == BS_FG_MODIFIER_NONE) {
+                                        if (ephon != BS_FG_PHONEME_NONE) {
+                                            BSFaceGenAnimationData* v11 = pfacenode->GetAnimationData();
+                                            v11->SetAnimPhonemeValue(ephon, fvalue);
+                                            BSFaceGenAnimationData* v10 = pfacenodeSkinned->GetAnimationData();
+                                            v10->SetAnimPhonemeValue(ephon, fvalue);
+                                        }
+                                    }
+                                    else {
+                                        BSFaceGenAnimationData* v13 = pfacenode->GetAnimationData();
+                                        v13->SetAnimModifierValue(emod, fvalue);
+                                        BSFaceGenAnimationData* v12 = pfacenodeSkinned->GetAnimationData();
+                                        v12->SetAnimModifierValue(emod, fvalue);
+                                    }
+                                }
+                                else {
+                                    BSFaceGenAnimationData* v15 = pfacenode->GetAnimationData();
+                                    v15->SetAnimExpressionValue(eexp, fvalue);
+                                    BSFaceGenAnimationData* v14 = pfacenodeSkinned->GetAnimationData();
+                                    v14->SetAnimExpressionValue(eexp, fvalue);
                                 }
                             }
                         }
@@ -678,58 +664,56 @@ bool Character::InitiateTresPassPackage(TrespassPackage* apPack) {
 
 void Character::InitiateSpectator() {
     TESPackage* v1;
-    if (!GetCurrentPackage() || (v1 = GetCurrentPackage(), v1->GetPackType() != PACKAGE_TYPE_FLEE)) {
-        if (!IsInCombat() && (!IsinDialogue() || GetCurrentTarget() != pPlayer) &&
-            (GetSitSleepState() == SIT_SLEEP_NORMAL ||
-             (GetSitSleepState() == SIT_SLEEP_IS_SITTING || GetSitSleepState() == SIT_SLEEP_IS_SLEEPING)) &&
-            !ShouldSkipFallOutBehavior(FALLOUT_BEHAVIORS_OBSERVE_COMBAT_BEHAVIOR)) {
-            BaseProcess* pproc = pCurrentProcess;
-            if (pproc) {
-                TESPackage* ppack = pproc->GetRunOncePackage();
-                if (!ppack ||
-                    (ppack->ePROCEDURE_TYPE != PACKAGE_PROCEDURE_OBSERVE_COMBAT &&
-                     (ppack->ePROCEDURE_TYPE != PACKAGE_PROCEDURE_FLEE &&
-                      ppack->ePROCEDURE_TYPE != PACKAGE_PROCEDURE_FLEE_NON_COMBAT))) {
-                    TESPackage* ppack_2 = pproc->GetCurrentPackage();
-                    if (!ppack_2 ||
-                        (ppack_2->ePROCEDURE_TYPE != PACKAGE_PROCEDURE_OBSERVE_COMBAT &&
-                         (ppack_2->ePROCEDURE_TYPE != PACKAGE_PROCEDURE_FLEE &&
-                          ppack_2->ePROCEDURE_TYPE != PACKAGE_PROCEDURE_FLEE_NON_COMBAT))) {
-                        SpectatorPackage* pspecPack;
-                        pCurrentProcess->ClearRunOncePackage();
-                        BaseProcess* CurrentAIProcess = pCurrentProcess;
-                        CurrentAIProcess->ClearActionHeadTrackTarget(true);
-                        if (pCurrentProcess->GetSitSleepState() == SIT_SLEEP_IS_SITTING || IsSleeping()) {
-                            InitiateGetUpPackage();
-                        }
-                        SpectatorPackage* apMemory =
-                            static_cast<SpectatorPackage*>(ourMalloc(sizeof(SpectatorPackage)));
-                        if (apMemory) {
-                            pspecPack = ::new (apMemory) SpectatorPackage;
-                        }
-                        else {
-                            pspecPack = nullptr;
-                        }
-                        BaseProcess* v7 = pCurrentProcess;
-                        v7->ComputeLastTimeProcessed();
-                        if (GetCurrentPackage()) {
-                            TESPackage* CurrentPackage = GetCurrentPackage();
-                            pspecPack->CopyAllFlags(CurrentPackage);
-                        }
-                        if (pCurrentProcess) {
-                            BaseProcess* v6 = pCurrentProcess;
-                            if (v6->GetPackageThatIsRunning()) {
-                                BaseProcess* v5 = pCurrentProcess;
-                                TESPackage* v3 = v5->GetPackageThatIsRunning();
-                                if (v3->IsInterruptPackage()) {
-                                    EndInterruptPackage(false);
-                                }
+    if ((!GetCurrentPackage() || (v1 = GetCurrentPackage(), v1->GetPackType() != PACKAGE_TYPE_FLEE)) &&
+        (!IsInCombat() && (!IsinDialogue() || GetCurrentTarget() != pPlayer) &&
+         (GetSitSleepState() == SIT_SLEEP_NORMAL ||
+          (GetSitSleepState() == SIT_SLEEP_IS_SITTING || GetSitSleepState() == SIT_SLEEP_IS_SLEEPING)) &&
+         !ShouldSkipFallOutBehavior(FALLOUT_BEHAVIORS_OBSERVE_COMBAT_BEHAVIOR))) {
+        BaseProcess* pproc = pCurrentProcess;
+        if (pproc) {
+            TESPackage* ppack = pproc->GetRunOncePackage();
+            if (!ppack ||
+                (ppack->ePROCEDURE_TYPE != PACKAGE_PROCEDURE_OBSERVE_COMBAT &&
+                 (ppack->ePROCEDURE_TYPE != PACKAGE_PROCEDURE_FLEE &&
+                  ppack->ePROCEDURE_TYPE != PACKAGE_PROCEDURE_FLEE_NON_COMBAT))) {
+                TESPackage* ppack_2 = pproc->GetCurrentPackage();
+                if (!ppack_2 ||
+                    (ppack_2->ePROCEDURE_TYPE != PACKAGE_PROCEDURE_OBSERVE_COMBAT &&
+                     (ppack_2->ePROCEDURE_TYPE != PACKAGE_PROCEDURE_FLEE &&
+                      ppack_2->ePROCEDURE_TYPE != PACKAGE_PROCEDURE_FLEE_NON_COMBAT))) {
+                    SpectatorPackage* pspecPack;
+                    pCurrentProcess->ClearRunOncePackage();
+                    BaseProcess* CurrentAIProcess = pCurrentProcess;
+                    CurrentAIProcess->ClearActionHeadTrackTarget(true);
+                    if (pCurrentProcess->GetSitSleepState() == SIT_SLEEP_IS_SITTING || IsSleeping()) {
+                        InitiateGetUpPackage();
+                    }
+                    SpectatorPackage* apMemory = static_cast<SpectatorPackage*>(ourMalloc(sizeof(SpectatorPackage)));
+                    if (apMemory) {
+                        pspecPack = ::new (apMemory) SpectatorPackage;
+                    }
+                    else {
+                        pspecPack = nullptr;
+                    }
+                    BaseProcess* v7 = pCurrentProcess;
+                    v7->ComputeLastTimeProcessed();
+                    if (GetCurrentPackage()) {
+                        TESPackage* CurrentPackage = GetCurrentPackage();
+                        pspecPack->CopyAllFlags(CurrentPackage);
+                    }
+                    if (pCurrentProcess) {
+                        BaseProcess* v6 = pCurrentProcess;
+                        if (v6->GetPackageThatIsRunning()) {
+                            BaseProcess* v5 = pCurrentProcess;
+                            TESPackage* v3 = v5->GetPackageThatIsRunning();
+                            if (v3->IsInterruptPackage()) {
+                                EndInterruptPackage(false);
                             }
                         }
-                        BaseProcess* v4 = pCurrentProcess;
-                        v4->SavePackageToExtraData(this);
-                        PutCreatedPackage(pspecPack, false, true);
                     }
+                    BaseProcess* v4 = pCurrentProcess;
+                    v4->SavePackageToExtraData(this);
+                    PutCreatedPackage(pspecPack, false, true);
                 }
             }
         }
@@ -775,10 +759,9 @@ float Character::GetArmorRating() {
     if (!(fMaxArmorRating.Float() > 0.0)) {
         return fArmorRating;
     }
-    else {
-        float* v2 = &fMaxArmorRating.Float();
-        return BSMIN(fArmorRating, *v2);
-    }
+
+    float* v2 = &fMaxArmorRating.Float();
+    return BSMIN(fArmorRating, *v2);
 }
 
 float Character::GetArmorThreshold() {
@@ -846,27 +829,25 @@ void Character::PrecacheData() {
     GetArmorThreshold();
     GetArmorRating();
     NiNode* apScene = Get3D();
-    if (apScene) {
-        if (pCurrentProcess) {
-            if (!pCurrentProcess->GetFaceNode()) {
-                NiFixedString* v1 = &FixedStrings::QRaceHeadBiped();
-                NiAVObject* ObjectByName = BSUtilities::GetObjectByName(apScene, *v1);
-                BSFaceGenNiNode* v3 =
-                    static_cast<BSFaceGenNiNode*>(NiObject::DynamicCastStatic(&BSFaceGenNiNode::ms_RTTI, ObjectByName));
-                pCurrentProcess->SetFaceNode(v3);
-            }
-            if (!pCurrentProcess->GetFaceSkinnedNode()) {
-                NiFixedString* v4 = &FixedStrings::QRaceHeadSkinned();
-                NiAVObject* v5 = BSUtilities::GetObjectByName(apScene, *v4);
-                BSFaceGenNiNode* v6 =
-                    static_cast<BSFaceGenNiNode*>(NiObject::DynamicCastStatic(&BSFaceGenNiNode::ms_RTTI, v5));
-                pCurrentProcess->SetFaceSkinnedNode(v6);
-            }
-            if (!pCurrentProcess->GetHeadAnims()) {
-                NiFixedString* v7 = &FixedStrings::QHeadAnims();
-                NiAVObject* v8 = BSUtilities::GetObjectByName(apScene, *v7);
-                pCurrentProcess->SetHeadAnims(v8);
-            }
+    if ((apScene) && (pCurrentProcess)) {
+        if (!pCurrentProcess->GetFaceNode()) {
+            NiFixedString* v1 = &FixedStrings::QRaceHeadBiped();
+            NiAVObject* ObjectByName = BSUtilities::GetObjectByName(apScene, *v1);
+            BSFaceGenNiNode* v3 =
+                static_cast<BSFaceGenNiNode*>(NiObject::DynamicCastStatic(&BSFaceGenNiNode::ms_RTTI, ObjectByName));
+            pCurrentProcess->SetFaceNode(v3);
+        }
+        if (!pCurrentProcess->GetFaceSkinnedNode()) {
+            NiFixedString* v4 = &FixedStrings::QRaceHeadSkinned();
+            NiAVObject* v5 = BSUtilities::GetObjectByName(apScene, *v4);
+            BSFaceGenNiNode* v6 =
+                static_cast<BSFaceGenNiNode*>(NiObject::DynamicCastStatic(&BSFaceGenNiNode::ms_RTTI, v5));
+            pCurrentProcess->SetFaceSkinnedNode(v6);
+        }
+        if (!pCurrentProcess->GetHeadAnims()) {
+            NiFixedString* v7 = &FixedStrings::QHeadAnims();
+            NiAVObject* v8 = BSUtilities::GetObjectByName(apScene, *v7);
+            pCurrentProcess->SetHeadAnims(v8);
         }
     }
 }

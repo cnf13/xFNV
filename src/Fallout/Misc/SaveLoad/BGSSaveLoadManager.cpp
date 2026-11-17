@@ -368,43 +368,39 @@ bool BGSSaveLoadManager::SaveGame(const char* apFileName, int32_t aiDeviceID, bo
                 EndSaveGame();
                 return false;
             }
-            else {
-                EndSaveGame();
-                if (apSaveFile != pSaveLoadFile) {
-                    CloseSaveFile(apSaveFile, true);
-                }
-                if (abOutputStats) {
-                    char apFullPath[270];
-                    GetFullPath(apFileName, apFullPath, false);
-                    BGSSaveLoadStatsMap::OutputSaveLoadStats(apFullPath);
-                }
-                pSaveLoadGame->pHistory->Rewind(aiCount);
-                if (apSaveFile != pSaveLoadFile) {
-                    if (pSaveGameList) {
-                        AddSaveGame(Dst, aiDeviceID, iCurrentSaveGameNumber);
-                    }
-                }
-                if (!bIsQuickSave && !bIsAutoSave) {
-                    ++iCurrentSaveGameNumber;
-                }
-                SetMostRecentSaveGame(Dst, aiDeviceID);
-                return true;
-            }
-        }
-        else {
+
             EndSaveGame();
-            return false;
+            if (apSaveFile != pSaveLoadFile) {
+                CloseSaveFile(apSaveFile, true);
+            }
+            if (abOutputStats) {
+                char apFullPath[270];
+                GetFullPath(apFileName, apFullPath, false);
+                BGSSaveLoadStatsMap::OutputSaveLoadStats(apFullPath);
+            }
+            pSaveLoadGame->pHistory->Rewind(aiCount);
+            if ((apSaveFile != pSaveLoadFile) && (pSaveGameList)) {
+                AddSaveGame(Dst, aiDeviceID, iCurrentSaveGameNumber);
+            }
+
+            if (!bIsQuickSave && !bIsAutoSave) {
+                ++iCurrentSaveGameNumber;
+            }
+            SetMostRecentSaveGame(Dst, aiDeviceID);
+            return true;
         }
-    }
-    else {
-        if (!v13) {
-            const char* v4 = sCantSaveNow.String();
-            Interface::ShowMessage(
-                v4, 0, "Interface\\Icons\\Message Icons\\glow_message_vaultboy_sad.dds", nullptr, 2.0f, false
-            );
-        }
+
+        EndSaveGame();
         return false;
     }
+
+    if (!v13) {
+        const char* v4 = sCantSaveNow.String();
+        Interface::ShowMessage(
+            v4, 0, "Interface\\Icons\\Message Icons\\glow_message_vaultboy_sad.dds", nullptr, 2.0f, false
+        );
+    }
+    return false;
 }
 
 void BGSSaveLoadManager::GetSaveDirectoryPath(char* apDirectoryPath) {
@@ -603,13 +599,12 @@ bool BGSSaveLoadManager::LoadGame(
         if (pFile != pSaveLoadFile) {
             CloseSaveFile(pFile, false);
         }
-        if (bResult) {
-            if (abOutputStats) {
-                char acFullPath[271];
-                GetFullPath(apFileName, acFullPath, false);
-                BGSSaveLoadStatsMap::OutputSaveLoadStats(acFullPath);
-            }
+        if ((bResult) && (abOutputStats)) {
+            char acFullPath[271];
+            GetFullPath(apFileName, acFullPath, false);
+            BGSSaveLoadStatsMap::OutputSaveLoadStats(acFullPath);
         }
+
         if (bIsConsoleVisible) {
             Interface::OpenConsole();
             TESObjectREFR* pDebugTextReference = Main::pDebugTextReference;
@@ -686,14 +681,12 @@ void BGSSaveLoadManager::DeleteSaveGameList() {
 
 void BGSSaveLoadManager::SetMostRecentSaveGame(const char* apSaveFileName, int32_t aiDeviceID) {
     uint32_t size;
-    if (apSaveFileName) {
-        if ((!pMostRecentSaveGame) || BSstrcmp(pMostRecentSaveGame, apSaveFileName)) {
-            ourFree(pMostRecentSaveGame);
-            size = BSstrlen(apSaveFileName) + 1;
-            pMostRecentSaveGame = static_cast<char*>(static_cast<void*>(static_cast<int8_t*>(ourMalloc(size))));
-            BSstrcpy(pMostRecentSaveGame, size, apSaveFileName);
-            iMostRecentSaveGameDeviceID = aiDeviceID;
-        }
+    if ((apSaveFileName) && ((!pMostRecentSaveGame) || BSstrcmp(pMostRecentSaveGame, apSaveFileName))) {
+        ourFree(pMostRecentSaveGame);
+        size = BSstrlen(apSaveFileName) + 1;
+        pMostRecentSaveGame = static_cast<char*>(static_cast<void*>(static_cast<int8_t*>(ourMalloc(size))));
+        BSstrcpy(pMostRecentSaveGame, size, apSaveFileName);
+        iMostRecentSaveGameDeviceID = aiDeviceID;
     }
 }
 
@@ -1085,10 +1078,8 @@ void BGSSaveLoadManager::SysUtilSaveCompleteCallback(
         }
         pSaveLoadManager->pSaveLoadFile = nullptr;
     }
-    if (pSaveLoadManager) {
-        if (pSaveLoadManager->pSysUtilSaveCompleteCallback) {
-            pSaveLoadManager->pSysUtilSaveCompleteCallback(aeResult, apSaveDataFile);
-        }
+    if ((pSaveLoadManager) && (pSaveLoadManager->pSysUtilSaveCompleteCallback)) {
+        pSaveLoadManager->pSysUtilSaveCompleteCallback(aeResult, apSaveDataFile);
     }
 }
 
@@ -1134,9 +1125,8 @@ uint32_t MessageMenu::GetCurrentButtonCount() {
     if (pMe) {
         return pMe->buttonList.NumUnfiltered();
     }
-    else {
-        return 0;
-    }
+
+    return 0;
 }
 
 void BGSSaveLoadFileEntry::GetFileTime(_FILETIME& arFileTime) {

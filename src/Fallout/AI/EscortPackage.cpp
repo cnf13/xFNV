@@ -123,24 +123,20 @@ int32_t EscortActorPackageData::GetNumEscortedActorsOfType(Actor* apEscorter, TE
     while (ecx0) {
         v6 = ecx0->m_item;
         ecx0 = ecx0->m_pkNext;
-        if (v6) {
-            if (v6->GetDelete() || (!v6->IsFollowing(apEscorter))) {
-                (&EscortedActors)->Remove(v6);
-                bool vCondition1;
-                vCondition1 = !(&EscortedActors)->IsEmpty();
-                if (vCondition1) {
-                    ecx0 = &EscortedActors;
-                }
+        if ((v6) && (v6->GetDelete() || (!v6->IsFollowing(apEscorter)))) {
+            (&EscortedActors)->Remove(v6);
+            bool vCondition1;
+            vCondition1 = !(&EscortedActors)->IsEmpty();
+            if (vCondition1) {
+                ecx0 = &EscortedActors;
             }
         }
     }
     int32_t v7 = 0;
     for (ecx0 = &EscortedActors; ecx0; ecx0 = ecx0->m_pkNext) {
         v5 = ecx0->m_item;
-        if (v5) {
-            if (v5->GetIsOfType(apType)) {
-                ++v7;
-            }
+        if ((v5) && (v5->GetIsOfType(apType))) {
+            ++v7;
         }
     }
     return v7;

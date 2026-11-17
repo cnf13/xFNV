@@ -543,12 +543,11 @@ void hkaTrackAnalysis::analyzeQsTransform(
             }
         }
         // A static rotation whose |w| is 1 is the identity: clear.
-        if ((staticMask[t] & 0xc) == (HK_TRACK_STATIC << 2)) {
-            if (std::fabs(avg.m_rotation.m_vec(3)) == 1.0f) {
-                staticMask[t] = static_cast<uint16_t>((staticMask[t] & 0xfff3) | (HK_TRACK_CLEAR << 2));
-                avg.m_rotation.m_vec.m_quad = hkQuadReal0001;
-            }
+        if (((staticMask[t] & 0xc) == (HK_TRACK_STATIC << 2)) && (std::fabs(avg.m_rotation.m_vec(3)) == 1.0f)) {
+            staticMask[t] = static_cast<uint16_t>((staticMask[t] & 0xfff3) | (HK_TRACK_CLEAR << 2));
+            avg.m_rotation.m_vec.m_quad = hkQuadReal0001;
         }
+
         // A static scale within half the tolerance of one is clear.
         if ((staticMask[t] & 0x30) == (HK_TRACK_STATIC << 4)) {
             hkVector4 one;

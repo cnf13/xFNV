@@ -82,18 +82,16 @@ void ContainerObject::Copy(ContainerObject* apCopy) {
     if (apCopy) {
         pObj = apCopy->pObj;
         i_count = (int32_t)((uint32_t)apCopy->i_count);
-        if (apCopy->pItemExtra) {
-            if (!apCopy->pItemExtra->IsDefault()) {
-                v4 = ourMalloc(sizeof(ContainerItemExtra));
-                if (v4) {
-                    v2 = ::new (v4) ContainerItemExtra;
-                }
-                else {
-                    v2 = nullptr;
-                }
-                pItemExtra = v2;
-                pItemExtra->Copy(apCopy->pItemExtra);
+        if ((apCopy->pItemExtra) && (!apCopy->pItemExtra->IsDefault())) {
+            v4 = ourMalloc(sizeof(ContainerItemExtra));
+            if (v4) {
+                v2 = ::new (v4) ContainerItemExtra;
             }
+            else {
+                v2 = nullptr;
+            }
+            pItemExtra = v2;
+            pItemExtra->Copy(apCopy->pItemExtra);
         }
     }
 }
@@ -319,14 +317,9 @@ void TESContainer::AddLevItemContainerToChanges(int32_t aiLevItemIndex, Inventor
                 apChanges->AddItem(pcont->pObj, pextra, pcont->i_count);
             }
         }
-        if (bhadChanges) {
-            if (apChanges->pRef) {
-                if (appMain->bOnIdle) {
-                    if (!pSaveLoadGame->GetSaveGameLoading() || pSaveLoadGame->GetPositioningPlayerCharacter()) {
-                        apChanges->pRef->ForceChange(CHANGE_REFR_LEVELED_INVENTORY);
-                    }
-                }
-            }
+        if ((bhadChanges) && (apChanges->pRef) && (appMain->bOnIdle) &&
+            (!pSaveLoadGame->GetSaveGameLoading() || pSaveLoadGame->GetPositioningPlayerCharacter())) {
+            apChanges->pRef->ForceChange(CHANGE_REFR_LEVELED_INVENTORY);
         }
     }
 }
@@ -421,32 +414,30 @@ void TESContainer::AddContainerToReference(TESObjectREFR* apRef, bool abSilent) 
                         }
                         pextra = pextra_2;
                         pextra_2->SetCount(1);
-                        if (pextra_2) {
-                            if (!pextra->GetScript()) {
-                                TESObjectREFR* pref;
-                                pextra->SetScript(pscript);
-                                ScriptLocals* pLocals = pscript->CloneLocals();
-                                pextra->SetScriptLocals(pLocals);
-                                TESObjectREFR* pRefMemory =
-                                    static_cast<TESObjectREFR*>(ourMalloc(sizeof(TESObjectREFR)));
-                                if (pRefMemory) {
-                                    pref = ::new (pRefMemory) TESObjectREFR;
-                                }
-                                else {
-                                    pref = nullptr;
-                                }
-                                pref->SetTemporary();
-                                ScriptLocals* pExtraLocals = pextra->GetScriptLocals();
-                                pscript->Run(pref, pExtraLocals, nullptr, false);
-                                if (pref) {
-                                    delete pref;
-                                }
-                                if (pcont->pItemExtra) {
-                                    TESHealthForm* FormAsHealthForm = TESHealthForm::GetFormAsHealthForm(pcont->pObj);
-                                    pcont->pItemExtra->AddToExtraDataList(pextra, FormAsHealthForm);
-                                }
+                        if ((pextra_2) && (!pextra->GetScript())) {
+                            TESObjectREFR* pref;
+                            pextra->SetScript(pscript);
+                            ScriptLocals* pLocals = pscript->CloneLocals();
+                            pextra->SetScriptLocals(pLocals);
+                            TESObjectREFR* pRefMemory = static_cast<TESObjectREFR*>(ourMalloc(sizeof(TESObjectREFR)));
+                            if (pRefMemory) {
+                                pref = ::new (pRefMemory) TESObjectREFR;
+                            }
+                            else {
+                                pref = nullptr;
+                            }
+                            pref->SetTemporary();
+                            ScriptLocals* pExtraLocals = pextra->GetScriptLocals();
+                            pscript->Run(pref, pExtraLocals, nullptr, false);
+                            if (pref) {
+                                delete pref;
+                            }
+                            if (pcont->pItemExtra) {
+                                TESHealthForm* FormAsHealthForm = TESHealthForm::GetFormAsHealthForm(pcont->pObj);
+                                pcont->pItemExtra->AddToExtraDataList(pextra, FormAsHealthForm);
                             }
                         }
+
                         if (pactor) {
                             pactor->AddObjecttoContainer(pcont->pObj, pextra, 1);
                         }
@@ -480,45 +471,41 @@ void TESContainer::AddContainerToReference(TESObjectREFR* apRef, bool abSilent) 
                 }
             }
         }
-        if (pactor == pPlayer) {
-            if (plast) {
-                if (!abSilent) {
-                    BSStringT<char> pstring;
-                    if (plast->i_count <= 1) {
-                        const char* pAdded = sAddItemtoInventory.String();
-                        pstring.SPrintF("%s %s", TESFullName::GetFullName(plast->pObj), pAdded);
-                    }
-                    else {
-                        const char* pAdded = sAddItemtoInventory.String();
-                        const char* pPluralText = sPlural.String();
-                        const char* pFullName = TESFullName::GetFullName(plast->pObj);
-                        pstring.SPrintF("%i %s%s %s", plast->i_count, pFullName, pPluralText, pAdded);
-                    }
-                    // abSilent is false here, so the sound is always requested.
-                    switch (plast->pObj->GetFormType()) {
-                        case ARMO_ID:
-                        case BOOK_ID:
-                        case LIGH_ID:
-                        case MISC_ID:
-                        case WEAP_ID:
-                        case AMMO_ID:
-                        case KEYM_ID:
-                        case ALCH_ID:
-                        case COBJ_ID:
-                        case IMOD_ID:
-                        case CHIP_ID:
-                        case CCRD_ID:
-                        case CMNY_ID: {
-                            const char* pSoundName = pPlayer->GetPickUpSoundName(plast->pObj, true, false);
-                            Interface::ShowMessage(
-                                pstring.pString, 0, "Interface\\Icons\\Message Icons\\glow_message_giftbox.dds",
-                                pSoundName, 2.0f, false
-                            );
-                            break;
-                        }
-                        default: break;
-                    }
+        if ((pactor == pPlayer) && (plast) && (!abSilent)) {
+            BSStringT<char> pstring;
+            if (plast->i_count <= 1) {
+                const char* pAdded = sAddItemtoInventory.String();
+                pstring.SPrintF("%s %s", TESFullName::GetFullName(plast->pObj), pAdded);
+            }
+            else {
+                const char* pAdded = sAddItemtoInventory.String();
+                const char* pPluralText = sPlural.String();
+                const char* pFullName = TESFullName::GetFullName(plast->pObj);
+                pstring.SPrintF("%i %s%s %s", plast->i_count, pFullName, pPluralText, pAdded);
+            }
+            // abSilent is false here, so the sound is always requested.
+            switch (plast->pObj->GetFormType()) {
+                case ARMO_ID:
+                case BOOK_ID:
+                case LIGH_ID:
+                case MISC_ID:
+                case WEAP_ID:
+                case AMMO_ID:
+                case KEYM_ID:
+                case ALCH_ID:
+                case COBJ_ID:
+                case IMOD_ID:
+                case CHIP_ID:
+                case CCRD_ID:
+                case CMNY_ID: {
+                    const char* pSoundName = pPlayer->GetPickUpSoundName(plast->pObj, true, false);
+                    Interface::ShowMessage(
+                        pstring.pString, 0, "Interface\\Icons\\Message Icons\\glow_message_giftbox.dds", pSoundName,
+                        2.0f, false
+                    );
+                    break;
                 }
+                default: break;
             }
         }
     }
@@ -600,13 +587,11 @@ TESObjectARMO* TESContainer::GetBestArmor(TESActorBase* apActorBase, BIPED_OBJEC
         ContainerObject* pcont = pList->m_item;
         if (pcont) {
             TESObjectARMO* pObj = dynamic_cast<TESObjectARMO*>(pcont->pObj);
-            if (pObj) {
-                if (aeBodySlot != BO_NONE && pObj->FillsBipedSlot(aeBodySlot, false, nullptr)) {
-                    float fDesire = apActorBase->GetDesirability(pObj);
-                    if (fHighDesire < static_cast<double>(fDesire)) {
-                        fHighDesire = fDesire;
-                        pBest = pObj;
-                    }
+            if ((pObj) && (aeBodySlot != BO_NONE && pObj->FillsBipedSlot(aeBodySlot, false, nullptr))) {
+                float fDesire = apActorBase->GetDesirability(pObj);
+                if (fHighDesire < static_cast<double>(fDesire)) {
+                    fHighDesire = fDesire;
+                    pBest = pObj;
                 }
             }
         }

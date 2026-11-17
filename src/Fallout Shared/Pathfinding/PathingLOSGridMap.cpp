@@ -291,9 +291,8 @@ bool PathingLOSGrid::SetLocationSeen(const PathingLocation& arLocation, bool abS
         }
         return bresult;
     }
-    else {
-        return false;
-    }
+
+    return false;
 }
 
 bool PathingLOSGrid::GetNavMesh(NavMeshPtr& spRetNavMesh) const {
@@ -408,9 +407,8 @@ bool PathingLOSGrid::IsLocationSeen(const PathingLocation& arLocation) {
         bool IsLocationSeen = LOSGridCells.GetAt(iindex)->IsLocationSeen(arLocation);
         return IsLocationSeen;
     }
-    else {
-        return false;
-    }
+
+    return false;
 }
 
 void PathingLOSGrid::operator delete(void* apMemory) {
@@ -460,9 +458,8 @@ bool PathingLOSGridCell::SetLOSMapFromSeenTriangles(NiPointer<PathingLOSMap>& as
         }
         return true;
     }
-    else {
-        return false;
-    }
+
+    return false;
 }
 
 // Each byte is read signed.
@@ -492,9 +489,8 @@ bool PathingLOSGridCell::SetSeenTrianglesFromLOSMap(NiPointer<PathingLOSMap>& as
         }
         return true;
     }
-    else {
-        return false;
-    }
+
+    return false;
 }
 
 void PathingLOSGridCell::Setup(NavMeshInfo* apNavMeshInfo, uint32_t aiGridIndex) {

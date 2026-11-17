@@ -96,23 +96,22 @@ bool TESHair::CanBeFemale() {
 
 bool TESHair::CanBeHairForNPC(TESNPC* apNPC) {
     bool bretval = false;
-    if (apNPC) {
-        if (apNPC->GetRace()) {
-            TESHair* item = this;
-            if ((&apNPC->GetRace()->HairList)->IsInList(item)) {
-                TESActorBase::SEX Sex = apNPC->GetSex();
-                if (Sex) {
-                    if (Sex == TESActorBase::SEX_FEMALE && CanBeFemale()) {
-                        return true;
-                    }
+    if ((apNPC) && (apNPC->GetRace())) {
+        TESHair* item = this;
+        if ((&apNPC->GetRace()->HairList)->IsInList(item)) {
+            TESActorBase::SEX Sex = apNPC->GetSex();
+            if (Sex) {
+                if (Sex == TESActorBase::SEX_FEMALE && CanBeFemale()) {
+                    return true;
                 }
-                else {
-                    if (CanBeMale()) {
-                        return true;
-                    }
+            }
+            else {
+                if (CanBeMale()) {
+                    return true;
                 }
             }
         }
     }
+
     return bretval;
 }

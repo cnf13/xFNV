@@ -517,18 +517,15 @@ bool Cmd_GetOwnerLastTarget_Execute(
     HitData* lastTargetInfo;
     Actor* v10;
     afReturnValue = 0.0;
-    if (apContainer) {
-        if (apContainer->IsActor()) {
-            v10 = static_cast<Actor*>(apContainer);
-            lastTargetInfo = v10->GetLastAttackHitData();
-            if (lastTargetInfo) {
-                if (lastTargetInfo->pTarget) {
-                    apID = lastTargetInfo->pTarget->TESForm::GetFormID();
-                    Script::PutNumericIDInDouble(apID, afReturnValue);
-                }
-            }
+    if ((apContainer) && (apContainer->IsActor())) {
+        v10 = static_cast<Actor*>(apContainer);
+        lastTargetInfo = v10->GetLastAttackHitData();
+        if ((lastTargetInfo) && (lastTargetInfo->pTarget)) {
+            apID = lastTargetInfo->pTarget->TESForm::GetFormID();
+            Script::PutNumericIDInDouble(apID, afReturnValue);
         }
     }
+
     return true;
 }
 
@@ -702,22 +699,21 @@ bool Cmd_RemoveRecurringFromChallenge(
 
 // An IterateInventory callback: appends the item's worn mark, count, name and form ID to the string apData.
 uint8_t apCallback(ItemChange* apItem, BSStringT<char>* apData) {
-    if (apData) {
-        if (apItem) {
-            const char* pWorn;
-            char acBuffer[264];
-            if (apItem->GetWorn(false)) {
-                pWorn = "[E]";
-            }
-            else {
-                pWorn = "";
-            }
-            uint32_t uiFormID = apItem->pContainerObj->iFormID;
-            const char* pFullName = apItem->GetFullName();
-            BSsprintf(acBuffer, 260, "%s%i %s (%08X),", pWorn, apItem->iNumber, pFullName, uiFormID);
-            apData->operator+=(static_cast<const char*>(acBuffer));
+    if ((apData) && (apItem)) {
+        const char* pWorn;
+        char acBuffer[264];
+        if (apItem->GetWorn(false)) {
+            pWorn = "[E]";
         }
+        else {
+            pWorn = "";
+        }
+        uint32_t uiFormID = apItem->pContainerObj->iFormID;
+        const char* pFullName = apItem->GetFullName();
+        BSsprintf(acBuffer, 260, "%s%i %s (%08X),", pWorn, apItem->iNumber, pFullName, uiFormID);
+        apData->operator+=(static_cast<const char*>(acBuffer));
     }
+
     return 0;
 }
 
@@ -800,13 +796,11 @@ float NonLinearInterpolator::GetCurrent() {
             float v3 = fTotalTime - fRemainingTime;
             return FLerp(fPercentages[v7], fPercentages[v7 + 1], 0.0, fTotalTime, v3);
         }
-        else {
-            return fPercentages[99];
-        }
-    }
-    else {
+
         return fPercentages[99];
     }
+
+    return fPercentages[99];
 }
 
 CompassTarget::CompassTarget() : pTarget(nullptr), bIsHostile(false), bIsUndetected(false) {}
@@ -1313,10 +1307,8 @@ uint16_t PlayerCharacter::GetSaveSize(uint32_t aiFlags) {
         uint32_t v4 = iPlayerCustomClass.Int();
         TESClass* pcustomClass = pDataHandler->GetClass(v4);
         isize_3 += 4;
-        if (pclass) {
-            if (pclass == pcustomClass) {
-                isize_3 += pclass->GetSaveSize();
-            }
+        if ((pclass) && (pclass == pcustomClass)) {
+            isize_3 += pclass->GetSaveSize();
         }
     }
     if (pSaveLoadGameOLD->GetCurrentVersion() >= 69u) {
@@ -1620,11 +1612,10 @@ void PlayerCharacter::SaveGame(uint32_t aiFlags) {
     }
     if (pSaveLoadGameOLD->GetCurrentVersion() >= 108u) {
         uint32_t iOccupiedRegionWeatherID = 0;
-        if (pOccupiedRegion) {
-            if (pOccupiedRegion->pCurrentWeather) {
-                iOccupiedRegionWeatherID = pOccupiedRegion->pCurrentWeather->iFormID;
-            }
+        if ((pOccupiedRegion) && (pOccupiedRegion->pCurrentWeather)) {
+            iOccupiedRegionWeatherID = pOccupiedRegion->pCurrentWeather->iFormID;
         }
+
         SaveNumericID(&iOccupiedRegionWeatherID, 4);
     }
     if (pSaveLoadGameOLD->GetCurrentVersion() >= 111u) {
@@ -1731,10 +1722,8 @@ void PlayerCharacter::SaveGame(uint32_t aiFlags) {
             iClassID = pClass->iFormID;
         }
         SaveNumericID(&iClassID, 4);
-        if (pClass) {
-            if (pClass == pCustomClass) {
-                pClass->SaveGameTES();
-            }
+        if ((pClass) && (pClass == pCustomClass)) {
+            pClass->SaveGameTES();
         }
     }
     if (pSaveLoadGameOLD->GetCurrentVersion() >= 69u) {
@@ -1906,11 +1895,9 @@ void PlayerCharacter::SaveGame(BGSSaveFormBuffer* apSaveGameBuffer) {
     uint32_t isaveGameBufferPos = apSaveGameBuffer->StartVariableSizedValue();
     for (BSSimpleList<TESTopic*>* plist = GetTopicList(); plist; plist = plist->m_pkNext) {
         TESTopic* ptopic = plist->m_item;
-        if (ptopic) {
-            if (!ptopic->IsRandom()) {
-                apSaveGameBuffer->SaveFormID(ptopic, 0);
-                ++icount;
-            }
+        if ((ptopic) && (!ptopic->IsRandom())) {
+            apSaveGameBuffer->SaveFormID(ptopic, 0);
+            ++icount;
         }
     }
     apSaveGameBuffer->SaveVariableSizedValue(icount, isaveGameBufferPos);
@@ -2398,10 +2385,8 @@ void PlayerCharacter::LoadGame(uint32_t aiFlags, uint32_t aiCurrentFlags) {
         LoadNumericID(&iweatherID, 4);
         TESForm* pweatherForm = TESForm::GetFormByNumericID(iweatherID);
         TESWeather* poccupiedRegionWeather = dynamic_cast<TESWeather*>(pweatherForm);
-        if (pOccupiedRegion) {
-            if (poccupiedRegionWeather) {
-                pOccupiedRegion->pCurrentWeather = poccupiedRegionWeather;
-            }
+        if ((pOccupiedRegion) && (poccupiedRegionWeather)) {
+            pOccupiedRegion->pCurrentWeather = poccupiedRegionWeather;
         }
     }
     if (pSaveLoadGameOLD->GetCurrentVersion() >= 111u) {
@@ -2516,10 +2501,8 @@ void PlayerCharacter::LoadGame(uint32_t aiFlags, uint32_t aiCurrentFlags) {
         if (pclass) {
             pactorBase->SetClass(pclass);
         }
-        if (pclass) {
-            if (pclass == pcustomClass) {
-                pclass->LoadGameTES();
-            }
+        if ((pclass) && (pclass == pcustomClass)) {
+            pclass->LoadGameTES();
         }
     }
     if (pSaveLoadGameOLD->GetCurrentVersion() >= 69u) {
@@ -3262,10 +3245,8 @@ void PlayerCharacter::InitLoadGame(BGSLoadFormBuffer* apLoadGameBuffer) {
     SetControlsDisabled(ucControlsDisabled);
     ActiveEffect::InitLoadActiveEffectList(apLoadGameBuffer, pActiveEffectList);
     for (PerkRankData* pperkRank : Perks) {
-        if (pperkRank) {
-            if (pperkRank->pPerk) {
-                pperkRank->pPerk->AddPerkEntryPoints(this, pperkRank->cCurrentRank, false);
-            }
+        if ((pperkRank) && (pperkRank->pPerk)) {
+            pperkRank->pPerk->AddPerkEntryPoints(this, pperkRank->cCurrentRank, false);
         }
     }
     if (p1stPersonCamera) {
@@ -3288,19 +3269,13 @@ void PlayerCharacter::InitLoadGame(BGSLoadFormBuffer* apLoadGameBuffer) {
         StatusSoundHandle.operator=(*v14);
         StatusSoundHandle.Play(true);
     }
-    if (Get3D()) {
-        if (!apLoadGameBuffer->GetChangeFlags().CheckFlags(CHANGE_REFR_LEVELED_INVENTORY | CHANGE_REFR_INVENTORY)) {
-            if (apLoadGameBuffer->GetOldChangeFlags().CheckFlags(
-                    CHANGE_REFR_LEVELED_INVENTORY | CHANGE_REFR_INVENTORY
-                )) {
-                TESNPC* pnpc = static_cast<TESNPC*>(GetActorBase());
-                pnpc->InitDefaultWorn(this, true, true, false, true);
-                if (pCurrentProcess) {
-                    if (pCurrentProcess->GetAll3DUpdateFlags()) {
-                        pCurrentProcess->Update3dModel(this);
-                    }
-                }
-            }
+    if ((Get3D()) &&
+        (!apLoadGameBuffer->GetChangeFlags().CheckFlags(CHANGE_REFR_LEVELED_INVENTORY | CHANGE_REFR_INVENTORY)) &&
+        (apLoadGameBuffer->GetOldChangeFlags().CheckFlags(CHANGE_REFR_LEVELED_INVENTORY | CHANGE_REFR_INVENTORY))) {
+        TESNPC* pnpc = static_cast<TESNPC*>(GetActorBase());
+        pnpc->InitDefaultWorn(this, true, true, false, true);
+        if ((pCurrentProcess) && (pCurrentProcess->GetAll3DUpdateFlags())) {
+            pCurrentProcess->Update3dModel(this);
         }
     }
 }
@@ -3314,11 +3289,10 @@ void PlayerCharacter::FinishInitLoadGame(uint32_t aiFlags, uint32_t aiOldFlags) 
         }
     }
     ActiveEffect::FinishInitLoadGameActiveEffectList(pActiveEffectList, this);
-    if (pGrabbedObject) {
-        if (eGrabType != PlayerCharacter::GRAB_TELEKINESIS) {
-            CreateMouseSpring(pGrabbedObject, eGrabType, fGrabDistance);
-        }
+    if ((pGrabbedObject) && (eGrabType != PlayerCharacter::GRAB_TELEKINESIS)) {
+        CreateMouseSpring(pGrabbedObject, eGrabType, fGrabDistance);
     }
+
     DetectLifeEffect::CheckPlayerRunningDetectLife();
     NightEyeEffect::ApplyVisualEffect();
     SetLastKnownGoodPosition();
@@ -3340,11 +3314,10 @@ void PlayerCharacter::Revert(uint32_t aiFlags) {
         SetInCharGen(false);
         ConflictingObjects.RemoveAll();
         ActiveEffect::RevertActiveEffectList(pActiveEffectList, this);
-        if ((aiFlags & CHANGE_REFR_ANIMATION) != 0) {
-            if (p1stPersonAnimation) {
-                p1stPersonAnimation->RevertTES(this);
-            }
+        if (((aiFlags & CHANGE_REFR_ANIMATION) != 0) && (p1stPersonAnimation)) {
+            p1stPersonAnimation->RevertTES(this);
         }
+
         ResetLastPlayingTimeUpdate();
         DestroyMouseSpring();
         DroppedRefList.RemoveAll();
@@ -3356,11 +3329,10 @@ void PlayerCharacter::Revert(BGSLoadFormBuffer* apLoadGameBuffer) {
     TESTopic* ptopic;
     BSSimpleList<PerkRankData*>* pperkRankList;
     Character::Revert(apLoadGameBuffer);
-    if (apLoadGameBuffer->GetOldChangeFlags().CheckFlags(CHANGE_REFR_ANIMATION)) {
-        if (p1stPersonAnimation) {
-            p1stPersonAnimation->Revert(apLoadGameBuffer);
-        }
+    if ((apLoadGameBuffer->GetOldChangeFlags().CheckFlags(CHANGE_REFR_ANIMATION)) && (p1stPersonAnimation)) {
+        p1stPersonAnimation->Revert(apLoadGameBuffer);
     }
+
     NiAVObject* v3 = Get3D(false);
     SetStoredWorldRecurse(v3, nullptr);
     if (apLoadGameBuffer->GetOldChangeFlags().CheckFlags(CHANGE_REFR_SCALE)) {
@@ -3482,10 +3454,8 @@ void PlayerCharacter::Revert(BGSLoadFormBuffer* apLoadGameBuffer) {
     ActiveEffect::RevertActiveEffectList(apLoadGameBuffer, pActiveEffectList);
     for (BSSimpleList<TESTopic*>* plist = pDataHandler->GetTopicList(); plist; plist = plist->m_pkNext) {
         ptopic = plist->m_item;
-        if (ptopic) {
-            if (ptopic->IsRandom()) {
-                listTopics.AddHead(*reinterpret_cast<void**>(&ptopic));
-            }
+        if ((ptopic) && (ptopic->IsRandom())) {
+            listTopics.AddHead(*reinterpret_cast<void**>(&ptopic));
         }
     }
     BSSimpleList<TESTopic*>* TopicList = GetTopicList();
@@ -3521,12 +3491,11 @@ void PlayerCharacter::FinishLoadGame(BGSLoadFormBuffer* apLoadGameBuffer) {
     if (appMain->bFlyCamera) {
         UpdateFlyCamera(0.0f, true);
     }
-    if (pGrabbedObject) {
-        if (eGrabType != PlayerCharacter::GRAB_TELEKINESIS) {
-            CreateMouseSpring(pGrabbedObject, eGrabType, fGrabDistance);
-            Interface::SetDragDroppingState(2);
-        }
+    if ((pGrabbedObject) && (eGrabType != PlayerCharacter::GRAB_TELEKINESIS)) {
+        CreateMouseSpring(pGrabbedObject, eGrabType, fGrabDistance);
+        Interface::SetDragDroppingState(2);
     }
+
     SetLastKnownGoodPosition();
     SetFOV(fFOV);
     ActiveEffect::FinishLoadActiveEffectList(apLoadGameBuffer, pActiveEffectList);
@@ -3818,18 +3787,18 @@ void PlayerCharacter::SetParentCell(TESObjectCELL* apCell) {
         pCellWorld->pAcousticSpaceListener->bBufferRemovalOperations = true;
     }
     MoveHavok(false);
-    if (GetParentCell() && GetParentCell()->GetbhkWorld()) {
-        if (DecalCaster::GetInstance(DecalCaster::GetMaxDecalWidthLarge(), false)) {
-            bhkWorld* pWorld = GetParentCell()->GetbhkWorld();
-            DecalCaster::GetInstance(DecalCaster::GetMaxDecalWidthLarge(), true)->Add(pWorld);
-        }
+    if ((GetParentCell() && GetParentCell()->GetbhkWorld()) &&
+        (DecalCaster::GetInstance(DecalCaster::GetMaxDecalWidthLarge(), false))) {
+        bhkWorld* pWorld = GetParentCell()->GetbhkWorld();
+        DecalCaster::GetInstance(DecalCaster::GetMaxDecalWidthLarge(), true)->Add(pWorld);
     }
-    if (GetParentCell() && GetParentCell()->GetbhkWorld()) {
-        if (DecalCaster::GetInstance(DecalCaster::GetMaxDecalWidthSmall(), false)) {
-            bhkWorld* pWorld = GetParentCell()->GetbhkWorld();
-            DecalCaster::GetInstance(DecalCaster::GetMaxDecalWidthSmall(), true)->Add(pWorld);
-        }
+
+    if ((GetParentCell() && GetParentCell()->GetbhkWorld()) &&
+        (DecalCaster::GetInstance(DecalCaster::GetMaxDecalWidthSmall(), false))) {
+        bhkWorld* pWorld = GetParentCell()->GetbhkWorld();
+        DecalCaster::GetInstance(DecalCaster::GetMaxDecalWidthSmall(), true)->Add(pWorld);
     }
+
     if (spCameraRigidBody.operator==(static_cast<bhkRigidBody*>(nullptr))) {
         hkVector4 hkv;
         bhkSphereShape* pSphereMemory = static_cast<bhkSphereShape*>(NiMemObject::operator new(sizeof(bhkSphereShape)));
@@ -3934,13 +3903,13 @@ void PlayerCharacter::SetParentCell(TESObjectCELL* apCell) {
             TESRegionDataSound* pRSD =
                 static_cast<TESRegionDataSound*>(pCurrentRegion->pDataList->Find(REGION_DATA_SOUND_ID));
             if (pRSD) {
-                if (pRSD->bOverride) {
-                    if (!pSoundOverrideRegion ||
-                        (pSoundOverrideRegion != pRSD && pSoundOverrideRegion->cPriority < pRSD->cPriority)) {
-                        CurrentRegionSoundList.RemoveAll();
-                        pSoundOverrideRegion = pRSD;
-                    }
+                if ((pRSD->bOverride) &&
+                    (!pSoundOverrideRegion ||
+                     (pSoundOverrideRegion != pRSD && pSoundOverrideRegion->cPriority < pRSD->cPriority))) {
+                    CurrentRegionSoundList.RemoveAll();
+                    pSoundOverrideRegion = pRSD;
                 }
+
                 if (!pSoundOverrideRegion || pSoundOverrideRegion == pRSD) {
                     for (pRegSounds = &pRSD->sounds.soundList; pRegSounds && pRegSounds->m_item;
                          pRegSounds = pRegSounds->m_pkNext) {
@@ -3965,11 +3934,10 @@ void PlayerCharacter::SetParentCell(TESObjectCELL* apCell) {
                     static_cast<TESRegionDataWeather*>(pOccupiedRegion->pDataList->Find(REGION_DATA_WEATHER_ID));
                 TESRegionDataWeather* pCurRWD =
                     static_cast<TESRegionDataWeather*>(pCurrentRegion->pDataList->Find(REGION_DATA_WEATHER_ID));
-                if (pCurRWD) {
-                    if (!pOccRWD || (pCurRWD->bOverride && !pOccRWD->bOverride) ||
-                        (pCurRWD->bOverride == pOccRWD->bOverride && pCurRWD->cPriority > pOccRWD->cPriority)) {
-                        SetOccupiedRegion(pCurrentRegion);
-                    }
+                if ((pCurRWD) &&
+                    (!pOccRWD || (pCurRWD->bOverride && !pOccRWD->bOverride) ||
+                     (pCurRWD->bOverride == pOccRWD->bOverride && pCurRWD->cPriority > pOccRWD->cPriority))) {
+                    SetOccupiedRegion(pCurrentRegion);
                 }
             }
             else {
@@ -4198,12 +4166,11 @@ void PlayerCharacter::Update(float afDelta) {
         Animation* v19 = this->GetAnimation(v18);
         v19->SetGlobalTimeMultiplier(fPersonalMultiplier);
     }
-    if (this->pQueuedWeaponAttach) {
-        if (!this->pCurrentProcess->Get3DUpdateFlag(RESET_MODEL)) {
-            this->AttachWeapon(this->pQueuedWeaponAttach);
-            this->pQueuedWeaponAttach = nullptr;
-        }
+    if ((this->pQueuedWeaponAttach) && (!this->pCurrentProcess->Get3DUpdateFlag(RESET_MODEL))) {
+        this->AttachWeapon(this->pQueuedWeaponAttach);
+        this->pQueuedWeaponAttach = nullptr;
     }
+
     if (this->bBlockActivate && !appMain->IsInMenuMode()) {
         this->fBlockActivateTimer = this->fBlockActivateTimer - afDelta;
         if (this->fBlockActivateTimer < 0.0) {
@@ -4248,12 +4215,11 @@ void PlayerCharacter::Update(float afDelta) {
         TESObjectREFR* BumpedRef = this->GetBumpedRef();
         this->AddPlayerAction(PLAYER_ACTION_KNOCKING_OVER_OBJECTS, 2.0f, BumpedRef);
     }
-    if (this->GetBumpedActor()) {
-        if (this->fTimeronAction <= 0.0) {
-            int32_t fValuea = iSoundLevelLoud.Int();
-            this->SetActionSoundValue(fValuea);
-        }
+    if ((this->GetBumpedActor()) && (this->fTimeronAction <= 0.0)) {
+        int32_t fValuea = iSoundLevelLoud.Int();
+        this->SetActionSoundValue(fValuea);
     }
+
     bool IronSights = this->GetIronSights();
     if (IronSights && this->pCurrentProcess->GetWeaponDrawn()) {
         TESObjectWEAP* pcurrentWeapon;
@@ -4427,15 +4393,13 @@ void PlayerCharacter::Update(float afDelta) {
         }
         uint16_t slastMoveMode = this->GetMoveMode();
         if (this->IsSneaking() && this->IsMoving()) {
-            if (Interface::GetDetectionLevel() < 3) {
-                if (this->bActorinSneakRange) {
-                    if (!(this->fsecondSneaking > 1.0)) {
-                        this->fsecondSneaking = this->fsecondSneaking + afDelta;
-                    }
-                    else {
-                        this->UseSkill(ActorValue::SNEAK, 0);
-                        this->fsecondSneaking = 0.0f;
-                    }
+            if ((Interface::GetDetectionLevel() < 3) && (this->bActorinSneakRange)) {
+                if (!(this->fsecondSneaking > 1.0)) {
+                    this->fsecondSneaking = this->fsecondSneaking + afDelta;
+                }
+                else {
+                    this->UseSkill(ActorValue::SNEAK, 0);
+                    this->fsecondSneaking = 0.0f;
                 }
             }
         }
@@ -4471,31 +4435,31 @@ void PlayerCharacter::Update(float afDelta) {
              this->pCurrentProcess->GetFadeState() == BaseProcess::FADE_NORMAL) ||
             !static_cast<HighProcess*>(this->pCurrentProcess)->HighProcess::FadeUpdate(this)) {
             BaseProcess* fCheckForSpotter = this->pCurrentProcess;
-            if (fCheckForSpotter->IsSustainedFire() && !pVATS.IsInVats()) {
-                if (this->pCurrentProcess->GetCurrentWeapon()) {
-                    ANIMATION_ACTION eaction = this->GetAnimAction();
-                    if (eaction == ANIM_ACTION_ATTACK ||
-                        (eaction == ANIM_ACTION_ATTACK_WAIT_FOR_EJECT ||
-                         (eaction == ANIM_ACTION_ATTACK_FOLLOW_THROUGH ||
-                          (eaction == ANIM_ACTION_ATTACK_THROW || eaction == ANIM_ACTION_ATTACK_THROW_ATTACH)))) {
-                        TESObjectWEAP* pweapon_3 =
-                            static_cast<TESObjectWEAP*>(this->pCurrentProcess->GetCurrentWeapon()->pContainerObj);
-                        if (pweapon_3) {
-                            bool bhasAmmo = true;
-                            if (pweapon_3->GetCurrentAmmo(pPlayer)) {
-                                ItemChange* pammo = this->pCurrentProcess->GetCurrentAmmo();
-                                if (pammo) {
-                                    int32_t FormHealth_0 = pammo->iNumber;
-                                    bhasAmmo = FormHealth_0 >= pweapon_3->GetAmmoPerShot();
-                                }
-                                else {
-                                    bhasAmmo = false;
-                                }
+            if ((fCheckForSpotter->IsSustainedFire() && !pVATS.IsInVats()) &&
+                (this->pCurrentProcess->GetCurrentWeapon())) {
+                ANIMATION_ACTION eaction = this->GetAnimAction();
+                if (eaction == ANIM_ACTION_ATTACK ||
+                    (eaction == ANIM_ACTION_ATTACK_WAIT_FOR_EJECT ||
+                     (eaction == ANIM_ACTION_ATTACK_FOLLOW_THROUGH ||
+                      (eaction == ANIM_ACTION_ATTACK_THROW || eaction == ANIM_ACTION_ATTACK_THROW_ATTACH)))) {
+                    TESObjectWEAP* pweapon_3 =
+                        static_cast<TESObjectWEAP*>(this->pCurrentProcess->GetCurrentWeapon()->pContainerObj);
+                    if (pweapon_3) {
+                        bool bhasAmmo = true;
+                        if (pweapon_3->GetCurrentAmmo(pPlayer)) {
+                            ItemChange* pammo = this->pCurrentProcess->GetCurrentAmmo();
+                            if (pammo) {
+                                int32_t FormHealth_0 = pammo->iNumber;
+                                bhasAmmo = FormHealth_0 >= pweapon_3->GetAmmoPerShot();
+                            }
+                            else {
+                                bhasAmmo = false;
                             }
                         }
                     }
                 }
             }
+
             if (this->pCurrentProcess->GetKnockState() || this->IsParalyzed()) {
                 pVATS.QuitVATSPlayback(false, false);
                 this->bAiControlledActivate = false;
@@ -4637,132 +4601,124 @@ void PlayerCharacter::Update(float afDelta) {
                             pCurrentWater = nullptr;
                         }
                     }
-                    if (pcontrols->GetUserAction(Controls::UACTN_QUICKLOAD, 1)) {
-                        if (pSaveLoadManager->Quickload()) {
-                            fPlayerDeathReloadTime_0 = -1.0f;
-                        }
+                    if ((pcontrols->GetUserAction(Controls::UACTN_QUICKLOAD, 1)) && (pSaveLoadManager->Quickload())) {
+                        fPlayerDeathReloadTime_0 = -1.0f;
                     }
+
                     if (!this->IsDead(false) && !this->IsDying()) {
                         this->UpdateMagic(false, false);
-                        if (pcontrols->GetUserAction(Controls::UACTN_ACTIVATE, 1)) {
-                            if (!this->IsPipboyActive() && !Interface::IsInMenuMode() && !this->IsParalyzed() &&
-                                !this->GetTempPerson()) {
-                                Actor* pactor_2 = static_cast<Actor*>(Interface::GetActivateREFR());
-                                char v269 = 1;
-                                bool v268 = false;
-                                if (pactor_2) {
-                                    if (pactor_2->IsFurniture()) {
-                                        v268 = IronSights;
-                                    }
-                                }
-                                if (this->GetControlsDisabled(PlayerCharacter::DPC_MOVEMENT)) {
+                        if ((pcontrols->GetUserAction(Controls::UACTN_ACTIVATE, 1)) &&
+                            (!this->IsPipboyActive() && !Interface::IsInMenuMode() && !this->IsParalyzed() &&
+                             !this->GetTempPerson())) {
+                            Actor* pactor_2 = static_cast<Actor*>(Interface::GetActivateREFR());
+                            char v269 = 1;
+                            bool v268 = false;
+                            if ((pactor_2) && (pactor_2->IsFurniture())) {
+                                v268 = IronSights;
+                            }
+
+                            if (this->GetControlsDisabled(PlayerCharacter::DPC_MOVEMENT)) {
+                                v268 = true;
+                            }
+                            if ((pactor_2) && (pactor_2->IsProjectile())) {
+                                ArrowProjectile* parrow = dynamic_cast<ArrowProjectile*>(pactor_2);
+                                if ((parrow) && (parrow->eState == ArrowProjectile::STATE_FLYING)) {
                                     v268 = true;
                                 }
+                            }
+
+                            if ((pactor_2) && (pactor_2->IsActor())) {
+                                BaseProcess* pprocess = pactor_2->pCurrentProcess;
+                                if (pprocess->GetFadeState() == BaseProcess::FADE_OUT_DISABLE ||
+                                    pprocess->GetFadeState() == BaseProcess::FADE_OUT_DELETE) {
+                                    v268 = true;
+                                }
+                            }
+
+                            int32_t v264 = this->GetSitSleepState() - 1;
+                            switch (v264) {
+                                case 0:
+                                case 1:
+                                case 2:
+                                case 4:
+                                case 5:
+                                case 6:
+                                case 7:
+                                case 9: {
+                                    v268 = true;
+                                    break;
+                                }
+                                default: {
+                                    break;
+                                }
+                            }
+                            ANIMATION_ACTION AnimAction = this->GetAnimAction();
+                            if (AnimAction != ANIM_ACTION_NONE) {
+                                v268 = true;
+                            }
+                            if (this->bWant3rdPerson != this->b3rdPerson) {
+                                v268 = true;
+                            }
+                            if (this->GetBlockActivate()) {
+                                v268 = true;
+                            }
+                            bool v262 = false;
+                            if (!v268) {
+                                Interface::SetInfoForRef(nullptr, false, false);
                                 if (pactor_2) {
-                                    if (pactor_2->IsProjectile()) {
-                                        ArrowProjectile* parrow = dynamic_cast<ArrowProjectile*>(pactor_2);
-                                        if (parrow) {
-                                            if (parrow->eState == ArrowProjectile::STATE_FLYING) {
-                                                v268 = true;
-                                            }
+                                    BSSimpleList<BGSEntryPointFunctionDataActivateChoice*> ChoiceList;
+                                    BGSEntryPoint::HandleEntryPoint(
+                                        BGSEntryPoint::ACTIVATE, this, pactor_2, &ChoiceList, pactor_2
+                                    );
+                                    if (ChoiceList.IsEmpty()) {
+                                        int32_t icount_2 = pactor_2->GetCount();
+                                        if (pactor_2->Activate(this, false, nullptr, icount_2)) {
+                                            v269 = 0;
                                         }
                                     }
-                                }
-                                if (pactor_2) {
-                                    if (pactor_2->IsActor()) {
-                                        BaseProcess* pprocess = pactor_2->pCurrentProcess;
-                                        if (pprocess->GetFadeState() == BaseProcess::FADE_OUT_DISABLE ||
-                                            pprocess->GetFadeState() == BaseProcess::FADE_OUT_DELETE) {
-                                            v268 = true;
-                                        }
-                                    }
-                                }
-                                int32_t v264 = this->GetSitSleepState() - 1;
-                                switch (v264) {
-                                    case 0:
-                                    case 1:
-                                    case 2:
-                                    case 4:
-                                    case 5:
-                                    case 6:
-                                    case 7:
-                                    case 9: {
-                                        v268 = true;
-                                        break;
-                                    }
-                                    default: {
-                                        break;
-                                    }
-                                }
-                                ANIMATION_ACTION AnimAction = this->GetAnimAction();
-                                if (AnimAction != ANIM_ACTION_NONE) {
-                                    v268 = true;
-                                }
-                                if (this->bWant3rdPerson != this->b3rdPerson) {
-                                    v268 = true;
-                                }
-                                if (this->GetBlockActivate()) {
-                                    v268 = true;
-                                }
-                                bool v262 = false;
-                                if (!v268) {
-                                    Interface::SetInfoForRef(nullptr, false, false);
-                                    if (pactor_2) {
-                                        BSSimpleList<BGSEntryPointFunctionDataActivateChoice*> ChoiceList;
-                                        BGSEntryPoint::HandleEntryPoint(
-                                            BGSEntryPoint::ACTIVATE, this, pactor_2, &ChoiceList, pactor_2
-                                        );
-                                        if (ChoiceList.IsEmpty()) {
-                                            int32_t icount_2 = pactor_2->GetCount();
-                                            if (pactor_2->Activate(this, false, nullptr, icount_2)) {
+                                    else {
+                                        if (!MessageMenu::AddMessageToQueue(&ChoiceList, pactor_2)) {
+                                            int32_t icount = pactor_2->GetCount();
+                                            if (pactor_2->Activate(this, false, nullptr, icount)) {
                                                 v269 = 0;
                                             }
                                         }
-                                        else {
-                                            if (!MessageMenu::AddMessageToQueue(&ChoiceList, pactor_2)) {
-                                                int32_t icount = pactor_2->GetCount();
-                                                if (pactor_2->Activate(this, false, nullptr, icount)) {
-                                                    v269 = 0;
-                                                }
-                                            }
-                                        }
                                     }
-                                    else {
+                                }
+                                else {
+                                    v262 = true;
+                                }
+                                if (v269 && this->pCurrentProcess->GetCurrentFurniture()) {
+                                    TESObjectREFR* v38 = this->pCurrentProcess->GetCurrentFurniture();
+                                    v262 = !v38->Activate(this, false, nullptr, 1);
+                                }
+                                else {
+                                    if (v269) {
                                         v262 = true;
                                     }
-                                    if (v269 && this->pCurrentProcess->GetCurrentFurniture()) {
-                                        TESObjectREFR* v38 = this->pCurrentProcess->GetCurrentFurniture();
-                                        v262 = !v38->Activate(this, false, nullptr, 1);
-                                    }
-                                    else {
-                                        if (v269) {
-                                            v262 = true;
-                                        }
-                                    }
                                 }
-                                if (v262 || v268) {
-                                    (&this->m_Extra)->GetCreatureAwakeSound(hndl);
-                                    TESSound* pnoactSound = FalloutAudio::GetNoActivationSound();
-                                    if (!hndl.IsValid()) {
-                                        if (pnoactSound) {
-                                            const char* Filename = pnoactSound->GetFilename();
-                                            BSAudio* v39 = &BSAudio::QInstance();
-                                            BSSoundHandle* SoundHandleByFilename = v39->GetSoundHandleByFilename(
-                                                &v257, Filename,
-                                                BSGameSound::SOUND_FLAG_IS_2D | BSGameSound::SOUND_FLAG_SYSTEM_SOUND |
-                                                    BSGameSound::SOUND_FLAG_ONE_SHOT,
-                                                pnoactSound
-                                            );
-                                            hndl.operator=(*SoundHandleByFilename);
-                                        }
-                                    }
-                                    if (!hndl.IsPlaying()) {
-                                        hndl.Play(false);
-                                    }
-                                    (&this->m_Extra)->SetCreatureAwakeSound(hndl);
-                                }
-                                v302 = true;
                             }
+                            if (v262 || v268) {
+                                (&this->m_Extra)->GetCreatureAwakeSound(hndl);
+                                TESSound* pnoactSound = FalloutAudio::GetNoActivationSound();
+                                if ((!hndl.IsValid()) && (pnoactSound)) {
+                                    const char* Filename = pnoactSound->GetFilename();
+                                    BSAudio* v39 = &BSAudio::QInstance();
+                                    BSSoundHandle* SoundHandleByFilename = v39->GetSoundHandleByFilename(
+                                        &v257, Filename,
+                                        BSGameSound::SOUND_FLAG_IS_2D | BSGameSound::SOUND_FLAG_SYSTEM_SOUND |
+                                            BSGameSound::SOUND_FLAG_ONE_SHOT,
+                                        pnoactSound
+                                    );
+                                    hndl.operator=(*SoundHandleByFilename);
+                                }
+
+                                if (!hndl.IsPlaying()) {
+                                    hndl.Play(false);
+                                }
+                                (&this->m_Extra)->SetCreatureAwakeSound(hndl);
+                            }
+                            v302 = true;
                         }
                     }
                 }
@@ -4796,29 +4752,27 @@ void PlayerCharacter::Update(float afDelta) {
                 this->CheckPlayerGreetFlag();
                 bool v255 = false;
                 this->fAmmoSwapButtonTimer = this->fAmmoSwapButtonTimer + afDelta;
-                if (pcontrols->GetUserAction(Controls::UACTN_HOTKEY2, 1)) {
-                    if (this->pCurrentProcess->GetCurrentWeapon()) {
-                        if (this->IsWeaponDrawn()) {
-                            int32_t iupState = InterfaceManager::CheckMenuButton(Interface::eButtonDPadUp, false);
-                            int32_t ileftState = InterfaceManager::CheckMenuButton(Interface::eButtonDPadLeft, false);
-                            int32_t irightState = InterfaceManager::CheckMenuButton(Interface::eButtonDPadRight, false);
-                            int32_t v251 = iupState == 2 || !iupState;
-                            bool v250 = v251;
-                            int32_t v249 = ileftState == 2 || !ileftState;
-                            bool v248 = v249;
-                            int32_t v247 = irightState == 2 || !irightState;
-                            bool v246 = v247;
-                            if (!v250 || (!v248 && !v246)) {
-                                float* v40 = &fPlayerAmmoSwapTimer.Float();
-                                bool bStartReload = *v40 < static_cast<double>(this->fAmmoSwapButtonTimer);
-                                this->AmmoSwapHelper(bStartReload, false);
-                                if (bStartReload) {
-                                    this->fAmmoSwapButtonTimer = 0.0f;
-                                }
-                            }
+                if ((pcontrols->GetUserAction(Controls::UACTN_HOTKEY2, 1)) &&
+                    (this->pCurrentProcess->GetCurrentWeapon()) && (this->IsWeaponDrawn())) {
+                    int32_t iupState = InterfaceManager::CheckMenuButton(Interface::eButtonDPadUp, false);
+                    int32_t ileftState = InterfaceManager::CheckMenuButton(Interface::eButtonDPadLeft, false);
+                    int32_t irightState = InterfaceManager::CheckMenuButton(Interface::eButtonDPadRight, false);
+                    int32_t v251 = iupState == 2 || !iupState;
+                    bool v250 = v251;
+                    int32_t v249 = ileftState == 2 || !ileftState;
+                    bool v248 = v249;
+                    int32_t v247 = irightState == 2 || !irightState;
+                    bool v246 = v247;
+                    if (!v250 || (!v248 && !v246)) {
+                        float* v40 = &fPlayerAmmoSwapTimer.Float();
+                        bool bStartReload = *v40 < static_cast<double>(this->fAmmoSwapButtonTimer);
+                        this->AmmoSwapHelper(bStartReload, false);
+                        if (bStartReload) {
+                            this->fAmmoSwapButtonTimer = 0.0f;
                         }
                     }
                 }
+
                 if (pcontrols->GetUserAction(Controls::UACTN_READY_RELOAD_WEAPON, 1) ||
                     pcontrols->GetUserAction(Controls::UACTN_READY_RELOAD_WEAPON, 0)) {
                     if (!this->GetControlsDisabled(PlayerCharacter::DPC_FIGHTING)) {
@@ -5349,149 +5303,141 @@ void PlayerCharacter::Update(float afDelta) {
                         }
                     }
                 }
-                if (!v198 && !this->GetControlsDisabled(PlayerCharacter::DPC_MOVEMENT)) {
-                    if (pcontrols->GetUserAction(Controls::UACTN_JUMP, 1)) {
-                        if (!this->IsOverEncumbered()) {
-                            Animation* v49 = this->GetAnimation();
-                            uint16_t Group = v49->GetGroup(AGS_WEAPON);
-                            if (!TESAnimGroup::IsPowerAttackAction(Group) &&
-                                this->GetAnimAction() != ANIM_ACTION_DODGE) {
-                                Animation* v197 = this->GetAnimation();
-                                if (this->GetAnimAction() == ANIM_ACTION_WAIT_FOR_LOWER_BODY_ANIM) {
-                                    if (v197->GetCurrentSequence(AGS_MOVEMENT)) {
-                                        BSAnimGroupSequence* CurrentSequence = v197->GetCurrentSequence(AGS_MOVEMENT);
-                                        TESAnimGroup* AnimGroup = CurrentSequence->GetAnimGroup();
-                                        if (TESAnimGroupIsJumpingLandAnim(AnimGroup, nullptr)) {
-                                            this->SetAnimAction(ANIM_ACTION_NONE, nullptr);
-                                        }
-                                    }
-                                }
-                                if (this->GetAnimAction() != ANIM_ACTION_WAIT_FOR_LOWER_BODY_ANIM) {
-                                    int32_t v196 = !this->IsJumping() && !this->IsSwimming();
-                                    bool v194 = pcontrols->GetUserAction(Controls::UACTN_BLOCK, 0) != 0;
-                                    bool bblocking = this->GetBlocked();
-                                    if (v194) {
-                                        if (Interface::GetActivateREFR()) {
-                                            if (!bblocking) {
-                                                bhkCharacterController* v54 = this->GetCharController();
-                                                if (static_cast<uint8_t>(v54->CanJump())) {
-                                                    this->Jump();
-                                                }
-                                            }
-                                        }
-                                        else {
-                                            bhkCharacterController* v53 = this->GetCharController();
-                                            if (v53->GetState() == HK_CHARACTER_ON_GROUND) {
-                                                this->Dodge(smoveMode);
-                                            }
-                                        }
-                                    }
-                                    else {
-                                        bhkCharacterController* v55 = this->GetCharController();
-                                        if (static_cast<uint8_t>(v55->CanJump())) {
+                if ((!v198 && !this->GetControlsDisabled(PlayerCharacter::DPC_MOVEMENT)) &&
+                    (pcontrols->GetUserAction(Controls::UACTN_JUMP, 1)) && (!this->IsOverEncumbered())) {
+                    Animation* v49 = this->GetAnimation();
+                    uint16_t Group = v49->GetGroup(AGS_WEAPON);
+                    if (!TESAnimGroup::IsPowerAttackAction(Group) && this->GetAnimAction() != ANIM_ACTION_DODGE) {
+                        Animation* v197 = this->GetAnimation();
+                        if ((this->GetAnimAction() == ANIM_ACTION_WAIT_FOR_LOWER_BODY_ANIM) &&
+                            (v197->GetCurrentSequence(AGS_MOVEMENT))) {
+                            BSAnimGroupSequence* CurrentSequence = v197->GetCurrentSequence(AGS_MOVEMENT);
+                            TESAnimGroup* AnimGroup = CurrentSequence->GetAnimGroup();
+                            if (TESAnimGroupIsJumpingLandAnim(AnimGroup, nullptr)) {
+                                this->SetAnimAction(ANIM_ACTION_NONE, nullptr);
+                            }
+                        }
+
+                        if (this->GetAnimAction() != ANIM_ACTION_WAIT_FOR_LOWER_BODY_ANIM) {
+                            int32_t v196 = !this->IsJumping() && !this->IsSwimming();
+                            bool v194 = pcontrols->GetUserAction(Controls::UACTN_BLOCK, 0) != 0;
+                            bool bblocking = this->GetBlocked();
+                            if (v194) {
+                                if (Interface::GetActivateREFR()) {
+                                    if (!bblocking) {
+                                        bhkCharacterController* v54 = this->GetCharController();
+                                        if (static_cast<uint8_t>(v54->CanJump())) {
                                             this->Jump();
                                         }
                                     }
-                                    this->ForcePhysicsGrabDrop();
-                                    v302 = true;
+                                }
+                                else {
+                                    bhkCharacterController* v53 = this->GetCharController();
+                                    if (v53->GetState() == HK_CHARACTER_ON_GROUND) {
+                                        this->Dodge(smoveMode);
+                                    }
                                 }
                             }
+                            else {
+                                bhkCharacterController* v55 = this->GetCharController();
+                                if (static_cast<uint8_t>(v55->CanJump())) {
+                                    this->Jump();
+                                }
+                            }
+                            this->ForcePhysicsGrabDrop();
+                            v302 = true;
                         }
                     }
                 }
-                if (!this->IsTresPassing()) {
-                    if ((&this->m_Extra)->GetTrespassPackage()) {
-                        (&this->m_Extra)->RemoveTrespassPackage();
-                    }
+
+                if ((!this->IsTresPassing()) && ((&this->m_Extra)->GetTrespassPackage())) {
+                    (&this->m_Extra)->RemoveTrespassPackage();
                 }
+
                 bsearch = false;
-                if (pcontrols->GetUserAction(Controls::UACTN_RESTMENU, 1)) {
-                    if (!this->GetPCControlFlags()) {
-                        if (this->IsTresPassing()) {
-                            const char* v56 = sNoWaitTrespass.String();
+                if ((pcontrols->GetUserAction(Controls::UACTN_RESTMENU, 1)) && (!this->GetPCControlFlags())) {
+                    if (this->IsTresPassing()) {
+                        const char* v56 = sNoWaitTrespass.String();
+                        Interface::ShowMessage(
+                            v56, 0, "Interface\\Icons\\Message Icons\\glow_message_vaultboy_sad.dds", nullptr, 2.0f,
+                            false
+                        );
+                    }
+                    else {
+                        if (this->IsAlarmForPlayerCharactaer()) {
+                            const char* v57 = sNoWaitWhileAlarmSounding.String();
                             Interface::ShowMessage(
-                                v56, 0, "Interface\\Icons\\Message Icons\\glow_message_vaultboy_sad.dds", nullptr, 2.0f,
+                                v57, 0, "Interface\\Icons\\Message Icons\\glow_message_vaultboy_sad.dds", nullptr, 2.0f,
                                 false
                             );
                         }
                         else {
-                            if (this->IsAlarmForPlayerCharactaer()) {
-                                const char* v57 = sNoWaitWhileAlarmSounding.String();
+                            TESObjectCELL* afMultb = this->GetParentCell();
+                            const NiPoint3* v58 = &this->GetLocationOnReference();
+                            if (this->IsPointDeepUnderWater(*v58, afMultb, 0.875f)) {
+                                const char* v59 = sNoWaitUnderWater.String();
                                 Interface::ShowMessage(
-                                    v57, 0, "Interface\\Icons\\Message Icons\\glow_message_vaultboy_sad.dds", nullptr,
+                                    v59, 0, "Interface\\Icons\\Message Icons\\glow_message_vaultboy_sad.dds", nullptr,
                                     2.0f, false
                                 );
                             }
                             else {
-                                TESObjectCELL* afMultb = this->GetParentCell();
-                                const NiPoint3* v58 = &this->GetLocationOnReference();
-                                if (this->IsPointDeepUnderWater(*v58, afMultb, 0.875f)) {
-                                    const char* v59 = sNoWaitUnderWater.String();
+                                bool Interior = pPlayer->GetInterior();
+                                if (ReferenceProcessLists.AreHostilActorsNear(Interior)) {
+                                    const char* v61 = sNoWaitHostilActorsNear.String();
                                     Interface::ShowMessage(
-                                        v59, 0, "Interface\\Icons\\Message Icons\\glow_message_vaultboy_sad.dds",
+                                        v61, 0, "Interface\\Icons\\Message Icons\\glow_message_vaultboy_sad.dds",
                                         nullptr, 2.0f, false
                                     );
                                 }
                                 else {
-                                    bool Interior = pPlayer->GetInterior();
-                                    if (ReferenceProcessLists.AreHostilActorsNear(Interior)) {
-                                        const char* v61 = sNoWaitHostilActorsNear.String();
+                                    bhkCharacterController* v63;
+                                    bhkCharacterController* v62 = pPlayer->GetCharController();
+                                    if (v62->GetState() == HK_CHARACTER_JUMPING ||
+                                        (v63 = pPlayer->GetCharController(), v63->GetState() == HK_CHARACTER_IN_AIR)) {
+                                        const char* v64 = sNoWaitInAir.String();
                                         Interface::ShowMessage(
-                                            v61, 0, "Interface\\Icons\\Message Icons\\glow_message_vaultboy_sad.dds",
+                                            v64, 0, "Interface\\Icons\\Message Icons\\glow_message_vaultboy_sad.dds",
                                             nullptr, 2.0f, false
                                         );
                                     }
                                     else {
-                                        bhkCharacterController* v63;
-                                        bhkCharacterController* v62 = pPlayer->GetCharController();
-                                        if (v62->GetState() == HK_CHARACTER_JUMPING ||
-                                            (v63 = pPlayer->GetCharController(),
-                                             v63->GetState() == HK_CHARACTER_IN_AIR)) {
-                                            const char* v64 = sNoWaitInAir.String();
-                                            Interface::ShowMessage(
-                                                v64, 0,
-                                                "Interface\\Icons\\Message Icons\\glow_message_vaultboy_sad.dds",
-                                                nullptr, 2.0f, false
-                                            );
-                                        }
-                                        else {
-                                            if (!pPlayer->GetParentCell()->GetCantWaitHere() && pPlayer->GetCanWait()) {
-                                                BaseProcess* v191;
-                                                if (ReferenceProcessLists.IsPlayerInRadiationArea() ||
-                                                    (this->pCurrentProcess &&
-                                                     (v191 = this->pCurrentProcess,
-                                                      v191->GetRadiationWaterDelta() != 0.0))) {
-                                                    const char* v66 = sNoWaitInRadiation.String();
+                                        if (!pPlayer->GetParentCell()->GetCantWaitHere() && pPlayer->GetCanWait()) {
+                                            BaseProcess* v191;
+                                            if (ReferenceProcessLists.IsPlayerInRadiationArea() ||
+                                                (this->pCurrentProcess &&
+                                                 (v191 = this->pCurrentProcess,
+                                                  v191->GetRadiationWaterDelta() != 0.0))) {
+                                                const char* v66 = sNoWaitInRadiation.String();
+                                                Interface::ShowMessage(
+                                                    v66, 0,
+                                                    "Interface\\Icons\\Message "
+                                                    "Icons\\glow_message_vaultboy_sad.dds",
+                                                    nullptr, 2.0f, false
+                                                );
+                                            }
+                                            else {
+                                                if (pPlayer->HasDamageHealthEffect()) {
+                                                    const char* v67 = sNoWaitTakingHealthDamage.String();
                                                     Interface::ShowMessage(
-                                                        v66, 0,
+                                                        v67, 0,
                                                         "Interface\\Icons\\Message "
                                                         "Icons\\glow_message_vaultboy_sad.dds",
                                                         nullptr, 2.0f, false
                                                     );
                                                 }
                                                 else {
-                                                    if (pPlayer->HasDamageHealthEffect()) {
-                                                        const char* v67 = sNoWaitTakingHealthDamage.String();
-                                                        Interface::ShowMessage(
-                                                            v67, 0,
-                                                            "Interface\\Icons\\Message "
-                                                            "Icons\\glow_message_vaultboy_sad.dds",
-                                                            nullptr, 2.0f, false
-                                                        );
-                                                    }
-                                                    else {
-                                                        Interface::CreateSleepMenu(false);
-                                                    }
+                                                    Interface::CreateSleepMenu(false);
                                                 }
                                             }
-                                            else {
-                                                const char* v65 = sNoWaitInCell.String();
-                                                Interface::ShowMessage(
-                                                    v65, 0,
-                                                    "Interface\\Icons\\Message Icons\\glow_message_vaultboy_sad.dds",
-                                                    nullptr, 2.0f, false
-                                                );
-                                            }
+                                        }
+                                        else {
+                                            const char* v65 = sNoWaitInCell.String();
+                                            Interface::ShowMessage(
+                                                v65, 0,
+                                                "Interface\\Icons\\Message Icons\\glow_message_vaultboy_sad.dds",
+                                                nullptr, 2.0f, false
+                                            );
                                         }
                                     }
                                 }
@@ -5499,6 +5445,7 @@ void PlayerCharacter::Update(float afDelta) {
                         }
                     }
                 }
+
                 this->b3rdPerson = true;
                 this->UpdateAnimation();
                 this->PickAnimations(PlayerCharacter::fWalkSpeedMult, PlayerCharacter::fPCTurnScale);
@@ -5674,43 +5621,38 @@ void PlayerCharacter::Update(float afDelta) {
                     Actor* pactor_3 = static_cast<Actor*>(Interface::GetActivateREFR());
                     bool v170 = true;
                     bool bDontActivate = false;
-                    if (pactor_3) {
-                        if (pactor_3->IsFurniture()) {
-                            bDontActivate = IronSights;
-                        }
+                    if ((pactor_3) && (pactor_3->IsFurniture())) {
+                        bDontActivate = IronSights;
                     }
+
                     if (this->GetControlsDisabled(PlayerCharacter::DPC_MOVEMENT)) {
                         bDontActivate = true;
                     }
-                    if (pactor_3) {
-                        if (pactor_3->IsProjectile()) {
-                            ArrowProjectile* parrow_2 = dynamic_cast<ArrowProjectile*>(pactor_3);
-                            if (parrow_2) {
-                                if (parrow_2->eState == ArrowProjectile::STATE_FLYING) {
-                                    bDontActivate = true;
-                                }
+                    if ((pactor_3) && (pactor_3->IsProjectile())) {
+                        ArrowProjectile* parrow_2 = dynamic_cast<ArrowProjectile*>(pactor_3);
+                        if ((parrow_2) && (parrow_2->eState == ArrowProjectile::STATE_FLYING)) {
+                            bDontActivate = true;
+                        }
+                    }
+
+                    if ((pactor_3) && (pactor_3->IsActor())) {
+                        BaseProcess* pprocess_2 = pactor_3->pCurrentProcess;
+                        if (!pactor_3->IsDead(false)) {
+                            const NiPoint3* v74;
+                            TESObjectCELL* afMultd;
+                            TESObjectCELL* afMultc = pactor_3->GetParentCell();
+                            const NiPoint3* v73 = &pactor_3->GetLocationOnReference();
+                            if (pactor_3->IsPointDeepUnderWater(*v73, afMultc, 0.875f) ||
+                                ((afMultd = this->GetParentCell(),
+                                  (v74 = &pPlayer->GetLocationOnReference(),
+                                   pPlayer->IsPointDeepUnderWater(*v74, afMultd, 0.875f))) ||
+                                 ((pprocess_2 && pprocess_2->GetFadeState() == BaseProcess::FADE_OUT_DISABLE) ||
+                                  (pprocess_2 && pprocess_2->GetFadeState() == BaseProcess::FADE_OUT_DELETE)))) {
+                                bDontActivate = true;
                             }
                         }
                     }
-                    if (pactor_3) {
-                        if (pactor_3->IsActor()) {
-                            BaseProcess* pprocess_2 = pactor_3->pCurrentProcess;
-                            if (!pactor_3->IsDead(false)) {
-                                const NiPoint3* v74;
-                                TESObjectCELL* afMultd;
-                                TESObjectCELL* afMultc = pactor_3->GetParentCell();
-                                const NiPoint3* v73 = &pactor_3->GetLocationOnReference();
-                                if (pactor_3->IsPointDeepUnderWater(*v73, afMultc, 0.875f) ||
-                                    ((afMultd = this->GetParentCell(),
-                                      (v74 = &pPlayer->GetLocationOnReference(),
-                                       pPlayer->IsPointDeepUnderWater(*v74, afMultd, 0.875f))) ||
-                                     ((pprocess_2 && pprocess_2->GetFadeState() == BaseProcess::FADE_OUT_DISABLE) ||
-                                      (pprocess_2 && pprocess_2->GetFadeState() == BaseProcess::FADE_OUT_DELETE)))) {
-                                    bDontActivate = true;
-                                }
-                            }
-                        }
-                    }
+
                     int32_t v165 = this->GetSitSleepState() - 1;
                     switch (v165) {
                         case 0:
@@ -5789,19 +5731,18 @@ void PlayerCharacter::Update(float afDelta) {
                         BSSoundHandle hndl_2;
                         (&this->m_Extra)->GetCreatureAwakeSound(hndl_2);
                         TESSound* pnoactSound_3 = FalloutAudio::GetNoActivationSound();
-                        if (!hndl_2.IsValid()) {
-                            if (pnoactSound_3) {
-                                const char* v111 = pnoactSound_3->GetFilename();
-                                BSAudio* v77 = &BSAudio::QInstance();
-                                BSSoundHandle* v156 = v77->GetSoundHandleByFilename(
-                                    &v157, v111,
-                                    BSGameSound::SOUND_FLAG_IS_2D | BSGameSound::SOUND_FLAG_SYSTEM_SOUND |
-                                        BSGameSound::SOUND_FLAG_ONE_SHOT,
-                                    pnoactSound_3
-                                );
-                                hndl_2.operator=(*v156);
-                            }
+                        if ((!hndl_2.IsValid()) && (pnoactSound_3)) {
+                            const char* v111 = pnoactSound_3->GetFilename();
+                            BSAudio* v77 = &BSAudio::QInstance();
+                            BSSoundHandle* v156 = v77->GetSoundHandleByFilename(
+                                &v157, v111,
+                                BSGameSound::SOUND_FLAG_IS_2D | BSGameSound::SOUND_FLAG_SYSTEM_SOUND |
+                                    BSGameSound::SOUND_FLAG_ONE_SHOT,
+                                pnoactSound_3
+                            );
+                            hndl_2.operator=(*v156);
                         }
+
                         if (!hndl_2.IsPlaying()) {
                             hndl_2.Play(false);
                         }
@@ -5912,21 +5853,21 @@ void PlayerCharacter::Update(float afDelta) {
                 }
                 bsearch = false;
                 CharacterProgression* CharacterProgressionInfo = this->GetCharacterProgressionInfo();
-                if (CharacterProgressionInfo->GetReadyToLevelUp()) {
-                    if (!this->IsPlayerCharacterInCombat(&bsearch) && !pVATS.IsInVats() &&
-                        HUDMainMenu::IsXPMeterFinishedMoving() && InterfaceManager::IsPipboyClosed() &&
-                        !InterfaceManager::GetContainerMenuQueued() && !this->GetInChargen()) {
-                        CharacterProgression* v85 = this->GetCharacterProgressionInfo();
-                        v85->BeginLevelUp();
-                    }
+                if ((CharacterProgressionInfo->GetReadyToLevelUp()) &&
+                    (!this->IsPlayerCharacterInCombat(&bsearch) && !pVATS.IsInVats() &&
+                     HUDMainMenu::IsXPMeterFinishedMoving() && InterfaceManager::IsPipboyClosed() &&
+                     !InterfaceManager::GetContainerMenuQueued() && !this->GetInChargen())) {
+                    CharacterProgression* v85 = this->GetCharacterProgressionInfo();
+                    v85->BeginLevelUp();
                 }
-                if (this->pReputationUpdate) {
-                    if (!this->IsPlayerCharacterInCombat(&bsearch) && !pVATS.IsInVats() && !Interface::InDialog() &&
-                        !StartMenu::PauseMenuIsActive()) {
-                        this->pReputationUpdate->DisplayReputationTitleChange();
-                        this->pReputationUpdate = nullptr;
-                    }
+
+                if ((this->pReputationUpdate) &&
+                    (!this->IsPlayerCharacterInCombat(&bsearch) && !pVATS.IsInVats() && !Interface::InDialog() &&
+                     !StartMenu::PauseMenuIsActive())) {
+                    this->pReputationUpdate->DisplayReputationTitleChange();
+                    this->pReputationUpdate = nullptr;
                 }
+
                 if (this->pCurrentProcess) {
                     this->pCurrentProcess->CheckForExpiredDetectionEvent();
                 }
@@ -5951,11 +5892,10 @@ void PlayerCharacter::Update(float afDelta) {
                 }
                 if (v255) {
                     float* v86 = &fCombatYieldTime.Float();
-                    if (*v86 > static_cast<double>(this->fCombatTimer) && this->fYieldTimer <= 0.0) {
-                        if (this->AttemptYield()) {
-                            float* v87 = &fCombatYieldRetryTime.Float();
-                            this->fYieldTimer = *v87;
-                        }
+                    if ((*v86 > static_cast<double>(this->fCombatTimer) && this->fYieldTimer <= 0.0) &&
+                        (this->AttemptYield())) {
+                        float* v87 = &fCombatYieldRetryTime.Float();
+                        this->fYieldTimer = *v87;
                     }
                 }
                 if (this->fYieldTimer > 0.0) {
@@ -6006,31 +5946,29 @@ void PlayerCharacter::Update(float afDelta) {
                                 if (pList->m_item->GetFormType() == REFR_ID) {
                                     TESObjectSTAT* pstat =
                                         dynamic_cast<TESObjectSTAT*>(pList->m_item->GetObjectReference());
-                                    if (pstat) {
-                                        if (pstat->cPassThroughSoundIndex != -1) {
-                                            TESObjectREFR* m_item = pList->m_item;
-                                            if (m_item->Get3D()) {
-                                                TESObjectREFR* v141 = pList->m_item;
-                                                NiNode* v98 = v141->Get3D();
-                                                float v140 = v98->GetWorldBoundRadius();
-                                                v140 = v140 * v140;
-                                                TESObjectREFR* v139 = pList->m_item;
-                                                double v138 = v140;
-                                                const NiPoint3* fValueh = &this->GetLocationOnReference();
-                                                const NiPoint3* v100 = &v139->GetLocationOnReference();
-                                                double v102 = (*v100 - *fValueh).SqrLength();
-                                                if (v102 < v138) {
-                                                    TESSound* NthBrushPassthroughSound =
-                                                        GetNthBrushPassthroughSound(pstat->cPassThroughSoundIndex);
-                                                    if (NthBrushPassthroughSound) {
-                                                        uint32_t CastingType = NthBrushPassthroughSound->iFormID;
-                                                        BSAudio* v103 = &BSAudio::QInstance();
-                                                        BSSoundHandle* SoundHandleByNumericID =
-                                                            v103->GetSoundHandleByNumericID(&v135, CastingType, 257u);
-                                                        SoundHandleByNumericID->Play(false);
-                                                        uint32_t v104 = BSGetTickCount();
-                                                        time_11E0BA8 = RandomInt(1500, 2000) + v104;
-                                                    }
+                                    if ((pstat) && (pstat->cPassThroughSoundIndex != -1)) {
+                                        TESObjectREFR* m_item = pList->m_item;
+                                        if (m_item->Get3D()) {
+                                            TESObjectREFR* v141 = pList->m_item;
+                                            NiNode* v98 = v141->Get3D();
+                                            float v140 = v98->GetWorldBoundRadius();
+                                            v140 = v140 * v140;
+                                            TESObjectREFR* v139 = pList->m_item;
+                                            double v138 = v140;
+                                            const NiPoint3* fValueh = &this->GetLocationOnReference();
+                                            const NiPoint3* v100 = &v139->GetLocationOnReference();
+                                            double v102 = (*v100 - *fValueh).SqrLength();
+                                            if (v102 < v138) {
+                                                TESSound* NthBrushPassthroughSound =
+                                                    GetNthBrushPassthroughSound(pstat->cPassThroughSoundIndex);
+                                                if (NthBrushPassthroughSound) {
+                                                    uint32_t CastingType = NthBrushPassthroughSound->iFormID;
+                                                    BSAudio* v103 = &BSAudio::QInstance();
+                                                    BSSoundHandle* SoundHandleByNumericID =
+                                                        v103->GetSoundHandleByNumericID(&v135, CastingType, 257u);
+                                                    SoundHandleByNumericID->Play(false);
+                                                    uint32_t v104 = BSGetTickCount();
+                                                    time_11E0BA8 = RandomInt(1500, 2000) + v104;
                                                 }
                                             }
                                         }
@@ -6319,12 +6257,11 @@ void PlayerCharacter::InitiateCannibalPackage(Actor* apTarget) {
 // both compares.
 void PlayerCharacter::SetRefraction(bool abEnable, float afRefractionPower) {
     float fPower = afRefractionPower;
-    if (abEnable && fPower <= 0.0) {
-        if (this->GetCurrentAIProcess()) {
-            BaseProcess* pProcess = this->GetCurrentAIProcess();
-            fPower = pProcess->GetScriptRefractionPower();
-        }
+    if ((abEnable && fPower <= 0.0) && (this->GetCurrentAIProcess())) {
+        BaseProcess* pProcess = this->GetCurrentAIProcess();
+        fPower = pProcess->GetScriptRefractionPower();
     }
+
     bool bRefractive = abEnable;
     if (abEnable && fPower <= 0.0) {
         bRefractive = false;
@@ -6731,35 +6668,28 @@ TESObjectREFR* PlayerCharacter::DropObject(
         }
     }
     else {
-        if (apObject->GetFormType() == AMMO_ID) {
-            if (GetCurrentWeapon()) {
-                PlayerCharacter* v11 = pPlayer;
-                TESObjectWEAP* CurrentWeapon = GetCurrentWeapon();
-                if (CurrentWeapon->GetCurrentAmmo(v11) == apObject) {
-                    pCurrentProcess->GetCurrentAmmo()->iNumber = 0;
-                    NiAVObject* v8 = Get3D(false);
-                    NiAVObject* pround = BSUtilities::GetObjectByName(v8, "##NifRound");
-                    if (pround) {
-                        pround->SetAppCulled(true);
-                    }
-                    NiAVObject* v9 = Get3D(false);
-                    pround = BSUtilities::GetObjectByName(v9, "##NifRound");
-                    if (pround) {
-                        pround->SetAppCulled(true);
-                    }
+        if ((apObject->GetFormType() == AMMO_ID) && (GetCurrentWeapon())) {
+            PlayerCharacter* v11 = pPlayer;
+            TESObjectWEAP* CurrentWeapon = GetCurrentWeapon();
+            if (CurrentWeapon->GetCurrentAmmo(v11) == apObject) {
+                pCurrentProcess->GetCurrentAmmo()->iNumber = 0;
+                NiAVObject* v8 = Get3D(false);
+                NiAVObject* pround = BSUtilities::GetObjectByName(v8, "##NifRound");
+                if (pround) {
+                    pround->SetAppCulled(true);
+                }
+                NiAVObject* v9 = Get3D(false);
+                pround = BSUtilities::GetObjectByName(v9, "##NifRound");
+                if (pround) {
+                    pround->SetAppCulled(true);
                 }
             }
         }
     }
-    if (pQueuedWeaponAttach) {
-        if (apObject == pQueuedWeaponAttach) {
-            if (apExtra) {
-                if (apExtra->GetWorn(false)) {
-                    pQueuedWeaponAttach = nullptr;
-                }
-            }
-        }
+    if ((pQueuedWeaponAttach) && (apObject == pQueuedWeaponAttach) && (apExtra) && (apExtra->GetWorn(false))) {
+        pQueuedWeaponAttach = nullptr;
     }
+
     TESBoundObject* pboundobj = apObject->IsBoundObject() ? static_cast<TESBoundObject*>(apObject) : nullptr;
     TESObjectREFR* pobjREFR =
         RemoveItem(pboundobj, apExtra, ainumber, false, true, nullptr, apPoint, apRotate, true, false);
@@ -6884,28 +6814,28 @@ void PlayerCharacter::PickUpObject(TESObjectREFR* apobjREFR, int32_t aicount, bo
         AddReferenceItem(apobjREFR, aicount, false, bAmmoAdded);
         bDeleteRef = true;
     }
-    if (!pCurrentProcess->GetCurrentAmmo() || !pCurrentProcess->GetCurrentAmmo()->GetCount()) {
-        if (pCurrentProcess->GetCurrentWeapon() && apobjREFR) {
-            TESBoundObject* pObject = apobjREFR->GetObjectReference();
-            PlayerCharacter* pHolder = pPlayer;
-            TESObjectWEAP* pCurrentWeapon =
+    if ((!pCurrentProcess->GetCurrentAmmo() || !pCurrentProcess->GetCurrentAmmo()->GetCount()) &&
+        (pCurrentProcess->GetCurrentWeapon() && apobjREFR)) {
+        TESBoundObject* pObject = apobjREFR->GetObjectReference();
+        PlayerCharacter* pHolder = pPlayer;
+        TESObjectWEAP* pCurrentWeapon =
+            static_cast<TESObjectWEAP*>(pCurrentProcess->GetCurrentWeapon()->GetItemChangeObject());
+        if (pObject == pCurrentWeapon->GetCurrentAmmo(pHolder)) {
+            // WEAPON_MOD_AMMO_REGEN_SECONDS
+            bool bRegenMod = pCurrentProcess->GetCurrentWeapon()->HasModEffectActive(6);
+            TESObjectWEAP* pRegenWeapon =
                 static_cast<TESObjectWEAP*>(pCurrentProcess->GetCurrentWeapon()->GetItemChangeObject());
-            if (pObject == pCurrentWeapon->GetCurrentAmmo(pHolder)) {
-                // WEAPON_MOD_AMMO_REGEN_SECONDS
-                bool bRegenMod = pCurrentProcess->GetCurrentWeapon()->HasModEffectActive(6);
-                TESObjectWEAP* pRegenWeapon =
+            if (pRegenWeapon->GetAmmoRegenRate(bRegenMod) <= 0.0) {
+                // WEAPON_MOD_INCREASE_CLIP_SIZE
+                bool bUseModValue = pCurrentProcess->GetCurrentWeapon()->HasModEffectActive(2);
+                int32_t iReloadAnim = IsWeaponDrawn() ? 2 : 0;
+                TESObjectWEAP* pReloadWeapon =
                     static_cast<TESObjectWEAP*>(pCurrentProcess->GetCurrentWeapon()->GetItemChangeObject());
-                if (pRegenWeapon->GetAmmoRegenRate(bRegenMod) <= 0.0) {
-                    // WEAPON_MOD_INCREASE_CLIP_SIZE
-                    bool bUseModValue = pCurrentProcess->GetCurrentWeapon()->HasModEffectActive(2);
-                    int32_t iReloadAnim = IsWeaponDrawn() ? 2 : 0;
-                    TESObjectWEAP* pReloadWeapon =
-                        static_cast<TESObjectWEAP*>(pCurrentProcess->GetCurrentWeapon()->GetItemChangeObject());
-                    ReloadWeaponNV(pReloadWeapon, iReloadAnim, bUseModValue, false);
-                }
+                ReloadWeaponNV(pReloadWeapon, iReloadAnim, bUseModValue, false);
             }
         }
     }
+
     if (bDeleteRef) {
         delete apobjREFR;
     }
@@ -7068,9 +6998,8 @@ bool PlayerCharacter::ReloadWeaponNV(
     if (apWeapon && apWeapon->GetIsLoopingReload()) {
         return ReloadLoop(apWeapon, aiReloadAnim, bUseModValue, bFromInventory);
     }
-    else {
-        return ReloadWeapon(apWeapon, aiReloadAnim, bUseModValue);
-    }
+
+    return ReloadWeapon(apWeapon, aiReloadAnim, bUseModValue);
 }
 
 uint32_t PlayerCharacter::UseAmmo(int32_t aiShotCount) {
@@ -7402,19 +7331,17 @@ uint8_t PlayerCharacter::GetPerkRank(BGSPerk* apPerk, bool bAlt) {
 }
 
 void PlayerCharacter::AddPerkEntry(BGSPerkEntry* apPerkEntry, bool bAlt) {
-    if (apPerkEntry) {
-        if (apPerkEntry->GetType() == PERK_ENTRY_TYPE_ENTRY_POINT) {
-            uint8_t centryPoint = static_cast<BGSEntryPointPerkEntry*>(apPerkEntry)->GetEntryPoint();
-            if (centryPoint < 74u) {
-                if (bAlt) {
-                    CompanionPerkEntryLists[centryPoint].Insert(apPerkEntry, &BGSPerk::PerkEntryPrioritySortFunction);
-                }
-                else {
-                    PerkEntryLists[centryPoint].Insert(apPerkEntry, &BGSPerk::PerkEntryPrioritySortFunction);
-                }
-                InventoryChanges* pinventory = (&pPlayer->m_Extra)->GetContainerChanges();
-                pinventory->ForceWeightRecalculation();
+    if ((apPerkEntry) && (apPerkEntry->GetType() == PERK_ENTRY_TYPE_ENTRY_POINT)) {
+        uint8_t centryPoint = static_cast<BGSEntryPointPerkEntry*>(apPerkEntry)->GetEntryPoint();
+        if (centryPoint < 74u) {
+            if (bAlt) {
+                CompanionPerkEntryLists[centryPoint].Insert(apPerkEntry, &BGSPerk::PerkEntryPrioritySortFunction);
             }
+            else {
+                PerkEntryLists[centryPoint].Insert(apPerkEntry, &BGSPerk::PerkEntryPrioritySortFunction);
+            }
+            InventoryChanges* pinventory = (&pPlayer->m_Extra)->GetContainerChanges();
+            pinventory->ForceWeightRecalculation();
         }
     }
 }
@@ -7509,15 +7436,14 @@ NiPoint3 PlayerCharacter::CalculateAnticipatedLocation(float afDeltaT) {
     NiPoint3 a2;
     NiPoint3 result;
     NiPoint3 kPos = *QLocationOnReference();
-    if (afDeltaT > 0.0) {
-        if (GetCharController()) {
-            NiPoint3 kVelocity;
-            bhkCharacterController* pController = GetCharController();
-            pController->GetLinearVelocity(kVelocity);
-            NiPoint3* v4 = &(result = kVelocity * afDeltaT);
-            kPos.operator+=(*v4);
-        }
+    if ((afDeltaT > 0.0) && (GetCharController())) {
+        NiPoint3 kVelocity;
+        bhkCharacterController* pController = GetCharController();
+        pController->GetLinearVelocity(kVelocity);
+        NiPoint3* v4 = &(result = kVelocity * afDeltaT);
+        kPos.operator+=(*v4);
     }
+
     a2 = kPos;
     return a2;
 }
@@ -7570,9 +7496,8 @@ float PlayerCharacter::GetMagicEffectivenessModifier(bool a1, float a2) {
     if (PlayerCharacter::IsGodMode()) {
         return Actor::GetMagicEffectivenessModifier(a1, 0.0f);
     }
-    else {
-        return 1.0f;
-    }
+
+    return 1.0f;
 }
 
 void PlayerCharacter::SetCurrentSpell(MagicItem* apCurrentSpell) {
@@ -7663,12 +7588,11 @@ BSSimpleList<PerkRankData*>* PlayerCharacter::GetPerkList(bool bAlt) {
 
 PlayerCharacter::TerminalAccessType PlayerCharacter::GetTerminalAccess(TESObjectREFR* apTerminalRef) {
     BGSTerminal* v7 = nullptr;
-    if (apTerminalRef) {
-        if (apTerminalRef->GetObjectReference()) {
-            TESBoundObject* ObjectReference = apTerminalRef->GetObjectReference();
-            v7 = dynamic_cast<BGSTerminal*>(ObjectReference);
-        }
+    if ((apTerminalRef) && (apTerminalRef->GetObjectReference())) {
+        TESBoundObject* ObjectReference = apTerminalRef->GetObjectReference();
+        v7 = dynamic_cast<BGSTerminal*>(ObjectReference);
     }
+
     if (!v7) {
         return PlayerCharacter::TAT_HACK_INELIGIBLE;
     }
@@ -7686,18 +7610,16 @@ PlayerCharacter::TerminalAccessType PlayerCharacter::GetTerminalAccess(TESObject
     if (v7->IsHackEligible(apTerminalRef, a2)) {
         return PlayerCharacter::TAT_HACK_ELIGIBLE;
     }
-    else {
-        return PlayerCharacter::TAT_HACK_INELIGIBLE;
-    }
+
+    return PlayerCharacter::TAT_HACK_INELIGIBLE;
 }
 
 int32_t PlayerCharacter::GetLastAction() {
     int32_t v3 = 0;
-    if (pListofActions) {
-        if (pListofActions->m_item) {
-            return pListofActions->m_item->eAction;
-        }
+    if ((pListofActions) && (pListofActions->m_item)) {
+        return pListofActions->m_item->eAction;
     }
+
     return v3;
 }
 
@@ -8413,15 +8335,13 @@ bool PlayerCharacter::SetFirstPerson(bool abFirst) {
         chaseCameraPos = p1stPersonCamera->GetWorldTranslate();
         this->Show1stPerson(!bWant3rdPerson);
     }
-    else if (!bVanityMode) {
-        if ((&sp1stPerson3D)->operator->()) {
-            if ((&sp1stPerson3D)->operator->()->GetAppCulled()) {
-                if (!bWant3rdPerson) {
-                    b3rdPerson = true;
-                }
-            }
-        }
+    else if (
+        (!bVanityMode) && ((&sp1stPerson3D)->operator->()) && ((&sp1stPerson3D)->operator->()->GetAppCulled()) &&
+        (!bWant3rdPerson)
+    ) {
+        b3rdPerson = true;
     }
+
     if (bWasWanted && bVATSForce1stPerson && bVATSReturnPlayerTo1stPerson) {
         b3rdPerson = bWant3rdPerson;
         this->Show1stPerson(true);
@@ -8621,11 +8541,10 @@ void PlayerCharacter::SetSelectedScroll(TESObjectBOOK* apScroll) {
     EnchantmentItem* v2;
     if ((!apScroll) || static_cast<TESEnchantableForm*>(apScroll)->TESEnchantableForm::GetFormEnchanting()) {
         if ((!pSelectedScroll) || (pSelectedScroll != apScroll)) {
-            if (pSelectedScroll) {
-                if (!apScroll) {
-                    SetSelectedSpell(nullptr);
-                }
+            if ((pSelectedScroll) && (!apScroll)) {
+                SetSelectedSpell(nullptr);
             }
+
             pSelectedScroll = apScroll;
             if (pSelectedScroll) {
                 v2 = static_cast<TESEnchantableForm*>(pSelectedScroll)->TESEnchantableForm::GetFormEnchanting();
@@ -8936,9 +8855,8 @@ NiAVObject* PlayerCharacter::GetCurrent3D() {
     if (IsActually3rdPerson()) {
         return TESObjectREFR::Get3D();
     }
-    else {
-        return (&sp1stPerson3D)->operator->();
-    }
+
+    return (&sp1stPerson3D)->operator->();
 }
 
 bool PlayerCharacter::IsSleeping() {
@@ -8979,13 +8897,12 @@ bool PlayerCharacter::IsAcousticSpaceTransition() {
 
 // The first-person left arm playing a pip-boy group, else the pip-boy menu being open.
 bool PlayerCharacter::IsPipboyActive() {
-    if (p1stPersonAnimation && p1stPersonAnimation->GetCurrentSequence(AGS_LEFT_ARM)) {
-        if (p1stPersonAnimation->GetCurrentSequence(AGS_LEFT_ARM)->GetAnimGroup()->GetType() == ANIM_GROUP_PIPBOY ||
-            p1stPersonAnimation->GetCurrentSequence(AGS_LEFT_ARM)->GetAnimGroup()->GetType() ==
-                ANIM_GROUP_PIPBOY_CHILD) {
-            return true;
-        }
+    if ((p1stPersonAnimation && p1stPersonAnimation->GetCurrentSequence(AGS_LEFT_ARM)) &&
+        (p1stPersonAnimation->GetCurrentSequence(AGS_LEFT_ARM)->GetAnimGroup()->GetType() == ANIM_GROUP_PIPBOY ||
+         p1stPersonAnimation->GetCurrentSequence(AGS_LEFT_ARM)->GetAnimGroup()->GetType() == ANIM_GROUP_PIPBOY_CHILD)) {
+        return true;
     }
+
     return Interface::IsInPipboyMenu();
 }
 
@@ -9084,27 +9001,26 @@ int32_t PlayerCharacter::GetNumberOfFollowers() {
     int32_t v6 = 0;
     ExtraDataList* extra = pPlayer->TESObjectREFR::GetExtra();
     ExtraFollower* followerExtra = extra->GetFollowerExtra();
-    if (followerExtra) {
-        if (followerExtra->pActorlist) {
-            ecx0 = followerExtra->pActorlist;
-            while (ecx0 && ecx0->m_item) {
-                v4 = ecx0->m_item;
-                if (v4 &&
-                    (v4->MobileObject::GetCurrentAIProcess() &&
-                     (v4->GetCurrentPackage() &&
-                      (((currentPackage = v4->GetCurrentPackage()), (((int32_t)currentPackage->GetPackType()) == 1)) &&
-                       (static_cast<const void*>(v4->GetCurrentTarget()) == static_cast<const void*>(pPlayer)))))) {
-                    ++v6;
-                    ecx0 = ecx0->m_pkNext;
-                }
-                else {
-                    followerExtra->pActorlist->Remove(v4);
-                    ecx0 = followerExtra->pActorlist;
-                    v6 = 0;
-                }
+    if ((followerExtra) && (followerExtra->pActorlist)) {
+        ecx0 = followerExtra->pActorlist;
+        while (ecx0 && ecx0->m_item) {
+            v4 = ecx0->m_item;
+            if (v4 &&
+                (v4->MobileObject::GetCurrentAIProcess() &&
+                 (v4->GetCurrentPackage() &&
+                  (((currentPackage = v4->GetCurrentPackage()), (((int32_t)currentPackage->GetPackType()) == 1)) &&
+                   (static_cast<const void*>(v4->GetCurrentTarget()) == static_cast<const void*>(pPlayer)))))) {
+                ++v6;
+                ecx0 = ecx0->m_pkNext;
+            }
+            else {
+                followerExtra->pActorlist->Remove(v4);
+                ecx0 = followerExtra->pActorlist;
+                v6 = 0;
             }
         }
     }
+
     return v6;
 }
 
@@ -9177,53 +9093,43 @@ void PlayerCharacter::UpdateAutoAimActor() {
                 break;
             }
             pmob = (&ReferenceProcessLists.MobProcessArray)->GetItem(i);
-            if (pmob) {
-                if (pmob->IsActor() && !pmob->IsDead(false) && pmob->GetCurrentProcessType() == PROCESS_TYPE_HIGH) {
-                    if (pmob->Get3D()) {
-                        if (pPlayer->IsActorPerceived(static_cast<Actor*>(pmob))) {
-                            Actor* ptestActor = static_cast<Actor*>(pmob);
-                            const NiPoint3* z = &this->GetLocationOnReference();
-                            const NiPoint3* v2 = &ptestActor->GetLocationOnReference();
-                            NiPoint3 v93 = *v2 - *z;
-                            float v92 = v93.Length();
-                            bool bIsHostileToPlayer = pPlayer->IsActorPerceived(static_cast<Actor*>(pmob))->bIsHostile;
-                            if (v101 > static_cast<double>(v92)) {
-                                NiPoint3 npcMinY;
-                                NiPoint3 npcMaxX;
-                                alignas(16) NiPoint3 npcMinX;
-                                NiNode* v3 = pmob->Get3D();
-                                const NiBound* WorldBound = &v3->GetWorldBound();
-                                NiBound kBound = *WorldBound;
-                                NiPoint3 npcMaxY;
-                                Camera->ScreenSpaceBoundBound(kBound, npcMinY, npcMaxY, 1e-05f);
-                                kBound.SetRadius(ptestActor->GetBoundMax().x);
-                                Camera->ScreenSpaceBoundBound(kBound, npcMinX, npcMaxX, 1e-05f);
-                                char bShouldBeTargeted = 1;
-                                if (npcMinX.x == -1.0 && npcMaxX.x == 1.0) {
+            if ((pmob) &&
+                (pmob->IsActor() && !pmob->IsDead(false) && pmob->GetCurrentProcessType() == PROCESS_TYPE_HIGH) &&
+                (pmob->Get3D()) && (pPlayer->IsActorPerceived(static_cast<Actor*>(pmob)))) {
+                Actor* ptestActor = static_cast<Actor*>(pmob);
+                const NiPoint3* z = &this->GetLocationOnReference();
+                const NiPoint3* v2 = &ptestActor->GetLocationOnReference();
+                NiPoint3 v93 = *v2 - *z;
+                float v92 = v93.Length();
+                bool bIsHostileToPlayer = pPlayer->IsActorPerceived(static_cast<Actor*>(pmob))->bIsHostile;
+                if (v101 > static_cast<double>(v92)) {
+                    NiPoint3 npcMinY;
+                    NiPoint3 npcMaxX;
+                    alignas(16) NiPoint3 npcMinX;
+                    NiNode* v3 = pmob->Get3D();
+                    const NiBound* WorldBound = &v3->GetWorldBound();
+                    NiBound kBound = *WorldBound;
+                    NiPoint3 npcMaxY;
+                    Camera->ScreenSpaceBoundBound(kBound, npcMinY, npcMaxY, 1e-05f);
+                    kBound.SetRadius(ptestActor->GetBoundMax().x);
+                    Camera->ScreenSpaceBoundBound(kBound, npcMinX, npcMaxX, 1e-05f);
+                    char bShouldBeTargeted = 1;
+                    if (npcMinX.x == -1.0 && npcMaxX.x == 1.0) {
+                        bShouldBeTargeted = 0;
+                    }
+                    else {
+                        if (!(screenTarget.x > static_cast<double>(npcMinX.x)) ||
+                            !(screenTarget.x > static_cast<double>(npcMaxX.x))) {
+                            if (!(screenTarget.y < static_cast<double>(npcMinX.x)) ||
+                                !(screenTarget.y < static_cast<double>(npcMaxX.x))) {
+                                if (npcMinY.y == -1.0 && npcMaxY.y == 1.0) {
                                     bShouldBeTargeted = 0;
                                 }
                                 else {
-                                    if (!(screenTarget.x > static_cast<double>(npcMinX.x)) ||
-                                        !(screenTarget.x > static_cast<double>(npcMaxX.x))) {
-                                        if (!(screenTarget.y < static_cast<double>(npcMinX.x)) ||
-                                            !(screenTarget.y < static_cast<double>(npcMaxX.x))) {
-                                            if (npcMinY.y == -1.0 && npcMaxY.y == 1.0) {
-                                                bShouldBeTargeted = 0;
-                                            }
-                                            else {
-                                                if (!(screenTarget.x > static_cast<double>(npcMinY.y)) ||
-                                                    !(screenTarget.x > static_cast<double>(npcMaxY.y))) {
-                                                    if (screenTarget.y < static_cast<double>(npcMinY.y) &&
-                                                        screenTarget.y < static_cast<double>(npcMaxY.y)) {
-                                                        bShouldBeTargeted = 0;
-                                                    }
-                                                }
-                                                else {
-                                                    bShouldBeTargeted = 0;
-                                                }
-                                            }
-                                        }
-                                        else {
+                                    if (!(screenTarget.x > static_cast<double>(npcMinY.y)) ||
+                                        !(screenTarget.x > static_cast<double>(npcMaxY.y))) {
+                                        if (screenTarget.y < static_cast<double>(npcMinY.y) &&
+                                            screenTarget.y < static_cast<double>(npcMaxY.y)) {
                                             bShouldBeTargeted = 0;
                                         }
                                     }
@@ -9231,16 +9137,20 @@ void PlayerCharacter::UpdateAutoAimActor() {
                                         bShouldBeTargeted = 0;
                                     }
                                 }
-                                if (bShouldBeTargeted) {
-                                    if (pPlayer->LineOfSight(false, ptestActor, true, nullptr, false)) {
-                                        this->pPlayersTargetActor = ptestActor;
-                                        if (bIsHostileToPlayer) {
-                                            pbestActor = ptestActor;
-                                            v101 = v92;
-                                        }
-                                    }
-                                }
                             }
+                            else {
+                                bShouldBeTargeted = 0;
+                            }
+                        }
+                        else {
+                            bShouldBeTargeted = 0;
+                        }
+                    }
+                    if ((bShouldBeTargeted) && (pPlayer->LineOfSight(false, ptestActor, true, nullptr, false))) {
+                        this->pPlayersTargetActor = ptestActor;
+                        if (bIsHostileToPlayer) {
+                            pbestActor = ptestActor;
+                            v101 = v92;
                         }
                     }
                 }
@@ -9335,61 +9245,53 @@ void PlayerCharacter::UpdateAutoAimActor() {
             }
         }
         else {
-            if (pVATS.eMode == VATS::VATS_MENU_MODE) {
-                if (pVATSTarget) {
-                    if (FormFlags) {
-                        if (!FormFlags->IsMeleeWeapon() && !InterfaceManager::Has360Controller()) {
-                            NiPoint3 v46;
-                            NiPoint3 v47;
-                            NiNode* v50 = pVATSTarget->Get3D();
-                            const NiPoint3* zd = &pPlayer->Get3D()->GetWorldTranslate();
-                            NiNode* v17 = pVATSTarget->Get3D();
-                            v48 = (v17->GetWorldTranslate() - *zd).Length() + 128.0;
-                            InterfaceManager* v19 = InterfaceManager::Instance();
-                            int32_t v29 = static_cast<int32_t>(v19->sRealCursorPos.z);
-                            InterfaceManager* v20 = InterfaceManager::Instance();
-                            int32_t v27 = static_cast<int32_t>(v20->sRealCursorPos.x);
-                            SceneGraph* v21 = Main::GetWorldSceneGraph();
-                            v21->GetCamera()->WindowPointToRay(v27, v29, v47, v46, nullptr);
-                            NiAVObject* v45 = ArrowProjectile::PickSceneGraph(v50, v47, v46, v48, false);
-                            if (v45) {
-                                Actor* v44 = static_cast<Actor*>(TESObjectREFR::FindReferenceFor3D(v45));
-                                eVATSTargetLimb = ActorValue::VALUE_NONE;
-                                if (v44->IsActor()) {
-                                    BGSBodyPart::LIMB_ENUM DamageLocation = BGSBodyPart::LIMB_NONE;
-                                    if (v45->IsNode()) {
-                                        NiNode* v22 = v45->IsNode();
-                                        DamageLocation = v44->GetDamageLocation(v22);
-                                    }
-                                    else {
-                                        DamageLocation = v44->GetDamageLocation(v45->m_pkParent);
-                                    }
-                                    VATSMenu::SetLimb(DamageLocation);
-                                    TESActorBase* ActorBase = v44->GetActorBase();
-                                    BGSBodyPartData* v40 = ActorBase->GetBodyPartData();
-                                    if (v40) {
-                                        BGSBodyPart* BodyPart = v40->GetBodyPart(DamageLocation);
-                                        if (BodyPart) {
-                                            eVATSTargetLimb = static_cast<ActorValue::Index>(BodyPart->GetActorValue());
-                                        }
-                                    }
-                                }
+            if ((pVATS.eMode == VATS::VATS_MENU_MODE) && (pVATSTarget) && (FormFlags) &&
+                (!FormFlags->IsMeleeWeapon() && !InterfaceManager::Has360Controller())) {
+                NiPoint3 v46;
+                NiPoint3 v47;
+                NiNode* v50 = pVATSTarget->Get3D();
+                const NiPoint3* zd = &pPlayer->Get3D()->GetWorldTranslate();
+                NiNode* v17 = pVATSTarget->Get3D();
+                v48 = (v17->GetWorldTranslate() - *zd).Length() + 128.0;
+                InterfaceManager* v19 = InterfaceManager::Instance();
+                int32_t v29 = static_cast<int32_t>(v19->sRealCursorPos.z);
+                InterfaceManager* v20 = InterfaceManager::Instance();
+                int32_t v27 = static_cast<int32_t>(v20->sRealCursorPos.x);
+                SceneGraph* v21 = Main::GetWorldSceneGraph();
+                v21->GetCamera()->WindowPointToRay(v27, v29, v47, v46, nullptr);
+                NiAVObject* v45 = ArrowProjectile::PickSceneGraph(v50, v47, v46, v48, false);
+                if (v45) {
+                    Actor* v44 = static_cast<Actor*>(TESObjectREFR::FindReferenceFor3D(v45));
+                    eVATSTargetLimb = ActorValue::VALUE_NONE;
+                    if (v44->IsActor()) {
+                        BGSBodyPart::LIMB_ENUM DamageLocation = BGSBodyPart::LIMB_NONE;
+                        if (v45->IsNode()) {
+                            NiNode* v22 = v45->IsNode();
+                            DamageLocation = v44->GetDamageLocation(v22);
+                        }
+                        else {
+                            DamageLocation = v44->GetDamageLocation(v45->m_pkParent);
+                        }
+                        VATSMenu::SetLimb(DamageLocation);
+                        TESActorBase* ActorBase = v44->GetActorBase();
+                        BGSBodyPartData* v40 = ActorBase->GetBodyPartData();
+                        if (v40) {
+                            BGSBodyPart* BodyPart = v40->GetBodyPart(DamageLocation);
+                            if (BodyPart) {
+                                eVATSTargetLimb = static_cast<ActorValue::Index>(BodyPart->GetActorValue());
                             }
                         }
                     }
                 }
             }
         }
-        if (phitRef) {
-            if (phitRef == pbestActor) {
-                if (this->GetCurrentWeapon()) {
-                    TESObjectWEAP* CurrentWeapon = this->GetCurrentWeapon();
-                    if (!CurrentWeapon->IsMeleeWeapon()) {
-                        pbestActor = nullptr;
-                    }
-                }
+        if ((phitRef) && (phitRef == pbestActor) && (this->GetCurrentWeapon())) {
+            TESObjectWEAP* CurrentWeapon = this->GetCurrentWeapon();
+            if (!CurrentWeapon->IsMeleeWeapon()) {
+                pbestActor = nullptr;
             }
         }
+
         this->pAutoAimActor = pbestActor;
         if (phitRef) {
             const NiPoint3* v24 = &phitRef->GetLocationOnReference();
@@ -9413,9 +9315,8 @@ Actor* PlayerCharacter::GetAutoAimActor() {
     if (pAutoAimActor && pAutoAimActor->Get3D()) {
         return pAutoAimActor;
     }
-    else {
-        return nullptr;
-    }
+
+    return nullptr;
 }
 
 void PlayerCharacter::ApplyAutoAimActor(
@@ -9463,14 +9364,11 @@ void PlayerCharacter::ApplyAutoAimActor(
               (v9 = pCurrentProcess->GetCurrentWeapon(), !v9->HasModEffectActive(WEAPON_MOD_IRON_SITES))))) &&
            ((v10 = GetCurrentWeapon(), !v10->HasScope()) || (v11 = GetCurrentWeapon(), v11->HasModScope())))))) {
         TESObjectWEAP* v12;
-        if (pVATS.eMode == VATS::VATS_PLAYBACK) {
-            if (pcurrentVATSAction) {
-                if (pcurrentVATSAction->pTarget) {
-                    bvatsPlayback = true;
-                    pvatsTarget3d = (NiAVObject*)pcurrentVATSAction->pTarget->Get3D();
-                }
-            }
+        if ((pVATS.eMode == VATS::VATS_PLAYBACK) && (pcurrentVATSAction) && (pcurrentVATSAction->pTarget)) {
+            bvatsPlayback = true;
+            pvatsTarget3d = (NiAVObject*)pcurrentVATSAction->pTarget->Get3D();
         }
+
         float fadditionalMissHeading = 0.0f;
         float fadditionalMissLooking = 0.0f;
         if (!apReleaseObj || (!GetCurrentWeapon() || (v12 = GetCurrentWeapon(), v12->IsMeleeWeapon()))) {
@@ -9685,27 +9583,25 @@ void PlayerCharacter::ApplyAutoAimActor(
                         bUseSplit = v32->HasModEffectActive(WEAPON_MOD_SPLIT_BEAM);
                     }
                     if (bvatsPlayback) {
-                        if (pweapon) {
-                            if (pweapon->GetNumProjectiles(bUseSplit, false, pPlayer) > 1u) {
-                                float AttackSkillModBase;
-                                float CurrentGameHour;
-                                if (apProjectile) {
-                                    CurrentGameHour = apProjectile->fSpreadHeading;
-                                }
-                                else {
-                                    CurrentGameHour = 0.0f;
-                                }
-                                float* v35 = &fVatsShotgunSpreadRatio.Float();
-                                fheadingDelta = *v35 * CurrentGameHour + fheadingDelta;
-                                if (apProjectile) {
-                                    AttackSkillModBase = apProjectile->fSpreadLooking;
-                                }
-                                else {
-                                    AttackSkillModBase = 0.0f;
-                                }
-                                float* v36 = &fVatsShotgunSpreadRatio.Float();
-                                flookingDelta = *v36 * AttackSkillModBase + flookingDelta;
+                        if ((pweapon) && (pweapon->GetNumProjectiles(bUseSplit, false, pPlayer) > 1u)) {
+                            float AttackSkillModBase;
+                            float CurrentGameHour;
+                            if (apProjectile) {
+                                CurrentGameHour = apProjectile->fSpreadHeading;
                             }
+                            else {
+                                CurrentGameHour = 0.0f;
+                            }
+                            float* v35 = &fVatsShotgunSpreadRatio.Float();
+                            fheadingDelta = *v35 * CurrentGameHour + fheadingDelta;
+                            if (apProjectile) {
+                                AttackSkillModBase = apProjectile->fSpreadLooking;
+                            }
+                            else {
+                                AttackSkillModBase = 0.0f;
+                            }
+                            float* v36 = &fVatsShotgunSpreadRatio.Float();
+                            flookingDelta = *v36 * AttackSkillModBase + flookingDelta;
                         }
                     }
                     else {
@@ -9816,14 +9712,13 @@ void PlayerCharacter::ApplyAutoAimActor(
                 if (!apProjectile || apProjectile->GetFormType() != PGRE_ID) {
                     localPoint = *TESHavokUtilities::GetLocalPointWithinCollision(&apResult, pvatsTarget3d);
                 }
-                if (apProjectile) {
-                    if (apProjectile->pTarget) {
-                        ProjectileTarget* ptarget = apProjectile->pTarget;
-                        ptarget->pReference = pcurrentVATSAction->pTarget;
-                        ptarget->spPart.operator=(pvatsTarget3d);
-                        ptarget->kOffset = localPoint;
-                    }
+                if ((apProjectile) && (apProjectile->pTarget)) {
+                    ProjectileTarget* ptarget = apProjectile->pTarget;
+                    ptarget->pReference = pcurrentVATSAction->pTarget;
+                    ptarget->spPart.operator=(pvatsTarget3d);
+                    ptarget->kOffset = localPoint;
                 }
+
                 ktargetLocation = pvatsTarget3d->GetWorldTransform() * localPoint;
             }
             else {
@@ -9984,13 +9879,12 @@ void PlayerCharacter::PositionPlayer(NiPoint3 aPos, NiPoint3 aAngle, TESObjectCE
             TES::pInstance->SetWorldSpace(apCell->GetWorldSpace());
         }
         // Leaving an interior: put out the pip-boy light.
-        if (binterior) {
-            if (IsSpellTarget(MagicSystem::GetPipBoyLightSpell(), true)) {
-                Interface::GetPipboy()->ShowPipboyLightEffect(true, false, true);
-                Interface::GetPipboy()->ShowPipboyLightEffect(false, false, true);
-                Dispel(MagicSystem::GetPipBoyLightSpell(), nullptr, nullptr);
-            }
+        if ((binterior) && (IsSpellTarget(MagicSystem::GetPipBoyLightSpell(), true))) {
+            Interface::GetPipboy()->ShowPipboyLightEffect(true, false, true);
+            Interface::GetPipboy()->ShowPipboyLightEffect(false, false, true);
+            Dispel(MagicSystem::GetPipBoyLightSpell(), nullptr, nullptr);
         }
+
         TES::pInstance->LeaveInterior(&aPos);
     }
     BSAudio::QInstance().EndAllMovingSounds();
@@ -10300,12 +10194,11 @@ void PlayerCharacter::ClearCellsIfTargetNotLoaded(TESObjectCELL* apTarget, TESWo
         else {
             pnode = nullptr;
         }
-        if (pnode) {
-            if (pnode->m_pkParent) {
-                NiNode* Parent = pnode->m_pkParent;
-                Parent->DetachChild(p3D);
-            }
+        if ((pnode) && (pnode->m_pkParent)) {
+            NiNode* Parent = pnode->m_pkParent;
+            Parent->DetachChild(p3D);
         }
+
         MemoryLevelManager::BeginMemoryFree(&freedata, false, true, false);
         TES::pInstance->ClearAllCells(false, true);
         ProcessLists::bIsForciblyUpdated = true;
@@ -10527,12 +10420,8 @@ void PlayerCharacter::UpdateCamera(bool abForce, bool abSkipUpdateLOD) {
                     p1stPersonBip->Update(UpdateData_2);
                 }
             }
-            if (pCameraCaster) {
-                if (pCameraCaster->GetWorld()) {
-                    if (pVATS.eMode != VATS::VATS_PLAYBACK) {
-                        pCameraCaster->Remove();
-                    }
-                }
+            if ((pCameraCaster) && (pCameraCaster->GetWorld()) && (pVATS.eMode != VATS::VATS_PLAYBACK)) {
+                pCameraCaster->Remove();
             }
         }
     }
@@ -10598,31 +10487,30 @@ void PlayerCharacter::UpdateCamera(bool abForce, bool abSkipUpdateLOD) {
         kLastGrassUpdatePos = *::new (&v85) NiPoint3(currentPos.x, currentPos.y, 0.0f);
         kLastGrassUpdateDir = kcurDir_2;
     }
-    if (!abSkipUpdateLOD) {
-        if (GetWorldSpace()) {
-            TESWorldSpace* WorldSpace = GetWorldSpace();
-            BGSTerrainManager* TerrainManager = WorldSpace->GetTerrainManager();
-            if (TerrainManager->bNeedsImmediateUpdate) {
-                const NiPoint3* v57 = &GetLocationOnReference();
-                TESWorldSpace* v40 = GetWorldSpace();
-                BGSTerrainManager* v41 = v40->GetTerrainManager();
-                v41->Update(*v57, BGSTerrainManager::UPDATE_ALL);
-            }
-            else {
-                if (fmovedistLOD > 512.0 || abForce) {
-                    const NiPoint3* v58 = &GetLocationOnReference();
-                    TESWorldSpace* v42 = GetWorldSpace();
-                    BGSTerrainManager* v43 = v42->GetTerrainManager();
-                    v43->Update(*v58, BGSTerrainManager::UPDATE_ALL);
-                    kLastLODUpdatePos = *::new (&v84) NiPoint3(currentPos.x, currentPos.y, 0.0f);
-                }
-            }
-            const NiPoint3* v70 = &GetLocationOnReference();
-            TESWorldSpace* v44 = GetWorldSpace();
-            BGSTerrainManager* v45 = v44->GetTerrainManager();
-            v45->UpdateMorphParameters(*v70);
+    if ((!abSkipUpdateLOD) && (GetWorldSpace())) {
+        TESWorldSpace* WorldSpace = GetWorldSpace();
+        BGSTerrainManager* TerrainManager = WorldSpace->GetTerrainManager();
+        if (TerrainManager->bNeedsImmediateUpdate) {
+            const NiPoint3* v57 = &GetLocationOnReference();
+            TESWorldSpace* v40 = GetWorldSpace();
+            BGSTerrainManager* v41 = v40->GetTerrainManager();
+            v41->Update(*v57, BGSTerrainManager::UPDATE_ALL);
         }
+        else {
+            if (fmovedistLOD > 512.0 || abForce) {
+                const NiPoint3* v58 = &GetLocationOnReference();
+                TESWorldSpace* v42 = GetWorldSpace();
+                BGSTerrainManager* v43 = v42->GetTerrainManager();
+                v43->Update(*v58, BGSTerrainManager::UPDATE_ALL);
+                kLastLODUpdatePos = *::new (&v84) NiPoint3(currentPos.x, currentPos.y, 0.0f);
+            }
+        }
+        const NiPoint3* v70 = &GetLocationOnReference();
+        TESWorldSpace* v44 = GetWorldSpace();
+        BGSTerrainManager* v45 = v44->GetTerrainManager();
+        v45->UpdateMorphParameters(*v70);
     }
+
     if (p1stPersonCamera) {
         Cached1stPersonCameraPos = p1stPersonCamera->GetWorldTranslate();
     }
@@ -11338,11 +11226,10 @@ void PlayerCharacter::UpdateFlyCamera(float afDelta, bool abFreezeTime) {
         }
         uint16_t slastMoveMode = GetMoveMode();
         smoveMode = slastMoveMode & 0xCC00;
-        if (pVATS.eMode) {
-            if (UpdateHeadingAndLooking(afDelta, false, &smoveMode, false)) {
-                buserInput = true;
-            }
+        if ((pVATS.eMode) && (UpdateHeadingAndLooking(afDelta, false, &smoveMode, false))) {
+            buserInput = true;
         }
+
         int32_t imouseX = 0;
         int32_t v50 = 0;
         int32_t v54 = 0;
@@ -11537,46 +11424,44 @@ void PlayerCharacter::UpdateFlyCamera(float afDelta, bool abFreezeTime) {
                     }
                 }
             }
-            if (pcontrols->GetUserAction(Controls::UACTN_JUMP, 1)) {
-                if (!IsOverEncumbered()) {
-                    Animation* v6 = GetAnimation();
-                    uint16_t Group = v6->GetGroup(AGS_WEAPON);
-                    if (!TESAnimGroup::IsPowerAttackAction(Group) && GetAnimAction() != ANIM_ACTION_DODGE) {
-                        bool v19 = !IsJumping() && !IsSwimming();
-                        bool bsuccess = false;
-                        bool bpressingBlock = pcontrols->GetUserAction(Controls::UACTN_BLOCK, 0) != 0;
-                        bool bblocking = GetBlocked();
-                        if (bpressingBlock) {
-                            if (Interface::GetActivateREFR()) {
-                                if (!bblocking) {
-                                    bhkCharacterController* CharController = GetCharController();
-                                    if (static_cast<uint8_t>(CharController->CanJump())) {
-                                        bsuccess = Jump() != nullptr;
-                                    }
-                                }
-                            }
-                            else {
-                                bhkCharacterController* v8 = GetCharController();
-                                if (v8->GetState() == HK_CHARACTER_ON_GROUND) {
-                                    // Dodge takes the move mode's low byte.
-                                    ANIM_GROUP_ENUM eresult = Dodge(static_cast<uint8_t>(smoveMode));
-                                    bsuccess = eresult != ANIM_GROUP_NONE;
+            if ((pcontrols->GetUserAction(Controls::UACTN_JUMP, 1)) && (!IsOverEncumbered())) {
+                Animation* v6 = GetAnimation();
+                uint16_t Group = v6->GetGroup(AGS_WEAPON);
+                if (!TESAnimGroup::IsPowerAttackAction(Group) && GetAnimAction() != ANIM_ACTION_DODGE) {
+                    bool v19 = !IsJumping() && !IsSwimming();
+                    bool bsuccess = false;
+                    bool bpressingBlock = pcontrols->GetUserAction(Controls::UACTN_BLOCK, 0) != 0;
+                    bool bblocking = GetBlocked();
+                    if (bpressingBlock) {
+                        if (Interface::GetActivateREFR()) {
+                            if (!bblocking) {
+                                bhkCharacterController* CharController = GetCharController();
+                                if (static_cast<uint8_t>(CharController->CanJump())) {
+                                    bsuccess = Jump() != nullptr;
                                 }
                             }
                         }
                         else {
-                            bhkCharacterController* v10 = GetCharController();
-                            if (static_cast<uint8_t>(v10->CanJump())) {
-                                bsuccess = Jump() != nullptr;
+                            bhkCharacterController* v8 = GetCharController();
+                            if (v8->GetState() == HK_CHARACTER_ON_GROUND) {
+                                // Dodge takes the move mode's low byte.
+                                ANIM_GROUP_ENUM eresult = Dodge(static_cast<uint8_t>(smoveMode));
+                                bsuccess = eresult != ANIM_GROUP_NONE;
                             }
                         }
-                        ForcePhysicsGrabDrop();
-                        if (v19 && bsuccess) {
-                            bhkCharacterController* v11 = GetCharController();
-                            v11->CanJump();
-                        }
-                        buserInput = true;
                     }
+                    else {
+                        bhkCharacterController* v10 = GetCharController();
+                        if (static_cast<uint8_t>(v10->CanJump())) {
+                            bsuccess = Jump() != nullptr;
+                        }
+                    }
+                    ForcePhysicsGrabDrop();
+                    if (v19 && bsuccess) {
+                        bhkCharacterController* v11 = GetCharController();
+                        v11->CanJump();
+                    }
+                    buserInput = true;
                 }
             }
         }
@@ -11593,56 +11478,48 @@ void PlayerCharacter::UpdateFlyCamera(float afDelta, bool abFreezeTime) {
         if (imouseX || (v50 || (smoveMode & 15) != 0)) {
             buserInput = true;
         }
-        if (pcontrols->GetUserAction(Controls::UACTN_ACTIVATE, 1)) {
-            if (!Interface::IsInMenuMode() && !GetControlsDisabled(PlayerCharacter::DPC_MOVEMENT) && !IsParalyzed() &&
-                !bdropping) {
-                Actor* pactor = static_cast<Actor*>(Interface::GetActivateREFR());
-                bool bcheckFurniture = true;
-                bool bskipActivate = false;
-                if (pactor) {
-                    if (pactor->IsFurniture() && GetIronSights()) {
-                        bskipActivate = true;
-                    }
-                }
-                if (pactor) {
-                    if (pactor->IsProjectile()) {
-                        TESObjectCONT* parrow = static_cast<TESObjectCONT*>(
-                            FNVD_DYNAMIC_CAST_VOID(ArrowProjectile)(pactor, RTTI_TESObjectREFR, RTTI_ArrowProjectile)
-                        );
-                        if (parrow) {
-                            if (!parrow->GetOpenSound()) {
-                                bskipActivate = true;
-                            }
-                        }
-                    }
-                }
-                if (pactor) {
-                    if (pactor->IsActor()) {
-                        TESObjectREFR* pref = (TESObjectREFR*)pactor;
-                        BaseProcess* pprocess = pactor->pCurrentProcess;
-                        if (pprocess->GetFadeState() == BaseProcess::FADE_OUT_DISABLE ||
-                            pprocess->GetFadeState() == BaseProcess::FADE_OUT_DELETE) {
-                            bskipActivate = true;
-                        }
-                    }
-                }
-                if (!bskipActivate) {
-                    Interface::SetInfoForRef(nullptr, false, false);
-                    if (pactor) {
-                        if (pactor->Activate(this, false, nullptr, 1)) {
-                            bcheckFurniture = false;
-                        }
-                    }
-                    if (bcheckFurniture) {
-                        if (pCurrentProcess->GetCurrentFurniture()) {
-                            TESObjectREFR* pref_2 = pCurrentProcess->GetCurrentFurniture();
-                            pref_2->Activate(this, false, nullptr, 1);
-                        }
-                    }
-                }
-                buserInput = true;
+        if ((pcontrols->GetUserAction(Controls::UACTN_ACTIVATE, 1)) &&
+            (!Interface::IsInMenuMode() && !GetControlsDisabled(PlayerCharacter::DPC_MOVEMENT) && !IsParalyzed() &&
+             !bdropping)) {
+            Actor* pactor = static_cast<Actor*>(Interface::GetActivateREFR());
+            bool bcheckFurniture = true;
+            bool bskipActivate = false;
+            if ((pactor) && (pactor->IsFurniture() && GetIronSights())) {
+                bskipActivate = true;
             }
+
+            if ((pactor) && (pactor->IsProjectile())) {
+                TESObjectCONT* parrow = static_cast<TESObjectCONT*>(
+                    FNVD_DYNAMIC_CAST_VOID(ArrowProjectile)(pactor, RTTI_TESObjectREFR, RTTI_ArrowProjectile)
+                );
+                if ((parrow) && (!parrow->GetOpenSound())) {
+                    bskipActivate = true;
+                }
+            }
+
+            if ((pactor) && (pactor->IsActor())) {
+                TESObjectREFR* pref = (TESObjectREFR*)pactor;
+                BaseProcess* pprocess = pactor->pCurrentProcess;
+                if (pprocess->GetFadeState() == BaseProcess::FADE_OUT_DISABLE ||
+                    pprocess->GetFadeState() == BaseProcess::FADE_OUT_DELETE) {
+                    bskipActivate = true;
+                }
+            }
+
+            if (!bskipActivate) {
+                Interface::SetInfoForRef(nullptr, false, false);
+                if ((pactor) && (pactor->Activate(this, false, nullptr, 1))) {
+                    bcheckFurniture = false;
+                }
+
+                if ((bcheckFurniture) && (pCurrentProcess->GetCurrentFurniture())) {
+                    TESObjectREFR* pref_2 = pCurrentProcess->GetCurrentFurniture();
+                    pref_2->Activate(this, false, nullptr, 1);
+                }
+            }
+            buserInput = true;
         }
+
         if (pPlayerSphere) {
             uint32_t v13 = iFlyCameraFrameCount++;
             if (v13 < 20) {
@@ -11677,19 +11554,16 @@ void PlayerCharacter::UpdateFlyCamera(float afDelta, bool abFreezeTime) {
             v16->Update(afDelta, this);
         }
     }
-    if (pcontrols->GetUserAction(Controls::UACTN_QUICKSAVE, 1)) {
-        if (!bQuickSaving) {
-            bQuickSaving = 1;
-            pSaveLoadManager->Quicksave();
-            bQuickSaving = 0;
-        }
+    if ((pcontrols->GetUserAction(Controls::UACTN_QUICKSAVE, 1)) && (!bQuickSaving)) {
+        bQuickSaving = 1;
+        pSaveLoadManager->Quicksave();
+        bQuickSaving = 0;
     }
-    if (pcontrols->GetUserAction(Controls::UACTN_QUICKLOAD, 1)) {
-        if (!bQuickLoading) {
-            bQuickLoading = 1;
-            pSaveLoadManager->Quickload();
-            bQuickLoading = 0;
-        }
+
+    if ((pcontrols->GetUserAction(Controls::UACTN_QUICKLOAD, 1)) && (!bQuickLoading)) {
+        bQuickLoading = 1;
+        pSaveLoadManager->Quickload();
+        bQuickLoading = 0;
     }
 }
 
@@ -11747,44 +11621,41 @@ bool PlayerCharacter::CheckUserInputAttacks() {
             --ivatsAttackDelay;
         }
         else if (
-            pCurrentAction && ActionPoints::IsAttackAction(pCurrentAction->eAction) && pCurrentAction->cFireShots &&
-            !pCurrentAction->bStranger && !pCurrentAction->bMissFortune
+            (pCurrentAction && ActionPoints::IsAttackAction(pCurrentAction->eAction) && pCurrentAction->cFireShots &&
+             !pCurrentAction->bStranger && !pCurrentAction->bMissFortune) &&
+            ((pWeapon && pWeapon->IsAutomaticWeapon()) ||
+             ((TESAnimGroup::GetType(pAnimation->GetGroup(AGS_WEAPON)) == ANIM_GROUP_AIM ||
+               TESAnimGroup::GetType(pAnimation->GetGroup(AGS_WEAPON)) == ANIM_GROUP_AIM_IS) &&
+              pAnimation->GetCurrentSequence(AGS_WEAPON)->GetState() == NiControllerSequence::kAnimating &&
+              (!pAnimation->GetCurrentSequence(AGS_WEAPON_UP) ||
+               pAnimation->GetCurrentSequence(AGS_WEAPON_UP)->GetState() == NiControllerSequence::kAnimating) &&
+              (!pAnimation->GetCurrentSequence(AGS_WEAPON_DOWN) ||
+               pAnimation->GetCurrentSequence(AGS_WEAPON_DOWN)->GetState() == NiControllerSequence::kAnimating)))
         ) {
-            if ((pWeapon && pWeapon->IsAutomaticWeapon()) ||
-                ((TESAnimGroup::GetType(pAnimation->GetGroup(AGS_WEAPON)) == ANIM_GROUP_AIM ||
-                  TESAnimGroup::GetType(pAnimation->GetGroup(AGS_WEAPON)) == ANIM_GROUP_AIM_IS) &&
-                 pAnimation->GetCurrentSequence(AGS_WEAPON)->GetState() == NiControllerSequence::kAnimating &&
-                 (!pAnimation->GetCurrentSequence(AGS_WEAPON_UP) ||
-                  pAnimation->GetCurrentSequence(AGS_WEAPON_UP)->GetState() == NiControllerSequence::kAnimating) &&
-                 (!pAnimation->GetCurrentSequence(AGS_WEAPON_DOWN) ||
-                  pAnimation->GetCurrentSequence(AGS_WEAPON_DOWN)->GetState() == NiControllerSequence::kAnimating))) {
-                bool bFire = false;
-                if (pVATS.GetMeleeAttack() ||
-                    ((!pWeapon || pWeapon->IsMeleeWeapon()) && pVATS.GetCurrentCamera() &&
-                     pVATS.GetCurrentCamera()->IsInitialized() && pVATS.GetCurrentCameraMinTimer() <= 0.0)) {
-                    if (pAnimation->SpecialIdleLoaded() && !pAnimation->IsIdleNotLoaded(pVATS.GetMeleeAttack())) {
-                        bFire = true;
-                    }
-                }
-                else {
+            bool bFire = false;
+            if (pVATS.GetMeleeAttack() ||
+                ((!pWeapon || pWeapon->IsMeleeWeapon()) && pVATS.GetCurrentCamera() &&
+                 pVATS.GetCurrentCamera()->IsInitialized() && pVATS.GetCurrentCameraMinTimer() <= 0.0)) {
+                if (pAnimation->SpecialIdleLoaded() && !pAnimation->IsIdleNotLoaded(pVATS.GetMeleeAttack())) {
                     bFire = true;
                 }
-                if (bFire) {
-                    pControls->ForceUserAction(Controls::UACTN_USE);
-                    if (!pWeapon || !pWeapon->IsAutomaticWeapon()) {
-                        ivatsAttackDelay = 3;
-                        switch (pCurrentAction->eAction) {
-                            case ActionPoints::ACTION_ATTACK_UNARMED:
-                            case ActionPoints::ACTION_ATTACK_ONE_HAND_MELEE:
-                            case ActionPoints::ACTION_ATTACK_TWO_HAND_MELEE:
-                            case ActionPoints::ACTION_PLAYER_SPECIAL_WEAPON_ATTACK:
-                            case ActionPoints::ACTION_PLAYER_SPECIAL_UNARMED_ATTACK:
-                            case ActionPoints::ACTION_PLAYER_SPECIAL_UNARMED_ATTACK_2:
-                            case ActionPoints::ACTION_PLAYER_SPECIAL_UNARMED_ATTACK_3:
-                                --pCurrentAction->cFireShots;
-                                break;
-                            default: break;
-                        }
+            }
+            else {
+                bFire = true;
+            }
+            if (bFire) {
+                pControls->ForceUserAction(Controls::UACTN_USE);
+                if (!pWeapon || !pWeapon->IsAutomaticWeapon()) {
+                    ivatsAttackDelay = 3;
+                    switch (pCurrentAction->eAction) {
+                        case ActionPoints::ACTION_ATTACK_UNARMED:
+                        case ActionPoints::ACTION_ATTACK_ONE_HAND_MELEE:
+                        case ActionPoints::ACTION_ATTACK_TWO_HAND_MELEE:
+                        case ActionPoints::ACTION_PLAYER_SPECIAL_WEAPON_ATTACK:
+                        case ActionPoints::ACTION_PLAYER_SPECIAL_UNARMED_ATTACK:
+                        case ActionPoints::ACTION_PLAYER_SPECIAL_UNARMED_ATTACK_2:
+                        case ActionPoints::ACTION_PLAYER_SPECIAL_UNARMED_ATTACK_3: --pCurrentAction->cFireShots; break;
+                        default: break;
                     }
                 }
             }
@@ -12538,9 +12409,8 @@ NiAVObject* PlayerCharacter::Get3D(bool abFirstPerson) {
     if (abFirstPerson) {
         return (&sp1stPerson3D)->operator->();
     }
-    else {
-        return TESObjectREFR::Get3D();
-    }
+
+    return TESObjectREFR::Get3D();
 }
 
 void PlayerCharacter::ResetShapeCasterInfo() {
@@ -12821,19 +12691,17 @@ void PlayerCharacter::Show1stPerson(bool abFirstPerson) {
             else {
                 pnodeTo = nullptr;
             }
-            if (pnodeFrom) {
-                if (pnodeTo) {
-                    for (uint32_t I = 0;; ++I) {
-                        uint32_t ArrayCount = pnodeFrom->GetArrayCount();
-                        if (I >= ArrayCount) {
-                            break;
-                        }
-                        NiPointer<NiAVObject> pchild(static_cast<NiAVObject*>(nullptr));
-                        pnodeFrom->DetachChildAt(I, pchild);
-                        if (pchild.operator!=(static_cast<NiAVObject*>(nullptr))) {
-                            NiAVObject* v19 = pchild.m_pObject;
-                            pnodeTo->AttachChild(v19, 1);
-                        }
+            if ((pnodeFrom) && (pnodeTo)) {
+                for (uint32_t I = 0;; ++I) {
+                    uint32_t ArrayCount = pnodeFrom->GetArrayCount();
+                    if (I >= ArrayCount) {
+                        break;
+                    }
+                    NiPointer<NiAVObject> pchild(static_cast<NiAVObject*>(nullptr));
+                    pnodeFrom->DetachChildAt(I, pchild);
+                    if (pchild.operator!=(static_cast<NiAVObject*>(nullptr))) {
+                        NiAVObject* v19 = pchild.m_pObject;
+                        pnodeTo->AttachChild(v19, 1);
                     }
                 }
             }
@@ -12954,11 +12822,10 @@ void PlayerCharacter::AddPlayerAction(PLAYER_ACTION aeAction, float afTime, TESO
         PlayerActionObject* v12 = nullptr;
         while (plist && (plist->m_item && !pobject)) {
             PlayerActionObject* pAction = plist->m_item;
-            if (pAction) {
-                if (pAction->eAction == aeAction) {
-                    pobject = pAction;
-                }
+            if ((pAction) && (pAction->eAction == aeAction)) {
+                pobject = pAction;
             }
+
             plist = plist->m_pkNext;
         }
         if (pobject) {
@@ -13238,20 +13105,18 @@ void PlayerCharacter::CheckForQuestTargetUpdate(TESObjectREFR* apMovingRef) {
 }
 
 void PlayerCharacter::BuildPathToTarget(TESObjectREFR* apTargetRef, TeleportPath* apOutResultPath, bool abIgnoreLocks) {
-    if (apTargetRef) {
-        if (apOutResultPath) {
-            // Destroyed in reverse order: the path, the marker's location, then the player's, as the game does.
-            PathingLocation kPlayerPathing(pPlayer);
-            PathingLocation kMarkerPathing(apTargetRef);
-            TeleportPath kPath;
-            ActorLockData apMemory(pPlayer);
+    if ((apTargetRef) && (apOutResultPath)) {
+        // Destroyed in reverse order: the path, the marker's location, then the player's, as the game does.
+        PathingLocation kPlayerPathing(pPlayer);
+        PathingLocation kMarkerPathing(apTargetRef);
+        TeleportPath kPath;
+        ActorLockData apMemory(pPlayer);
+        apOutResultPath->Clear();
+        if (!Pathing::BuildLowPath(
+                kPlayerPathing, kMarkerPathing, apOutResultPath, &apMemory,
+                Pathing::DOOR_LOCK_DISPOSITION_LOCKS_ARE_MINIMAL_USE
+            )) {
             apOutResultPath->Clear();
-            if (!Pathing::BuildLowPath(
-                    kPlayerPathing, kMarkerPathing, apOutResultPath, &apMemory,
-                    Pathing::DOOR_LOCK_DISPOSITION_LOCKS_ARE_MINIMAL_USE
-                )) {
-                apOutResultPath->Clear();
-            }
         }
     }
 }
@@ -13370,10 +13235,9 @@ void PlayerCharacter::SetLastSpaceForDoor(TESObjectDOOR* apDoor, uint8_t acSpace
 // Sets the mode on the global player's mover, not on this, as the game does.
 void PlayerCharacter::SetMoveMode(uint32_t aiMoveMode, bool abValue) {
     static_cast<PlayerMover*>(pPlayer->pActorMover)->SetMoveMode(aiMoveMode, abValue);
-    if ((aiMoveMode & 0x400) && GetAnimation(false)) {
-        if (TESAnimGroup::GetType(GetAnimation()->GetGroup(AGS_WEAPON)) == ANIM_GROUP_AIM) {
-            GetAnimation(false)->BlendOut(AGS_WEAPON, false);
-        }
+    if (((aiMoveMode & 0x400) && GetAnimation(false)) &&
+        (TESAnimGroup::GetType(GetAnimation()->GetGroup(AGS_WEAPON)) == ANIM_GROUP_AIM)) {
+        GetAnimation(false)->BlendOut(AGS_WEAPON, false);
     }
 }
 
@@ -13561,13 +13425,11 @@ void PlayerCharacter::EnteringMenuMode() {
     BaseProcess* currentAIProcess;
     if (ArrowProjectile::GetArrowCount() > 0) {
         currentAIProcess = MobileObject::GetCurrentAIProcess();
-        if (currentAIProcess) {
-            if (currentAIProcess->GetCurrentAmmo()) {
-                v2 = currentAIProcess->GetCurrentAmmo();
-                apObject = v2->ItemChange::GetItemChangeObject();
-                if (apObject) {
-                    ProcessLists::DeleteAttachedArrows(apObject, 2147483647, this, 1, 1);
-                }
+        if ((currentAIProcess) && (currentAIProcess->GetCurrentAmmo())) {
+            v2 = currentAIProcess->GetCurrentAmmo();
+            apObject = v2->ItemChange::GetItemChangeObject();
+            if (apObject) {
+                ProcessLists::DeleteAttachedArrows(apObject, 2147483647, this, 1, 1);
             }
         }
     }
@@ -13600,11 +13462,10 @@ void PlayerCharacter::DestroyMouseSpring() {
     spGrabSpring.operator=(static_cast<bhkMouseSpringAction*>(nullptr));
     eGrabType = PlayerCharacter::GRAB_NONE;
     fGrabObjectWeight = 0.0f;
-    if (pGrabbedObject) {
-        if (pGrabbedObject->IsReference()) {
-            Script::SetActionFlag(nullptr, &pGrabbedObject->m_Extra, SCRIPT_ACTION_ONRELEASE);
-        }
+    if ((pGrabbedObject) && (pGrabbedObject->IsReference())) {
+        Script::SetActionFlag(nullptr, &pGrabbedObject->m_Extra, SCRIPT_ACTION_ONRELEASE);
     }
+
     pGrabbedObject = nullptr;
 }
 
@@ -14076,9 +13937,8 @@ int32_t PlayerCharacter::GetNumberActorsInCombat() {
     if (pCombatGroup) {
         return (int32_t)pCombatGroup->GetTargetCount();
     }
-    else {
-        return 0;
-    }
+
+    return 0;
 }
 
 void PlayerCharacter::SetNeedResetHardcoreTimer(bool aNeedReset) {
@@ -14211,15 +14071,13 @@ void PlayerCharacter::Setup3rdPersonCameraCaster() {
     TESObjectCELL* parentCell;
     TESObjectCELL* v3;
     bhkWorld* havokWorld;
-    if (pCameraCaster) {
-        if (TESObjectREFR::GetParentCell()) {
-            v1 = static_cast<bhkWorldM*>(pCameraCaster->GetWorld());
-            parentCell = TESObjectREFR::GetParentCell();
-            if (static_cast<const void*>(v1) != static_cast<const void*>(parentCell->GetbhkWorld())) {
-                v3 = TESObjectREFR::GetParentCell();
-                havokWorld = v3->GetbhkWorld();
-                pCameraCaster->Add(havokWorld);
-            }
+    if ((pCameraCaster) && (TESObjectREFR::GetParentCell())) {
+        v1 = static_cast<bhkWorldM*>(pCameraCaster->GetWorld());
+        parentCell = TESObjectREFR::GetParentCell();
+        if (static_cast<const void*>(v1) != static_cast<const void*>(parentCell->GetbhkWorld())) {
+            v3 = TESObjectREFR::GetParentCell();
+            havokWorld = v3->GetbhkWorld();
+            pCameraCaster->Add(havokWorld);
         }
     }
 }
@@ -14267,9 +14125,9 @@ Actor* PlayerCharacter::GetBumpedActor() {
     if (referenceFor3D && referenceFor3D->IsActor()) {
         return static_cast<Actor*>(referenceFor3D);
     }
-    else {
-        return nullptr;
-    }
+
+    return nullptr;
+
     return static_cast<Actor*>(reinterpret_cast<TESObjectREFR*>(static_cast<uintptr_t>(v6)));
 }
 
@@ -14285,9 +14143,8 @@ MediaLocationController* PlayerCharacter::GetMediaLocationController() {
             static_cast<AudioMarker*>(closestAudioMarkerInfo->pMarkerData)->GetMediaLocationController()
         );
     }
-    else {
-        return nullptr;
-    }
+
+    return nullptr;
 }
 
 char PlayerCharacter::GetInSleepPackage() {
@@ -14349,24 +14206,23 @@ int32_t PlayerCharacter::GetCurrentPotionCount() {
         else {
             pPotion = nullptr;
         }
-        if (pPotion) {
-            if (pPotion->GetSpellType() == MagicSystem::POTION) {
-                bool bQueued = EatDrinkItems && EatDrinkItems->IsInList(pPotion);
-                if (!bQueued) {
-                    bool bFound = false;
-                    for (int32_t k = 0; (k < iMax) && !bFound; ++k) {
-                        if (!pPotions[k]) {
-                            pPotions[k] = pPotion;
-                            pEffectCounts[k] = 1;
-                            ++iCount;
-                            bFound = true;
-                        }
-                        else if (pPotions[k] == pPotion) {
-                            if (pEffectCounts[k] < static_cast<uint32_t>(pPotions[k]->ItemsInList())) {
-                                ++pEffectCounts[k];
-                                bFound = true;
-                            }
-                        }
+        if ((pPotion) && (pPotion->GetSpellType() == MagicSystem::POTION)) {
+            bool bQueued = EatDrinkItems && EatDrinkItems->IsInList(pPotion);
+            if (!bQueued) {
+                bool bFound = false;
+                for (int32_t k = 0; (k < iMax) && !bFound; ++k) {
+                    if (!pPotions[k]) {
+                        pPotions[k] = pPotion;
+                        pEffectCounts[k] = 1;
+                        ++iCount;
+                        bFound = true;
+                    }
+                    else if (
+                        (pPotions[k] == pPotion) &&
+                        (pEffectCounts[k] < static_cast<uint32_t>(pPotions[k]->ItemsInList()))
+                    ) {
+                        ++pEffectCounts[k];
+                        bFound = true;
                     }
                 }
             }
@@ -14484,17 +14340,16 @@ void PlayerCharacter::DoIronSightsZoom(float afDelta) {
         [[maybe_unused]] float fzoomScale = 1.0f;
         SceneGraph* WorldSceneGraph = Main::GetWorldSceneGraph();
         WorldSceneGraph->GetCamera()->SetViewPort(BSShaderManager::kFramebufferViewport);
-        if (pweapon) {
-            if (pCurrentProcess->GetWeaponDrawn()) {
-                float a1 = pweapon->GetIronSightFOV();
-                fzoom = std::fabs(a1);
-                ItemChange* pchange = pCurrentProcess->GetCurrentWeapon();
-                fextraZoom = 0.0f;
-                if (pchange->HasModEffectActive(WEAPON_MOD_IRON_SITES, fextraZoom)) {
-                    fzoom = fzoom - fextraZoom;
-                }
+        if ((pweapon) && (pCurrentProcess->GetWeaponDrawn())) {
+            float a1 = pweapon->GetIronSightFOV();
+            fzoom = std::fabs(a1);
+            ItemChange* pchange = pCurrentProcess->GetCurrentWeapon();
+            fextraZoom = 0.0f;
+            if (pchange->HasModEffectActive(WEAPON_MOD_IRON_SITES, fextraZoom)) {
+                fzoom = fzoom - fextraZoom;
             }
         }
+
         if (IsPipboyActive()) {
             if (GetIronSights()) {
                 SetIronSights(false, false, false);
@@ -14674,223 +14529,213 @@ void PlayerCharacter::CreateMouseSpring(
     if (bAllowHavokGrabTheLiving.Bool() || (!apObject->IsActor() || apObject->IsDead(false))) {
         Projectile* pprojectile;
         // A grenade projectile that is a live mine is never grabbed.
-        if (!apObject ||
-            (!apObject->IsProjectile() ||
-             ((pprojectile = static_cast<Projectile*>(apObject),
-               pprojectile->GetProjectileType() != Projectile::PROJECTILE_TYPE_GRENADE) ||
-              (!pprojectile->IsMine() || pprojectile->IsFlagSet(Projectile::TURNED_OFF))))) {
-            if (apObject) {
-                if (apObject->GetParentCell()) {
-                    NiNode* pav = apObject->Get3D();
-                    bhkRigidBody* pbody = bhkRigidBody::FindHeaviestRigidBody(pav);
-                    if (pbody) {
-                        NiPoint3 point;
-                        NiPoint3 dir;
-                        int32_t bnormalGrabSuccess = BSXFlags::FindFlag(pav, BSXFlags::COMPLEX) || apObject->IsActor();
-                        bool v75 = bnormalGrabSuccess;
-                        this->pGrabbedObject = apObject;
-                        // The script action bit 0x80000 has no name in OBJECT_ACTION.
-                        Script::SetActionFlag(nullptr, &this->pGrabbedObject->m_Extra, SCRIPT_ACTION_ONGRAB);
-                        this->eGrabType = aeGrabType;
-                        this->fGrabDistance = afDistance;
-                        hkMouseSpringActionCinfo v74;
-                        fmassTotal = 0.0f;
-                        if (v75 && apObject->IsActor()) {
-                            GetTotalMassData(pav, &hkvCenterOfMass, &fmassTotal);
+        if ((!apObject ||
+             (!apObject->IsProjectile() ||
+              ((pprojectile = static_cast<Projectile*>(apObject),
+                pprojectile->GetProjectileType() != Projectile::PROJECTILE_TYPE_GRENADE) ||
+               (!pprojectile->IsMine() || pprojectile->IsFlagSet(Projectile::TURNED_OFF))))) &&
+            (apObject) && (apObject->GetParentCell())) {
+            NiNode* pav = apObject->Get3D();
+            bhkRigidBody* pbody = bhkRigidBody::FindHeaviestRigidBody(pav);
+            if (pbody) {
+                NiPoint3 point;
+                NiPoint3 dir;
+                int32_t bnormalGrabSuccess = BSXFlags::FindFlag(pav, BSXFlags::COMPLEX) || apObject->IsActor();
+                bool v75 = bnormalGrabSuccess;
+                this->pGrabbedObject = apObject;
+                // The script action bit 0x80000 has no name in OBJECT_ACTION.
+                Script::SetActionFlag(nullptr, &this->pGrabbedObject->m_Extra, SCRIPT_ACTION_ONGRAB);
+                this->eGrabType = aeGrabType;
+                this->fGrabDistance = afDistance;
+                hkMouseSpringActionCinfo v74;
+                fmassTotal = 0.0f;
+                if (v75 && apObject->IsActor()) {
+                    GetTotalMassData(pav, &hkvCenterOfMass, &fmassTotal);
+                }
+                else {
+                    pbody->GetCenterOfMassInWorld(hkvCenterOfMass);
+                }
+                this->GetEyeVector(point, dir, true);
+                char v69 = 0;
+                bhkWorld* pw = apObject->GetParentCell()->GetbhkWorld();
+                if ((this->eGrabType == PlayerCharacter::GRAB_NORMAL) && (pw) &&
+                    (!pSaveLoadGame->GetSaveGameLoading())) {
+                    if (Interface::IsActivatePickFuzzy() && ViewCaster::GetFuzzyBody()) {
+                        Interface::GetActivatePickLocation(&mousePoint);
+                        if (!pSaveLoadGame->GetSaveGameLoading()) {
+                            double v9 = (mousePoint - point).Length();
+                            this->fGrabDistance = v9;
                         }
-                        else {
-                            pbody->GetCenterOfMassInWorld(hkvCenterOfMass);
-                        }
-                        this->GetEyeVector(point, dir, true);
-                        char v69 = 0;
-                        bhkWorld* pw = apObject->GetParentCell()->GetbhkWorld();
-                        if (this->eGrabType == PlayerCharacter::GRAB_NORMAL) {
-                            if (pw) {
-                                if (!pSaveLoadGame->GetSaveGameLoading()) {
-                                    if (Interface::IsActivatePickFuzzy() && ViewCaster::GetFuzzyBody()) {
-                                        Interface::GetActivatePickLocation(&mousePoint);
-                                        if (!pSaveLoadGame->GetSaveGameLoading()) {
-                                            double v9 = (mousePoint - point).Length();
-                                            this->fGrabDistance = v9;
-                                        }
-                                        v74.m_mousePositionInWorld.NI2HK(mousePoint);
-                                        bhkRigidBody* pfuzzyBody = ViewCaster::GetFuzzyBody();
-                                        v74.m_body = pfuzzyBody->operator*();
-                                        v69 = 1;
-                                    }
-                                    else {
-                                        bhkPickData pd;
-                                        fltr.iFilter = 0;
-                                        fltr.SetLayer(L_ITEMPICKER);
-                                        // GetCollisionFilter returns its argument: the group is read from v65.
-                                        this->GetCollisionFilter(&v65.iFilter);
-                                        uint32_t Group = v65.GetGroup();
-                                        fltr.SetGroup(Group);
-                                        pd.SetFilter(fltr);
-                                        pd.NiSetFrom(point);
-                                        pd.NiSetLength(dir * this->fGrabDistance);
-                                        if (pw->PickObject(pd)) {
-                                            NiAVObject* ppickedAV;
-                                            hkpRigidBody* prb = pd.GethkRigidBody();
-                                            bhkCollisionObject* pcol = bhkCollisionObject::Getbhk(prb);
-                                            if (pcol) {
-                                                ppickedAV = pcol->m_pkSceneObject;
-                                            }
-                                            else {
-                                                ppickedAV = nullptr;
-                                            }
-                                            TESObjectREFR* ppickedRef = TESObjectREFR::FindReferenceFor3D(ppickedAV);
-                                            if (prb) {
-                                                if (ppickedRef == apObject) {
-                                                    if (!v75) {
-                                                        bhkRigidBody* pbhkbody =
-                                                            static_cast<bhkRigidBody*>(bhkEntity::Getbhk(prb));
-                                                        pbhkbody->GetCenterOfMassInWorld(hkvCenterOfMass);
-                                                    }
-                                                    v69 = 1;
-                                                    v74.m_body = prb;
-                                                    this->fGrabDistance = this->fGrabDistance * pd.m_hitFraction;
-                                                    NiPoint3 springLoc = point + dir * this->fGrabDistance;
-                                                    v74.m_mousePositionInWorld.NI2HK(springLoc);
-                                                }
-                                            }
-                                        }
-                                    }
-                                }
-                            }
-                        }
-                        if (!v69) {
-                            v74.m_mousePositionInWorld.operator=(hkvCenterOfMass);
-                            if (v75) {
-                                hkVector4 addition;
-                                NiPoint3* v10 =
-                                    ::new (&v49) NiPoint3((&pav->GetWorldTransform())->m_Rotate * NiPoint3_UNIT_Z);
-                                NI2HKNS(addition, *v10);
-                                v74.m_mousePositionInWorld.ToHK(tmphk);
-                                tmphk.add4(addition);
-                                v74.m_mousePositionInWorld.operator=(tmphk);
-                            }
-                            if (!pSaveLoadGame->GetSaveGameLoading()) {
-                                NiPoint3 mousePoint_2;
-                                hkVector4* v11 = &v74.m_mousePositionInWorld.ToHK(tmphk);
-                                HK2NI(mousePoint_2, *v11);
-                                double v13 = (mousePoint_2 - point).Length();
-                                this->fGrabDistance = v13;
-                            }
-                            v74.m_body = pbody->operator*();
-                        }
-                        if (this->eGrabType == PlayerCharacter::GRAB_NORMAL) {
-                            this->AddPlayerAction(PLAYER_ACTION_Z_KEY_OBJECT, 20.0f, apObject);
-                        }
-                        hkpRigidBody* phkbody = v74.m_body;
-                        if (!v74.m_body->m_world ||
-                            (phkbody->getMotionType() == hkpMotion::MOTION_FIXED ||
-                             phkbody->getMotionType() == hkpMotion::MOTION_KEYFRAMED)) {
-                            this->DestroyMouseSpring();
-                        }
-                        else {
-                            bhkMouseSpringAction* v29;
-                            hkVector4 hktemp;
-                            bhkCharacterController* pcon = this->GetCharController();
-                            if (pcon) {
-                                float a2 = pcon->GetRadius();
-                                float v44 = HK2NI(a2) + 5.0;
-                                if (v44 > static_cast<double>(this->fGrabDistance)) {
-                                    this->fGrabDistance = v44;
-                                }
-                            }
-                            if (this->eGrabType == PlayerCharacter::GRAB_TELEKINESIS) {
-                                if (v75) {
-                                    v74.m_springDamping = fMagicTelekinesisComplexSpringDamping.Float();
-                                    v74.m_springElasticity = fMagicTelekinesisComplexSpringElasticity.Float();
-                                    v74.m_objectDamping = fMagicTelekinesisComplexObjectDamping.Float();
-                                    v74.m_maxRelativeForce = fMagicTelekinesisComplexMaxForce.Float();
-                                }
-                                else {
-                                    v74.m_springDamping = fMagicTelekinesisSpringDamping.Float();
-                                    v74.m_springElasticity = fMagicTelekinesisSpringElasticity.Float();
-                                    v74.m_objectDamping = fMagicTelekinesisObjectDamping.Float();
-                                    v74.m_maxRelativeForce = fMagicTelekinesisMaxForce.Float();
-                                }
+                        v74.m_mousePositionInWorld.NI2HK(mousePoint);
+                        bhkRigidBody* pfuzzyBody = ViewCaster::GetFuzzyBody();
+                        v74.m_body = pfuzzyBody->operator*();
+                        v69 = 1;
+                    }
+                    else {
+                        bhkPickData pd;
+                        fltr.iFilter = 0;
+                        fltr.SetLayer(L_ITEMPICKER);
+                        // GetCollisionFilter returns its argument: the group is read from v65.
+                        this->GetCollisionFilter(&v65.iFilter);
+                        uint32_t Group = v65.GetGroup();
+                        fltr.SetGroup(Group);
+                        pd.SetFilter(fltr);
+                        pd.NiSetFrom(point);
+                        pd.NiSetLength(dir * this->fGrabDistance);
+                        if (pw->PickObject(pd)) {
+                            NiAVObject* ppickedAV;
+                            hkpRigidBody* prb = pd.GethkRigidBody();
+                            bhkCollisionObject* pcol = bhkCollisionObject::Getbhk(prb);
+                            if (pcol) {
+                                ppickedAV = pcol->m_pkSceneObject;
                             }
                             else {
-                                float fscaleForce = 1.0f;
-                                float v42 = 1.0f;
-                                if (this->pGrabbedObject->IsActor()) {
-                                    float fminWeight = fZKeyMaxForceWeightLow.Float();
-                                    float fmaxWeight = fZKeyMaxForceWeightHigh.Float();
-                                    float fscaleHigh = fZKeyMaxForceScaleHigh.Float();
-                                    float fscaleLow = fZKeyMaxForceScaleLow.Float();
-                                    float a2a = bhkUtilFunctions::GetTotalMass(pav);
-                                    float a2b = BSMAX(fminWeight, a2a);
-                                    float ftotalWeight = BSMIN(fmaxWeight, a2b);
-                                    fscaleForce = FLerp(fscaleLow, fscaleHigh, fmaxWeight, fminWeight, ftotalWeight) *
-                                        fscaleForce;
-                                    bool bonlyContactConstraints = true;
-                                    for (int32_t i = 0;; ++i) {
-                                        if (i >= phkbody->m_constraintsMaster.getSize() || !bonlyContactConstraints) {
-                                            break;
-                                        }
-                                        hkSmallArray<hkConstraintInternal>* v15 = &phkbody->m_constraintsMaster;
-                                        hkpConstraintData* DataCalled = (&v15->operator[](i))->m_constraint->m_data;
-                                        bonlyContactConstraints =
-                                            DataCalled->getType() == hkpConstraintData::CONSTRAINT_TYPE_CONTACT;
-                                    }
-                                    if (bonlyContactConstraints) {
-                                        v42 = v42 * 0.10000000149011612;
-                                        fscaleForce = fscaleForce * 0.20000000298023224;
-                                    }
+                                ppickedAV = nullptr;
+                            }
+                            TESObjectREFR* ppickedRef = TESObjectREFR::FindReferenceFor3D(ppickedAV);
+                            if ((prb) && (ppickedRef == apObject)) {
+                                if (!v75) {
+                                    bhkRigidBody* pbhkbody = static_cast<bhkRigidBody*>(bhkEntity::Getbhk(prb));
+                                    pbhkbody->GetCenterOfMassInWorld(hkvCenterOfMass);
                                 }
-                                else {
-                                    CFilter* v16 = pbody->GetCollisionFilter(&v33);
-                                    if (v16->GetLayer() == L_TRAP) {
-                                        v42 = v42 * 0.10000000149011612;
-                                        fscaleForce = fscaleForce * 0.5;
-                                    }
-                                }
-                                v74.m_springDamping = fZKeySpringDamping.Float();
-                                float* v17 = &fZKeySpringElasticity.Float();
-                                v74.m_springElasticity = *v17 * v42;
-                                v74.m_objectDamping = fZKeyObjectDamping.Float();
-                                float* v18 = &fZKeyMaxForce.Float();
-                                v74.m_maxRelativeForce = *v18 * fscaleForce;
+                                v69 = 1;
+                                v74.m_body = prb;
+                                this->fGrabDistance = this->fGrabDistance * pd.m_hitFraction;
+                                NiPoint3 springLoc = point + dir * this->fGrabDistance;
+                                v74.m_mousePositionInWorld.NI2HK(springLoc);
                             }
-                            v74.m_mousePositionInWorld.ToHK(hktemp);
-                            const hkVector4* Translation = &phkbody->getTranslation();
-                            hktemp.sub4(*Translation);
-                            const hkTransform* a1 = &phkbody->getTransform();
-                            hkVector4* v20 = &v74.m_positionInRbLocal.ToHK(hkv);
-                            v20->setRotatedInverseDir(a1->m_rotation, hktemp);
-                            v74.m_positionInRbLocal.operator=(hkv);
-                            this->pGrabbedObject->GetParentCell()->GetbhkWorld()->MarkForWrite();
-                            bhkMouseSpringAction* v30 = static_cast<bhkMouseSpringAction*>(
-                                NiMemObject::operator new(sizeof(bhkMouseSpringAction))
-                            );
-                            if (v30) {
-                                v29 = ::new (v30) bhkMouseSpringAction(v74);
-                            }
-                            else {
-                                v29 = nullptr;
-                            }
-                            this->spGrabSpring.operator=(v29);
-                            bhkMouseSpringAction* v28 = this->spGrabSpring.m_pObject;
-                            bhkWorld* v21 = this->pGrabbedObject->GetParentCell()->GetbhkWorld();
-                            v28->Add(v21);
-                            this->pGrabbedObject->GetParentCell()->GetbhkWorld()->MarkForWrite();
-                            NiNode* v22 = apObject->Get3D();
-                            double TotalMass = bhkUtilFunctions::GetTotalMass(v22);
-                            this->fGrabObjectWeight = TotalMass;
+                        }
+                    }
+                }
+
+                if (!v69) {
+                    v74.m_mousePositionInWorld.operator=(hkvCenterOfMass);
+                    if (v75) {
+                        hkVector4 addition;
+                        NiPoint3* v10 = ::new (&v49) NiPoint3((&pav->GetWorldTransform())->m_Rotate * NiPoint3_UNIT_Z);
+                        NI2HKNS(addition, *v10);
+                        v74.m_mousePositionInWorld.ToHK(tmphk);
+                        tmphk.add4(addition);
+                        v74.m_mousePositionInWorld.operator=(tmphk);
+                    }
+                    if (!pSaveLoadGame->GetSaveGameLoading()) {
+                        NiPoint3 mousePoint_2;
+                        hkVector4* v11 = &v74.m_mousePositionInWorld.ToHK(tmphk);
+                        HK2NI(mousePoint_2, *v11);
+                        double v13 = (mousePoint_2 - point).Length();
+                        this->fGrabDistance = v13;
+                    }
+                    v74.m_body = pbody->operator*();
+                }
+                if (this->eGrabType == PlayerCharacter::GRAB_NORMAL) {
+                    this->AddPlayerAction(PLAYER_ACTION_Z_KEY_OBJECT, 20.0f, apObject);
+                }
+                hkpRigidBody* phkbody = v74.m_body;
+                if (!v74.m_body->m_world ||
+                    (phkbody->getMotionType() == hkpMotion::MOTION_FIXED ||
+                     phkbody->getMotionType() == hkpMotion::MOTION_KEYFRAMED)) {
+                    this->DestroyMouseSpring();
+                }
+                else {
+                    bhkMouseSpringAction* v29;
+                    hkVector4 hktemp;
+                    bhkCharacterController* pcon = this->GetCharController();
+                    if (pcon) {
+                        float a2 = pcon->GetRadius();
+                        float v44 = HK2NI(a2) + 5.0;
+                        if (v44 > static_cast<double>(this->fGrabDistance)) {
+                            this->fGrabDistance = v44;
+                        }
+                    }
+                    if (this->eGrabType == PlayerCharacter::GRAB_TELEKINESIS) {
+                        if (v75) {
+                            v74.m_springDamping = fMagicTelekinesisComplexSpringDamping.Float();
+                            v74.m_springElasticity = fMagicTelekinesisComplexSpringElasticity.Float();
+                            v74.m_objectDamping = fMagicTelekinesisComplexObjectDamping.Float();
+                            v74.m_maxRelativeForce = fMagicTelekinesisComplexMaxForce.Float();
+                        }
+                        else {
+                            v74.m_springDamping = fMagicTelekinesisSpringDamping.Float();
+                            v74.m_springElasticity = fMagicTelekinesisSpringElasticity.Float();
+                            v74.m_objectDamping = fMagicTelekinesisObjectDamping.Float();
+                            v74.m_maxRelativeForce = fMagicTelekinesisMaxForce.Float();
                         }
                     }
                     else {
-                        if (aeGrabType == PlayerCharacter::GRAB_INVENTORY_DROP) {
-                            this->pGrabbedObject = apObject;
-                            // The script action bit 0x80000 has no name in OBJECT_ACTION.
-                            Script::SetActionFlag(nullptr, &this->pGrabbedObject->m_Extra, SCRIPT_ACTION_ONGRAB);
-                            this->eGrabType = PlayerCharacter::GRAB_INVENTORY_DROP;
-                            this->fGrabDistance = afDistance;
+                        float fscaleForce = 1.0f;
+                        float v42 = 1.0f;
+                        if (this->pGrabbedObject->IsActor()) {
+                            float fminWeight = fZKeyMaxForceWeightLow.Float();
+                            float fmaxWeight = fZKeyMaxForceWeightHigh.Float();
+                            float fscaleHigh = fZKeyMaxForceScaleHigh.Float();
+                            float fscaleLow = fZKeyMaxForceScaleLow.Float();
+                            float a2a = bhkUtilFunctions::GetTotalMass(pav);
+                            float a2b = BSMAX(fminWeight, a2a);
+                            float ftotalWeight = BSMIN(fmaxWeight, a2b);
+                            fscaleForce =
+                                FLerp(fscaleLow, fscaleHigh, fmaxWeight, fminWeight, ftotalWeight) * fscaleForce;
+                            bool bonlyContactConstraints = true;
+                            for (int32_t i = 0;; ++i) {
+                                if (i >= phkbody->m_constraintsMaster.getSize() || !bonlyContactConstraints) {
+                                    break;
+                                }
+                                hkSmallArray<hkConstraintInternal>* v15 = &phkbody->m_constraintsMaster;
+                                hkpConstraintData* DataCalled = (&v15->operator[](i))->m_constraint->m_data;
+                                bonlyContactConstraints =
+                                    DataCalled->getType() == hkpConstraintData::CONSTRAINT_TYPE_CONTACT;
+                            }
+                            if (bonlyContactConstraints) {
+                                v42 = v42 * 0.10000000149011612;
+                                fscaleForce = fscaleForce * 0.20000000298023224;
+                            }
                         }
+                        else {
+                            CFilter* v16 = pbody->GetCollisionFilter(&v33);
+                            if (v16->GetLayer() == L_TRAP) {
+                                v42 = v42 * 0.10000000149011612;
+                                fscaleForce = fscaleForce * 0.5;
+                            }
+                        }
+                        v74.m_springDamping = fZKeySpringDamping.Float();
+                        float* v17 = &fZKeySpringElasticity.Float();
+                        v74.m_springElasticity = *v17 * v42;
+                        v74.m_objectDamping = fZKeyObjectDamping.Float();
+                        float* v18 = &fZKeyMaxForce.Float();
+                        v74.m_maxRelativeForce = *v18 * fscaleForce;
                     }
+                    v74.m_mousePositionInWorld.ToHK(hktemp);
+                    const hkVector4* Translation = &phkbody->getTranslation();
+                    hktemp.sub4(*Translation);
+                    const hkTransform* a1 = &phkbody->getTransform();
+                    hkVector4* v20 = &v74.m_positionInRbLocal.ToHK(hkv);
+                    v20->setRotatedInverseDir(a1->m_rotation, hktemp);
+                    v74.m_positionInRbLocal.operator=(hkv);
+                    this->pGrabbedObject->GetParentCell()->GetbhkWorld()->MarkForWrite();
+                    bhkMouseSpringAction* v30 =
+                        static_cast<bhkMouseSpringAction*>(NiMemObject::operator new(sizeof(bhkMouseSpringAction)));
+                    if (v30) {
+                        v29 = ::new (v30) bhkMouseSpringAction(v74);
+                    }
+                    else {
+                        v29 = nullptr;
+                    }
+                    this->spGrabSpring.operator=(v29);
+                    bhkMouseSpringAction* v28 = this->spGrabSpring.m_pObject;
+                    bhkWorld* v21 = this->pGrabbedObject->GetParentCell()->GetbhkWorld();
+                    v28->Add(v21);
+                    this->pGrabbedObject->GetParentCell()->GetbhkWorld()->MarkForWrite();
+                    NiNode* v22 = apObject->Get3D();
+                    double TotalMass = bhkUtilFunctions::GetTotalMass(v22);
+                    this->fGrabObjectWeight = TotalMass;
+                }
+            }
+            else {
+                if (aeGrabType == PlayerCharacter::GRAB_INVENTORY_DROP) {
+                    this->pGrabbedObject = apObject;
+                    // The script action bit 0x80000 has no name in OBJECT_ACTION.
+                    Script::SetActionFlag(nullptr, &this->pGrabbedObject->m_Extra, SCRIPT_ACTION_ONGRAB);
+                    this->eGrabType = PlayerCharacter::GRAB_INVENTORY_DROP;
+                    this->fGrabDistance = afDistance;
                 }
             }
         }
@@ -15063,28 +14908,21 @@ TESObjectCELL* PlayerCharacter::GetWaterCell(float afCheckRadius) {
             if (v9) {
                 cell = TES::pInstance->GetGridCellCell(aiX, v9 + aiY);
             }
-            if (!cell || !cell->HasWater()) {
-                if (v14) {
-                    if (v9) {
-                        cell = TES::pInstance->GetGridCellCell(v14 + aiX, v9 + aiY);
-                        if (!cell || !cell->HasWater()) {
-                            if (v16) {
-                                GridCell* FirstGridCellWithWater = TES::pInstance->FindFirstGridCellWithWater();
-                                if (FirstGridCellWithWater) {
-                                    cell = FirstGridCellWithWater->pCell;
-                                }
-                            }
-                        }
+            if ((!cell || !cell->HasWater()) && (v14) && (v9)) {
+                cell = TES::pInstance->GetGridCellCell(v14 + aiX, v9 + aiY);
+                if ((!cell || !cell->HasWater()) && (v16)) {
+                    GridCell* FirstGridCellWithWater = TES::pInstance->FindFirstGridCellWithWater();
+                    if (FirstGridCellWithWater) {
+                        cell = FirstGridCellWithWater->pCell;
                     }
                 }
             }
         }
     }
-    if (cell) {
-        if (!cell->HasWater()) {
-            return nullptr;
-        }
+    if ((cell) && (!cell->HasWater())) {
+        return nullptr;
     }
+
     return cell;
 }
 
@@ -15101,96 +14939,85 @@ bool PlayerCharacter::CanFastTravel() {
         );
         return false;
     }
-    else {
-        BSSimpleList<TESObjectREFR*>* preflist =
-            ReferenceProcessLists.IsActorTargetingREFinPackage(pPlayer, PACKAGE_TYPE_ALARM, false);
-        if (!preflist || preflist->IsEmpty()) {
-            BSSimpleList<ActiveEffect*>* plist = GetActiveEffectList();
-            if (pCurrentProcess) {
-                while (plist && !plist->IsEmpty()) {
-                    BSSimpleList<ActiveEffect*>* pnext = plist->m_pkNext;
-                    ActiveEffect* peffect = plist->m_item;
-                    if (peffect && peffect->IsCausingDamage()) {
-                        BSsprintf(msg, 500, sFastTravelNoTravelHealthDamage.String());
-                        Interface::ShowMessage(
-                            msg, 0, "Interface\\Icons\\Message Icons\\glow_message_vaultboy_sad.dds", nullptr, 2.0f,
-                            false
-                        );
-                        return false;
-                    }
-                    plist = pnext;
-                }
-            }
-            if (static_cast<uint8_t>(pPlayer->GetScriptAllowedFastTravel())) {
-                if (pPlayer->IsOverEncumbered() &&
-                    (fCheckPerk = 0.0f,
-                     (BGSEntryPoint::HandleEntryPoint(BGSEntryPoint::HAS_ALWAYS_FAST_TRAVEL, this, &fCheckPerk),
-                      fCheckPerk < 1.0))) {
-                    BSsprintf(msg, 500, sNoFastTravelOverencumbered.String());
-                    Interface::ShowMessage(msg, 0, nullptr, nullptr, 2.0f, false);
+
+    BSSimpleList<TESObjectREFR*>* preflist =
+        ReferenceProcessLists.IsActorTargetingREFinPackage(pPlayer, PACKAGE_TYPE_ALARM, false);
+    if (!preflist || preflist->IsEmpty()) {
+        BSSimpleList<ActiveEffect*>* plist = GetActiveEffectList();
+        if (pCurrentProcess) {
+            while (plist && !plist->IsEmpty()) {
+                BSSimpleList<ActiveEffect*>* pnext = plist->m_pkNext;
+                ActiveEffect* peffect = plist->m_item;
+                if (peffect && peffect->IsCausingDamage()) {
+                    BSsprintf(msg, 500, sFastTravelNoTravelHealthDamage.String());
+                    Interface::ShowMessage(
+                        msg, 0, "Interface\\Icons\\Message Icons\\glow_message_vaultboy_sad.dds", nullptr, 2.0f, false
+                    );
                     return false;
                 }
-                else {
-                    if (pPlayer->GetActorValue(ActorValue::FATIGUE) >= 1 &&
-                        pPlayer->GetActorValue(ActorValue::HEALTH) >= 1) {
-                        if (pPlayer->IsJumping()) {
-                            BSsprintf(msg, 500, sNoFastTravelInAir.String());
-                            Interface::ShowMessage(
-                                msg, 0, "Interface\\Icons\\Message Icons\\glow_message_vaultboy_sad.dds", nullptr, 2.0f,
-                                false
-                            );
-                            return false;
-                        }
-                        else {
-                            if (GetParentCell()) {
-                                bretval = !GetParentCell()->CantTravelFrom();
-                            }
-                            else {
-                                TESWorldSpace* pworld = GetWorldSpace();
-                                if (pworld) {
-                                    bretval = !pworld->CantTravelFrom();
-                                }
-                            }
-                            if (!bretval) {
-                                BSsprintf(msg, 500, sNoFastTravelCell.String());
-                                Interface::ShowMessage(
-                                    msg, 0, "Interface\\Icons\\Message Icons\\glow_message_vaultboy_sad.dds", nullptr,
-                                    2.0f, false
-                                );
-                            }
-                            return bretval;
-                        }
-                    }
-                    else {
-                        BSsprintf(msg, 500, sFastTravelNoTravelHealthDamage.String());
-                        Interface::ShowMessage(
-                            msg, 0, "Interface\\Icons\\Message Icons\\glow_message_vaultboy_sad.dds", nullptr, 2.0f,
-                            false
-                        );
-                        return false;
-                    }
-                }
-            }
-            else {
-                BSsprintf(msg, 500, sNoFastTravelScriptBlock.String());
-                Interface::ShowMessage(
-                    msg, 0, "Interface\\Icons\\Message Icons\\glow_message_vaultboy_sad.dds", nullptr, 2.0f, false
-                );
-                return false;
+                plist = pnext;
             }
         }
-        else {
-            BSsprintf(msg, 500, sNoFastTravelAlarm.String());
+        if (static_cast<uint8_t>(pPlayer->GetScriptAllowedFastTravel())) {
+            if (pPlayer->IsOverEncumbered() &&
+                (fCheckPerk = 0.0f,
+                 (BGSEntryPoint::HandleEntryPoint(BGSEntryPoint::HAS_ALWAYS_FAST_TRAVEL, this, &fCheckPerk),
+                  fCheckPerk < 1.0))) {
+                BSsprintf(msg, 500, sNoFastTravelOverencumbered.String());
+                Interface::ShowMessage(msg, 0, nullptr, nullptr, 2.0f, false);
+                return false;
+            }
+
+            if (pPlayer->GetActorValue(ActorValue::FATIGUE) >= 1 && pPlayer->GetActorValue(ActorValue::HEALTH) >= 1) {
+                if (pPlayer->IsJumping()) {
+                    BSsprintf(msg, 500, sNoFastTravelInAir.String());
+                    Interface::ShowMessage(
+                        msg, 0, "Interface\\Icons\\Message Icons\\glow_message_vaultboy_sad.dds", nullptr, 2.0f, false
+                    );
+                    return false;
+                }
+
+                if (GetParentCell()) {
+                    bretval = !GetParentCell()->CantTravelFrom();
+                }
+                else {
+                    TESWorldSpace* pworld = GetWorldSpace();
+                    if (pworld) {
+                        bretval = !pworld->CantTravelFrom();
+                    }
+                }
+                if (!bretval) {
+                    BSsprintf(msg, 500, sNoFastTravelCell.String());
+                    Interface::ShowMessage(
+                        msg, 0, "Interface\\Icons\\Message Icons\\glow_message_vaultboy_sad.dds", nullptr, 2.0f, false
+                    );
+                }
+                return bretval;
+            }
+
+            BSsprintf(msg, 500, sFastTravelNoTravelHealthDamage.String());
             Interface::ShowMessage(
                 msg, 0, "Interface\\Icons\\Message Icons\\glow_message_vaultboy_sad.dds", nullptr, 2.0f, false
             );
-            preflist->RemoveAllPointerList();
-            if (preflist) {
-                delete preflist;
-            }
             return false;
         }
+
+        BSsprintf(msg, 500, sNoFastTravelScriptBlock.String());
+        Interface::ShowMessage(
+            msg, 0, "Interface\\Icons\\Message Icons\\glow_message_vaultboy_sad.dds", nullptr, 2.0f, false
+        );
+        return false;
     }
+
+    BSsprintf(msg, 500, sNoFastTravelAlarm.String());
+    Interface::ShowMessage(
+        msg, 0, "Interface\\Icons\\Message Icons\\glow_message_vaultboy_sad.dds", nullptr, 2.0f, false
+    );
+    preflist->RemoveAllPointerList();
+    if (preflist) {
+        delete preflist;
+    }
+    return false;
 }
 
 void PlayerCharacter::Sneak() {
@@ -15326,12 +15153,11 @@ void PlayerCharacter::ShaderNearbyItems() {
 
 void PlayerCharacter::UpdatePlayerCombat(float afDelta) {
     uint32_t apNumLost;
-    if (pCombatGroup) {
-        if (!pCombatGroup->GetTargetCount()) {
-            pCombatGroup->RemoveMember(this);
-            pCombatGroup = nullptr;
-        }
+    if ((pCombatGroup) && (!pCombatGroup->GetTargetCount())) {
+        pCombatGroup->RemoveMember(this);
+        pCombatGroup = nullptr;
     }
+
     if (pCombatGroup) {
         fCombatTimer = fCombatTimer + afDelta;
     }
@@ -15541,11 +15367,10 @@ void PlayerCharacter::ReturnToLastKnownGoodPosition(bool abPositionPlayer) {
                 v3, 0, "Interface\\Icons\\Message Icons\\glow_message_vaultboy_sad.dds", nullptr, 2.0f, false
             );
             bhkCharacterController* pcon = GetCharController();
-            if (pcon) {
-                if (!pcon->QSupported()) {
-                    LastKnownGoodPosition.z = pactor->QLocationOnReference()->z;
-                }
+            if ((pcon) && (!pcon->QSupported())) {
+                LastKnownGoodPosition.z = pactor->QLocationOnReference()->z;
             }
+
             pactor->SetLocationOnReference(LastKnownGoodPosition);
             if (pcon) {
                 pcon->SetPosition(LastKnownGoodPosition);
@@ -15657,35 +15482,33 @@ NiNode* PlayerCharacter::CloneInventory3D(bool abFlag) {
     BSCloningProcess cloneData;
     NiMatrix3 rot;
     if (!abFlag || spInventoryPC.m_pObject) {
-        if (!abFlag) {
-            if (spInventoryPC.m_pObject) {
-                Animation* apThis = this->GetInventoryAnimation();
-                if (apThis) {
-                    delete apThis;
-                }
-                pInventoryAnimation = nullptr;
-                NiNode* v27 = spInventoryPC.m_pObject;
-                NiFixedString* v19 = &FixedStrings::QRaceHeadBiped();
-                NiAVObject* pav_3 = v27->GetObjectByName(*v19);
-                BSFaceGenNiNode* pfacenode_3 =
-                    static_cast<BSFaceGenNiNode*>(NiObject::DynamicCastStatic(&BSFaceGenNiNode::ms_RTTI, pav_3));
-                if (pfacenode_3) {
-                    pfacenode_3->UpdateAllChildrenMorphData(true);
-                }
-                NiNode* v26 = spInventoryPC.m_pObject;
-                NiFixedString* v20 = &FixedStrings::QRaceHeadSkinned();
-                NiAVObject* pav_4 = v26->GetObjectByName(*v20);
-                BSFaceGenNiNode* pfacenode_4 =
-                    static_cast<BSFaceGenNiNode*>(NiObject::DynamicCastStatic(&BSFaceGenNiNode::ms_RTTI, pav_4));
-                if (pfacenode_4) {
-                    pfacenode_4->UpdateAllChildrenMorphData(true);
-                }
-                spInventoryPC.operator=(static_cast<NiNode*>(nullptr));
-                MagicShaderHitEffect* peffect = GetMagicShaderHitEffect();
-                if (peffect) {
-                    delete peffect;
-                    SetInventoryWeaponEffect(nullptr);
-                }
+        if ((!abFlag) && (spInventoryPC.m_pObject)) {
+            Animation* apThis = this->GetInventoryAnimation();
+            if (apThis) {
+                delete apThis;
+            }
+            pInventoryAnimation = nullptr;
+            NiNode* v27 = spInventoryPC.m_pObject;
+            NiFixedString* v19 = &FixedStrings::QRaceHeadBiped();
+            NiAVObject* pav_3 = v27->GetObjectByName(*v19);
+            BSFaceGenNiNode* pfacenode_3 =
+                static_cast<BSFaceGenNiNode*>(NiObject::DynamicCastStatic(&BSFaceGenNiNode::ms_RTTI, pav_3));
+            if (pfacenode_3) {
+                pfacenode_3->UpdateAllChildrenMorphData(true);
+            }
+            NiNode* v26 = spInventoryPC.m_pObject;
+            NiFixedString* v20 = &FixedStrings::QRaceHeadSkinned();
+            NiAVObject* pav_4 = v26->GetObjectByName(*v20);
+            BSFaceGenNiNode* pfacenode_4 =
+                static_cast<BSFaceGenNiNode*>(NiObject::DynamicCastStatic(&BSFaceGenNiNode::ms_RTTI, pav_4));
+            if (pfacenode_4) {
+                pfacenode_4->UpdateAllChildrenMorphData(true);
+            }
+            spInventoryPC.operator=(static_cast<NiNode*>(nullptr));
+            MagicShaderHitEffect* peffect = GetMagicShaderHitEffect();
+            if (peffect) {
+                delete peffect;
+                SetInventoryWeaponEffect(nullptr);
             }
         }
     }
@@ -15900,11 +15723,9 @@ bool PlayerCharacter::AddQuestStageItem(TESQuestStageItem* apNewItem) {
     if (apNewItem->GetEndQuest()) {
         Interface::PlayMenuSound(9);
         TESQuest* v4 = apNewItem->GetOwner();
-        if (v4 == pPlayer->GetActiveQuest()) {
-            if (apNewItem->m_pNextQuest) {
-                TESQuest* v5 = apNewItem->m_pNextQuest;
-                v5->SetEnabled(1u);
-            }
+        if ((v4 == pPlayer->GetActiveQuest()) && (apNewItem->m_pNextQuest)) {
+            TESQuest* v5 = apNewItem->m_pNextQuest;
+            v5->SetEnabled(1u);
         }
     }
     return true;
@@ -15983,15 +15804,14 @@ void PlayerCharacter::FocusOnActor(MobileObject* apActor, float afZoomPercent, b
                 phead = static_cast<NiNode*>(NiObject::DynamicCastStatic(&NiNode::ms_RTTI, pspeakerObject));
             }
             if (pfaceGenHead || phead) {
-                if (pfaceGenHead) {
-                    if (pfaceGenHead->GetAppCulled()) {
-                        pfaceGenHead->SetAppCulled(false);
-                        NiUpdateData UpdateData(0.0f, false, false);
-                        pfaceGenHead->Update(UpdateData);
-                        pfaceGenHead->UpdateWorldBound();
-                        pfaceGenHead->SetAppCulled(true);
-                    }
+                if ((pfaceGenHead) && (pfaceGenHead->GetAppCulled())) {
+                    pfaceGenHead->SetAppCulled(false);
+                    NiUpdateData UpdateData(0.0f, false, false);
+                    pfaceGenHead->Update(UpdateData);
+                    pfaceGenHead->UpdateWorldBound();
+                    pfaceGenHead->SetAppCulled(true);
                 }
+
                 NiBound headBound;
                 if (pfaceGenHead) {
                     headBound.Copy(&pfaceGenHead->GetWorldBound());
@@ -16147,11 +15967,9 @@ void PlayerCharacter::FocusOnActor(MobileObject* apActor, float afZoomPercent, b
                 Animation* pAnim = GetAnimation(!b3rdPerson);
                 UpdateAnimationMovement(pAnim, fmoveDelta);
             }
-            if (!bcalculated) {
-                if (pav) {
-                    int32_t fov = static_cast<int32_t>((src.Length() - 45.0) / 100.0 * 25.0) + 15;
-                    SetFOV(static_cast<float>(fov));
-                }
+            if ((!bcalculated) && (pav)) {
+                int32_t fov = static_cast<int32_t>((src.Length() - 45.0) / 100.0 * 25.0) + 15;
+                SetFOV(static_cast<float>(fov));
             }
         }
         PlayerCharacter::fDialogZoomPercent = fzoomPercent;
@@ -16195,41 +16013,34 @@ bool PlayerCharacter::IsActorFollowingEscortingPlayer(Actor* apActor, bool bAll)
     TESPackage* pPack = apActor->GetPackageSetAsPcurrent();
     ActorPackage* pCurrentPackage = &apActor->pCurrentProcess->CurrentPackage;
     if (!bAll) {
-        if (pPack) {
-            if (pPack->GetPackType() == PACKAGE_TYPE_FOLLOW || pPack->GetPackType() == PACKAGE_TYPE_ACCOMPANY) {
-                if (pPack->GetPackageTarget()) {
-                    TESObjectREFR* pref_2 = apActor->pCurrentProcess->CurrentPackage.pTarget;
-                    if (!pref_2) {
-                        TESBoundObject* pobject_2 =
-                            static_cast<TESBoundObject*>(pPack->GetPackageTarget()->GetTargObject());
-                        if (pobject_2) {
-                            if (pobject_2 == pPlayer->GetObjectReference()) {
-                                pref_2 = pPlayer;
-                            }
-                        }
-                    }
-                    if (pref_2 == pPlayer) {
-                        return !pPack->GetWaiting();
-                    }
+        if ((pPack) &&
+            (pPack->GetPackType() == PACKAGE_TYPE_FOLLOW || pPack->GetPackType() == PACKAGE_TYPE_ACCOMPANY) &&
+            (pPack->GetPackageTarget())) {
+            TESObjectREFR* pref_2 = apActor->pCurrentProcess->CurrentPackage.pTarget;
+            if (!pref_2) {
+                TESBoundObject* pobject_2 = static_cast<TESBoundObject*>(pPack->GetPackageTarget()->GetTargObject());
+                if ((pobject_2) && (pobject_2 == pPlayer->GetObjectReference())) {
+                    pref_2 = pPlayer;
                 }
             }
+            if (pref_2 == pPlayer) {
+                return !pPack->GetWaiting();
+            }
         }
+
         return false;
     }
     TESObjectREFR* pref = nullptr;
-    if (pCurrentPackage) {
-        if (pCurrentPackage->pTarget) {
-            pref = pCurrentPackage->pTarget;
-            if (!pref) {
-                TESBoundObject* pobject = static_cast<TESBoundObject*>(pPack->GetPackageTarget()->GetTargObject());
-                if (pobject) {
-                    if (pobject == pPlayer->GetObjectReference()) {
-                        pref = pPlayer;
-                    }
-                }
+    if ((pCurrentPackage) && (pCurrentPackage->pTarget)) {
+        pref = pCurrentPackage->pTarget;
+        if (!pref) {
+            TESBoundObject* pobject = static_cast<TESBoundObject*>(pPack->GetPackageTarget()->GetTargObject());
+            if ((pobject) && (pobject == pPlayer->GetObjectReference())) {
+                pref = pPlayer;
             }
         }
     }
+
     if (!pPack || pPack->GetLocationReference(apActor) != pPlayer) {
         if (pref != pPlayer) {
             BaseProcess* v4 = apActor->pCurrentProcess;
@@ -16258,23 +16069,20 @@ bool PlayerCharacter::ReloadLoop(
     ItemChange* pweaponItem = pCurrentProcess->GetCurrentWeapon();
     ItemChange* pAmmoItem = pCurrentProcess->GetCurrentAmmo();
     GetAnimation(false);
-    if (apWeapon) {
-        if (pammo) {
-            if (apWeapon != pammo) {
-                ItemChange* pWeaponTest = pinventory->GetInventoryItem(apWeapon, 0);
-                if (pWeaponTest->GetHotKey() >= 0) {
-                    int32_t iHK = pWeaponTest->GetHotKey();
-                    TESBoundObject* pAmmoOverride = static_cast<TESBoundObject*>(pPlayer->GetAmmoForHotKey(iHK));
-                    if (pAmmoOverride) {
-                        pammo = pAmmoOverride;
-                    }
-                }
-                if (pWeaponTest) {
-                    delete pWeaponTest;
-                }
+    if ((apWeapon) && (pammo) && (apWeapon != pammo)) {
+        ItemChange* pWeaponTest = pinventory->GetInventoryItem(apWeapon, 0);
+        if (pWeaponTest->GetHotKey() >= 0) {
+            int32_t iHK = pWeaponTest->GetHotKey();
+            TESBoundObject* pAmmoOverride = static_cast<TESBoundObject*>(pPlayer->GetAmmoForHotKey(iHK));
+            if (pAmmoOverride) {
+                pammo = pAmmoOverride;
             }
         }
+        if (pWeaponTest) {
+            delete pWeaponTest;
+        }
     }
+
     int32_t icount = pinventory->GetObjectCount(pammo);
     if (!pAmmoItem || pAmmoItem->pContainerObj != pammo) {
         ItemChange* parrows;
@@ -16301,12 +16109,11 @@ bool PlayerCharacter::ReloadLoop(
         return false;
     }
 LABEL_21:;
-    if (apWeapon) {
-        if (pammo != apWeapon) {
-            int32_t FormClipRounds = apWeapon->GetFormClipRounds(bUseModValue);
-            icount = BSMIN(icount, FormClipRounds);
-        }
+    if ((apWeapon) && (pammo != apWeapon)) {
+        int32_t FormClipRounds = apWeapon->GetFormClipRounds(bUseModValue);
+        icount = BSMIN(icount, FormClipRounds);
     }
+
     if (aiReloadAnim) {
         if (aiReloadAnim == 1) {
             Animation* panim = GetAnimation(false);
@@ -16317,36 +16124,33 @@ LABEL_21:;
             }
             return true;
         }
-        else {
-            if (aiReloadAnim == 2) {
-                ANIM_GROUP_ENUM eanimGroup_2 = static_cast<ANIM_GROUP_ENUM>(apWeapon->GetReloadAnim(bUseModValue) - 23);
-                uint16_t sanimGroup_2 = GetAnimGroup(eanimGroup_2, nullptr, false, nullptr);
-                if (TESAnimGroup::GetType(sanimGroup_2) == eanimGroup_2) {
-                    Animation* panim_2 = GetAnimation(false);
-                    panim_2->PlayGroup(sanimGroup_2, ACTION_START, -1, AGS_NONE);
-                    StartAnimOn1stPerson(sanimGroup_2, ACTION_START);
-                    BSAnimGroupSequence* CurrentSequence = panim_2->GetCurrentSequence(AGS_WEAPON);
-                    SetAnimAction(ANIM_ACTION_RELOAD_LOOP, CurrentSequence);
-                }
-                return true;
+
+        if (aiReloadAnim == 2) {
+            ANIM_GROUP_ENUM eanimGroup_2 = static_cast<ANIM_GROUP_ENUM>(apWeapon->GetReloadAnim(bUseModValue) - 23);
+            uint16_t sanimGroup_2 = GetAnimGroup(eanimGroup_2, nullptr, false, nullptr);
+            if (TESAnimGroup::GetType(sanimGroup_2) == eanimGroup_2) {
+                Animation* panim_2 = GetAnimation(false);
+                panim_2->PlayGroup(sanimGroup_2, ACTION_START, -1, AGS_NONE);
+                StartAnimOn1stPerson(sanimGroup_2, ACTION_START);
+                BSAnimGroupSequence* CurrentSequence = panim_2->GetCurrentSequence(AGS_WEAPON);
+                SetAnimAction(ANIM_ACTION_RELOAD_LOOP, CurrentSequence);
             }
-            else {
-                return false;
-            }
+            return true;
         }
+
+        return false;
     }
-    else {
-        int32_t iCurrentCount = 1;
-        if (pCurrentProcess->GetCurrentAmmo()) {
-            ItemChange* v10 = pCurrentProcess->GetCurrentAmmo();
-            iCurrentCount = v10->iNumber + 1;
-        }
-        if (bFromInventory) {
-            iCurrentCount = icount;
-        }
-        QueueEquipObject(pammo, iCurrentCount, nullptr, true, false, false);
-        return true;
+
+    int32_t iCurrentCount = 1;
+    if (pCurrentProcess->GetCurrentAmmo()) {
+        ItemChange* v10 = pCurrentProcess->GetCurrentAmmo();
+        iCurrentCount = v10->iNumber + 1;
     }
+    if (bFromInventory) {
+        iCurrentCount = icount;
+    }
+    QueueEquipObject(pammo, iCurrentCount, nullptr, true, false, false);
+    return true;
 }
 
 void PlayerCharacter::CheckPoisonWeapon(AlchemyItem* apPoison) {
@@ -16409,27 +16213,25 @@ void PlayerCharacter::AddQueuedEnchantment(TESBoundObject* apObject, ExtraDataLi
 }
 
 void PlayerCharacter::RemoveQueuedEnchantment(TESBoundObject* apObject, ExtraDataList* apExtra) {
-    if (apObject->GetFormType() == ARMO_ID || apObject->GetFormType() == CLOT_ID) {
-        if (QueuedWornEnchantments) {
-            EnchantmentItem* FormEnchanting;
-            TESEnchantableForm* penchantable = dynamic_cast<TESEnchantableForm*>(apObject);
-            if (penchantable) {
-                FormEnchanting = penchantable->pFormEnchanting;
+    if ((apObject->GetFormType() == ARMO_ID || apObject->GetFormType() == CLOT_ID) && (QueuedWornEnchantments)) {
+        EnchantmentItem* FormEnchanting;
+        TESEnchantableForm* penchantable = dynamic_cast<TESEnchantableForm*>(apObject);
+        if (penchantable) {
+            FormEnchanting = penchantable->pFormEnchanting;
+        }
+        else {
+            FormEnchanting = nullptr;
+        }
+        if (FormEnchanting) {
+            if (IsSpellTarget(FormEnchanting, true)) {
+                Dispel(apObject, false);
             }
-            else {
-                FormEnchanting = nullptr;
-            }
-            if (FormEnchanting) {
-                if (IsSpellTarget(FormEnchanting, true)) {
-                    Dispel(apObject, false);
+            QueuedWornEnchantments->Remove(apObject);
+            if (QueuedWornEnchantments->IsEmpty()) {
+                if (QueuedWornEnchantments) {
+                    delete QueuedWornEnchantments;
                 }
-                QueuedWornEnchantments->Remove(apObject);
-                if (QueuedWornEnchantments->IsEmpty()) {
-                    if (QueuedWornEnchantments) {
-                        delete QueuedWornEnchantments;
-                    }
-                    QueuedWornEnchantments = nullptr;
-                }
+                QueuedWornEnchantments = nullptr;
             }
         }
     }
@@ -16481,18 +16283,16 @@ void PlayerCharacter::HandlePhysicsGrab(float afTimeDelta) {
                             else {
                                 pbody = nullptr;
                             }
-                            if (pbody) {
-                                if (pbody->GethkWorld()) {
-                                    float fobjectMass = pbody->GetMass();
-                                    if (fobjectMass <= static_cast<double>(fGrabMaxWeightWalking.Float())) {
-                                        CreateMouseSpring(pObject, PlayerCharacter::GRAB_NORMAL, 1000.0f);
-                                        if (spGrabSpring.m_pObject) {
-                                            pObject->AddChange(4);
-                                        }
-                                        bIsGrabbing = true;
-                                        (&pObject->m_Extra)->NotifyGuardsAboutActivation(pObject, this);
-                                        (&pObject->m_Extra)->RemoveExtra(124);
+                            if ((pbody) && (pbody->GethkWorld())) {
+                                float fobjectMass = pbody->GetMass();
+                                if (fobjectMass <= static_cast<double>(fGrabMaxWeightWalking.Float())) {
+                                    CreateMouseSpring(pObject, PlayerCharacter::GRAB_NORMAL, 1000.0f);
+                                    if (spGrabSpring.m_pObject) {
+                                        pObject->AddChange(4);
                                     }
+                                    bIsGrabbing = true;
+                                    (&pObject->m_Extra)->NotifyGuardsAboutActivation(pObject, this);
+                                    (&pObject->m_Extra)->RemoveExtra(124);
                                 }
                             }
                         }
@@ -16555,19 +16355,17 @@ void PlayerCharacter::CheckGetAwayFromGuards() {
 }
 
 void PlayerCharacter::PlayImpactBasedHitShader(TESObjectREFR* apRef) {
-    if (apRef) {
-        if (apRef->Get3D()) {
-            NiPoint3 result;
-            const NiPoint3* afDistance = &GetLocationOnReference();
-            const NiPoint3* v2 = &apRef->GetLocationOnReference();
-            result = *v2 - *afDistance;
-            float afDistancea = result.Length();
-            float v10 = GamePlayFormulas::CalcImpactShaderAmount(afDistancea);
-            if (v10 > 0.0 && !pVATS.GetMode()) {
-                NiNode* afDistanceb = apRef->Get3D();
-                TESImageSpaceModifier* Hit = TESImageSpaceModifier::GetGetHit();
-                ImageSpaceModifierInstanceForm::Trigger(Hit, v10, afDistanceb);
-            }
+    if ((apRef) && (apRef->Get3D())) {
+        NiPoint3 result;
+        const NiPoint3* afDistance = &GetLocationOnReference();
+        const NiPoint3* v2 = &apRef->GetLocationOnReference();
+        result = *v2 - *afDistance;
+        float afDistancea = result.Length();
+        float v10 = GamePlayFormulas::CalcImpactShaderAmount(afDistancea);
+        if (v10 > 0.0 && !pVATS.GetMode()) {
+            NiNode* afDistanceb = apRef->Get3D();
+            TESImageSpaceModifier* Hit = TESImageSpaceModifier::GetGetHit();
+            ImageSpaceModifierInstanceForm::Trigger(Hit, v10, afDistanceb);
         }
     }
 }
@@ -16708,20 +16506,18 @@ void PlayerCharacter::UpdatePlayerActions() {
 }
 
 void PlayerCharacter::RemoveAllActionsForObject(TESObjectREFR* apActObject) {
-    if (pListofActions) {
-        if (apActObject) {
-            BSSimpleList<PlayerActionObject*>* plist = pListofActions;
-            ListBoxBase* item = nullptr;
-            while (plist && plist->m_item) {
-                PlayerActionObject* pAction = plist->m_item;
-                if (pAction && apActObject == pAction->prefObj) {
-                    plist->Remove(pAction);
-                    ourFree(pAction);
-                    plist = pListofActions;
-                }
-                else {
-                    plist = plist->m_pkNext;
-                }
+    if ((pListofActions) && (apActObject)) {
+        BSSimpleList<PlayerActionObject*>* plist = pListofActions;
+        ListBoxBase* item = nullptr;
+        while (plist && plist->m_item) {
+            PlayerActionObject* pAction = plist->m_item;
+            if (pAction && apActObject == pAction->prefObj) {
+                plist->Remove(pAction);
+                ourFree(pAction);
+                plist = pListofActions;
+            }
+            else {
+                plist = plist->m_pkNext;
             }
         }
     }
@@ -16750,51 +16546,48 @@ void PlayerCharacter::UpdateMenuModeButton(float afTimeDelta) {
         if (pcontrols->GetUserAction(Controls::UACTN_MENUMODE, 1) ||
             pcontrols->GetUserAction(Controls::UACTN_MENUMODE, 0)) {
             fMenuModeButtonTimer = fMenuModeButtonTimer + afTimeDelta;
-            if (!bPipboyLightDebounce) {
-                if (Interface::GetPipboy()->Get3rdPersonPipboyRoot()) {
-                    if (fPlayerPipBoyLightTimer.Float() < static_cast<double>(fMenuModeButtonTimer)) {
-                        MagicItem* a2;
-                        SpellItem* PipBoyLightSpell = MagicSystem::GetPipBoyLightSpell();
-                        if (PipBoyLightSpell) {
-                            a2 = &static_cast<MagicItem&>(static_cast<MagicItemForm&>(*PipBoyLightSpell));
-                        }
-                        else {
-                            a2 = nullptr;
-                        }
-                        if (IsSpellTarget(a2, true)) {
-                            MagicItem* apSpell;
-                            FOPipboyManager* Pipboy = Interface::GetPipboy();
-                            Pipboy->ShowPipboyLightEffect(true, false, true);
-                            FOPipboyManager* v3 = Interface::GetPipboy();
-                            v3->ShowPipboyLightEffect(false, false, true);
-                            BSAudio* v4 = &BSAudio::QInstance();
-                            BSSoundHandle* SoundHandleByName = v4->GetSoundHandleByName(&a1, "UIPipBoyLightOff", 289u);
-                            SoundHandleByName->Play(false);
-                            SpellItem* v15 = MagicSystem::GetPipBoyLightSpell();
-                            if (v15) {
-                                apSpell = &static_cast<MagicItem&>(static_cast<MagicItemForm&>(*v15));
-                            }
-                            else {
-                                apSpell = nullptr;
-                            }
-                            Dispel(apSpell, static_cast<MagicCaster*>(nullptr), static_cast<ActiveEffect*>(nullptr));
-                        }
-                        else {
-                            if (!pPlayer->GetControlsDisabled(PlayerCharacter::DPC_PIPBOY)) {
-                                FOPipboyManager* v5 = Interface::GetPipboy();
-                                v5->ShowPipboyLightEffect(true, true, true);
-                                FOPipboyManager* v6 = Interface::GetPipboy();
-                                v6->ShowPipboyLightEffect(false, true, true);
-                                BSAudio* v7 = &BSAudio::QInstance();
-                                BSSoundHandle* v13 = v7->GetSoundHandleByName(&arHandle, "UIPipBoyLightOn", 289u);
-                                v13->Play(false);
-                                SpellItem* v8 = MagicSystem::GetPipBoyLightSpell();
-                                CastAbility(v8, false);
-                            }
-                        }
-                        bPipboyLightDebounce = 1;
+            if ((!bPipboyLightDebounce) && (Interface::GetPipboy()->Get3rdPersonPipboyRoot()) &&
+                (fPlayerPipBoyLightTimer.Float() < static_cast<double>(fMenuModeButtonTimer))) {
+                MagicItem* a2;
+                SpellItem* PipBoyLightSpell = MagicSystem::GetPipBoyLightSpell();
+                if (PipBoyLightSpell) {
+                    a2 = &static_cast<MagicItem&>(static_cast<MagicItemForm&>(*PipBoyLightSpell));
+                }
+                else {
+                    a2 = nullptr;
+                }
+                if (IsSpellTarget(a2, true)) {
+                    MagicItem* apSpell;
+                    FOPipboyManager* Pipboy = Interface::GetPipboy();
+                    Pipboy->ShowPipboyLightEffect(true, false, true);
+                    FOPipboyManager* v3 = Interface::GetPipboy();
+                    v3->ShowPipboyLightEffect(false, false, true);
+                    BSAudio* v4 = &BSAudio::QInstance();
+                    BSSoundHandle* SoundHandleByName = v4->GetSoundHandleByName(&a1, "UIPipBoyLightOff", 289u);
+                    SoundHandleByName->Play(false);
+                    SpellItem* v15 = MagicSystem::GetPipBoyLightSpell();
+                    if (v15) {
+                        apSpell = &static_cast<MagicItem&>(static_cast<MagicItemForm&>(*v15));
+                    }
+                    else {
+                        apSpell = nullptr;
+                    }
+                    Dispel(apSpell, static_cast<MagicCaster*>(nullptr), static_cast<ActiveEffect*>(nullptr));
+                }
+                else {
+                    if (!pPlayer->GetControlsDisabled(PlayerCharacter::DPC_PIPBOY)) {
+                        FOPipboyManager* v5 = Interface::GetPipboy();
+                        v5->ShowPipboyLightEffect(true, true, true);
+                        FOPipboyManager* v6 = Interface::GetPipboy();
+                        v6->ShowPipboyLightEffect(false, true, true);
+                        BSAudio* v7 = &BSAudio::QInstance();
+                        BSSoundHandle* v13 = v7->GetSoundHandleByName(&arHandle, "UIPipBoyLightOn", 289u);
+                        v13->Play(false);
+                        SpellItem* v8 = MagicSystem::GetPipBoyLightSpell();
+                        CastAbility(v8, false);
                     }
                 }
+                bPipboyLightDebounce = 1;
             }
         }
         else {
@@ -16841,11 +16634,10 @@ bool PlayerCharacter::CanEquipOrUseObject(ItemChange* apItem) {
          !static_cast<TESObjectWEAP*>(pobj)->TESObjectWEAP::GetIsPlayable())) {
         bcanEquip = false;
     }
-    if (pextra) {
-        if (pextra->GetCanNotWear()) {
-            bcanEquip = false;
-        }
+    if ((pextra) && (pextra->GetCanNotWear())) {
+        bcanEquip = false;
     }
+
     ExtraHealth* pHealth = nullptr;
     if (pextra) {
         pHealth = static_cast<ExtraHealth*>(pextra->GetExtraData(EXTRA_HEALTH));
@@ -16973,10 +16765,8 @@ uint32_t PlayerCharacter::AttemptYield() {
                             phostileGroup->RemoveTarget(pplayerMember_2);
                         }
                         else {
-                            if (!bacceptNonTeammateYield) {
-                                if (psplitGroup) {
-                                    psplitGroup->AddMember(pplayerMember_2);
-                                }
+                            if ((!bacceptNonTeammateYield) && (psplitGroup)) {
+                                psplitGroup->AddMember(pplayerMember_2);
                             }
                         }
                     }
@@ -16990,12 +16780,10 @@ uint32_t PlayerCharacter::AttemptYield() {
                         break;
                     }
                     Actor* ptarget = phostileGroup->GetTarget(j_3);
-                    if (ptarget) {
-                        if (ptarget->bPlayerTeammate && !ptarget->IsAngryWithPlayer()) {
-                            phostileGroup->RemoveTarget(ptarget);
-                            --j_3;
-                            ptarget->StopCombat(nullptr);
-                        }
+                    if ((ptarget) && (ptarget->bPlayerTeammate && !ptarget->IsAngryWithPlayer())) {
+                        phostileGroup->RemoveTarget(ptarget);
+                        --j_3;
+                        ptarget->StopCombat(nullptr);
                     }
                 }
                 for (uint32_t j_4 = 0; j_4 < imemberCount; ++j_4) {
@@ -17004,11 +16792,10 @@ uint32_t PlayerCharacter::AttemptYield() {
                     if (pplayerGroup) {
                         pplayerGroup->RemoveTarget(pmember_3);
                     }
-                    if (bacceptNonTeammateYield) {
-                        if (psplitGroup) {
-                            psplitGroup->RemoveTarget(pmember_3);
-                        }
+                    if ((bacceptNonTeammateYield) && (psplitGroup)) {
+                        psplitGroup->RemoveTarget(pmember_3);
                     }
+
                     const NiPoint3* v4 = &pmember_3->GetLocationOnReference();
                     NiPoint3 memberVec = myLoc - *v4;
                     float fdistanceSquared_2 = memberVec.SqrLength();
@@ -17051,23 +16838,20 @@ uint32_t PlayerCharacter::AttemptYield() {
             }
         }
     }
-    if (pplayerGroup) {
-        if (iyieldingActors) {
-            for (uint32_t j_5 = 0; j_5 < pplayerGroup->GetMemberCount(); ++j_5) {
-                Actor* pplayerMember_3 = pplayerGroup->GetMember(j_5);
-                if (pplayerMember_3) {
-                    if (pplayerMember_3->GetCombatController()) {
-                        CombatController* v5 = pplayerMember_3->GetCombatController();
-                        v5->ForceStopCombat();
-                    }
-                }
-            }
-            while (pplayerGroup->GetTargetCount()) {
-                Actor* Target = pplayerGroup->GetTarget(0);
-                pplayerGroup->RemoveTarget(Target);
+    if ((pplayerGroup) && (iyieldingActors)) {
+        for (uint32_t j_5 = 0; j_5 < pplayerGroup->GetMemberCount(); ++j_5) {
+            Actor* pplayerMember_3 = pplayerGroup->GetMember(j_5);
+            if ((pplayerMember_3) && (pplayerMember_3->GetCombatController())) {
+                CombatController* v5 = pplayerMember_3->GetCombatController();
+                v5->ForceStopCombat();
             }
         }
+        while (pplayerGroup->GetTargetCount()) {
+            Actor* Target = pplayerGroup->GetTarget(0);
+            pplayerGroup->RemoveTarget(Target);
+        }
     }
+
     for (Actor* pmember_4 : *ReferenceProcessLists.GetAliveActorList()) {
         if (pmember_4) {
             TESPackage* pspec__pflee = pmember_4->GetCurrentPackage();
@@ -17384,10 +17168,8 @@ PlayerActionObject* PlayerCharacter::GetPlayerAction(PLAYER_ACTION aeAction) {
     for (BSSimpleList<PlayerActionObject*>* ecx0a = pListofActions; ecx0a && (ecx0a->m_item && !v4);
          ecx0a = ecx0a->m_pkNext) {
         PlayerActionObject* v5 = ecx0a->m_item;
-        if (v5) {
-            if (v5->eAction == aeAction) {
-                v4 = v5;
-            }
+        if ((v5) && (v5->eAction == aeAction)) {
+            v4 = v5;
         }
     }
     return v4;
@@ -17407,12 +17189,10 @@ void PlayerCharacter::DebugResetAllTerminals() {
         pform = nullptr;
         iid = 0;
         TESForm::pAllForms->GetNext(iter, iid, pform);
-        if (pform) {
-            if (pform->GetFormType() == REFR_ID) {
-                TESObjectREFR* pref_2 = static_cast<TESObjectREFR*>(pform);
-                if (pref_2->GetObjectReference()->GetFormType() == TERM_ID) {
-                    BGSTerminal::ResetState(pref_2);
-                }
+        if ((pform) && (pform->GetFormType() == REFR_ID)) {
+            TESObjectREFR* pref_2 = static_cast<TESObjectREFR*>(pform);
+            if (pref_2->GetObjectReference()->GetFormType() == TERM_ID) {
+                BGSTerminal::ResetState(pref_2);
             }
         }
     }
@@ -17437,9 +17217,8 @@ bool PlayerCharacter::IsDemigodMode() {
     if ((&::bSetDemigodMode)->Bool()) {
         return true;
     }
-    else {
-        return (bool)((int8_t)PlayerCharacter::bDemigodMode);
-    }
+
+    return (bool)((int8_t)PlayerCharacter::bDemigodMode);
 }
 
 void PlayerCharacter::SpeakDoneCallback(void* apUnused, bool abSucceeded) {

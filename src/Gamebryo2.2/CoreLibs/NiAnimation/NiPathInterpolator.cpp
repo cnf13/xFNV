@@ -53,10 +53,9 @@ NiObject* NiPathInterpolator::CreateClone(NiCloningProcess& kCloning) {
         CopyMembers(v4, &kCloning);
         return v4;
     }
-    else {
-        CopyMembers(nullptr, &kCloning);
-        return nullptr;
-    }
+
+    CopyMembers(nullptr, &kCloning);
+    return nullptr;
 }
 
 // The bank direction is read into an uninitialised local and stored to m_eBankDir; a short read leaves the local
@@ -826,7 +825,6 @@ NiObject* NiPathInterpolator::CreateObject() {
     if (v0) {
         return ::new (v0) NiPathInterpolator(nullptr, nullptr);
     }
-    else {
-        return nullptr;
-    }
+
+    return nullptr;
 }

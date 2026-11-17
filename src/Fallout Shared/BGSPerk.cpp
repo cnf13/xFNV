@@ -307,10 +307,8 @@ void BGSPerk::AddPerkEntryPoints(Actor* apActor, uint8_t acRank, bool bAlt) {
     BSSimpleList<BGSPerkEntry*>* ecx0;
     for (ecx0 = &PerkEntries; ecx0; ecx0 = ecx0->m_pkNext) {
         v4 = ecx0->m_item;
-        if (v4) {
-            if ((((uint32_t)(v4->GetRank() + 1)) == ((uint32_t)acRank)) && (((uint32_t)v4->GetType()) == 2)) {
-                v4->ApplyPerkEntry(apActor, bAlt);
-            }
+        if ((v4) && ((((uint32_t)(v4->GetRank() + 1)) == ((uint32_t)acRank)) && (((uint32_t)v4->GetType()) == 2))) {
+            v4->ApplyPerkEntry(apActor, bAlt);
         }
     }
 }
@@ -347,12 +345,11 @@ bool BGSPerk::GetIsPlayable() {
         for (BSSimpleList<void*>* plist = &PerkConditions; bresult && (plist && !plist->IsEmpty());
              plist = plist->m_pkNext) {
             TESConditionItem* pitem = static_cast<TESConditionItem*>(plist->m_item);
-            if (pitem) {
-                // A condition item stores its function's index from the function section's start.
-                if (pitem->GetConditionFunction() == FUNCTION_GET_IS_SEX - START_OF_FUNCTION_SECTION) {
-                    bool bignore;
-                    bresult = pitem->IsTrue(pPlayer, nullptr, bignore);
-                }
+            if ((pitem) && (pitem->GetConditionFunction() == FUNCTION_GET_IS_SEX - START_OF_FUNCTION_SECTION))
+            // A condition item stores its function's index from the function section's start.
+            {
+                bool bignore;
+                bresult = pitem->IsTrue(pPlayer, nullptr, bignore);
             }
         }
     }
@@ -445,37 +442,28 @@ void BGSPerk::BuildDescriptionString(char* apOutText, uint32_t aiOutSize) {
                     break;
                 }
             }
-            if (eindex != ActorValue::KARMA) {
-                if (ActorValue::GetActorValueAbbreviation(eindex)) {
-                    if (iValueMod + static_cast<int32_t>(pcurrConditon->GetComparisonValue())) {
-                        v21 = 1;
-                        if (!iConditionIndex && !v22) {
-                            BSstrcat(apOutText, static_cast<int32_t>(aiOutSize), ", ");
-                        }
-                        if (pcurrConditon->GetOr() && PerkConditions.GetConditionItem(iConditionIndex + 1)) {
-                            const char* v6 = sOr.String();
-                            int32_t v4 = iValueMod + static_cast<int32_t>(pcurrConditon->GetComparisonValue());
-                            BSsprintf(
-                                Src, 128, " %s%s%d %s ", ActorValue::GetActorValueAbbreviation(eindex), cSymbol, v4, v6
-                            );
-                        }
-                        else {
-                            if (PerkConditions.GetConditionItem(iConditionIndex + 1)) {
-                                int32_t v7 = iValueMod + static_cast<int32_t>(pcurrConditon->GetComparisonValue());
-                                BSsprintf(
-                                    Src, 128, "%s%s%d, ", ActorValue::GetActorValueAbbreviation(eindex), cSymbol, v7
-                                );
-                            }
-                            else {
-                                int32_t v8 = iValueMod + static_cast<int32_t>(pcurrConditon->GetComparisonValue());
-                                BSsprintf(
-                                    Src, 128, "%s%s%d", ActorValue::GetActorValueAbbreviation(eindex), cSymbol, v8
-                                );
-                            }
-                        }
-                        BSstrcat(apOutText, static_cast<int32_t>(aiOutSize), Src);
+            if ((eindex != ActorValue::KARMA) && (ActorValue::GetActorValueAbbreviation(eindex)) &&
+                (iValueMod + static_cast<int32_t>(pcurrConditon->GetComparisonValue()))) {
+                v21 = 1;
+                if (!iConditionIndex && !v22) {
+                    BSstrcat(apOutText, static_cast<int32_t>(aiOutSize), ", ");
+                }
+                if (pcurrConditon->GetOr() && PerkConditions.GetConditionItem(iConditionIndex + 1)) {
+                    const char* v6 = sOr.String();
+                    int32_t v4 = iValueMod + static_cast<int32_t>(pcurrConditon->GetComparisonValue());
+                    BSsprintf(Src, 128, " %s%s%d %s ", ActorValue::GetActorValueAbbreviation(eindex), cSymbol, v4, v6);
+                }
+                else {
+                    if (PerkConditions.GetConditionItem(iConditionIndex + 1)) {
+                        int32_t v7 = iValueMod + static_cast<int32_t>(pcurrConditon->GetComparisonValue());
+                        BSsprintf(Src, 128, "%s%s%d, ", ActorValue::GetActorValueAbbreviation(eindex), cSymbol, v7);
+                    }
+                    else {
+                        int32_t v8 = iValueMod + static_cast<int32_t>(pcurrConditon->GetComparisonValue());
+                        BSsprintf(Src, 128, "%s%s%d", ActorValue::GetActorValueAbbreviation(eindex), cSymbol, v8);
                     }
                 }
+                BSstrcat(apOutText, static_cast<int32_t>(aiOutSize), Src);
             }
         }
         else {
@@ -712,14 +700,13 @@ bool BGSEntryPointPerkEntry::CheckConditionFilters(uint32_t aiNumFilterForms, TE
         }
         return true;
     }
-    else {
-        Warning(
-            "FORMS: BGSEntryPointPerkEntry::CheckConditionFilters() was called with %i filter forms, but there are "
-            "%i conditions",
-            aiNumFilterForms, Data.cNumConditions
-        );
-        return false;
-    }
+
+    Warning(
+        "FORMS: BGSEntryPointPerkEntry::CheckConditionFilters() was called with %i filter forms, but there are "
+        "%i conditions",
+        aiNumFilterForms, Data.cNumConditions
+    );
+    return false;
 }
 
 uint8_t BGSEntryPointPerkEntry::GetFunction() {
@@ -1022,35 +1009,29 @@ BGSPerkEntry* BGSPerkEntry::CreatePerkEntryOfType(PERK_ENTRY_TYPE aePerkEntryTyp
             if (v6) {
                 return ::new (v6) BGSAbilityPerkEntry;
             }
-            else {
-                return nullptr;
-            }
-        }
-        else {
-            if (aePerkEntryType == PERK_ENTRY_TYPE_ENTRY_POINT) {
-                BGSEntryPointPerkEntry* v5 =
-                    static_cast<BGSEntryPointPerkEntry*>(ourMalloc(sizeof(BGSEntryPointPerkEntry)));
-                if (v5) {
-                    return ::new (v5) BGSEntryPointPerkEntry;
-                }
-                else {
-                    return nullptr;
-                }
-            }
-            else {
-                return nullptr;
-            }
-        }
-    }
-    else {
-        BGSQuestPerkEntry* apMemory = static_cast<BGSQuestPerkEntry*>(ourMalloc(sizeof(BGSQuestPerkEntry)));
-        if (apMemory) {
-            return ::new (apMemory) BGSQuestPerkEntry;
-        }
-        else {
+
             return nullptr;
         }
+
+        if (aePerkEntryType == PERK_ENTRY_TYPE_ENTRY_POINT) {
+            BGSEntryPointPerkEntry* v5 =
+                static_cast<BGSEntryPointPerkEntry*>(ourMalloc(sizeof(BGSEntryPointPerkEntry)));
+            if (v5) {
+                return ::new (v5) BGSEntryPointPerkEntry;
+            }
+
+            return nullptr;
+        }
+
+        return nullptr;
     }
+
+    BGSQuestPerkEntry* apMemory = static_cast<BGSQuestPerkEntry*>(ourMalloc(sizeof(BGSQuestPerkEntry)));
+    if (apMemory) {
+        return ::new (apMemory) BGSQuestPerkEntry;
+    }
+
+    return nullptr;
 }
 
 void QuestPerkEntryData::Endian() {

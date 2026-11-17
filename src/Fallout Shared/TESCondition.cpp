@@ -177,18 +177,16 @@ bool TESCondition::IsTrueFull(
 void TESCondition::Load(TESFile* apFile) {
     TESConditionItem* v2;
     void* v4;
-    if (apFile) {
-        if (apFile->GetTESChunk() == 1094997059) {
-            v4 = ourMalloc(sizeof(TESConditionItem));
-            if (v4) {
-                v2 = ::new (v4) TESConditionItem;
-            }
-            else {
-                v2 = nullptr;
-            }
-            v2->Load(apFile);
-            AddItem(v2);
+    if ((apFile) && (apFile->GetTESChunk() == 1094997059)) {
+        v4 = ourMalloc(sizeof(TESConditionItem));
+        if (v4) {
+            v2 = ::new (v4) TESConditionItem;
         }
+        else {
+            v2 = nullptr;
+        }
+        v2->Load(apFile);
+        AddItem(v2);
     }
 }
 
@@ -229,13 +227,12 @@ void* TESCondition::DeleteArray(uint32_t auiFlags) {
         }
         return reinterpret_cast<size_t*>(this) - 1;
     }
-    else {
-        this->~TESCondition();
-        if ((auiFlags & 1) != 0) {
-            ourFree(this);
-        }
-        return this;
+
+    this->~TESCondition();
+    if ((auiFlags & 1) != 0) {
+        ourFree(this);
     }
+    return this;
 }
 
 bool TESCondition::Compare(TESCondition* apCompare) {

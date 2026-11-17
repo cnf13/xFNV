@@ -36,20 +36,15 @@ NiObject* BSPlayerDistanceCheckController::CreateClone(NiCloningProcess& kClonin
 }
 
 void BSPlayerDistanceCheckController::Update(NiUpdateData& UpdateData) {
-    if (!(GetCheckDistance() < 0.0)) {
-        if (GetCallback()) {
-            if (pPlayer) {
-                NiAVObject* ptarget =
-                    static_cast<NiAVObject*>(NiObject::DynamicCastStatic(&NiAVObject::ms_RTTI, m_pkTarget));
-                if (ptarget) {
-                    const NiPoint3* WorldTranslate = &ptarget->GetWorldTranslate();
-                    const NiPoint3* v2 = &pPlayer->GetLocationOnReference();
-                    NiPoint3 diff = *v2 - *WorldTranslate;
-                    double fPlayerDistance = diff.Length();
-                    if (GetCheckDistance() > fPlayerDistance) {
-                        pfnCallback(ptarget);
-                    }
-                }
+    if ((!(GetCheckDistance() < 0.0)) && (GetCallback()) && (pPlayer)) {
+        NiAVObject* ptarget = static_cast<NiAVObject*>(NiObject::DynamicCastStatic(&NiAVObject::ms_RTTI, m_pkTarget));
+        if (ptarget) {
+            const NiPoint3* WorldTranslate = &ptarget->GetWorldTranslate();
+            const NiPoint3* v2 = &pPlayer->GetLocationOnReference();
+            NiPoint3 diff = *v2 - *WorldTranslate;
+            double fPlayerDistance = diff.Length();
+            if (GetCheckDistance() > fPlayerDistance) {
+                pfnCallback(ptarget);
             }
         }
     }

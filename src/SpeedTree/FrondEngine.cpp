@@ -688,107 +688,105 @@ void CFrondEngine::BuildExtrusionVertices(SFrondGuide& sGuide) {
     CVec3 v43;
     std::vector<std::vector<float, std::allocator<float>>, std::allocator<std::vector<float, std::allocator<float>>>>
         v50;
-    if (m_pGeometry) {
-        if (m_pLightingEngine) {
-            CVec3Vector vProfile;
-            CVec3Vector vNormals;
-            BuildProfileVectors(sGuide, vProfile, vNormals);
-            sGuide.m_nVerticesPerGuideVertex = static_cast<uint32_t>(vProfile.size());
-            sGuide.m_nVertexStartIndex = m_pGeometry->m_nVertexCounter;
-            for (uint32_t _Pos = 0; _Pos < sGuide.m_vVertices.size(); ++_Pos) {
-                float v47 = static_cast<double>(_Pos) /
-                    (static_cast<double>(static_cast<uint32_t>(sGuide.m_vVertices.size())) - 1.0);
-                for (uint32_t i = 0; i < sGuide.m_nVerticesPerGuideVertex; ++i) {
-                    CRotTransform* uExitCode;
-                    float pTexCoord[2];
-                    float pColor[4];
-                    float v44 = static_cast<double>(i) / (static_cast<double>(sGuide.m_nVerticesPerGuideVertex) - 1.0);
-                    cTransform = sGuide.m_vVertices[_Pos].m_cTrans;
-                    if (_Pos) {
-                        uExitCode = &sGuide.m_vVertices[_Pos - 1].m_cTrans;
-                    }
-                    else {
-                        uExitCode = &cTransform;
-                    }
-                    v33 = *uExitCode;
-                    cTransform.RotateX(sGuide.m_fOffsetAngle);
-                    v33.RotateX(sGuide.m_fOffsetAngle);
-                    CVec3 hProcess = vProfile[i] * cTransform;
-                    CVec3 apOther = vProfile[i] * v33;
-                    SFrondVertex* v11 = &sGuide.m_vVertices[_Pos];
-                    CVec3* v2 = hProcess.Add(&apResult, &apOther);
-                    CVec3* v3 = v2->Scale(&v15, 0.5f);
-                    v11->m_cPos.Add(&v38, v3);
-                    hProcess.Add(&cVec, &apOther);
-                    cVec.Normalize();
-                    m_pGeometry->AddVertexCoord(v38.m_afData);
-                    pTexCoord[0] = v44;
-                    pTexCoord[1] = v47;
-                    m_pGeometry->AddVertexTexCoord0(pTexCoord, sGuide.m_chFrondMapIndex);
-                    CVec3 out = vNormals[i] * cTransform;
-                    CVec3 v41 = vNormals[i] * v33;
-                    CVec3* v4 = out.Add(&v14, &v41);
-                    v4->Scale(&v43, 0.5f);
-                    v43.Normalize();
-                    pColor[3] = 1.0f;
-                    pColor[2] = 1.0f;
-                    pColor[1] = 1.0f;
-                    pColor[0] = 1.0f;
-                    m_pGeometry->AddVertexColor(pColor);
-                    m_pGeometry->AddVertexNormal(v43.m_afData);
-                    m_pGeometry->AddVertexTangent(cVec.m_afData);
-                    CVec3 result = v43.Cross(cVec);
-                    result.Normalize();
-                    m_pGeometry->AddVertexBinormal(result.m_afData);
-                    if (m_pGeometry->m_bVertexWeighting) {
-                        uint8_t fAngle = sGuide.m_vVertices[_Pos].m_nWindGroup;
-                        float fWindWeight = sGuide.m_vVertices[_Pos].m_fCrossSectionWeight;
-                        m_pGeometry->AddVertexWind(fWindWeight, fAngle);
-                    }
-                    ++m_pGeometry->m_nVertexCounter;
+    if ((m_pGeometry) && (m_pLightingEngine)) {
+        CVec3Vector vProfile;
+        CVec3Vector vNormals;
+        BuildProfileVectors(sGuide, vProfile, vNormals);
+        sGuide.m_nVerticesPerGuideVertex = static_cast<uint32_t>(vProfile.size());
+        sGuide.m_nVertexStartIndex = m_pGeometry->m_nVertexCounter;
+        for (uint32_t _Pos = 0; _Pos < sGuide.m_vVertices.size(); ++_Pos) {
+            float v47 = static_cast<double>(_Pos) /
+                (static_cast<double>(static_cast<uint32_t>(sGuide.m_vVertices.size())) - 1.0);
+            for (uint32_t i = 0; i < sGuide.m_nVerticesPerGuideVertex; ++i) {
+                CRotTransform* uExitCode;
+                float pTexCoord[2];
+                float pColor[4];
+                float v44 = static_cast<double>(i) / (static_cast<double>(sGuide.m_nVerticesPerGuideVertex) - 1.0);
+                cTransform = sGuide.m_vVertices[_Pos].m_cTrans;
+                if (_Pos) {
+                    uExitCode = &sGuide.m_vVertices[_Pos - 1].m_cTrans;
                 }
-            }
-            using apMemory_t = std::vector<float, std::allocator<float>>;
-            apMemory_t apMemory;
-            ::new (&v50) std::vector<CVec, std::allocator<CVec>>;
-            for (uint32_t j = 0; j < sGuide.m_nVerticesPerGuideVertex; ++j) {
-                float v31 = 0.0f;
-                using v30_t = std::vector<float, std::allocator<float>>;
-                v30_t v30;
-                float _Val = 0.0f;
-                v30.push_back(_Val);
-                for (uint32_t k = 1; k < sGuide.m_vVertices.size(); ++k) {
-                    int32_t nVertexIndex = j + (sGuide.m_nVerticesPerGuideVertex * k + sGuide.m_nVertexStartIndex);
-                    uint32_t v26 = j + (sGuide.m_nVerticesPerGuideVertex * (k - 1) + sGuide.m_nVertexStartIndex);
-                    const float* VertexCoord = m_pGeometry->GetVertexCoord(nVertexIndex);
-                    const float* v24 = m_pGeometry->GetVertexCoord(v26);
-                    CVec3 v27(*VertexCoord, VertexCoord[1], VertexCoord[2]);
-                    CVec3 a2(*v24, v24[1], v24[2]);
-                    double v5 = v27.Distance(a2);
-                    v31 = v5 + v31;
-                    v30.push_back(v31);
+                else {
+                    uExitCode = &cTransform;
                 }
-                v50.push_back(v30);
-                apMemory.push_back(v31);
-            }
-            for (size_t m = 0; m < sGuide.m_nVerticesPerGuideVertex; ++m) {
-                for (size_t n = 1; n < sGuide.m_vVertices.size(); ++n) {
-                    float v19[2];
-                    uint16_t v18 = m +
-                        (static_cast<uint16_t>(sGuide.m_nVerticesPerGuideVertex) * n +
-                         static_cast<uint16_t>(sGuide.m_nVertexStartIndex));
-                    m_pGeometry->m_nVertexCounter = v18;
-                    const float* VertexTexCoord0 = m_pGeometry->GetVertexTexCoord0(v18);
-                    v19[0] = *VertexTexCoord0;
-                    float* v6 = &v50[m][n];
-                    v19[1] = *v6 / apMemory[m] * 0.999f;
-                    m_pGeometry->AddVertexTexCoord0(v19, sGuide.m_chFrondMapIndex);
-                    ++m_pGeometry->m_nVertexCounter;
+                v33 = *uExitCode;
+                cTransform.RotateX(sGuide.m_fOffsetAngle);
+                v33.RotateX(sGuide.m_fOffsetAngle);
+                CVec3 hProcess = vProfile[i] * cTransform;
+                CVec3 apOther = vProfile[i] * v33;
+                SFrondVertex* v11 = &sGuide.m_vVertices[_Pos];
+                CVec3* v2 = hProcess.Add(&apResult, &apOther);
+                CVec3* v3 = v2->Scale(&v15, 0.5f);
+                v11->m_cPos.Add(&v38, v3);
+                hProcess.Add(&cVec, &apOther);
+                cVec.Normalize();
+                m_pGeometry->AddVertexCoord(v38.m_afData);
+                pTexCoord[0] = v44;
+                pTexCoord[1] = v47;
+                m_pGeometry->AddVertexTexCoord0(pTexCoord, sGuide.m_chFrondMapIndex);
+                CVec3 out = vNormals[i] * cTransform;
+                CVec3 v41 = vNormals[i] * v33;
+                CVec3* v4 = out.Add(&v14, &v41);
+                v4->Scale(&v43, 0.5f);
+                v43.Normalize();
+                pColor[3] = 1.0f;
+                pColor[2] = 1.0f;
+                pColor[1] = 1.0f;
+                pColor[0] = 1.0f;
+                m_pGeometry->AddVertexColor(pColor);
+                m_pGeometry->AddVertexNormal(v43.m_afData);
+                m_pGeometry->AddVertexTangent(cVec.m_afData);
+                CVec3 result = v43.Cross(cVec);
+                result.Normalize();
+                m_pGeometry->AddVertexBinormal(result.m_afData);
+                if (m_pGeometry->m_bVertexWeighting) {
+                    uint8_t fAngle = sGuide.m_vVertices[_Pos].m_nWindGroup;
+                    float fWindWeight = sGuide.m_vVertices[_Pos].m_fCrossSectionWeight;
+                    m_pGeometry->AddVertexWind(fWindWeight, fAngle);
                 }
+                ++m_pGeometry->m_nVertexCounter;
             }
-            using v50_t = std::vector<
-                std::vector<float, std::allocator<float>>, std::allocator<std::vector<float, std::allocator<float>>>>;
         }
+        using apMemory_t = std::vector<float, std::allocator<float>>;
+        apMemory_t apMemory;
+        ::new (&v50) std::vector<CVec, std::allocator<CVec>>;
+        for (uint32_t j = 0; j < sGuide.m_nVerticesPerGuideVertex; ++j) {
+            float v31 = 0.0f;
+            using v30_t = std::vector<float, std::allocator<float>>;
+            v30_t v30;
+            float _Val = 0.0f;
+            v30.push_back(_Val);
+            for (uint32_t k = 1; k < sGuide.m_vVertices.size(); ++k) {
+                int32_t nVertexIndex = j + (sGuide.m_nVerticesPerGuideVertex * k + sGuide.m_nVertexStartIndex);
+                uint32_t v26 = j + (sGuide.m_nVerticesPerGuideVertex * (k - 1) + sGuide.m_nVertexStartIndex);
+                const float* VertexCoord = m_pGeometry->GetVertexCoord(nVertexIndex);
+                const float* v24 = m_pGeometry->GetVertexCoord(v26);
+                CVec3 v27(*VertexCoord, VertexCoord[1], VertexCoord[2]);
+                CVec3 a2(*v24, v24[1], v24[2]);
+                double v5 = v27.Distance(a2);
+                v31 = v5 + v31;
+                v30.push_back(v31);
+            }
+            v50.push_back(v30);
+            apMemory.push_back(v31);
+        }
+        for (size_t m = 0; m < sGuide.m_nVerticesPerGuideVertex; ++m) {
+            for (size_t n = 1; n < sGuide.m_vVertices.size(); ++n) {
+                float v19[2];
+                uint16_t v18 = m +
+                    (static_cast<uint16_t>(sGuide.m_nVerticesPerGuideVertex) * n +
+                     static_cast<uint16_t>(sGuide.m_nVertexStartIndex));
+                m_pGeometry->m_nVertexCounter = v18;
+                const float* VertexTexCoord0 = m_pGeometry->GetVertexTexCoord0(v18);
+                v19[0] = *VertexTexCoord0;
+                float* v6 = &v50[m][n];
+                v19[1] = *v6 / apMemory[m] * 0.999f;
+                m_pGeometry->AddVertexTexCoord0(v19, sGuide.m_chFrondMapIndex);
+                ++m_pGeometry->m_nVertexCounter;
+            }
+        }
+        using v50_t = std::vector<
+            std::vector<float, std::allocator<float>>, std::allocator<std::vector<float, std::allocator<float>>>>;
     }
 }
 

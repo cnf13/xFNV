@@ -182,15 +182,12 @@ BSShaderProperty::RenderPassArray* TallGrassShaderProperty::GetRenderPasses(
         bool bFitSlope = (ulFlags[1] & BSS2_Fit_Slope) != 0;
         bool bBillboard = (ulFlags[1] & BSS2_Billboard_and_Envmap_Light_Fade) != 0;
         bool v13 = false;
-        if (!BSShaderManager::bInterior) {
-            if (BSShaderManager::pProjectedShadowTexture.m_pObject) {
-                if ((BSShaderManager::iEnabledPasses & 32) != 0 && BSShaderManager::eShaderLevel >= 2) {
-                    if (static_cast<int32_t>(static_cast<int64_t>(ShadowLightShader::kShadowProjTransform.w)) != 0) {
-                        v13 = true;
-                    }
-                }
-            }
+        if ((!BSShaderManager::bInterior) && (BSShaderManager::pProjectedShadowTexture.m_pObject) &&
+            ((BSShaderManager::iEnabledPasses & 32) != 0 && BSShaderManager::eShaderLevel >= 2) &&
+            (static_cast<int32_t>(static_cast<int64_t>(ShadowLightShader::kShadowProjTransform.w)) != 0)) {
+            v13 = true;
         }
+
         int32_t v14 = (inumlights != 0 ? 20 : 0) + (BSShaderManager::bHDR ? 582 : 0);
         if (v12) {
             v15 = apGeom;
@@ -351,16 +348,14 @@ void TallGrassShaderProperty::ClearStaticMaps() {
                 const char* pckey;
                 TallGrassShaderProperty::GetCachedGeometryMap()->GetNext(kiter_2, pckey, spCache);
                 TallGrassShaderProperty::CachedGeometry* m_pObject = spCache.m_pObject;
-                if (m_pObject) {
-                    if (!m_pObject->bQueued) {
-                        m_pObject->spTriGeomData = nullptr;
-                        MemoryManager_Singleton.Deallocate(m_pObject->pInstanceIndex);
-                        m_pObject->pInstanceIndex = nullptr;
-                        m_pObject->spBaseTexture = nullptr;
-                        m_pObject->spAlphaNoBlend = nullptr;
-                        m_pObject->spAlphaBlend = nullptr;
-                        m_pObject->spStencil = nullptr;
-                    }
+                if ((m_pObject) && (!m_pObject->bQueued)) {
+                    m_pObject->spTriGeomData = nullptr;
+                    MemoryManager_Singleton.Deallocate(m_pObject->pInstanceIndex);
+                    m_pObject->pInstanceIndex = nullptr;
+                    m_pObject->spBaseTexture = nullptr;
+                    m_pObject->spAlphaNoBlend = nullptr;
+                    m_pObject->spAlphaBlend = nullptr;
+                    m_pObject->spStencil = nullptr;
                 }
             }
             while (kiter_2);
@@ -809,78 +804,75 @@ void TallGrassShaderProperty::RemoveFromTerrainChunk(int32_t alTerrainChunkSeed)
     }
     pos = v8;
     TallGrassShaderProperty::CachedGrass* pCachedGrass = nullptr;
-    if (TallGrassShaderProperty::GetCachedGrassMap()->m_kAllocator.m_uiCount) {
-        if (v8) {
-            do {
-                uint32_t v24;
-                TallGrassShaderProperty::GetCachedGrassMap()->GetNext(pos, v24, pCachedGrass);
-                TallGrassShaderProperty::CachedGrass* v9 = pCachedGrass;
-                if (pCachedGrass) {
-                    NiTMap<int32_t, int32_t>* p_pLowTerrainChunkMap = &pCachedGrass->pLowTerrainChunkMap;
-                    NiTMap<int32_t, int32_t>* v21 = &pCachedGrass->pLowTerrainChunkMap;
-                    if (pCachedGrass->pLowTerrainChunkMap.GetAt(alTerrainChunkSeed, iChunkIndex)) {
-                        NiTListItem<TallGrassGroup*>* m_pkHead = v9->pLowGrassGroupList.m_pkHead;
-                        NiTPointerList<TallGrassGroup*>* p_pLowGrassGroupList = &v9->pLowGrassGroupList;
-                        if (m_pkHead) {
-                            do {
-                                TallGrassGroup* m_element = m_pkHead->m_element;
-                                TallGrassGroup** p_m_element = &m_pkHead->m_element;
-                                NiTListItem<TallGrassGroup*>* v14 = m_pkHead;
-                                m_pkHead = m_pkHead->m_pkNext;
-                                if (m_element) {
-                                    if (!m_element->RemoveTerrainChunk(alTerrainChunkSeed)) {
-                                        if (v14 == p_pLowGrassGroupList->m_pkHead) {
-                                            p_pLowGrassGroupList->RemoveHead();
+    if ((TallGrassShaderProperty::GetCachedGrassMap()->m_kAllocator.m_uiCount) && (v8)) {
+        do {
+            uint32_t v24;
+            TallGrassShaderProperty::GetCachedGrassMap()->GetNext(pos, v24, pCachedGrass);
+            TallGrassShaderProperty::CachedGrass* v9 = pCachedGrass;
+            if (pCachedGrass) {
+                NiTMap<int32_t, int32_t>* p_pLowTerrainChunkMap = &pCachedGrass->pLowTerrainChunkMap;
+                NiTMap<int32_t, int32_t>* v21 = &pCachedGrass->pLowTerrainChunkMap;
+                if (pCachedGrass->pLowTerrainChunkMap.GetAt(alTerrainChunkSeed, iChunkIndex)) {
+                    NiTListItem<TallGrassGroup*>* m_pkHead = v9->pLowGrassGroupList.m_pkHead;
+                    NiTPointerList<TallGrassGroup*>* p_pLowGrassGroupList = &v9->pLowGrassGroupList;
+                    if (m_pkHead) {
+                        do {
+                            TallGrassGroup* m_element = m_pkHead->m_element;
+                            TallGrassGroup** p_m_element = &m_pkHead->m_element;
+                            NiTListItem<TallGrassGroup*>* v14 = m_pkHead;
+                            m_pkHead = m_pkHead->m_pkNext;
+                            if ((m_element) && (!m_element->RemoveTerrainChunk(alTerrainChunkSeed))) {
+                                if (v14 == p_pLowGrassGroupList->m_pkHead) {
+                                    p_pLowGrassGroupList->RemoveHead();
+                                }
+                                else {
+                                    if (v14 == p_pLowGrassGroupList->m_pkTail) {
+                                        p_pLowGrassGroupList->RemoveTail();
+                                    }
+                                    else {
+                                        NiTListItem<TallGrassGroup*>* pkPrev = v14->m_pkPrev;
+                                        NiTListItem<TallGrassGroup*>* m_pkNext = v14->m_pkNext;
+                                        if (pkPrev) {
+                                            pkPrev->m_pkNext = m_pkNext;
                                         }
-                                        else {
-                                            if (v14 == p_pLowGrassGroupList->m_pkTail) {
-                                                p_pLowGrassGroupList->RemoveTail();
-                                            }
-                                            else {
-                                                NiTListItem<TallGrassGroup*>* pkPrev = v14->m_pkPrev;
-                                                NiTListItem<TallGrassGroup*>* m_pkNext = v14->m_pkNext;
-                                                if (pkPrev) {
-                                                    pkPrev->m_pkNext = m_pkNext;
-                                                }
-                                                if (m_pkNext) {
-                                                    m_pkNext->m_pkPrev = pkPrev;
-                                                }
-                                                *p_m_element = nullptr;
-                                                // EXE-INLINED 0x45CEE0
-                                                using PoolAllocator = NiTAbstractPoolAllocator<uint32_t>;
-                                                PoolAllocator::ms_kSpinLock.Lock(nullptr);
-                                                // The pool treats a freed list item as untyped node storage, as the
-                                                // allocator's own Deallocate (NiTPointerAllocator) casts it.
-                                                PoolAllocator::AllocNode* pkFreed =
-                                                    reinterpret_cast<PoolAllocator::AllocNode*>(v14);
-                                                pkFreed->m_pkData = nullptr;
-                                                pkFreed->m_pkNext = PoolAllocator::ms_pkFreeMem;
-                                                bool v17 = PoolAllocator::ms_kSpinLock.uiLockCount-- == 1;
-                                                PoolAllocator::ms_pkFreeMem = pkFreed;
-                                                if (v17) {
-                                                    PoolAllocator::ms_kSpinLock.uiOwningThread = 0;
-                                                }
-                                                --p_pLowGrassGroupList->m_uiCount;
-                                            }
+                                        if (m_pkNext) {
+                                            m_pkNext->m_pkPrev = pkPrev;
                                         }
-                                        m_element->~TallGrassGroup();
-                                        MemoryManager_Singleton.Deallocate(m_element);
-                                        --uiGrassGeometryCount;
+                                        *p_m_element = nullptr;
+                                        // EXE-INLINED 0x45CEE0
+                                        using PoolAllocator = NiTAbstractPoolAllocator<uint32_t>;
+                                        PoolAllocator::ms_kSpinLock.Lock(nullptr);
+                                        // The pool treats a freed list item as untyped node storage, as the
+                                        // allocator's own Deallocate (NiTPointerAllocator) casts it.
+                                        PoolAllocator::AllocNode* pkFreed =
+                                            reinterpret_cast<PoolAllocator::AllocNode*>(v14);
+                                        pkFreed->m_pkData = nullptr;
+                                        pkFreed->m_pkNext = PoolAllocator::ms_pkFreeMem;
+                                        bool v17 = PoolAllocator::ms_kSpinLock.uiLockCount-- == 1;
+                                        PoolAllocator::ms_pkFreeMem = pkFreed;
+                                        if (v17) {
+                                            PoolAllocator::ms_kSpinLock.uiOwningThread = 0;
+                                        }
+                                        --p_pLowGrassGroupList->m_uiCount;
                                     }
                                 }
+                                m_element->~TallGrassGroup();
+                                MemoryManager_Singleton.Deallocate(m_element);
+                                --uiGrassGeometryCount;
                             }
-                            while (m_pkHead);
-                            p_pLowTerrainChunkMap = v21;
-                            v1 = v22;
                         }
-                        p_pLowTerrainChunkMap->RemoveAt_00E91FD0(alTerrainChunkSeed);
-                        eMemContext = v23;
+                        while (m_pkHead);
+                        p_pLowTerrainChunkMap = v21;
+                        v1 = v22;
                     }
+                    p_pLowTerrainChunkMap->RemoveAt_00E91FD0(alTerrainChunkSeed);
+                    eMemContext = v23;
                 }
             }
-            while (pos);
         }
+        while (pos);
     }
+
     v1->eMemContext = eMemContext;
 }
 
@@ -996,19 +988,18 @@ void TallGrassShaderProperty::RemoveAllGrass() {
     }
     kiter_2 = kiter;
     pcgrass = nullptr;
-    if (TallGrassShaderProperty::GetCachedGrassMap()->m_kAllocator.m_uiCount) {
-        if (kiter) {
-            do {
-                TallGrassShaderProperty::GetCachedGrassMap()->GetNext(kiter_2, ikey, pcgrass);
-                TallGrassShaderProperty::CachedGrass* v7 = pcgrass;
-                if (pcgrass) {
-                    pcgrass->Free();
-                    MemoryManager_Singleton.Deallocate(v7);
-                }
+    if ((TallGrassShaderProperty::GetCachedGrassMap()->m_kAllocator.m_uiCount) && (kiter)) {
+        do {
+            TallGrassShaderProperty::GetCachedGrassMap()->GetNext(kiter_2, ikey, pcgrass);
+            TallGrassShaderProperty::CachedGrass* v7 = pcgrass;
+            if (pcgrass) {
+                pcgrass->Free();
+                MemoryManager_Singleton.Deallocate(v7);
             }
-            while (kiter_2);
         }
+        while (kiter_2);
     }
+
     TallGrassShaderProperty::GetCachedGrassMap()->RemoveAll();
     uiGrassGeometryCount = 0;
     uiGrassInstanceCount = 0;

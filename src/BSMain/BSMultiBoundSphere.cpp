@@ -177,7 +177,6 @@ NiObject* BSMultiBoundSphere::CreateObject() {
     if (v2) {
         return ::new (v2) BSMultiBoundSphere;
     }
-    else {
-        return nullptr;
-    }
+
+    return nullptr;
 }

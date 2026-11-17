@@ -164,10 +164,8 @@ void BGSSaveGameBuffer::Save(BGSSaveLoadFile* apFile, uint32_t aiSize) {
         }
     }
     else {
-        if (pBuffer) {
-            if (aiSize) {
-                apFile->Write(pBuffer, aiSize);
-            }
+        if ((pBuffer) && (aiSize)) {
+            apFile->Write(pBuffer, aiSize);
         }
     }
 }

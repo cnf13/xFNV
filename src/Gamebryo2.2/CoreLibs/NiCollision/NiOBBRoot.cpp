@@ -37,12 +37,10 @@ bool NiOBBRoot::TestCollision(
     if (this == pTestRoot) {
         return false;
     }
-    else {
-        return (bool)((int32_t)m_pTree->TestCollision(
-            pTestRoot->m_pTree, pThisObj, pOtherObj, iMaxDepth, iTestMaxDepth, m_uiChangeStamp,
-            pTestRoot->m_uiChangeStamp
-        ));
-    }
+
+    return (bool)((int32_t)m_pTree->TestCollision(
+        pTestRoot->m_pTree, pThisObj, pOtherObj, iMaxDepth, iTestMaxDepth, m_uiChangeStamp, pTestRoot->m_uiChangeStamp
+    ));
 }
 
 int32_t NiOBBRoot::FindCollisions(
@@ -58,12 +56,11 @@ int32_t NiOBBRoot::FindCollisions(
     if (this == pTestRoot) {
         return 0;
     }
-    else {
-        return m_pTree->FindCollisions(
-            pTestRoot->m_pTree, pThisRoot, pOtherRoot, pThisObj, pOtherObj, iMaxDepth, iTestMaxDepth, m_uiChangeStamp,
-            pTestRoot->m_uiChangeStamp, bCollision
-        );
-    }
+
+    return m_pTree->FindCollisions(
+        pTestRoot->m_pTree, pThisRoot, pOtherRoot, pThisObj, pOtherObj, iMaxDepth, iTestMaxDepth, m_uiChangeStamp,
+        pTestRoot->m_uiChangeStamp, bCollision
+    );
 }
 
 // Picks against the tree.

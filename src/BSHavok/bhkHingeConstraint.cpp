@@ -262,15 +262,13 @@ void hkHingeConstraintCinfo::GetViewerStrings(NiTPrimitiveArray<char*>* apString
 // KEEP: the exe's caller hkHingeConstraintCinfo::CloneData (0xCBDB70) pushes edx at 0xCBDC80 after the call at
 // 0xCBDC73, loaded before it; the exe body leaves edx alone, clang does not guarantee it.
 void hkHingeConstraintCinfo::ApplyScale(float afScale, hkpConstraintData* apInfo) {
-    if (apInfo) {
-        if (1.0f != afScale) {
-            hkpHingeConstraintData* pd = static_cast<hkpHingeConstraintData*>(apInfo);
-            __m128 kScale = _mm_set_ss(afScale);
-            kScale = _mm_shuffle_ps(kScale, kScale, 0);
-            hkVector4& rPivotA = pd->m_atoms.m_transforms.m_transformA.m_translation;
-            rPivotA.m_quad = _mm_mul_ps(kScale, rPivotA.m_quad);
-            hkVector4& rPivotB = pd->m_atoms.m_transforms.m_transformB.m_translation;
-            rPivotB.m_quad = _mm_mul_ps(kScale, rPivotB.m_quad);
-        }
+    if ((apInfo) && (1.0f != afScale)) {
+        hkpHingeConstraintData* pd = static_cast<hkpHingeConstraintData*>(apInfo);
+        __m128 kScale = _mm_set_ss(afScale);
+        kScale = _mm_shuffle_ps(kScale, kScale, 0);
+        hkVector4& rPivotA = pd->m_atoms.m_transforms.m_transformA.m_translation;
+        rPivotA.m_quad = _mm_mul_ps(kScale, rPivotA.m_quad);
+        hkVector4& rPivotB = pd->m_atoms.m_transforms.m_transformB.m_translation;
+        rPivotB.m_quad = _mm_mul_ps(kScale, rPivotB.m_quad);
     }
 }

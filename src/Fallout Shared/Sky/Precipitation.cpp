@@ -163,46 +163,43 @@ void Precipitation::Load(const char* apFilename) {
         pParent->AttachChild(spLastPrecipRoot.m_pObject, 1);
         spCurrentPrecipRoot.operator=(static_cast<NiNode*>(nullptr));
     }
-    if (apFilename) {
-        if (*apFilename) {
-            NiNode* pprecipNode = pModelLoader->LoadFile(apFilename, LOD_MULT_NONE, true, false, false, false);
-            if (pprecipNode) {
-                NiNode* v6;
-                bool bsnow = BSstricmp(apFilename, "Sky\\Snow.NIF") == 0;
-                NiUpdateData UpdateData(0.0f, false, false);
-                pprecipNode->UpdateDownwardPass(UpdateData, 0);
-                NiNode* v8 = static_cast<NiNode*>(NiMemObject::operator new(sizeof(NiNode)));
-                if (v8) {
-                    v6 = ::new (v8) NiNode(0);
+    if ((apFilename) && (*apFilename)) {
+        NiNode* pprecipNode = pModelLoader->LoadFile(apFilename, LOD_MULT_NONE, true, false, false, false);
+        if (pprecipNode) {
+            NiNode* v6;
+            bool bsnow = BSstricmp(apFilename, "Sky\\Snow.NIF") == 0;
+            NiUpdateData UpdateData(0.0f, false, false);
+            pprecipNode->UpdateDownwardPass(UpdateData, 0);
+            NiNode* v8 = static_cast<NiNode*>(NiMemObject::operator new(sizeof(NiNode)));
+            if (v8) {
+                v6 = ::new (v8) NiNode(0);
+            }
+            else {
+                v6 = nullptr;
+            }
+            spCurrentPrecipRoot.operator=(v6);
+            fBirthRate = 0.0f;
+            for (uint32_t i = 0; i < pprecipNode->GetChildCount(); ++i) {
+                NiParticleSystem* pps;
+                NiAVObject* v5 = pprecipNode->GetAt(i);
+                NiNode* pNode = v5->IsNode();
+                if (pNode) {
+                    NiAVObject* v2 = pNode->GetAtChecked(0);
+                    pps = static_cast<NiParticleSystem*>(NiObject::DynamicCastStatic(&NiParticleSystem::ms_RTTI, v2));
                 }
                 else {
-                    v6 = nullptr;
+                    pps = nullptr;
                 }
-                spCurrentPrecipRoot.operator=(v6);
-                fBirthRate = 0.0f;
-                for (uint32_t i = 0; i < pprecipNode->GetChildCount(); ++i) {
-                    NiParticleSystem* pps;
-                    NiAVObject* v5 = pprecipNode->GetAt(i);
-                    NiNode* pNode = v5->IsNode();
-                    if (pNode) {
-                        NiAVObject* v2 = pNode->GetAtChecked(0);
-                        pps =
-                            static_cast<NiParticleSystem*>(NiObject::DynamicCastStatic(&NiParticleSystem::ms_RTTI, v2));
-                    }
-                    else {
-                        pps = nullptr;
-                    }
-                    if (pps) {
-                        NiGeometry* pprecipGeom = CreateShaderGeometry(pps, pParent->GetWorldTransform(), bsnow);
-                        if (pprecipGeom) {
-                            NiNode* v3 = spCurrentPrecipRoot.m_pObject;
-                            v3->AttachChild(pprecipGeom, 1);
-                        }
+                if (pps) {
+                    NiGeometry* pprecipGeom = CreateShaderGeometry(pps, pParent->GetWorldTransform(), bsnow);
+                    if (pprecipGeom) {
+                        NiNode* v3 = spCurrentPrecipRoot.m_pObject;
+                        v3->AttachChild(pprecipGeom, 1);
                     }
                 }
-                pParent->AttachChild(spCurrentPrecipRoot.m_pObject, 1);
-                spCurrentPrecipRoot.m_pObject->UpdateProperties();
             }
+            pParent->AttachChild(spCurrentPrecipRoot.m_pObject, 1);
+            spCurrentPrecipRoot.m_pObject->UpdateProperties();
         }
     }
 }
@@ -289,34 +286,28 @@ void Precipitation::Update(float afSecondsPassed) {
             }
         }
         else {
-            if (pSky->GetWeatherUpdateFlag()) {
-                if (pCurrentWeather) {
-                    TESModel* v6 = &pCurrentWeather->precipNIF;
-                    Load_0(v6);
-                }
+            if ((pSky->GetWeatherUpdateFlag()) && (pCurrentWeather)) {
+                TESModel* v6 = &pCurrentWeather->precipNIF;
+                Load_0(v6);
             }
         }
     }
-    if (fCurrentPct >= 1.0) {
-        if (spLastPrecipRoot.m_pObject) {
-            pParent->DetachChild(spLastPrecipRoot.m_pObject);
-            spLastPrecipRoot.operator=(static_cast<NiNode*>(nullptr));
-        }
+    if ((fCurrentPct >= 1.0) && (spLastPrecipRoot.m_pObject)) {
+        pParent->DetachChild(spLastPrecipRoot.m_pObject);
+        spLastPrecipRoot.operator=(static_cast<NiNode*>(nullptr));
     }
+
     fBirthRate = 0.0f;
     if (spCurrentPrecipRoot.m_pObject || spLastPrecipRoot.m_pObject) {
         add_11AE5D0(afSecondsPassed);
-        if (pPlayer) {
-            if (pPlayer->GetParentCell()) {
-                if (pPlayer->GetParentCell()->HasWater()) {
-                    SceneGraph* WorldSceneGraph = Main::GetWorldSceneGraph();
-                    const NiPoint3* WorldTranslate = &WorldSceneGraph->GetCameraRoot()->GetWorldTranslate();
-                    if (static_cast<double>(WorldTranslate->z) < pPlayer->GetRelevantWaterHeight()) {
-                        bcull = true;
-                    }
-                }
+        if ((pPlayer) && (pPlayer->GetParentCell()) && (pPlayer->GetParentCell()->HasWater())) {
+            SceneGraph* WorldSceneGraph = Main::GetWorldSceneGraph();
+            const NiPoint3* WorldTranslate = &WorldSceneGraph->GetCameraRoot()->GetWorldTranslate();
+            if (static_cast<double>(WorldTranslate->z) < pPlayer->GetRelevantWaterHeight()) {
+                bcull = true;
             }
         }
+
         if (spCurrentPrecipRoot.m_pObject) {
             float fBR = 0.0f;
             if (fBeginPct < static_cast<double>(fCurrentPct)) {

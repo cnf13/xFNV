@@ -607,85 +607,78 @@ void Sky::UpdateWind() {
     float v7;
     float v8;
     float v9;
-    if (pCurrentWeather) {
-        if ((((int32_t)eMode) == 3) || (((int32_t)eMode) == 2)) {
-            fWindSpeed = pCurrentWeather->GetWeatherData(TESWeather::WD_WIND_SPEED, 1.0, 0.0);
-            if (pLastWeather) {
-                fWindSpeed = (fWindSpeed * fCurrentWeatherPct);
-                v4 = 1.0 - fCurrentWeatherPct;
-                fWindSpeed =
-                    (float)((pLastWeather->GetWeatherData(TESWeather::WD_WIND_SPEED, 1.0, 0.0) * v4) + fWindSpeed);
-            }
-            BSShaderManager::SetWindDirection(NiPoint2::UNIT_Y);
-            BSShaderManager::SetWindMagnitude(fWindSpeed);
-            ecx0;
-            v9 = 15.0f;
-            v8 = 15.0f;
-            v7 = (float)(((BSShaderManager::GetTimer(false) / 3600.0) * 6.283180236816406) * 15.0f);
-            v1 = NiSinQ(v7);
-            ecx0.x = (float)(v1 * v8);
-            v3 = (float)(v7 * 0.699999988079071);
-            v2 = NiCosQ(v3);
-            ecx0.y = (float)(v2 * v8);
-            ShadowLightShader::SetProjectedShadowTranslate(ecx0);
+    if ((pCurrentWeather) && ((((int32_t)eMode) == 3) || (((int32_t)eMode) == 2))) {
+        fWindSpeed = pCurrentWeather->GetWeatherData(TESWeather::WD_WIND_SPEED, 1.0, 0.0);
+        if (pLastWeather) {
+            fWindSpeed = (fWindSpeed * fCurrentWeatherPct);
+            v4 = 1.0 - fCurrentWeatherPct;
+            fWindSpeed = (float)((pLastWeather->GetWeatherData(TESWeather::WD_WIND_SPEED, 1.0, 0.0) * v4) + fWindSpeed);
         }
+        BSShaderManager::SetWindDirection(NiPoint2::UNIT_Y);
+        BSShaderManager::SetWindMagnitude(fWindSpeed);
+        ecx0;
+        v9 = 15.0f;
+        v8 = 15.0f;
+        v7 = (float)(((BSShaderManager::GetTimer(false) / 3600.0) * 6.283180236816406) * 15.0f);
+        v1 = NiSinQ(v7);
+        ecx0.x = (float)(v1 * v8);
+        v3 = (float)(v7 * 0.699999988079071);
+        v2 = NiCosQ(v3);
+        ecx0.y = (float)(v2 * v8);
+        ShadowLightShader::SetProjectedShadowTranslate(ecx0);
     }
 }
 
 void Sky::HandleClimateChange() {
     if ((uiFlags & 64) != 0) {
-        if (pStars) {
-            if (eMode == Sky::SM_FULL || eMode == Sky::SM_FAKEEXTERIOR) {
-                const char* NightSkyModel = pCurrentClimate->GetNightSkyModel();
-                pStars->LoadGeometry(NightSkyModel);
-            }
+        if ((pStars) && (eMode == Sky::SM_FULL || eMode == Sky::SM_FAKEEXTERIOR)) {
+            const char* NightSkyModel = pCurrentClimate->GetNightSkyModel();
+            pStars->LoadGeometry(NightSkyModel);
         }
-        if (pSun) {
-            if (eMode == Sky::SM_FULL || eMode == Sky::SM_FAKEEXTERIOR) {
-                BSStringT<char> strfilename;
-                SkyShaderProperty* pprop = static_cast<SkyShaderProperty*>(pSun->GetBase()->GetProperty(3));
-                NiTexture* ptex = nullptr;
-                const TESTexture* ptestexture = pCurrentClimate->GetTexture(TESClimate::TX_SUN);
-                if (ptestexture) {
-                    if (ptestexture->GetTextureNameLength()) {
-                        NiPointer<NiTexture> spTex(static_cast<NiTexture*>(nullptr));
-                        const char* v1 = ptestexture->GetDefaultPath();
-                        strfilename.operator=(v1);
-                        const char* pTextureName = ptestexture->GetTextureName();
-                        strfilename.operator+=(pTextureName);
-                        BSShaderManager::GetTexture(strfilename.pString, true, spTex, true, false);
-                        ptex = spTex.m_pObject;
-                        if (ptex) {
-                            pprop->SetTexture(static_cast<NiSourceTexture*>(ptex));
-                        }
-                    }
+
+        if ((pSun) && (eMode == Sky::SM_FULL || eMode == Sky::SM_FAKEEXTERIOR)) {
+            BSStringT<char> strfilename;
+            SkyShaderProperty* pprop = static_cast<SkyShaderProperty*>(pSun->GetBase()->GetProperty(3));
+            NiTexture* ptex = nullptr;
+            const TESTexture* ptestexture = pCurrentClimate->GetTexture(TESClimate::TX_SUN);
+            if ((ptestexture) && (ptestexture->GetTextureNameLength())) {
+                NiPointer<NiTexture> spTex(static_cast<NiTexture*>(nullptr));
+                const char* v1 = ptestexture->GetDefaultPath();
+                strfilename.operator=(v1);
+                const char* pTextureName = ptestexture->GetTextureName();
+                strfilename.operator+=(pTextureName);
+                BSShaderManager::GetTexture(strfilename.pString, true, spTex, true, false);
+                ptex = spTex.m_pObject;
+                if (ptex) {
+                    pprop->SetTexture(static_cast<NiSourceTexture*>(ptex));
                 }
-                pSun->GetSunBaseNode()->SetDisplayObject(ptex != nullptr);
-                NiAVObject* pSunGlare = pSun->GetSunGlareGeo();
-                pprop = static_cast<SkyShaderProperty*>(pSunGlare->GetProperty(3));
-                ptestexture = pCurrentClimate->GetTexture(TESClimate::TX_GLARE);
-                if (ptestexture) {
-                    if (ptestexture->GetTextureNameLength()) {
-                        if (BSShaderManager::bHDR || BSstricmp(ptestexture->GetTextureName(), "Sky\\SunGlare.dds")) {
-                            const char* v5 = ptestexture->GetDefaultPath();
-                            strfilename.operator=(v5);
-                            const char* v6 = ptestexture->GetTextureName();
-                            strfilename.operator+=(v6);
-                        }
-                        else {
-                            strfilename.operator=("Textures\\Sky\\SunGlareNonHDR.dds");
-                        }
-                        NiPointer<NiTexture> spTex_2(static_cast<NiTexture*>(nullptr));
-                        BSShaderManager::GetTexture(strfilename.pString, true, spTex_2, true, false);
-                        ptex = spTex_2.m_pObject;
-                        if (ptex) {
-                            pprop->SetTexture(static_cast<NiSourceTexture*>(ptex));
-                        }
-                    }
-                }
-                pSun->GetSunGlareNode()->SetDisplayObject(ptex != nullptr);
             }
+
+            pSun->GetSunBaseNode()->SetDisplayObject(ptex != nullptr);
+            NiAVObject* pSunGlare = pSun->GetSunGlareGeo();
+            pprop = static_cast<SkyShaderProperty*>(pSunGlare->GetProperty(3));
+            ptestexture = pCurrentClimate->GetTexture(TESClimate::TX_GLARE);
+            if ((ptestexture) && (ptestexture->GetTextureNameLength())) {
+                if (BSShaderManager::bHDR || BSstricmp(ptestexture->GetTextureName(), "Sky\\SunGlare.dds")) {
+                    const char* v5 = ptestexture->GetDefaultPath();
+                    strfilename.operator=(v5);
+                    const char* v6 = ptestexture->GetTextureName();
+                    strfilename.operator+=(v6);
+                }
+                else {
+                    strfilename.operator=("Textures\\Sky\\SunGlareNonHDR.dds");
+                }
+                NiPointer<NiTexture> spTex_2(static_cast<NiTexture*>(nullptr));
+                BSShaderManager::GetTexture(strfilename.pString, true, spTex_2, true, false);
+                ptex = spTex_2.m_pObject;
+                if (ptex) {
+                    pprop->SetTexture(static_cast<NiSourceTexture*>(ptex));
+                }
+            }
+
+            pSun->GetSunGlareNode()->SetDisplayObject(ptex != nullptr);
         }
+
         if (!pCurrentClimate->UsesMasser() || pMasser) {
             if (!pCurrentClimate->UsesMasser()) {
                 if (pMasser) {
@@ -781,20 +774,15 @@ void Sky::UpdateWeather() {
             }
         }
         bool bloadNewWeather = pOverrideWeather == nullptr;
-        if (pCurrentWeather) {
-            if (pSaveLoadGame->GetSaveGameLoading()) {
-                bloadNewWeather = false;
-            }
+        if ((pCurrentWeather) && (pSaveLoadGame->GetSaveGameLoading())) {
+            bloadNewWeather = false;
         }
+
         if (bloadNewWeather) {
             pNewWeather = pDefaultWeather;
             TESRegion* pPlayerRegion = pPlayer->GetOccupiedRegion();
-            if (pPlayerRegion) {
-                if (pPlayerRegion->pCurrentWeather) {
-                    if (eMode != Sky::SM_FAKEEXTERIOR) {
-                        pNewWeather = pPlayerRegion->pCurrentWeather;
-                    }
-                }
+            if ((pPlayerRegion) && (pPlayerRegion->pCurrentWeather) && (eMode != Sky::SM_FAKEEXTERIOR)) {
+                pNewWeather = pPlayerRegion->pCurrentWeather;
             }
         }
         else {
@@ -1694,37 +1682,33 @@ void Sky::ReloadAllTextures() {
     AutoMemContext tempMemContext(
         MEM_CONTEXT_SKY, true, "D:\\_Fallout3\\Platforms\\Common\\Code\\Fallout Shared\\Sky\\Sky.cpp", 2268
     );
-    if (pClouds) {
-        if (pCurrentWeather) {
-            if (!pSaveLoadGame->GetSaveGameLoading()) {
-                for (int32_t i = 0;; ++i) {
-                    int32_t NumLayers = pClouds->GetNumLayers();
-                    if (i >= NumLayers) {
-                        break;
-                    }
-                    if (pCurrentWeather->GetCloudTexture(i)) {
-                        if (pCurrentWeather->GetCloudTexture(i)->GetTextureNameLength()) {
-                            BSStringT<char> strFile;
-                            const TESTexture* CloudTexture = pCurrentWeather->GetCloudTexture(i);
-                            const char* TextureName = pCurrentWeather->GetCloudTexture(i)->GetTextureName();
-                            strFile.SPrintF("%s%s", CloudTexture->GetDefaultPath(), TextureName);
-                            if (FileFinder::Locate(strFile.pString, nullptr, 0, 0xFFFFFFFFu)) {
-                                NiGeometry* CloudsGeo = pClouds->GetCloudsGeo(i);
-                                if (CloudsGeo->GetProperty(5)) {
-                                    NiPointer<NiTexture> spTexture(static_cast<NiTexture*>(nullptr));
-                                    BSShaderManager::GetTexture(strFile.pString, true, spTexture, true, false);
-                                    NiSourceTexture* v13 = static_cast<NiSourceTexture*>(spTexture.m_pObject);
-                                    NiGeometry* v3 = pClouds->GetCloudsGeo(i);
-                                    SkyShaderProperty* Property = static_cast<SkyShaderProperty*>(v3->GetProperty(3));
-                                    Property->SetTexture(v13);
-                                }
-                            }
-                        }
+    if ((pClouds) && (pCurrentWeather) && (!pSaveLoadGame->GetSaveGameLoading())) {
+        for (int32_t i = 0;; ++i) {
+            int32_t NumLayers = pClouds->GetNumLayers();
+            if (i >= NumLayers) {
+                break;
+            }
+            if ((pCurrentWeather->GetCloudTexture(i)) &&
+                (pCurrentWeather->GetCloudTexture(i)->GetTextureNameLength())) {
+                BSStringT<char> strFile;
+                const TESTexture* CloudTexture = pCurrentWeather->GetCloudTexture(i);
+                const char* TextureName = pCurrentWeather->GetCloudTexture(i)->GetTextureName();
+                strFile.SPrintF("%s%s", CloudTexture->GetDefaultPath(), TextureName);
+                if (FileFinder::Locate(strFile.pString, nullptr, 0, 0xFFFFFFFFu)) {
+                    NiGeometry* CloudsGeo = pClouds->GetCloudsGeo(i);
+                    if (CloudsGeo->GetProperty(5)) {
+                        NiPointer<NiTexture> spTexture(static_cast<NiTexture*>(nullptr));
+                        BSShaderManager::GetTexture(strFile.pString, true, spTexture, true, false);
+                        NiSourceTexture* v13 = static_cast<NiSourceTexture*>(spTexture.m_pObject);
+                        NiGeometry* v3 = pClouds->GetCloudsGeo(i);
+                        SkyShaderProperty* Property = static_cast<SkyShaderProperty*>(v3->GetProperty(3));
+                        Property->SetTexture(v13);
                     }
                 }
             }
         }
     }
+
     if (pMasser) {
         SkyShaderProperty* pprop = static_cast<SkyShaderProperty*>(pMasser->spShadowMesh.m_pObject->GetProperty(3));
         NiPointer<NiTexture> spTex(static_cast<NiTexture*>(nullptr));
@@ -1747,57 +1731,52 @@ void Sky::ReloadAllTextures() {
         pSecunda->spShadowMesh.m_pObject->SetDisplayObject(ptex_2 != nullptr);
         pSecunda->eUpdateMoonTexture = Moon::US_INITIALIZE;
     }
-    if (pSun) {
-        if (pCurrentClimate) {
-            BSStringT<char> strfilename;
-            SkyShaderProperty* pprop_3 = static_cast<SkyShaderProperty*>(pSun->GetBase()->GetProperty(3));
-            NiTexture* ptex_3 = nullptr;
-            NiPointer<NiTexture> spTex_3(static_cast<NiTexture*>(nullptr));
-            const TESTexture* ptestexture = pCurrentClimate->GetTexture(TESClimate::TX_SUN);
-            if (ptestexture) {
-                if (ptestexture->GetTextureNameLength()) {
-                    const char* v5 = ptestexture->GetDefaultPath();
-                    strfilename.operator=(v5);
-                    const char* pTextureName = ptestexture->GetTextureName();
-                    strfilename.operator+=(pTextureName);
-                    BSShaderManager::GetTexture(strfilename.pString, true, spTex_3, true, false);
-                    ptex_3 = spTex_3.m_pObject;
-                    if (ptex_3) {
-                        pprop_3->SetTexture(static_cast<NiSourceTexture*>(ptex_3));
-                    }
-                }
+    if ((pSun) && (pCurrentClimate)) {
+        BSStringT<char> strfilename;
+        SkyShaderProperty* pprop_3 = static_cast<SkyShaderProperty*>(pSun->GetBase()->GetProperty(3));
+        NiTexture* ptex_3 = nullptr;
+        NiPointer<NiTexture> spTex_3(static_cast<NiTexture*>(nullptr));
+        const TESTexture* ptestexture = pCurrentClimate->GetTexture(TESClimate::TX_SUN);
+        if ((ptestexture) && (ptestexture->GetTextureNameLength())) {
+            const char* v5 = ptestexture->GetDefaultPath();
+            strfilename.operator=(v5);
+            const char* pTextureName = ptestexture->GetTextureName();
+            strfilename.operator+=(pTextureName);
+            BSShaderManager::GetTexture(strfilename.pString, true, spTex_3, true, false);
+            ptex_3 = spTex_3.m_pObject;
+            if (ptex_3) {
+                pprop_3->SetTexture(static_cast<NiSourceTexture*>(ptex_3));
             }
-            pSun->GetSunBaseNode()->SetDisplayObject(ptex_3 != nullptr);
-            NiAVObject* pSunGlare = pSun->GetSunGlareGeo();
-            SkyShaderProperty* pprop_4 = static_cast<SkyShaderProperty*>(pSunGlare->GetProperty(3));
-            ptestexture = pCurrentClimate->GetTexture(TESClimate::TX_SUN);
-            if (ptestexture) {
-                if (ptestexture->GetTextureNameLength()) {
-                    if (BSShaderManager::bHDR || BSstricmp(ptestexture->GetTextureName(), "Sky\\SunGlare.dds")) {
-                        const char* v9 = ptestexture->GetDefaultPath();
-                        strfilename.operator=(v9);
-                        const char* v10 = ptestexture->GetTextureName();
-                        strfilename.operator+=(v10);
-                    }
-                    else {
-                        strfilename.operator=("Textures\\Sky\\SunGlareNonHDR.dds");
-                    }
-                    NiPointer<NiTexture> spTex_4(static_cast<NiTexture*>(nullptr));
-                    BSShaderManager::GetTexture(strfilename.pString, true, spTex_4, true, false);
-                    ptex_3 = spTex_4.m_pObject;
-                    if (ptex_3) {
-                        pprop_4->SetTexture(static_cast<NiSourceTexture*>(ptex_3));
-                    }
-                }
-            }
-            pSun->GetSunGlareNode()->SetDisplayObject(ptex_3 != nullptr);
         }
+
+        pSun->GetSunBaseNode()->SetDisplayObject(ptex_3 != nullptr);
+        NiAVObject* pSunGlare = pSun->GetSunGlareGeo();
+        SkyShaderProperty* pprop_4 = static_cast<SkyShaderProperty*>(pSunGlare->GetProperty(3));
+        ptestexture = pCurrentClimate->GetTexture(TESClimate::TX_SUN);
+        if ((ptestexture) && (ptestexture->GetTextureNameLength())) {
+            if (BSShaderManager::bHDR || BSstricmp(ptestexture->GetTextureName(), "Sky\\SunGlare.dds")) {
+                const char* v9 = ptestexture->GetDefaultPath();
+                strfilename.operator=(v9);
+                const char* v10 = ptestexture->GetTextureName();
+                strfilename.operator+=(v10);
+            }
+            else {
+                strfilename.operator=("Textures\\Sky\\SunGlareNonHDR.dds");
+            }
+            NiPointer<NiTexture> spTex_4(static_cast<NiTexture*>(nullptr));
+            BSShaderManager::GetTexture(strfilename.pString, true, spTex_4, true, false);
+            ptex_3 = spTex_4.m_pObject;
+            if (ptex_3) {
+                pprop_4->SetTexture(static_cast<NiSourceTexture*>(ptex_3));
+            }
+        }
+
+        pSun->GetSunGlareNode()->SetDisplayObject(ptex_3 != nullptr);
     }
-    if (pStars) {
-        if (pCurrentClimate) {
-            const char* NightSkyModel = pCurrentClimate->GetNightSkyModel();
-            pStars->LoadGeometry(NightSkyModel);
-        }
+
+    if ((pStars) && (pCurrentClimate)) {
+        const char* NightSkyModel = pCurrentClimate->GetNightSkyModel();
+        pStars->LoadGeometry(NightSkyModel);
     }
 }
 

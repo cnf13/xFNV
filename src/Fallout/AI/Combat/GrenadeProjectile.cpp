@@ -120,19 +120,17 @@ void GrenadeProjectile::UpdateProjectile(float afDelta) {
             NiNode* v2 = Get3D();
             bhkWorld::SetGroup(v2, NewSystemGroup, true, false);
             bCollisionGroupReset = true;
-            if (GetProjectileBase()) {
-                if (GetProjectileBase()->Data.pActiveSoundLoop) {
-                    TESSound* WorldSpace = GetProjectileBase()->Data.pActiveSoundLoop;
-                    if (!TESSound::ConvertLoopFlag(WorldSpace->GetData().iFlags)) {
-                        void* afDelta = GetProjectileBase()->Data.pActiveSoundLoop;
-                        TESSound* v5 = GetProjectileBase()->Data.pActiveSoundLoop;
-                        const char* Filename = v5->GetFilename();
-                        BSAudio* v6 = &BSAudio::QInstance();
-                        v6->GetSoundHandleByFilename(&sndHandle, Filename, 258u, afDelta);
-                        const NiPoint3* v7 = &GetLocationOnReference();
-                        sndHandle.SetPosition(*v7);
-                        sndHandle.Play(false);
-                    }
+            if ((GetProjectileBase()) && (GetProjectileBase()->Data.pActiveSoundLoop)) {
+                TESSound* WorldSpace = GetProjectileBase()->Data.pActiveSoundLoop;
+                if (!TESSound::ConvertLoopFlag(WorldSpace->GetData().iFlags)) {
+                    void* afDelta = GetProjectileBase()->Data.pActiveSoundLoop;
+                    TESSound* v5 = GetProjectileBase()->Data.pActiveSoundLoop;
+                    const char* Filename = v5->GetFilename();
+                    BSAudio* v6 = &BSAudio::QInstance();
+                    v6->GetSoundHandleByFilename(&sndHandle, Filename, 258u, afDelta);
+                    const NiPoint3* v7 = &GetLocationOnReference();
+                    sndHandle.SetPosition(*v7);
+                    sndHandle.Play(false);
                 }
             }
         }
@@ -153,14 +151,13 @@ void GrenadeProjectile::UpdateProjectile(float afDelta) {
                 }
             }
         }
-        if (IsFlagSet(Projectile::ACTIVE_IN_INVENTORY)) {
-            if (GetDesiredTarget()) {
-                HandleInventoryGrenadeDialogue();
-                TESObjectREFR* DesiredTarget = GetDesiredTarget();
-                const NiPoint3* v10 = &DesiredTarget->GetLocationOnReference();
-                SetLocationOnReference(*v10);
-            }
+        if ((IsFlagSet(Projectile::ACTIVE_IN_INVENTORY)) && (GetDesiredTarget())) {
+            HandleInventoryGrenadeDialogue();
+            TESObjectREFR* DesiredTarget = GetDesiredTarget();
+            const NiPoint3* v10 = &DesiredTarget->GetLocationOnReference();
+            SetLocationOnReference(*v10);
         }
+
         CheckExplosion(afDelta);
     }
 }
@@ -311,13 +308,11 @@ void GrenadeProjectile::ReportCollision(hkpContactPointAddedEvent& arEvent) {
 
 // Adds an impact on apController's reference at akPos.
 void GrenadeProjectile::ReportCollision(bhkCharacterController* apController, NiPoint3 akPos, NiPoint3 akNormal) {
-    if (apController) {
-        if (apController->GetNiObject()) {
-            NiAVObject* NiObject_ = apController->GetNiObject();
-            TESObjectREFR* ReferenceFor3D = TESObjectREFR::FindReferenceFor3D(NiObject_);
-            hkpShapePhantom* v9 = apController->GethkShapePhantom();
-            AddImpact(ReferenceFor3D, akPos, akNormal, v9->getCollidable(), 0xFFFFFFFFu, BHK_MATERIAL_MAX);
-        }
+    if ((apController) && (apController->GetNiObject())) {
+        NiAVObject* NiObject_ = apController->GetNiObject();
+        TESObjectREFR* ReferenceFor3D = TESObjectREFR::FindReferenceFor3D(NiObject_);
+        hkpShapePhantom* v9 = apController->GethkShapePhantom();
+        AddImpact(ReferenceFor3D, akPos, akNormal, v9->getCollidable(), 0xFFFFFFFFu, BHK_MATERIAL_MAX);
     }
 }
 

@@ -216,11 +216,9 @@ NiDX92DBufferData* NiDX92DBufferData::DynamicCast(Ni2DBuffer::RendererData* apDa
 }
 
 void NiDX92DBufferData::ClearRenderTarget(IDirect3DDevice9* apD3DDevice9, uint32_t auiTarget) {
-    if (auiTarget) {
-        if (NiDX92DBufferData::ms_apkCurrentBuffer[auiTarget]) {
-            apD3DDevice9->SetRenderTarget(auiTarget, nullptr);
-            NiDX92DBufferData::ms_apkCurrentBuffer[auiTarget] = nullptr;
-        }
+    if ((auiTarget) && (NiDX92DBufferData::ms_apkCurrentBuffer[auiTarget])) {
+        apD3DDevice9->SetRenderTarget(auiTarget, nullptr);
+        NiDX92DBufferData::ms_apkCurrentBuffer[auiTarget] = nullptr;
     }
 }
 

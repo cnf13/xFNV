@@ -551,7 +551,7 @@ namespace fnvd {
     template <auto Member, class R, class P, class... A>
     requires std::is_member_function_pointer_v<decltype(Member)> && std::is_pointer_v<P>
     R callMember(P apThis, A... aArgs) {
-        using C = typename detail::MemberClass<decltype(Member)>::type;
+        using C = detail::MemberClass<decltype(Member)>::type;
         if constexpr (std::is_void_v<R>) {
             (static_cast<C*>(apThis)->*Member)(aArgs...);
         }

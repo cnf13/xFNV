@@ -281,9 +281,8 @@ hkpShapePhantom* bhkCharacterProxy::GethkShapePhantom() {
     if (v3) {
         return v3->GetShapePhantom();
     }
-    else {
-        return nullptr;
-    }
+
+    return nullptr;
 }
 
 void bhkCharacterProxy::RembhkRefs() {
@@ -348,9 +347,8 @@ hkpCharacterProxy* bhkCharacterProxy::operator*() {
     if (this) {
         return static_cast<hkpCharacterProxy*>(GethkObject());
     }
-    else {
-        return nullptr;
-    }
+
+    return nullptr;
 }
 
 void bhkCharacterProxy::SetLinearVelocity(const hkVector4& arVel) {

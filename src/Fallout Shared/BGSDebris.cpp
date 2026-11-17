@@ -137,18 +137,14 @@ bool BGSDebris::Load(TESFile* apFile) {
 void BGSDebris::Save() {
     StartForm();
     for (BGSDebrisData* pdebrisData : *GetData()) {
-        if (pdebrisData) {
-            if (pdebrisData->pFileName) {
-                if (BSstrlen(pdebrisData->pFileName)) {
-                    uint32_t idataSize = BSstrlen(pdebrisData->pFileName) + 3;
-                    char* pdata = static_cast<char*>(ourMalloc(idataSize));
-                    *pdata = pdebrisData->cPercentage;
-                    BSstrcpy(pdata + 1, idataSize, pdebrisData->pFileName);
-                    pdata[BSstrlen(pdebrisData->pFileName) + 2] = pdebrisData->cFlags;
-                    TESForm::AddChunkArray(DATA_ID, pdata, idataSize);
-                    ourFree(pdata);
-                }
-            }
+        if ((pdebrisData) && (pdebrisData->pFileName) && (BSstrlen(pdebrisData->pFileName))) {
+            uint32_t idataSize = BSstrlen(pdebrisData->pFileName) + 3;
+            char* pdata = static_cast<char*>(ourMalloc(idataSize));
+            *pdata = pdebrisData->cPercentage;
+            BSstrcpy(pdata + 1, idataSize, pdebrisData->pFileName);
+            pdata[BSstrlen(pdebrisData->pFileName) + 2] = pdebrisData->cFlags;
+            TESForm::AddChunkArray(DATA_ID, pdata, idataSize);
+            ourFree(pdata);
         }
     }
     CloseForm();
@@ -245,44 +241,39 @@ void BGSDebris::SpawnDebris(TESObjectCELL* apCell, const NiPoint3& arLocation, u
     if (apCell) {
         uint32_t inumParticlesSpawned = 0;
         for (BGSDebrisData* pdebrisData : *GetData()) {
-            if (pdebrisData) {
-                if (pdebrisData->pFileName) {
-                    if (pdebrisData->cPercentage) {
-                        uint32_t inumparticles = aiNumParticles * pdebrisData->cPercentage / 100;
-                        if (!inumparticles) {
-                            inumparticles = inumParticlesSpawned < aiNumParticles;
+            if ((pdebrisData) && (pdebrisData->pFileName) && (pdebrisData->cPercentage)) {
+                uint32_t inumparticles = aiNumParticles * pdebrisData->cPercentage / 100;
+                if (!inumparticles) {
+                    inumparticles = inumParticlesSpawned < aiNumParticles;
+                }
+                for (uint32_t i = 0; i < inumparticles; ++i) {
+                    debrisVector.x = RandomFloat(-1.0f, 1.0f);
+                    debrisVector.y = RandomFloat(-1.0f, 1.0f);
+                    debrisVector.z = RandomFloat(-1.0f, 1.0f);
+                    debrisVector.Unitize();
+                    if (pdebrisData->GetHasCollisionData()) {
+                        BSTempEffectDebris* pdebris;
+                        velocity = NiPoint3_ZERO;
+                        BSTempEffectDebris* v7 =
+                            static_cast<BSTempEffectDebris*>(NiMemObject::operator new(sizeof(BSTempEffectDebris)));
+                        if (v7) {
+                            pdebris = ::new (v7) BSTempEffectDebris(
+                                apCell, 90.0f, pdebrisData->pFileName, nullptr, arLocation, debrisVector, velocity,
+                                velocity, afScale, false, false
+                            );
                         }
-                        for (uint32_t i = 0; i < inumparticles; ++i) {
-                            debrisVector.x = RandomFloat(-1.0f, 1.0f);
-                            debrisVector.y = RandomFloat(-1.0f, 1.0f);
-                            debrisVector.z = RandomFloat(-1.0f, 1.0f);
-                            debrisVector.Unitize();
-                            if (pdebrisData->GetHasCollisionData()) {
-                                BSTempEffectDebris* pdebris;
-                                velocity = NiPoint3_ZERO;
-                                BSTempEffectDebris* v7 = static_cast<BSTempEffectDebris*>(
-                                    NiMemObject::operator new(sizeof(BSTempEffectDebris))
-                                );
-                                if (v7) {
-                                    pdebris = ::new (v7) BSTempEffectDebris(
-                                        apCell, 90.0f, pdebrisData->pFileName, nullptr, arLocation, debrisVector,
-                                        velocity, velocity, afScale, false, false
-                                    );
-                                }
-                                else {
-                                    pdebris = nullptr;
-                                }
-                                BSTempEffectDebris* v9 = pdebris;
-                            }
-                            else {
-                                float v5 = afScale * 10.0;
-                                BSTempEffectParticle::Spawn(
-                                    apCell, 10.0f, pdebrisData->pFileName, debrisVector, arLocation, v5, 7u, nullptr
-                                );
-                            }
-                            ++inumParticlesSpawned;
+                        else {
+                            pdebris = nullptr;
                         }
+                        BSTempEffectDebris* v9 = pdebris;
                     }
+                    else {
+                        float v5 = afScale * 10.0;
+                        BSTempEffectParticle::Spawn(
+                            apCell, 10.0f, pdebrisData->pFileName, debrisVector, arLocation, v5, 7u, nullptr
+                        );
+                    }
+                    ++inumParticlesSpawned;
                 }
             }
         }

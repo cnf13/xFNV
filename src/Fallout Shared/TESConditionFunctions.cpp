@@ -220,11 +220,10 @@ bool Cmd_GetPCInFaction(TESObjectREFR* apRefObject, void* apParam1, void* apPara
 bool Cmd_GetInWorldspace(TESObjectREFR* apRefObject, void* apParam1, void* apParam2, double& afReturnValue) {
     afReturnValue = 0.0;
     TESWorldSpace* v6 = nullptr;
-    if (apParam1) {
-        if (static_cast<TESForm*>(apParam1)->GetFormType() == 65) {
-            v6 = static_cast<TESWorldSpace*>(apParam1);
-        }
+    if ((apParam1) && (static_cast<TESForm*>(apParam1)->GetFormType() == 65)) {
+        v6 = static_cast<TESWorldSpace*>(apParam1);
     }
+
     TESObjectREFR* v7 = nullptr;
     if (apParam2) {
         int32_t FormType = static_cast<TESObjectREFR*>(apParam2)->GetFormType();
@@ -235,11 +234,10 @@ bool Cmd_GetInWorldspace(TESObjectREFR* apRefObject, void* apParam1, void* apPar
     if (!v7) {
         v7 = apRefObject;
     }
-    if (v6) {
-        if (v7->GetWorldSpace() == v6) {
-            afReturnValue = 1.0;
-        }
+    if ((v6) && (v7->GetWorldSpace() == v6)) {
+        afReturnValue = 1.0;
     }
+
     if (GetThreadTLSData()->bSystemOutput) {
         Interface::PrintLine("GetInWorldspace >> %0.2f", afReturnValue);
     }
@@ -249,24 +247,19 @@ bool Cmd_GetInWorldspace(TESObjectREFR* apRefObject, void* apParam1, void* apPar
 bool Cmd_GetIsClass(TESObjectREFR* apRefObject, void* apParam1, void* apParam2, double& afReturnValue) {
     afReturnValue = 0.0;
     TESNPC* ObjectReference = nullptr;
-    if (apRefObject) {
-        if (apRefObject->GetObjectReference()->GetFormType() == NPC__ID) {
-            ObjectReference = static_cast<TESNPC*>(apRefObject->GetObjectReference());
-        }
+    if ((apRefObject) && (apRefObject->GetObjectReference()->GetFormType() == NPC__ID)) {
+        ObjectReference = static_cast<TESNPC*>(apRefObject->GetObjectReference());
     }
+
     TESClass* v6 = nullptr;
-    if (apParam1) {
-        if (static_cast<TESForm*>(apParam1)->GetFormType() == CLAS_ID) {
-            v6 = static_cast<TESClass*>(apParam1);
-        }
+    if ((apParam1) && (static_cast<TESForm*>(apParam1)->GetFormType() == CLAS_ID)) {
+        v6 = static_cast<TESClass*>(apParam1);
     }
-    if (ObjectReference) {
-        if (v6) {
-            if (ObjectReference->GetClass() == v6) {
-                afReturnValue = 1.0;
-            }
-        }
+
+    if ((ObjectReference) && (v6) && (ObjectReference->GetClass() == v6)) {
+        afReturnValue = 1.0;
     }
+
     if (GetThreadTLSData()->bSystemOutput) {
         Interface::PrintLine("GetIsClass >> %0.2f", afReturnValue);
     }
@@ -282,11 +275,10 @@ bool Cmd_GetIsCreatureType(TESObjectREFR* apRefObject, void* apParam1, void* apP
             v6 = static_cast<TESCreature*>(apRefObject->GetObjectReference());
         }
     }
-    if (v6) {
-        if (v6->GetCreatureType() == reinterpret_cast<intptr_t>(apParam1)) {
-            afReturnValue = 1.0;
-        }
+    if ((v6) && (v6->GetCreatureType() == reinterpret_cast<intptr_t>(apParam1))) {
+        afReturnValue = 1.0;
     }
+
     if (GetThreadTLSData()->bSystemOutput) {
         Interface::PrintLine("GetIsCreatureType >> %0.2f", afReturnValue);
     }
@@ -330,12 +322,9 @@ bool Cmd_GetQuestVariable_Eval(TESObjectREFR* apRefObject, void* apParam1, void*
                 break;
             }
         }
-        if (pLocals) {
-            if (pLocals->m_pMasterScript) {
-                // The script passes the variable's index as an integer in the parameter slot.
-                afReturnValue =
-                    pLocals->GetVariable(static_cast<uint32_t>(reinterpret_cast<uintptr_t>(apParam2)), nullptr);
-            }
+        if ((pLocals) && (pLocals->m_pMasterScript)) {
+            // The script passes the variable's index as an integer in the parameter slot.
+            afReturnValue = pLocals->GetVariable(static_cast<uint32_t>(reinterpret_cast<uintptr_t>(apParam2)), nullptr);
         }
     }
     return true;
@@ -378,11 +367,10 @@ bool Cmd_GetPlayerControlsDisabled(TESObjectREFR* apRefObject, void* apParam1, v
 
 bool Cmd_GetPCExpelled(TESObjectREFR* apRefObject, void* apParam1, void* apParam2, double& afReturnValue) {
     afReturnValue = 0.0;
-    if (apParam1) {
-        if (static_cast<TESFaction*>(apParam1)->GetPCExpelled()) {
-            afReturnValue = 1.0;
-        }
+    if ((apParam1) && (static_cast<TESFaction*>(apParam1)->GetPCExpelled())) {
+        afReturnValue = 1.0;
     }
+
     if (Script::GetThreadSystemOutput()) {
         if (0.0 == afReturnValue) {
             Interface::PrintLine("PC is not expelled.");
@@ -396,11 +384,10 @@ bool Cmd_GetPCExpelled(TESObjectREFR* apRefObject, void* apParam1, void* apParam
 
 bool Cmd_GetPCFactionMurder(TESObjectREFR* apRefObject, void* apParam1, void* apParam2, double& afReturnValue) {
     afReturnValue = 0.0;
-    if (apParam1) {
-        if (static_cast<TESFaction*>(apParam1)->GetPCHasMurdereredMember()) {
-            afReturnValue = 1.0;
-        }
+    if ((apParam1) && (static_cast<TESFaction*>(apParam1)->GetPCHasMurdereredMember())) {
+        afReturnValue = 1.0;
     }
+
     if (GetThreadTLSData()->bSystemOutput) {
         if (0.0 == afReturnValue) {
             Interface::PrintLine("PC did not Murder a faction member.");
@@ -437,14 +424,13 @@ bool Cmd_IsOwner_Eval(TESObjectREFR* apRefObject, void* apParam1, void* apParam2
     if (!apParam1) {
         apObj = pPlayer->GetObjectReference();
     }
-    if (apRefObject) {
-        if (apObj) {
-            ExtraDataList* Extra = apRefObject->GetExtra();
-            if (Extra->GetOwner() == apObj) {
-                afReturnValue = 1.0;
-            }
+    if ((apRefObject) && (apObj)) {
+        ExtraDataList* Extra = apRefObject->GetExtra();
+        if (Extra->GetOwner() == apObj) {
+            afReturnValue = 1.0;
         }
     }
+
     if (GetThreadTLSData()->bSystemOutput) {
         if (0.0 == afReturnValue) {
             const char* FullName = TESFullName::GetFullName(apObj);
@@ -499,15 +485,14 @@ bool Cmd_GetIsAlignment(
     double& afReturnValue
 ) {
     afReturnValue = 0.0;
-    if (apRefObject) {
-        if (apRefObject->IsActor()) {
-            ActorValueOwner* pOwner = static_cast<Actor*>(apRefObject);
-            float afKarma = pOwner->GetActorFloatValue(ActorValue::KARMA);
-            if (TESActorBaseData::GetAlignmentForKarma(afKarma) == apParam1) {
-                afReturnValue = 1.0;
-            }
+    if ((apRefObject) && (apRefObject->IsActor())) {
+        ActorValueOwner* pOwner = static_cast<Actor*>(apRefObject);
+        float afKarma = pOwner->GetActorFloatValue(ActorValue::KARMA);
+        if (TESActorBaseData::GetAlignmentForKarma(afKarma) == apParam1) {
+            afReturnValue = 1.0;
         }
     }
+
     if (GetThreadTLSData()->bSystemOutput) {
         const char* v6;
         if (!(afReturnValue > 0.0)) {
@@ -523,25 +508,22 @@ bool Cmd_GetIsAlignment(
 
 bool Cmd_GetConcussed(TESObjectREFR* apRefObject, void* apParam1, void* apParam2, double& afReturnValue) {
     afReturnValue = 0.0;
-    if (apRefObject) {
-        if (apRefObject->IsActor()) {
-            if (get_bConcussion_11DBE50()) {
-                // The MagicTarget base is used with no null test, as the game does.
-                Actor* pActor = static_cast<Actor*>(apRefObject);
-                if (pActor->HasArchType(EffectArchetypes::CONCUSSION, 0)) {
-                    afReturnValue = 1.0;
-                }
-                if (GetThreadTLSData()->bSystemOutput) {
-                    if (!(afReturnValue > 0.0)) {
-                        Interface::PrintLine("%s is not concussed ", apRefObject->GetFullName());
-                    }
-                    else {
-                        Interface::PrintLine("%s is concussed", apRefObject->GetFullName());
-                    }
-                }
+    if ((apRefObject) && (apRefObject->IsActor()) && (get_bConcussion_11DBE50())) {
+        // The MagicTarget base is used with no null test, as the game does.
+        Actor* pActor = static_cast<Actor*>(apRefObject);
+        if (pActor->HasArchType(EffectArchetypes::CONCUSSION, 0)) {
+            afReturnValue = 1.0;
+        }
+        if (GetThreadTLSData()->bSystemOutput) {
+            if (!(afReturnValue > 0.0)) {
+                Interface::PrintLine("%s is not concussed ", apRefObject->GetFullName());
+            }
+            else {
+                Interface::PrintLine("%s is concussed", apRefObject->GetFullName());
             }
         }
     }
+
     return true;
 }
 
@@ -552,16 +534,15 @@ char get_bConcussion_11DBE50() {
 bool Cmd_GetForceHitReaction(TESObjectREFR* apRefObject, void* apParam1, void* apParam2, double& afReturnValue) {
     const char* fullName;
     double v6;
-    if (apRefObject) {
-        if (apRefObject->IsActor()) {
-            afReturnValue = (double)static_cast<Actor*>(apRefObject)->GetForceHitReaction();
-            if (Script::GetThreadSystemOutput()) {
-                v6 = afReturnValue;
-                fullName = apRefObject->GetFullName();
-                Interface::PrintLine("GetForceHitReactionConditionFunction: %s >> %0.2f", fullName, v6);
-            }
+    if ((apRefObject) && (apRefObject->IsActor())) {
+        afReturnValue = (double)static_cast<Actor*>(apRefObject)->GetForceHitReaction();
+        if (Script::GetThreadSystemOutput()) {
+            v6 = afReturnValue;
+            fullName = apRefObject->GetFullName();
+            Interface::PrintLine("GetForceHitReactionConditionFunction: %s >> %0.2f", fullName, v6);
         }
     }
+
     return true;
 }
 
@@ -747,33 +728,27 @@ bool Script::GetWeaponAnimTypeConditionFunction(
 ) {
     afReturnValue = 0.0;
     Actor* pactor = nullptr;
-    if (apRefObject) {
-        if (apRefObject->IsActor()) {
-            pactor = static_cast<Actor*>(apRefObject);
+    if ((apRefObject) && (apRefObject->IsActor())) {
+        pactor = static_cast<Actor*>(apRefObject);
+    }
+
+    if ((pactor) && (pactor->pCurrentProcess)) {
+        BaseProcess* CurrentAIProcess = pactor->pCurrentProcess;
+        ItemChange* pweapdata = CurrentAIProcess->GetCurrentWeapon();
+        TESObjectWEAP* pweap = nullptr;
+        if ((pweapdata) && (pweapdata->pContainerObj) && (pweapdata->pContainerObj->GetFormType() == WEAP_ID)) {
+            pweap = static_cast<TESObjectWEAP*>(pweapdata->pContainerObj);
+        }
+
+        if (pweap) {
+            // The table's entry is converted as a signed 32-bit integer.
+            afReturnValue = static_cast<double>(static_cast<int32_t>(weaponToAnimGroupWeapon[pweap->GetWeaponType()]));
+        }
+        else {
+            afReturnValue = 1.0;
         }
     }
-    if (pactor) {
-        if (pactor->pCurrentProcess) {
-            BaseProcess* CurrentAIProcess = pactor->pCurrentProcess;
-            ItemChange* pweapdata = CurrentAIProcess->GetCurrentWeapon();
-            TESObjectWEAP* pweap = nullptr;
-            if (pweapdata) {
-                if (pweapdata->pContainerObj) {
-                    if (pweapdata->pContainerObj->GetFormType() == WEAP_ID) {
-                        pweap = static_cast<TESObjectWEAP*>(pweapdata->pContainerObj);
-                    }
-                }
-            }
-            if (pweap) {
-                // The table's entry is converted as a signed 32-bit integer.
-                afReturnValue =
-                    static_cast<double>(static_cast<int32_t>(weaponToAnimGroupWeapon[pweap->GetWeaponType()]));
-            }
-            else {
-                afReturnValue = 1.0;
-            }
-        }
-    }
+
     if (GetThreadTLSData()->bSystemOutput) {
         Interface::PrintLine("Get Weapon Anim >> %0.2f", afReturnValue);
     }
@@ -788,238 +763,234 @@ bool Script::GetCurrentAIProcedureConditionFunction(
 ) {
     afReturnValue = 0.0;
     Actor* pactor = nullptr;
-    if (apRefObject) {
-        if (apRefObject->IsActor()) {
-            pactor = static_cast<Actor*>(apRefObject);
-        }
+    if ((apRefObject) && (apRefObject->IsActor())) {
+        pactor = static_cast<Actor*>(apRefObject);
     }
-    if (pactor) {
-        if (pactor->pCurrentProcess) {
-            if (pactor->GetCurrentPackage()) {
-                CombatController* pcombatController = static_cast<CombatController*>(pactor->GetCurrentPackage());
-                BaseProcess* pproc = pactor->pCurrentProcess;
-                uint32_t Count = pcombatController->ePROCEDURE_TYPE;
-                PROCEDURE v9 = Procedure_Action[Count][pproc->GetProcedureIndexRunning()];
-                if (pcombatController->GetPackType() == PACKAGE_TYPE_COMBAT && pcombatController->IsFleeing()) {
-                    v9 = PROCEDURE_FLEE;
-                }
-                switch (v9) {
-                    case PROCEDURE_TRAVEL: {
-                        afReturnValue = 0.0;
-                        break;
-                    }
-                    case PROCEDURE_WANDER: {
-                        afReturnValue = 7.0;
-                        break;
-                    }
-                    case PROCEDURE_ACTIVATE: {
-                        afReturnValue = 1.0;
-                        break;
-                    }
-                    case PROCEDURE_ACQUIRE: {
-                        afReturnValue = 2.0;
-                        break;
-                    }
-                    case PROCEDURE_SLEEP: {
-                        afReturnValue = 8.0;
-                        break;
-                    }
-                    case PROCEDURE_EAT: {
-                        afReturnValue = 10.0;
-                        break;
-                    }
-                    case PROCEDURE_FOLLOW: {
-                        afReturnValue = 11.0;
-                        break;
-                    }
-                    case PROCEDURE_ESCORT: {
-                        afReturnValue = 12.0;
-                        break;
-                    }
-                    case PROCEDURE_ALARM: {
-                        afReturnValue = 14.0;
-                        break;
-                    }
-                    case PROCEDURE_COMBAT: {
-                        afReturnValue = 13.0;
-                        break;
-                    }
-                    case PROCEDURE_FLEE: {
-                        afReturnValue = 16.0;
-                        break;
-                    }
-                    case PROCEDURE_YIELD: {
-                        afReturnValue = 18.0;
-                        break;
-                    }
-                    case PROCEDURE_DIALOGUE: {
-                        afReturnValue = 4.0;
-                        break;
-                    }
-                    case PROCEDURE_WAIT: {
-                        afReturnValue = 3.0;
-                        break;
-                    }
-                    case PROCEDURE_TRAVEL_TARGET: {
-                        afReturnValue = 19.0;
-                        break;
-                    }
-                    case PROCEDURE_PURSUE: {
-                        afReturnValue = 15.0;
-                        break;
-                    }
-                    case PROCEDURE_GREET: {
-                        afReturnValue = 5.0;
-                        break;
-                    }
-                    case PROCEDURE_CREATE_FOLLOW: {
-                        afReturnValue = 20.0;
-                        break;
-                    }
-                    case PROCEDURE_OBSERVE_COMBAT: {
-                        afReturnValue = 9.0;
-                        break;
-                    }
-                    case PROCEDURE_GREET_DEAD: {
-                        afReturnValue = 6.0;
-                        break;
-                    }
-                    case PROCEDURE_GET_UP: {
-                        afReturnValue = 21.0;
-                        break;
-                    }
-                    case PROCEDURE_MOUNT_HORSE: {
-                        afReturnValue = 22.0;
-                        break;
-                    }
-                    case PROCEDURE_DISMOUNT_HORSE: {
-                        afReturnValue = 23.0;
-                        break;
-                    }
-                    case PROCEDURE_DO_NOTHING: {
-                        afReturnValue = 24.0;
-                        break;
-                    }
-                    case PROCEDURE_ACCOMPANY: {
-                        afReturnValue = 27.0;
-                        break;
-                    }
-                    case PROCEDURE_USE_ITEM_AT: {
-                        afReturnValue = 28.0;
-                        break;
-                    }
-                    case PROCEDURE_FEED: {
-                        afReturnValue = 29.0;
-                        break;
-                    }
-                    case PROCEDURE_AMBUSH_WAIT: {
-                        afReturnValue = 30.0;
-                        break;
-                    }
-                    case PROCEDURE_SURFACE: {
-                        afReturnValue = 31.0;
-                        break;
-                    }
-                    case PROCEDURE_WAIT_FOR_SPELL: {
-                        afReturnValue = 32.0;
-                        break;
-                    }
-                    case PROCEDURE_CHOOSE_CAST: {
-                        afReturnValue = 33.0;
-                        break;
-                    }
-                    case PROCEDURE_FLEE_NON_COMBAT: {
-                        afReturnValue = 34.0;
-                        break;
-                    }
-                    case PROCEDURE_REMOVE_WORN_ITEMS: {
-                        afReturnValue = 35.0;
-                        break;
-                    }
-                    case PROCEDURE_SEARCH: {
-                        afReturnValue = 36.0;
-                        break;
-                    }
-                    case PROCEDURE_CLEAR_MOUNT_POSITION: {
-                        afReturnValue = 37.0;
-                        break;
-                    }
-                    case PROCEDURE_SUMMON_CREATURE_DEFEND: {
-                        afReturnValue = 38.0;
-                        break;
-                    }
-                    case PROCEDURE_AVOID_RADIATION: {
-                        afReturnValue = 39.0;
-                        break;
-                    }
-                    case PROCEDURE_UNEQUIP_ARMOR: {
-                        afReturnValue = 40.0;
-                        break;
-                    }
-                    case PROCEDURE_TAKE_BACK_ITEM: {
-                        afReturnValue = 47.0;
-                        break;
-                    }
-                    case PROCEDURE_SANDBOX: {
-                        SandBoxActorPackageData* psandData =
-                            static_cast<SandBoxActorPackageData*>(pproc->GetInstanceDataThatIsRunning());
-                        afReturnValue = 45.0;
-                        if (psandData) {
-                            uint32_t esandState = psandData->eState;
-                            if (esandState == 3) {
-                                uint32_t uiproc = psandData->eProcedure + 1;
-                                if (uiproc < 7) {
-                                    afReturnValue = rdata_10357C8[uiproc];
-                                }
-                            }
-                            else {
-                                if (esandState < 4) {
-                                    afReturnValue = rdata_10357B8[esandState];
-                                }
-                            }
+
+    if ((pactor) && (pactor->pCurrentProcess) && (pactor->GetCurrentPackage())) {
+        CombatController* pcombatController = static_cast<CombatController*>(pactor->GetCurrentPackage());
+        BaseProcess* pproc = pactor->pCurrentProcess;
+        uint32_t Count = pcombatController->ePROCEDURE_TYPE;
+        PROCEDURE v9 = Procedure_Action[Count][pproc->GetProcedureIndexRunning()];
+        if (pcombatController->GetPackType() == PACKAGE_TYPE_COMBAT && pcombatController->IsFleeing()) {
+            v9 = PROCEDURE_FLEE;
+        }
+        switch (v9) {
+            case PROCEDURE_TRAVEL: {
+                afReturnValue = 0.0;
+                break;
+            }
+            case PROCEDURE_WANDER: {
+                afReturnValue = 7.0;
+                break;
+            }
+            case PROCEDURE_ACTIVATE: {
+                afReturnValue = 1.0;
+                break;
+            }
+            case PROCEDURE_ACQUIRE: {
+                afReturnValue = 2.0;
+                break;
+            }
+            case PROCEDURE_SLEEP: {
+                afReturnValue = 8.0;
+                break;
+            }
+            case PROCEDURE_EAT: {
+                afReturnValue = 10.0;
+                break;
+            }
+            case PROCEDURE_FOLLOW: {
+                afReturnValue = 11.0;
+                break;
+            }
+            case PROCEDURE_ESCORT: {
+                afReturnValue = 12.0;
+                break;
+            }
+            case PROCEDURE_ALARM: {
+                afReturnValue = 14.0;
+                break;
+            }
+            case PROCEDURE_COMBAT: {
+                afReturnValue = 13.0;
+                break;
+            }
+            case PROCEDURE_FLEE: {
+                afReturnValue = 16.0;
+                break;
+            }
+            case PROCEDURE_YIELD: {
+                afReturnValue = 18.0;
+                break;
+            }
+            case PROCEDURE_DIALOGUE: {
+                afReturnValue = 4.0;
+                break;
+            }
+            case PROCEDURE_WAIT: {
+                afReturnValue = 3.0;
+                break;
+            }
+            case PROCEDURE_TRAVEL_TARGET: {
+                afReturnValue = 19.0;
+                break;
+            }
+            case PROCEDURE_PURSUE: {
+                afReturnValue = 15.0;
+                break;
+            }
+            case PROCEDURE_GREET: {
+                afReturnValue = 5.0;
+                break;
+            }
+            case PROCEDURE_CREATE_FOLLOW: {
+                afReturnValue = 20.0;
+                break;
+            }
+            case PROCEDURE_OBSERVE_COMBAT: {
+                afReturnValue = 9.0;
+                break;
+            }
+            case PROCEDURE_GREET_DEAD: {
+                afReturnValue = 6.0;
+                break;
+            }
+            case PROCEDURE_GET_UP: {
+                afReturnValue = 21.0;
+                break;
+            }
+            case PROCEDURE_MOUNT_HORSE: {
+                afReturnValue = 22.0;
+                break;
+            }
+            case PROCEDURE_DISMOUNT_HORSE: {
+                afReturnValue = 23.0;
+                break;
+            }
+            case PROCEDURE_DO_NOTHING: {
+                afReturnValue = 24.0;
+                break;
+            }
+            case PROCEDURE_ACCOMPANY: {
+                afReturnValue = 27.0;
+                break;
+            }
+            case PROCEDURE_USE_ITEM_AT: {
+                afReturnValue = 28.0;
+                break;
+            }
+            case PROCEDURE_FEED: {
+                afReturnValue = 29.0;
+                break;
+            }
+            case PROCEDURE_AMBUSH_WAIT: {
+                afReturnValue = 30.0;
+                break;
+            }
+            case PROCEDURE_SURFACE: {
+                afReturnValue = 31.0;
+                break;
+            }
+            case PROCEDURE_WAIT_FOR_SPELL: {
+                afReturnValue = 32.0;
+                break;
+            }
+            case PROCEDURE_CHOOSE_CAST: {
+                afReturnValue = 33.0;
+                break;
+            }
+            case PROCEDURE_FLEE_NON_COMBAT: {
+                afReturnValue = 34.0;
+                break;
+            }
+            case PROCEDURE_REMOVE_WORN_ITEMS: {
+                afReturnValue = 35.0;
+                break;
+            }
+            case PROCEDURE_SEARCH: {
+                afReturnValue = 36.0;
+                break;
+            }
+            case PROCEDURE_CLEAR_MOUNT_POSITION: {
+                afReturnValue = 37.0;
+                break;
+            }
+            case PROCEDURE_SUMMON_CREATURE_DEFEND: {
+                afReturnValue = 38.0;
+                break;
+            }
+            case PROCEDURE_AVOID_RADIATION: {
+                afReturnValue = 39.0;
+                break;
+            }
+            case PROCEDURE_UNEQUIP_ARMOR: {
+                afReturnValue = 40.0;
+                break;
+            }
+            case PROCEDURE_TAKE_BACK_ITEM: {
+                afReturnValue = 47.0;
+                break;
+            }
+            case PROCEDURE_SANDBOX: {
+                SandBoxActorPackageData* psandData =
+                    static_cast<SandBoxActorPackageData*>(pproc->GetInstanceDataThatIsRunning());
+                afReturnValue = 45.0;
+                if (psandData) {
+                    uint32_t esandState = psandData->eState;
+                    if (esandState == 3) {
+                        uint32_t uiproc = psandData->eProcedure + 1;
+                        if (uiproc < 7) {
+                            afReturnValue = rdata_10357C8[uiproc];
                         }
-                        break;
                     }
-                    case PROCEDURE_USE_IDLE_MARKER: {
-                        afReturnValue = 46.0;
-                        break;
-                    }
-                    case PROCEDURE_PATROL: {
-                        afReturnValue = 41.0;
-                        break;
-                    }
-                    case PROCEDURE_GUARD: {
-                        afReturnValue = 44.0;
-                        break;
-                    }
-                    case PROCEDURE_DIALOGUE_ACTIVATE: {
-                        afReturnValue = 43.0;
-                        break;
-                    }
-                    case PROCEDURE_USE_WEAPON: {
-                        afReturnValue = 42.0;
-                        break;
-                    }
-                    case PROCEDURE_MOVEMENT_BLOCKED: {
-                        afReturnValue = 49.0;
-                        break;
-                    }
-                    case PROCEDURE_CANNIBAL_FEED: {
-                        afReturnValue = 50.0;
-                        break;
-                    }
-                    case PROCEDURE_DONE: {
-                        afReturnValue = 17.0;
-                        break;
-                    }
-                    default: {
-                        afReturnValue = -1.0;
-                        break;
+                    else {
+                        if (esandState < 4) {
+                            afReturnValue = rdata_10357B8[esandState];
+                        }
                     }
                 }
+                break;
+            }
+            case PROCEDURE_USE_IDLE_MARKER: {
+                afReturnValue = 46.0;
+                break;
+            }
+            case PROCEDURE_PATROL: {
+                afReturnValue = 41.0;
+                break;
+            }
+            case PROCEDURE_GUARD: {
+                afReturnValue = 44.0;
+                break;
+            }
+            case PROCEDURE_DIALOGUE_ACTIVATE: {
+                afReturnValue = 43.0;
+                break;
+            }
+            case PROCEDURE_USE_WEAPON: {
+                afReturnValue = 42.0;
+                break;
+            }
+            case PROCEDURE_MOVEMENT_BLOCKED: {
+                afReturnValue = 49.0;
+                break;
+            }
+            case PROCEDURE_CANNIBAL_FEED: {
+                afReturnValue = 50.0;
+                break;
+            }
+            case PROCEDURE_DONE: {
+                afReturnValue = 17.0;
+                break;
+            }
+            default: {
+                afReturnValue = -1.0;
+                break;
             }
         }
     }
+
     if (GetThreadTLSData()->bSystemOutput) {
         Interface::PrintLine("Procedure >> %0.2f", afReturnValue);
     }
@@ -1070,97 +1041,94 @@ bool Script::GetLOSConditionFunction(
         }
         TESObjectREFR* pTarget = static_cast<TESObjectREFR*>(apParam1);
         bool bInSight = false;
-        if (pAttacker) {
-            if (pTarget) {
-                if (pAttacker == pPlayer) {
-                    bool bInFrustum = false;
-                    SceneGraph* WorldSceneGraph = Main::GetWorldSceneGraph();
-                    NiNode* pcamnode = WorldSceneGraph->GetCameraRoot();
-                    NiCamera* pcam = Main::GetWorldSceneGraph()->GetCamera();
-                    BSFadeNode* pfadenode;
-                    if (pTarget->Get3D()) {
-                        pfadenode = pTarget->Get3D()->IsFadeNode();
-                    }
-                    else {
-                        pfadenode = nullptr;
-                    }
-                    if (pfadenode && NodeInFrustum(pfadenode, pcam)) {
-                        bInFrustum = true;
-                    }
-                    else {
-                        if (pTarget->IsMarker()) {
-                            NiBound kBound;
-                            kBound.SetCenter(pTarget->GetLocationOnReference());
-                            kBound.SetRadius(1.0f);
-                            if (BoundInFrustum(kBound, pcam)) {
-                                bInFrustum = true;
-                            }
-                        }
-                    }
-                    if (bInFrustum) {
-                        float fzs[3];
-                        alignas(16) CFilter icolFilter;
-                        alignas(16) NiPoint3 position = pcamnode->GetTranslate();
-                        bhkPickData pickRes;
-                        MobileObject* pmob = nullptr;
-                        if (pTarget) {
-                            if (pTarget->IsMobileObject()) {
-                                pmob = static_cast<MobileObject*>(pTarget);
-                            }
-                        }
-                        SpecificItemCollector collector(L_LOS, pmob);
-                        pickRes.SetClosestCollector(&collector);
-                        NiPoint3 destPoint = pTarget->GetLocationOnReference();
-                        pickRes.NiSetFrom(position);
-                        pPlayer->GetCollisionFilter(&icolFilter.iFilter);
-                        CFilter fltr(0);
-                        fltr.SetLayer(L_LOS);
-                        uint32_t Group = icolFilter.GetGroup();
-                        fltr.SetGroup(Group);
-                        pickRes.SetFilter(fltr);
-                        alignas(16) NiPoint3 kBoundMax = pTarget->GetBoundMax();
-                        NiPoint3 kBoundMin = pTarget->GetBoundMin();
-                        float fTargetHeight = kBoundMax.z - kBoundMin.z;
-                        fzs[0] = fTargetHeight * 0.75 + destPoint.z;
-                        fzs[1] = fTargetHeight * 0.5 + destPoint.z;
-                        fzs[2] = fTargetHeight * 0.25 + destPoint.z;
-                        for (int32_t i = 0; i < 3; ++i) {
-                            TESObjectREFR* phitref;
-                            destPoint.z = fzs[i];
-                            pickRes.NiSetTo(destPoint);
-                            NiAVObject* phit = TES::pInstance->Pick(pickRes);
-                            if (phit) {
-                                phitref = TESObjectREFR::FindReferenceFor3D(phit);
-                            }
-                            else {
-                                phitref = nullptr;
-                            }
-                            if (!phit || phitref == pTarget) {
-                                bInSight = true;
-                                break;
-                            }
-                        }
-                        if (bInSight) {
-                            afReturnValue = 1.0;
-                        }
-                        else {
-                            afReturnValue =
-                                static_cast<double>(pAttacker->LineOfSight(false, pTarget, true, nullptr, false));
-                        }
-                    }
+        if ((pAttacker) && (pTarget)) {
+            if (pAttacker == pPlayer) {
+                bool bInFrustum = false;
+                SceneGraph* WorldSceneGraph = Main::GetWorldSceneGraph();
+                NiNode* pcamnode = WorldSceneGraph->GetCameraRoot();
+                NiCamera* pcam = Main::GetWorldSceneGraph()->GetCamera();
+                BSFadeNode* pfadenode;
+                if (pTarget->Get3D()) {
+                    pfadenode = pTarget->Get3D()->IsFadeNode();
                 }
                 else {
-                    afReturnValue = static_cast<double>(pAttacker->LineOfSight(false, pTarget, true, nullptr, false));
+                    pfadenode = nullptr;
                 }
-                if (GetThreadTLSData()->bSystemOutput) {
-                    if (0.0 == afReturnValue) {
-                        const char* a2a = pTarget->GetFullName();
-                        Interface::PrintLine("%s can't see %s", pAttacker->GetFullName(), a2a);
+                if (pfadenode && NodeInFrustum(pfadenode, pcam)) {
+                    bInFrustum = true;
+                }
+                else {
+                    if (pTarget->IsMarker()) {
+                        NiBound kBound;
+                        kBound.SetCenter(pTarget->GetLocationOnReference());
+                        kBound.SetRadius(1.0f);
+                        if (BoundInFrustum(kBound, pcam)) {
+                            bInFrustum = true;
+                        }
+                    }
+                }
+                if (bInFrustum) {
+                    float fzs[3];
+                    alignas(16) CFilter icolFilter;
+                    alignas(16) NiPoint3 position = pcamnode->GetTranslate();
+                    bhkPickData pickRes;
+                    MobileObject* pmob = nullptr;
+                    if ((pTarget) && (pTarget->IsMobileObject())) {
+                        pmob = static_cast<MobileObject*>(pTarget);
+                    }
+
+                    SpecificItemCollector collector(L_LOS, pmob);
+                    pickRes.SetClosestCollector(&collector);
+                    NiPoint3 destPoint = pTarget->GetLocationOnReference();
+                    pickRes.NiSetFrom(position);
+                    pPlayer->GetCollisionFilter(&icolFilter.iFilter);
+                    CFilter fltr(0);
+                    fltr.SetLayer(L_LOS);
+                    uint32_t Group = icolFilter.GetGroup();
+                    fltr.SetGroup(Group);
+                    pickRes.SetFilter(fltr);
+                    alignas(16) NiPoint3 kBoundMax = pTarget->GetBoundMax();
+                    NiPoint3 kBoundMin = pTarget->GetBoundMin();
+                    float fTargetHeight = kBoundMax.z - kBoundMin.z;
+                    fzs[0] = fTargetHeight * 0.75 + destPoint.z;
+                    fzs[1] = fTargetHeight * 0.5 + destPoint.z;
+                    fzs[2] = fTargetHeight * 0.25 + destPoint.z;
+                    for (int32_t i = 0; i < 3; ++i) {
+                        TESObjectREFR* phitref;
+                        destPoint.z = fzs[i];
+                        pickRes.NiSetTo(destPoint);
+                        NiAVObject* phit = TES::pInstance->Pick(pickRes);
+                        if (phit) {
+                            phitref = TESObjectREFR::FindReferenceFor3D(phit);
+                        }
+                        else {
+                            phitref = nullptr;
+                        }
+                        if (!phit || phitref == pTarget) {
+                            bInSight = true;
+                            break;
+                        }
+                    }
+                    if (bInSight) {
+                        afReturnValue = 1.0;
                     }
                     else {
-                        const char* a2 = pTarget->GetFullName();
-                        Interface::PrintLine("%s sees %s", pAttacker->GetFullName(), a2);
+                        afReturnValue =
+                            static_cast<double>(pAttacker->LineOfSight(false, pTarget, true, nullptr, false));
                     }
+                }
+            }
+            else {
+                afReturnValue = static_cast<double>(pAttacker->LineOfSight(false, pTarget, true, nullptr, false));
+            }
+            if (GetThreadTLSData()->bSystemOutput) {
+                if (0.0 == afReturnValue) {
+                    const char* a2a = pTarget->GetFullName();
+                    Interface::PrintLine("%s can't see %s", pAttacker->GetFullName(), a2a);
+                }
+                else {
+                    const char* a2 = pTarget->GetFullName();
+                    Interface::PrintLine("%s sees %s", pAttacker->GetFullName(), a2);
                 }
             }
         }
@@ -1331,24 +1299,19 @@ bool Script::GetIsRaceConditionFunction(
 ) {
     afReturnValue = 0.0;
     TESNPC* ObjectReference = nullptr;
-    if (apRefObject) {
-        if (apRefObject->GetObjectReference()->GetFormType() == NPC__ID) {
-            ObjectReference = static_cast<TESNPC*>(apRefObject->GetObjectReference());
-        }
+    if ((apRefObject) && (apRefObject->GetObjectReference()->GetFormType() == NPC__ID)) {
+        ObjectReference = static_cast<TESNPC*>(apRefObject->GetObjectReference());
     }
+
     TESRace* v6 = nullptr;
-    if (apParam1) {
-        if (static_cast<TESForm*>(apParam1)->GetFormType() == RACE_ID) {
-            v6 = static_cast<TESRace*>(apParam1);
-        }
+    if ((apParam1) && (static_cast<TESForm*>(apParam1)->GetFormType() == RACE_ID)) {
+        v6 = static_cast<TESRace*>(apParam1);
     }
-    if (ObjectReference) {
-        if (v6) {
-            if (ObjectReference->GetRace() == v6) {
-                afReturnValue = 1.0;
-            }
-        }
+
+    if ((ObjectReference) && (v6) && (ObjectReference->GetRace() == v6)) {
+        afReturnValue = 1.0;
     }
+
     if (GetThreadTLSData()->bSystemOutput) {
         Interface::PrintLine("GetIsRace >> %0.2f", afReturnValue);
     }
@@ -1363,21 +1326,19 @@ bool Script::GetInFactionConditionFunction(
 ) {
     afReturnValue = 0.0;
     TESFaction* pfac = nullptr;
-    if (apParam1) {
-        if (static_cast<TESForm*>(apParam1)->GetFormType() == FACT_ID) {
-            pfac = static_cast<TESFaction*>(apParam1);
-        }
+    if ((apParam1) && (static_cast<TESForm*>(apParam1)->GetFormType() == FACT_ID)) {
+        pfac = static_cast<TESFaction*>(apParam1);
     }
+
     if (apRefObject == pInFactionRef && pfac == pFaction) {
         afReturnValue = fInFaction;
     }
     else {
         Actor* pact = nullptr;
-        if (apRefObject) {
-            if (apRefObject->IsActor()) {
-                pact = static_cast<Actor*>(apRefObject);
-            }
+        if ((apRefObject) && (apRefObject->IsActor())) {
+            pact = static_cast<Actor*>(apRefObject);
         }
+
         if (!pact) {
             return true;
         }
@@ -1401,11 +1362,10 @@ bool Script::GetArmorRatingUpperConditionFunction(
     double& afReturnValue
 ) {
     TESObjectREFR* v8 = nullptr;
-    if (apRefObject) {
-        if (apRefObject->IsActor()) {
-            v8 = apRefObject;
-        }
+    if ((apRefObject) && (apRefObject->IsActor())) {
+        v8 = apRefObject;
     }
+
     afReturnValue = 0.0;
     if (v8) {
         InventoryChanges* InventoryChanges_ = InventoryChanges::GetInventoryChanges(apRefObject);
@@ -1413,11 +1373,10 @@ bool Script::GetArmorRatingUpperConditionFunction(
             ItemChange* WornItem = InventoryChanges_->GetWornItem(BO_UPPER_BODY, false);
             if (WornItem) {
                 TESObjectARMO* FormFlags = nullptr;
-                if (WornItem->pContainerObj) {
-                    if (WornItem->pContainerObj->GetFormType() == ARMO_ID) {
-                        FormFlags = static_cast<TESObjectARMO*>(WornItem->pContainerObj);
-                    }
+                if ((WornItem->pContainerObj) && (WornItem->pContainerObj->GetFormType() == ARMO_ID)) {
+                    FormFlags = static_cast<TESObjectARMO*>(WornItem->pContainerObj);
                 }
+
                 if (FormFlags) {
                     if (FormFlags->GetArmorWeight()) {
                         afReturnValue = 2.0;
@@ -1447,42 +1406,33 @@ bool Script::GetDetectedConditionFunction(
     int32_t inumber = 0;
     int32_t ilight = -1;
     Actor* pactor = nullptr;
-    if (apRefObject) {
-        if (apRefObject->IsActor()) {
-            pactor = static_cast<Actor*>(apRefObject);
-        }
+    if ((apRefObject) && (apRefObject->IsActor())) {
+        pactor = static_cast<Actor*>(apRefObject);
     }
+
     Actor* pdetector = nullptr;
-    if (apParam1) {
-        if (static_cast<TESObjectREFR*>(apParam1)->IsActor()) {
-            pdetector = static_cast<Actor*>(apParam1);
-        }
+    if ((apParam1) && (static_cast<TESObjectREFR*>(apParam1)->IsActor())) {
+        pdetector = static_cast<Actor*>(apParam1);
     }
-    if (pactor) {
-        if (pdetector) {
-            if (pactor->pCurrentProcess) {
-                if (pdetector->pCurrentProcess) {
-                    bool blinesight;
-                    bool bincombat = false;
-                    bsearch = false;
-                    if (pdetector == pPlayer) {
-                        bincombat = pPlayer->IsPlayerCharacterInCombat(&bsearch);
-                    }
-                    else {
-                        bincombat = pdetector->IsInCombat();
-                    }
-                    inumber = pactor->GetDetectionLevelAgainstActor(
-                        false, pdetector, blinesight, false, bincombat, false, nullptr
-                    );
-                    if (inumber > 0) {
-                        afReturnValue = 1.0;
-                    }
-                    BaseProcess* CurrentAIProcess = pdetector->pCurrentProcess;
-                    ilight = static_cast<int32_t>(CurrentAIProcess->GetActorLightLevel());
-                }
-            }
+
+    if ((pactor) && (pdetector) && (pactor->pCurrentProcess) && (pdetector->pCurrentProcess)) {
+        bool blinesight;
+        bool bincombat = false;
+        bsearch = false;
+        if (pdetector == pPlayer) {
+            bincombat = pPlayer->IsPlayerCharacterInCombat(&bsearch);
         }
+        else {
+            bincombat = pdetector->IsInCombat();
+        }
+        inumber = pactor->GetDetectionLevelAgainstActor(false, pdetector, blinesight, false, bincombat, false, nullptr);
+        if (inumber > 0) {
+            afReturnValue = 1.0;
+        }
+        BaseProcess* CurrentAIProcess = pdetector->pCurrentProcess;
+        ilight = static_cast<int32_t>(CurrentAIProcess->GetActorLightLevel());
     }
+
     if (GetThreadTLSData()->bSystemOutput) {
         Interface::PrintLine("GetDetected >> %i and light %i", inumber, ilight);
     }
@@ -1497,16 +1447,14 @@ bool Script::GetDeadConditionFunction(
 ) {
     afReturnValue = 0.0;
     TESObjectREFR* v5 = nullptr;
-    if (apRefObject) {
-        if (apRefObject->IsActor()) {
-            v5 = apRefObject;
-        }
+    if ((apRefObject) && (apRefObject->IsActor())) {
+        v5 = apRefObject;
     }
-    if (v5) {
-        if (v5->IsDead(true)) {
-            afReturnValue = 1.0;
-        }
+
+    if ((v5) && (v5->IsDead(true))) {
+        afReturnValue = 1.0;
     }
+
     if (GetThreadTLSData()->bSystemOutput) {
         Interface::PrintLine("GetDead >> %0.2f", afReturnValue);
     }
@@ -1523,11 +1471,10 @@ bool Script::GetItemCountConditionFunction(
     if (apRefObject->HasContainer()) {
         InventoryChanges* pchange;
         TESBoundObject* pobject = nullptr;
-        if (apParam1) {
-            if (static_cast<TESForm*>(apParam1)->IsBoundObject()) {
-                pobject = static_cast<TESBoundObject*>(apParam1);
-            }
+        if ((apParam1) && (static_cast<TESForm*>(apParam1)->IsBoundObject())) {
+            pobject = static_cast<TESBoundObject*>(apParam1);
         }
+
         if (apRefObject) {
             pchange = InventoryChanges::GetInventoryChanges(apRefObject);
         }
@@ -1540,17 +1487,15 @@ bool Script::GetItemCountConditionFunction(
                 afReturnValue = static_cast<double>(std::abs(ObjectCount));
             }
             else {
-                if (apParam1) {
-                    if (static_cast<TESForm*>(apParam1)->GetFormType() == FLST_ID) {
-                        BGSListForm* pformlist = static_cast<BGSListForm*>(apParam1);
-                        BSSimpleList<TESForm*>* plist = pformlist->GetFormList();
-                        while (plist && !plist->IsEmpty()) {
-                            TESForm* pcheckform = plist->m_item;
-                            plist = plist->m_pkNext;
-                            if (pcheckform->IsBoundObject()) {
-                                int32_t v6 = pchange->GetObjectCount(static_cast<TESBoundObject*>(pcheckform));
-                                afReturnValue = static_cast<double>(std::abs(v6)) + afReturnValue;
-                            }
+                if ((apParam1) && (static_cast<TESForm*>(apParam1)->GetFormType() == FLST_ID)) {
+                    BGSListForm* pformlist = static_cast<BGSListForm*>(apParam1);
+                    BSSimpleList<TESForm*>* plist = pformlist->GetFormList();
+                    while (plist && !plist->IsEmpty()) {
+                        TESForm* pcheckform = plist->m_item;
+                        plist = plist->m_pkNext;
+                        if (pcheckform->IsBoundObject()) {
+                            int32_t v6 = pchange->GetObjectCount(static_cast<TESBoundObject*>(pcheckform));
+                            afReturnValue = static_cast<double>(std::abs(v6)) + afReturnValue;
                         }
                     }
                 }
@@ -1561,12 +1506,11 @@ bool Script::GetItemCountConditionFunction(
         }
         return true;
     }
-    else {
-        if (GetThreadTLSData()->bSystemOutput) {
-            Interface::PrintLine("Calling Reference is not a Container Object");
-        }
-        return true;
+
+    if (GetThreadTLSData()->bSystemOutput) {
+        Interface::PrintLine("Calling Reference is not a Container Object");
     }
+    return true;
 }
 
 bool Script::GetEquippedConditionFunction(
@@ -1577,11 +1521,10 @@ bool Script::GetEquippedConditionFunction(
 ) {
     afReturnValue = 0.0;
     Actor* ptarget = nullptr;
-    if (apRefObject) {
-        if (apRefObject->IsActor()) {
-            ptarget = static_cast<Actor*>(apRefObject);
-        }
+    if ((apRefObject) && (apRefObject->IsActor())) {
+        ptarget = static_cast<Actor*>(apRefObject);
     }
+
     TESBoundObject* pobject = static_cast<TESBoundObject*>(apParam1);
     if (ptarget && apParam1) {
         BSSimpleList<TESForm*>* plist = nullptr;
@@ -1593,11 +1536,9 @@ bool Script::GetEquippedConditionFunction(
         while (pobject) {
             if (pobject->IsBoundObject()) {
                 InventoryChanges* pchange = InventoryChanges::GetInventoryChanges(ptarget);
-                if (pchange) {
-                    if (pchange->WearingObject(pobject, false)) {
-                        afReturnValue = 1.0;
-                        break;
-                    }
+                if ((pchange) && (pchange->WearingObject(pobject, false))) {
+                    afReturnValue = 1.0;
+                    break;
                 }
             }
             if (plist) {
@@ -1625,11 +1566,10 @@ bool Script::GetSleepingConditionFunction(
 ) {
     afReturnValue = 0.0;
     TESObjectREFR* v5 = nullptr;
-    if (apRefObject) {
-        if (apRefObject->IsActor()) {
-            v5 = apRefObject;
-        }
+    if ((apRefObject) && (apRefObject->IsActor())) {
+        v5 = apRefObject;
     }
+
     if (v5) {
         switch (v5->GetSitSleepState()) {
             case SIT_SLEEP_LOAD_SLEEP_IDLE: {
@@ -1671,11 +1611,10 @@ bool Script::GetSittingConditionFunction(
 ) {
     afReturnValue = 0.0;
     TESObjectREFR* v5 = nullptr;
-    if (apRefObject) {
-        if (apRefObject->IsActor()) {
-            v5 = apRefObject;
-        }
+    if ((apRefObject) && (apRefObject->IsActor())) {
+        v5 = apRefObject;
     }
+
     if (v5) {
         switch (v5->GetSitSleepState()) {
             case SIT_SLEEP_LOAD_SIT_IDLE: {
@@ -1757,17 +1696,14 @@ bool Script::GetIsPlayableRaceConditionFunction(
     else {
         afReturnValue = 0.0;
         TESNPC* pnpc = nullptr;
-        if (apRefObject) {
-            if (apRefObject->GetObjectReference()->GetFormType() == NPC__ID) {
-                pnpc = static_cast<TESNPC*>(apRefObject->GetObjectReference());
-            }
+        if ((apRefObject) && (apRefObject->GetObjectReference()->GetFormType() == NPC__ID)) {
+            pnpc = static_cast<TESNPC*>(apRefObject->GetObjectReference());
         }
+
         if (pnpc) {
             TESRace* prace = pnpc->GetRace();
-            if (prace) {
-                if (prace->GetPlayable()) {
-                    afReturnValue = 1.0;
-                }
+            if ((prace) && (prace->GetPlayable())) {
+                afReturnValue = 1.0;
             }
         }
         pIsPlayableRaceRef = apRefObject;
@@ -1787,20 +1723,19 @@ bool Script::IsInListConditionFunction(
 ) {
     afReturnValue = 0.0;
     BGSListForm* pformlist = static_cast<BGSListForm*>(apParam1);
-    if (apRefObject) {
-        if (pformlist) {
-            TESBoundObject* pobj = (&apRefObject->m_Extra)->GetLevCreaOriginalBase();
-            if (!pobj) {
-                pobj = apRefObject->GetObjectReference();
-            }
-            if (pobj) {
-                TESForm* item = pobj;
-                if ((&pformlist->ListOfForms)->IsInList(item)) {
-                    afReturnValue = 1.0;
-                }
+    if ((apRefObject) && (pformlist)) {
+        TESBoundObject* pobj = (&apRefObject->m_Extra)->GetLevCreaOriginalBase();
+        if (!pobj) {
+            pobj = apRefObject->GetObjectReference();
+        }
+        if (pobj) {
+            TESForm* item = pobj;
+            if ((&pformlist->ListOfForms)->IsInList(item)) {
+                afReturnValue = 1.0;
             }
         }
     }
+
     if (GetThreadTLSData()->bSystemOutput) {
         Interface::PrintLine("IsInList >> %0.2f", afReturnValue);
     }
@@ -1863,11 +1798,10 @@ bool Script::GetArmorRatingConditionFunction(
 ) {
     afReturnValue = 0.0;
     Actor* pactor = nullptr;
-    if (apRefObject) {
-        if (apRefObject->IsActor()) {
-            pactor = static_cast<Actor*>(apRefObject);
-        }
+    if ((apRefObject) && (apRefObject->IsActor())) {
+        pactor = static_cast<Actor*>(apRefObject);
     }
+
     if (pactor) {
         afReturnValue = pactor->GetActorFloatValue(ActorValue::DAMAGE_RESISTANCE);
         if (GetThreadTLSData()->bSystemOutput) {
@@ -1901,11 +1835,10 @@ bool Script::GetKnockedStateConditionFunction(
 ) {
     afReturnValue = 0.0;
     Actor* pactor = nullptr;
-    if (apRefObject) {
-        if (apRefObject->IsActor()) {
-            pactor = static_cast<Actor*>(apRefObject);
-        }
+    if ((apRefObject) && (apRefObject->IsActor())) {
+        pactor = static_cast<Actor*>(apRefObject);
     }
+
     if (pactor) {
         MiddleHighProcess* pprocess = dynamic_cast<MiddleHighProcess*>(pactor->pCurrentProcess);
         if (pprocess) {
@@ -1945,12 +1878,10 @@ bool Script::IsGuardConditionFunction(
         if (apRefObject->GetObjectReference()->GetFormType() == NPC__ID) {
             pNPC = static_cast<TESNPC*>(apRefObject->GetObjectReference());
         }
-        if (pNPC) {
-            if (pNPC->GetClass()) {
-                TESClass* Class = pNPC->GetClass();
-                if (Class->IsGuard()) {
-                    afReturnValue = 1.0;
-                }
+        if ((pNPC) && (pNPC->GetClass())) {
+            TESClass* Class = pNPC->GetClass();
+            if (Class->IsGuard()) {
+                afReturnValue = 1.0;
             }
         }
     }
@@ -1968,11 +1899,10 @@ bool Script::IsTalkingConditionFunction(
 ) {
     afReturnValue = 0.0;
     Actor* v6 = nullptr;
-    if (apRefObject) {
-        if (apRefObject->IsActor()) {
-            v6 = static_cast<Actor*>(apRefObject);
-        }
+    if ((apRefObject) && (apRefObject->IsActor())) {
+        v6 = static_cast<Actor*>(apRefObject);
     }
+
     if (v6) {
         if (v6->GetIsTalking()) {
             afReturnValue = 1.0;
@@ -1980,10 +1910,8 @@ bool Script::IsTalkingConditionFunction(
     }
     else {
         Actor* MobileObjectExtra = static_cast<Actor*>(apRefObject->GetMobileObjectExtra());
-        if (MobileObjectExtra) {
-            if (MobileObjectExtra->IsTalking()) {
-                afReturnValue = 1.0;
-            }
+        if ((MobileObjectExtra) && (MobileObjectExtra->IsTalking())) {
+            afReturnValue = 1.0;
         }
     }
     if (GetThreadTLSData()->bSystemOutput) {
@@ -2000,11 +1928,10 @@ bool Script::GetTrespassWarningLevelConditionFunction(
 ) {
     afReturnValue = -1.0;
     Actor* pactor = nullptr;
-    if (apRefObject) {
-        if (apRefObject->IsActor()) {
-            pactor = static_cast<Actor*>(apRefObject);
-        }
+    if ((apRefObject) && (apRefObject->IsActor())) {
+        pactor = static_cast<Actor*>(apRefObject);
     }
+
     if (pactor) {
         TESPackage* pbasepack = pactor->GetCurrentPackage();
         if (pbasepack) {
@@ -2042,16 +1969,14 @@ bool Script::IsTrespassingConditionFunction(
 ) {
     afReturnValue = 0.0;
     Actor* pactor = nullptr;
-    if (apRefObject) {
-        if (apRefObject->IsActor()) {
-            pactor = static_cast<Actor*>(apRefObject);
-        }
+    if ((apRefObject) && (apRefObject->IsActor())) {
+        pactor = static_cast<Actor*>(apRefObject);
     }
-    if (pactor) {
-        if (pactor->IsTresPassing()) {
-            afReturnValue = 1.0;
-        }
+
+    if ((pactor) && (pactor->IsTresPassing())) {
+        afReturnValue = 1.0;
     }
+
     if (GetThreadTLSData()->bSystemOutput) {
         Interface::PrintLine("Is Trespassing Value %0.2f", afReturnValue);
     }
@@ -2065,14 +1990,13 @@ bool Script::GetGroupMemberCountConditionFunction(
     double& afReturnValue
 ) {
     afReturnValue = 0.0;
-    if (apRefObject) {
-        if (apRefObject->IsActor()) {
-            CombatGroup* pgroup = static_cast<Actor*>(apRefObject)->GetCombatGroup();
-            if (pgroup) {
-                afReturnValue = static_cast<double>(pgroup->GetMemberCount());
-            }
+    if ((apRefObject) && (apRefObject->IsActor())) {
+        CombatGroup* pgroup = static_cast<Actor*>(apRefObject)->GetCombatGroup();
+        if (pgroup) {
+            afReturnValue = static_cast<double>(pgroup->GetMemberCount());
         }
     }
+
     return true;
 }
 
@@ -2135,14 +2059,12 @@ bool Script::GetDetectionLevelConditionFunction(
         if (apRefObject->IsActor()) {
             pActor = static_cast<Actor*>(apRefObject);
         }
-        if (pActor) {
-            if (apParam1) {
-                afReturnValue = static_cast<double>(pActor->GetDetectionLevelValue(static_cast<Actor*>(apParam1)));
-                if (GetThreadTLSData()->bSystemOutput) {
-                    double v6 = afReturnValue;
-                    const char* FullName = static_cast<TESObjectREFR*>(apParam1)->GetFullName();
-                    Interface::PrintLine("%s detects %s at level %.02f", pActor->GetFullName(), FullName, v6);
-                }
+        if ((pActor) && (apParam1)) {
+            afReturnValue = static_cast<double>(pActor->GetDetectionLevelValue(static_cast<Actor*>(apParam1)));
+            if (GetThreadTLSData()->bSystemOutput) {
+                double v6 = afReturnValue;
+                const char* FullName = static_cast<TESObjectREFR*>(apParam1)->GetFullName();
+                Interface::PrintLine("%s detects %s at level %.02f", pActor->GetFullName(), FullName, v6);
             }
         }
     }
@@ -2158,43 +2080,41 @@ bool Script::GetVATSTargetHeightConditionFunction(
     afReturnValue = 0.0;
     if (pVATS.eMode == VATS::VATS_PLAYBACK) {
         VATS_COMMAND* pcommand = pVATS.GetCurrentAction();
-        if (pcommand) {
-            if (ActionPoints::IsAttackAction(pcommand->eAction)) {
-                Actor* pactor = static_cast<Actor*>(pcommand->pTarget);
-                ActorValue::Index etargetLimb = pcommand->eLimb;
-                if (pactor) {
-                    NiPoint3 ecx0;
-                    NiNode* ptarget3d = pactor->Get3D();
-                    char v16 = 0;
-                    if (etargetLimb != ActorValue::VALUE_NONE && pactor->IsActor()) {
-                        TESActorBase* ActorBase = pactor->GetActorBase();
-                        BGSBodyPartData* pbodyPartData = ActorBase->GetBodyPartData();
-                        if (pbodyPartData) {
-                            BGSBodyPart* pbodyPart = pbodyPartData->GetBodyPart_005E5130(etargetLimb);
-                            if (pbodyPart) {
-                                const char* TargetName = pbodyPart->GetTargetName();
-                                NiNode* v4 = pactor->Get3D();
-                                NiAVObject* ptarget = BSUtilities::GetObjectByName(v4, TargetName);
-                                if (ptarget) {
-                                    ecx0 = ptarget->GetWorldTranslate();
-                                    v16 = 1;
-                                }
+        if ((pcommand) && (ActionPoints::IsAttackAction(pcommand->eAction))) {
+            Actor* pactor = static_cast<Actor*>(pcommand->pTarget);
+            ActorValue::Index etargetLimb = pcommand->eLimb;
+            if (pactor) {
+                NiPoint3 ecx0;
+                NiNode* ptarget3d = pactor->Get3D();
+                char v16 = 0;
+                if (etargetLimb != ActorValue::VALUE_NONE && pactor->IsActor()) {
+                    TESActorBase* ActorBase = pactor->GetActorBase();
+                    BGSBodyPartData* pbodyPartData = ActorBase->GetBodyPartData();
+                    if (pbodyPartData) {
+                        BGSBodyPart* pbodyPart = pbodyPartData->GetBodyPart_005E5130(etargetLimb);
+                        if (pbodyPart) {
+                            const char* TargetName = pbodyPart->GetTargetName();
+                            NiNode* v4 = pactor->Get3D();
+                            NiAVObject* ptarget = BSUtilities::GetObjectByName(v4, TargetName);
+                            if (ptarget) {
+                                ecx0 = ptarget->GetWorldTranslate();
+                                v16 = 1;
                             }
                         }
                     }
-                    if (!v16) {
-                        const NiPoint3* Center;
-                        if (ptarget3d) {
-                            Center = &(&ptarget3d->GetWorldBound())->m_kCenter;
-                        }
-                        else {
-                            Center = &pactor->GetLocationOnReference();
-                        }
-                        ecx0 = *Center;
-                    }
-                    const NiPoint3* v6 = &pPlayer->GetLocationOnReference();
-                    afReturnValue = ecx0.z - v6->z;
                 }
+                if (!v16) {
+                    const NiPoint3* Center;
+                    if (ptarget3d) {
+                        Center = &(&ptarget3d->GetWorldBound())->m_kCenter;
+                    }
+                    else {
+                        Center = &pactor->GetLocationOnReference();
+                    }
+                    ecx0 = *Center;
+                }
+                const NiPoint3* v6 = &pPlayer->GetLocationOnReference();
+                afReturnValue = ecx0.z - v6->z;
             }
         }
     }
@@ -2249,11 +2169,10 @@ bool Script::IsActorEvilConditionFunction(
     double& afReturnValue
 ) {
     Actor* v7 = nullptr;
-    if (apRefObject) {
-        if (apRefObject->IsActor()) {
-            v7 = static_cast<Actor*>(apRefObject);
-        }
+    if ((apRefObject) && (apRefObject->IsActor())) {
+        v7 = static_cast<Actor*>(apRefObject);
     }
+
     afReturnValue = 0.0;
     if (v7) {
         if (v7->IsEvil()) {
@@ -2280,32 +2199,29 @@ bool Script::IsActorVictimConditionFunction(
     double& afReturnValue
 ) {
     TESObjectREFR* v8 = nullptr;
-    if (apRefObject) {
-        if (apRefObject->IsActor()) {
-            v8 = apRefObject;
-        }
+    if ((apRefObject) && (apRefObject->IsActor())) {
+        v8 = apRefObject;
     }
+
     afReturnValue = 0.0;
-    if (v8) {
-        if (v8->IsNpc()) {
-            TESForm* ObjectReference = v8->GetObjectReference();
-            if (ObjectReference) {
-                if (ObjectReference == GetThreadTLSData()->pCrimeVictim) {
-                    afReturnValue = 1.0;
-                }
-            }
-            if (!GetThreadTLSData()->bSystemOutput || 0.0 == afReturnValue) {
-                if (GetThreadTLSData()->bSystemOutput) {
-                    const char* FullName = v8->GetFullName();
-                    Interface::PrintLine("%s  is not a crime victim ", FullName);
-                }
-            }
-            else {
-                const char* v4 = v8->GetFullName();
-                Interface::PrintLine("%s  crime victim ", v4);
+    if ((v8) && (v8->IsNpc())) {
+        TESForm* ObjectReference = v8->GetObjectReference();
+        if ((ObjectReference) && (ObjectReference == GetThreadTLSData()->pCrimeVictim)) {
+            afReturnValue = 1.0;
+        }
+
+        if (!GetThreadTLSData()->bSystemOutput || 0.0 == afReturnValue) {
+            if (GetThreadTLSData()->bSystemOutput) {
+                const char* FullName = v8->GetFullName();
+                Interface::PrintLine("%s  is not a crime victim ", FullName);
             }
         }
+        else {
+            const char* v4 = v8->GetFullName();
+            Interface::PrintLine("%s  crime victim ", v4);
+        }
     }
+
     return true;
 }
 
@@ -2317,19 +2233,17 @@ bool Script::GetIdleDoneOnceConditionFunction(
 ) {
     afReturnValue = 0.0;
     Actor* pactor = nullptr;
-    if (apRefObject) {
-        if (apRefObject->IsActor()) {
-            pactor = static_cast<Actor*>(apRefObject);
+    if ((apRefObject) && (apRefObject->IsActor())) {
+        pactor = static_cast<Actor*>(apRefObject);
+    }
+
+    if ((pactor) && (pactor->pCurrentProcess)) {
+        BaseProcess* CurrentAIProcess = pactor->pCurrentProcess;
+        if (CurrentAIProcess->GetIdleDoneOnce()) {
+            afReturnValue = 1.0;
         }
     }
-    if (pactor) {
-        if (pactor->pCurrentProcess) {
-            BaseProcess* CurrentAIProcess = pactor->pCurrentProcess;
-            if (CurrentAIProcess->GetIdleDoneOnce()) {
-                afReturnValue = 1.0;
-            }
-        }
-    }
+
     return true;
 }
 
@@ -2340,20 +2254,18 @@ bool Script::IsInDangerousWaterConditionFunction(
     double& afReturnValue
 ) {
     afReturnValue = 0.0;
-    if (apRefObject) {
-        if (apRefObject->IsActor() && static_cast<Actor*>(apRefObject)->IsInWater()) {
-            if (apRefObject->GetParentCell()) {
-                TESObjectCELL* ParentCell = apRefObject->GetParentCell();
-                if (ParentCell->GetWaterType()) {
-                    TESObjectCELL* v5 = apRefObject->GetParentCell();
-                    TESWaterForm* WaterType = v5->GetWaterType();
-                    if (WaterType->IsDangerous()) {
-                        afReturnValue = 1.0;
-                    }
-                }
+    if ((apRefObject) && (apRefObject->IsActor() && static_cast<Actor*>(apRefObject)->IsInWater()) &&
+        (apRefObject->GetParentCell())) {
+        TESObjectCELL* ParentCell = apRefObject->GetParentCell();
+        if (ParentCell->GetWaterType()) {
+            TESObjectCELL* v5 = apRefObject->GetParentCell();
+            TESWaterForm* WaterType = v5->GetWaterType();
+            if (WaterType->IsDangerous()) {
+                afReturnValue = 1.0;
             }
         }
     }
+
     return true;
 }
 
@@ -2364,19 +2276,18 @@ bool Script::GetTimeDeadConditionFunction(
     double& afReturnValue
 ) {
     afReturnValue = 0.0;
-    if (apRefObject) {
-        if (apRefObject->IsDead(false) && apRefObject->IsActor()) {
-            Actor* pactor = static_cast<Actor*>(apRefObject);
-            if (pactor->pCurrentProcess) {
-                BaseProcess* CurrentAIProcess = pactor->pCurrentProcess;
-                float fdeadtime = CurrentAIProcess->GetDeathTime();
-                if (fdeadtime > 0.0) {
-                    float fcurrtime = static_cast<float>(appCalendar.GetHoursPassed());
-                    afReturnValue = fcurrtime - fdeadtime;
-                }
+    if ((apRefObject) && (apRefObject->IsDead(false) && apRefObject->IsActor())) {
+        Actor* pactor = static_cast<Actor*>(apRefObject);
+        if (pactor->pCurrentProcess) {
+            BaseProcess* CurrentAIProcess = pactor->pCurrentProcess;
+            float fdeadtime = CurrentAIProcess->GetDeathTime();
+            if (fdeadtime > 0.0) {
+                float fcurrtime = static_cast<float>(appCalendar.GetHoursPassed());
+                afReturnValue = fcurrtime - fdeadtime;
             }
         }
     }
+
     return true;
 }
 
@@ -2419,14 +2330,13 @@ bool Script::HasFriendDispositionConditionFunction(
     double& afReturnValue
 ) {
     afReturnValue = 0.0;
-    if (apRefObject) {
-        if (apRefObject->IsActor()) {
-            int32_t v4 = static_cast<Actor*>(apRefObject)->GetDisposition(pPlayer, nullptr);
-            if (v4 >= iDialogueDispositionFriendValue.Int()) {
-                afReturnValue = 1.0;
-            }
+    if ((apRefObject) && (apRefObject->IsActor())) {
+        int32_t v4 = static_cast<Actor*>(apRefObject)->GetDisposition(pPlayer, nullptr);
+        if (v4 >= iDialogueDispositionFriendValue.Int()) {
+            afReturnValue = 1.0;
         }
     }
+
     return true;
 }
 
@@ -2437,14 +2347,13 @@ bool Script::GetGroupTargetCountConditionFunction(
     double& afReturnValue
 ) {
     afReturnValue = 0.0;
-    if (apRefObject) {
-        if (apRefObject->IsActor()) {
-            CombatGroup* pgroup = static_cast<Actor*>(apRefObject)->GetCombatGroup();
-            if (pgroup) {
-                afReturnValue = static_cast<double>(pgroup->GetTargetCount());
-            }
+    if ((apRefObject) && (apRefObject->IsActor())) {
+        CombatGroup* pgroup = static_cast<Actor*>(apRefObject)->GetCombatGroup();
+        if (pgroup) {
+            afReturnValue = static_cast<double>(pgroup->GetTargetCount());
         }
     }
+
     return true;
 }
 
@@ -2455,18 +2364,17 @@ bool Script::HasPerkConditionFunction(
     double& afReturnValue
 ) {
     afReturnValue = 0.0;
-    if (apRefObject) {
-        if (apRefObject->IsActor()) {
-            int32_t v5 =
-                static_cast<Actor*>(apRefObject)->GetPerkRank(static_cast<BGSPerk*>(apParam1), apParam2 != nullptr);
-            if (GetThreadTLSData()->bSystemOutput) {
-                Interface::PrintLine("Perk Rank >> %d", v5);
-            }
-            if (v5) {
-                afReturnValue = 1.0;
-            }
+    if ((apRefObject) && (apRefObject->IsActor())) {
+        int32_t v5 =
+            static_cast<Actor*>(apRefObject)->GetPerkRank(static_cast<BGSPerk*>(apParam1), apParam2 != nullptr);
+        if (GetThreadTLSData()->bSystemOutput) {
+            Interface::PrintLine("Perk Rank >> %d", v5);
+        }
+        if (v5) {
+            afReturnValue = 1.0;
         }
     }
+
     return true;
 }
 
@@ -2535,27 +2443,25 @@ bool Script::GetAggroRadiusViolatedConditionFunction(
     double& afReturnValue
 ) {
     afReturnValue = 0.0;
-    if (apRefObject) {
-        if (apRefObject->IsActor()) {
-            Actor* pactor = static_cast<Actor*>(apRefObject);
-            if (pactor->pCurrentProcess) {
-                if (pactor->pCurrentProcess->GetRunOncePackage()) {
-                    TESPackage* v4 = pactor->pCurrentProcess->GetRunOncePackage();
-                    if (v4->GetPackType() == PACKAGE_TYPE_GUARD) {
-                        afReturnValue = 1.0;
-                    }
-                }
+    if ((apRefObject) && (apRefObject->IsActor())) {
+        Actor* pactor = static_cast<Actor*>(apRefObject);
+        if ((pactor->pCurrentProcess) && (pactor->pCurrentProcess->GetRunOncePackage())) {
+            TESPackage* v4 = pactor->pCurrentProcess->GetRunOncePackage();
+            if (v4->GetPackType() == PACKAGE_TYPE_GUARD) {
+                afReturnValue = 1.0;
             }
-            if (GetThreadTLSData()->bSystemOutput) {
-                if (!(afReturnValue > 0.0)) {
-                    Interface::PrintLine("%s does not have his aggro radius violated ", apRefObject->GetFullName());
-                }
-                else {
-                    Interface::PrintLine("%s has his aggro radius violated ", apRefObject->GetFullName());
-                }
+        }
+
+        if (GetThreadTLSData()->bSystemOutput) {
+            if (!(afReturnValue > 0.0)) {
+                Interface::PrintLine("%s does not have his aggro radius violated ", apRefObject->GetFullName());
+            }
+            else {
+                Interface::PrintLine("%s has his aggro radius violated ", apRefObject->GetFullName());
             }
         }
     }
+
     return true;
 }
 
@@ -2568,12 +2474,10 @@ bool Script::GetMapMarkerVisibleConditionFunction(
     afReturnValue = 0.0;
     if (apRefObject) {
         MapMarkerData* MapMarkerData_ = apRefObject->GetMapMarkerData();
-        if (MapMarkerData_) {
-            if (MapMarkerData_->GetVisible()) {
-                afReturnValue = 1.0;
-                if (MapMarkerData_->GetTravelLoc()) {
-                    afReturnValue = 2.0;
-                }
+        if ((MapMarkerData_) && (MapMarkerData_->GetVisible())) {
+            afReturnValue = 1.0;
+            if (MapMarkerData_->GetTravelLoc()) {
+                afReturnValue = 2.0;
             }
         }
     }
@@ -2589,20 +2493,19 @@ bool Script::GetWeaponHealthPercConditionFunction(
     void* apParam2,
     double& afReturnValue
 ) {
-    if (apRefObject) {
-        if (apRefObject->IsActor()) {
-            Actor* pactor = static_cast<Actor*>(apRefObject);
-            if (pactor->pCurrentProcess) {
-                ItemChange* pweapon = pactor->pCurrentProcess->GetCurrentWeapon();
-                if (!pweapon || pweapon->pContainerObj == pFists) {
-                    afReturnValue = 100.0;
-                }
-                else {
-                    afReturnValue = pweapon->GetItemHealth(true);
-                }
+    if ((apRefObject) && (apRefObject->IsActor())) {
+        Actor* pactor = static_cast<Actor*>(apRefObject);
+        if (pactor->pCurrentProcess) {
+            ItemChange* pweapon = pactor->pCurrentProcess->GetCurrentWeapon();
+            if (!pweapon || pweapon->pContainerObj == pFists) {
+                afReturnValue = 100.0;
+            }
+            else {
+                afReturnValue = pweapon->GetItemHealth(true);
             }
         }
     }
+
     if (GetThreadTLSData()->bSystemOutput) {
         Interface::PrintLine("GetWeaponHealthPerc >> %0.2f", afReturnValue);
     }
@@ -2618,18 +2521,14 @@ bool Script::IsGreetingPlayerConditionFunction(
     double& afReturnValue
 ) {
     afReturnValue = 0.0;
-    if (apRefObject) {
-        if (apRefObject->IsActor()) {
-            Actor* pactor = static_cast<Actor*>(apRefObject);
-            if (pactor->pCurrentProcess) {
-                if (pactor->pCurrentProcess->GetGreetingFlag()) {
-                    if (pactor->pDialogueItemTarget == pPlayer) {
-                        afReturnValue = 1.0;
-                    }
-                }
-            }
+    if ((apRefObject) && (apRefObject->IsActor())) {
+        Actor* pactor = static_cast<Actor*>(apRefObject);
+        if ((pactor->pCurrentProcess) && (pactor->pCurrentProcess->GetGreetingFlag()) &&
+            (pactor->pDialogueItemTarget == pPlayer)) {
+            afReturnValue = 1.0;
         }
     }
+
     if (GetThreadTLSData()->bSystemOutput) {
         Interface::PrintLine("IsGreeting the player >> %.2f", afReturnValue);
     }
@@ -2671,14 +2570,13 @@ bool Script::GetIgnoreCrimeConditionFunction(
     double& afReturnValue
 ) {
     afReturnValue = 0.0;
-    if (apRefObject) {
-        if (apRefObject->IsActor()) {
-            Actor* pactor = static_cast<Actor*>(apRefObject);
-            if (pactor->GetIgnoreCrime()) {
-                afReturnValue = 1.0;
-            }
+    if ((apRefObject) && (apRefObject->IsActor())) {
+        Actor* pactor = static_cast<Actor*>(apRefObject);
+        if (pactor->GetIgnoreCrime()) {
+            afReturnValue = 1.0;
         }
     }
+
     if (GetThreadTLSData()->bSystemOutput) {
         if (!(afReturnValue > 0.0)) {
             Interface::PrintLine("%s is not ignoring crime", apRefObject->GetFullName());
@@ -2803,16 +2701,15 @@ bool Script::GetIsUsedItemTypeConditionFunction(
     double& afReturnValue
 ) {
     afReturnValue = 0.0;
-    if (apParam1) {
-        if (TESIdleManager::GetUsedItem()) {
-            TESObject* UsedItem = TESIdleManager::GetUsedItem();
-            // The parameter holds the form type as an integer; the whole parameter value is compared with GetFormType's
-            // result.
-            if (static_cast<uintptr_t>(UsedItem->GetFormType()) == reinterpret_cast<uintptr_t>(apParam1)) {
-                afReturnValue = 1.0;
-            }
+    if ((apParam1) && (TESIdleManager::GetUsedItem())) {
+        TESObject* UsedItem = TESIdleManager::GetUsedItem();
+        // The parameter holds the form type as an integer; the whole parameter value is compared with GetFormType's
+        // result.
+        if (static_cast<uintptr_t>(UsedItem->GetFormType()) == reinterpret_cast<uintptr_t>(apParam1)) {
+            afReturnValue = 1.0;
         }
     }
+
     if (GetThreadTLSData()->bSystemOutput) {
         Interface::PrintLine("GetIsUsedItemType >> %0.2f", afReturnValue);
     }
@@ -3198,11 +3095,10 @@ bool Script::IsCurrentFurnitureRefConditionFunction(
     BaseProcess* pBaseProcess;
     afReturnValue = 0.0;
     Actor* pActor = nullptr;
-    if (apRefObject) {
-        if (apRefObject->IsActor()) {
-            pActor = static_cast<Actor*>(apRefObject);
-        }
+    if ((apRefObject) && (apRefObject->IsActor())) {
+        pActor = static_cast<Actor*>(apRefObject);
     }
+
     if (pActor) {
         pBaseProcess = pActor->MobileObject::GetCurrentAIProcess();
         if (static_cast<const void*>(pBaseProcess->GetCurrentFurniture()) == static_cast<const void*>(apParam1)) {
@@ -3230,13 +3126,10 @@ bool Script::GetIsRefConditionFunction(
             v6 = static_cast<TESForm*>(apParam1);
         }
     }
-    if (apRefObject) {
-        if (v6) {
-            if (static_cast<const void*>(apRefObject) == static_cast<const void*>(v6)) {
-                afReturnValue = 1.0;
-            }
-        }
+    if ((apRefObject) && (v6) && (static_cast<const void*>(apRefObject) == static_cast<const void*>(v6))) {
+        afReturnValue = 1.0;
     }
+
     if (Script::GetThreadSystemOutput()) {
         Interface::PrintLine("GetIsRef >> %0.2f", afReturnValue);
     }
@@ -3253,11 +3146,10 @@ bool Script::GetUnconsciousConditionFunction(
     const char* fullName;
     afReturnValue = 0.0;
     Actor* v7 = nullptr;
-    if (apRefObject) {
-        if (apRefObject->IsActor()) {
-            v7 = static_cast<Actor*>(apRefObject);
-        }
+    if ((apRefObject) && (apRefObject->IsActor())) {
+        v7 = static_cast<Actor*>(apRefObject);
     }
+
     if (v7) {
         if (v7->IsUnConscious()) {
             afReturnValue = 1.0;
@@ -3286,11 +3178,10 @@ bool Script::GetHeadingAngleConditionFunction(
 ) {
     afReturnValue = 0.0;
     MobileObject* pMobile = nullptr;
-    if (apRefObject) {
-        if (apRefObject->IsMobileObject()) {
-            pMobile = static_cast<MobileObject*>(apRefObject);
-        }
+    if ((apRefObject) && (apRefObject->IsMobileObject())) {
+        pMobile = static_cast<MobileObject*>(apRefObject);
     }
+
     TESObjectREFR* pTarget = static_cast<TESObjectREFR*>(apParam1);
     if (pMobile && pTarget) {
         const NiPoint3* pMobileLocation = &pMobile->GetLocationOnReference();
@@ -3356,11 +3247,10 @@ bool Script::IsPlayerGrabbedRefConditionFunction(
     double& afReturnValue
 ) {
     afReturnValue = 0.0;
-    if (apParam1) {
-        if (static_cast<const void*>(pPlayer->GetGrabObject()) == static_cast<const void*>(apParam1)) {
-            afReturnValue = 1.0;
-        }
+    if ((apParam1) && (static_cast<const void*>(pPlayer->GetGrabObject()) == static_cast<const void*>(apParam1))) {
+        afReturnValue = 1.0;
     }
+
     return true;
 }
 
@@ -3371,12 +3261,11 @@ bool Script::GetVATSRightAreaFreeConditionFunction(
     double& afReturnValue
 ) {
     afReturnValue = 0.0;
-    if (apRefObject) {
-        if (apRefObject->IsActor()) {
-            afReturnValue = (double)static_cast<Actor*>(apRefObject)
-                                ->GetVATSAreaFree(static_cast<TESObjectREFR*>(apParam1), 1.5707963705062866f);
-        }
+    if ((apRefObject) && (apRefObject->IsActor())) {
+        afReturnValue = (double)static_cast<Actor*>(apRefObject)
+                            ->GetVATSAreaFree(static_cast<TESObjectREFR*>(apParam1), 1.5707963705062866f);
     }
+
     if (Script::GetThreadSystemOutput()) {
         Interface::PrintLine("VATSRightAreaFree >> %.2f", afReturnValue);
     }
@@ -3390,12 +3279,11 @@ bool Script::GetVATSLeftAreaFreeConditionFunction(
     double& afReturnValue
 ) {
     afReturnValue = 0.0;
-    if (apRefObject) {
-        if (apRefObject->IsActor()) {
-            afReturnValue = (double)static_cast<Actor*>(apRefObject)
-                                ->GetVATSAreaFree(static_cast<TESObjectREFR*>(apParam1), 4.71238899230957f);
-        }
+    if ((apRefObject) && (apRefObject->IsActor())) {
+        afReturnValue = (double)static_cast<Actor*>(apRefObject)
+                            ->GetVATSAreaFree(static_cast<TESObjectREFR*>(apParam1), 4.71238899230957f);
     }
+
     if (Script::GetThreadSystemOutput()) {
         Interface::PrintLine("VATSLeftAreaFree >> %.2f", afReturnValue);
     }
@@ -3409,12 +3297,11 @@ bool Script::GetVATSBackAreaFreeConditionFunction(
     double& afReturnValue
 ) {
     afReturnValue = 0.0;
-    if (apRefObject) {
-        if (apRefObject->IsActor()) {
-            afReturnValue = (double)static_cast<Actor*>(apRefObject)
-                                ->GetVATSAreaFree(static_cast<TESObjectREFR*>(apParam1), 3.1415927410125732f);
-        }
+    if ((apRefObject) && (apRefObject->IsActor())) {
+        afReturnValue = (double)static_cast<Actor*>(apRefObject)
+                            ->GetVATSAreaFree(static_cast<TESObjectREFR*>(apParam1), 3.1415927410125732f);
     }
+
     if (Script::GetThreadSystemOutput()) {
         Interface::PrintLine("VATSBackAreaFree >> %.2f", afReturnValue);
     }
@@ -3428,12 +3315,11 @@ bool Script::GetVATSFrontAreaFreeConditionFunction(
     double& afReturnValue
 ) {
     afReturnValue = 0.0;
-    if (apRefObject) {
-        if (apRefObject->IsActor()) {
-            afReturnValue =
-                (double)static_cast<Actor*>(apRefObject)->GetVATSAreaFree(static_cast<TESObjectREFR*>(apParam1), 0.0);
-        }
+    if ((apRefObject) && (apRefObject->IsActor())) {
+        afReturnValue =
+            (double)static_cast<Actor*>(apRefObject)->GetVATSAreaFree(static_cast<TESObjectREFR*>(apParam1), 0.0);
     }
+
     if (Script::GetThreadSystemOutput()) {
         Interface::PrintLine("VATSFrontAreaFree >> %.2f", afReturnValue);
     }
@@ -3447,12 +3333,11 @@ bool Script::GetVATSRightTargetVisibleConditionFunction(
     double& afReturnValue
 ) {
     afReturnValue = 0.0;
-    if (apRefObject) {
-        if (apRefObject->IsActor()) {
-            afReturnValue = (double)static_cast<Actor*>(apRefObject)
-                                ->GetVATSTargetVisible(static_cast<TESObjectREFR*>(apParam1), 1.5707963705062866f);
-        }
+    if ((apRefObject) && (apRefObject->IsActor())) {
+        afReturnValue = (double)static_cast<Actor*>(apRefObject)
+                            ->GetVATSTargetVisible(static_cast<TESObjectREFR*>(apParam1), 1.5707963705062866f);
     }
+
     if (Script::GetThreadSystemOutput()) {
         Interface::PrintLine("VATSRightTargetVisible >> %.2f", afReturnValue);
     }
@@ -3466,12 +3351,11 @@ bool Script::GetVATSLeftTargetVisibleConditionFunction(
     double& afReturnValue
 ) {
     afReturnValue = 0.0;
-    if (apRefObject) {
-        if (apRefObject->IsActor()) {
-            afReturnValue = (double)static_cast<Actor*>(apRefObject)
-                                ->GetVATSTargetVisible(static_cast<TESObjectREFR*>(apParam1), 4.71238899230957f);
-        }
+    if ((apRefObject) && (apRefObject->IsActor())) {
+        afReturnValue = (double)static_cast<Actor*>(apRefObject)
+                            ->GetVATSTargetVisible(static_cast<TESObjectREFR*>(apParam1), 4.71238899230957f);
     }
+
     if (Script::GetThreadSystemOutput()) {
         Interface::PrintLine("VATSLeftTargetVisible >> %.2f", afReturnValue);
     }
@@ -3485,12 +3369,11 @@ bool Script::GetVATSBackTargetVisibleConditionFunction(
     double& afReturnValue
 ) {
     afReturnValue = 0.0;
-    if (apRefObject) {
-        if (apRefObject->IsActor()) {
-            afReturnValue = (double)static_cast<Actor*>(apRefObject)
-                                ->GetVATSTargetVisible(static_cast<TESObjectREFR*>(apParam1), 3.1415927410125732f);
-        }
+    if ((apRefObject) && (apRefObject->IsActor())) {
+        afReturnValue = (double)static_cast<Actor*>(apRefObject)
+                            ->GetVATSTargetVisible(static_cast<TESObjectREFR*>(apParam1), 3.1415927410125732f);
     }
+
     if (Script::GetThreadSystemOutput()) {
         Interface::PrintLine("VATSBackTargetVisible >> %.2f", afReturnValue);
     }
@@ -3504,12 +3387,11 @@ bool Script::GetVATSFrontTargetVisibleConditionFunction(
     double& afReturnValue
 ) {
     afReturnValue = 0.0;
-    if (apRefObject) {
-        if (apRefObject->IsActor()) {
-            afReturnValue = (double)static_cast<Actor*>(apRefObject)
-                                ->GetVATSTargetVisible(static_cast<TESObjectREFR*>(apParam1), 0.0);
-        }
+    if ((apRefObject) && (apRefObject->IsActor())) {
+        afReturnValue =
+            (double)static_cast<Actor*>(apRefObject)->GetVATSTargetVisible(static_cast<TESObjectREFR*>(apParam1), 0.0);
     }
+
     if (Script::GetThreadSystemOutput()) {
         Interface::PrintLine("VATSFrontTargetVisible >> %.2f", afReturnValue);
     }
@@ -3554,32 +3436,26 @@ bool Script::GetIsCurrentPackageConditionFunction(
 ) {
     afReturnValue = 0.0;
     Actor* pactor = nullptr;
-    if (apRefObject) {
-        if (apRefObject->IsActor()) {
-            pactor = static_cast<Actor*>(apRefObject);
-        }
+    if ((apRefObject) && (apRefObject->IsActor())) {
+        pactor = static_cast<Actor*>(apRefObject);
     }
+
     TESPackage* ppackage = nullptr;
-    if (apParam1) {
-        if (static_cast<TESForm*>(apParam1)->GetFormType() == PACK_ID) {
-            ppackage = static_cast<TESPackage*>(apParam1);
+    if ((apParam1) && (static_cast<TESForm*>(apParam1)->GetFormType() == PACK_ID)) {
+        ppackage = static_cast<TESPackage*>(apParam1);
+    }
+
+    if ((pactor) && (ppackage)) {
+        TESPackage* pactorpack = pactor->GetPackageSetAsPcurrent();
+        if ((pactorpack) && (pactorpack->GetIsCreated()) && ((&pactor->m_Extra)->GetPackageExtra())) {
+            pactorpack = (&pactor->m_Extra)->GetPackageExtra();
+        }
+
+        if (pactorpack == ppackage) {
+            afReturnValue = 1.0;
         }
     }
-    if (pactor) {
-        if (ppackage) {
-            TESPackage* pactorpack = pactor->GetPackageSetAsPcurrent();
-            if (pactorpack) {
-                if (pactorpack->GetIsCreated()) {
-                    if ((&pactor->m_Extra)->GetPackageExtra()) {
-                        pactorpack = (&pactor->m_Extra)->GetPackageExtra();
-                    }
-                }
-            }
-            if (pactorpack == ppackage) {
-                afReturnValue = 1.0;
-            }
-        }
-    }
+
     if (GetThreadTLSData()->bSystemOutput) {
         Interface::PrintLine("GetIsCurrentPackage >> %0.2f", afReturnValue);
     }
@@ -3594,33 +3470,31 @@ bool Script::IsCurrentFurnitureObjConditionFunction(
 ) {
     afReturnValue = 0.0;
     Actor* pactor = nullptr;
-    if (apRefObject) {
-        if (apRefObject->IsActor()) {
-            pactor = static_cast<Actor*>(apRefObject);
-        }
+    if ((apRefObject) && (apRefObject->IsActor())) {
+        pactor = static_cast<Actor*>(apRefObject);
     }
+
     BGSListForm* plistform = static_cast<BGSListForm*>(apParam1);
-    if (pactor) {
-        if (plistform) {
-            BaseProcess* CurrentAIProcess = pactor->pCurrentProcess;
-            TESObjectREFR* pref = CurrentAIProcess->GetCurrentFurniture();
-            if (pref) {
-                if (plistform->GetFormType() == FURN_ID) {
-                    if (pref->GetObjectReference() == apParam1) {
-                        afReturnValue = 1.0;
-                    }
+    if ((pactor) && (plistform)) {
+        BaseProcess* CurrentAIProcess = pactor->pCurrentProcess;
+        TESObjectREFR* pref = CurrentAIProcess->GetCurrentFurniture();
+        if (pref) {
+            if (plistform->GetFormType() == FURN_ID) {
+                if (pref->GetObjectReference() == apParam1) {
+                    afReturnValue = 1.0;
                 }
-                else {
-                    if (plistform->GetFormType() == FLST_ID) {
-                        TESForm* item = pref->GetObjectReference();
-                        if ((&plistform->ListOfForms)->IsInList(item)) {
-                            afReturnValue = 1.0;
-                        }
+            }
+            else {
+                if (plistform->GetFormType() == FLST_ID) {
+                    TESForm* item = pref->GetObjectReference();
+                    if ((&plistform->ListOfForms)->IsInList(item)) {
+                        afReturnValue = 1.0;
                     }
                 }
             }
         }
     }
+
     if (GetThreadTLSData()->bSystemOutput) {
         Interface::PrintLine("IsCurrentFurnitureObj>> %0.2f", afReturnValue);
     }
@@ -3671,11 +3545,10 @@ bool Script::GetFactionRankDifferenceConditionFunction(
 ) {
     afReturnValue = 0.0;
     Actor* pact = nullptr;
-    if (apRefObject) {
-        if (apRefObject->IsActor()) {
-            pact = static_cast<Actor*>(apRefObject);
-        }
+    if ((apRefObject) && (apRefObject->IsActor())) {
+        pact = static_cast<Actor*>(apRefObject);
     }
+
     // The second parameter is the other actor.
     Actor* ptarget = static_cast<Actor*>(apParam2);
     if (!pact || !ptarget) {
@@ -3684,22 +3557,18 @@ bool Script::GetFactionRankDifferenceConditionFunction(
     TESActorBase* pactorbase1 = pact->GetActorBase();
     TESActorBase* pactorbase2 = ptarget->GetActorBase();
     TESFaction* pfac = nullptr;
-    if (apParam1) {
-        if (static_cast<TESForm*>(apParam1)->GetFormType() == FACT_ID) {
-            pfac = static_cast<TESFaction*>(apParam1);
+    if ((apParam1) && (static_cast<TESForm*>(apParam1)->GetFormType() == FACT_ID)) {
+        pfac = static_cast<TESFaction*>(apParam1);
+    }
+
+    if ((pactorbase1) && (pactorbase2) && (pfac)) {
+        int32_t irank1 = pactorbase1->GetFactionRank(pfac, pact == pPlayer);
+        int32_t irank2 = pactorbase2->GetFactionRank(pfac, ptarget == pPlayer);
+        if (irank1 != -1 && irank2 != -1) {
+            afReturnValue = static_cast<double>(irank1 - irank2);
         }
     }
-    if (pactorbase1) {
-        if (pactorbase2) {
-            if (pfac) {
-                int32_t irank1 = pactorbase1->GetFactionRank(pfac, pact == pPlayer);
-                int32_t irank2 = pactorbase2->GetFactionRank(pfac, ptarget == pPlayer);
-                if (irank1 != -1 && irank2 != -1) {
-                    afReturnValue = static_cast<double>(irank1 - irank2);
-                }
-            }
-        }
-    }
+
     if (GetThreadTLSData()->bSystemOutput) {
         Interface::PrintLine("GetFactionRankDifference >> %0.2f", afReturnValue);
     }
@@ -3734,13 +3603,10 @@ bool Script::GetInSameCellConditionFunction(
     else {
         ptestcell = nullptr;
     }
-    if (prefcell) {
-        if (ptestcell) {
-            if (prefcell == ptestcell) {
-                afReturnValue = 1.0;
-            }
-        }
+    if ((prefcell) && (ptestcell) && (prefcell == ptestcell)) {
+        afReturnValue = 1.0;
     }
+
     if (GetThreadTLSData()->bSystemOutput) {
         Interface::PrintLine("GetInSameCell >> %0.2f", afReturnValue);
     }
@@ -3792,22 +3658,20 @@ bool Script::GetFactionRankConditionFunction(
 ) {
     afReturnValue = -1.0;
     Actor* pact = nullptr;
-    if (apRefObject) {
-        if (apRefObject->IsActor()) {
-            pact = static_cast<Actor*>(apRefObject);
-        }
+    if ((apRefObject) && (apRefObject->IsActor())) {
+        pact = static_cast<Actor*>(apRefObject);
     }
+
     if (!pact) {
         return true;
     }
     pact->GetActorBase();
     TESFaction* pfac = nullptr;
     // The condition parameters arrive untyped; a form parameter is a TESForm.
-    if (apParam1) {
-        if (static_cast<TESForm*>(apParam1)->GetFormType() == FACT_ID) {
-            pfac = static_cast<TESFaction*>(apParam1);
-        }
+    if ((apParam1) && (static_cast<TESForm*>(apParam1)->GetFormType() == FACT_ID)) {
+        pfac = static_cast<TESFaction*>(apParam1);
     }
+
     if (pfac) {
         afReturnValue = static_cast<double>(pact->GetFactionRank(pfac, pact == pPlayer));
     }
@@ -3825,11 +3689,10 @@ bool Script::GetGlobalValueConditionFunction(
 ) {
     afReturnValue = -1.0;
     TESGlobal* pglobal = nullptr;
-    if (apParam1) {
-        if (static_cast<TESForm*>(apParam1)->GetFormType() == GLOB_ID) {
-            pglobal = static_cast<TESGlobal*>(apParam1);
-        }
+    if ((apParam1) && (static_cast<TESForm*>(apParam1)->GetFormType() == GLOB_ID)) {
+        pglobal = static_cast<TESGlobal*>(apParam1);
     }
+
     if (pglobal) {
         afReturnValue = pglobal->fValue;
     }
@@ -3847,36 +3710,33 @@ bool Script::GetDispositionConditionFunction(
 ) {
     afReturnValue = 0.0;
     Actor* pactor = nullptr;
-    if (apRefObject) {
-        if (apRefObject->IsActor()) {
-            pactor = static_cast<Actor*>(apRefObject);
-        }
+    if ((apRefObject) && (apRefObject->IsActor())) {
+        pactor = static_cast<Actor*>(apRefObject);
     }
+
     TESObjectREFR* ptargetRef = static_cast<TESObjectREFR*>(apParam1);
     Actor* ptarget = nullptr;
-    if (ptargetRef) {
-        if (ptargetRef->IsActor()) {
-            ptarget = static_cast<Actor*>(ptargetRef);
+    if ((ptargetRef) && (ptargetRef->IsActor())) {
+        ptarget = static_cast<Actor*>(ptargetRef);
+    }
+
+    if ((pactor) && (ptarget)) {
+        if (pactor == pDispositionActor && ptarget == pDispositionTarget) {
+            afReturnValue = fDisposition;
+        }
+        else {
+            afReturnValue = static_cast<double>(pactor->GetDisposition(ptarget, nullptr));
+            pDispositionTarget = ptarget;
+            pDispositionActor = pactor;
+            fDisposition = afReturnValue;
+        }
+        if (GetThreadTLSData()->bSystemOutput) {
+            double v6 = afReturnValue;
+            const char* FullName = ptarget->GetFullName();
+            Interface::PrintLine("%.20s disposition to %.20s is %.1f", pactor->GetFullName(), FullName, v6);
         }
     }
-    if (pactor) {
-        if (ptarget) {
-            if (pactor == pDispositionActor && ptarget == pDispositionTarget) {
-                afReturnValue = fDisposition;
-            }
-            else {
-                afReturnValue = static_cast<double>(pactor->GetDisposition(ptarget, nullptr));
-                pDispositionTarget = ptarget;
-                pDispositionActor = pactor;
-                fDisposition = afReturnValue;
-            }
-            if (GetThreadTLSData()->bSystemOutput) {
-                double v6 = afReturnValue;
-                const char* FullName = ptarget->GetFullName();
-                Interface::PrintLine("%.20s disposition to %.20s is %.1f", pactor->GetFullName(), FullName, v6);
-            }
-        }
-    }
+
     return true;
 }
 
@@ -3898,29 +3758,27 @@ bool Script::GetCrimeConditionFunction(
         }
     }
     Actor* ptarget = nullptr;
-    if (apRefObject) {
-        if (apRefObject->IsActor()) {
-            ptarget = static_cast<Actor*>(apRefObject);
-        }
+    if ((apRefObject) && (apRefObject->IsActor())) {
+        ptarget = static_cast<Actor*>(apRefObject);
     }
-    if (ptarget) {
-        if (pcriminal) {
-            if (iCrimeType > -1 && iCrimeType < 5) {
-                if (ReferenceProcessLists.IsCrimeinGlobalCrimeList(
-                        ptarget, pcriminal, ptarget, static_cast<PackageNS::CRIME_TYPE>(iCrimeType), nullptr, -1
-                    )) {
-                    afReturnValue = 1.0;
-                }
+
+    if ((ptarget) && (pcriminal)) {
+        if (iCrimeType > -1 && iCrimeType < 5) {
+            if (ReferenceProcessLists.IsCrimeinGlobalCrimeList(
+                    ptarget, pcriminal, ptarget, static_cast<PackageNS::CRIME_TYPE>(iCrimeType), nullptr, -1
+                )) {
+                afReturnValue = 1.0;
             }
-            else {
-                if (ReferenceProcessLists.IsCrimeinGlobalCrimeList(
-                        ptarget, pcriminal, ptarget, PackageNS::CRIME_TYPE_NONE, nullptr, -1
-                    )) {
-                    afReturnValue = 1.0;
-                }
+        }
+        else {
+            if (ReferenceProcessLists.IsCrimeinGlobalCrimeList(
+                    ptarget, pcriminal, ptarget, PackageNS::CRIME_TYPE_NONE, nullptr, -1
+                )) {
+                afReturnValue = 1.0;
             }
         }
     }
+
     if (GetThreadTLSData()->bSystemOutput) {
         Interface::PrintLine("GetCrime >> %0.2f", afReturnValue);
     }
@@ -3935,19 +3793,17 @@ bool Script::IsSpellTargetConditionFunction(
 ) {
     afReturnValue = 0.0;
     TESObjectREFR* v6 = nullptr;
-    if (apRefObject) {
-        if (apRefObject->IsActor()) {
-            v6 = apRefObject;
+    if ((apRefObject) && (apRefObject->IsActor())) {
+        v6 = apRefObject;
+    }
+
+    if ((v6) && (apParam1)) {
+        MagicTarget* v4 = v6->GetMagicTarget();
+        if (v4->IsSpellTarget(static_cast<MagicItem*>(apParam1), true)) {
+            afReturnValue = 1.0;
         }
     }
-    if (v6) {
-        if (apParam1) {
-            MagicTarget* v4 = v6->GetMagicTarget();
-            if (v4->IsSpellTarget(static_cast<MagicItem*>(apParam1), true)) {
-                afReturnValue = 1.0;
-            }
-        }
-    }
+
     if (GetThreadTLSData()->bSystemOutput) {
         Interface::PrintLine("Is Spell Target >> %0.2f", afReturnValue);
     }
@@ -3962,16 +3818,14 @@ bool Script::GetSpellUsageNumberConditionFunction(
 ) {
     afReturnValue = 0.0;
     Actor* pactor = nullptr;
-    if (apRefObject) {
-        if (apRefObject->IsActor()) {
-            pactor = static_cast<Actor*>(apRefObject);
-        }
+    if ((apRefObject) && (apRefObject->IsActor())) {
+        pactor = static_cast<Actor*>(apRefObject);
     }
-    if (pactor) {
-        if (apParam1) {
-            afReturnValue = pactor->GetSpellUsageCount(static_cast<MagicItem*>(apParam1));
-        }
+
+    if ((pactor) && (apParam1)) {
+        afReturnValue = pactor->GetSpellUsageCount(static_cast<MagicItem*>(apParam1));
     }
+
     if (GetThreadTLSData()->bSystemOutput) {
         Interface::PrintLine("GetSpellUsageNum >> %0.2f", afReturnValue);
     }
@@ -4002,12 +3856,12 @@ bool Script::IsLimbGoneConditionFunction(
     double& afReturnValue
 ) {
     afReturnValue = 0.0;
-    if (apRefObject) {
-        if (apRefObject->IsActor() &&
-            apRefObject->GetDismembered(static_cast<BGSBodyPart::LIMB_ENUM>(reinterpret_cast<uintptr_t>(apParam1)))) {
-            afReturnValue = 1.0;
-        }
+    if ((apRefObject) &&
+        (apRefObject->IsActor() &&
+         apRefObject->GetDismembered(static_cast<BGSBodyPart::LIMB_ENUM>(reinterpret_cast<uintptr_t>(apParam1))))) {
+        afReturnValue = 1.0;
     }
+
     return true;
 }
 
@@ -4018,17 +3872,16 @@ bool Script::GetKillerConditionFunction(
     double& afReturnValue
 ) {
     afReturnValue = 0.0;
-    if (apRefObject) {
-        if (apRefObject->IsActor()) {
-            Actor* pactor = static_cast<Actor*>(apRefObject);
-            if (pactor->IsDead(false) && apParam1 == pactor->pMyKiller) {
-                afReturnValue = 1.0;
-            }
-            if (GetThreadTLSData()->bSystemOutput) {
-                Interface::PrintLine("IsKiller >> %0.2f", afReturnValue);
-            }
+    if ((apRefObject) && (apRefObject->IsActor())) {
+        Actor* pactor = static_cast<Actor*>(apRefObject);
+        if (pactor->IsDead(false) && apParam1 == pactor->pMyKiller) {
+            afReturnValue = 1.0;
+        }
+        if (GetThreadTLSData()->bSystemOutput) {
+            Interface::PrintLine("IsKiller >> %0.2f", afReturnValue);
         }
     }
+
     return true;
 }
 
@@ -4040,26 +3893,18 @@ bool Script::GetKillerObjectConditionFunction(
 ) {
     BGSListForm* pformlist = static_cast<BGSListForm*>(apParam1);
     Actor* pactor = nullptr;
-    if (apRefObject) {
-        if (apRefObject->IsActor()) {
-            pactor = static_cast<Actor*>(apRefObject);
+    if ((apRefObject) && (apRefObject->IsActor())) {
+        pactor = static_cast<Actor*>(apRefObject);
+    }
+
+    if ((pactor) && (pactor->pCurrentProcess) && (pactor->IsDead(false)) && (pformlist)) {
+        ExtraDismemberedLimbs* pDeathStruct = (&pactor->m_Extra)->GetDismembermentExtra();
+        TESForm* pweap = pDeathStruct->pDeathObject;
+        if ((pweap) && ((&pformlist->ListOfForms)->IsInList(pweap))) {
+            afReturnValue = 1.0;
         }
     }
-    if (pactor) {
-        if (pactor->pCurrentProcess) {
-            if (pactor->IsDead(false)) {
-                if (pformlist) {
-                    ExtraDismemberedLimbs* pDeathStruct = (&pactor->m_Extra)->GetDismembermentExtra();
-                    TESForm* pweap = pDeathStruct->pDeathObject;
-                    if (pweap) {
-                        if ((&pformlist->ListOfForms)->IsInList(pweap)) {
-                            afReturnValue = 1.0;
-                        }
-                    }
-                }
-            }
-        }
-    }
+
     if (GetThreadTLSData()->bSystemOutput) {
         Interface::PrintLine("IsKillerObject >> %0.2f", afReturnValue);
     }
@@ -4073,13 +3918,12 @@ bool Script::GetFactionCombatReactionConditionFunction(
     void* apParam2,
     double& afReturnValue
 ) {
-    if (apParam2) {
-        if (apParam1) {
-            afReturnValue = static_cast<double>(
-                static_cast<TESFaction*>(apParam1)->GetReaction_0048C1B0(static_cast<TESForm*>(apParam2))
-            );
-        }
+    if ((apParam2) && (apParam1)) {
+        afReturnValue = static_cast<double>(
+            static_cast<TESFaction*>(apParam1)->GetReaction_0048C1B0(static_cast<TESForm*>(apParam2))
+        );
     }
+
     return true;
 }
 

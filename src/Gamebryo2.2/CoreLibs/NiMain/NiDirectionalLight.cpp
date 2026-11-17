@@ -75,7 +75,6 @@ NiObject* NiDirectionalLight::CreateObject() {
     if (v0) {
         return ::new (v0) NiDirectionalLight;
     }
-    else {
-        return nullptr;
-    }
+
+    return nullptr;
 }

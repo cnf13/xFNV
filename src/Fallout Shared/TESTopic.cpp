@@ -299,37 +299,36 @@ bool TESTopic::SavesBefore(TESForm* apForm) {
 
 bool TESTopic::SavesBefore(FORM* apGroupFORM) {
     bool bretval = false;
-    if (apGroupFORM) {
-        if (apGroupFORM->form == formEnumString[2].uiFormString) {
-            uint32_t form = apGroupFORM->form;
-            switch (apGroupFORM->iFormID) {
-                case 0u: {
-                    bretval = TESForm::SavesBefore(apGroupFORM);
-                    break;
+    if ((apGroupFORM) && (apGroupFORM->form == formEnumString[2].uiFormString)) {
+        uint32_t form = apGroupFORM->form;
+        switch (apGroupFORM->iFormID) {
+            case 0u: {
+                bretval = TESForm::SavesBefore(apGroupFORM);
+                break;
+            }
+            case 1u:
+            case 2u:
+            case 3u:
+            case 4u:
+            case 5u:
+            case 6u: {
+                bretval = false;
+                break;
+            }
+            case 7u: {
+                TESForm* FormByNumericID = TESForm::GetFormByNumericID(apGroupFORM->flags);
+                TESTopic* ptopic = dynamic_cast<TESTopic*>(FormByNumericID);
+                if (ptopic) {
+                    bretval = SavesBefore(ptopic);
                 }
-                case 1u:
-                case 2u:
-                case 3u:
-                case 4u:
-                case 5u:
-                case 6u: {
-                    bretval = false;
-                    break;
-                }
-                case 7u: {
-                    TESForm* FormByNumericID = TESForm::GetFormByNumericID(apGroupFORM->flags);
-                    TESTopic* ptopic = dynamic_cast<TESTopic*>(FormByNumericID);
-                    if (ptopic) {
-                        bretval = SavesBefore(ptopic);
-                    }
-                    break;
-                }
-                default: {
-                    return bretval;
-                }
+                break;
+            }
+            default: {
+                return bretval;
             }
         }
     }
+
     return bretval;
 }
 
@@ -464,9 +463,8 @@ TESTopicInfo* TESTopic::GetMatchingInfo(TESObjectREFR* apSpeaker, TESObjectREFR*
     if (bDispositionFailure) {
         return nullptr;
     }
-    else {
-        return matchingInfo_0;
-    }
+
+    return matchingInfo_0;
 }
 
 TESTopicInfo* TESTopic::GetMatchingInfo(
@@ -490,22 +488,21 @@ TESQuest* TESTopic::GetOwnerQuest(TESTopicInfo* apInfo) {
         TESTopic* Topic = TESTopic::GetTopic(DT_CONVERSATION, 5);
         return Topic->GetOwnerQuest(apInfo);
     }
-    else {
-        const BSSimpleList<QUEST_INFO*>* pList = &m_listQuestInfo;
-        while (pList && pList->m_item) {
-            QUEST_INFO* pQuestInfo = pList->m_item;
-            pList = pList->m_pkNext;
-            uint32_t maxSize = (&pQuestInfo->infoArray)->m_uiSize;
-            if (maxSize) {
-                for (uint32_t i = 0; i < maxSize; ++i) {
-                    if (TESTopic::GetInfoByIndex(pQuestInfo, i) == apInfo) {
-                        return pQuestInfo->pQuest;
-                    }
+
+    const BSSimpleList<QUEST_INFO*>* pList = &m_listQuestInfo;
+    while (pList && pList->m_item) {
+        QUEST_INFO* pQuestInfo = pList->m_item;
+        pList = pList->m_pkNext;
+        uint32_t maxSize = (&pQuestInfo->infoArray)->m_uiSize;
+        if (maxSize) {
+            for (uint32_t i = 0; i < maxSize; ++i) {
+                if (TESTopic::GetInfoByIndex(pQuestInfo, i) == apInfo) {
+                    return pQuestInfo->pQuest;
                 }
             }
         }
-        return nullptr;
     }
+    return nullptr;
 }
 
 bool TESTopic::HasQuest(TESQuest* apQuest, bool bRequireInfos) {
@@ -662,19 +659,16 @@ DialogueItem* TESTopic::CreateDialogueItem(
     else {
         v12 = nullptr;
     }
-    if (abRunImmediate) {
-        if (v12) {
-            if (v12->GetInfo()) {
-                TESTopicInfo* CastingType = v12->GetInfo();
-                if (CastingType->IsRunImmediately()) {
-                    TESTopicInfo* v8 = v12->GetInfo();
-                    v8->RunResult(TIRS_BEGIN, apSpeaker);
-                    TESTopicInfo* v9 = v12->GetInfo();
-                    v9->AddTopicList();
-                }
-            }
+    if ((abRunImmediate) && (v12) && (v12->GetInfo())) {
+        TESTopicInfo* CastingType = v12->GetInfo();
+        if (CastingType->IsRunImmediately()) {
+            TESTopicInfo* v8 = v12->GetInfo();
+            v8->RunResult(TIRS_BEGIN, apSpeaker);
+            TESTopicInfo* v9 = v12->GetInfo();
+            v9->AddTopicList();
         }
     }
+
     return v12;
 }
 
@@ -1012,11 +1006,10 @@ TESTopicInfo* TESTopic::GetMatchingInfo(
     BSSimpleList<DialogueItem*>* apConversationList
 ) {
     const TESTopic* pchecktopic = apTopic;
-    if (apTopic) {
-        if (pchecktopic->IsRemappedRumors()) {
-            pchecktopic = TESTopic::GetTopic(DT_CONVERSATION, 5);
-        }
+    if ((apTopic) && (pchecktopic->IsRemappedRumors())) {
+        pchecktopic = TESTopic::GetTopic(DT_CONVERSATION, 5);
     }
+
     abDispositionFailure = false;
     if (!pchecktopic || pchecktopic->GetDelete()) {
         return nullptr;
@@ -1082,12 +1075,8 @@ TESTopicInfo* TESTopic::GetMatchingInfo(
                                         break;
                                     }
                                 }
-                                if (!abIsConversation) {
-                                    if (pLinkFromList) {
-                                        if (pLinkFromList->IsEmpty()) {
-                                            bOK = true;
-                                        }
-                                    }
+                                if ((!abIsConversation) && (pLinkFromList) && (pLinkFromList->IsEmpty())) {
+                                    bOK = true;
                                 }
                             }
                             else {
@@ -1156,32 +1145,30 @@ TESTopicInfo* TESTopic::GetMatchingInfo(
         if (abIsConversation) {
             return nullptr;
         }
-        else {
-            return pInfoRefusal;
-        }
+
+        return pInfoRefusal;
+    }
+
+    int32_t v14;
+    if (iinfocount) {
+        v14 = Random() % iinfocount + 1;
     }
     else {
-        int32_t v14;
-        if (iinfocount) {
-            v14 = Random() % iinfocount + 1;
-        }
-        else {
-            v14 = 0;
-        }
-        int32_t count = 0;
-        BSSimpleList<TESTopicInfo*>* pRandomList = &matchinginfolist;
-        TESTopicInfo* v17 = nullptr;
-        while (count < v14 && pRandomList) {
-            TESTopicInfo* m_item = pRandomList->m_item;
-            if (m_item) {
-                v17 = m_item;
-                ++count;
-            }
-            pRandomList = pRandomList->m_pkNext;
-        }
-        matchinginfolist.RemoveAll();
-        return v17;
+        v14 = 0;
     }
+    int32_t count = 0;
+    BSSimpleList<TESTopicInfo*>* pRandomList = &matchinginfolist;
+    TESTopicInfo* v17 = nullptr;
+    while (count < v14 && pRandomList) {
+        TESTopicInfo* m_item = pRandomList->m_item;
+        if (m_item) {
+            v17 = m_item;
+            ++count;
+        }
+        pRandomList = pRandomList->m_pkNext;
+    }
+    matchinginfolist.RemoveAll();
+    return v17;
 }
 
 TESTopicInfo* TESTopic::GetMatchingFollowUpInfo(
@@ -1209,53 +1196,50 @@ TESTopicInfo* TESTopic::GetMatchingFollowUpInfo(
         TESTopicInfo* pinfo = pList->m_item;
         TESQuest* pquest = pinfo->pOwnerQuest;
         pList = pList->m_pkNext;
-        if (pquest) {
-            if (pquest->GetEnabled() && (&pquest->objConditions)->IsTrue(apSpeaker, apTarget)) {
-                bool bDispositionInfoFailure = false;
-                bool bNotSaidOnce = true;
-                if (pinfo) {
-                    if (pinfo->IsSayOnceADay() && apSpeaker->IsMobileObject()) {
-                        bNotSaidOnce = !apSpeaker->HasSaidTopicInfo(pinfo);
+        if ((pquest) && (pquest->GetEnabled() && (&pquest->objConditions)->IsTrue(apSpeaker, apTarget))) {
+            bool bDispositionInfoFailure = false;
+            bool bNotSaidOnce = true;
+            if ((pinfo) && (pinfo->IsSayOnceADay() && apSpeaker->IsMobileObject())) {
+                bNotSaidOnce = !apSpeaker->HasSaidTopicInfo(pinfo);
+            }
+
+            if (pinfo &&
+                (bNotSaidOnce && pinfo->CheckCondition(bDispositionInfoFailure, nullptr, apSpeaker, apTarget))) {
+                abDispositionFailure = false;
+                bool bOK = true;
+                if (pinfo->IsRandomEnd()) {
+                    bFinished = true;
+                }
+                for (BSSimpleList<DialogueItem*>* pList_2 = apConversationList; pList_2 && !pList_2->IsEmpty();
+                     pList_2 = pList_2->m_pkNext) {
+                    TESTopicInfo* Info = pList_2->m_item->pInfo;
+                    if (Info == pinfo) {
+                        pUsedInfo = pinfo;
+                        bOK = false;
+                        break;
                     }
                 }
-                if (pinfo &&
-                    (bNotSaidOnce && pinfo->CheckCondition(bDispositionInfoFailure, nullptr, apSpeaker, apTarget))) {
-                    abDispositionFailure = false;
-                    bool bOK = true;
+                if (bOK) {
                     if (pinfo->IsRandomEnd()) {
                         bFinished = true;
                     }
-                    for (BSSimpleList<DialogueItem*>* pList_2 = apConversationList; pList_2 && !pList_2->IsEmpty();
-                         pList_2 = pList_2->m_pkNext) {
-                        TESTopicInfo* Info = pList_2->m_item->pInfo;
-                        if (Info == pinfo) {
-                            pUsedInfo = pinfo;
-                            bOK = false;
-                            break;
-                        }
+                    if (matchinginfolist.IsEmpty() && !pinfo->IsRandom()) {
+                        TESTopicInfo* v10 = pinfo;
+                        return v10;
                     }
-                    if (bOK) {
-                        if (pinfo->IsRandomEnd()) {
-                            bFinished = true;
-                        }
-                        if (matchinginfolist.IsEmpty() && !pinfo->IsRandom()) {
-                            TESTopicInfo* v10 = pinfo;
-                            return v10;
-                        }
-                        if (!pinfo->IsRandom()) {
-                            bFinished = true;
-                            break;
-                        }
-                        matchinginfolist.AddHead(pinfo);
-                        ++iinfocount;
-                    }
-                    if (!abIsConversation && bDispositionInfoFailure) {
-                        pInfoRefusal = pinfo;
-                        abDispositionFailure = true;
-                    }
-                    if (bFinished) {
+                    if (!pinfo->IsRandom()) {
+                        bFinished = true;
                         break;
                     }
+                    matchinginfolist.AddHead(pinfo);
+                    ++iinfocount;
+                }
+                if (!abIsConversation && bDispositionInfoFailure) {
+                    pInfoRefusal = pinfo;
+                    abDispositionFailure = true;
+                }
+                if (bFinished) {
+                    break;
                 }
             }
         }
@@ -1264,32 +1248,30 @@ TESTopicInfo* TESTopic::GetMatchingFollowUpInfo(
         if (abIsConversation) {
             return nullptr;
         }
-        else {
-            return pInfoRefusal;
-        }
+
+        return pInfoRefusal;
+    }
+
+    int32_t dieRoll;
+    if (iinfocount) {
+        dieRoll = Random() % iinfocount + 1;
     }
     else {
-        int32_t dieRoll;
-        if (iinfocount) {
-            dieRoll = Random() % iinfocount + 1;
-        }
-        else {
-            dieRoll = 0;
-        }
-        int32_t count = 0;
-        BSSimpleList<TESTopicInfo*>* pRandomList = &matchinginfolist;
-        TESTopicInfo* v11 = nullptr;
-        while (count < dieRoll && pRandomList) {
-            TESTopicInfo* v13 = pRandomList->m_item;
-            if (v13) {
-                v11 = v13;
-                ++count;
-            }
-            pRandomList = pRandomList->m_pkNext;
-        }
-        matchinginfolist.RemoveAll();
-        return v11;
+        dieRoll = 0;
     }
+    int32_t count = 0;
+    BSSimpleList<TESTopicInfo*>* pRandomList = &matchinginfolist;
+    TESTopicInfo* v11 = nullptr;
+    while (count < dieRoll && pRandomList) {
+        TESTopicInfo* v13 = pRandomList->m_item;
+        if (v13) {
+            v11 = v13;
+            ++count;
+        }
+        pRandomList = pRandomList->m_pkNext;
+    }
+    matchinginfolist.RemoveAll();
+    return v11;
 }
 
 uint32_t TESTopic::CreateConversation(
@@ -1315,15 +1297,14 @@ uint32_t TESTopic::CreateConversation(
     TESObjectREFR* pCurrentTarget = apTarget;
     TESTopic* pLastTopic = nullptr;
     TESForm* pspeakerForm = apSpeaker->GetObjectReference();
-    if (pspeakerForm) {
-        if (pspeakerForm->GetFormType() == CREA_ID) {
-            // A creature without a voice type has no conversation.
-            TESActorBaseData* pActorData = static_cast<TESCreature*>(pspeakerForm);
-            if (!pActorData->GetVoiceType()) {
-                return 0;
-            }
+    if ((pspeakerForm) && (pspeakerForm->GetFormType() == CREA_ID)) {
+        // A creature without a voice type has no conversation.
+        TESActorBaseData* pActorData = static_cast<TESCreature*>(pspeakerForm);
+        if (!pActorData->GetVoiceType()) {
+            return 0;
         }
     }
+
     TESTopic* pNextTopic = apStartingTopic;
     if (!apStartingTopic) {
         pNextTopic = pDataHandler->GetGlobalTopic(kTopicHELLO);
@@ -1349,13 +1330,12 @@ uint32_t TESTopic::CreateConversation(
                 break;
             }
         }
-        if (pConvItem->pInfo) {
-            if (pConvItem->pInfo->IsRunImmediately()) {
-                pConvItem->pInfo->RunResult(TIRS_BEGIN, apSpeaker);
-                pConvItem->pInfo->RunResult(TIRS_END, apSpeaker);
-                pConvItem->pInfo->AddTopicList();
-            }
+        if ((pConvItem->pInfo) && (pConvItem->pInfo->IsRunImmediately())) {
+            pConvItem->pInfo->RunResult(TIRS_BEGIN, apSpeaker);
+            pConvItem->pInfo->RunResult(TIRS_END, apSpeaker);
+            pConvItem->pInfo->AddTopicList();
         }
+
         apConversationList->AddTail(pConvItem);
         pLastTopic = pNextTopic;
         pNextTopic = nullptr;

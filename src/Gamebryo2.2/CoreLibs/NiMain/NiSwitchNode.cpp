@@ -278,9 +278,8 @@ NiAVObject* NiSwitchNode::GetActiveChild() const {
     if ((m_iIndex < 0) || (m_iIndex >= ((int32_t)m_kChildren.m_usSize))) {
         return nullptr;
     }
-    else {
-        return m_kChildren.m_pBase[m_iIndex].m_pObject;
-    }
+
+    return m_kChildren.m_pBase[m_iIndex].m_pObject;
 }
 
 void NiSwitchNode::CopyMembers(NiSwitchNode* pkDest, NiCloningProcess& kCloning) {
@@ -294,7 +293,6 @@ NiObject* NiSwitchNode::CreateObject() {
     if (v0) {
         return ::new (v0) NiSwitchNode;
     }
-    else {
-        return nullptr;
-    }
+
+    return nullptr;
 }

@@ -265,13 +265,12 @@ bool BSParticleSystemManager::CheckEmitterRecurse(NiAVObject* apObject, BSMaster
                         }
                         return v4 != 0;
                     }
-                    else {
-                        Warning(
-                            "DEFAULT: \"%s\" is a Master Particle System not pointing to the proper root.",
-                            apObject->m_kName.GetHandle()
-                        );
-                        return false;
-                    }
+
+                    Warning(
+                        "DEFAULT: \"%s\" is a Master Particle System not pointing to the proper root.",
+                        apObject->m_kName.GetHandle()
+                    );
+                    return false;
                 }
             }
         }
@@ -280,19 +279,18 @@ bool BSParticleSystemManager::CheckEmitterRecurse(NiAVObject* apObject, BSMaster
         );
         return false;
     }
-    else {
-        NiNode* pnode = apObject->IsNode();
-        if (pnode) {
-            uint32_t m_usSize = pnode->m_kChildren.m_usSize;
-            for (uint32_t k = 0; k < m_usSize; ++k) {
-                NiAVObject* pchild = pnode->m_kChildren.m_pBase[k].m_pObject;
-                if (pchild && !BSParticleSystemManager::CheckEmitterRecurse(pchild, apMasterSystem)) {
-                    return false;
-                }
+
+    NiNode* pnode = apObject->IsNode();
+    if (pnode) {
+        uint32_t m_usSize = pnode->m_kChildren.m_usSize;
+        for (uint32_t k = 0; k < m_usSize; ++k) {
+            NiAVObject* pchild = pnode->m_kChildren.m_pBase[k].m_pObject;
+            if (pchild && !BSParticleSystemManager::CheckEmitterRecurse(pchild, apMasterSystem)) {
+                return false;
             }
         }
-        return true;
     }
+    return true;
 }
 
 bool BSParticleSystemManager::IsValidMasterParticleSystem(NiAVObject* apObject) {
@@ -334,19 +332,18 @@ bool BSParticleSystemManager::ReplaceEmitterRecurse(NiAVObject* apObject, BSMast
         );
         return false;
     }
-    else {
-        NiNode* pnode = apObject->IsNode();
-        if (pnode) {
-            uint32_t ucount = pnode->m_kChildren.m_usSize;
-            for (uint32_t uindex = 0; uindex < ucount; ++uindex) {
-                NiAVObject* pchild = pnode->m_kChildren.m_pBase[uindex].m_pObject;
-                if (pchild && !BSParticleSystemManager::ReplaceEmitterRecurse(pchild, apMasterSystem)) {
-                    return false;
-                }
+
+    NiNode* pnode = apObject->IsNode();
+    if (pnode) {
+        uint32_t ucount = pnode->m_kChildren.m_usSize;
+        for (uint32_t uindex = 0; uindex < ucount; ++uindex) {
+            NiAVObject* pchild = pnode->m_kChildren.m_pBase[uindex].m_pObject;
+            if (pchild && !BSParticleSystemManager::ReplaceEmitterRecurse(pchild, apMasterSystem)) {
+                return false;
             }
         }
-        return true;
     }
+    return true;
 }
 
 BSMasterParticleSystem* BSParticleSystemManager::MakeMasterParticleSystem(NiNode* apBaseNode) {

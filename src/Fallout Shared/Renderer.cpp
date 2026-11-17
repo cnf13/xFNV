@@ -940,53 +940,49 @@ void Renderer::SetGamma(float afGamma) {
 }
 
 void Renderer::DoResize() {
-    if (Renderer::GetNIRenderer()) {
-        if (Renderer::iTargetWidth) {
-            if (Renderer::iTargetHeight) {
-                BSShaderAccumulator* Accumulator = BSShaderManager::GetAccumulator();
-                Accumulator->ClearAllQueries();
-                Renderer::iINIScreenWidth = Renderer::iTargetWidth;
-                Renderer::iINIScreenHeight = Renderer::iTargetHeight;
-                Renderer::bWidescreen =
-                    static_cast<double>(Renderer::iTargetHeight) / static_cast<double>(Renderer::iTargetWidth) != 0.75;
-                pMoviePlayer->Stop();
-                Interface::Free();
-                Main::DestroyInterfaceSceneGraph();
-                Main::DestroyInterface3DSceneGraph();
-                Renderer::GetNIRenderer()->SetSorter(nullptr);
-                uint32_t v11 = Renderer::iTargetHeight;
-                uint32_t v9 = Renderer::iTargetWidth;
-                NiDX9Renderer* NIRenderer = Renderer::GetNIRenderer();
-                NiDX9Renderer::RecreateStatus v2 = NIRenderer->Recreate(v9, v11);
-                bool v16 = v2 != NiDX9Renderer::RECREATESTATUS_FAILED;
-                if (v2) {
-                    // The window's client area at the new size and the saved location, shown.
-                    SDL_SetWindowSize(
-                        pSDLMainWindow, static_cast<int32_t>(Renderer::iINIScreenWidth.operator uint32_t()),
-                        static_cast<int32_t>(Renderer::iINIScreenHeight.operator uint32_t())
-                    );
-                    SDL_SetWindowPosition(
-                        pSDLMainWindow, static_cast<int32_t>(Renderer::iLocationX.operator uint32_t()),
-                        static_cast<int32_t>(Renderer::iLocationY.operator uint32_t())
-                    );
-                    SDL_ShowWindow(pSDLMainWindow);
-                }
-                else {
-                    Renderer::SetErrorString("Failed to Recreate Gamebryo Render in desired dimensions.");
-                }
-                BSTexturePalette::RemoveAll();
-                BSShaderManager::Reinitialize();
-                BSShaderAccumulator* v5 = BSShaderManager::GetAccumulator();
-                Renderer::spRenderer.m_pObject->SetSorter(v5);
-                SceneGraph* WorldSceneGraph = Main::GetWorldSceneGraph();
-                WorldSceneGraph->UpdateCameraFOV();
-                Main::CreateMenuRootNode();
-                Main::CreateMenuRootNode3D();
-                Interface::Init(false);
-                Interface::InitSecond();
-                Interface::CreateStartMenu();
-            }
+    if ((Renderer::GetNIRenderer()) && (Renderer::iTargetWidth) && (Renderer::iTargetHeight)) {
+        BSShaderAccumulator* Accumulator = BSShaderManager::GetAccumulator();
+        Accumulator->ClearAllQueries();
+        Renderer::iINIScreenWidth = Renderer::iTargetWidth;
+        Renderer::iINIScreenHeight = Renderer::iTargetHeight;
+        Renderer::bWidescreen =
+            static_cast<double>(Renderer::iTargetHeight) / static_cast<double>(Renderer::iTargetWidth) != 0.75;
+        pMoviePlayer->Stop();
+        Interface::Free();
+        Main::DestroyInterfaceSceneGraph();
+        Main::DestroyInterface3DSceneGraph();
+        Renderer::GetNIRenderer()->SetSorter(nullptr);
+        uint32_t v11 = Renderer::iTargetHeight;
+        uint32_t v9 = Renderer::iTargetWidth;
+        NiDX9Renderer* NIRenderer = Renderer::GetNIRenderer();
+        NiDX9Renderer::RecreateStatus v2 = NIRenderer->Recreate(v9, v11);
+        bool v16 = v2 != NiDX9Renderer::RECREATESTATUS_FAILED;
+        if (v2) {
+            // The window's client area at the new size and the saved location, shown.
+            SDL_SetWindowSize(
+                pSDLMainWindow, static_cast<int32_t>(Renderer::iINIScreenWidth.operator uint32_t()),
+                static_cast<int32_t>(Renderer::iINIScreenHeight.operator uint32_t())
+            );
+            SDL_SetWindowPosition(
+                pSDLMainWindow, static_cast<int32_t>(Renderer::iLocationX.operator uint32_t()),
+                static_cast<int32_t>(Renderer::iLocationY.operator uint32_t())
+            );
+            SDL_ShowWindow(pSDLMainWindow);
         }
+        else {
+            Renderer::SetErrorString("Failed to Recreate Gamebryo Render in desired dimensions.");
+        }
+        BSTexturePalette::RemoveAll();
+        BSShaderManager::Reinitialize();
+        BSShaderAccumulator* v5 = BSShaderManager::GetAccumulator();
+        Renderer::spRenderer.m_pObject->SetSorter(v5);
+        SceneGraph* WorldSceneGraph = Main::GetWorldSceneGraph();
+        WorldSceneGraph->UpdateCameraFOV();
+        Main::CreateMenuRootNode();
+        Main::CreateMenuRootNode3D();
+        Interface::Init(false);
+        Interface::InitSecond();
+        Interface::CreateStartMenu();
     }
 }
 
@@ -1045,13 +1041,12 @@ bool Renderer::ValidateSettings(bool abCheckDims) {
                                 if (Renderer::GetFullScreen() && Renderer::GetScreenWidth() == Mode->m_uiWidth) {
                                     float v10;
                                     float v11 = aspectRatio - 1.25;
-                                    if (!(std::fabs(v11) < 0.009999999776482582) ||
-                                        (v10 = aspectRatio - 1.3333333730697632,
-                                         !(std::fabs(v10) < 0.009999999776482582))) {
-                                        if (Mode->m_uiHeight > Renderer::GetScreenHeight() &&
-                                            (aiIndex > AdapterDesc->GetModeCount() || Mode->m_uiHeight)) {
-                                            aiIndex = a2;
-                                        }
+                                    if ((!(std::fabs(v11) < 0.009999999776482582) ||
+                                         (v10 = aspectRatio - 1.3333333730697632,
+                                          !(std::fabs(v10) < 0.009999999776482582))) &&
+                                        (Mode->m_uiHeight > Renderer::GetScreenHeight() &&
+                                         (aiIndex > AdapterDesc->GetModeCount() || Mode->m_uiHeight))) {
+                                        aiIndex = a2;
                                     }
                                 }
                             }
@@ -1132,9 +1127,8 @@ NiDX9AdapterDesc* Renderer::GetAdapterDesc(uint32_t auiIndex) {
     if (Renderer::GetSystemDesc() && auiIndex < Renderer::m_kAdapters->m_uiAdapterCount) {
         return Renderer::m_kAdapters->GetAdapter(auiIndex);
     }
-    else {
-        return nullptr;
-    }
+
+    return nullptr;
 }
 
 bool Renderer::GetMultiSampleTypeSupported(D3DMULTISAMPLE_TYPE aeMultiSample, D3DFORMAT aeFormat) {

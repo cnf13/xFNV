@@ -199,9 +199,8 @@ double dMin(double adA, float afB) {
     if (!(afB > adA)) {
         return afB;
     }
-    else {
-        return adA;
-    }
+
+    return adA;
 }
 
 float GetZAngleFromVector(const NiPoint3& aDirection) {
@@ -227,9 +226,8 @@ int32_t BSMAX(int32_t aiA, int32_t aiB) {
     if (aiA <= aiB) {
         return aiB;
     }
-    else {
-        return aiA;
-    }
+
+    return aiA;
 }
 
 int32_t BSAbs(int32_t alValue) {
@@ -315,9 +313,8 @@ float GetAngleDelta(float afStartAngle, float afTargetAngle, float& afOutDir) {
         if (!(fDelta > (-3.1415927410125732))) {
             return (float)(fDelta + 6.2831854820251465);
         }
-        else {
-            afOutDir = (-0x1p+0f);
-        }
+
+        afOutDir = (-0x1p+0f);
     }
     else {
         if (fDelta > 3.1415927410125732) {
@@ -986,17 +983,14 @@ bool PickDistance(
     bool abClearResults
 ) {
     bool v7 = false;
-    if (apPick) {
-        if (apTarget) {
-            if (afDistance != 0.0) {
-                if (abClearResults) {
-                    apPick->SetTarget(nullptr);
-                    apPick->PickObjects(NiPoint3_ZERO, NiPoint3_ZERO, false);
-                }
-                return PickDistanceRecursive(apPick, aOrigin, aDir, afDistance, apTarget);
-            }
+    if ((apPick) && (apTarget) && (afDistance != 0.0)) {
+        if (abClearResults) {
+            apPick->SetTarget(nullptr);
+            apPick->PickObjects(NiPoint3_ZERO, NiPoint3_ZERO, false);
         }
+        return PickDistanceRecursive(apPick, aOrigin, aDir, afDistance, apTarget);
     }
+
     return v7;
 }
 
@@ -1073,18 +1067,16 @@ hkpPhantom* hkpGetPhantom(const hkpCollidable* collidable) {
     if (collidable->getType() == 2) {
         return static_cast<hkpPhantom*>(hkGetWorldObject(collidable));
     }
-    else {
-        return nullptr;
-    }
+
+    return nullptr;
 }
 
 hkpRigidBody* hkpGetRigidBody(const hkpCollidable* collidable) {
     if (collidable->getType() == 1) {
         return static_cast<hkpRigidBody*>(hkGetWorldObject(collidable));
     }
-    else {
-        return nullptr;
-    }
+
+    return nullptr;
 }
 
 NiAVObject* GetAVObjectForCollidable(const hkpCollidable* aphkCol) {
@@ -1105,18 +1097,15 @@ NiAVObject* GetAVObjectForCollidable(const hkpCollidable* aphkCol) {
             if (pcol) {
                 return pcol->m_pkSceneObject;
             }
-            else {
-                uint32_t CollisionFilterInfo = aphkCol->getCollisionFilterInfo();
-                CFilter filter(CollisionFilterInfo);
-                if (filter.GetGroup() == 1) {
-                    const hkVector4* Translation = &pbody->getTranslation();
-                    HK2NI(location, *Translation);
-                    NiAVObject* pland3D = (NiAVObject*)TES::pInstance->GetLandGeometry(location);
-                    if (pland3D) {
-                        if (pland3D->m_pkParent) {
-                            return (NiAVObject*)pland3D->m_pkParent;
-                        }
-                    }
+
+            uint32_t CollisionFilterInfo = aphkCol->getCollisionFilterInfo();
+            CFilter filter(CollisionFilterInfo);
+            if (filter.GetGroup() == 1) {
+                const hkVector4* Translation = &pbody->getTranslation();
+                HK2NI(location, *Translation);
+                NiAVObject* pland3D = (NiAVObject*)TES::pInstance->GetLandGeometry(location);
+                if ((pland3D) && (pland3D->m_pkParent)) {
+                    return (NiAVObject*)pland3D->m_pkParent;
                 }
             }
         }
@@ -1338,20 +1327,19 @@ void RecursivelyRemoveAllDecals(NiAVObject* apRoot) {
 }
 
 void AddNoLightingPropertyRecurse(NiAVObject* apObject) {
-    if (apObject->IsGeometry()) {
-        if (!apObject->GetProperty(3)) {
-            BSShaderNoLightingProperty* v1;
-            BSShaderNoLightingProperty* apMemory =
-                static_cast<BSShaderNoLightingProperty*>(NiMemObject::operator new(sizeof(BSShaderNoLightingProperty)));
-            if (apMemory) {
-                v1 = ::new (apMemory) BSShaderNoLightingProperty;
-            }
-            else {
-                v1 = nullptr;
-            }
-            apObject->AttachProperty(v1);
+    if ((apObject->IsGeometry()) && (!apObject->GetProperty(3))) {
+        BSShaderNoLightingProperty* v1;
+        BSShaderNoLightingProperty* apMemory =
+            static_cast<BSShaderNoLightingProperty*>(NiMemObject::operator new(sizeof(BSShaderNoLightingProperty)));
+        if (apMemory) {
+            v1 = ::new (apMemory) BSShaderNoLightingProperty;
         }
+        else {
+            v1 = nullptr;
+        }
+        apObject->AttachProperty(v1);
     }
+
     NiNode* v5 = apObject->IsNode();
     if (v5) {
         for (uint32_t a1 = 0; a1 < v5->GetArrayCount(); ++a1) {
@@ -1366,13 +1354,11 @@ void AddNoLightingPropertyRecurse(NiAVObject* apObject) {
 void PrepareObjectWithNoLightingRecurse(NiAVObject* apObject) {
     if (!apObject->IsGeometry() || apObject->GetProperty(3)) {
         NiNode* v5 = apObject->IsNode();
-        if (v5) {
-            if (v5->IsVisualObject()) {
-                for (uint32_t auiIndex = 0; auiIndex < v5->GetArrayCount(); ++auiIndex) {
-                    NiAVObject* apObjecta = v5->GetAt(auiIndex);
-                    if (apObjecta) {
-                        PrepareObjectWithNoLightingRecurse(apObjecta);
-                    }
+        if ((v5) && (v5->IsVisualObject())) {
+            for (uint32_t auiIndex = 0; auiIndex < v5->GetArrayCount(); ++auiIndex) {
+                NiAVObject* apObjecta = v5->GetAt(auiIndex);
+                if (apObjecta) {
+                    PrepareObjectWithNoLightingRecurse(apObjecta);
                 }
             }
         }
@@ -1401,17 +1387,16 @@ float GetUnclampedZAngleFromVector(const NiPoint3& aDirection) {
         if (!((&aDirection)->x > 0.0)) {
             return 4.71238899230957f;
         }
-        else {
-            return 1.5707963705062866f;
-        }
+
+        return 1.5707963705062866f;
     }
-    else {
-        v2 = (&aDirection)->x / (&aDirection)->y;
-        v3 = std::atanf(v2);
-        if ((&aDirection)->y < 0.0) {
-            return (float)(v3 + 3.1415927410125732);
-        }
+
+    v2 = (&aDirection)->x / (&aDirection)->y;
+    v3 = std::atanf(v2);
+    if ((&aDirection)->y < 0.0) {
+        return (float)(v3 + 3.1415927410125732);
     }
+
     return v3;
 }
 
@@ -2176,14 +2161,12 @@ bool RemoveEditorMarkers(NiNode* apNode) {
     if (!kMarkerRemover.pRoot) {
         const NiFixedString* v2 = &BSXFlags::Tag();
         BSXFlags* pbsx = static_cast<BSXFlags*>(apNode->GetExtraData(*v2));
-        if (pbsx) {
-            if (pbsx->QEditorMarker()) {
-                kMarkerRemover.pRoot = apNode;
-                NiControllerManager* pmanager =
-                    static_cast<NiControllerManager*>(apNode->GetController(&NiControllerManager::ms_RTTI));
-                if (pmanager) {
-                    kMarkerRemover.pPalette = pmanager->GetObjectPalette();
-                }
+        if ((pbsx) && (pbsx->QEditorMarker())) {
+            kMarkerRemover.pRoot = apNode;
+            NiControllerManager* pmanager =
+                static_cast<NiControllerManager*>(apNode->GetController(&NiControllerManager::ms_RTTI));
+            if (pmanager) {
+                kMarkerRemover.pPalette = pmanager->GetObjectPalette();
             }
         }
     }
@@ -2214,27 +2197,26 @@ bool RemoveEditorMarkers(NiNode* apNode) {
         }
         return bretVal;
     }
-    else {
-        if (kMarkerRemover.pPalette) {
-            NiFixedString* g_EditorMarker = get_g_EditorMarker();
-            kMarkerRemover.pPalette->SetAVObject(*g_EditorMarker, nullptr);
-            NiFixedString* g_EditorMarker0 = get_g_EditorMarker0();
-            kMarkerRemover.pPalette->SetAVObject(*g_EditorMarker0, nullptr);
-            NiFixedString* g_EditorMarker1 = get_g_EditorMarker1();
-            kMarkerRemover.pPalette->SetAVObject(*g_EditorMarker1, nullptr);
-            NiFixedString* g_EditorMarker2 = get_g_EditorMarker2();
-            kMarkerRemover.pPalette->SetAVObject(*g_EditorMarker2, nullptr);
-        }
-        if (apNode->m_pkParent) {
-            NiNode* Parent = apNode->m_pkParent;
-            Parent->DetachChild(apNode);
-        }
-        if (kMarkerRemover.pRoot == apNode) {
-            kMarkerRemover.pRoot = nullptr;
-            kMarkerRemover.pPalette = nullptr;
-        }
-        return true;
+
+    if (kMarkerRemover.pPalette) {
+        NiFixedString* g_EditorMarker = get_g_EditorMarker();
+        kMarkerRemover.pPalette->SetAVObject(*g_EditorMarker, nullptr);
+        NiFixedString* g_EditorMarker0 = get_g_EditorMarker0();
+        kMarkerRemover.pPalette->SetAVObject(*g_EditorMarker0, nullptr);
+        NiFixedString* g_EditorMarker1 = get_g_EditorMarker1();
+        kMarkerRemover.pPalette->SetAVObject(*g_EditorMarker1, nullptr);
+        NiFixedString* g_EditorMarker2 = get_g_EditorMarker2();
+        kMarkerRemover.pPalette->SetAVObject(*g_EditorMarker2, nullptr);
     }
+    if (apNode->m_pkParent) {
+        NiNode* Parent = apNode->m_pkParent;
+        Parent->DetachChild(apNode);
+    }
+    if (kMarkerRemover.pRoot == apNode) {
+        kMarkerRemover.pRoot = nullptr;
+        kMarkerRemover.pPalette = nullptr;
+    }
+    return true;
 }
 
 float FindTimeForNoteKey(NiAVObject* pObject, const char* pcSequenceName, const char* pcKeyName) {
@@ -2265,9 +2247,8 @@ float FindTimeForNoteKey(NiAVObject* pObject, const char* pcSequenceName, const 
         }
         return 0.0f;
     }
-    else {
-        return 0.0f;
-    }
+
+    return 0.0f;
 }
 
 void TintScenegraph(NiAVObject* apRoot, NiColor& aColor, void* apTextureEffectData) {
@@ -2366,9 +2347,8 @@ int32_t GetCollisionObjectIndexInSceneGraph(
     if (recData.uDataA[2].i == -1) {
         return -1;
     }
-    else {
-        return recData.uDataA[2].i;
-    }
+
+    return recData.uDataA[2].i;
 }
 
 void GetCollisionObjectIndex(bhkNiCollisionObject* apCollision, bhkWorldNS::ObjectRecData& arData) {
@@ -2426,10 +2406,8 @@ int32_t GetHavokWorldObjectCountInSceneGraph(NiAVObject* apRoot) {
 
 void GetHavokWorldObjectCount(bhkNiCollisionObject* apCollision, bhkWorldNS::ObjectRecData& arData) {
     bhkWorldObject* WorldObject = apCollision->GetWorldObject();
-    if (WorldObject) {
-        if (WorldObject->GethkObject()) {
-            ++arData.uDataA[0u].i;
-        }
+    if ((WorldObject) && (WorldObject->GethkObject())) {
+        ++arData.uDataA[0u].i;
     }
 }
 
@@ -2444,9 +2422,8 @@ int32_t GetHavokWorldObjectIndexInSceneGraph(NiAVObject* apRoot, hkpWorldObject*
     if (recData.uDataA[2].i == -1) {
         return -1;
     }
-    else {
-        return recData.uDataA[2].i;
-    }
+
+    return recData.uDataA[2].i;
 }
 
 void GetHavokWorldObjectIndex(bhkNiCollisionObject* apCollision, bhkWorldNS::ObjectRecData& arData) {
@@ -2662,9 +2639,8 @@ bhkWorldObject* bhkWorldObject::Getbhk(const hkpWorldObject* apObj) {
     if (apObj) {
         return apObj->getUserData();
     }
-    else {
-        return nullptr;
-    }
+
+    return nullptr;
 }
 
 void FixedStrings::InitSDM() {
@@ -3328,14 +3304,12 @@ float NiASin(float fValue) {
     if (!(fValue > (-1.0))) {
         return -NI_HALF_PI;
     }
-    else {
-        if (!(fValue < 1.0)) {
-            return NI_HALF_PI;
-        }
-        else {
-            return std::asin(fValue);
-        }
+
+    if (!(fValue < 1.0)) {
+        return NI_HALF_PI;
     }
+
+    return std::asin(fValue);
 }
 
 NiMatrix3* NiMatrix3::Inverse(NiMatrix3* apResult) const {

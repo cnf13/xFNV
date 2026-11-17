@@ -194,16 +194,14 @@ void BSTexturePalette::PurgeUnusedTextures() {
                     }
                     iterator.iPriority = iPriority;
                 }
-                if (spTexture.m_pObject) {
-                    if (spTexture.m_pObject->m_uiRefCount == 2) {
-                        if (pcurItem->pFileEntry) {
-                            BSTexturePalette::pEntryMap->Remove(pcurItem->pFileEntry);
-                            pTexMaps = BSTexturePalette::pTexMap;
-                        }
-                        pTexMaps[iCurPriority].Remove(pcurItem);
-                        ++iPurged;
+                if ((spTexture.m_pObject) && (spTexture.m_pObject->m_uiRefCount == 2)) {
+                    if (pcurItem->pFileEntry) {
+                        BSTexturePalette::pEntryMap->Remove(pcurItem->pFileEntry);
                         pTexMaps = BSTexturePalette::pTexMap;
                     }
+                    pTexMaps[iCurPriority].Remove(pcurItem);
+                    ++iPurged;
+                    pTexMaps = BSTexturePalette::pTexMap;
                 }
             }
             while (bFound && iPurged < BSTexturePalette::iMaxTexturesToPurgeS);

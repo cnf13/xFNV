@@ -76,12 +76,18 @@ void hkKdTreeCollidableRayBundleCaster::addMidPhaseHit(hkPrimitiveId primId, con
         to[i]._setRotatedInverseDir(transform.m_rotation, rel);
     }
     hkpShapeRayBundleCastInput bundleInput;
-    hkQuadReal from0 = from[0].m_quad, from1 = from[1].m_quad, from2 = from[2].m_quad, from3 = from[3].m_quad;
+    hkQuadReal from0 = from[0].m_quad;
+    hkQuadReal from1 = from[1].m_quad;
+    hkQuadReal from2 = from[2].m_quad;
+    hkQuadReal from3 = from[3].m_quad;
     _MM_TRANSPOSE4_PS(from0, from1, from2, from3);
     bundleInput.m_from[0].m_quad = from0;
     bundleInput.m_from[1].m_quad = from1;
     bundleInput.m_from[2].m_quad = from2;
-    hkQuadReal to0 = to[0].m_quad, to1 = to[1].m_quad, to2 = to[2].m_quad, to3 = to[3].m_quad;
+    hkQuadReal to0 = to[0].m_quad;
+    hkQuadReal to1 = to[1].m_quad;
+    hkQuadReal to2 = to[2].m_quad;
+    hkQuadReal to3 = to[3].m_quad;
     _MM_TRANSPOSE4_PS(to0, to1, to2, to3);
     bundleInput.m_to[0].m_quad = to0;
     bundleInput.m_to[1].m_quad = to1;

@@ -33,10 +33,9 @@ NiObject* NiLightDimmerController::CreateClone(NiCloningProcess& kCloning) {
         NiFloatInterpController::CopyMembers(v4, kCloning);
         return v4;
     }
-    else {
-        NiFloatInterpController::CopyMembers(nullptr, kCloning);
-        return nullptr;
-    }
+
+    NiFloatInterpController::CopyMembers(nullptr, kCloning);
+    return nullptr;
 }
 
 // BSMaterialEmittanceMultController uses the same function.

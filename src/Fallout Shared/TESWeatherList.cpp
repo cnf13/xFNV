@@ -83,9 +83,8 @@ TESWeather* TESWeatherList::GetRandomWeather() {
     if (pEntry) {
         return pEntry->pWeather;
     }
-    else {
-        return nullptr;
-    }
+
+    return nullptr;
 }
 
 void TESWeatherList::Save(CHUNK_ID aeChunkID) {
@@ -171,70 +170,64 @@ int32_t TESWeatherList::SortCompare(WeatherEntry* p1, WeatherEntry* p2) {
     if (p1->uiChance <= p2->uiChance) {
         return (int32_t)((uint8_t)(p1->uiChance < p2->uiChance));
     }
-    else {
-        return (-1);
-    }
+
+    return (-1);
 }
 
 void TESWeatherList::LoadWeatherListChunk(TESWeatherList* apWeatherList, TESFile* apFile, TESForm* pForm) {
-    if (apFile) {
-        if (apWeatherList) {
-            if (pForm) {
-                uint32_t uiCount = apFile->GetChunkSize() / sizeof(tmpWeatherEntry);
-                if (uiCount) {
-                    tmpWeatherEntry* tmpArray;
-                    apWeatherList->FlushList();
-                    // new tmpWeatherEntry[uiCount]: on overflow the size test passes SIZE_MAX to ourMalloc.
-                    void* pMemory = ourMalloc(
-                        uiCount <= SIZE_MAX / sizeof(tmpWeatherEntry) ? sizeof(tmpWeatherEntry) * uiCount : SIZE_MAX
-                    );
-                    if (pMemory) {
-                        rt::eh_vector_constructor_iterator(
-                            pMemory, sizeof(tmpWeatherEntry), static_cast<int32_t>(uiCount),
-                            &fnvd::constructElement<tmpWeatherEntry>
-                        );
-                        tmpArray = static_cast<tmpWeatherEntry*>(pMemory);
-                    }
-                    else {
-                        tmpArray = nullptr;
-                    }
-                    if (!apFile->GetChunkData(tmpArray, sizeof(tmpWeatherEntry) * uiCount)) {
-                        Warning("FORMS: Error getting TESWeatherList chunk for form ID: %d", pForm->iFormID);
-                    }
-                    for (uint32_t ui = 0; ui < uiCount; ++ui) {
-                        WeatherEntry* pEntry;
-                        if (apFile->QEndian()) {
-                            tmpArray[ui].Endian();
-                        }
-                        TESForm::AddCompileIndex(tmpArray[ui].uiNumericID, apFile);
-                        WeatherEntry* apMemory = static_cast<WeatherEntry*>(ourMalloc(sizeof(WeatherEntry)));
-                        if (apMemory) {
-                            pEntry = ::new (apMemory) WeatherEntry;
-                        }
-                        else {
-                            pEntry = nullptr;
-                        }
-                        apWeatherList->AddHead(pEntry);
-                        WeatherEntry* m_item = apWeatherList->m_item;
-                        TESForm* FormByNumericID = TESForm::GetFormByNumericID(tmpArray[ui].uiNumericID);
-                        m_item->pWeather = dynamic_cast<TESWeather*>(FormByNumericID);
-                        if (!m_item->pWeather) {
-                            Warning(
-                                "DEFAULT: Error while loading weather list...cannot identify TESWeather from form "
-                                "ID: "
-                                "(%08X)",
-                                tmpArray[ui].uiNumericID
-                            );
-                        }
-                        apWeatherList->m_item->uiChance = tmpArray[ui].uiChance;
-                        TESForm::AddCompileIndex(tmpArray[ui].uiGlobalID, apFile);
-                        TESForm* pGlobalForm = TESForm::GetFormByNumericID(tmpArray[ui].uiGlobalID);
-                        apWeatherList->m_item->pChanceVar = dynamic_cast<TESGlobal*>(pGlobalForm);
-                    }
-                    apWeatherList->Sort(&TESWeatherList::SortCompare);
-                    ourFree(tmpArray);
-                }
+    if ((apFile) && (apWeatherList) && (pForm)) {
+        uint32_t uiCount = apFile->GetChunkSize() / sizeof(tmpWeatherEntry);
+        if (uiCount) {
+            tmpWeatherEntry* tmpArray;
+            apWeatherList->FlushList();
+            // new tmpWeatherEntry[uiCount]: on overflow the size test passes SIZE_MAX to ourMalloc.
+            void* pMemory =
+                ourMalloc(uiCount <= SIZE_MAX / sizeof(tmpWeatherEntry) ? sizeof(tmpWeatherEntry) * uiCount : SIZE_MAX);
+            if (pMemory) {
+                rt::eh_vector_constructor_iterator(
+                    pMemory, sizeof(tmpWeatherEntry), static_cast<int32_t>(uiCount),
+                    &fnvd::constructElement<tmpWeatherEntry>
+                );
+                tmpArray = static_cast<tmpWeatherEntry*>(pMemory);
             }
+            else {
+                tmpArray = nullptr;
+            }
+            if (!apFile->GetChunkData(tmpArray, sizeof(tmpWeatherEntry) * uiCount)) {
+                Warning("FORMS: Error getting TESWeatherList chunk for form ID: %d", pForm->iFormID);
+            }
+            for (uint32_t ui = 0; ui < uiCount; ++ui) {
+                WeatherEntry* pEntry;
+                if (apFile->QEndian()) {
+                    tmpArray[ui].Endian();
+                }
+                TESForm::AddCompileIndex(tmpArray[ui].uiNumericID, apFile);
+                WeatherEntry* apMemory = static_cast<WeatherEntry*>(ourMalloc(sizeof(WeatherEntry)));
+                if (apMemory) {
+                    pEntry = ::new (apMemory) WeatherEntry;
+                }
+                else {
+                    pEntry = nullptr;
+                }
+                apWeatherList->AddHead(pEntry);
+                WeatherEntry* m_item = apWeatherList->m_item;
+                TESForm* FormByNumericID = TESForm::GetFormByNumericID(tmpArray[ui].uiNumericID);
+                m_item->pWeather = dynamic_cast<TESWeather*>(FormByNumericID);
+                if (!m_item->pWeather) {
+                    Warning(
+                        "DEFAULT: Error while loading weather list...cannot identify TESWeather from form "
+                        "ID: "
+                        "(%08X)",
+                        tmpArray[ui].uiNumericID
+                    );
+                }
+                apWeatherList->m_item->uiChance = tmpArray[ui].uiChance;
+                TESForm::AddCompileIndex(tmpArray[ui].uiGlobalID, apFile);
+                TESForm* pGlobalForm = TESForm::GetFormByNumericID(tmpArray[ui].uiGlobalID);
+                apWeatherList->m_item->pChanceVar = dynamic_cast<TESGlobal*>(pGlobalForm);
+            }
+            apWeatherList->Sort(&TESWeatherList::SortCompare);
+            ourFree(tmpArray);
         }
     }
 }

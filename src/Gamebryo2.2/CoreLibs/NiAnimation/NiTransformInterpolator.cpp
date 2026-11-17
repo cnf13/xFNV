@@ -53,10 +53,9 @@ NiObject* NiTransformInterpolator::CreateClone(NiCloningProcess& kCloning) {
         CopyMembers(v4, kCloning);
         return v4;
     }
-    else {
-        CopyMembers(nullptr, kCloning);
-        return nullptr;
-    }
+
+    CopyMembers(nullptr, kCloning);
+    return nullptr;
 }
 
 // The data link is resolved at once (nif binds it in LinkObject). Without data, a transform with any valid part is a
@@ -523,7 +522,6 @@ NiObject* NiTransformInterpolator::CreateObject() {
     if (v0) {
         return ::new (v0) NiTransformInterpolator(nullptr);
     }
-    else {
-        return nullptr;
-    }
+
+    return nullptr;
 }

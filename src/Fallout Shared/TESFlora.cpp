@@ -154,76 +154,73 @@ bool TESFlora::Activate(
 ) {
     FNVD_INLINED_LOCAL(BSSoundHandle, a1, std::nullopt, std::nullopt);
     Actor* pactor = dynamic_cast<Actor*>(apActionRef);
-    if (apItemActivated) {
-        if (pactor) {
-            bool bsuccess = false;
-            if (!apItemActivated->GetEmpty()) {
-                if (pFormIngredient) {
-                    SEASON Season = appCalendar.GetSeason();
-                    uint8_t ichance = GetProductionChance(Season);
-                    if (ichance) {
-                        bsuccess = Random() % 100 < ichance;
-                    }
-                }
+    if ((apItemActivated) && (pactor)) {
+        bool bsuccess = false;
+        if ((!apItemActivated->GetEmpty()) && (pFormIngredient)) {
+            SEASON Season = appCalendar.GetSeason();
+            uint8_t ichance = GetProductionChance(Season);
+            if (ichance) {
+                bsuccess = Random() % 100 < ichance;
             }
-            if (bsuccess) {
-                IngredientItem* pingr = pFormIngredient;
-                Script* pScript = TESScriptableForm::GetFormScript(pingr);
-                if (pScript) {
-                    ExtraDataList* pExtra;
-                    BaseExtraList* v25 = nullptr;
-                    ExtraDataList* pExtraList = static_cast<ExtraDataList*>(ourMalloc(sizeof(ExtraDataList)));
-                    if (pExtraList) {
-                        pExtra = ::new (pExtraList) ExtraDataList;
-                    }
-                    else {
-                        pExtra = nullptr;
-                    }
-                    pExtra->SetCount(1);
-                    if (pExtra) {
-                        if (!pExtra->GetScript()) {
-                            TESObjectREFR* pref;
-                            pExtra->SetScript(pScript);
-                            Script* Script_ = pExtra->GetScript();
-                            ScriptLocals* v8 = Script_->CloneLocals();
-                            pExtra->SetScriptLocals(v8);
-                            void* apMemory = ourMalloc(sizeof(TESObjectREFR));
-                            if (apMemory) {
-                                pref = ::new (apMemory) TESObjectREFR;
-                            }
-                            else {
-                                pref = nullptr;
-                            }
-                            ScriptLocals* ScriptLocals_ = pExtra->GetScriptLocals();
-                            pScript->Run(pref, ScriptLocals_, nullptr, false);
-                        }
-                    }
-                    pactor->AddObjecttoContainer(pingr, pExtra, 1);
+        }
+
+        if (bsuccess) {
+            IngredientItem* pingr = pFormIngredient;
+            Script* pScript = TESScriptableForm::GetFormScript(pingr);
+            if (pScript) {
+                ExtraDataList* pExtra;
+                BaseExtraList* v25 = nullptr;
+                ExtraDataList* pExtraList = static_cast<ExtraDataList*>(ourMalloc(sizeof(ExtraDataList)));
+                if (pExtraList) {
+                    pExtra = ::new (pExtraList) ExtraDataList;
                 }
                 else {
-                    pactor->AddBoundObjectItem(pingr, nullptr, 1);
+                    pExtra = nullptr;
                 }
-                if (pactor == pPlayer) {
-                    BSStringT<char> v23;
-                    v23.SPrintF(gs_sFloraSuccessMessage.String(), pingr->GetFullName());
-                    Interface::ShowMessage(v23.pString, 0, nullptr, nullptr, 2.0f, false);
-                    BSSoundHandle soundHand;
-                    BSAudio* v10 = &BSAudio::QInstance();
-                    BSSoundHandle* arHandle = v10->GetSoundHandleByName(&a1, "ITMPickupOrganic", 288u);
-                    soundHand.operator=(*arHandle);
-                    soundHand.Play(false);
+                pExtra->SetCount(1);
+                if ((pExtra) && (!pExtra->GetScript())) {
+                    TESObjectREFR* pref;
+                    pExtra->SetScript(pScript);
+                    Script* Script_ = pExtra->GetScript();
+                    ScriptLocals* v8 = Script_->CloneLocals();
+                    pExtra->SetScriptLocals(v8);
+                    void* apMemory = ourMalloc(sizeof(TESObjectREFR));
+                    if (apMemory) {
+                        pref = ::new (apMemory) TESObjectREFR;
+                    }
+                    else {
+                        pref = nullptr;
+                    }
+                    ScriptLocals* ScriptLocals_ = pExtra->GetScriptLocals();
+                    pScript->Run(pref, ScriptLocals_, nullptr, false);
                 }
+
+                pactor->AddObjecttoContainer(pingr, pExtra, 1);
             }
             else {
-                if (pactor == pPlayer) {
-                    const char* v11 = gs_sFloraFailureMessage.String();
-                    Interface::ShowMessage(v11, 0, nullptr, nullptr, 2.0f, false);
-                    Interface::PlayMenuSound(29);
-                }
+                pactor->AddBoundObjectItem(pingr, nullptr, 1);
             }
-            apItemActivated->SetEmpty(true);
+            if (pactor == pPlayer) {
+                BSStringT<char> v23;
+                v23.SPrintF(gs_sFloraSuccessMessage.String(), pingr->GetFullName());
+                Interface::ShowMessage(v23.pString, 0, nullptr, nullptr, 2.0f, false);
+                BSSoundHandle soundHand;
+                BSAudio* v10 = &BSAudio::QInstance();
+                BSSoundHandle* arHandle = v10->GetSoundHandleByName(&a1, "ITMPickupOrganic", 288u);
+                soundHand.operator=(*arHandle);
+                soundHand.Play(false);
+            }
         }
+        else {
+            if (pactor == pPlayer) {
+                const char* v11 = gs_sFloraFailureMessage.String();
+                Interface::ShowMessage(v11, 0, nullptr, nullptr, 2.0f, false);
+                Interface::PlayMenuSound(29);
+            }
+        }
+        apItemActivated->SetEmpty(true);
     }
+
     return true;
 }
 

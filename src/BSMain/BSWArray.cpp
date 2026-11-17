@@ -104,9 +104,8 @@ BSWArray* BSWArray::Find(NiObjectNET* apObject) {
             v2 = 0;
             return v2 != 0 ? static_cast<BSWArray*>(ExtraData) : nullptr;
         }
-        else {
-            return nullptr;
-        }
+
+        return nullptr;
     }
     return v5;
 }

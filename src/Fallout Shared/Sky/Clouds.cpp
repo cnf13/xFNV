@@ -153,23 +153,21 @@ void Clouds::Update(Sky* apSky, float afSecondsPassed) {
                         SkyShaderProperty* pprop_2 =
                             static_cast<SkyShaderProperty*>(spClouds[i_4].m_pObject->GetProperty(3));
                         const TESTexture* ptestexture_2 = pCurrentWeather->GetCloudTexture(i_4);
-                        if (ptestexture_2) {
-                            if (ptestexture_2->GetTextureNameLength()) {
-                                const char* v14 = ptestexture_2->GetDefaultPath();
-                                strfilename_2.operator=(v14);
-                                const char* v15 = ptestexture_2->GetTextureName();
-                                strfilename_2.operator+=(v15);
-                                NiPointer<NiTexture> spTex(static_cast<NiTexture*>(nullptr));
-                                BSShaderManager::GetTexture(strfilename_2.pString, true, spTex, true, false);
-                                NiTexture* ptex = spTex.m_pObject;
-                                if (ptex) {
-                                    pprop_2->SetTexture(static_cast<NiSourceTexture*>(ptex));
-                                    NiFixedString* aFilename = ::new (static_cast<void*>(&apString))
-                                        NiFixedString(static_cast<const char*>(strfilename_2.pString));
-                                    pprop_2->SetTextureFile(*aFilename);
-                                    apString.~NiFixedString();
-                                    pprop_2->SetBlendValue(0.0f);
-                                }
+                        if ((ptestexture_2) && (ptestexture_2->GetTextureNameLength())) {
+                            const char* v14 = ptestexture_2->GetDefaultPath();
+                            strfilename_2.operator=(v14);
+                            const char* v15 = ptestexture_2->GetTextureName();
+                            strfilename_2.operator+=(v15);
+                            NiPointer<NiTexture> spTex(static_cast<NiTexture*>(nullptr));
+                            BSShaderManager::GetTexture(strfilename_2.pString, true, spTex, true, false);
+                            NiTexture* ptex = spTex.m_pObject;
+                            if (ptex) {
+                                pprop_2->SetTexture(static_cast<NiSourceTexture*>(ptex));
+                                NiFixedString* aFilename = ::new (static_cast<void*>(&apString))
+                                    NiFixedString(static_cast<const char*>(strfilename_2.pString));
+                                pprop_2->SetTextureFile(*aFilename);
+                                apString.~NiFixedString();
+                                pprop_2->SetBlendValue(0.0f);
                             }
                         }
                     }

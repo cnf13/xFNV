@@ -60,9 +60,8 @@ uint32_t hkSystemMemoryBlockServer::getTotalAvailableMemory() {
     if (v1) {
         return (uint32_t)((int32_t)(v1 - m_allocated));
     }
-    else {
-        return (uint32_t)(-1);
-    }
+
+    return (uint32_t)(-1);
 }
 
 uint32_t hkSystemMemoryBlockServer::getMemoryLimit() {
@@ -77,16 +76,14 @@ hkBool hkSystemMemoryBlockServer::setMemoryLimit(uint32_t size) {
             result.m_bool = 1;
             return result;
         }
-        else {
-            result.m_bool = 0;
-            return result;
-        }
-    }
-    else {
-        m_memoryLimit = 0;
-        result.m_bool = 1;
+
+        result.m_bool = 0;
         return result;
     }
+
+    m_memoryLimit = 0;
+    result.m_bool = 1;
+    return result;
 }
 
 // The SDK's criticalAlloc(hk_size_t): the size goes on as blockAlloc's int.

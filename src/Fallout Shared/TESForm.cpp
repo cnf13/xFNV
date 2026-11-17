@@ -70,9 +70,8 @@ uint16_t Min(uint16_t a1, uint16_t a2) {
     if (((int32_t)a1) >= ((int32_t)a2)) {
         return a2;
     }
-    else {
-        return a1;
-    }
+
+    return a1;
 }
 
 TESForm::TESForm() : BaseFormComponent(), cFormType(0), iFormFlags(8), iFormID(0), pSourceFiles() {
@@ -262,164 +261,163 @@ bool TESForm::SavesBefore(TESForm* apForm) {
 
 bool TESForm::SavesBefore(FORM* apGroupFORM) {
     bool bretval = false;
-    if (apGroupFORM) {
-        if (apGroupFORM->form == formEnumString[2].uiFormString) {
-            uint32_t form = apGroupFORM->form;
-            switch (apGroupFORM->iFormID) {
-                case 0u: {
-                    uint32_t v12;
-                    int32_t v14;
-                    ENUM_FORM_ID FormTypeFromFormString = TESForm::GetFormTypeFromFormString(apGroupFORM->flags);
-                    ENUM_FORM_ID FormType = GetFormType();
-                    switch (FormTypeFromFormString) {
-                        case IMOD_ID: {
-                            v12 = 311;
-                            break;
-                        }
-                        case CHIP_ID: {
-                            v12 = 312;
-                            break;
-                        }
-                        case CCRD_ID: {
-                            v12 = 313;
-                            break;
-                        }
-                        case CMNY_ID: {
-                            v12 = 314;
-                            break;
-                        }
-                        default: {
-                            v12 = 10 * FormTypeFromFormString;
-                            break;
-                        }
+    if ((apGroupFORM) && (apGroupFORM->form == formEnumString[2].uiFormString)) {
+        uint32_t form = apGroupFORM->form;
+        switch (apGroupFORM->iFormID) {
+            case 0u: {
+                uint32_t v12;
+                int32_t v14;
+                ENUM_FORM_ID FormTypeFromFormString = TESForm::GetFormTypeFromFormString(apGroupFORM->flags);
+                ENUM_FORM_ID FormType = GetFormType();
+                switch (FormTypeFromFormString) {
+                    case IMOD_ID: {
+                        v12 = 311;
+                        break;
                     }
-                    switch (FormType) {
-                        case IMOD_ID: {
-                            v14 = 311;
-                            break;
-                        }
-                        case CHIP_ID: {
-                            v14 = 312;
-                            break;
-                        }
-                        case CCRD_ID: {
-                            v14 = 313;
-                            break;
-                        }
-                        case CMNY_ID: {
-                            v14 = 314;
-                            break;
-                        }
-                        default: {
-                            v14 = 10 * FormType;
-                            break;
-                        }
+                    case CHIP_ID: {
+                        v12 = 312;
+                        break;
                     }
-                    if (v14 < v12) {
-                        bretval = true;
+                    case CCRD_ID: {
+                        v12 = 313;
+                        break;
                     }
-                    break;
+                    case CMNY_ID: {
+                        v12 = 314;
+                        break;
+                    }
+                    default: {
+                        v12 = 10 * FormTypeFromFormString;
+                        break;
+                    }
                 }
-                case 1u:
-                case 4u:
-                case 5u: {
-                    uint32_t v8;
-                    int32_t v7 = GetFormType();
-                    switch (v7) {
-                        case 103: {
-                            v8 = 311;
-                            break;
-                        }
-                        case 108: {
-                            v8 = 312;
-                            break;
-                        }
-                        case 115: {
-                            v8 = 313;
-                            break;
-                        }
-                        case 116: {
-                            v8 = 314;
-                            break;
-                        }
-                        default: {
-                            v8 = 10 * v7;
-                            break;
-                        }
+                switch (FormType) {
+                    case IMOD_ID: {
+                        v14 = 311;
+                        break;
                     }
-                    if (v8 < 650) {
-                        bretval = true;
+                    case CHIP_ID: {
+                        v14 = 312;
+                        break;
                     }
-                    break;
+                    case CCRD_ID: {
+                        v14 = 313;
+                        break;
+                    }
+                    case CMNY_ID: {
+                        v14 = 314;
+                        break;
+                    }
+                    default: {
+                        v14 = 10 * FormType;
+                        break;
+                    }
                 }
-                case 2u:
-                case 3u:
-                case 6u: {
-                    uint32_t v10;
-                    ENUM_FORM_ID v9 = GetFormType();
-                    switch (v9) {
-                        case IMOD_ID: {
-                            v10 = 311;
-                            break;
-                        }
-                        case CHIP_ID: {
-                            v10 = 312;
-                            break;
-                        }
-                        case CCRD_ID: {
-                            v10 = 313;
-                            break;
-                        }
-                        case CMNY_ID: {
-                            v10 = 314;
-                            break;
-                        }
-                        default: {
-                            v10 = 10 * v9;
-                            break;
-                        }
-                    }
-                    if (v10 < 570) {
-                        bretval = true;
-                    }
-                    break;
+                if (v14 < v12) {
+                    bretval = true;
                 }
-                case 7u: {
-                    uint32_t v6;
-                    int32_t v5 = GetFormType();
-                    switch (v5) {
-                        case 103: {
-                            v6 = 311;
-                            break;
-                        }
-                        case 108: {
-                            v6 = 312;
-                            break;
-                        }
-                        case 115: {
-                            v6 = 313;
-                            break;
-                        }
-                        case 116: {
-                            v6 = 314;
-                            break;
-                        }
-                        default: {
-                            v6 = 10 * v5;
-                            break;
-                        }
+                break;
+            }
+            case 1u:
+            case 4u:
+            case 5u: {
+                uint32_t v8;
+                int32_t v7 = GetFormType();
+                switch (v7) {
+                    case 103: {
+                        v8 = 311;
+                        break;
                     }
-                    if (v6 < 690) {
-                        bretval = true;
+                    case 108: {
+                        v8 = 312;
+                        break;
                     }
-                    break;
+                    case 115: {
+                        v8 = 313;
+                        break;
+                    }
+                    case 116: {
+                        v8 = 314;
+                        break;
+                    }
+                    default: {
+                        v8 = 10 * v7;
+                        break;
+                    }
                 }
-                default: {
-                    return bretval;
+                if (v8 < 650) {
+                    bretval = true;
                 }
+                break;
+            }
+            case 2u:
+            case 3u:
+            case 6u: {
+                uint32_t v10;
+                ENUM_FORM_ID v9 = GetFormType();
+                switch (v9) {
+                    case IMOD_ID: {
+                        v10 = 311;
+                        break;
+                    }
+                    case CHIP_ID: {
+                        v10 = 312;
+                        break;
+                    }
+                    case CCRD_ID: {
+                        v10 = 313;
+                        break;
+                    }
+                    case CMNY_ID: {
+                        v10 = 314;
+                        break;
+                    }
+                    default: {
+                        v10 = 10 * v9;
+                        break;
+                    }
+                }
+                if (v10 < 570) {
+                    bretval = true;
+                }
+                break;
+            }
+            case 7u: {
+                uint32_t v6;
+                int32_t v5 = GetFormType();
+                switch (v5) {
+                    case 103: {
+                        v6 = 311;
+                        break;
+                    }
+                    case 108: {
+                        v6 = 312;
+                        break;
+                    }
+                    case 115: {
+                        v6 = 313;
+                        break;
+                    }
+                    case 116: {
+                        v6 = 314;
+                        break;
+                    }
+                    default: {
+                        v6 = 10 * v5;
+                        break;
+                    }
+                }
+                if (v6 < 690) {
+                    bretval = true;
+                }
+                break;
+            }
+            default: {
+                return bretval;
             }
         }
     }
+
     return bretval;
 }
 
@@ -434,11 +432,10 @@ TESForm* TESForm::CreateDuplicateForm(bool abCreateEditorID, NiTPointerMap<TESFo
             SetFormEditorID(tempstr.pString);
         }
     }
-    if (pdupform) {
-        if (apCopyMap) {
-            apCopyMap->SetAt(this, pdupform);
-        }
+    if ((pdupform) && (apCopyMap)) {
+        apCopyMap->SetAt(this, pdupform);
     }
+
     return pdupform;
 }
 
@@ -678,16 +675,14 @@ bool TESForm::BelongsInGroup(FORM* apGroupFORM, bool abAllowParentGroups, bool a
 }
 
 void TESForm::CreateGroupData(FORM* apOutGroupFORM, FORM_GROUP* apParentGroup) {
-    if (apOutGroupFORM) {
-        if (!apParentGroup) {
-            apOutGroupFORM->form = formEnumString[GRUP_ID].uiFormString;
-            apOutGroupFORM->iFormID = 0;
-            apOutGroupFORM->flags = formEnumString[GetFormType()].uiFormString;
-            apOutGroupFORM->length = 0;
-            apOutGroupFORM->iVersionControl = 0;
-            apOutGroupFORM->sFormVersion = 0;
-            apOutGroupFORM->sVCVersion = 0;
-        }
+    if ((apOutGroupFORM) && (!apParentGroup)) {
+        apOutGroupFORM->form = formEnumString[GRUP_ID].uiFormString;
+        apOutGroupFORM->iFormID = 0;
+        apOutGroupFORM->flags = formEnumString[GetFormType()].uiFormString;
+        apOutGroupFORM->length = 0;
+        apOutGroupFORM->iVersionControl = 0;
+        apOutGroupFORM->sFormVersion = 0;
+        apOutGroupFORM->sVCVersion = 0;
     }
 }
 
@@ -978,75 +973,67 @@ void TESForm::LoadData(TESFile* apFile, void* apData, uint16_t asSize) {
     TESAttackDamageForm* pAttack = dynamic_cast<TESAttackDamageForm*>(this);
     TESAttributes* pAttributes = dynamic_cast<TESAttributes*>(this);
     BGSClipRoundsForm* pClipRounds = dynamic_cast<BGSClipRoundsForm*>(this);
-    if (pUses) {
-        if (sOffset < sChunkSize) {
-            pUses->iUses = pBuffer[sOffset];
-            ++sOffset;
-        }
+    if ((pUses) && (sOffset < sChunkSize)) {
+        pUses->iUses = pBuffer[sOffset];
+        ++sOffset;
     }
-    if (pValue) {
-        if (sOffset < sChunkSize) {
-            int32_t iValue = *reinterpret_cast<int32_t*>(&pBuffer[sOffset]);
-            sOffset += 4;
-            if (apFile->QEndian()) {
-                ENDIAN(iValue, false);
-            }
-            pValue->SetFormValue(iValue);
+
+    if ((pValue) && (sOffset < sChunkSize)) {
+        int32_t iValue = *reinterpret_cast<int32_t*>(&pBuffer[sOffset]);
+        sOffset += 4;
+        if (apFile->QEndian()) {
+            ENDIAN(iValue, false);
         }
+        pValue->SetFormValue(iValue);
     }
-    if (pHealth) {
-        if (sOffset < sChunkSize) {
-            uint32_t iHealth = *reinterpret_cast<uint32_t*>(&pBuffer[sOffset]);
-            sOffset += 4;
-            if (apFile->QEndian()) {
-                ENDIAN(iHealth, false);
-            }
-            pHealth->iHealth = iHealth;
+
+    if ((pHealth) && (sOffset < sChunkSize)) {
+        uint32_t iHealth = *reinterpret_cast<uint32_t*>(&pBuffer[sOffset]);
+        sOffset += 4;
+        if (apFile->QEndian()) {
+            ENDIAN(iHealth, false);
         }
+        pHealth->iHealth = iHealth;
     }
-    if (pWeight) {
-        if (sOffset < sChunkSize) {
-            float fRead;
-            ourMemcpy(&fRead, &pBuffer[sOffset], sizeof(fRead));
-            float fWeight = fRead;
-            sOffset += 4;
-            if (apFile->QEndian()) {
-                ENDIAN(fWeight, false);
-            }
-            pWeight->SetFormWeight(fWeight);
+
+    if ((pWeight) && (sOffset < sChunkSize)) {
+        float fRead;
+        ourMemcpy(&fRead, &pBuffer[sOffset], sizeof(fRead));
+        float fWeight = fRead;
+        sOffset += 4;
+        if (apFile->QEndian()) {
+            ENDIAN(fWeight, false);
         }
+        pWeight->SetFormWeight(fWeight);
     }
-    if (pQuality) {
-        if (sOffset < sChunkSize) {
-            float fRead;
-            ourMemcpy(&fRead, &pBuffer[sOffset], sizeof(fRead));
-            float fQuality = fRead;
-            sOffset += 4;
-            if (apFile->QEndian()) {
-                ENDIAN(fQuality, false);
-            }
-            // Truncates the float to an int and stores its low byte.
-            pQuality->cQuality = static_cast<uint8_t>(static_cast<int32_t>(fQuality));
+
+    if ((pQuality) && (sOffset < sChunkSize)) {
+        float fRead;
+        ourMemcpy(&fRead, &pBuffer[sOffset], sizeof(fRead));
+        float fQuality = fRead;
+        sOffset += 4;
+        if (apFile->QEndian()) {
+            ENDIAN(fQuality, false);
         }
+        // Truncates the float to an int and stores its low byte.
+        pQuality->cQuality = static_cast<uint8_t>(static_cast<int32_t>(fQuality));
     }
-    if (pAttack) {
-        if (sOffset < sChunkSize) {
-            uint16_t sDamage = *reinterpret_cast<uint16_t*>(&pBuffer[sOffset]);
-            sOffset += 2;
-            if (apFile->QEndian()) {
-                ENDIAN(sDamage, false);
-            }
-            pAttack->SetDamage(sDamage);
+
+    if ((pAttack) && (sOffset < sChunkSize)) {
+        uint16_t sDamage = *reinterpret_cast<uint16_t*>(&pBuffer[sOffset]);
+        sOffset += 2;
+        if (apFile->QEndian()) {
+            ENDIAN(sDamage, false);
         }
+        pAttack->SetDamage(sDamage);
     }
+
     if (pAttributes) {
         sOffset += pAttributes->Load(&pBuffer[sOffset]);
     }
-    if (pClipRounds) {
-        if (sOffset < sChunkSize) {
-            pClipRounds->cClipRounds = pBuffer[sOffset];
-            ++sOffset;
-        }
+    if ((pClipRounds) && (sOffset < sChunkSize)) {
+        pClipRounds->cClipRounds = pBuffer[sOffset];
+        ++sOffset;
     }
 }
 
@@ -1512,12 +1499,11 @@ bool TESForm::ExpandChunk(CHUNK* apChunk, uint16_t asExpandSize) {
         TESForm::pFormBuffer = static_cast<FORM*>(ourRealloc(TESForm::pFormBuffer, TESForm::iBufferSize));
         return true;
     }
-    else {
-        if (endianSwapOnSave) {
-            apChunk->Endian();
-        }
-        return false;
+
+    if (endianSwapOnSave) {
+        apChunk->Endian();
     }
+    return false;
 }
 
 void TESForm::SetInPlaceableWater(bool abVal) {
@@ -1539,9 +1525,8 @@ const char* TESForm::GetFormTypeString(uint8_t aiFormType) {
     if (aiFormType >= 121u) {
         return "";
     }
-    else {
-        return formEnumString[aiFormType].pFormString;
-    }
+
+    return formEnumString[aiFormType].pFormString;
 }
 
 bool TESForm::IsDefaultForm(uint32_t aiID) {
@@ -1697,9 +1682,8 @@ uint32_t TESForm::GetNameLen(TESForm* apForm) {
     if (pFullName) {
         return pFullName->GetFullNameLength();
     }
-    else {
-        return 0;
-    }
+
+    return 0;
 }
 
 void TESForm::AddChunkArray(CHUNK_ID aeChunkID, const uint32_t* apData, uint32_t aiCount) {
@@ -1723,61 +1707,59 @@ void TESForm::AddChunkArray(CHUNK_ID aeChunkID, const int16_t* apData, uint32_t 
 void TESForm::CompressSaveBuffer() {
     uint32_t itempsize;
     z_stream_s zstream;
-    if (TESForm::pFormBuffer) {
-        if (TESForm::iBufferSize > 24) {
-            FORM* pFORM = TESForm::pFormBuffer;
+    if ((TESForm::pFormBuffer) && (TESForm::iBufferSize > 24)) {
+        FORM* pFORM = TESForm::pFormBuffer;
+        if (TESForm::QEndianSwapOnSave()) {
+            pFORM->Endian();
+        }
+        if ((pFORM->flags & 0x40000) != 0) {
             if (TESForm::QEndianSwapOnSave()) {
                 pFORM->Endian();
             }
-            if ((pFORM->flags & 0x40000) != 0) {
-                if (TESForm::QEndianSwapOnSave()) {
-                    pFORM->Endian();
-                }
+        }
+        else {
+            uint32_t ioriginalsize = TESForm::iBufferSize - 24;
+            // The record data after the FORM header is treated as raw bytes.
+            uint8_t* apDest = reinterpret_cast<uint8_t*>(&TESForm::pFormBuffer[1]);
+            zstream.zalloc = nullptr;
+            zstream.zfree = nullptr;
+            zstream.opaque = nullptr;
+            zstream.state = nullptr;
+            if (deflateInit(&zstream, Z_DEFAULT_COMPRESSION)) {
+                Warning("SAVELOAD: Error initializing ZLib stream for deflate.");
             }
             else {
-                uint32_t ioriginalsize = TESForm::iBufferSize - 24;
-                // The record data after the FORM header is treated as raw bytes.
-                uint8_t* apDest = reinterpret_cast<uint8_t*>(&TESForm::pFormBuffer[1]);
-                zstream.zalloc = nullptr;
-                zstream.zfree = nullptr;
-                zstream.opaque = nullptr;
-                zstream.state = nullptr;
-                if (deflateInit(&zstream, Z_DEFAULT_COMPRESSION)) {
-                    Warning("SAVELOAD: Error initializing ZLib stream for deflate.");
+                uint32_t icompbuffsize = 2 * ioriginalsize;
+                char* pcompressionbuffer = static_cast<char*>(ourMalloc(2 * ioriginalsize));
+                zstream.avail_in = ioriginalsize;
+                zstream.next_in = apDest;
+                zstream.avail_out = icompbuffsize;
+                zstream.next_out = reinterpret_cast<uint8_t*>(pcompressionbuffer);
+                if (deflate(&zstream, Z_FINISH) == Z_STREAM_ERROR) {
+                    Warning("SAVELOAD: Error deflating ZLib stream.");
+                    ourFree(pcompressionbuffer);
                 }
                 else {
-                    uint32_t icompbuffsize = 2 * ioriginalsize;
-                    char* pcompressionbuffer = static_cast<char*>(ourMalloc(2 * ioriginalsize));
-                    zstream.avail_in = ioriginalsize;
-                    zstream.next_in = apDest;
-                    zstream.avail_out = icompbuffsize;
-                    zstream.next_out = reinterpret_cast<uint8_t*>(pcompressionbuffer);
-                    if (deflate(&zstream, Z_FINISH) == Z_STREAM_ERROR) {
-                        Warning("SAVELOAD: Error deflating ZLib stream.");
-                        ourFree(pcompressionbuffer);
+                    uint32_t icompressedsize = icompbuffsize - zstream.avail_out;
+                    uint32_t inewbuffersize = icompbuffsize - zstream.avail_out + 28;
+                    FORM* pbuffer = static_cast<FORM*>(ourMalloc(inewbuffersize));
+                    pFORM->flags |= 0x40000;
+                    pFORM->length = inewbuffersize - 24;
+                    if (TESForm::QEndianSwapOnSave()) {
+                        pFORM->Endian();
                     }
-                    else {
-                        uint32_t icompressedsize = icompbuffsize - zstream.avail_out;
-                        uint32_t inewbuffersize = icompbuffsize - zstream.avail_out + 28;
-                        FORM* pbuffer = static_cast<FORM*>(ourMalloc(inewbuffersize));
-                        pFORM->flags |= 0x40000;
-                        pFORM->length = inewbuffersize - 24;
-                        if (TESForm::QEndianSwapOnSave()) {
-                            pFORM->Endian();
-                        }
-                        ourMemcpy(pbuffer, pFORM, sizeof(FORM));
-                        itempsize = ioriginalsize;
-                        if (TESForm::QEndianSwapOnSave()) {
-                            ENDIAN<uint32_t>(itempsize, false);
-                        }
-                        ourMemcpy(&pbuffer[1], &itempsize, 4u);
-                        ourMemcpy(&pbuffer[1].length, pcompressionbuffer, icompressedsize);
-                        ourFree(TESForm::pFormBuffer);
-                        TESForm::pFormBuffer = pbuffer;
-                        TESForm::iBufferSize = inewbuffersize;
-                        deflateEnd(&zstream);
-                        ourFree(pcompressionbuffer);
+                    ourMemcpy(pbuffer, pFORM, sizeof(FORM));
+                    itempsize = ioriginalsize;
+                    if (TESForm::QEndianSwapOnSave()) {
+                        ENDIAN<uint32_t>(itempsize, false);
                     }
+                    ourMemcpy(&pbuffer[1], &itempsize, 4u);
+                    ourMemcpy(&pbuffer[1].length, pcompressionbuffer, icompressedsize);
+                    ourFree(TESForm::pFormBuffer);
+                    TESForm::pFormBuffer = pbuffer;
+                    TESForm::iBufferSize = inewbuffersize;
+                    deflateEnd(&zstream);
+                    ourFree(pcompressionbuffer);
                 }
             }
         }

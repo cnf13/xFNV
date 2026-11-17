@@ -60,17 +60,15 @@ HavokMaterialType GetMaterialFromCollidable(const hkpCdBody* apCollidable, NiPoi
             BSMIN(static_cast<int32_t>(Material), static_cast<int32_t>(BHK_MATERIAL_TUMBLEWEED))
         );
     }
-    else {
-        const hkpCollidable* Root = apCollidable->getRootCollidable();
-        CFilter kFilter;
-        kFilter.iFilter = Root->getCollisionFilterInfo();
-        if (kFilter.GetLayer() == L_GROUND) {
-            return TES::pInstance->GetLandMaterialType(*arLandPos);
-        }
-        else {
-            return bhkUtilFunctions::GetMaterialValue(apCollidable);
-        }
+
+    const hkpCollidable* Root = apCollidable->getRootCollidable();
+    CFilter kFilter;
+    kFilter.iFilter = Root->getCollisionFilterInfo();
+    if (kFilter.GetLayer() == L_GROUND) {
+        return TES::pInstance->GetLandMaterialType(*arLandPos);
     }
+
+    return bhkUtilFunctions::GetMaterialValue(apCollidable);
 }
 
 bhkContactListener::bhkContactListener() {}
@@ -180,51 +178,48 @@ void FOCollisionListener::DealObjectDamage() {
     while (plist && !plist->IsEmpty()) {
         FOCollisionListener::ObjectDamageImpactData* pdata = plist->m_item;
         plist->RemoveHead();
-        if (pdata->spBody.m_pObject) {
-            if (pdata->fDamage > 0.0) {
-                TESObjectREFR* pref;
-                NiAVObject* pav;
-                bhkCollisionObject* pcol;
-                hkpRigidBody* pbody = pdata->spBody.m_pObject->operator*();
-                if (pbody) {
-                    pcol = bhkCollisionObject::Getbhk(pbody);
+        if ((pdata->spBody.m_pObject) && (pdata->fDamage > 0.0)) {
+            TESObjectREFR* pref;
+            NiAVObject* pav;
+            bhkCollisionObject* pcol;
+            hkpRigidBody* pbody = pdata->spBody.m_pObject->operator*();
+            if (pbody) {
+                pcol = bhkCollisionObject::Getbhk(pbody);
+            }
+            else {
+                pcol = nullptr;
+            }
+            if (pcol) {
+                pav = pcol->m_pkSceneObject;
+            }
+            else {
+                pav = nullptr;
+            }
+            if (pav) {
+                pref = TESObjectREFR::FindReferenceFor3D(pav);
+            }
+            else {
+                pref = nullptr;
+            }
+            if (pref) {
+                pref->SetActorCause(pdata->spCause.m_pObject);
+                if (AILinearTaskThreadManager::ShouldQueue3DTask()) {
+                    float afDamage = pdata->fDamage;
+                    TaskQueueInterface* Instance = TaskQueueInterface::GetInstance();
+                    Instance->QueueUpdateDestructibleObject(pref, afDamage, false);
                 }
                 else {
-                    pcol = nullptr;
+                    pref->DamageObject(pdata->fDamage, false);
                 }
-                if (pcol) {
-                    pav = pcol->m_pkSceneObject;
-                }
-                else {
-                    pav = nullptr;
-                }
-                if (pav) {
-                    pref = TESObjectREFR::FindReferenceFor3D(pav);
-                }
-                else {
-                    pref = nullptr;
-                }
-                if (pref) {
-                    pref->SetActorCause(pdata->spCause.m_pObject);
-                    if (AILinearTaskThreadManager::ShouldQueue3DTask()) {
-                        float afDamage = pdata->fDamage;
-                        TaskQueueInterface* Instance = TaskQueueInterface::GetInstance();
-                        Instance->QueueUpdateDestructibleObject(pref, afDamage, false);
-                    }
-                    else {
-                        pref->DamageObject(pdata->fDamage, false);
-                    }
-                    if (pref->GetDestroyed()) {
-                        if (pdata->spCause.m_pObject) {
-                            PlayerCharacter* Actor_ = static_cast<PlayerCharacter*>(pdata->spCause.m_pObject->pActor);
-                            if (Actor_ == pPlayer) {
-                                pPlayer->AddPlayerAction(PLAYER_ACTION_DESTROY_OBJECT, 8.0f, nullptr);
-                            }
-                        }
+                if ((pref->GetDestroyed()) && (pdata->spCause.m_pObject)) {
+                    PlayerCharacter* Actor_ = static_cast<PlayerCharacter*>(pdata->spCause.m_pObject->pActor);
+                    if (Actor_ == pPlayer) {
+                        pPlayer->AddPlayerAction(PLAYER_ACTION_DESTROY_OBJECT, 8.0f, nullptr);
                     }
                 }
             }
         }
+
         if (pdata) {
             delete pdata;
         }
@@ -232,11 +227,10 @@ void FOCollisionListener::DealObjectDamage() {
 }
 
 void FOCollisionListener::ReportProjectileImpact(TESObjectREFR* apCollidingRef, hkpContactPointAddedEvent& arEvent) {
-    if (apCollidingRef) {
-        if (apCollidingRef->IsProjectile() &&
-            (((int32_t)static_cast<Projectile*>(apCollidingRef)->GetProjectileType()) == 3)) {
-            static_cast<GrenadeProjectile*>(apCollidingRef)->ReportCollision(arEvent);
-        }
+    if ((apCollidingRef) &&
+        (apCollidingRef->IsProjectile() &&
+         (((int32_t)static_cast<Projectile*>(apCollidingRef)->GetProjectileType()) == 3))) {
+        static_cast<GrenadeProjectile*>(apCollidingRef)->ReportCollision(arEvent);
     }
 }
 
@@ -265,72 +259,71 @@ void FOCollisionListener::StoreObjectDamage(
 ) {
     float fvelocity = NiAbs(afProjectedVelocity);
     if (!(fPhysicsDamageSpeedMin.Float() > static_cast<double>(fvelocity))) {
-        if (apRefA) {
-            if (apRefA->GetDestructible() && !apRefA->GetDestroyed() && !apRefA->IsProjectile() &&
-                (!apRefB || !apRefB->IsProjectile())) {
-                float fmass = apBodyB->getMass();
-                if (fmass == 0.0) {
-                    fmass = 10000.0f;
+        if ((apRefA) &&
+            (apRefA->GetDestructible() && !apRefA->GetDestroyed() && !apRefA->IsProjectile() &&
+             (!apRefB || !apRefB->IsProjectile()))) {
+            float fmass = apBodyB->getMass();
+            if (fmass == 0.0) {
+                fmass = 10000.0f;
+            }
+            float fdamage = GetObjectImpactDamage(fmass, fvelocity);
+            if (fdamage > 0.0) {
+                FOCollisionListener::ObjectDamageImpactData* pdata;
+                FOCollisionListener::ObjectDamageImpactData* apMemory =
+                    static_cast<FOCollisionListener::ObjectDamageImpactData*>(
+                        ourMalloc(sizeof(FOCollisionListener::ObjectDamageImpactData))
+                    );
+                if (apMemory) {
+                    pdata = ::new (apMemory) FOCollisionListener::ObjectDamageImpactData;
                 }
-                float fdamage = GetObjectImpactDamage(fmass, fvelocity);
-                if (fdamage > 0.0) {
-                    FOCollisionListener::ObjectDamageImpactData* pdata;
-                    FOCollisionListener::ObjectDamageImpactData* apMemory =
-                        static_cast<FOCollisionListener::ObjectDamageImpactData*>(
-                            ourMalloc(sizeof(FOCollisionListener::ObjectDamageImpactData))
-                        );
-                    if (apMemory) {
-                        pdata = ::new (apMemory) FOCollisionListener::ObjectDamageImpactData;
-                    }
-                    else {
-                        pdata = nullptr;
-                    }
-                    FOCollisionListener::ObjectDamageImpactData* pdata_2 = pdata;
-                    pdata->spBody.operator=(static_cast<bhkRigidBody*>(bhkEntity::Getbhk(apBodyA)));
-                    pdata->fDamage = fdamage;
-                    if (apRefB) {
-                        ActorCause* apObject = apRefB->GetActorCause();
-                        pdata_2->spCause.operator=(apObject);
-                    }
-                    else {
-                        pdata_2->spCause.operator=(static_cast<ActorCause*>(nullptr));
-                    }
-                    DamageImpacts.AddHead(pdata_2);
+                else {
+                    pdata = nullptr;
                 }
+                FOCollisionListener::ObjectDamageImpactData* pdata_2 = pdata;
+                pdata->spBody.operator=(static_cast<bhkRigidBody*>(bhkEntity::Getbhk(apBodyA)));
+                pdata->fDamage = fdamage;
+                if (apRefB) {
+                    ActorCause* apObject = apRefB->GetActorCause();
+                    pdata_2->spCause.operator=(apObject);
+                }
+                else {
+                    pdata_2->spCause.operator=(static_cast<ActorCause*>(nullptr));
+                }
+                DamageImpacts.AddHead(pdata_2);
             }
         }
-        if (apRefB) {
-            if (apRefB->GetDestructible() && !apRefB->GetDestroyed() && !apRefB->IsProjectile() &&
-                (!apRefA || !apRefA->IsProjectile())) {
-                float fmass_2 = apBodyA->getMass();
-                if (fmass_2 == 0.0) {
-                    fmass_2 = 10000.0f;
+
+        if ((apRefB) &&
+            (apRefB->GetDestructible() && !apRefB->GetDestroyed() && !apRefB->IsProjectile() &&
+             (!apRefA || !apRefA->IsProjectile()))) {
+            float fmass_2 = apBodyA->getMass();
+            if (fmass_2 == 0.0) {
+                fmass_2 = 10000.0f;
+            }
+            float fdamage_2 = GetObjectImpactDamage(fmass_2, fvelocity);
+            if (fdamage_2 > 0.0) {
+                FOCollisionListener::ObjectDamageImpactData* pdata_3;
+                FOCollisionListener::ObjectDamageImpactData* v11 =
+                    static_cast<FOCollisionListener::ObjectDamageImpactData*>(
+                        ourMalloc(sizeof(FOCollisionListener::ObjectDamageImpactData))
+                    );
+                if (v11) {
+                    pdata_3 = ::new (v11) FOCollisionListener::ObjectDamageImpactData;
                 }
-                float fdamage_2 = GetObjectImpactDamage(fmass_2, fvelocity);
-                if (fdamage_2 > 0.0) {
-                    FOCollisionListener::ObjectDamageImpactData* pdata_3;
-                    FOCollisionListener::ObjectDamageImpactData* v11 =
-                        static_cast<FOCollisionListener::ObjectDamageImpactData*>(
-                            ourMalloc(sizeof(FOCollisionListener::ObjectDamageImpactData))
-                        );
-                    if (v11) {
-                        pdata_3 = ::new (v11) FOCollisionListener::ObjectDamageImpactData;
-                    }
-                    else {
-                        pdata_3 = nullptr;
-                    }
-                    FOCollisionListener::ObjectDamageImpactData* pdata_4 = pdata_3;
-                    pdata_3->spBody.operator=(static_cast<bhkRigidBody*>(bhkEntity::Getbhk(apBodyB)));
-                    pdata_3->fDamage = fdamage_2;
-                    if (apRefA) {
-                        ActorCause* v6 = apRefA->GetActorCause();
-                        pdata_4->spCause.operator=(v6);
-                    }
-                    else {
-                        pdata_4->spCause.operator=(static_cast<ActorCause*>(nullptr));
-                    }
-                    DamageImpacts.AddHead(pdata_4);
+                else {
+                    pdata_3 = nullptr;
                 }
+                FOCollisionListener::ObjectDamageImpactData* pdata_4 = pdata_3;
+                pdata_3->spBody.operator=(static_cast<bhkRigidBody*>(bhkEntity::Getbhk(apBodyB)));
+                pdata_3->fDamage = fdamage_2;
+                if (apRefA) {
+                    ActorCause* v6 = apRefA->GetActorCause();
+                    pdata_4->spCause.operator=(v6);
+                }
+                else {
+                    pdata_4->spCause.operator=(static_cast<ActorCause*>(nullptr));
+                }
+                DamageImpacts.AddHead(pdata_4);
             }
         }
     }
@@ -344,9 +337,8 @@ FOCollisionListener* FOCollisionListener::Instance() {
     if (v3) {
         return ::new (v3) FOCollisionListener;
     }
-    else {
-        return nullptr;
-    }
+
+    return nullptr;
 }
 
 BIPED_PART CFilter::GetBipedPart() {

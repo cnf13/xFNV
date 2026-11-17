@@ -802,10 +802,8 @@ void Font::KillData() {
 }
 
 void Font::Unload() {
-    if (iRefCount) {
-        if (!(--iRefCount)) {
-            KillData();
-        }
+    if ((iRefCount) && (!(--iRefCount))) {
+        KillData();
     }
 }
 
@@ -1315,11 +1313,10 @@ int32_t Font::LineBreakText(
         }
     }
     char* pString = axTextString.pString;
-    if (*axTextString.pString) {
-        if (n >= sLen) {
-            ++iline_count;
-        }
+    if ((*axTextString.pString) && (n >= sLen)) {
+        ++iline_count;
     }
+
     if (imax_width <= iwidth) {
         imax_width_2 = iwidth;
     }
@@ -1459,11 +1456,10 @@ FontManager::TextLine* FontManager::TextLine::AddChar(FontManager::CharData* apC
                 if (xChars.m_uiCount) {
                     pfirst = xChars.m_pkHead->m_element;
                 }
-                if (pfirst) {
-                    if (apChar->iFontIndex != pfirst->iFontIndex) {
-                        bAdjustLineHeight = true;
-                    }
+                if ((pfirst) && (apChar->iFontIndex != pfirst->iFontIndex)) {
+                    bAdjustLineHeight = true;
                 }
+
                 apChar->iX = apChar->iLeadingEdge;
                 this->iWidth = apChar->iWidth;
                 NiTListItem<FontManager::CharData*>* elem_2 = xChars.m_pkHead;
@@ -1480,11 +1476,10 @@ FontManager::TextLine* FontManager::TextLine::AddChar(FontManager::CharData* apC
                 if (xChars.m_uiCount) {
                     pfirst_2 = xChars.m_pkTail->m_element;
                 }
-                if (pfirst_2) {
-                    if (apChar->iFontIndex != pfirst_2->iFontIndex) {
-                        bAdjustLineHeight = true;
-                    }
+                if ((pfirst_2) && (apChar->iFontIndex != pfirst_2->iFontIndex)) {
+                    bAdjustLineHeight = true;
                 }
+
                 apChar->iX = apChar->iLeadingEdge + this->iWidth;
                 this->iWidth += apChar->iWidth;
             }
@@ -1821,9 +1816,8 @@ FontManager::TextPage* FontManager::TextDoc::CurrentPage() {
     if (i) {
         return i->m_element;
     }
-    else {
-        return nullptr;
-    }
+
+    return nullptr;
 }
 
 void FontManager::TextDoc::Render(NiNode* apParent, FontManager::TextData* apData) {
@@ -2162,10 +2156,9 @@ NiPoint3* FontManager::CalculateStringDimensions(
         apResult->z = v17.z;
         return apResult;
     }
-    else {
-        *apResult = NiPoint3_ZERO;
-        return apResult;
-    }
+
+    *apResult = NiPoint3_ZERO;
+    return apResult;
 }
 
 float FontManager::GetLinePadding(int32_t aiFont) {
@@ -2868,19 +2861,18 @@ NiTriShape* FontManager::MakeImage(BSStringT<char> axFilename, NiPoint3 axPos, i
     }
     fscale = 1.0f;
     NiTexture* ptex = nullptr;
-    if (axFilename.pString) {
-        if (*axFilename.pString) {
-            uint8_t v18[8];
-            NiPointer<NiTexture> spTempTexture;
-            uint8_t* v55 = v18;
-            uint8_t* v36 = v18;
-            uint8_t* v25 = v18;
-            char* apFilename = axFilename.pString;
-            // Passes a null texture by value as the fifth argument.
-            TileImage::AddToTesTextures(axFilename.pString, fscale, spTempTexture, 0.0f, NiPointer<NiTexture>());
-            ptex = spTempTexture.m_pObject;
-        }
+    if ((axFilename.pString) && (*axFilename.pString)) {
+        uint8_t v18[8];
+        NiPointer<NiTexture> spTempTexture;
+        uint8_t* v55 = v18;
+        uint8_t* v36 = v18;
+        uint8_t* v25 = v18;
+        char* apFilename = axFilename.pString;
+        // Passes a null texture by value as the fifth argument.
+        TileImage::AddToTesTextures(axFilename.pString, fscale, spTempTexture, 0.0f, NiPointer<NiTexture>());
+        ptex = spTempTexture.m_pObject;
     }
+
     if (ptex) {
         float v53 = 0.0f;
         float v54 = 0.0f;

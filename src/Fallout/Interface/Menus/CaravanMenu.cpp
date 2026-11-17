@@ -451,21 +451,19 @@ void CaravanMenu::DoIdle() {
                             }
                             if ((ixAxis || iyAxis) && static_cast<double>(uiPrevIdleTick) - fSelectionDelay > 0.25) {
                                 fSelectionDelay = static_cast<float>(uiPrevIdleTick);
-                                if (eActiveMenu == CaravanMenu::CA_DECK_MENU) {
-                                    if (ixAxis) {
-                                        int32_t iValue_2 = static_cast<int32_t>(
-                                            pTiles[15]->GetFloat(CaravanMenu::iUT_CurrentValue) +
-                                            static_cast<double>(ixAxis)
+                                if ((eActiveMenu == CaravanMenu::CA_DECK_MENU) && (ixAxis)) {
+                                    int32_t iValue_2 = static_cast<int32_t>(
+                                        pTiles[15]->GetFloat(CaravanMenu::iUT_CurrentValue) +
+                                        static_cast<double>(ixAxis)
+                                    );
+                                    if (iValue_2 >= 0 && iValue_2 < iTotalCards) {
+                                        pTiles[15]->Set(
+                                            CaravanMenu::iUT_CurrentValue, static_cast<float>(iValue_2), false
                                         );
-                                        if (iValue_2 >= 0 && iValue_2 < iTotalCards) {
-                                            pTiles[15]->Set(
-                                                CaravanMenu::iUT_CurrentValue, static_cast<float>(iValue_2), false
-                                            );
-                                            int32_t v69 = Tile::TextToTrait("_SetInCode");
-                                            pTiles[15]->Poke(v69, 1.0f);
-                                            eGameState = static_cast<CaravanMenu::CaravanState>((ixAxis <= 0) + 5);
-                                            iNumSteps = 1;
-                                        }
+                                        int32_t v69 = Tile::TextToTrait("_SetInCode");
+                                        pTiles[15]->Poke(v69, 1.0f);
+                                        eGameState = static_cast<CaravanMenu::CaravanState>((ixAxis <= 0) + 5);
+                                        iNumSteps = 1;
                                     }
                                 }
                             }
@@ -611,73 +609,68 @@ void CaravanMenu::DoIdle() {
             return;
         }
         case CaravanMenu::CA_CAMERA_TO_GAME_ANIM: {
-            if (pCameraAnimations[1]) {
-                if (pHandAnimations[0][0]) {
-                    if (pHandAnimations[1][0]) {
-                        if (CaravanMenu::fTimeDelta == 0.0) {
-                            pCameraAnimManager->ActivateSequence(pCameraAnimations[1], 0, false, 1.0f, 0.0f, nullptr);
-                            ZeroFlags();
-                            SetFlag(CaravanMenu::CAF_DISABLE_ALLCONTROLS, true);
-                            pHandAnimManager[0]->ActivateSequence(pHandAnimations[0][0], 0, false, 1.0f, 0.0f, nullptr);
-                            pHandAnimManager[1]->ActivateSequence(pHandAnimations[1][0], 0, false, 1.0f, 0.0f, nullptr);
-                            fSelectionDelay = 0.0f;
-                            BSAudio* v11 = &BSAudio::QInstance();
-                            BSSoundHandle* v111 = v11->GetSoundHandleByName(&a1, "GAMECaravanStartMatch", 289u);
-                            v111->Play(false);
-                            UpdateTileAlpha(CaravanMenu::TI_NO_TILE);
-                        }
-                        NiUpdateData UpdateData1_2(CaravanMenu::fTimeDelta, true, false);
-                        NiUpdateData UpdateData2(CaravanMenu::fTimeDelta, true, false);
-                        NiUpdateData UpdateData3(CaravanMenu::fTimeDelta, true, false);
-                        pHandGeometry[0]->Update(UpdateData2);
-                        pHandGeometry[1]->Update(UpdateData3);
-                        NiAVObject* v12 = CaravanMenu::spModel.m_pObject->GetAt(0);
-                        v12->Update(UpdateData1_2);
-                        if (static_cast<double>(CaravanMenu::fTimeDelta) >= pCameraAnimations[1]->m_fEndKeyTime &&
-                            static_cast<double>(CaravanMenu::fTimeDelta) >= pHandAnimations[0][0]->m_fEndKeyTime &&
-                            static_cast<double>(CaravanMenu::fTimeDelta) >= pHandAnimations[1][0]->m_fEndKeyTime) {
-                            pCameraAnimManager->DeactivateSequence(pCameraAnimations[1], 0.0f);
-                            pHandAnimManager[0]->DeactivateSequence(pHandAnimations[0][0], 0.0f);
-                            pHandAnimManager[1]->DeactivateSequence(pHandAnimations[1][0], 0.0f);
-                            SetFlag(CaravanMenu::CAF_TRACK_SETUP, true);
-                            float x = 0.0f;
-                            float y = 0.0f;
-                            int32_t iSafeZoneWidth = static_cast<int32_t>(pTiles[2]->GetFloat(4017));
-                            NiAVObject* obj = BSUtilities::GetObjectByName(pTrackGrids[0], "Select1_01:0");
-                            CaravanMenu::sp3DCamera.m_pObject->WorldPtToScreenPt(
-                                obj->GetWorldTranslate(), x, y, 1e-05f
-                            );
-                            x = static_cast<double>(iSafeZoneWidth) * x - 120.0;
-                            pTiles[23]->Set(4001, x, true);
-                            pTiles[28]->Set(4001, x, true);
-                            x = x + 265.0;
-                            pTiles[24]->Set(4001, x, true);
-                            pTiles[27]->Set(4001, x, true);
-                            x = x + 265.0;
-                            pTiles[25]->Set(4001, x, true);
-                            pTiles[26]->Set(4001, x, true);
-                            Tile* TileByName = Tile::GetTileByName(pTiles[2], "CGM_NPCTrackRect");
-                            TileByName->Set(4003, 1);
-                            Tile* v14 = Tile::GetTileByName(pTiles[2], "CGM_PlayerTrackRect");
-                            v14->Set(4003, 1);
-                            UpdateCaravanFlags();
-                            UpdateTileAlpha(CaravanMenu::TI_NO_TILE);
-                            eGameState = CaravanMenu::CA_GAME_PROCESS_AI;
-                            InterfaceManager* v15 = InterfaceManager::Instance();
-                            if (!v15->xTutorialManager.HasBeenShown(Interface::TUT_CARAVAN_TRACK)) {
-                                TESForm* v16 = TESForm::GetFormByEditorID("HelpCaravanStartingCaravans");
-                                BGSMessage* helpForm_2 = dynamic_cast<BGSMessage*>(v16);
-                                if (helpForm_2) {
-                                    bTutorial = TutorialMenu::Create(helpForm_2, false);
-                                    InterfaceManager* v17 = InterfaceManager::Instance();
-                                    v17->xTutorialManager.FlagAsShown(Interface::TUT_CARAVAN_TRACK);
-                                    iTutorial = 32;
-                                }
-                            }
+            if ((pCameraAnimations[1]) && (pHandAnimations[0][0]) && (pHandAnimations[1][0])) {
+                if (CaravanMenu::fTimeDelta == 0.0) {
+                    pCameraAnimManager->ActivateSequence(pCameraAnimations[1], 0, false, 1.0f, 0.0f, nullptr);
+                    ZeroFlags();
+                    SetFlag(CaravanMenu::CAF_DISABLE_ALLCONTROLS, true);
+                    pHandAnimManager[0]->ActivateSequence(pHandAnimations[0][0], 0, false, 1.0f, 0.0f, nullptr);
+                    pHandAnimManager[1]->ActivateSequence(pHandAnimations[1][0], 0, false, 1.0f, 0.0f, nullptr);
+                    fSelectionDelay = 0.0f;
+                    BSAudio* v11 = &BSAudio::QInstance();
+                    BSSoundHandle* v111 = v11->GetSoundHandleByName(&a1, "GAMECaravanStartMatch", 289u);
+                    v111->Play(false);
+                    UpdateTileAlpha(CaravanMenu::TI_NO_TILE);
+                }
+                NiUpdateData UpdateData1_2(CaravanMenu::fTimeDelta, true, false);
+                NiUpdateData UpdateData2(CaravanMenu::fTimeDelta, true, false);
+                NiUpdateData UpdateData3(CaravanMenu::fTimeDelta, true, false);
+                pHandGeometry[0]->Update(UpdateData2);
+                pHandGeometry[1]->Update(UpdateData3);
+                NiAVObject* v12 = CaravanMenu::spModel.m_pObject->GetAt(0);
+                v12->Update(UpdateData1_2);
+                if (static_cast<double>(CaravanMenu::fTimeDelta) >= pCameraAnimations[1]->m_fEndKeyTime &&
+                    static_cast<double>(CaravanMenu::fTimeDelta) >= pHandAnimations[0][0]->m_fEndKeyTime &&
+                    static_cast<double>(CaravanMenu::fTimeDelta) >= pHandAnimations[1][0]->m_fEndKeyTime) {
+                    pCameraAnimManager->DeactivateSequence(pCameraAnimations[1], 0.0f);
+                    pHandAnimManager[0]->DeactivateSequence(pHandAnimations[0][0], 0.0f);
+                    pHandAnimManager[1]->DeactivateSequence(pHandAnimations[1][0], 0.0f);
+                    SetFlag(CaravanMenu::CAF_TRACK_SETUP, true);
+                    float x = 0.0f;
+                    float y = 0.0f;
+                    int32_t iSafeZoneWidth = static_cast<int32_t>(pTiles[2]->GetFloat(4017));
+                    NiAVObject* obj = BSUtilities::GetObjectByName(pTrackGrids[0], "Select1_01:0");
+                    CaravanMenu::sp3DCamera.m_pObject->WorldPtToScreenPt(obj->GetWorldTranslate(), x, y, 1e-05f);
+                    x = static_cast<double>(iSafeZoneWidth) * x - 120.0;
+                    pTiles[23]->Set(4001, x, true);
+                    pTiles[28]->Set(4001, x, true);
+                    x = x + 265.0;
+                    pTiles[24]->Set(4001, x, true);
+                    pTiles[27]->Set(4001, x, true);
+                    x = x + 265.0;
+                    pTiles[25]->Set(4001, x, true);
+                    pTiles[26]->Set(4001, x, true);
+                    Tile* TileByName = Tile::GetTileByName(pTiles[2], "CGM_NPCTrackRect");
+                    TileByName->Set(4003, 1);
+                    Tile* v14 = Tile::GetTileByName(pTiles[2], "CGM_PlayerTrackRect");
+                    v14->Set(4003, 1);
+                    UpdateCaravanFlags();
+                    UpdateTileAlpha(CaravanMenu::TI_NO_TILE);
+                    eGameState = CaravanMenu::CA_GAME_PROCESS_AI;
+                    InterfaceManager* v15 = InterfaceManager::Instance();
+                    if (!v15->xTutorialManager.HasBeenShown(Interface::TUT_CARAVAN_TRACK)) {
+                        TESForm* v16 = TESForm::GetFormByEditorID("HelpCaravanStartingCaravans");
+                        BGSMessage* helpForm_2 = dynamic_cast<BGSMessage*>(v16);
+                        if (helpForm_2) {
+                            bTutorial = TutorialMenu::Create(helpForm_2, false);
+                            InterfaceManager* v17 = InterfaceManager::Instance();
+                            v17->xTutorialManager.FlagAsShown(Interface::TUT_CARAVAN_TRACK);
+                            iTutorial = 32;
                         }
                     }
                 }
             }
+
             return;
         }
         case CaravanMenu::CA_CAMERA_TO_RESULTS_ANIM: {
@@ -984,102 +977,99 @@ void CaravanMenu::DoIdle() {
         }
         case CaravanMenu::CA_GAME_INTRO_DEAL_ANIM: {
             uint32_t isAI = this->IsFlagSet(CaravanMenu::CAF_AI);
-            if (pStartAnimations[isAI][iSelectedDeckCard]) {
-                if (pTrackAnimations[iSelectedTrack][iSelectedRow][iSelectedColumn][0]) {
-                    if (CaravanMenu::fTimeDelta == 0.0) {
-                        UpdateSelectedTrackCardTexture();
-                        pHandAnimManager[isAI]->ActivateSequence(
-                            pStartAnimations[isAI][iSelectedDeckCard], 0, false, 1.0f, 0.0f, nullptr
-                        );
-                        pTrackAnimManager[iSelectedTrack][iSelectedRow]->ActivateSequence(
-                            pTrackAnimations[iSelectedTrack][iSelectedRow][iSelectedColumn][0], 0, false, 1.0f, 0.0f,
-                            nullptr
-                        );
-                        if (!isAI) {
-                            SelectDeckCard(true);
-                        }
-                        SetFlag(CaravanMenu::CAF_DISABLE_ALLCONTROLS, true);
-                        fSelectionDelay = 0.0f;
-                        BSAudio* v44 = &BSAudio::QInstance();
-                        BSSoundHandle* v103 = v44->GetSoundHandleByName(&v123, "GAMECaravanConfirmAddtoDeck", 289u);
-                        v103->Play(false);
+            if ((pStartAnimations[isAI][iSelectedDeckCard]) &&
+                (pTrackAnimations[iSelectedTrack][iSelectedRow][iSelectedColumn][0])) {
+                if (CaravanMenu::fTimeDelta == 0.0) {
+                    UpdateSelectedTrackCardTexture();
+                    pHandAnimManager[isAI]->ActivateSequence(
+                        pStartAnimations[isAI][iSelectedDeckCard], 0, false, 1.0f, 0.0f, nullptr
+                    );
+                    pTrackAnimManager[iSelectedTrack][iSelectedRow]->ActivateSequence(
+                        pTrackAnimations[iSelectedTrack][iSelectedRow][iSelectedColumn][0], 0, false, 1.0f, 0.0f,
+                        nullptr
+                    );
+                    if (!isAI) {
+                        SelectDeckCard(true);
                     }
-                    NiUpdateData UpdateData1_13(CaravanMenu::fTimeDelta, true, false);
-                    pHandGeometry[isAI]->Update(UpdateData1_13);
-                    NiUpdateData UpdateData2_11(CaravanMenu::fTimeDelta, true, false);
-                    pTrackGeometry[iSelectedTrack][iSelectedRow]->Update(UpdateData2_11);
-                    if (static_cast<double>(CaravanMenu::fTimeDelta) >=
-                            pStartAnimations[isAI][iSelectedDeckCard]->m_fEndKeyTime &&
-                        static_cast<double>(CaravanMenu::fTimeDelta) >=
-                            pTrackAnimations[iSelectedTrack][iSelectedRow][iSelectedColumn][0]->m_fEndKeyTime) {
-                        uint32_t auiValue;
-                        pHandAnimManager[isAI]->DeactivateSequence(pStartAnimations[isAI][iSelectedDeckCard], 0.0f);
-                        pTrackAnimManager[iSelectedTrack][iSelectedRow]->DeactivateSequence(
-                            pTrackAnimations[iSelectedTrack][iSelectedRow][iSelectedColumn][0], 0.0f
+                    SetFlag(CaravanMenu::CAF_DISABLE_ALLCONTROLS, true);
+                    fSelectionDelay = 0.0f;
+                    BSAudio* v44 = &BSAudio::QInstance();
+                    BSSoundHandle* v103 = v44->GetSoundHandleByName(&v123, "GAMECaravanConfirmAddtoDeck", 289u);
+                    v103->Play(false);
+                }
+                NiUpdateData UpdateData1_13(CaravanMenu::fTimeDelta, true, false);
+                pHandGeometry[isAI]->Update(UpdateData1_13);
+                NiUpdateData UpdateData2_11(CaravanMenu::fTimeDelta, true, false);
+                pTrackGeometry[iSelectedTrack][iSelectedRow]->Update(UpdateData2_11);
+                if (static_cast<double>(CaravanMenu::fTimeDelta) >=
+                        pStartAnimations[isAI][iSelectedDeckCard]->m_fEndKeyTime &&
+                    static_cast<double>(CaravanMenu::fTimeDelta) >=
+                        pTrackAnimations[iSelectedTrack][iSelectedRow][iSelectedColumn][0]->m_fEndKeyTime) {
+                    uint32_t auiValue;
+                    pHandAnimManager[isAI]->DeactivateSequence(pStartAnimations[isAI][iSelectedDeckCard], 0.0f);
+                    pTrackAnimManager[iSelectedTrack][iSelectedRow]->DeactivateSequence(
+                        pTrackAnimations[iSelectedTrack][iSelectedRow][iSelectedColumn][0], 0.0f
+                    );
+                    if ((pCardTracks[2]->iSize && !this->IsFlagSet(CaravanMenu::CAF_AI)) ||
+                        (pCardTracks[3]->iSize && this->IsFlagSet(CaravanMenu::CAF_AI))) {
+                        bool Xa = this->IsFlagSet(CaravanMenu::CAF_TRACK_SETUP);
+                        bool IsFlagSet = this->IsFlagSet(CaravanMenu::CAF_AI);
+                        UpdateGameHandTextures(!IsFlagSet, Xa);
+                        pHandAnimManager[isAI]->ActivateSequence(
+                            pHandAnimations[isAI][1], 0, false, 1.0f, 0.0f, nullptr
                         );
-                        if ((pCardTracks[2]->iSize && !this->IsFlagSet(CaravanMenu::CAF_AI)) ||
-                            (pCardTracks[3]->iSize && this->IsFlagSet(CaravanMenu::CAF_AI))) {
-                            bool Xa = this->IsFlagSet(CaravanMenu::CAF_TRACK_SETUP);
-                            bool IsFlagSet = this->IsFlagSet(CaravanMenu::CAF_AI);
-                            UpdateGameHandTextures(!IsFlagSet, Xa);
-                            pHandAnimManager[isAI]->ActivateSequence(
-                                pHandAnimations[isAI][1], 0, false, 1.0f, 0.0f, nullptr
-                            );
-                            NiUpdateData UpdateData1_14(0.0f, true, false);
-                            pHandGeometry[isAI]->Update(UpdateData1_14);
-                            pHandAnimManager[isAI]->DeactivateSequence(pHandAnimations[isAI][1], 0.0f);
-                            if (!this->IsFlagSet(CaravanMenu::CAF_AI)) {
-                                if (pCardTracks[2]->iSize) {
-                                    if (pCardTracks[3]->iSize) {
-                                        SetFlag(CaravanMenu::CAF_TRACK_SETUP, false);
-                                        InterfaceManager* v46 = InterfaceManager::Instance();
-                                        if (!v46->xTutorialManager.HasBeenShown(Interface::TUT_CARAVAN_GAME)) {
-                                            TESForm* v47 = TESForm::GetFormByEditorID("HelpCaravanContractWar");
-                                            BGSMessage* helpForm_3 = dynamic_cast<BGSMessage*>(v47);
-                                            if (helpForm_3) {
-                                                bTutorial = TutorialMenu::Create(helpForm_3, false);
-                                                InterfaceManager* v48 = InterfaceManager::Instance();
-                                                v48->xTutorialManager.FlagAsShown(Interface::TUT_CARAVAN_GAME);
-                                                iTutorial = 33;
-                                            }
-                                        }
-                                    }
+                        NiUpdateData UpdateData1_14(0.0f, true, false);
+                        pHandGeometry[isAI]->Update(UpdateData1_14);
+                        pHandAnimManager[isAI]->DeactivateSequence(pHandAnimations[isAI][1], 0.0f);
+                        if ((!this->IsFlagSet(CaravanMenu::CAF_AI)) && (pCardTracks[2]->iSize) &&
+                            (pCardTracks[3]->iSize)) {
+                            SetFlag(CaravanMenu::CAF_TRACK_SETUP, false);
+                            InterfaceManager* v46 = InterfaceManager::Instance();
+                            if (!v46->xTutorialManager.HasBeenShown(Interface::TUT_CARAVAN_GAME)) {
+                                TESForm* v47 = TESForm::GetFormByEditorID("HelpCaravanContractWar");
+                                BGSMessage* helpForm_3 = dynamic_cast<BGSMessage*>(v47);
+                                if (helpForm_3) {
+                                    bTutorial = TutorialMenu::Create(helpForm_3, false);
+                                    InterfaceManager* v48 = InterfaceManager::Instance();
+                                    v48->xTutorialManager.FlagAsShown(Interface::TUT_CARAVAN_GAME);
+                                    iTutorial = 33;
                                 }
                             }
                         }
-                        else {
-                            bool v49 = this->IsFlagSet(CaravanMenu::CAF_AI);
-                            UpdateGameHandTextures(!v49, true);
-                            pHandAnimManager[isAI]->ActivateSequence(
-                                pStartAnimations[isAI][0], 0, false, 1.0f, 0.0f, nullptr
-                            );
-                            NiUpdateData UpdateData1_15(0.0f, true, false);
-                            pHandGeometry[isAI]->Update(UpdateData1_15);
-                            pHandAnimManager[isAI]->DeactivateSequence(pStartAnimations[isAI][0], 0.0f);
-                        }
-                        pHandAnimManager[isAI]->DeactivateAll(0.0f);
-                        if (isAI == 1) {
-                            iSelectedDeckCard = pPlayerHand.iSize - 1;
-                            SelectDeckCard(false);
-                            if (this->IsFlagSet(CaravanMenu::CAF_TRACK_SETUP) &&
-                                pPlayerHand.operator[](iSelectedDeckCard)->data.iFaceValue > 10) {
-                                SetFlag(CaravanMenu::CAF_DISABLE_A, true);
-                            }
-                        }
-                        pTiles[isAI + 29]->Poke(CaravanMenu::iUT_Value, 1.0f);
-                        if (isAI) {
-                            auiValue = pNPCDeck.iSize;
-                        }
-                        else {
-                            auiValue = pPlayerDeck.iSize;
-                        }
-                        pTiles[isAI + 29]->Set(CaravanMenu::iUT_Value, auiValue);
-                        UpdateCaravanFlags();
-                        UpdateTileAlpha(CaravanMenu::TI_NO_TILE);
-                        eGameState = CaravanMenu::CA_GAME_PROCESS_AI;
                     }
+                    else {
+                        bool v49 = this->IsFlagSet(CaravanMenu::CAF_AI);
+                        UpdateGameHandTextures(!v49, true);
+                        pHandAnimManager[isAI]->ActivateSequence(
+                            pStartAnimations[isAI][0], 0, false, 1.0f, 0.0f, nullptr
+                        );
+                        NiUpdateData UpdateData1_15(0.0f, true, false);
+                        pHandGeometry[isAI]->Update(UpdateData1_15);
+                        pHandAnimManager[isAI]->DeactivateSequence(pStartAnimations[isAI][0], 0.0f);
+                    }
+                    pHandAnimManager[isAI]->DeactivateAll(0.0f);
+                    if (isAI == 1) {
+                        iSelectedDeckCard = pPlayerHand.iSize - 1;
+                        SelectDeckCard(false);
+                        if (this->IsFlagSet(CaravanMenu::CAF_TRACK_SETUP) &&
+                            pPlayerHand.operator[](iSelectedDeckCard)->data.iFaceValue > 10) {
+                            SetFlag(CaravanMenu::CAF_DISABLE_A, true);
+                        }
+                    }
+                    pTiles[isAI + 29]->Poke(CaravanMenu::iUT_Value, 1.0f);
+                    if (isAI) {
+                        auiValue = pNPCDeck.iSize;
+                    }
+                    else {
+                        auiValue = pPlayerDeck.iSize;
+                    }
+                    pTiles[isAI + 29]->Set(CaravanMenu::iUT_Value, auiValue);
+                    UpdateCaravanFlags();
+                    UpdateTileAlpha(CaravanMenu::TI_NO_TILE);
+                    eGameState = CaravanMenu::CA_GAME_PROCESS_AI;
                 }
             }
+
             return;
         }
         case CaravanMenu::CA_GAME_INTRO_DISCARD_ANIM: {
@@ -1849,10 +1839,9 @@ bool CaravanMenu::DoKey(int32_t a1) {
             if (a1 == 65) {
                 return DoGamepad(11, 0.0f);
             }
-            else {
-                if (a1 != 0x80000000u && a1 <= -0x7FFFFFFC && !eGameState) {
-                    unkE80 = a1;
-                }
+
+            if (a1 != 0x80000000u && a1 <= -0x7FFFFFFC && !eGameState) {
+                unkE80 = a1;
             }
         }
     }
@@ -2115,33 +2104,33 @@ bool CaravanMenu::DoGamepad(int32_t a1, float a2) {
             if (IsFlagSet(CaravanMenu::CAF_DISABLE_LT)) {
                 return false;
             }
-            if (eActiveMenu == CaravanMenu::CA_GAME_MENU && !IsFlagSet(CaravanMenu::CAF_SELECT_TRACK)) {
-                if (pPlayerDeck.iSize) {
-                    eGameState = static_cast<CaravanMenu::CaravanState>(
-                        IsFlagSet(CaravanMenu::CAF_TRACK_SETUP) ? CaravanMenu::CA_GAME_INTRO_DISCARD_ANIM
-                                                                : CaravanMenu::CA_GAME_DISCARDCARD_ANIM
-                    );
-                    if (iNextPlayerCard == -1) {
-                        TESCaravanCard* pTrackCard_4 = pPlayerHand.operator[](iSelectedDeckCard);
-                        pPlayerHand.Remove(iSelectedDeckCard, true);
+            if ((eActiveMenu == CaravanMenu::CA_GAME_MENU && !IsFlagSet(CaravanMenu::CAF_SELECT_TRACK)) &&
+                (pPlayerDeck.iSize)) {
+                eGameState = static_cast<CaravanMenu::CaravanState>(
+                    IsFlagSet(CaravanMenu::CAF_TRACK_SETUP) ? CaravanMenu::CA_GAME_INTRO_DISCARD_ANIM
+                                                            : CaravanMenu::CA_GAME_DISCARDCARD_ANIM
+                );
+                if (iNextPlayerCard == -1) {
+                    TESCaravanCard* pTrackCard_4 = pPlayerHand.operator[](iSelectedDeckCard);
+                    pPlayerHand.Remove(iSelectedDeckCard, true);
+                }
+                else {
+                    TESCaravanCard* pDeckCard_2 = pPlayerDeck.operator[](iNextPlayerCard);
+                    TESCaravanCard* pTrackCard_5 = pPlayerHand.operator[](iSelectedDeckCard);
+                    pPlayerHand.Remove(iSelectedDeckCard, true);
+                    pPlayerHand.Add(pDeckCard_2);
+                    pPlayerDeck.Remove(iNextPlayerCard, true);
+                    if (pPlayerDeck.iSize) {
+                        uint32_t v17 = pPlayerDeck.iSize;
+                        iNextPlayerCard = RandomInt(0, v17);
                     }
                     else {
-                        TESCaravanCard* pDeckCard_2 = pPlayerDeck.operator[](iNextPlayerCard);
-                        TESCaravanCard* pTrackCard_5 = pPlayerHand.operator[](iSelectedDeckCard);
-                        pPlayerHand.Remove(iSelectedDeckCard, true);
-                        pPlayerHand.Add(pDeckCard_2);
-                        pPlayerDeck.Remove(iNextPlayerCard, true);
-                        if (pPlayerDeck.iSize) {
-                            uint32_t v17 = pPlayerDeck.iSize;
-                            iNextPlayerCard = RandomInt(0, v17);
-                        }
-                        else {
-                            iNextPlayerCard = -1;
-                        }
-                        UpdateDealCardTexture(true);
+                        iNextPlayerCard = -1;
                     }
+                    UpdateDealCardTexture(true);
                 }
             }
+
             goto LABEL_135;
         }
         case 14: {
@@ -3294,294 +3283,242 @@ void CaravanMenu::SwapDeckBuildingTextures(int32_t aiTarget, bool abFastScrollin
     char apDest[28];
     char blockName[28];
     for (int32_t i = 0; i < 24; ++i) {
-        if (deckFaceShaders[i]) {
-            if (deckFaceShaders[i + 24]) {
-                if (deckFaceShaders[i + 48]) {
-                    if (deckFaceShaders[i + 72]) {
-                        uint32_t auiIndex = aiTarget - (11 - i);
-                        // Tests the difference's sign, then compares it unsigned.
-                        if (static_cast<int32_t>(auiIndex) >= 0 && auiIndex < iTotalCards) {
-                            NiAVObject* pFace_2;
-                            if (i >= 9) {
-                                BSsprintf(apString1, 25, "Deck_%i:%i", i + 1, i);
-                                pFace_2 = BSUtilities::GetObjectByName(
-                                    pActiveDeckGeometry, static_cast<const char*>(apString1)
-                                );
-                                pFace_2->SetTranslate(0.0f, 0.0f, 0.0f);
-                                BSsprintf(apString1, 25, "Deck_%i_Back:0", i + 1);
-                                pFace_2 = BSUtilities::GetObjectByName(
-                                    pActiveDeckGeometry, static_cast<const char*>(apString1)
-                                );
-                                pFace_2->SetTranslate(0.0f, 0.0f, 0.0f);
-                                BSsprintf(apString1, 25, "Available_%i:%i", i + 1, i);
-                                pFace_2 = BSUtilities::GetObjectByName(
-                                    pInactiveDeckGeometry, static_cast<const char*>(apString1)
-                                );
-                                pFace_2->SetTranslate(0.0f, 0.0f, 0.0f);
-                                BSsprintf(apString1, 25, "Available_%i_Back:0", i + 1);
-                                pFace_2 = BSUtilities::GetObjectByName(
-                                    pInactiveDeckGeometry, static_cast<const char*>(apString1)
-                                );
-                                pFace_2->SetTranslate(0.0f, 0.0f, 0.0f);
-                                if (i == 12 || i == 11) {
-                                    BSsprintf(apString1, 25, "Deck_%i_Shadow:0", i + 1);
-                                    pFace_2 = BSUtilities::GetObjectByName(
-                                        pActiveDeckGeometry, static_cast<const char*>(apString1)
-                                    );
-                                    NiPoint3 v39 = pFace_2->GetTranslate();
-                                    pFace_2->SetTranslate(v39.x, v39.y, 0.0f);
-                                    BSsprintf(apString1, 25, "Available_%i_Shadow:0", i + 1);
-                                    pFace_2 = BSUtilities::GetObjectByName(
-                                        pInactiveDeckGeometry, static_cast<const char*>(apString1)
-                                    );
-                                    v39 = pFace_2->GetTranslate();
-                                    pFace_2->SetTranslate(v39.x, v39.y, 0.0f);
-                                }
-                                else {
-                                    BSsprintf(apString1, 25, "Deck_%i_Shadow:0", i + 1);
-                                    pFace_2 = BSUtilities::GetObjectByName(
-                                        pActiveDeckGeometry, static_cast<const char*>(apString1)
-                                    );
-                                    pFace_2->SetTranslate(0.0f, 0.0f, 0.0f);
-                                    BSsprintf(apString1, 25, "Available_%i_Shadow:0", i + 1);
-                                    pFace_2 = BSUtilities::GetObjectByName(
-                                        pInactiveDeckGeometry, static_cast<const char*>(apString1)
-                                    );
-                                    pFace_2->SetTranslate(0.0f, 0.0f, 0.0f);
-                                }
-                            }
-                            else {
-                                BSsprintf(apName, 25, "Deck_0%i:%i", i + 1, i);
-                                pFace_2 =
-                                    BSUtilities::GetObjectByName(pActiveDeckGeometry, static_cast<const char*>(apName));
-                                pFace_2->SetTranslate(0.0f, 0.0f, 0.0f);
-                                BSsprintf(apName, 25, "Deck_0%i_Back:0", i + 1);
-                                pFace_2 =
-                                    BSUtilities::GetObjectByName(pActiveDeckGeometry, static_cast<const char*>(apName));
-                                pFace_2->SetTranslate(0.0f, 0.0f, 0.0f);
-                                BSsprintf(apName, 25, "Deck_0%i_Shadow:0", i + 1);
-                                pFace_2 =
-                                    BSUtilities::GetObjectByName(pActiveDeckGeometry, static_cast<const char*>(apName));
-                                pFace_2->SetTranslate(0.0f, 0.0f, 0.0f);
-                                BSsprintf(apName, 25, "Available_0%i:%i", i + 1, i);
-                                pFace_2 = BSUtilities::GetObjectByName(
-                                    pInactiveDeckGeometry, static_cast<const char*>(apName)
-                                );
-                                pFace_2->SetTranslate(0.0f, 0.0f, 0.0f);
-                                BSsprintf(apName, 25, "Available_0%i_Back:0", i + 1);
-                                pFace_2 = BSUtilities::GetObjectByName(
-                                    pInactiveDeckGeometry, static_cast<const char*>(apName)
-                                );
-                                pFace_2->SetTranslate(0.0f, 0.0f, 0.0f);
-                                BSsprintf(apName, 25, "Available_0%i_Shadow:0", i + 1);
-                                pFace_2 = BSUtilities::GetObjectByName(
-                                    pInactiveDeckGeometry, static_cast<const char*>(apName)
-                                );
-                                pFace_2->SetTranslate(0.0f, 0.0f, 0.0f);
-                            }
-                            NiUpdateData v33(0.0f, false, false);
-                            pInactiveDeckGeometry->Update(v33);
-                            NiUpdateData v32(0.0f, false, false);
-                            pActiveDeckGeometry->Update(v32);
-                            // The value is read and never used, as the game does.
-                            [[maybe_unused]] float DataFogFarPlane = deckFaceShaders[i]->fAlpha;
-                            if (pDeckArray.operator[](auiIndex)->bIsActive) {
-                                NiPointer<NiSourceTexture> textptr(static_cast<NiSourceTexture*>(nullptr));
-                                BSsprintf(
-                                    apInPath, 260, "%s%s", "Textures\\",
-                                    (&pDeckArray.operator[](auiIndex)->faceTexture)->GetTextureName()
-                                );
-                                SwapPlatformLanguageTexturePath(apInPath, acPath, 260u);
-                                TES::pInstance->CreateTextureImage(acPath, textptr, false, false);
-                                if (textptr.m_pObject) {
-                                    NiSourceTexture* a4n = textptr.m_pObject;
-                                    deckFaceShaders[i]->SetTexture(BSShaderProperty::TEXTYPE_DIFFUSE, 0, a4n);
-                                }
-                                BSsprintf(
-                                    apInPath, 260, "%s%s", "Textures\\",
-                                    (&pDeckArray.operator[](auiIndex)->backTexture)->GetTextureName()
-                                );
-                                SwapPlatformLanguageTexturePath(apInPath, acPath, 260u);
-                                TES::pInstance->CreateTextureImage(acPath, textptr, false, false);
-                                if (textptr.m_pObject) {
-                                    NiSourceTexture* a4o = textptr.m_pObject;
-                                    deckFaceShaders[i + 24]->SetTexture(BSShaderProperty::TEXTYPE_DIFFUSE, 0, a4o);
-                                }
-                                BSsprintf(
-                                    apInPath, 260, "%s%s", "Textures\\",
-                                    (&pDeckArray.operator[](auiIndex)->backTexture)->GetTextureName()
-                                );
-                                SwapPlatformLanguageTexturePath(apInPath, acPath, 260u);
-                                TES::pInstance->CreateTextureImage(acPath, textptr, false, false);
-                                if (textptr.m_pObject) {
-                                    NiSourceTexture* a4p = textptr.m_pObject;
-                                    deckFaceShaders[i + 48]->SetTexture(BSShaderProperty::TEXTYPE_DIFFUSE, 0, a4p);
-                                }
-                                BSsprintf(
-                                    apInPath, 260, "%s%s", "Textures\\",
-                                    (&pDeckArray.operator[](auiIndex)->faceTexture)->GetTextureName()
-                                );
-                                SwapPlatformLanguageTexturePath(apInPath, acPath, 260u);
-                                TES::pInstance->CreateTextureImage(acPath, textptr, false, false);
-                                if (textptr.m_pObject) {
-                                    NiSourceTexture* a4q = textptr.m_pObject;
-                                    deckFaceShaders[i + 72]->SetTexture(BSShaderProperty::TEXTYPE_DIFFUSE, 0, a4q);
-                                }
-                            }
-                            else {
-                                // Only the call is kept: the card's faceTexture address tested after it is never null.
-                                pDeckArray.operator[](auiIndex);
-                                {
-                                    NiPointer<NiSourceTexture> textptr_2(static_cast<NiSourceTexture*>(nullptr));
-                                    BSsprintf(
-                                        apInPath, 260, "%s%s", "Textures\\",
-                                        (&pDeckArray.operator[](auiIndex)->faceTexture)->GetTextureName()
-                                    );
-                                    SwapPlatformLanguageTexturePath(apInPath, acPath, 260u);
-                                    TES::pInstance->CreateTextureImage(acPath, textptr_2, false, false);
-                                    if (textptr_2.m_pObject) {
-                                        NiSourceTexture* a4r = textptr_2.m_pObject;
-                                        deckFaceShaders[i + 48]->SetTexture(BSShaderProperty::TEXTYPE_DIFFUSE, 0, a4r);
-                                    }
-                                    BSsprintf(
-                                        apInPath, 260, "%s%s", "Textures\\",
-                                        (&pDeckArray.operator[](auiIndex)->backTexture)->GetTextureName()
-                                    );
-                                    SwapPlatformLanguageTexturePath(apInPath, acPath, 260u);
-                                    TES::pInstance->CreateTextureImage(acPath, textptr_2, false, false);
-                                    if (textptr_2.m_pObject) {
-                                        NiSourceTexture* a4s = textptr_2.m_pObject;
-                                        deckFaceShaders[i + 72]->SetTexture(BSShaderProperty::TEXTYPE_DIFFUSE, 0, a4s);
-                                    }
-                                    BSsprintf(
-                                        apInPath, 260, "%s%s", "Textures\\",
-                                        (&pDeckArray.operator[](auiIndex)->backTexture)->GetTextureName()
-                                    );
-                                    SwapPlatformLanguageTexturePath(apInPath, acPath, 260u);
-                                    TES::pInstance->CreateTextureImage(acPath, textptr_2, false, false);
-                                    if (textptr_2.m_pObject) {
-                                        NiSourceTexture* a4t = textptr_2.m_pObject;
-                                        deckFaceShaders[i]->SetTexture(BSShaderProperty::TEXTYPE_DIFFUSE, 0, a4t);
-                                    }
-                                    BSsprintf(
-                                        apInPath, 260, "%s%s", "Textures\\",
-                                        (&pDeckArray.operator[](auiIndex)->faceTexture)->GetTextureName()
-                                    );
-                                    SwapPlatformLanguageTexturePath(apInPath, acPath, 260u);
-                                    TES::pInstance->CreateTextureImage(acPath, textptr_2, false, false);
-                                    if (textptr_2.m_pObject) {
-                                        NiSourceTexture* a4u = textptr_2.m_pObject;
-                                        deckFaceShaders[i + 24]->SetTexture(BSShaderProperty::TEXTYPE_DIFFUSE, 0, a4u);
-                                    }
-                                }
-                            }
+        if ((deckFaceShaders[i]) && (deckFaceShaders[i + 24]) && (deckFaceShaders[i + 48]) &&
+            (deckFaceShaders[i + 72])) {
+            uint32_t auiIndex = aiTarget - (11 - i);
+            // Tests the difference's sign, then compares it unsigned.
+            if (static_cast<int32_t>(auiIndex) >= 0 && auiIndex < iTotalCards) {
+                NiAVObject* pFace_2;
+                if (i >= 9) {
+                    BSsprintf(apString1, 25, "Deck_%i:%i", i + 1, i);
+                    pFace_2 = BSUtilities::GetObjectByName(pActiveDeckGeometry, static_cast<const char*>(apString1));
+                    pFace_2->SetTranslate(0.0f, 0.0f, 0.0f);
+                    BSsprintf(apString1, 25, "Deck_%i_Back:0", i + 1);
+                    pFace_2 = BSUtilities::GetObjectByName(pActiveDeckGeometry, static_cast<const char*>(apString1));
+                    pFace_2->SetTranslate(0.0f, 0.0f, 0.0f);
+                    BSsprintf(apString1, 25, "Available_%i:%i", i + 1, i);
+                    pFace_2 = BSUtilities::GetObjectByName(pInactiveDeckGeometry, static_cast<const char*>(apString1));
+                    pFace_2->SetTranslate(0.0f, 0.0f, 0.0f);
+                    BSsprintf(apString1, 25, "Available_%i_Back:0", i + 1);
+                    pFace_2 = BSUtilities::GetObjectByName(pInactiveDeckGeometry, static_cast<const char*>(apString1));
+                    pFace_2->SetTranslate(0.0f, 0.0f, 0.0f);
+                    if (i == 12 || i == 11) {
+                        BSsprintf(apString1, 25, "Deck_%i_Shadow:0", i + 1);
+                        pFace_2 =
+                            BSUtilities::GetObjectByName(pActiveDeckGeometry, static_cast<const char*>(apString1));
+                        NiPoint3 v39 = pFace_2->GetTranslate();
+                        pFace_2->SetTranslate(v39.x, v39.y, 0.0f);
+                        BSsprintf(apString1, 25, "Available_%i_Shadow:0", i + 1);
+                        pFace_2 =
+                            BSUtilities::GetObjectByName(pInactiveDeckGeometry, static_cast<const char*>(apString1));
+                        v39 = pFace_2->GetTranslate();
+                        pFace_2->SetTranslate(v39.x, v39.y, 0.0f);
+                    }
+                    else {
+                        BSsprintf(apString1, 25, "Deck_%i_Shadow:0", i + 1);
+                        pFace_2 =
+                            BSUtilities::GetObjectByName(pActiveDeckGeometry, static_cast<const char*>(apString1));
+                        pFace_2->SetTranslate(0.0f, 0.0f, 0.0f);
+                        BSsprintf(apString1, 25, "Available_%i_Shadow:0", i + 1);
+                        pFace_2 =
+                            BSUtilities::GetObjectByName(pInactiveDeckGeometry, static_cast<const char*>(apString1));
+                        pFace_2->SetTranslate(0.0f, 0.0f, 0.0f);
+                    }
+                }
+                else {
+                    BSsprintf(apName, 25, "Deck_0%i:%i", i + 1, i);
+                    pFace_2 = BSUtilities::GetObjectByName(pActiveDeckGeometry, static_cast<const char*>(apName));
+                    pFace_2->SetTranslate(0.0f, 0.0f, 0.0f);
+                    BSsprintf(apName, 25, "Deck_0%i_Back:0", i + 1);
+                    pFace_2 = BSUtilities::GetObjectByName(pActiveDeckGeometry, static_cast<const char*>(apName));
+                    pFace_2->SetTranslate(0.0f, 0.0f, 0.0f);
+                    BSsprintf(apName, 25, "Deck_0%i_Shadow:0", i + 1);
+                    pFace_2 = BSUtilities::GetObjectByName(pActiveDeckGeometry, static_cast<const char*>(apName));
+                    pFace_2->SetTranslate(0.0f, 0.0f, 0.0f);
+                    BSsprintf(apName, 25, "Available_0%i:%i", i + 1, i);
+                    pFace_2 = BSUtilities::GetObjectByName(pInactiveDeckGeometry, static_cast<const char*>(apName));
+                    pFace_2->SetTranslate(0.0f, 0.0f, 0.0f);
+                    BSsprintf(apName, 25, "Available_0%i_Back:0", i + 1);
+                    pFace_2 = BSUtilities::GetObjectByName(pInactiveDeckGeometry, static_cast<const char*>(apName));
+                    pFace_2->SetTranslate(0.0f, 0.0f, 0.0f);
+                    BSsprintf(apName, 25, "Available_0%i_Shadow:0", i + 1);
+                    pFace_2 = BSUtilities::GetObjectByName(pInactiveDeckGeometry, static_cast<const char*>(apName));
+                    pFace_2->SetTranslate(0.0f, 0.0f, 0.0f);
+                }
+                NiUpdateData v33(0.0f, false, false);
+                pInactiveDeckGeometry->Update(v33);
+                NiUpdateData v32(0.0f, false, false);
+                pActiveDeckGeometry->Update(v32);
+                // The value is read and never used, as the game does.
+                [[maybe_unused]] float DataFogFarPlane = deckFaceShaders[i]->fAlpha;
+                if (pDeckArray.operator[](auiIndex)->bIsActive) {
+                    NiPointer<NiSourceTexture> textptr(static_cast<NiSourceTexture*>(nullptr));
+                    BSsprintf(
+                        apInPath, 260, "%s%s", "Textures\\",
+                        (&pDeckArray.operator[](auiIndex)->faceTexture)->GetTextureName()
+                    );
+                    SwapPlatformLanguageTexturePath(apInPath, acPath, 260u);
+                    TES::pInstance->CreateTextureImage(acPath, textptr, false, false);
+                    if (textptr.m_pObject) {
+                        NiSourceTexture* a4n = textptr.m_pObject;
+                        deckFaceShaders[i]->SetTexture(BSShaderProperty::TEXTYPE_DIFFUSE, 0, a4n);
+                    }
+                    BSsprintf(
+                        apInPath, 260, "%s%s", "Textures\\",
+                        (&pDeckArray.operator[](auiIndex)->backTexture)->GetTextureName()
+                    );
+                    SwapPlatformLanguageTexturePath(apInPath, acPath, 260u);
+                    TES::pInstance->CreateTextureImage(acPath, textptr, false, false);
+                    if (textptr.m_pObject) {
+                        NiSourceTexture* a4o = textptr.m_pObject;
+                        deckFaceShaders[i + 24]->SetTexture(BSShaderProperty::TEXTYPE_DIFFUSE, 0, a4o);
+                    }
+                    BSsprintf(
+                        apInPath, 260, "%s%s", "Textures\\",
+                        (&pDeckArray.operator[](auiIndex)->backTexture)->GetTextureName()
+                    );
+                    SwapPlatformLanguageTexturePath(apInPath, acPath, 260u);
+                    TES::pInstance->CreateTextureImage(acPath, textptr, false, false);
+                    if (textptr.m_pObject) {
+                        NiSourceTexture* a4p = textptr.m_pObject;
+                        deckFaceShaders[i + 48]->SetTexture(BSShaderProperty::TEXTYPE_DIFFUSE, 0, a4p);
+                    }
+                    BSsprintf(
+                        apInPath, 260, "%s%s", "Textures\\",
+                        (&pDeckArray.operator[](auiIndex)->faceTexture)->GetTextureName()
+                    );
+                    SwapPlatformLanguageTexturePath(apInPath, acPath, 260u);
+                    TES::pInstance->CreateTextureImage(acPath, textptr, false, false);
+                    if (textptr.m_pObject) {
+                        NiSourceTexture* a4q = textptr.m_pObject;
+                        deckFaceShaders[i + 72]->SetTexture(BSShaderProperty::TEXTYPE_DIFFUSE, 0, a4q);
+                    }
+                }
+                else {
+                    // Only the call is kept: the card's faceTexture address tested after it is never null.
+                    pDeckArray.operator[](auiIndex);
+                    {
+                        NiPointer<NiSourceTexture> textptr_2(static_cast<NiSourceTexture*>(nullptr));
+                        BSsprintf(
+                            apInPath, 260, "%s%s", "Textures\\",
+                            (&pDeckArray.operator[](auiIndex)->faceTexture)->GetTextureName()
+                        );
+                        SwapPlatformLanguageTexturePath(apInPath, acPath, 260u);
+                        TES::pInstance->CreateTextureImage(acPath, textptr_2, false, false);
+                        if (textptr_2.m_pObject) {
+                            NiSourceTexture* a4r = textptr_2.m_pObject;
+                            deckFaceShaders[i + 48]->SetTexture(BSShaderProperty::TEXTYPE_DIFFUSE, 0, a4r);
                         }
-                        else {
-                            NiAVObject* pFace;
-                            // The z offset is kept as an int and converted at each use.
-                            int32_t iZ = -50;
-                            if (abFastScrolling) {
-                                iZ = 0;
-                            }
-                            if (i >= 9) {
-                                BSsprintf(apDest, 25, "Deck_%i:%i", i + 1, i);
-                                pFace =
-                                    BSUtilities::GetObjectByName(pActiveDeckGeometry, static_cast<const char*>(apDest));
-                                float a4f = static_cast<float>(iZ);
-                                pFace->SetTranslate(0.0f, 0.0f, a4f);
-                                BSsprintf(apDest, 25, "Deck_%i_Back:0", i + 1);
-                                pFace =
-                                    BSUtilities::GetObjectByName(pActiveDeckGeometry, static_cast<const char*>(apDest));
-                                float a4g = static_cast<float>(iZ);
-                                pFace->SetTranslate(0.0f, 0.0f, a4g);
-                                BSsprintf(apDest, 25, "Available_%i:%i", i + 1, i);
-                                pFace = BSUtilities::GetObjectByName(
-                                    pInactiveDeckGeometry, static_cast<const char*>(apDest)
-                                );
-                                float a4h = static_cast<float>(iZ);
-                                pFace->SetTranslate(0.0f, 0.0f, a4h);
-                                BSsprintf(apDest, 25, "Available_%i_Back:0", i + 1);
-                                pFace = BSUtilities::GetObjectByName(
-                                    pInactiveDeckGeometry, static_cast<const char*>(apDest)
-                                );
-                                float a4i = static_cast<float>(iZ);
-                                pFace->SetTranslate(0.0f, 0.0f, a4i);
-                                if (i == 12 || i == 11) {
-                                    BSsprintf(apDest, 25, "Deck_%i_Shadow:0", i + 1);
-                                    pFace = BSUtilities::GetObjectByName(
-                                        pActiveDeckGeometry, static_cast<const char*>(apDest)
-                                    );
-                                    NiPoint3 v44 = pFace->GetTranslate();
-                                    float a4l = static_cast<float>(iZ);
-                                    pFace->SetTranslate(v44.x, v44.y, a4l);
-                                    BSsprintf(apDest, 25, "Available_%i_Shadow:0", i + 1);
-                                    pFace = BSUtilities::GetObjectByName(
-                                        pInactiveDeckGeometry, static_cast<const char*>(apDest)
-                                    );
-                                    v44 = pFace->GetTranslate();
-                                    float a4m = static_cast<float>(iZ);
-                                    pFace->SetTranslate(v44.x, v44.y, a4m);
-                                }
-                                else {
-                                    BSsprintf(apDest, 25, "Deck_%i_Shadow:0", i + 1);
-                                    pFace = BSUtilities::GetObjectByName(
-                                        pActiveDeckGeometry, static_cast<const char*>(apDest)
-                                    );
-                                    float a4j = static_cast<float>(iZ);
-                                    pFace->SetTranslate(0.0f, 0.0f, a4j);
-                                    BSsprintf(apDest, 25, "Available_%i_Shadow:0", i + 1);
-                                    pFace = BSUtilities::GetObjectByName(
-                                        pInactiveDeckGeometry, static_cast<const char*>(apDest)
-                                    );
-                                    float a4k = static_cast<float>(iZ);
-                                    pFace->SetTranslate(0.0f, 0.0f, a4k);
-                                }
-                            }
-                            else {
-                                BSsprintf(blockName, 25, "Deck_0%i:%i", i + 1, i);
-                                pFace = BSUtilities::GetObjectByName(
-                                    pActiveDeckGeometry, static_cast<const char*>(blockName)
-                                );
-                                float a4 = static_cast<float>(iZ);
-                                pFace->SetTranslate(0.0f, 0.0f, a4);
-                                BSsprintf(blockName, 25, "Deck_0%i_Back:0", i + 1);
-                                pFace = BSUtilities::GetObjectByName(
-                                    pActiveDeckGeometry, static_cast<const char*>(blockName)
-                                );
-                                float a4a = static_cast<float>(iZ);
-                                pFace->SetTranslate(0.0f, 0.0f, a4a);
-                                BSsprintf(blockName, 25, "Available_0%i:%i", i + 1, i);
-                                pFace = BSUtilities::GetObjectByName(
-                                    pInactiveDeckGeometry, static_cast<const char*>(blockName)
-                                );
-                                float a4b = static_cast<float>(iZ);
-                                pFace->SetTranslate(0.0f, 0.0f, a4b);
-                                BSsprintf(blockName, 25, "Available_0%i_Back:0", i + 1);
-                                pFace = BSUtilities::GetObjectByName(
-                                    pInactiveDeckGeometry, static_cast<const char*>(blockName)
-                                );
-                                float a4c = static_cast<float>(iZ);
-                                pFace->SetTranslate(0.0f, 0.0f, a4c);
-                                BSsprintf(blockName, 25, "Deck_0%i_Shadow:0", i + 1);
-                                pFace = BSUtilities::GetObjectByName(
-                                    pActiveDeckGeometry, static_cast<const char*>(blockName)
-                                );
-                                float a4d = static_cast<float>(iZ);
-                                pFace->SetTranslate(0.0f, 0.0f, a4d);
-                                BSsprintf(blockName, 25, "Available_0%i_Shadow:0", i + 1);
-                                pFace = BSUtilities::GetObjectByName(
-                                    pInactiveDeckGeometry, static_cast<const char*>(blockName)
-                                );
-                                float a4e = static_cast<float>(iZ);
-                                pFace->SetTranslate(0.0f, 0.0f, a4e);
-                            }
-                            NiUpdateData apMemory(0.0f, false, false);
-                            pInactiveDeckGeometry->Update(apMemory);
-                            NiUpdateData v34(0.0f, false, false);
-                            pActiveDeckGeometry->Update(v34);
+                        BSsprintf(
+                            apInPath, 260, "%s%s", "Textures\\",
+                            (&pDeckArray.operator[](auiIndex)->backTexture)->GetTextureName()
+                        );
+                        SwapPlatformLanguageTexturePath(apInPath, acPath, 260u);
+                        TES::pInstance->CreateTextureImage(acPath, textptr_2, false, false);
+                        if (textptr_2.m_pObject) {
+                            NiSourceTexture* a4s = textptr_2.m_pObject;
+                            deckFaceShaders[i + 72]->SetTexture(BSShaderProperty::TEXTYPE_DIFFUSE, 0, a4s);
+                        }
+                        BSsprintf(
+                            apInPath, 260, "%s%s", "Textures\\",
+                            (&pDeckArray.operator[](auiIndex)->backTexture)->GetTextureName()
+                        );
+                        SwapPlatformLanguageTexturePath(apInPath, acPath, 260u);
+                        TES::pInstance->CreateTextureImage(acPath, textptr_2, false, false);
+                        if (textptr_2.m_pObject) {
+                            NiSourceTexture* a4t = textptr_2.m_pObject;
+                            deckFaceShaders[i]->SetTexture(BSShaderProperty::TEXTYPE_DIFFUSE, 0, a4t);
+                        }
+                        BSsprintf(
+                            apInPath, 260, "%s%s", "Textures\\",
+                            (&pDeckArray.operator[](auiIndex)->faceTexture)->GetTextureName()
+                        );
+                        SwapPlatformLanguageTexturePath(apInPath, acPath, 260u);
+                        TES::pInstance->CreateTextureImage(acPath, textptr_2, false, false);
+                        if (textptr_2.m_pObject) {
+                            NiSourceTexture* a4u = textptr_2.m_pObject;
+                            deckFaceShaders[i + 24]->SetTexture(BSShaderProperty::TEXTYPE_DIFFUSE, 0, a4u);
                         }
                     }
                 }
+            }
+            else {
+                NiAVObject* pFace;
+                // The z offset is kept as an int and converted at each use.
+                int32_t iZ = -50;
+                if (abFastScrolling) {
+                    iZ = 0;
+                }
+                if (i >= 9) {
+                    BSsprintf(apDest, 25, "Deck_%i:%i", i + 1, i);
+                    pFace = BSUtilities::GetObjectByName(pActiveDeckGeometry, static_cast<const char*>(apDest));
+                    float a4f = static_cast<float>(iZ);
+                    pFace->SetTranslate(0.0f, 0.0f, a4f);
+                    BSsprintf(apDest, 25, "Deck_%i_Back:0", i + 1);
+                    pFace = BSUtilities::GetObjectByName(pActiveDeckGeometry, static_cast<const char*>(apDest));
+                    float a4g = static_cast<float>(iZ);
+                    pFace->SetTranslate(0.0f, 0.0f, a4g);
+                    BSsprintf(apDest, 25, "Available_%i:%i", i + 1, i);
+                    pFace = BSUtilities::GetObjectByName(pInactiveDeckGeometry, static_cast<const char*>(apDest));
+                    float a4h = static_cast<float>(iZ);
+                    pFace->SetTranslate(0.0f, 0.0f, a4h);
+                    BSsprintf(apDest, 25, "Available_%i_Back:0", i + 1);
+                    pFace = BSUtilities::GetObjectByName(pInactiveDeckGeometry, static_cast<const char*>(apDest));
+                    float a4i = static_cast<float>(iZ);
+                    pFace->SetTranslate(0.0f, 0.0f, a4i);
+                    if (i == 12 || i == 11) {
+                        BSsprintf(apDest, 25, "Deck_%i_Shadow:0", i + 1);
+                        pFace = BSUtilities::GetObjectByName(pActiveDeckGeometry, static_cast<const char*>(apDest));
+                        NiPoint3 v44 = pFace->GetTranslate();
+                        float a4l = static_cast<float>(iZ);
+                        pFace->SetTranslate(v44.x, v44.y, a4l);
+                        BSsprintf(apDest, 25, "Available_%i_Shadow:0", i + 1);
+                        pFace = BSUtilities::GetObjectByName(pInactiveDeckGeometry, static_cast<const char*>(apDest));
+                        v44 = pFace->GetTranslate();
+                        float a4m = static_cast<float>(iZ);
+                        pFace->SetTranslate(v44.x, v44.y, a4m);
+                    }
+                    else {
+                        BSsprintf(apDest, 25, "Deck_%i_Shadow:0", i + 1);
+                        pFace = BSUtilities::GetObjectByName(pActiveDeckGeometry, static_cast<const char*>(apDest));
+                        float a4j = static_cast<float>(iZ);
+                        pFace->SetTranslate(0.0f, 0.0f, a4j);
+                        BSsprintf(apDest, 25, "Available_%i_Shadow:0", i + 1);
+                        pFace = BSUtilities::GetObjectByName(pInactiveDeckGeometry, static_cast<const char*>(apDest));
+                        float a4k = static_cast<float>(iZ);
+                        pFace->SetTranslate(0.0f, 0.0f, a4k);
+                    }
+                }
+                else {
+                    BSsprintf(blockName, 25, "Deck_0%i:%i", i + 1, i);
+                    pFace = BSUtilities::GetObjectByName(pActiveDeckGeometry, static_cast<const char*>(blockName));
+                    float a4 = static_cast<float>(iZ);
+                    pFace->SetTranslate(0.0f, 0.0f, a4);
+                    BSsprintf(blockName, 25, "Deck_0%i_Back:0", i + 1);
+                    pFace = BSUtilities::GetObjectByName(pActiveDeckGeometry, static_cast<const char*>(blockName));
+                    float a4a = static_cast<float>(iZ);
+                    pFace->SetTranslate(0.0f, 0.0f, a4a);
+                    BSsprintf(blockName, 25, "Available_0%i:%i", i + 1, i);
+                    pFace = BSUtilities::GetObjectByName(pInactiveDeckGeometry, static_cast<const char*>(blockName));
+                    float a4b = static_cast<float>(iZ);
+                    pFace->SetTranslate(0.0f, 0.0f, a4b);
+                    BSsprintf(blockName, 25, "Available_0%i_Back:0", i + 1);
+                    pFace = BSUtilities::GetObjectByName(pInactiveDeckGeometry, static_cast<const char*>(blockName));
+                    float a4c = static_cast<float>(iZ);
+                    pFace->SetTranslate(0.0f, 0.0f, a4c);
+                    BSsprintf(blockName, 25, "Deck_0%i_Shadow:0", i + 1);
+                    pFace = BSUtilities::GetObjectByName(pActiveDeckGeometry, static_cast<const char*>(blockName));
+                    float a4d = static_cast<float>(iZ);
+                    pFace->SetTranslate(0.0f, 0.0f, a4d);
+                    BSsprintf(blockName, 25, "Available_0%i_Shadow:0", i + 1);
+                    pFace = BSUtilities::GetObjectByName(pInactiveDeckGeometry, static_cast<const char*>(blockName));
+                    float a4e = static_cast<float>(iZ);
+                    pFace->SetTranslate(0.0f, 0.0f, a4e);
+                }
+                NiUpdateData apMemory(0.0f, false, false);
+                pInactiveDeckGeometry->Update(apMemory);
+                NiUpdateData v34(0.0f, false, false);
+                pActiveDeckGeometry->Update(v34);
             }
         }
     }
@@ -3710,16 +3647,15 @@ void CaravanMenu::UpdateDealCardTexture(bool abPlayer) {
 }
 
 void CaravanMenu::SelectDeckCard(bool abUnselectOnly) {
-    if (pSelectedObject) {
-        if ((&pSelectedObject->GetTranslate())->z > 0.0) {
-            pSelectedObject->SetTranslate(0.0f, (&pSelectedObject->GetTranslate())->y, 0.0f);
-            NiUpdateData kUpdate1(0.0f, false, false);
-            pSelectedObject->Update(kUpdate1);
-            pSelectedShadow->SetTranslate(0.0f, (&pSelectedObject->GetTranslate())->y, 0.0f);
-            NiUpdateData kUpdate2(0.0f, false, false);
-            pSelectedShadow->Update(kUpdate2);
-        }
+    if ((pSelectedObject) && ((&pSelectedObject->GetTranslate())->z > 0.0)) {
+        pSelectedObject->SetTranslate(0.0f, (&pSelectedObject->GetTranslate())->y, 0.0f);
+        NiUpdateData kUpdate1(0.0f, false, false);
+        pSelectedObject->Update(kUpdate1);
+        pSelectedShadow->SetTranslate(0.0f, (&pSelectedObject->GetTranslate())->y, 0.0f);
+        NiUpdateData kUpdate2(0.0f, false, false);
+        pSelectedShadow->Update(kUpdate2);
     }
+
     if (!abUnselectOnly) {
         char blockName[32];
         BSsprintf(blockName, 30, "Player-Deck_0%i:%i", iSelectedDeckCard + 1, iSelectedDeckCard);
@@ -3867,36 +3803,35 @@ void CaravanMenu::HandleTrackSelection(int32_t aiXShift, int32_t aiYShift) {
             this->iSelectedTrack = BSMIN(v3, 2);
         }
     }
-    if (aiYShift) {
-        if (iSelectedRow == this->iSelectedRow) {
+    if ((aiYShift) && (iSelectedRow == this->iSelectedRow)) {
+        if (this->iSelectedTrack >= 3) {
+            this->iSelectedRow -= aiYShift;
+            int32_t v6 = this->iSelectedRow;
+        }
+        else {
+            this->iSelectedRow += aiYShift;
+            int32_t v5 = this->iSelectedRow;
+        }
+        int32_t v10 = this->iSelectedRow;
+        if (v10 == -1) {
             if (this->iSelectedTrack >= 3) {
-                this->iSelectedRow -= aiYShift;
-                int32_t v6 = this->iSelectedRow;
+                this->iSelectedTrack = 5 - iSelectedTrack;
+                int32_t v8 = this->iSelectedTrack;
             }
             else {
-                this->iSelectedRow += aiYShift;
-                int32_t v5 = this->iSelectedRow;
+                this->iSelectedTrack = 5 - iSelectedTrack;
+                int32_t v7 = this->iSelectedTrack;
             }
-            int32_t v10 = this->iSelectedRow;
-            if (v10 == -1) {
-                if (this->iSelectedTrack >= 3) {
-                    this->iSelectedTrack = 5 - iSelectedTrack;
-                    int32_t v8 = this->iSelectedTrack;
-                }
-                else {
-                    this->iSelectedTrack = 5 - iSelectedTrack;
-                    int32_t v7 = this->iSelectedTrack;
-                }
-                int32_t v9 = this->iSelectedTrack;
-                this->iSelectedRow = 0;
-            }
-            else {
-                if (this->iSelectedRow == 7) {
-                    this->iSelectedRow = 6;
-                }
+            int32_t v9 = this->iSelectedTrack;
+            this->iSelectedRow = 0;
+        }
+        else {
+            if (this->iSelectedRow == 7) {
+                this->iSelectedRow = 6;
             }
         }
     }
+
     if (aiXShift == aiYShift && !aiXShift) {
         this->iSelectedTrack = 0;
         this->iSelectedRow = 0;
@@ -3934,14 +3869,12 @@ void CaravanMenu::LoadNewBill(int32_t a1) {
             }
         }
         else {
-            if (v16 == 2) {
-                if (Controller) {
-                    NiFixedString* v3 = ::new (static_cast<void*>(&v7)) NiFixedString("Alt_Place");
-                    a2 = Controller->GetSequenceByName(*v3);
-                    v7.~NiFixedString();
-                    Controller->ActivateSequence(a2, 0, false, 1.0f, 0.0f, nullptr);
-                    NiTimeController::StartAnimations(a1a);
-                }
+            if ((v16 == 2) && (Controller)) {
+                NiFixedString* v3 = ::new (static_cast<void*>(&v7)) NiFixedString("Alt_Place");
+                a2 = Controller->GetSequenceByName(*v3);
+                v7.~NiFixedString();
+                Controller->ActivateSequence(a2, 0, false, 1.0f, 0.0f, nullptr);
+                NiTimeController::StartAnimations(a1a);
             }
         }
     }
@@ -3970,14 +3903,12 @@ void CaravanMenu::LoadNewCoin(int32_t a1) {
     NiControllerManager* Controller =
         static_cast<NiControllerManager*>(a1a->GetController(&NiControllerManager::ms_RTTI));
     if (v13) {
-        if (v13 == 1) {
-            if (Controller) {
-                NiFixedString* v3 = ::new (static_cast<void*>(&v6)) NiFixedString("Bottom_Place");
-                a2 = Controller->GetSequenceByName(*v3);
-                v6.~NiFixedString();
-                Controller->ActivateSequence(a2, 0, false, 1.0f, 0.0f, nullptr);
-                NiTimeController::StartAnimations(a1a);
-            }
+        if ((v13 == 1) && (Controller)) {
+            NiFixedString* v3 = ::new (static_cast<void*>(&v6)) NiFixedString("Bottom_Place");
+            a2 = Controller->GetSequenceByName(*v3);
+            v6.~NiFixedString();
+            Controller->ActivateSequence(a2, 0, false, 1.0f, 0.0f, nullptr);
+            NiTimeController::StartAnimations(a1a);
         }
     }
     else {
@@ -4014,9 +3945,8 @@ int32_t CaravanMenu::CalculateWinningState(int32_t aivalue) {
     if (aivalue >= 21) {
         return (int32_t)((uint8_t)(aivalue > 26));
     }
-    else {
-        return (-1);
-    }
+
+    return (-1);
 }
 
 uint32_t CaravanMenu::LoadNifs2() {
@@ -4229,11 +4159,9 @@ void CaravanMenu::PrepareBettingCurrency() {
     for (BSSimpleList<ItemChange*>* pNode = pPlayerContainer->pListofChanges; pNode && pNode->m_item;
          pNode = pNode->m_pkNext) {
         TESBoundObject* pObject = pNode->m_item->pContainerObj;
-        if (pObject) {
-            if (pObject->GetFormType() == CMNY_ID && pNode->m_item->iNumber > 0) {
-                int32_t iCount = pNode->m_item->iNumber;
-                iTotalFunds += iCount * TESValueForm::GetFormValue(pObject);
-            }
+        if ((pObject) && (pObject->GetFormType() == CMNY_ID && pNode->m_item->iNumber > 0)) {
+            int32_t iCount = pNode->m_item->iNumber;
+            iTotalFunds += iCount * TESValueForm::GetFormValue(pObject);
         }
     }
     iNPCTotalFunds = 0;
@@ -4243,11 +4171,9 @@ void CaravanMenu::PrepareBettingCurrency() {
     for (BSSimpleList<ItemChange*>* pNode = pNPCContainer->pListofChanges; pNode && pNode->m_item;
          pNode = pNode->m_pkNext) {
         TESBoundObject* pObject = pNode->m_item->pContainerObj;
-        if (pObject) {
-            if (pObject->GetFormType() == CMNY_ID && pNode->m_item->iNumber > 0) {
-                int32_t iCount = pNode->m_item->iNumber;
-                iNPCTotalFunds += iCount * TESValueForm::GetFormValue(pObject);
-            }
+        if ((pObject) && (pObject->GetFormType() == CMNY_ID && pNode->m_item->iNumber > 0)) {
+            int32_t iCount = pNode->m_item->iNumber;
+            iNPCTotalFunds += iCount * TESValueForm::GetFormValue(pObject);
         }
     }
 }
@@ -4657,112 +4583,88 @@ void CaravanMenu::PrepareResultsMenu() {
 }
 
 void CaravanMenu::FlipSelectedCardTextures(int32_t aiTarget) {
-    if (deckFaceShaders[12]) {
-        if (deckFaceShaders[36]) {
-            if (deckFaceShaders[60]) {
-                if (deckFaceShaders[84]) {
-                    char apDest[268];
-                    // Language-swapped path buffer.
-                    char acPath[268];
-                    int32_t index = static_cast<int32_t>(pTiles[15]->GetFloat(CaravanMenu::iUT_CurrentValue));
-                    if (pDeckArray.operator[](index)->bIsActive) {
-                        NiPointer<NiSourceTexture> textptr(static_cast<NiSourceTexture*>(nullptr));
-                        BSsprintf(
-                            apDest, 260, "%s%s", "Textures\\",
-                            (&pDeckArray.operator[](index)->faceTexture)->GetTextureName()
-                        );
-                        SwapPlatformLanguageTexturePath(apDest, acPath, 260u);
-                        TES::pInstance->CreateTextureImage(acPath, textptr, false, false);
-                        if (textptr.m_pObject) {
-                            deckFaceShaders[aiTarget]->SetTexture(
-                                BSShaderProperty::TEXTYPE_DIFFUSE, 0, textptr.m_pObject
-                            );
-                        }
-                        BSsprintf(
-                            apDest, 260, "%s%s", "Textures\\",
-                            (&pDeckArray.operator[](index)->backTexture)->GetTextureName()
-                        );
-                        SwapPlatformLanguageTexturePath(apDest, acPath, 260u);
-                        TES::pInstance->CreateTextureImage(acPath, textptr, false, false);
-                        if (textptr.m_pObject) {
-                            deckFaceShaders[aiTarget + 24]->SetTexture(
-                                BSShaderProperty::TEXTYPE_DIFFUSE, 0, textptr.m_pObject
-                            );
-                        }
-                        BSsprintf(
-                            apDest, 260, "%s%s", "Textures\\",
-                            (&pDeckArray.operator[](index)->backTexture)->GetTextureName()
-                        );
-                        SwapPlatformLanguageTexturePath(apDest, acPath, 260u);
-                        TES::pInstance->CreateTextureImage(acPath, textptr, false, false);
-                        if (textptr.m_pObject) {
-                            deckFaceShaders[aiTarget + 48]->SetTexture(
-                                BSShaderProperty::TEXTYPE_DIFFUSE, 0, textptr.m_pObject
-                            );
-                        }
-                        BSsprintf(
-                            apDest, 260, "%s%s", "Textures\\",
-                            (&pDeckArray.operator[](index)->faceTexture)->GetTextureName()
-                        );
-                        SwapPlatformLanguageTexturePath(apDest, acPath, 260u);
-                        TES::pInstance->CreateTextureImage(acPath, textptr, false, false);
-                        if (textptr.m_pObject) {
-                            deckFaceShaders[aiTarget + 72]->SetTexture(
-                                BSShaderProperty::TEXTYPE_DIFFUSE, 0, textptr.m_pObject
-                            );
-                        }
-                    }
-                    else {
-                        // Only the call is kept: the card's faceTexture address tested after it is never null.
-                        pDeckArray.operator[](index);
-                        {
-                            NiPointer<NiSourceTexture> textptr_2(static_cast<NiSourceTexture*>(nullptr));
-                            BSsprintf(
-                                apDest, 260, "%s%s", "Textures\\",
-                                (&pDeckArray.operator[](index)->faceTexture)->GetTextureName()
-                            );
-                            SwapPlatformLanguageTexturePath(apDest, acPath, 260u);
-                            TES::pInstance->CreateTextureImage(acPath, textptr_2, false, false);
-                            if (textptr_2.m_pObject) {
-                                deckFaceShaders[aiTarget + 48]->SetTexture(
-                                    BSShaderProperty::TEXTYPE_DIFFUSE, 0, textptr_2.m_pObject
-                                );
-                            }
-                            BSsprintf(
-                                apDest, 260, "%s%s", "Textures\\",
-                                (&pDeckArray.operator[](index)->backTexture)->GetTextureName()
-                            );
-                            SwapPlatformLanguageTexturePath(apDest, acPath, 260u);
-                            TES::pInstance->CreateTextureImage(acPath, textptr_2, false, false);
-                            if (textptr_2.m_pObject) {
-                                deckFaceShaders[aiTarget + 72]->SetTexture(
-                                    BSShaderProperty::TEXTYPE_DIFFUSE, 0, textptr_2.m_pObject
-                                );
-                            }
-                            BSsprintf(
-                                apDest, 260, "%s%s", "Textures\\",
-                                (&pDeckArray.operator[](index)->backTexture)->GetTextureName()
-                            );
-                            SwapPlatformLanguageTexturePath(apDest, acPath, 260u);
-                            TES::pInstance->CreateTextureImage(acPath, textptr_2, false, false);
-                            if (textptr_2.m_pObject) {
-                                deckFaceShaders[aiTarget]->SetTexture(
-                                    BSShaderProperty::TEXTYPE_DIFFUSE, 0, textptr_2.m_pObject
-                                );
-                            }
-                            BSsprintf(
-                                apDest, 260, "%s%s", "Textures\\",
-                                (&pDeckArray.operator[](index)->faceTexture)->GetTextureName()
-                            );
-                            SwapPlatformLanguageTexturePath(apDest, acPath, 260u);
-                            TES::pInstance->CreateTextureImage(acPath, textptr_2, false, false);
-                            if (textptr_2.m_pObject) {
-                                deckFaceShaders[aiTarget + 24]->SetTexture(
-                                    BSShaderProperty::TEXTYPE_DIFFUSE, 0, textptr_2.m_pObject
-                                );
-                            }
-                        }
-                    }
+    if ((deckFaceShaders[12]) && (deckFaceShaders[36]) && (deckFaceShaders[60]) && (deckFaceShaders[84])) {
+        char apDest[268];
+        // Language-swapped path buffer.
+        char acPath[268];
+        int32_t index = static_cast<int32_t>(pTiles[15]->GetFloat(CaravanMenu::iUT_CurrentValue));
+        if (pDeckArray.operator[](index)->bIsActive) {
+            NiPointer<NiSourceTexture> textptr(static_cast<NiSourceTexture*>(nullptr));
+            BSsprintf(
+                apDest, 260, "%s%s", "Textures\\", (&pDeckArray.operator[](index)->faceTexture)->GetTextureName()
+            );
+            SwapPlatformLanguageTexturePath(apDest, acPath, 260u);
+            TES::pInstance->CreateTextureImage(acPath, textptr, false, false);
+            if (textptr.m_pObject) {
+                deckFaceShaders[aiTarget]->SetTexture(BSShaderProperty::TEXTYPE_DIFFUSE, 0, textptr.m_pObject);
+            }
+            BSsprintf(
+                apDest, 260, "%s%s", "Textures\\", (&pDeckArray.operator[](index)->backTexture)->GetTextureName()
+            );
+            SwapPlatformLanguageTexturePath(apDest, acPath, 260u);
+            TES::pInstance->CreateTextureImage(acPath, textptr, false, false);
+            if (textptr.m_pObject) {
+                deckFaceShaders[aiTarget + 24]->SetTexture(BSShaderProperty::TEXTYPE_DIFFUSE, 0, textptr.m_pObject);
+            }
+            BSsprintf(
+                apDest, 260, "%s%s", "Textures\\", (&pDeckArray.operator[](index)->backTexture)->GetTextureName()
+            );
+            SwapPlatformLanguageTexturePath(apDest, acPath, 260u);
+            TES::pInstance->CreateTextureImage(acPath, textptr, false, false);
+            if (textptr.m_pObject) {
+                deckFaceShaders[aiTarget + 48]->SetTexture(BSShaderProperty::TEXTYPE_DIFFUSE, 0, textptr.m_pObject);
+            }
+            BSsprintf(
+                apDest, 260, "%s%s", "Textures\\", (&pDeckArray.operator[](index)->faceTexture)->GetTextureName()
+            );
+            SwapPlatformLanguageTexturePath(apDest, acPath, 260u);
+            TES::pInstance->CreateTextureImage(acPath, textptr, false, false);
+            if (textptr.m_pObject) {
+                deckFaceShaders[aiTarget + 72]->SetTexture(BSShaderProperty::TEXTYPE_DIFFUSE, 0, textptr.m_pObject);
+            }
+        }
+        else {
+            // Only the call is kept: the card's faceTexture address tested after it is never null.
+            pDeckArray.operator[](index);
+            {
+                NiPointer<NiSourceTexture> textptr_2(static_cast<NiSourceTexture*>(nullptr));
+                BSsprintf(
+                    apDest, 260, "%s%s", "Textures\\", (&pDeckArray.operator[](index)->faceTexture)->GetTextureName()
+                );
+                SwapPlatformLanguageTexturePath(apDest, acPath, 260u);
+                TES::pInstance->CreateTextureImage(acPath, textptr_2, false, false);
+                if (textptr_2.m_pObject) {
+                    deckFaceShaders[aiTarget + 48]->SetTexture(
+                        BSShaderProperty::TEXTYPE_DIFFUSE, 0, textptr_2.m_pObject
+                    );
+                }
+                BSsprintf(
+                    apDest, 260, "%s%s", "Textures\\", (&pDeckArray.operator[](index)->backTexture)->GetTextureName()
+                );
+                SwapPlatformLanguageTexturePath(apDest, acPath, 260u);
+                TES::pInstance->CreateTextureImage(acPath, textptr_2, false, false);
+                if (textptr_2.m_pObject) {
+                    deckFaceShaders[aiTarget + 72]->SetTexture(
+                        BSShaderProperty::TEXTYPE_DIFFUSE, 0, textptr_2.m_pObject
+                    );
+                }
+                BSsprintf(
+                    apDest, 260, "%s%s", "Textures\\", (&pDeckArray.operator[](index)->backTexture)->GetTextureName()
+                );
+                SwapPlatformLanguageTexturePath(apDest, acPath, 260u);
+                TES::pInstance->CreateTextureImage(acPath, textptr_2, false, false);
+                if (textptr_2.m_pObject) {
+                    deckFaceShaders[aiTarget]->SetTexture(BSShaderProperty::TEXTYPE_DIFFUSE, 0, textptr_2.m_pObject);
+                }
+                BSsprintf(
+                    apDest, 260, "%s%s", "Textures\\", (&pDeckArray.operator[](index)->faceTexture)->GetTextureName()
+                );
+                SwapPlatformLanguageTexturePath(apDest, acPath, 260u);
+                TES::pInstance->CreateTextureImage(acPath, textptr_2, false, false);
+                if (textptr_2.m_pObject) {
+                    deckFaceShaders[aiTarget + 24]->SetTexture(
+                        BSShaderProperty::TEXTYPE_DIFFUSE, 0, textptr_2.m_pObject
+                    );
                 }
             }
         }
@@ -5739,22 +5641,23 @@ CaravanAIPackage* CaravanMenu::ProcessAI(CaravanAIPackage* apResult) {
                                     pPackage->iTrack = iTrack;
                                 }
                             }
-                            else if (sum > 16) {
-                                if (pCardTracks[iTrack][iRow - 1].GetAt(0)->data.iFaceValue <
-                                    pCardTracks[iTrack][iRow - 2].GetAt(0)->data.iFaceValue) {
-                                    pPackage->iRow = iRow - 1;
-                                    pPackage->iPriority = sum + 25;
-                                    pPackage->iActionType = 1;
-                                    pPackageList->Add(pPackage);
-                                    pNew = static_cast<CaravanAIPackage*>(ourMalloc(sizeof(CaravanAIPackage)));
-                                    if (pNew) {
-                                        std::memset(pNew, 0, sizeof(CaravanAIPackage));
-                                    }
-                                    pPackage = pNew;
-                                    pPackage->iRow = iRow;
-                                    pPackage->iDeckCard = iDeckCard;
-                                    pPackage->iTrack = iTrack;
+                            else if (
+                                (sum > 16) &&
+                                (pCardTracks[iTrack][iRow - 1].GetAt(0)->data.iFaceValue <
+                                 pCardTracks[iTrack][iRow - 2].GetAt(0)->data.iFaceValue)
+                            ) {
+                                pPackage->iRow = iRow - 1;
+                                pPackage->iPriority = sum + 25;
+                                pPackage->iActionType = 1;
+                                pPackageList->Add(pPackage);
+                                pNew = static_cast<CaravanAIPackage*>(ourMalloc(sizeof(CaravanAIPackage)));
+                                if (pNew) {
+                                    std::memset(pNew, 0, sizeof(CaravanAIPackage));
                                 }
+                                pPackage = pNew;
+                                pPackage->iRow = iRow;
+                                pPackage->iDeckCard = iDeckCard;
+                                pPackage->iTrack = iTrack;
                             }
                         }
                         break;
@@ -5907,19 +5810,17 @@ void CaravanMenu::Close() {
     if (CaravanMenu::pMe) {
         CaravanMenu::pMe->eGameState = CaravanMenu::CA_CLOSING_MENU;
         int32_t MenuID = CaravanMenu::GetMenuID_();
-        if (Menu::GetMenuByClass(MenuID)) {
-            if (CaravanMenu::pMe->eActiveMenu == CaravanMenu::CA_DECK_MENU) {
-                BSSimpleList<TESCaravanCard*>* pAct = pPlayer->GetCaravanCards2();
-                BSSimpleList<TESCaravanCard*>* pInact = pPlayer->GetCaravanCards1();
-                pAct->RemoveAll();
-                pInact->RemoveAll();
-                for (int32_t i = 0; i < CaravanMenu::pMe->pDeckArray.iSize; ++i) {
-                    if (CaravanMenu::pMe->pDeckArray.operator[](i)->bIsActive) {
-                        pAct->AddHead(CaravanMenu::pMe->pDeckArray.operator[](i));
-                    }
-                    else {
-                        pInact->AddHead(CaravanMenu::pMe->pDeckArray.operator[](i));
-                    }
+        if ((Menu::GetMenuByClass(MenuID)) && (CaravanMenu::pMe->eActiveMenu == CaravanMenu::CA_DECK_MENU)) {
+            BSSimpleList<TESCaravanCard*>* pAct = pPlayer->GetCaravanCards2();
+            BSSimpleList<TESCaravanCard*>* pInact = pPlayer->GetCaravanCards1();
+            pAct->RemoveAll();
+            pInact->RemoveAll();
+            for (int32_t i = 0; i < CaravanMenu::pMe->pDeckArray.iSize; ++i) {
+                if (CaravanMenu::pMe->pDeckArray.operator[](i)->bIsActive) {
+                    pAct->AddHead(CaravanMenu::pMe->pDeckArray.operator[](i));
+                }
+                else {
+                    pInact->AddHead(CaravanMenu::pMe->pDeckArray.operator[](i));
                 }
             }
         }
@@ -6022,34 +5923,28 @@ Tile* CaravanMenu::Create(
                 }
                 return ptile;
             }
-            else {
-                Warning("MENUS: Caravan Menu Creation Failed... Are your menu and art resources up to date?");
-                CaravanMenu::Close();
-                return nullptr;
-            }
-        }
-        else {
-            if (CaravanMenu::pMe) {
-                if (CaravanMenu::pMe->pMenu) {
-                    if (CaravanMenu::pMe) {
-                        delete CaravanMenu::pMe;
-                    }
-                }
-            }
+
+            Warning("MENUS: Caravan Menu Creation Failed... Are your menu and art resources up to date?");
+            CaravanMenu::Close();
             return nullptr;
         }
-    }
-    else {
-        char msg[264];
-        BSsprintf(msg, 260, sCardCountText.operator const char*());
-        Interface::ShowMessage(
-            msg, 0, "Interface\\Icons\\Message Icons\\glow_message_vaultboy_surprised.dds", nullptr, 2.0f, false
-        );
-        BSAudio* v6 = &BSAudio::QInstance();
-        BSSoundHandle* SoundHandleByName = v6->GetSoundHandleByName(&a1, "UIPopUpMessageGeneral", 289u);
-        SoundHandleByName->Play(false);
+
+        if ((CaravanMenu::pMe) && (CaravanMenu::pMe->pMenu) && (CaravanMenu::pMe)) {
+            delete CaravanMenu::pMe;
+        }
+
         return nullptr;
     }
+
+    char msg[264];
+    BSsprintf(msg, 260, sCardCountText.operator const char*());
+    Interface::ShowMessage(
+        msg, 0, "Interface\\Icons\\Message Icons\\glow_message_vaultboy_surprised.dds", nullptr, 2.0f, false
+    );
+    BSAudio* v6 = &BSAudio::QInstance();
+    BSSoundHandle* SoundHandleByName = v6->GetSoundHandleByName(&a1, "UIPopUpMessageGeneral", 289u);
+    SoundHandleByName->Play(false);
+    return nullptr;
 }
 
 void CaravanAIPackage::Print_WhatIsHeThinking(BSSimpleArray<TESCaravanCard*, 1024>* pNPCHandArray) {

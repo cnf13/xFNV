@@ -300,7 +300,6 @@ NiObject* NiPSysSphericalCollider::CreateObject() {
     if (v0) {
         return ::new (v0) NiPSysSphericalCollider(1.0, false, false, nullptr, nullptr, 1.0);
     }
-    else {
-        return nullptr;
-    }
+
+    return nullptr;
 }

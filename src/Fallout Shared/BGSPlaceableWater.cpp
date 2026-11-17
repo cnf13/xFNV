@@ -252,9 +252,8 @@ TESWaterForm* BGSPlaceableWater::GetWaterType() {
     if (Data.pWaterType && (GetInitialized() && Data.pWaterType->pRemappedWaterForm)) {
         return Data.pWaterType->pRemappedWaterForm;
     }
-    else {
-        return Data.pWaterType;
-    }
+
+    return Data.pWaterType;
 }
 
 bool BGSPlaceableWater::IsAutomaticWater() {

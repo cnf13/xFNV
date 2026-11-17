@@ -157,10 +157,8 @@ void FormComponentCollection::CopyAllComponents(FormComponentCollection* apFCC) 
     int32_t i;
     if (apFCC) {
         for (i = 0; i < 38; ++i) {
-            if (pFCArray[i]) {
-                if (apFCC->pFCArray[i]) {
-                    pFCArray[i]->CopyComponent(apFCC->pFCArray[i]);
-                }
+            if ((pFCArray[i]) && (apFCC->pFCArray[i])) {
+                pFCArray[i]->CopyComponent(apFCC->pFCArray[i]);
             }
         }
     }

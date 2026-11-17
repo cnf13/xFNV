@@ -323,48 +323,45 @@ Crime::Crime(
 }
 
 Crime::~Crime() {
-    if (pDataHandler) {
-        if (!pDataHandler->GetClearingData()) {
-            ClearActorKnowList();
-            ReferenceProcessLists.RemoveCrimeGlobalCrimeList(this);
-            if (pcrimetarget) {
-                if (pcrimetarget->m_Extra.GetPlayerCrimeList()) {
-                    Crime* item = this;
-                    pcrimetarget->m_Extra.GetPlayerCrimeList()->Remove(item);
-                }
+    if ((pDataHandler) && (!pDataHandler->GetClearingData())) {
+        ClearActorKnowList();
+        ReferenceProcessLists.RemoveCrimeGlobalCrimeList(this);
+        if ((pcrimetarget) && (pcrimetarget->m_Extra.GetPlayerCrimeList())) {
+            Crime* item = this;
+            pcrimetarget->m_Extra.GetPlayerCrimeList()->Remove(item);
+        }
+
+        for (BSSimpleList<TESFaction*>* plist = pListofEnemyFactions; plist && !plist->IsEmpty();
+             plist = plist->m_pkNext) {
+            TESFaction* pfac = plist->m_item;
+            if (!ReferenceProcessLists.IsEnemyFactionofOtherCrime(pfac, this)) {
+                pfac->SetPCAnEnemy(false);
             }
-            for (BSSimpleList<TESFaction*>* plist = pListofEnemyFactions; plist && !plist->IsEmpty();
-                 plist = plist->m_pkNext) {
-                TESFaction* pfac = plist->m_item;
-                if (!ReferenceProcessLists.IsEnemyFactionofOtherCrime(pfac, this)) {
-                    pfac->SetPCAnEnemy(false);
-                }
+        }
+        Actor* pact = static_cast<Actor*>(pcrimetarget);
+        if ((pact) && (pact->IsActor())) {
+            BSSimpleList<Crime*>* pcrimelist = pact->m_Extra.GetPlayerCrimeList();
+            if (pcrimelist) {
+                Crime* v3 = this;
+                pcrimelist->Remove(v3);
             }
-            Actor* pact = static_cast<Actor*>(pcrimetarget);
-            if (pact) {
-                if (pact->IsActor()) {
-                    BSSimpleList<Crime*>* pcrimelist = pact->m_Extra.GetPlayerCrimeList();
-                    if (pcrimelist) {
-                        Crime* v3 = this;
-                        pcrimelist->Remove(v3);
-                    }
-                }
+        }
+
+        // prespond is never advanced, so a non-empty result loops for ever, as the game does.
+        BSSimpleList<TESObjectREFR*>* prespond = ReferenceProcessLists.GetActorsProcessCrimeAlarm(this, true);
+        while (prespond) {
+            Actor* pact_2 = static_cast<Actor*>(prespond->m_item);
+            if (pact_2->IsAlarmed()) {
+                pact_2->EndInterruptPackage(false);
             }
-            // prespond is never advanced, so a non-empty result loops for ever, as the game does.
-            BSSimpleList<TESObjectREFR*>* prespond = ReferenceProcessLists.GetActorsProcessCrimeAlarm(this, true);
-            while (prespond) {
-                Actor* pact_2 = static_cast<Actor*>(prespond->m_item);
-                if (pact_2->IsAlarmed()) {
-                    pact_2->EndInterruptPackage(false);
-                }
-                BSSimpleList<Crime*>* pcrimelist_2 = pact_2->m_Extra.GetPlayerCrimeList();
-                if (pcrimelist_2) {
-                    Crime* v2 = this;
-                    pcrimelist_2->Remove(v2);
-                }
+            BSSimpleList<Crime*>* pcrimelist_2 = pact_2->m_Extra.GetPlayerCrimeList();
+            if (pcrimelist_2) {
+                Crime* v2 = this;
+                pcrimelist_2->Remove(v2);
             }
         }
     }
+
     if (pListofEnemyFactions) {
         pListofEnemyFactions->RemoveAll();
         delete pListofEnemyFactions;
@@ -508,9 +505,8 @@ int32_t Crime::GetRefCount() {
     if (pActorsknowofCrime.IsEmpty()) {
         return 0;
     }
-    else {
-        return pActorsknowofCrime.ItemsInList();
-    }
+
+    return pActorsknowofCrime.ItemsInList();
 }
 
 void Crime::AddEnemyFactions(TESFaction* apFaction) {

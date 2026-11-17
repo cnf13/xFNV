@@ -184,11 +184,10 @@ void MagicFogProjectile::SaveGame(uint32_t aiFlags) {
             }
             SaveNumericID(&itargetID, 4);
             ceffectItemIndex = 0;
-            if (pSpell) {
-                if (plist->pEffect) {
-                    ceffectItemIndex = pSpell->GetEffectItemIndex(plist->pEffect);
-                }
+            if ((pSpell) && (plist->pEffect)) {
+                ceffectItemIndex = pSpell->GetEffectItemIndex(plist->pEffect);
             }
+
             SaveGameDataOLD(&ceffectItemIndex, 1);
             ++usCount;
         }
@@ -244,42 +243,39 @@ void MagicFogProjectile::InitLoadGame(uint32_t aiFlags, uint32_t aiOldFlags) {
     MagicProjectile::InitLoadGame(aiFlags, aiOldFlags);
     Init3D();
     GetParentCell()->AddReference(this, false);
-    if (eState != MagicFogProjectile::FOG_STATE_PERSISTANT) {
-        if (pAVEffect->GetBoltSound()) {
-            uint32_t isoundFileID = pAVEffect->GetBoltSound()->iFormID;
-            if (Sound.IsValid()) {
-                Sound.Release();
-            }
-            BSSoundHandle* arHandle = PlaySound(
-                &a2, isoundFileID, true,
-                BSGameSound::SOUND_FLAG_IS_3D | BSGameSound::SOUND_FLAG_ONE_SHOT |
-                    BSGameSound::SOUND_FLAG_ANIMATION_DRIVEN,
-                true
-            );
-            Sound.operator=(*arHandle);
+    if ((eState != MagicFogProjectile::FOG_STATE_PERSISTANT) && (pAVEffect->GetBoltSound())) {
+        uint32_t isoundFileID = pAVEffect->GetBoltSound()->iFormID;
+        if (Sound.IsValid()) {
+            Sound.Release();
         }
+        BSSoundHandle* arHandle = PlaySound(
+            &a2, isoundFileID, true,
+            BSGameSound::SOUND_FLAG_IS_3D | BSGameSound::SOUND_FLAG_ONE_SHOT | BSGameSound::SOUND_FLAG_ANIMATION_DRIVEN,
+            true
+        );
+        Sound.operator=(*arHandle);
     }
+
     ourMemcpy(&ffadeTimer, &pLight, sizeof(ffadeTimer));
     pLight = nullptr;
-    if (Get3D()) {
-        if (pAVEffect->data.pLight) {
-            MagicLight* v8;
-            MagicLight* v11 = static_cast<MagicLight*>(ourMalloc(sizeof(MagicLight)));
-            if (v11) {
-                NiNode* a3 = Get3D();
-                uint32_t CastingType = pAVEffect->data.pLight->iFormID;
-                v8 = ::new (v11) MagicLight(CastingType, a3);
-            }
-            else {
-                v8 = nullptr;
-            }
-            pLight = v8;
-            if (pLight) {
-                pLight->Fade(false, fProjectileDuration);
-                pLight->SetFadeTimer(ffadeTimer);
-            }
+    if ((Get3D()) && (pAVEffect->data.pLight)) {
+        MagicLight* v8;
+        MagicLight* v11 = static_cast<MagicLight*>(ourMalloc(sizeof(MagicLight)));
+        if (v11) {
+            NiNode* a3 = Get3D();
+            uint32_t CastingType = pAVEffect->data.pLight->iFormID;
+            v8 = ::new (v11) MagicLight(CastingType, a3);
+        }
+        else {
+            v8 = nullptr;
+        }
+        pLight = v8;
+        if (pLight) {
+            pLight->Fade(false, fProjectileDuration);
+            pLight->SetFadeTimer(ffadeTimer);
         }
     }
+
     if (pSaveLoadGameOLD->GetCurrentVersion() >= 113u) {
         for (MagicFogProjectile::SpellTarget* plist = pTargetList; plist; plist = plist->pNext) {
             uint32_t itargetID = static_cast<uint32_t>(reinterpret_cast<uintptr_t>(plist->pTarget));
@@ -626,16 +622,14 @@ void MagicFogProjectile::Collide(
         NiPoint3 v17 = GetLocationOnReference();
         GetCaster()->FindTargets_0(pSpell, GetParentCell(), v17, this, apCollidee, false, fpower, 1.0f);
     }
-    if (pAVEffect->data.pAreaSound) {
-        if (!abFizzle) {
-            TESSound* OpenSound = pAVEffect->data.pAreaSound;
-            uint32_t a3 = OpenSound->iFormID;
-            BSAudio* v8 = &BSAudio::QInstance();
-            v8->GetSoundHandleByNumericID(&soundHand, a3, 258u);
-            NiPoint3 v13 = GetLocationOnReference();
-            soundHand.SetPosition(v13.x, v13.y, v13.z);
-            soundHand.Play(false);
-        }
+    if ((pAVEffect->data.pAreaSound) && (!abFizzle)) {
+        TESSound* OpenSound = pAVEffect->data.pAreaSound;
+        uint32_t a3 = OpenSound->iFormID;
+        BSAudio* v8 = &BSAudio::QInstance();
+        v8->GetSoundHandleByNumericID(&soundHand, a3, 258u);
+        NiPoint3 v13 = GetLocationOnReference();
+        soundHand.SetPosition(v13.x, v13.y, v13.z);
+        soundHand.Play(false);
     }
 }
 
@@ -797,15 +791,13 @@ void MagicFogProjectile::AdjustParticles(NiAVObject* apav) {
         }
     }
     else {
-        if (apav) {
-            if (apav->IsNode()) {
-                uint32_t I = 0;
-                for (uint32_t j = static_cast<NiNode*>(apav)->NiNode::GetArrayCount(); I < j;
-                     j = static_cast<NiNode*>(apav)->NiNode::GetArrayCount()) {
-                    NiAVObject* pchild = static_cast<NiNode*>(apav)->NiNode::GetAt(I);
-                    AdjustParticles(pchild);
-                    ++I;
-                }
+        if ((apav) && (apav->IsNode())) {
+            uint32_t I = 0;
+            for (uint32_t j = static_cast<NiNode*>(apav)->NiNode::GetArrayCount(); I < j;
+                 j = static_cast<NiNode*>(apav)->NiNode::GetArrayCount()) {
+                NiAVObject* pchild = static_cast<NiNode*>(apav)->NiNode::GetAt(I);
+                AdjustParticles(pchild);
+                ++I;
             }
         }
     }

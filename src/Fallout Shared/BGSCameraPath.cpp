@@ -330,30 +330,29 @@ BGSCameraPath* BGSCameraPath::GetChildByIndex(uint32_t aiIndex) {
 
 BGSCameraPath* BGSCameraPath::GetCameraPathToPlay(TESObjectREFR* apActionRef, TESObjectREFR* apTargetRef) {
     BGSCameraPath* pCamera = nullptr;
-    if (!GetDelete()) {
-        if (Conditions.IsTrue(apActionRef, apTargetRef)) {
-            BSSimpleList<BGSCameraShot*>* Filename;
-            if (GetAllowNoShots() || (Filename = &ShotList, !Filename->IsEmpty())) {
-                pCamera = this;
-            }
-            uint32_t NumChildren = GetChildCount();
-            if (NumChildren) {
-                BGSCameraPath* CameraPathToPlay = nullptr;
-                for (uint32_t aiIndex = 0; aiIndex < NumChildren; ++aiIndex) {
-                    BGSCameraPath* ChildByIndex = GetChildByIndex(aiIndex);
-                    if (ChildByIndex) {
-                        CameraPathToPlay = ChildByIndex->GetCameraPathToPlay(apActionRef, apTargetRef);
-                    }
-                    if (CameraPathToPlay) {
-                        break;
-                    }
+    if ((!GetDelete()) && (Conditions.IsTrue(apActionRef, apTargetRef))) {
+        BSSimpleList<BGSCameraShot*>* Filename;
+        if (GetAllowNoShots() || (Filename = &ShotList, !Filename->IsEmpty())) {
+            pCamera = this;
+        }
+        uint32_t NumChildren = GetChildCount();
+        if (NumChildren) {
+            BGSCameraPath* CameraPathToPlay = nullptr;
+            for (uint32_t aiIndex = 0; aiIndex < NumChildren; ++aiIndex) {
+                BGSCameraPath* ChildByIndex = GetChildByIndex(aiIndex);
+                if (ChildByIndex) {
+                    CameraPathToPlay = ChildByIndex->GetCameraPathToPlay(apActionRef, apTargetRef);
                 }
                 if (CameraPathToPlay) {
-                    return CameraPathToPlay;
+                    break;
                 }
+            }
+            if (CameraPathToPlay) {
+                return CameraPathToPlay;
             }
         }
     }
+
     return pCamera;
 }
 
@@ -432,11 +431,9 @@ bool BGSCameraPath::InitParents() {
 
 void BGSCameraPath::RemoveChild(BGSCameraPath* apChild) {
     uint32_t indexForChild;
-    if (apChild) {
-        if (pChildPaths) {
-            indexForChild = GetIndexForChild(apChild);
-            RemoveChildAtIndex(indexForChild);
-        }
+    if ((apChild) && (pChildPaths)) {
+        indexForChild = GetIndexForChild(apChild);
+        RemoveChildAtIndex(indexForChild);
     }
 }
 

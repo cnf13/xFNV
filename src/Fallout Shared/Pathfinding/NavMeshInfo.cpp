@@ -207,9 +207,8 @@ TESObjectCELL* NavMeshInfo::GetCell() const {
     if (pWorldSpace) {
         return pWorldSpace->GetCellFromKey(iCellKey);
     }
-    else {
-        return GetInteriorCell();
-    }
+
+    return GetInteriorCell();
 }
 
 TESObjectCELL* NavMeshInfo::GetInteriorCell() const {

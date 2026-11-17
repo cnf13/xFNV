@@ -307,29 +307,25 @@ void BSFaceGenNiNode::FixSkinInstances(NiNode* apRoot, bool abWarnOnFail) {
                 NiTriBasedGeom* ptri = pobjTemp->IsTriBasedGeom();
                 if (ptri) {
                     NiSkinInstance* pskin = ptri->GetSkinInstance();
-                    if (pskin) {
-                        if (pskin->GetSkinData()) {
-                            uint32_t iboneCount = pskin->GetSkinData()->m_uiBones;
-                            NiAVObject** pbones = pskin->m_ppkBones;
-                            if (pbones) {
-                                if (iboneCount) {
-                                    for (uint32_t ibone = 0; ibone < iboneCount; ++ibone) {
-                                        NiAVObject* pbone = apRoot->GetObjectByName(*&pbones[ibone]->m_kName);
-                                        if (pbone) {
-                                            pskin->SetBone(ibone, pbone);
-                                        }
-                                        else {
-                                            if (abWarnOnFail) {
-                                                Warning(
-                                                    "MODELS: Could not find bone \"%s\" for the head node.",
-                                                    (&pbones[ibone]->m_kName)->GetHandleString()
-                                                );
-                                            }
-                                        }
+                    if ((pskin) && (pskin->GetSkinData())) {
+                        uint32_t iboneCount = pskin->GetSkinData()->m_uiBones;
+                        NiAVObject** pbones = pskin->m_ppkBones;
+                        if ((pbones) && (iboneCount)) {
+                            for (uint32_t ibone = 0; ibone < iboneCount; ++ibone) {
+                                NiAVObject* pbone = apRoot->GetObjectByName(*&pbones[ibone]->m_kName);
+                                if (pbone) {
+                                    pskin->SetBone(ibone, pbone);
+                                }
+                                else {
+                                    if (abWarnOnFail) {
+                                        Warning(
+                                            "MODELS: Could not find bone \"%s\" for the head node.",
+                                            (&pbones[ibone]->m_kName)->GetHandleString()
+                                        );
                                     }
-                                    pskin->m_pkRootParent = this;
                                 }
                             }
+                            pskin->m_pkRootParent = this;
                         }
                     }
                 }
@@ -356,77 +352,73 @@ void BSFaceGenNiNode::UpdateAllChildrenMorphData(bool abChanged) {
         NiAVObject* pobj = GetAt(i);
         if (pobj) {
             objdata.ptri = pobj->IsTriBasedGeom();
-            if (objdata.ptri) {
-                if (objdata.ptri->GetModelData()) {
-                    objdata.pmorph = BSFaceGenManager::GetFaceGenMorphDataHead(objdata.ptri);
-                    if (objdata.pmorph) {
-                        objdata.pmorphBase = static_cast<BSFaceGenBaseMorphExtraData*>(
-                            BSFaceGenUtils::GetFaceGenExtraData<BSFaceGenBaseMorphExtraData>(objdata.ptri)
-                        );
-                        if (objdata.pmorphBase) {
-                            if (objdata.ptri->GetModelData()->LockPackedVertexData(true)) {
-                                objdata.ptri->GetModelData()->GetVerticesIterator(objdata.iter);
-                                objdata.ivertCount = objdata.ptri->GetVertexCount();
-                                if (abChanged || bForceBaseMorph) {
-                                    BSFaceGenManager::RefreshMeshFromBaseMorphExtraData(objdata.ptri, objdata.iter);
-                                    objdata.bbaseApplied = true;
-                                    bForceBaseMorph = false;
-                                }
-                                bool bmodAdded = false;
-                                bool bphoAdded = false;
-                                NiPoint3 cameraloc = BSFaceGenManager::GetCameraPosition();
-                                float buffer = 10.0f;
-                                float dist = (cameraloc - GetWorldTranslate()).Length();
-                                float morphdist = BSFaceGenManager::GetLodDistance();
-                                float talkdist = BSFaceGenManager::GetTalkingLodDistance();
-                                if (Main::GetSceneIsComplex()) {
-                                    morphdist = morphdist * 0.25;
-                                    talkdist = talkdist * 0.25;
-                                }
-                                bool bdophonemes = false;
-                                bool bdomodifiers = false;
-                                if (dist <= talkdist + buffer || (bIAmInDialogue || Interface::IsInMenuMode())) {
-                                    bdophonemes = true;
-                                    if (dist <= morphdist + buffer || (bIAmInDialogue || Interface::IsInMenuMode())) {
-                                        bdomodifiers = true;
-                                    }
-                                }
-                                if (bForceMorphUpdates && !objdata.bbaseApplied) {
-                                    BSFaceGenManager::RefreshMeshFromBaseMorphExtraData(objdata.ptri, objdata.iter);
-                                    objdata.bbaseApplied = true;
-                                }
-                                if (bdophonemes && !bDisableMorphUpdates) {
-                                    ApplyFacialPhonemes(objdata);
-                                    bphoAdded = true;
-                                    if (bdomodifiers) {
-                                        ApplyFacialExpressions(objdata);
+            if ((objdata.ptri) && (objdata.ptri->GetModelData())) {
+                objdata.pmorph = BSFaceGenManager::GetFaceGenMorphDataHead(objdata.ptri);
+                if (objdata.pmorph) {
+                    objdata.pmorphBase = static_cast<BSFaceGenBaseMorphExtraData*>(
+                        BSFaceGenUtils::GetFaceGenExtraData<BSFaceGenBaseMorphExtraData>(objdata.ptri)
+                    );
+                    if ((objdata.pmorphBase) && (objdata.ptri->GetModelData()->LockPackedVertexData(true))) {
+                        objdata.ptri->GetModelData()->GetVerticesIterator(objdata.iter);
+                        objdata.ivertCount = objdata.ptri->GetVertexCount();
+                        if (abChanged || bForceBaseMorph) {
+                            BSFaceGenManager::RefreshMeshFromBaseMorphExtraData(objdata.ptri, objdata.iter);
+                            objdata.bbaseApplied = true;
+                            bForceBaseMorph = false;
+                        }
+                        bool bmodAdded = false;
+                        bool bphoAdded = false;
+                        NiPoint3 cameraloc = BSFaceGenManager::GetCameraPosition();
+                        float buffer = 10.0f;
+                        float dist = (cameraloc - GetWorldTranslate()).Length();
+                        float morphdist = BSFaceGenManager::GetLodDistance();
+                        float talkdist = BSFaceGenManager::GetTalkingLodDistance();
+                        if (Main::GetSceneIsComplex()) {
+                            morphdist = morphdist * 0.25;
+                            talkdist = talkdist * 0.25;
+                        }
+                        bool bdophonemes = false;
+                        bool bdomodifiers = false;
+                        if (dist <= talkdist + buffer || (bIAmInDialogue || Interface::IsInMenuMode())) {
+                            bdophonemes = true;
+                            if (dist <= morphdist + buffer || (bIAmInDialogue || Interface::IsInMenuMode())) {
+                                bdomodifiers = true;
+                            }
+                        }
+                        if (bForceMorphUpdates && !objdata.bbaseApplied) {
+                            BSFaceGenManager::RefreshMeshFromBaseMorphExtraData(objdata.ptri, objdata.iter);
+                            objdata.bbaseApplied = true;
+                        }
+                        if (bdophonemes && !bDisableMorphUpdates) {
+                            ApplyFacialPhonemes(objdata);
+                            bphoAdded = true;
+                            if (bdomodifiers) {
+                                ApplyFacialExpressions(objdata);
+                                ApplyFacialModifiers(objdata);
+                                ApplyFacialCustomMorphs(objdata);
+                                bmodAdded = true;
+                            }
+                        }
+                        BSFaceGenAnimationData* v6 = GetAnimationData();
+                        if (v6->GetDead()) {
+                            if (!bmodAdded) {
+                                BSFaceGenAnimationData* v3 = GetAnimationData();
+                                if (v3->GetModifierValue(BS_FG_MODIFIER_BLINK_LEFT) > 0.0) {
+                                    NiNode* Parent = m_pkParent;
+                                    if (Parent->IsFadeNode()) {
                                         ApplyFacialModifiers(objdata);
-                                        ApplyFacialCustomMorphs(objdata);
                                         bmodAdded = true;
                                     }
                                 }
-                                BSFaceGenAnimationData* v6 = GetAnimationData();
-                                if (v6->GetDead()) {
-                                    if (!bmodAdded) {
-                                        BSFaceGenAnimationData* v3 = GetAnimationData();
-                                        if (v3->GetModifierValue(BS_FG_MODIFIER_BLINK_LEFT) > 0.0) {
-                                            NiNode* Parent = m_pkParent;
-                                            if (Parent->IsFadeNode()) {
-                                                ApplyFacialModifiers(objdata);
-                                                bmodAdded = true;
-                                            }
-                                        }
-                                    }
-                                }
-                                else {
-                                    if (!bphoAdded && dist > BSFaceGenManager::GetLodDistance() - buffer) {
-                                        BSFaceGenAnimationData* pAnimData = GetAnimationData();
-                                        pAnimData->ResetCurrentMorphs(0.0f, true, true, true, true, false);
-                                    }
-                                }
-                                objdata.ptri->GetModelData()->UnlockPackedVertexData();
                             }
                         }
+                        else {
+                            if (!bphoAdded && dist > BSFaceGenManager::GetLodDistance() - buffer) {
+                                BSFaceGenAnimationData* pAnimData = GetAnimationData();
+                                pAnimData->ResetCurrentMorphs(0.0f, true, true, true, true, false);
+                            }
+                        }
+                        objdata.ptri->GetModelData()->UnlockPackedVertexData();
                     }
                 }
             }

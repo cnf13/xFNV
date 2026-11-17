@@ -53,12 +53,12 @@ void NiParallelUpdateTaskManager::EndUpdate() {
 }
 
 int32_t NiParallelUpdateTaskManager::WaitRenderSema(uint32_t aiTime) {
-    if (NiParallelUpdateTaskManager::ms_pkManager) {
-        if ((&NiParallelUpdateTaskManager::ms_pkManager->m_kRenderSema)->Wait(aiTime) == 1) {
-            NiParallelUpdateTaskManager::End();
-            (&NiParallelUpdateTaskManager::ms_pkManager->m_kRenderSema)->Wait(0xFFFFFFFFu);
-        }
+    if ((NiParallelUpdateTaskManager::ms_pkManager) &&
+        ((&NiParallelUpdateTaskManager::ms_pkManager->m_kRenderSema)->Wait(aiTime) == 1)) {
+        NiParallelUpdateTaskManager::End();
+        (&NiParallelUpdateTaskManager::ms_pkManager->m_kRenderSema)->Wait(0xFFFFFFFFu);
     }
+
     return 0;
 }
 
@@ -66,9 +66,8 @@ int32_t NiParallelUpdateTaskManager::SignalRenderSema() {
     if (NiParallelUpdateTaskManager::ms_pkManager) {
         return (&NiParallelUpdateTaskManager::ms_pkManager->m_kRenderSema)->Signal();
     }
-    else {
-        return 0;
-    }
+
+    return 0;
 }
 
 void NiParallelUpdateTaskManager::BeginUpdate() {
@@ -103,7 +102,6 @@ int32_t NiTaskManager::GetNumTasks(NiTaskManager::TaskPriority ePriority) {
     if (m_uiHead < m_uiTail) {
         return m_uiTail - m_uiHead;
     }
-    else {
-        return m_uiTail + (v3->m_uiAlloced - m_uiHead);
-    }
+
+    return m_uiTail + (v3->m_uiAlloced - m_uiHead);
 }

@@ -29,10 +29,7 @@ bool TESRegionPoint::operator==(const TESRegionPoint& aRP) const {
         return false;
     }
     float fOtherY = aRP.GetY();
-    if (FloatEQ(GetY(), fOtherY, 0.001f)) {
-        return true;
-    }
-    return false;
+    return FloatEQ(GetY(), fOtherY, 0.001f);
 }
 
 float TESRegionPoint::GetX() const {

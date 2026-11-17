@@ -128,17 +128,15 @@ bool BookMenu::IsWellFormedMenu() {
 void BookMenu::Close() {
     Menu* menu;
     TileMenu* menuByClass = static_cast<TileMenu*>(Menu::GetMenuByClass(1026));
-    if (menuByClass) {
-        if (menuByClass->Tile::GetMenu()) {
-            menuByClass->Tile::Set(6002, 1);
-            menu = menuByClass->Tile::GetMenu();
-            menu->StartFadeOut();
-            if (pBook->IsScroll()) {
-                InterfaceManager::PlayMenuSound(MENU_SOUND_SCROLL_CLOSE);
-            }
-            else {
-                InterfaceManager::PlayMenuSound(MENU_SOUND_BOOK_CLOSE);
-            }
+    if ((menuByClass) && (menuByClass->Tile::GetMenu())) {
+        menuByClass->Tile::Set(6002, 1);
+        menu = menuByClass->Tile::GetMenu();
+        menu->StartFadeOut();
+        if (pBook->IsScroll()) {
+            InterfaceManager::PlayMenuSound(MENU_SOUND_SCROLL_CLOSE);
+        }
+        else {
+            InterfaceManager::PlayMenuSound(MENU_SOUND_BOOK_CLOSE);
         }
     }
 }
@@ -214,19 +212,16 @@ Tile* BookMenu::Create(TESObjectBOOK* apBook, TESObjectREFR* apRef) {
             pme->PrepForVisibility(false);
             return ptile;
         }
-        else {
-            Warning("MENUS: Book Menu Creation Failed... Are your menu and art resources up to date?");
-            return nullptr;
-        }
-    }
-    else {
-        if (pme) {
-            if (pme->pMenu) {
-                delete pme;
-            }
-        }
+
+        Warning("MENUS: Book Menu Creation Failed... Are your menu and art resources up to date?");
         return nullptr;
     }
+
+    if ((pme) && (pme->pMenu)) {
+        delete pme;
+    }
+
+    return nullptr;
 }
 
 const char* TESObjectBOOK::GetDescription() {

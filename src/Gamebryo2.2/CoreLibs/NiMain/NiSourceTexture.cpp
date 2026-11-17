@@ -134,11 +134,13 @@ void NiSourceTexture::LoadBinary(NiStream& kStream) {
             m_kFormatPrefs.m_ePixelLayout = NiTexture::FormatPrefs::PIX_DEFAULT;
         }
     }
-    else if (uiVersion < NiStream::GetVersion(5, 0, 0, 1)) {
-        if (m_kFormatPrefs.m_ePixelLayout == NiTexture::FormatPrefs::PALETTIZED_4) {
-            m_kFormatPrefs.m_ePixelLayout = NiTexture::FormatPrefs::PIX_DEFAULT;
-        }
+    else if (
+        (uiVersion < NiStream::GetVersion(5, 0, 0, 1)) &&
+        (m_kFormatPrefs.m_ePixelLayout == NiTexture::FormatPrefs::PALETTIZED_4)
+    ) {
+        m_kFormatPrefs.m_ePixelLayout = NiTexture::FormatPrefs::PIX_DEFAULT;
     }
+
     uint8_t bStatic;
     NiStreamLoadBinary(kStream, bStatic);
     m_bStatic = bStatic != 0;
@@ -353,9 +355,8 @@ uint32_t NiSourceTexture::GetWidth() const {
     if (m_spSrcPixelData) {
         return *m_spSrcPixelData->m_puiWidth;
     }
-    else {
-        return (uint32_t)0;
-    }
+
+    return (uint32_t)0;
 }
 
 uint32_t NiSourceTexture::GetHeight() const {
@@ -373,22 +374,20 @@ uint32_t NiSourceTexture::GetHeight() const {
     if (v4) {
         return *v4->m_puiHeight;
     }
-    else {
-        return (uint32_t)0;
-    }
+
+    return (uint32_t)0;
 }
 
 // Reads the platform file's pixel data when the texture has a file name but neither pixel data nor persistent renderer
 // data.
 void NiSourceTexture::LoadPixelDataFromFile() {
-    if (m_kFilename.GetHandle() != NiGlobalStringTable::NULL_STRING) {
-        if (!m_spSrcPixelData.m_pObject && !m_spPersistentSrcRendererData.m_pObject) {
-            NiImageConverter* pConverter = NiImageConverter::GetImageConverter();
-            NiPointer<NiPixelData> spFileData =
-                pConverter->ReadImageFile(m_kPlatformFilename.GetHandle(), m_spSrcPixelData.m_pObject, nullptr);
-            if (!m_spSrcPixelData.m_pObject || spFileData.m_pObject != m_spSrcPixelData.m_pObject) {
-                m_spSrcPixelData.operator=(spFileData);
-            }
+    if ((m_kFilename.GetHandle() != NiGlobalStringTable::NULL_STRING) &&
+        (!m_spSrcPixelData.m_pObject && !m_spPersistentSrcRendererData.m_pObject)) {
+        NiImageConverter* pConverter = NiImageConverter::GetImageConverter();
+        NiPointer<NiPixelData> spFileData =
+            pConverter->ReadImageFile(m_kPlatformFilename.GetHandle(), m_spSrcPixelData.m_pObject, nullptr);
+        if (!m_spSrcPixelData.m_pObject || spFileData.m_pObject != m_spSrcPixelData.m_pObject) {
+            m_spSrcPixelData.operator=(spFileData);
         }
     }
 }
@@ -558,7 +557,6 @@ NiObject* NiSourceTexture::CreateObject() {
     if (v0) {
         return ::new (v0) NiSourceTexture;
     }
-    else {
-        return nullptr;
-    }
+
+    return nullptr;
 }

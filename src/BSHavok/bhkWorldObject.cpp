@@ -93,16 +93,15 @@ void bhkWorldObject::LinkObject(NiStream& arStream) {
     if (pkObject) {
         auto* pkShape = static_cast<bhkShape*>(pkObject);
         pkCinfo->m_shape = static_cast<hkpShape*>(pkShape->phkObject);
-        if (this->DynamicCastMember(&bhkRigidBody::ms_RTTI)) {
-            if (pkObject->DynamicCastMember(&bhkNiTriStripsShape::ms_RTTI) ||
-                pkObject->DynamicCastMember(&bhkPackedNiTriStripsShape::ms_RTTI)) {
-                auto* pkMopp = static_cast<bhkMoppBvTreeShape*>(NiMemObject::operator new(sizeof(bhkMoppBvTreeShape)));
-                if (pkMopp) {
-                    pkMopp = ::new (pkMopp) bhkMoppBvTreeShape(pkShape);
-                }
-                if (pkMopp) {
-                    pkCinfo->m_shape = static_cast<hkpShape*>(pkMopp->phkObject);
-                }
+        if ((this->DynamicCastMember(&bhkRigidBody::ms_RTTI)) &&
+            (pkObject->DynamicCastMember(&bhkNiTriStripsShape::ms_RTTI) ||
+             pkObject->DynamicCastMember(&bhkPackedNiTriStripsShape::ms_RTTI))) {
+            auto* pkMopp = static_cast<bhkMoppBvTreeShape*>(NiMemObject::operator new(sizeof(bhkMoppBvTreeShape)));
+            if (pkMopp) {
+                pkMopp = ::new (pkMopp) bhkMoppBvTreeShape(pkShape);
+            }
+            if (pkMopp) {
+                pkCinfo->m_shape = static_cast<hkpShape*>(pkMopp->phkObject);
             }
         }
     }
@@ -528,9 +527,8 @@ hkpShape* bhkWorldObject::GethkShape() {
     if (collidableRw) {
         return const_cast<hkpShape*>(collidableRw->m_shape);
     }
-    else {
-        return nullptr;
-    }
+
+    return nullptr;
 }
 
 hkpCollidable* bhkWorldObject::GetCollidableRw() {

@@ -289,9 +289,8 @@ hkpShape* bhkShape::operator*() const {
     if (this) {
         return const_cast<bhkShape*>(this)->Gethk();
     }
-    else {
-        return nullptr;
-    }
+
+    return nullptr;
 }
 
 HavokMaterialType bhkShape::GetSubshapeMaterial(uint32_t aiKey) {
@@ -302,9 +301,8 @@ HavokMaterialType bhkShape::GetSubshapeMaterial(uint32_t aiKey) {
     if (!v3) {
         return static_cast<HavokMaterialType>(((int32_t)eMaterial) & 31);
     }
-    else {
-        return v3->QSubMaterial(aiKey);
-    }
+
+    return v3->QSubMaterial(aiKey);
 }
 
 HavokMaterialType bhkShape::GetMaterial() {
@@ -333,9 +331,8 @@ bhkShape* bhkShape::Getbhk(const hkpShape* apShape) {
     if (apShape) {
         return apShape->m_userData;
     }
-    else {
-        return nullptr;
-    }
+
+    return nullptr;
 }
 
 void bhkShape::GetMaterialColor(HavokMaterialType aeType, NiColor& arColor) {

@@ -76,12 +76,10 @@ void bhkSPCollisionObject::AddViewerStrings(NiTPrimitiveArray<char*>* apStrings)
 void bhkSPCollisionObject::hktoNiTransform() {
     // spWorldObject is a NiPointer<bhkWorldObject>; this collision object's world object is a phantom.
     bhkShapePhantom* psp = static_cast<bhkShapePhantom*>(static_cast<bhkWorldObject*>(spWorldObject));
-    if (psp) {
-        if (psp->phkObject) {
-            NiTransform kTransform;
-            psp->GetTransform(kTransform);
-            SetTransform(kTransform);
-        }
+    if ((psp) && (psp->phkObject)) {
+        NiTransform kTransform;
+        psp->GetTransform(kTransform);
+        SetTransform(kTransform);
     }
 }
 
@@ -92,14 +90,12 @@ void bhkSPCollisionObject::NitohkTransform() {
     NiAVObject* m_pkSceneObject = this->m_pkSceneObject;
     if (m_pkSceneObject) {
         this->m_pkSceneObject->UpdateWorldLoc();
-        if (psp) {
-            if (psp->phkObject) {
-                nit = m_pkSceneObject->m_kWorld;
-                bhkNiCollisionObject::kKeyframeLock.Lock(nullptr);
-                psp->SetTransform(nit);
-                if (!--bhkNiCollisionObject::kKeyframeLock.uiLockCount) {
-                    bhkNiCollisionObject::kKeyframeLock.uiOwningThread = 0;
-                }
+        if ((psp) && (psp->phkObject)) {
+            nit = m_pkSceneObject->m_kWorld;
+            bhkNiCollisionObject::kKeyframeLock.Lock(nullptr);
+            psp->SetTransform(nit);
+            if (!--bhkNiCollisionObject::kKeyframeLock.uiLockCount) {
+                bhkNiCollisionObject::kKeyframeLock.uiOwningThread = 0;
             }
         }
     }

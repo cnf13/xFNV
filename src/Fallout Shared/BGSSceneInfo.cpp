@@ -291,9 +291,8 @@ uint32_t BGSSceneInfo::GetSceneData(SCENE_INFO_DATA aeIndex) {
     if (aeIndex < 0 || aeIndex >= SID_COUNT) {
         return (uint32_t)0;
     }
-    else {
-        return SceneData.pData[aeIndex];
-    }
+
+    return SceneData.pData[aeIndex];
 }
 
 float BGSSceneInfo::GetMsUsage(SCENE_INFO_DATA aeIndex) {

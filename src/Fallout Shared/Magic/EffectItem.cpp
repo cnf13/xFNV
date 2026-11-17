@@ -70,9 +70,8 @@ float FloatFloor(float aIn) {
     if (!(aIn - v5 >= 0.0)) {
         return v5 - 1.0;
     }
-    else {
-        return v5;
-    }
+
+    return v5;
 }
 
 MEM_CONTEXT QMemContext() {
@@ -105,27 +104,24 @@ int32_t EffectItem::GetMagnitude() {
     if (pEffectSetting->IsFlagSet(EffectSetting::NO_MAGNITUDE)) {
         return 0;
     }
-    else {
-        return data.iMagnitude;
-    }
+
+    return data.iMagnitude;
 }
 
 int32_t EffectItem::GetDuration() {
     if (pEffectSetting->IsFlagSet(EffectSetting::NO_DURATION)) {
         return (uint32_t)0;
     }
-    else {
-        return (uint32_t)data.iDuration;
-    }
+
+    return (uint32_t)data.iDuration;
 }
 
 int32_t EffectItem::GetArea() {
     if (pEffectSetting->IsFlagSet(EffectSetting::NO_AREA) || (!EffectItem::GetRange())) {
         return (int32_t)0;
     }
-    else {
-        return data.iArea;
-    }
+
+    return data.iArea;
 }
 
 MagicSystem::Range EffectItem::GetRange() {
@@ -184,9 +180,8 @@ ActorValue::Index EffectItem::GetActorValueIndex() {
     if (IsActorValueUsed()) {
         return data.iActorValue;
     }
-    else {
-        return static_cast<ActorValue::Index>(-1);
-    }
+
+    return static_cast<ActorValue::Index>(-1);
 }
 
 bool EffectItem::IsHostile() {
@@ -235,13 +230,11 @@ bool EffectItem::IsScriptEffect() {
 Script* EffectItem::GetScript() {
     Script* pscript = nullptr;
     EffectSetting* psetting = GetEffectSetting();
-    if (EffectArchetypes::CheckFlag(psetting->GetEffectArchetype(), 64)) {
-        if (psetting->GetAssociatedItem()) {
-            if (psetting->GetAssociatedItem()->GetFormType() == SCPT_ID) {
-                pscript = static_cast<Script*>(GetEffectSetting()->GetAssociatedItem());
-            }
-        }
+    if ((EffectArchetypes::CheckFlag(psetting->GetEffectArchetype(), 64)) && (psetting->GetAssociatedItem()) &&
+        (psetting->GetAssociatedItem()->GetFormType() == SCPT_ID)) {
+        pscript = static_cast<Script*>(GetEffectSetting()->GetAssociatedItem());
     }
+
     return pscript;
 }
 
@@ -383,10 +376,8 @@ bool EffectItem::SharesAssociatedItem(EffectItem* apEffect1, EffectItem* apEffec
         TESForm* v5 = apEffect2->pEffectSetting->GetAssociatedItem();
         TESBipedModelForm* v6 = dynamic_cast<TESBipedModelForm*>(AssociatedItem);
         TESBipedModelForm* apOtherBiped = dynamic_cast<TESBipedModelForm*>(v5);
-        if (v6) {
-            if (apOtherBiped) {
-                return v6->FillsMatchingBipedSlots(apOtherBiped);
-            }
+        if ((v6) && (apOtherBiped)) {
+            return v6->FillsMatchingBipedSlots(apOtherBiped);
         }
     }
     return apEffect1->pEffectSetting->IsFlagSet(EffectSetting::USE_ASSOCIATED_WEAPON) &&
@@ -440,26 +431,22 @@ uint32_t SettingCollectionMap::GetViewerStrings(NiTPrimitiveArray<char*>* apStri
 
 void SettingCollectionMap::Add(Setting* apSetting) {
     AutoMemContext kContext(MEM_CONTEXT_GAMESETTING, true, "..\\BSMain\\Setting.h", 539);
-    if (apSetting) {
-        if (apSetting->pKey) {
-            Setting* pExisting;
-            if (Settings.GetAt(apSetting->pKey, pExisting)) {
-                SettingWarning(
-                    "DEFAULT: Setting key '%s' already used in map.\nSetting keys must be unique.\n", apSetting->pKey
-                );
-            }
-            else {
-                Settings.SetAt(apSetting->pKey, apSetting);
-            }
+    if ((apSetting) && (apSetting->pKey)) {
+        Setting* pExisting;
+        if (Settings.GetAt(apSetting->pKey, pExisting)) {
+            SettingWarning(
+                "DEFAULT: Setting key '%s' already used in map.\nSetting keys must be unique.\n", apSetting->pKey
+            );
+        }
+        else {
+            Settings.SetAt(apSetting->pKey, apSetting);
         }
     }
 }
 
 void SettingCollectionMap::Remove(Setting* apSetting) {
-    if (apSetting) {
-        if (apSetting->pKey) {
-            Settings.RemoveAt(apSetting->pKey);
-        }
+    if ((apSetting) && (apSetting->pKey)) {
+        Settings.RemoveAt(apSetting->pKey);
     }
 }
 

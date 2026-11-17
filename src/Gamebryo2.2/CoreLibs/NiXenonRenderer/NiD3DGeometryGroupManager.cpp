@@ -182,28 +182,25 @@ bool NiD3DGeometryGroupManager::AddObjectToGroup(
         if (m_pkPartitions->m_pkBuffData) {
             return false;
         }
-        else {
-            uint32_t m_uiPartitions = m_pObject->m_uiPartitions;
-            if (m_uiPartitions) {
-                uint32_t v11 = m_uiPartitions;
-                do {
-                    apGroup->AddObject(apData, apSkinInstance, m_pkPartitions++);
-                    --v11;
-                }
-                while (v11);
+
+        uint32_t m_uiPartitions = m_pObject->m_uiPartitions;
+        if (m_uiPartitions) {
+            uint32_t v11 = m_uiPartitions;
+            do {
+                apGroup->AddObject(apData, apSkinInstance, m_pkPartitions++);
+                --v11;
             }
-            return true;
+            while (v11);
         }
+        return true;
     }
-    else {
-        if (apData->m_pkBuffData) {
-            return false;
-        }
-        else {
-            apGroup->AddObject(apData, apSkinInstance, static_cast<NiSkinPartition::Partition*>(nullptr));
-            return true;
-        }
+
+    if (apData->m_pkBuffData) {
+        return false;
     }
+
+    apGroup->AddObject(apData, apSkinInstance, static_cast<NiSkinPartition::Partition*>(nullptr));
+    return true;
 }
 
 // Reads the group from the first partition before the loop and ignores this.

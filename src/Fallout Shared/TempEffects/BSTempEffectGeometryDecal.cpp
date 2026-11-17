@@ -122,13 +122,12 @@ bool BSTempEffectGeometryDecal::Update(float afTimeDelta) {
                 pdecalnode->RemoveFromDecalList(this);
             }
         }
-        if (pdecalnode) {
-            if (!spDecalParent.m_pObject->GetChildCount()) {
-                NiNode* Parent = spDecalParent.m_pObject->m_pkParent;
-                Parent->DetachChild(spDecalParent.m_pObject);
-                --BGSDecalManager::iSkinnedDecalCount;
-            }
+        if ((pdecalnode) && (!spDecalParent.m_pObject->GetChildCount())) {
+            NiNode* Parent = spDecalParent.m_pObject->m_pkParent;
+            Parent->DetachChild(spDecalParent.m_pObject);
+            --BGSDecalManager::iSkinnedDecalCount;
         }
+
         bFinished = true;
     }
     return ret;

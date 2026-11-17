@@ -324,11 +324,10 @@ bool TESActorBaseData::IsInEvilFactionsOnly() {
     v3 = (uint8_t)(!ecx0->IsEmpty());
     while (ecx0 && v3) {
         v2 = ecx0->m_item;
-        if (v2) {
-            if (!v2->pFaction->GetIsEvil()) {
-                v3 = 0;
-            }
+        if ((v2) && (!v2->pFaction->GetIsEvil())) {
+            v3 = 0;
         }
+
         ecx0 = ecx0->m_pkNext;
     }
     return (bool)v3;
@@ -1118,21 +1117,19 @@ void TESActorBaseData::Save() {
 void TESActorBaseData::SetPCFactionFlags(PC_FACTION_FLAG aeflag) {
     for (FACTION_RANK* m_item : (&listFactions)->ItemsUntilNull()) {
         TESFaction* pfaction = m_item->pFaction;
-        if (m_item) {
-            if (pPlayer->GetActorBase()->GetFactionRank(pfaction, true) != -1) {
-                if (aeflag) {
-                    if (aeflag == PC_FACTIONFLAG_ATTACK) {
-                        pfaction->SetPCAttack(true);
-                    }
-                    else {
-                        if (aeflag == PC_FACTIONFLAG_PLAYER_IS_ENEMY) {
-                            pfaction->SetPCAnEnemy(true);
-                        }
-                    }
+        if ((m_item) && (pPlayer->GetActorBase()->GetFactionRank(pfaction, true) != -1)) {
+            if (aeflag) {
+                if (aeflag == PC_FACTIONFLAG_ATTACK) {
+                    pfaction->SetPCAttack(true);
                 }
                 else {
-                    pfaction->SetPCMurder(true);
+                    if (aeflag == PC_FACTIONFLAG_PLAYER_IS_ENEMY) {
+                        pfaction->SetPCAnEnemy(true);
+                    }
                 }
+            }
+            else {
+                pfaction->SetPCMurder(true);
             }
         }
     }

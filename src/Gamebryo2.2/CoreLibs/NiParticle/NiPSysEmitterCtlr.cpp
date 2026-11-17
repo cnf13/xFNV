@@ -55,10 +55,9 @@ NiObject* NiPSysEmitterCtlr::CreateClone(NiCloningProcess& kCloning) {
         CopyMembers(v4, kCloning);
         return v4;
     }
-    else {
-        CopyMembers(nullptr, kCloning);
-        return nullptr;
-    }
+
+    CopyMembers(nullptr, kCloning);
+    return nullptr;
 }
 
 // The emitter active link is read in every file version.

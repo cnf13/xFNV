@@ -109,10 +109,9 @@ bool FORenderedMenuRaceSex::OnIdle() {
         pPlayer->UpdateAnimationMovement(v3, 0.0);
         return (bool)((uint8_t)FORenderedMenu::OnIdle());
     }
-    else {
-        Interface::EmergencyCloseAllMenusAndBreakStuff();
-        return false;
-    }
+
+    Interface::EmergencyCloseAllMenusAndBreakStuff();
+    return false;
 }
 
 bool FORenderedMenuRaceSex::Pick(bool a1, float* a2, float* a3) {
@@ -139,10 +138,8 @@ bool FORenderedMenuRaceSex::Pick(bool a1, float* a2, float* a3) {
                 int32_t DataClipDist = static_cast<int32_t>(v21->sRealCursorPos.x);
                 NiCamera* Camera = GetCamera();
                 Camera->WindowPointToRay(DataClipDist, ScriptProcessingDelay, a1a, a2a, nullptr);
-                if (apMemory.PickObjects(a1a, a2a, false)) {
-                    if ((&apMemory.m_pickResults)->GetAt(0)) {
-                        v18 = j;
-                    }
+                if ((apMemory.PickObjects(a1a, a2a, false)) && ((&apMemory.m_pickResults)->GetAt(0))) {
+                    v18 = j;
                 }
             }
             if (v18 >= 0) {

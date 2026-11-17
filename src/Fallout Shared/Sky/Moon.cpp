@@ -490,17 +490,14 @@ float Moon::GetMoonVisibility() const {
             if ((!(fAngleFadeStart < ((double)fPos))) || (!(v4 > ((double)fPos)))) {
                 return 0.0;
             }
-            else {
-                return 1.0;
-            }
+
+            return 1.0;
         }
-        else {
-            return ((v5 - fPos) / (v5 - v4));
-        }
+
+        return ((v5 - fPos) / (v5 - v4));
     }
-    else {
-        return ((fPos - fAngleFadeEnd) / (fAngleFadeStart - fAngleFadeEnd));
-    }
+
+    return ((fPos - fAngleFadeEnd) / (fAngleFadeStart - fAngleFadeEnd));
 }
 
 float Moon::GetMoonShadowVisibility() const {
@@ -517,17 +514,14 @@ float Moon::GetMoonShadowVisibility() const {
             if ((!(fAngleFadeEnd < ((double)fPos))) || (!(v5 > ((double)fPos)))) {
                 return 0.0;
             }
-            else {
-                return 1.0;
-            }
+
+            return 1.0;
         }
-        else {
-            return ((v7 - fPos) / (v7 - v5));
-        }
+
+        return ((v7 - fPos) / (v7 - v5));
     }
-    else {
-        return ((fPos - v6) / (fAngleFadeEnd - v6));
-    }
+
+    return ((fPos - v6) / (fAngleFadeEnd - v6));
 }
 
 // The phase is (days passed mod 8 phase lengths) / phase length; each operand is fetched again, as the game does.

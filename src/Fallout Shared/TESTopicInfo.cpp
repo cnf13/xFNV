@@ -290,10 +290,8 @@ bool TESTopicInfo::SavesBefore(TESForm* apForm) {
         TESTopic* pothertopic_2 = dynamic_cast<TESTopic*>(apForm);
         if (pothertopic_2) {
             TESTopic* pourtopic_2 = TESTopic::GetOwnerTopic(this);
-            if (pourtopic_2) {
-                if (pourtopic_2 != pothertopic_2) {
-                    return pourtopic_2->SavesBefore(pothertopic_2);
-                }
+            if ((pourtopic_2) && (pourtopic_2 != pothertopic_2)) {
+                return pourtopic_2->SavesBefore(pothertopic_2);
             }
         }
     }
@@ -303,12 +301,8 @@ bool TESTopicInfo::SavesBefore(TESForm* apForm) {
             if (pinfo) {
                 TESTopic* pourtopic = TESTopic::GetOwnerTopic(this);
                 TESTopic* pothertopic = TESTopic::GetOwnerTopic(pinfo);
-                if (pothertopic) {
-                    if (pourtopic) {
-                        if (pothertopic != pourtopic) {
-                            return pourtopic->SavesBefore(pothertopic);
-                        }
-                    }
+                if ((pothertopic) && (pourtopic) && (pothertopic != pourtopic)) {
+                    return pourtopic->SavesBefore(pothertopic);
                 }
             }
         }
@@ -448,15 +442,14 @@ void TESTopicInfo::GetFormDetailedString(BSStringT<char>& aString) {
         std::sprintf(v8, ", Topic '%s' (%08X)", ptopic->GetFormEditorID(), CastingType);
     }
     v7[0] = 0;
-    if (ptopic) {
-        if (GetInitialized()) {
-            TESQuest* pquest = ptopic->GetOwnerQuest(this);
-            if (pquest) {
-                int32_t v4 = pquest->iFormID;
-                std::sprintf(v7, "Quest '%s' (%08X)", pquest->GetEditorName(), v4);
-            }
+    if ((ptopic) && (GetInitialized())) {
+        TESQuest* pquest = ptopic->GetOwnerQuest(this);
+        if (pquest) {
+            int32_t v4 = pquest->iFormID;
+            std::sprintf(v7, "Quest '%s' (%08X)", pquest->GetEditorName(), v4);
         }
     }
+
     v9[0] = 0;
     TESResponse* presponse = GetResponseList(nullptr)->pHead;
     if (presponse) {
@@ -539,36 +532,33 @@ void TESTopicInfo::Copy(TESForm* apCopy) {
 
 bool TESTopicInfo::BelongsInGroup(FORM* apGroupFORM, bool abAllowParentGroups, bool abCurrentOnly) {
     bool v6 = false;
-    if (apGroupFORM) {
-        if (apGroupFORM->form == formEnumString[2].uiFormString) {
-            TESTopic* OwnerTopic = TESTopic::GetOwnerTopic(this);
-            if (OwnerTopic) {
-                if (abAllowParentGroups) {
-                    v6 = OwnerTopic->BelongsInGroup(apGroupFORM, abAllowParentGroups, abCurrentOnly);
-                }
-                if (!v6 && apGroupFORM->iFormID == 7) {
-                    return OwnerTopic->FormIDMatchesWithoutIndex(apGroupFORM->flags);
-                }
+    if ((apGroupFORM) && (apGroupFORM->form == formEnumString[2].uiFormString)) {
+        TESTopic* OwnerTopic = TESTopic::GetOwnerTopic(this);
+        if (OwnerTopic) {
+            if (abAllowParentGroups) {
+                v6 = OwnerTopic->BelongsInGroup(apGroupFORM, abAllowParentGroups, abCurrentOnly);
+            }
+            if (!v6 && apGroupFORM->iFormID == 7) {
+                return OwnerTopic->FormIDMatchesWithoutIndex(apGroupFORM->flags);
             }
         }
     }
+
     return v6;
 }
 
 void TESTopicInfo::CreateGroupData(FORM* apOutGroupFORM, FORM_GROUP* apParentGroup) {
     if (apOutGroupFORM) {
         apOutGroupFORM->form = 0;
-        if (apParentGroup) {
-            if (!apParentGroup->GroupData.iFormID &&
-                apParentGroup->GroupData.flags == formEnumString[69].uiFormString) {
-                TESTopic* pparenttopic = TESTopic::GetOwnerTopic(this);
-                if (pparenttopic) {
-                    apOutGroupFORM->form = formEnumString[2].uiFormString;
-                    apOutGroupFORM->iFormID = 7;
-                    apOutGroupFORM->flags = pparenttopic->iFormID;
-                    apOutGroupFORM->length = 0;
-                    apOutGroupFORM->iVersionControl = 0;
-                }
+        if ((apParentGroup) &&
+            (!apParentGroup->GroupData.iFormID && apParentGroup->GroupData.flags == formEnumString[69].uiFormString)) {
+            TESTopic* pparenttopic = TESTopic::GetOwnerTopic(this);
+            if (pparenttopic) {
+                apOutGroupFORM->form = formEnumString[2].uiFormString;
+                apOutGroupFORM->iFormID = 7;
+                apOutGroupFORM->flags = pparenttopic->iFormID;
+                apOutGroupFORM->length = 0;
+                apOutGroupFORM->iVersionControl = 0;
             }
         }
     }
@@ -724,26 +714,24 @@ void TESTopicInfo::ClearResponseList() {
 
 // Removes the info from apTopic's info list.
 void TESTopicInfo::RemoveInfoFromTopic(TESTopic* apTopic) {
-    if (apTopic) {
-        if (GetInfoIndex() != 0xFFFF) {
-            QUEST_INFO* pQuestInfo = apTopic->GetQuestInfoElement(this);
-            if (pQuestInfo) {
-                TopicInfoArray* pInfoArray = (&pQuestInfo->infoArray);
-                if (pInfoArray->GetAt(GetInfoIndex()) == this) {
-                    pInfoArray->RemoveAt(GetInfoIndex());
-                }
-                else {
-                    int32_t isize = pInfoArray->m_uiSize;
-                    for (int32_t i = 0; i < isize; ++i) {
-                        if (pInfoArray->GetAt(i) == this) {
-                            pInfoArray->RemoveAt(i);
-                            break;
-                        }
+    if ((apTopic) && (GetInfoIndex() != 0xFFFF)) {
+        QUEST_INFO* pQuestInfo = apTopic->GetQuestInfoElement(this);
+        if (pQuestInfo) {
+            TopicInfoArray* pInfoArray = (&pQuestInfo->infoArray);
+            if (pInfoArray->GetAt(GetInfoIndex()) == this) {
+                pInfoArray->RemoveAt(GetInfoIndex());
+            }
+            else {
+                int32_t isize = pInfoArray->m_uiSize;
+                for (int32_t i = 0; i < isize; ++i) {
+                    if (pInfoArray->GetAt(i) == this) {
+                        pInfoArray->RemoveAt(i);
+                        break;
                     }
                 }
-                pInfoArray->Compact();
-                TESTopic::SetTopicIndices(pInfoArray);
             }
+            pInfoArray->Compact();
+            TESTopic::SetTopicIndices(pInfoArray);
         }
     }
 }
@@ -802,15 +790,12 @@ void TESTopicInfo::RunResult(TOPIC_INFO_RESULT_SCRIPT aeScript, TESObjectREFR* a
     Script* pScript;
     if (apRef) {
         pScript = GetResultScript(aeScript);
-        if (Script::GetProcessScripts()) {
-            if (pScript) {
-                if (pScript->GetHeader()->dataSize) {
-                    extraDataList = apRef->TESObjectREFR::GetExtra();
-                    scriptLocals = extraDataList->GetScriptLocals();
-                    pScript->Run(apRef, scriptLocals, nullptr, true);
-                }
-            }
+        if ((Script::GetProcessScripts()) && (pScript) && (pScript->GetHeader()->dataSize)) {
+            extraDataList = apRef->TESObjectREFR::GetExtra();
+            scriptLocals = extraDataList->GetScriptLocals();
+            pScript->Run(apRef, scriptLocals, nullptr, true);
         }
+
         SetSaidOnce();
         if (IsSayOnceADay() && apRef->IsMobileObject()) {
             static_cast<MobileObject*>(apRef)->AddSayOnceTopicInfo(this);
@@ -839,9 +824,8 @@ DUMMY_NODE_STATE TESTopicInfo::GetDummyNodeState() {
     if ((((uint8_t)m_Data.flagsExt) & 16) != 0) {
         return DUM_DUMMY_ONLY;
     }
-    else {
-        return static_cast<DUMMY_NODE_STATE>(((uint8_t)((((uint8_t)m_Data.flagsExt) & 32) != 0)) + 2);
-    }
+
+    return static_cast<DUMMY_NODE_STATE>(((uint8_t)((((uint8_t)m_Data.flagsExt) & 32) != 0)) + 2);
 }
 
 uint32_t TESTopicInfo::GetSpeechChallengeDifficultyMult() {
@@ -1054,11 +1038,10 @@ bool TESTopicInfo::CheckCondition(
     }
     DUMMY_NODE_STATE DummyFlag = GetDummyNodeState();
     Actor* pTargetActor = nullptr;
-    if (apTargetRef) {
-        if (apTargetRef->IsActor()) {
-            pTargetActor = static_cast<Actor*>(apTargetRef);
-        }
+    if ((apTargetRef) && (apTargetRef->IsActor())) {
+        pTargetActor = static_cast<Actor*>(apTargetRef);
     }
+
     if (pTargetActor &&
         (v6 = pTargetActor->GetActorValue(ActorValue::INTELLIGENCE), v6 <= iDialogueDummySpeakThisIntOrBelow.Int())) {
         if (DummyFlag == DUM_NON_DUMMY_ONLY) {
@@ -1132,9 +1115,8 @@ int32_t ResponseListWrapper::GetResponseID() {
     if (pHead) {
         return pHead->GetListCount();
     }
-    else {
-        return 0;
-    }
+
+    return 0;
 }
 
 void ResponseListWrapper::ClearResponseList() {

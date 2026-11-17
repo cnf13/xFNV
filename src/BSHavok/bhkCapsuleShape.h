@@ -29,7 +29,7 @@ public:
     hkSerializableCinfo& CreateCinfo(bool& arCreated) override;
     void CopyMembers(bhkSerializable* apDest, NiCloningProcess& arCloneData) override;
     void BuildDisplayGeometry(NiNode* apNode, const NiColor& arDefColor) override;
-    virtual ~bhkCapsuleShape();
+    ~bhkCapsuleShape() override;
 
     // The (top, bottom, radius) overload: builds the Havok capsule from the two axis end points.
     void Init(const hkVector4& arTop, const hkVector4& arBottom, float afRad);

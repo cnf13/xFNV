@@ -157,10 +157,7 @@ bool BGSSaveLoadGame::ShouldAddChanges(TESForm* apForm, bool abForceAdd) {
         return false;
     }
     uint32_t iFormID = apForm->iFormID;
-    if (apForm->GetDelete() && pDataHandler->IsFormIDCreated(iFormID)) {
-        return false;
-    }
-    return true;
+    return !(apForm->GetDelete() && pDataHandler->IsFormIDCreated(iFormID));
 }
 
 bool BGSSaveLoadGame::GetChange(TESForm* apForm, BGSChangeFlags aiChanges) {
@@ -319,33 +316,31 @@ void BGSSaveLoadGame::LoadForm(TESForm* apForm) {
     if (!GetSaveGameLoading()) {
         uint32_t iformID = apForm->iFormID;
         BGSFormChanges* pchanges = pChangesMap->GetChanges(iformID);
-        if (pchanges) {
-            if (pchanges->UnloadedFormBuffer.pBuffer) {
-                ENUM_FORM_ID eformType = pchanges->UnloadedFormBuffer.GetFormType();
-                if (apForm->GetFormType() == eformType) {
-                    bool brestoreAllowChanges = SetThreadAllowChanges(false);
-                    BGSLoadFormBuffer* ploadFormBuffer = pchanges->UnloadedFormBuffer.FillLoadFormBuffer();
-                    // The load buffer owns the data: DestructKeepBuffer only clears the pointer.
-                    BGSUnloadedFormBuffer::DestructKeepBuffer(&pchanges->UnloadedFormBuffer);
-                    ploadFormBuffer->pForm = apForm;
-                    ploadFormBuffer->SetChangeFlags(pchanges->iChangeFlags);
-                    apForm->SetStillLoading(true);
-                    BGSSaveLoadInitialData::LoadInitialData(ploadFormBuffer, apForm, pchanges->iChangeFlags);
-                    apForm->LoadGame(ploadFormBuffer);
-                    ploadFormBuffer->ClearBuffer();
-                    FormBufferArray.Add(ploadFormBuffer);
-                    SetThreadAllowChanges(brestoreAllowChanges);
-                }
-                else {
-                    const char* FormTypeString = apForm->GetFormTypeString();
-                    const char* FormTypeString_0 = TESForm::GetFormTypeString(eformType);
-                    SaveGameWarning(
-                        "SAVELOAD: (Load Error) Form '%s' (%08X) was saved with form type %s, but "
-                        "currently has form type %s.  Its loading will be skipped.",
-                        apForm->GetFormEditorID(), iformID, FormTypeString_0, FormTypeString
-                    );
-                    pChangesMap->RemoveChanges(iformID);
-                }
+        if ((pchanges) && (pchanges->UnloadedFormBuffer.pBuffer)) {
+            ENUM_FORM_ID eformType = pchanges->UnloadedFormBuffer.GetFormType();
+            if (apForm->GetFormType() == eformType) {
+                bool brestoreAllowChanges = SetThreadAllowChanges(false);
+                BGSLoadFormBuffer* ploadFormBuffer = pchanges->UnloadedFormBuffer.FillLoadFormBuffer();
+                // The load buffer owns the data: DestructKeepBuffer only clears the pointer.
+                BGSUnloadedFormBuffer::DestructKeepBuffer(&pchanges->UnloadedFormBuffer);
+                ploadFormBuffer->pForm = apForm;
+                ploadFormBuffer->SetChangeFlags(pchanges->iChangeFlags);
+                apForm->SetStillLoading(true);
+                BGSSaveLoadInitialData::LoadInitialData(ploadFormBuffer, apForm, pchanges->iChangeFlags);
+                apForm->LoadGame(ploadFormBuffer);
+                ploadFormBuffer->ClearBuffer();
+                FormBufferArray.Add(ploadFormBuffer);
+                SetThreadAllowChanges(brestoreAllowChanges);
+            }
+            else {
+                const char* FormTypeString = apForm->GetFormTypeString();
+                const char* FormTypeString_0 = TESForm::GetFormTypeString(eformType);
+                SaveGameWarning(
+                    "SAVELOAD: (Load Error) Form '%s' (%08X) was saved with form type %s, but "
+                    "currently has form type %s.  Its loading will be skipped.",
+                    apForm->GetFormEditorID(), iformID, FormTypeString_0, FormTypeString
+                );
+                pChangesMap->RemoveChanges(iformID);
             }
         }
     }
@@ -496,17 +491,12 @@ void BGSSaveLoadGame::RevertCurrentChanges(
                 BGSChangeFlags::GetUnrevertibleChanges(
                     &kUnrevertible, pchanges->iChangeFlags, kNoChanges, eFormType, false
                 );
-                if (kUnrevertible.iFlags) {
-                    if (!HandleUnrevertibleChanges(pform, kUnrevertible, true)) {
-                        if (pform) {
-                            pReconstructForms->AddForm(pform, 8u);
-                        }
-                    }
+                if ((kUnrevertible.iFlags) && (!HandleUnrevertibleChanges(pform, kUnrevertible, true)) && (pform)) {
+                    pReconstructForms->AddForm(pform, 8u);
                 }
-                if (pform) {
-                    if (pchanges->iChangeFlags.ReduceToForcedChanges(pform)) {
-                        apNewChangesMap->AddChangeFlags(iformID, pchanges->iChangeFlags);
-                    }
+
+                if ((pform) && (pchanges->iChangeFlags.ReduceToForcedChanges(pform))) {
+                    apNewChangesMap->AddChangeFlags(iformID, pchanges->iChangeFlags);
                 }
             }
         }
@@ -531,11 +521,10 @@ void BGSSaveLoadGame::RevertCurrentChanges(
                     TESObjectCELL* pcell = nullptr;
                     TESWorldSpace* pworld = nullptr;
                     refData.GetOriginalLocationCellAndWorld(pcell, pworld);
-                    if (pcell) {
-                        if (TES::pInstance->IsCellLoaded(pcell, false)) {
-                            pReconstructForms->AddReference(pcell, iformID, 8u);
-                        }
+                    if ((pcell) && (TES::pInstance->IsCellLoaded(pcell, false))) {
+                        pReconstructForms->AddReference(pcell, iformID, 8u);
                     }
+
                     pFormIDMap = pcurrentFormIDMap;
                 }
             }
@@ -668,11 +657,10 @@ void BGSSaveLoadGame::InitForms(bool abLoadModels) {
                     kMoved.~BGSChangeFlags();
                     ::new (&kMoved) BGSChangeFlags(8);
                     AddChange(pactor, kMoved, true);
-                    if (pactor->IsActor()) {
-                        if (pactor->pCurrentProcess) {
-                            pactor->MovetoLow();
-                        }
+                    if ((pactor->IsActor()) && (pactor->pCurrentProcess)) {
+                        pactor->MovetoLow();
                     }
+
                     this->UnloadForm(pactor, true);
                     TESObjectCELL* pparentcell = pactor->GetParentCell();
                     if (pparentcell) {
@@ -783,9 +771,8 @@ uint32_t BGSSaveLoadGame::GetChangedFormID(uint32_t aiOldFormID) {
     if (vCondition1) {
         return a2;
     }
-    else {
-        return (uint32_t)0;
-    }
+
+    return (uint32_t)0;
 }
 
 void BGSSaveLoadGame::CleanupExpiredData() {
@@ -827,16 +814,14 @@ void BGSSaveLoadGame::CleanupExpiredData() {
             }
             else {
                 TESObjectCELL* pcell = static_cast<TESObjectCELL*>(TESForm::GetFormByNumericID(iformID));
-                if (pcell) {
-                    if (pcell->GetFormType() == CELL_ID) {
-                        TESObjectCELL* pcell_2 = pcell;
-                        idetachTime = pcell->GetDetachTime();
-                        if (!pcell->GetInterior()) {
-                            TESWorldSpace* WorldSpace = pcell_2->GetWorldSpace();
-                            ilocationID = WorldSpace->iFormID;
-                            icellX = pcell_2->GetDataX();
-                            icellY = pcell_2->GetDataY();
-                        }
+                if ((pcell) && (pcell->GetFormType() == CELL_ID)) {
+                    TESObjectCELL* pcell_2 = pcell;
+                    idetachTime = pcell->GetDetachTime();
+                    if (!pcell->GetInterior()) {
+                        TESWorldSpace* WorldSpace = pcell_2->GetWorldSpace();
+                        ilocationID = WorldSpace->iFormID;
+                        icellX = pcell_2->GetDataX();
+                        icellY = pcell_2->GetDataY();
                     }
                 }
             }
@@ -941,53 +926,48 @@ void BGSSaveLoadGame::CleanupExpiredData() {
                         );
                         refData_2.~ReferenceInitialData();
                         ::new (&refData_2) ReferenceInitialData;
-                        if (pchanges_2->UnloadedFormBuffer.pBuffer) {
-                            if (einitialDataType_3 == INITIAL_DATA_MOVED_REFERENCE) {
-                                char* v5 = pchanges_2->UnloadedFormBuffer.GetAdvancedBuffer();
-                                BGSSaveLoadInitialData::LoadInitialDataStruct(
-                                    v5, INITIAL_DATA_MOVED_REFERENCE, &refData_2
-                                );
-                                pReferencesMap->RemoveMovedReference(iformID_2);
-                                TESForm* pform_2 = TESForm::GetFormByNumericID(refData_2.iLocationID);
-                                if (pform_2 && pform_2->GetFormType() == WRLD_ID) {
-                                    pReferencesMap->RemoveReference(
-                                        refData_2.iLocationID, iformID_2, refData_2.Location
-                                    );
-                                }
-                                else {
-                                    pReferencesMap->RemoveReference_0(refData_2.iLocationID, iformID_2);
-                                }
+                        if ((pchanges_2->UnloadedFormBuffer.pBuffer) &&
+                            (einitialDataType_3 == INITIAL_DATA_MOVED_REFERENCE)) {
+                            char* v5 = pchanges_2->UnloadedFormBuffer.GetAdvancedBuffer();
+                            BGSSaveLoadInitialData::LoadInitialDataStruct(v5, INITIAL_DATA_MOVED_REFERENCE, &refData_2);
+                            pReferencesMap->RemoveMovedReference(iformID_2);
+                            TESForm* pform_2 = TESForm::GetFormByNumericID(refData_2.iLocationID);
+                            if (pform_2 && pform_2->GetFormType() == WRLD_ID) {
+                                pReferencesMap->RemoveReference(refData_2.iLocationID, iformID_2, refData_2.Location);
+                            }
+                            else {
+                                pReferencesMap->RemoveReference_0(refData_2.iLocationID, iformID_2);
                             }
                         }
+
                         if (pchanges_2->iChangeFlags.Equals(CHANGE_REFR_HAVOK_MOVE)) {
                             pChangesMap->RemoveChanges(iformID_2);
                             ++iremoveHavokFullCount;
                         }
                         else {
-                            if (pchanges_2->UnloadedFormBuffer.pBuffer) {
-                                if (einitialDataType_3) {
-                                    char* apBuffer = pchanges_2->UnloadedFormBuffer.GetAdvancedBuffer();
-                                    uint32_t iinitialDataSize =
-                                        BGSSaveLoadInitialData::GetInitialDataTypeDataSize(einitialDataType_3);
-                                    char* pbuffer = &apBuffer[iinitialDataSize];
-                                    uint32_t ihavokDataSize = 0;
-                                    uint32_t ihavokDataSizeTypeSize =
-                                        LoadVariableSizedValueFromBuffer(pbuffer, ihavokDataSize);
-                                    char* pbuffer_2 = &pbuffer[ihavokDataSize + ihavokDataSizeTypeSize];
-                                    char* poriginalBuffer = pchanges_2->UnloadedFormBuffer.pBuffer;
-                                    uint8_t cversion = pchanges_2->UnloadedFormBuffer.GetVersion();
-                                    uint32_t idataSize = pchanges_2->UnloadedFormBuffer.GetSize();
-                                    uint32_t inewDataSize =
-                                        idataSize - iinitialDataSize - ihavokDataSizeTypeSize - ihavokDataSize;
-                                    // The destructor only clears the pointer: the old buffer is freed below.
-                                    BGSUnloadedFormBuffer::DestructKeepBuffer(&pchanges_2->UnloadedFormBuffer);
-                                    pchanges_2->UnloadedFormBuffer.Initialize(
-                                        pbuffer_2, inewDataSize, eformType_2, cversion
-                                    );
-                                    ourFree(poriginalBuffer);
-                                    ++iremoveHavokUnloadedPartialCount;
-                                }
+                            if ((pchanges_2->UnloadedFormBuffer.pBuffer) && (einitialDataType_3)) {
+                                char* apBuffer = pchanges_2->UnloadedFormBuffer.GetAdvancedBuffer();
+                                uint32_t iinitialDataSize =
+                                    BGSSaveLoadInitialData::GetInitialDataTypeDataSize(einitialDataType_3);
+                                char* pbuffer = &apBuffer[iinitialDataSize];
+                                uint32_t ihavokDataSize = 0;
+                                uint32_t ihavokDataSizeTypeSize =
+                                    LoadVariableSizedValueFromBuffer(pbuffer, ihavokDataSize);
+                                char* pbuffer_2 = &pbuffer[ihavokDataSize + ihavokDataSizeTypeSize];
+                                char* poriginalBuffer = pchanges_2->UnloadedFormBuffer.pBuffer;
+                                uint8_t cversion = pchanges_2->UnloadedFormBuffer.GetVersion();
+                                uint32_t idataSize = pchanges_2->UnloadedFormBuffer.GetSize();
+                                uint32_t inewDataSize =
+                                    idataSize - iinitialDataSize - ihavokDataSizeTypeSize - ihavokDataSize;
+                                // The destructor only clears the pointer: the old buffer is freed below.
+                                BGSUnloadedFormBuffer::DestructKeepBuffer(&pchanges_2->UnloadedFormBuffer);
+                                pchanges_2->UnloadedFormBuffer.Initialize(
+                                    pbuffer_2, inewDataSize, eformType_2, cversion
+                                );
+                                ourFree(poriginalBuffer);
+                                ++iremoveHavokUnloadedPartialCount;
                             }
+
                             pchanges_2->iChangeFlags.RemoveFlags(12);
                         }
                         if (pref) {
@@ -1109,11 +1089,10 @@ bool BGSSaveLoadGame::LoadGame(BGSSaveLoadFile* apFile, bool abIgnoreMissingCont
             if (pForm->GetFormType() != eFormType) {
                 bSkip = true;
             }
-            else if (pForm->IsReference()) {
-                if (!static_cast<TESObjectREFR*>(pForm)->GetObjectReference()) {
-                    bSkip = true;
-                }
+            else if ((pForm->IsReference()) && (!static_cast<TESObjectREFR*>(pForm)->GetObjectReference())) {
+                bSkip = true;
             }
+
             if (bSkip) {
                 if (pDataHandler->IsFormIDCreated(iFormID)) {
                     ClearForm(pForm);
@@ -1203,11 +1182,10 @@ bool BGSSaveLoadGame::LoadGame(BGSSaveLoadFile* apFile, bool abIgnoreMissingCont
                 );
                 bSkip = true;
             }
-            else if (pForm->IsReference()) {
-                if (!static_cast<TESObjectREFR*>(pForm)->GetObjectReference()) {
-                    bSkip = true;
-                }
+            else if ((pForm->IsReference()) && (!static_cast<TESObjectREFR*>(pForm)->GetObjectReference())) {
+                bSkip = true;
             }
+
             if (bSkip) {
                 pChangesMap->RemoveChanges(pLoadFormBuffer->GetFormID());
                 pLoadFormBuffer->SkipData(apFile, 0);
@@ -1233,11 +1211,9 @@ bool BGSSaveLoadGame::LoadGame(BGSSaveLoadFile* apFile, bool abIgnoreMissingCont
                 return false;
             }
             BGSSaveLoadInitialData::LoadInitialData(pLoadFormBuffer, pForm, pLoadFormBuffer->GetChangeFlags());
-            if (pLoadFormBuffer->GetForm()) {
-                if (!GetSaveLoadFailed()) {
-                    pForm->SetStillLoading(true);
-                    pForm->LoadGame(pLoadFormBuffer);
-                }
+            if ((pLoadFormBuffer->GetForm()) && (!GetSaveLoadFailed())) {
+                pForm->SetStillLoading(true);
+                pForm->LoadGame(pLoadFormBuffer);
             }
         }
         else {

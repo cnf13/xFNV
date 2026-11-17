@@ -65,10 +65,8 @@ TESRegionGrassObjectList* TESRegionGrassObjectList::Copy(TESRegionGrassObjectLis
         if (pcopy->bOwnsTESRegionGrassObjectMemory) {
             TESRegionGrassObject** v2 = &pcurrent_2->m_item;
             TESRegionGrassObject* pobjCopy = (*v2)->Copy(nullptr);
-            if (!pcopy->Add(pobjCopy)) {
-                if (pobjCopy) {
-                    delete pobjCopy;
-                }
+            if ((!pcopy->Add(pobjCopy)) && (pobjCopy)) {
+                delete pobjCopy;
             }
         }
         else {
@@ -99,16 +97,15 @@ void TESRegionGrassObjectList::MergeLists(
     else {
         fpriorityOther = afOtherPriority / 100.0;
     }
-    if (apOtherList) {
-        if (!(fpriority < 0.0) && !(fpriority > 1.0) && !(fpriorityOther < 0.0) && !(fpriorityOther > 1.0)) {
-            for (BSSimpleList<TESRegionGrassObject*>* pcurrent =
-                     static_cast<BSSimpleList<TESRegionGrassObject*>*>(apOtherList);
-                 pcurrent && pcurrent->m_item; pcurrent = pcurrent->m_pkNext) {
-                TESRegionGrassObject* m_item = pcurrent->m_item;
-                if (m_item->GetObject()) {
-                    TESRegionGrassObject* pobjCopy = pcurrent->m_item->Copy(nullptr);
-                    Add(pobjCopy);
-                }
+    if ((apOtherList) &&
+        (!(fpriority < 0.0) && !(fpriority > 1.0) && !(fpriorityOther < 0.0) && !(fpriorityOther > 1.0))) {
+        for (BSSimpleList<TESRegionGrassObject*>* pcurrent =
+                 static_cast<BSSimpleList<TESRegionGrassObject*>*>(apOtherList);
+             pcurrent && pcurrent->m_item; pcurrent = pcurrent->m_pkNext) {
+            TESRegionGrassObject* m_item = pcurrent->m_item;
+            if (m_item->GetObject()) {
+                TESRegionGrassObject* pobjCopy = pcurrent->m_item->Copy(nullptr);
+                Add(pobjCopy);
             }
         }
     }
@@ -129,14 +126,13 @@ TESRegionGrassObject* TESRegionGrassObjectList::Find(uint32_t aiFind, int32_t ai
         TESRegionGrassObject* v10 = *v3;
         TESForm* v4 = (*v3)->GetObject();
         if (v4->iFormID == aiFind) {
-            if (aiParentFind >= 0) {
-                if (v10->GetParentTexture()) {
-                    TESLandTexture* v5 = v10->GetParentTexture();
-                    if (v5->iFormID == aiParentFind) {
-                        return v10;
-                    }
+            if ((aiParentFind >= 0) && (v10->GetParentTexture())) {
+                TESLandTexture* v5 = v10->GetParentTexture();
+                if (v5->iFormID == aiParentFind) {
+                    return v10;
                 }
             }
+
             if (aiParentFind < 0 && !v10->GetParentTexture()) {
                 return v10;
             }

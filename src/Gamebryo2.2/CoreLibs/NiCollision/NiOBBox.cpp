@@ -824,9 +824,14 @@ int32_t NiOBBox::FindIntersection(const NiOBBox& box, float& t, NiPoint3& p) {
     const float* extA = m_wExtent;
     const float* extB = box.m_wExtent;
 
-    float r0, r1, rsum, u0, u1;
+    float r0;
+    float r1;
+    float rsum;
+    float u0;
+    float u1;
     float C[3][3];
-    float d0[3], d1[3];
+    float d0[3];
+    float d1[3];
     float fDotV;
 
     // EXE-INLINED 0x439EF0
@@ -844,8 +849,10 @@ int32_t NiOBBox::FindIntersection(const NiOBBox& box, float& t, NiPoint3& p) {
 
     float dt = m_pRoot->m_fDeltaTime;
 
-    int32_t type = intrNone, side = 0;
-    float tintr, tmax = 0.0f;
+    int32_t type = intrNone;
+    int32_t side = 0;
+    float tintr;
+    float tmax = 0.0f;
 
     // A0
     // EXE-INLINED 0x4B6190
@@ -1006,8 +1013,14 @@ int32_t NiOBBox::FindIntersection(const NiOBBox& box, float& t, NiPoint3& p) {
     t = tmax;
 
     const float epsilon = 1e-06f;
-    int32_t i, j;
-    float x[3], y[3], ad, bd, div, tmp;
+    int32_t i;
+    int32_t j;
+    float x[3];
+    float y[3];
+    float ad;
+    float bd;
+    float div;
+    float tmp;
 
     NiPoint3 DTW;
     NiPoint3 kTV;

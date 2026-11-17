@@ -62,16 +62,15 @@ void CombatProcedureAttackRanged::Update() {
     }
     TESCombatStyle* CurrentCombatStyle = pCombatController->GetCurrentCombatStyle();
     float ftargetingFOV = CurrentCombatStyle->SimpleData.fTargetingFOV;
-    if (ftargetingFOV > 0.0) {
-        if (ptarget) {
-            float v32 = ftargetingFOV * 0.01745329238474369;
-            const NiPoint3* v2 = &ptarget->GetLocationOnReference();
-            if (!CombatUtilities::IsTargetWithinFiringArc(pattacker, *v2, v32, 6.2831855f)) {
-                SetFailed("Target outside targeting FOV");
-                return;
-            }
+    if ((ftargetingFOV > 0.0) && (ptarget)) {
+        float v32 = ftargetingFOV * 0.01745329238474369;
+        const NiPoint3* v2 = &ptarget->GetLocationOnReference();
+        if (!CombatUtilities::IsTargetWithinFiringArc(pattacker, *v2, v32, 6.2831855f)) {
+            SetFailed("Target outside targeting FOV");
+            return;
         }
     }
+
     BGSProjectile* pprojectile = pweapon->GetProjectile(pattacker);
     bool bautomaticWeapon = pweapon->IsAutomaticWeapon();
     bool v31 = bautomaticWeapon || pweapon->GetBurstShot();
@@ -83,12 +82,11 @@ void CombatProcedureAttackRanged::Update() {
     if (pCombatController->IsSwitchingWeapons()) {
         bcanAttack = false;
     }
-    if (this->eState) {
-        if (!bcanAttack) {
-            StopFiring();
-            this->eState = CombatProcedureAttackRanged::ATTACK_STATE_IDLE;
-        }
+    if ((this->eState) && (!bcanAttack)) {
+        StopFiring();
+        this->eState = CombatProcedureAttackRanged::ATTACK_STATE_IDLE;
     }
+
     if (bcanAttack) {
         float fminRange = 0.0f;
         float fmaxRange = 0.0f;
@@ -196,11 +194,10 @@ void CombatProcedureAttackRanged::Update() {
             }
         }
     }
-    if (ptarget) {
-        if (pcombatState->GetHasBufferedDetection()) {
-            pCombatDialogueManager->StartDialogue(pCombatController, DT_COMBAT, DC_ATTACK, false);
-        }
+    if ((ptarget) && (pcombatState->GetHasBufferedDetection())) {
+        pCombatDialogueManager->StartDialogue(pCombatController, DT_COMBAT, DC_ATTACK, false);
     }
+
     bool buseIronSights = false;
     if (ptarget) {
         float* v8 = &fCombatIronSightsDistance.Float();
@@ -263,10 +260,8 @@ void CombatProcedureAttackRanged::Update() {
                     bweaponReadyToFire = false;
                 }
             }
-            if (bweaponReadyToFire) {
-                if (cshotsToFire) {
-                    battack = true;
-                }
+            if ((bweaponReadyToFire) && (cshotsToFire)) {
+                battack = true;
             }
         }
         else {
@@ -371,12 +366,8 @@ void CombatProcedureAttackRanged::Update() {
                         float targetActorPosa = RandomFloat(fsemiAutoFireDelayMin, fsemiAutoFireDelayMax);
                         FireDelayTimer.Reset(targetActorPosa);
                     }
-                    if (pexplosion_2) {
-                        if (CombatUtilities::IsDangerousExplosion(pexplosion_2)) {
-                            pCombatDialogueManager->StartDialogue(
-                                pCombatController, DT_COMBAT, DC_FIRE_EXPLOSIVE, true
-                            );
-                        }
+                    if ((pexplosion_2) && (CombatUtilities::IsDangerousExplosion(pexplosion_2))) {
+                        pCombatDialogueManager->StartDialogue(pCombatController, DT_COMBAT, DC_FIRE_EXPLOSIVE, true);
                     }
                 }
                 return;
@@ -384,15 +375,14 @@ void CombatProcedureAttackRanged::Update() {
             bool battackAnyway = false;
             CombatProcedureAttackRanged::ATTACK_STATE v24 = this->eState;
             if (v24 == CombatProcedureAttackRanged::ATTACK_STATE_FIRING) {
-                if (phitRef) {
-                    if (phitRef->IsActor()) {
-                        Actor* phitActor = static_cast<Actor*>(phitRef);
-                        Actor* ptarget_2 = GetTarget();
-                        if (phitActor == ptarget_2 || pcombatGroup->IsTarget(phitActor)) {
-                            battackAnyway = true;
-                        }
+                if ((phitRef) && (phitRef->IsActor())) {
+                    Actor* phitActor = static_cast<Actor*>(phitRef);
+                    Actor* ptarget_2 = GetTarget();
+                    if (phitActor == ptarget_2 || pcombatGroup->IsTarget(phitActor)) {
+                        battackAnyway = true;
                     }
                 }
+
                 if (!battackAnyway) {
                     BGSExplosion* pexplosion = pprojectile->GetExplosion();
                     if (pexplosion) {
@@ -408,11 +398,10 @@ void CombatProcedureAttackRanged::Update() {
             else {
                 if (v24 == CombatProcedureAttackRanged::ATTACK_STATE_SUPPRESSIVE_FIRE) {
                     if (phitRef && phitRef->IsActor()) {
-                        if (phitRef) {
-                            if (phitRef->IsActor() && !phitRef->IsDead(false) &&
-                                pcombatGroup->IsTarget(static_cast<Actor*>(phitRef))) {
-                                battackAnyway = true;
-                            }
+                        if ((phitRef) &&
+                            (phitRef->IsActor() && !phitRef->IsDead(false) &&
+                             pcombatGroup->IsTarget(static_cast<Actor*>(phitRef)))) {
+                            battackAnyway = true;
                         }
                     }
                     else {
@@ -518,31 +507,27 @@ void CombatProcedureAttackRanged::DisplayDebugText(
         );
     }
     TESObjectWEAP* pweapon = pCombatController->GetCurrentWeapon();
-    if (TargetedPoint.operator!=(NiPoint3_ZERO)) {
-        if (pweapon) {
-            if (pweapon->GetAimArc() > 0.0) {
-                CombatUtilities::GetAngleToProjectedPoint(&rot, pattacker, TargetedPoint);
-                float fheading = pattacker->GetActualHeading();
-                rot.z = ClampAngle(rot.z);
-                float fdir = 0.0f;
-                float a1_4 = GetAngleDelta(fheading, rot.z, fdir);
-                float fdelta = std::fabs(a1_4);
-                float ffiringArc = pweapon->GetAimArc();
-                if (pattacker->IsPathing()) {
-                    apDebugText->PrintLine(
-                        aeLocation, aeJustify, "Weapon firing arc: ( %.2f/%.2f ) degrees (Moving)",
-                        (fdelta + fdelta) * 57.2957763671875, ffiringArc
-                    );
-                }
-                else {
-                    float* v10 = &fCombatFiringArcStationaryTurnMult.Float();
-                    ffiringArc = ffiringArc * *v10;
-                    apDebugText->PrintLine(
-                        aeLocation, aeJustify, "Weapon firing arc: ( %.2f/%.2f ) degrees (Stationary)",
-                        (fdelta + fdelta) * 57.2957763671875, ffiringArc
-                    );
-                }
-            }
+    if ((TargetedPoint.operator!=(NiPoint3_ZERO)) && (pweapon) && (pweapon->GetAimArc() > 0.0)) {
+        CombatUtilities::GetAngleToProjectedPoint(&rot, pattacker, TargetedPoint);
+        float fheading = pattacker->GetActualHeading();
+        rot.z = ClampAngle(rot.z);
+        float fdir = 0.0f;
+        float a1_4 = GetAngleDelta(fheading, rot.z, fdir);
+        float fdelta = std::fabs(a1_4);
+        float ffiringArc = pweapon->GetAimArc();
+        if (pattacker->IsPathing()) {
+            apDebugText->PrintLine(
+                aeLocation, aeJustify, "Weapon firing arc: ( %.2f/%.2f ) degrees (Moving)",
+                (fdelta + fdelta) * 57.2957763671875, ffiringArc
+            );
+        }
+        else {
+            float* v10 = &fCombatFiringArcStationaryTurnMult.Float();
+            ffiringArc = ffiringArc * *v10;
+            apDebugText->PrintLine(
+                aeLocation, aeJustify, "Weapon firing arc: ( %.2f/%.2f ) degrees (Stationary)",
+                (fdelta + fdelta) * 57.2957763671875, ffiringArc
+            );
         }
     }
 }

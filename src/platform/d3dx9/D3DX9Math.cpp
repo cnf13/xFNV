@@ -217,7 +217,10 @@ extern "C" D3DXMATRIX* WINAPI D3DXMatrixRotationYawPitchRoll(D3DXMATRIX* pOut, f
 
 // The plane over the length of its normal; a zero normal gives the zero plane.
 extern "C" D3DXPLANE* WINAPI D3DXPlaneNormalize(D3DXPLANE* pOut, const D3DXPLANE* pP) {
-    const float a = pP->a, b = pP->b, c = pP->c, d = pP->d;
+    const float a = pP->a;
+    const float b = pP->b;
+    const float c = pP->c;
+    const float d = pP->d;
     const float fSquare = a * a + b * b + c * c;
     if (fSquare == 0.0f) {
         pOut->a = pOut->b = pOut->c = pOut->d = 0.0f;
@@ -244,7 +247,9 @@ extern "C" D3DXPLANE* WINAPI D3DXPlaneTransform(D3DXPLANE* pOut, const D3DXPLANE
 }
 
 extern "C" D3DXVECTOR3* WINAPI D3DXVec3Normalize(D3DXVECTOR3* pOut, const D3DXVECTOR3* pV) {
-    const float x = pV->x, y = pV->y, z = pV->z;
+    const float x = pV->x;
+    const float y = pV->y;
+    const float z = pV->z;
     const float fSquare = x * x + y * y + z * z;
     if (fSquare == 0.0f) {
         pOut->x = pOut->y = pOut->z = 0.0f;
@@ -271,7 +276,9 @@ extern "C" D3DXVECTOR3* WINAPI D3DXVec3TransformCoord(D3DXVECTOR3* pOut, const D
 // The direction (x, y, z) times the matrix's upper 3x3, ((p0 + p1) + p2) as d3dx9 sums it.
 extern "C" D3DXVECTOR3* WINAPI D3DXVec3TransformNormal(D3DXVECTOR3* pOut, const D3DXVECTOR3* pV, const D3DXMATRIX* pM) {
     const M4 m = Load(pM);
-    const float x = pV->x, y = pV->y, z = pV->z;
+    const float x = pV->x;
+    const float y = pV->y;
+    const float z = pV->z;
     pOut->x = (x * m.m[0][0] + y * m.m[1][0]) + z * m.m[2][0];
     pOut->y = (x * m.m[0][1] + y * m.m[1][1]) + z * m.m[2][1];
     pOut->z = (x * m.m[0][2] + y * m.m[1][2]) + z * m.m[2][2];

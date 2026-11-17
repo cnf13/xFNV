@@ -262,9 +262,8 @@ ActorValue::Index TESObjectBOOK::GetTeaches() {
     if (static_cast<int8_t>(Data.eTeaches) == -1) {
         return ActorValue::VALUE_NONE;
     }
-    else {
-        return ActorValue::ToActorValue(ActorValue::SKILL, static_cast<char>(Data.eTeaches));
-    }
+
+    return ActorValue::ToActorValue(ActorValue::SKILL, static_cast<char>(Data.eTeaches));
 }
 
 bool TESObjectBOOK::Read(TESObjectREFR* apActionRef) {
@@ -290,9 +289,8 @@ bool TESObjectBOOK::Read(TESObjectREFR* apActionRef) {
         }
         return bresult;
     }
-    else {
-        const char* v3 = sCanNotReadBook.String();
-        Interface::ShowMessage(v3, 0, nullptr, nullptr, 2.0f, false);
-        return bresult;
-    }
+
+    const char* v3 = sCanNotReadBook.String();
+    Interface::ShowMessage(v3, 0, nullptr, nullptr, 2.0f, false);
+    return bresult;
 }

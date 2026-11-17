@@ -114,9 +114,8 @@ float PathingSolution::ComputeSplineLength(int32_t aiNodeIndex) {
         v8 = &(v12 = v7->operator-(*location));
         return v8->Length();
     }
-    else {
-        return 0.0;
-    }
+
+    return 0.0;
 }
 
 void PathingSolution::SetIncomplete(bool abIncomplete) {
@@ -240,82 +239,75 @@ void ActorMover::Update(float fdeltaT) {
         goto LABEL_45;
     }
     pprocess = pActor->pCurrentProcess;
-    if (pprocess) {
-        if (pprocess->GetFadeState() != 4) {
-            int32_t ProcessLevel = pprocess->eLevel;
-            if (ProcessLevel == pActor->GetDesiredProcessLevel() &&
-                (pprocess->GetSitSleepState() == SIT_SLEEP_NORMAL &&
-                 (!pActor->IsKnockedOut() &&
-                  (pprocess->GetKnockState() == KNOCK_STATE_NORMAL && !pprocess->GetCurrentlyReanimating())))) {
-                if (bActorChangedProcessLevel) {
-                    bActorChangedProcessLevel = false;
-                    HandleProcessLevelChange();
-                }
-                if (!bPathingFailed) {
-                    if (!bWaitingForPath) {
-                        if (spCurrentPath.m_pObject && spCurrentPath.m_pObject->IsValid()) {
-                            eState = ACTOR_MOVER_STATE_MOVING;
-                            UpdateMovement(fdeltaT);
-                            goto LABEL_45;
-                        }
-                        goto LABEL_39;
-                    }
-                    ActorPathingMessage msg;
-                    ActorPathingMessageQueue* v3 = spMessageQueue.m_pObject;
-                    if (v3->TryPop(&msg)) {
-                        if (msg.msgType) {
-                            if (msg.msgType == 1) {
-                                bWaitingForPath = 0;
-                                spCurrentPath = msg.spSolution;
-                                if (spCurrentPath.m_pObject &&
-                                    (spCurrentPath.m_pObject->IsValid() &&
-                                     spCurrentRequest.m_pObject->bAllowIncompletePath)) {
-                                    eState = ACTOR_MOVER_STATE_MOVING;
-                                    DoStartMoving(fdeltaT);
-                                }
-                                else {
-                                    eState = ACTOR_MOVER_STATE_FAILED;
-                                    SetPathingFailed(true);
-                                    if (spCurrentPath.m_pObject) {
-                                        uint32_t ilastLoadedVirtualNodeIndex =
-                                            spCurrentPath.m_pObject->iLastLoadedVirtualNodeIndex;
-                                        if (ilastLoadedVirtualNodeIndex != -1) {
-                                            if (spCurrentPath.m_pObject->GetVirtualNodeCount()) {
-                                                VirtualPathingNode* plastLoadedVirtualNode =
-                                                    spCurrentPath.m_pObject->GetVirtualNode(
-                                                        ilastLoadedVirtualNodeIndex
-                                                    );
-                                                if (plastLoadedVirtualNode) {
-                                                    FailedPathDestination.operator=(*&plastLoadedVirtualNode->Location);
-                                                    FailedPathDestination.ClearTriangleData();
-                                                }
-                                            }
-                                        }
-                                    }
-                                    ClearCurrentData();
-                                }
-                            }
-                        }
-                        else {
-                            eState = ACTOR_MOVER_STATE_MOVING;
-                            bWaitingForPath = 0;
-                            spCurrentPath = msg.spSolution;
-                            DoStartMoving(fdeltaT);
-                        }
+    if ((pprocess) && (pprocess->GetFadeState() != 4)) {
+        int32_t ProcessLevel = pprocess->eLevel;
+        if (ProcessLevel == pActor->GetDesiredProcessLevel() &&
+            (pprocess->GetSitSleepState() == SIT_SLEEP_NORMAL &&
+             (!pActor->IsKnockedOut() &&
+              (pprocess->GetKnockState() == KNOCK_STATE_NORMAL && !pprocess->GetCurrentlyReanimating())))) {
+            if (bActorChangedProcessLevel) {
+                bActorChangedProcessLevel = false;
+                HandleProcessLevelChange();
+            }
+            if (!bPathingFailed) {
+                if (!bWaitingForPath) {
+                    if (spCurrentPath.m_pObject && spCurrentPath.m_pObject->IsValid()) {
+                        eState = ACTOR_MOVER_STATE_MOVING;
+                        UpdateMovement(fdeltaT);
                         goto LABEL_45;
                     }
+                    goto LABEL_39;
                 }
-            LABEL_39:;
-                if (!spCurrentPath.m_pObject || (!spCurrentPath.m_pObject->IsValid() || bPathingFailed)) {
-                    if (pCurrentPathHandler) {
-                        if (pCurrentPathHandler->NoPathUpdate(fdeltaT) == 5) {
-                            eState = ACTOR_MOVER_STATE_FINISHED;
+                ActorPathingMessage msg;
+                ActorPathingMessageQueue* v3 = spMessageQueue.m_pObject;
+                if (v3->TryPop(&msg)) {
+                    if (msg.msgType) {
+                        if (msg.msgType == 1) {
+                            bWaitingForPath = 0;
+                            spCurrentPath = msg.spSolution;
+                            if (spCurrentPath.m_pObject &&
+                                (spCurrentPath.m_pObject->IsValid() &&
+                                 spCurrentRequest.m_pObject->bAllowIncompletePath)) {
+                                eState = ACTOR_MOVER_STATE_MOVING;
+                                DoStartMoving(fdeltaT);
+                            }
+                            else {
+                                eState = ACTOR_MOVER_STATE_FAILED;
+                                SetPathingFailed(true);
+                                if (spCurrentPath.m_pObject) {
+                                    uint32_t ilastLoadedVirtualNodeIndex =
+                                        spCurrentPath.m_pObject->iLastLoadedVirtualNodeIndex;
+                                    if ((ilastLoadedVirtualNodeIndex != -1) &&
+                                        (spCurrentPath.m_pObject->GetVirtualNodeCount())) {
+                                        VirtualPathingNode* plastLoadedVirtualNode =
+                                            spCurrentPath.m_pObject->GetVirtualNode(ilastLoadedVirtualNodeIndex);
+                                        if (plastLoadedVirtualNode) {
+                                            FailedPathDestination.operator=(*&plastLoadedVirtualNode->Location);
+                                            FailedPathDestination.ClearTriangleData();
+                                        }
+                                    }
+                                }
+                                ClearCurrentData();
+                            }
                         }
                     }
+                    else {
+                        eState = ACTOR_MOVER_STATE_MOVING;
+                        bWaitingForPath = 0;
+                        spCurrentPath = msg.spSolution;
+                        DoStartMoving(fdeltaT);
+                    }
+                    goto LABEL_45;
                 }
+            }
+        LABEL_39:;
+            if ((!spCurrentPath.m_pObject || (!spCurrentPath.m_pObject->IsValid() || bPathingFailed)) &&
+                (pCurrentPathHandler) && (pCurrentPathHandler->NoPathUpdate(fdeltaT) == 5)) {
+                eState = ACTOR_MOVER_STATE_FINISHED;
             }
         }
     }
+
 LABEL_45:;
     SetCurrentFrameMoveModeAndDelta();
     DebugOnEvent();
@@ -437,12 +429,9 @@ void ActorMover::LoadGame(BGSLoadFormBuffer* apLoadGameBuffer) {
         spCurrentRequest.operator=(PathingRequest::CreatePathingRequest(static_cast<PATHING_REQUEST_TYPE>(ctype)));
         PathingRequest* v11 = spCurrentRequest.m_pObject;
         v11->LoadGame(apLoadGameBuffer);
-        if (pActor) {
-            if (pActor->pCurrentProcess) {
-                if (!pActor->pCurrentProcess->CurrentPackage.GetFlag(ActorPackage::SAVELOAD_SHARED_PACKAGE)) {
-                    spCurrentRequest.m_pObject->SetActorLockData(pActor);
-                }
-            }
+        if ((pActor) && (pActor->pCurrentProcess) &&
+            (!pActor->pCurrentProcess->CurrentPackage.GetFlag(ActorPackage::SAVELOAD_SHARED_PACKAGE))) {
+            spCurrentRequest.m_pObject->SetActorLockData(pActor);
         }
     }
     char v20 = 0;
@@ -520,11 +509,9 @@ void ActorMover::InitLoadGame(BGSLoadFormBuffer* apLoadGameBuffer) {
         if (v3->GetType() == PATHING_REQUEST_LOS) {
             PathingRequestLOS* plosRequest = static_cast<PathingRequestLOS*>(spCurrentRequest.m_pObject);
             CombatController* pCombatController = pActor->GetCombatController();
-            if (pCombatController) {
-                if (pCombatController->pCombatGroup) {
-                    NiPointer<PathingLOSGridMap> spLOSGridMap(pCombatController->pCombatGroup->GetSearchLOSGridMap());
-                    plosRequest->SetLOSGridMap(spLOSGridMap);
-                }
+            if ((pCombatController) && (pCombatController->pCombatGroup)) {
+                NiPointer<PathingLOSGridMap> spLOSGridMap(pCombatController->pCombatGroup->GetSearchLOSGridMap());
+                plosRequest->SetLOSGridMap(spLOSGridMap);
             }
         }
         PathingRequest* v2 = spCurrentRequest.m_pObject;
@@ -563,12 +550,12 @@ void ActorMover::FinishLoadGame(BGSLoadFormBuffer* apLoadGameBuffer) {
         }
         spMessageQueue.operator=(pMessageQueue);
     }
-    if (!bHideFailed) {
-        // BuildPath takes both smart pointers by value and releases them.
-        if (PathManager::QInstance()->BuildPath(spCurrentRequest, spMessageQueue, true)) {
-            return;
-        }
+    if ((!bHideFailed) && (PathManager::QInstance()->BuildPath(spCurrentRequest, spMessageQueue, true)))
+    // BuildPath takes both smart pointers by value and releases them.
+    {
+        return;
     }
+
     SetPathingFailed(true);
     bWaitingForPath = false;
 }
@@ -709,10 +696,7 @@ bool ActorMover::IsActorInLoadedArea() {
         return false;
     }
     TESObjectCELL* pParentCell = pActor->GetParentCell();
-    if (pParentCell->GetAttached() && !pPlayer->IsSleepingorResting()) {
-        return true;
-    }
-    return false;
+    return pParentCell->GetAttached() && !pPlayer->IsSleepingorResting();
 }
 
 // Treats terminal states as complete and active rotation or a valid path as incomplete.
@@ -770,11 +754,10 @@ void ActorMover::FinishMoving(bool abClearHandler) {
     }
     spCurrentRequest.operator=(static_cast<PathingRequest*>(nullptr));
     spCurrentPath.operator=(static_cast<PathingSolution*>(nullptr));
-    if (pCurrentPathHandler) {
-        if (abClearHandler) {
-            pCurrentPathHandler->ClearMovement();
-        }
+    if ((pCurrentPathHandler) && (abClearHandler)) {
+        pCurrentPathHandler->ClearMovement();
     }
+
     if (bWaitingForPath) {
         ActorPathingMessageQueue* v2;
         ActorPathingMessageQueue* apMemory =
@@ -989,11 +972,10 @@ void ActorMover::StopMoving() {
 
 void ActorMover::DoStopMoving() {
     if (eState != ACTOR_MOVER_STATE_FINISHED) {
-        if (pCurrentPathHandler) {
-            if (!pCurrentPathHandler->IsDetailedPathHandler()) {
-                eState = ACTOR_MOVER_STATE_FINISHED;
-            }
+        if ((pCurrentPathHandler) && (!pCurrentPathHandler->IsDetailedPathHandler())) {
+            eState = ACTOR_MOVER_STATE_FINISHED;
         }
+
         bStopMovementNextUpdate = true;
     }
     if (bPathingFailed) {
@@ -1034,18 +1016,16 @@ void ActorMover::SetPathingFailed(bool abValue) {
         if (spCurrentRequest.m_pObject) {
             TESObjectCELL* porCell = (&spCurrentRequest.m_pObject->Origin)->GetCell();
             TESObjectCELL* pdestCell = (&spCurrentRequest.m_pObject->Destination)->GetCell();
-            if (porCell) {
-                if (pdestCell) {
-                    double WaterHeight =
-                        TES::pInstance->GetWaterHeight((&spCurrentRequest.m_pObject->Origin)->GetLocation(), porCell);
-                    bool borUnderWater = (&spCurrentRequest.m_pObject->Origin)->GetLocation().z < WaterHeight;
-                    double v12 = TES::pInstance->GetWaterHeight(
-                        (&spCurrentRequest.m_pObject->Destination)->GetLocation(), pdestCell
-                    );
-                    bool bdestUnderWater = (&spCurrentRequest.m_pObject->Destination)->GetLocation().z < v12;
-                    if (borUnderWater != bdestUnderWater) {
-                        fthreshold_2 = 1.0f;
-                    }
+            if ((porCell) && (pdestCell)) {
+                double WaterHeight =
+                    TES::pInstance->GetWaterHeight((&spCurrentRequest.m_pObject->Origin)->GetLocation(), porCell);
+                bool borUnderWater = (&spCurrentRequest.m_pObject->Origin)->GetLocation().z < WaterHeight;
+                double v12 = TES::pInstance->GetWaterHeight(
+                    (&spCurrentRequest.m_pObject->Destination)->GetLocation(), pdestCell
+                );
+                bool bdestUnderWater = (&spCurrentRequest.m_pObject->Destination)->GetLocation().z < v12;
+                if (borUnderWater != bdestUnderWater) {
+                    fthreshold_2 = 1.0f;
                 }
             }
         }
@@ -1225,14 +1205,13 @@ bool ActorMover::RequestRotateActor(float afTargetAngle, bool abForceTurn) {
         v8 = true;
     }
     if (!v8) {
-        if (pCurrentPathHandler) {
-            if (!pCurrentPathHandler->IsDetailedPathHandler()) {
-                if (pCurrentPathHandler) {
-                    delete pCurrentPathHandler;
-                }
-                pCurrentPathHandler = nullptr;
+        if ((pCurrentPathHandler) && (!pCurrentPathHandler->IsDetailedPathHandler())) {
+            if (pCurrentPathHandler) {
+                delete pCurrentPathHandler;
             }
+            pCurrentPathHandler = nullptr;
         }
+
         if (!pCurrentPathHandler) {
             DetailedActorPathHandler* v5;
             DetailedActorPathHandler* apMemory =
@@ -1308,27 +1287,24 @@ float ActorMover::GetCurrentPercent() const {
     if (pCurrentPathHandler) {
         return pCurrentPathHandler->GetPercentTraveled();
     }
-    else {
-        return 0.0;
-    }
+
+    return 0.0;
 }
 
 float ActorMover::GetDistanceTraveled() const {
     if (pCurrentPathHandler) {
         return pCurrentPathHandler->GetDistanceTraveled();
     }
-    else {
-        return 0.0;
-    }
+
+    return 0.0;
 }
 
 float ActorMover::GetDistanceRemaining() const {
     if (pCurrentPathHandler) {
         return pCurrentPathHandler->GetDistanceRemaining();
     }
-    else {
-        return 0.0;
-    }
+
+    return 0.0;
 }
 
 bool ActorMover::IsPathIncomplete() const {
@@ -1386,28 +1362,25 @@ ActorMover::END_OF_PATH_CHECK_RESULT ActorMover::EndOfCurrentPathCheck() {
                 v5->ClearCurrentDetailedPath();
                 return ActorMover::END_OF_PATH_TELEPORT;
             }
-            else {
-                eState = ACTOR_MOVER_STATE_FAILED;
-                SetPathingFailed(true);
-                DoStopMoving();
-                return ActorMover::END_OF_PATH_FAILED;
-            }
+
+            eState = ACTOR_MOVER_STATE_FAILED;
+            SetPathingFailed(true);
+            DoStopMoving();
+            return ActorMover::END_OF_PATH_FAILED;
         }
-        else {
-            iPreviousNode = (uint32_t)this->iPreviousNode;
-            v7 = (&pCurrentPathHandler->spPath)->operator->();
-            if (iPreviousNode >= ((uint32_t)(((int32_t)v7->GetVirtualNodeCount()) - 1))) {
-                DoStopMoving();
-            }
-            return ActorMover::END_OF_PATH_OK;
+
+        iPreviousNode = (uint32_t)this->iPreviousNode;
+        v7 = (&pCurrentPathHandler->spPath)->operator->();
+        if (iPreviousNode >= ((uint32_t)(((int32_t)v7->GetVirtualNodeCount()) - 1))) {
+            DoStopMoving();
         }
+        return ActorMover::END_OF_PATH_OK;
     }
-    else {
-        eState = ACTOR_MOVER_STATE_FAILED;
-        SetPathingFailed(true);
-        StopMoving();
-        return ActorMover::END_OF_PATH_FAILED;
-    }
+
+    eState = ACTOR_MOVER_STATE_FAILED;
+    SetPathingFailed(true);
+    StopMoving();
+    return ActorMover::END_OF_PATH_FAILED;
 }
 
 bool ActorMover::GetLookAtPoint(NiPoint3& apPoint) const {
@@ -1744,10 +1717,9 @@ NiPoint3* ActorMover::GetNextNodeLocation(NiPoint3* apResult) {
         ::new (apResult) NiPoint3(pCurrentPathHandler->GetNextNodeLocation());
         return apResult;
     }
-    else {
-        *apResult = pActor->GetLocationOnReference();
-        return apResult;
-    }
+
+    *apResult = pActor->GetLocationOnReference();
+    return apResult;
 }
 
 bool ActorMover::GetCurrentGoal_009DE2B0(NiPoint3* apRetLocation) {
@@ -1776,17 +1748,15 @@ void ActorMover::WarpToNextNode() {
     char v59 = 0;
     if (spCurrentRequest.m_pObject) {
         if (pActor->IsFollowAccompanyPackageTarget(pPlayer)) {
-            if (pCurrentPathHandler) {
-                if (spCurrentPath.operator->()) {
-                    if (!pCurrentPathHandler->IsDetailedPathHandler()) {
-                        PathingSolution* v1 = spCurrentPath.operator->();
-                        if (!v1->IsIncomplete()) {
-                            pActor->InitiateMovementBlockedPackage();
-                            return;
-                        }
-                    }
+            if ((pCurrentPathHandler) && (spCurrentPath.operator->()) &&
+                (!pCurrentPathHandler->IsDetailedPathHandler())) {
+                PathingSolution* v1 = spCurrentPath.operator->();
+                if (!v1->IsIncomplete()) {
+                    pActor->InitiateMovementBlockedPackage();
+                    return;
                 }
             }
+
             const NiPoint3* a2 = &pPlayer->GetLocationOnReference();
             const NiPoint3* v2 = &pActor->GetLocationOnReference();
             NiPoint3* v3 = &(result = *v2 - *a2);
@@ -1804,29 +1774,28 @@ void ActorMover::WarpToNextNode() {
             PathingRequest* v8 = spCurrentRequest.m_pObject;
             PathingLocation* LocalTransform = static_cast<PathingLocation*>(&v8->GetDestination());
             TESObjectCELL* Cell = LocalTransform->GetCell();
-            if (apCell) {
-                if (Cell) {
-                    NiPoint3 v42;
-                    NiPoint3 v44;
-                    PathingRequest* v10 = spCurrentRequest.m_pObject;
-                    PathingLocation* v11 = static_cast<PathingLocation*>(&v10->GetOrigin());
-                    NiPoint3* Location_ = &(v45 = v11->GetLocation());
-                    double WaterHeight = TES::pInstance->GetWaterHeight(*Location_, apCell);
-                    PathingRequest* v14 = spCurrentRequest.m_pObject;
-                    PathingLocation* v15 = static_cast<PathingLocation*>(&v14->GetOrigin());
-                    char v55 = (&(v44 = v15->GetLocation()))->z < WaterHeight;
-                    PathingRequest* v16 = spCurrentRequest.m_pObject;
-                    PathingLocation* v17 = static_cast<PathingLocation*>(&v16->GetDestination());
-                    NiPoint3* v18 = &(v43 = v17->GetLocation());
-                    double v19 = TES::pInstance->GetWaterHeight(*v18, Cell);
-                    PathingRequest* v20 = spCurrentRequest.m_pObject;
-                    PathingLocation* v21 = static_cast<PathingLocation*>(&v20->GetDestination());
-                    char v54 = (&(v42 = v21->GetLocation()))->z < v19;
-                    if (v55 != v54) {
-                        v59 = 1;
-                    }
+            if ((apCell) && (Cell)) {
+                NiPoint3 v42;
+                NiPoint3 v44;
+                PathingRequest* v10 = spCurrentRequest.m_pObject;
+                PathingLocation* v11 = static_cast<PathingLocation*>(&v10->GetOrigin());
+                NiPoint3* Location_ = &(v45 = v11->GetLocation());
+                double WaterHeight = TES::pInstance->GetWaterHeight(*Location_, apCell);
+                PathingRequest* v14 = spCurrentRequest.m_pObject;
+                PathingLocation* v15 = static_cast<PathingLocation*>(&v14->GetOrigin());
+                char v55 = (&(v44 = v15->GetLocation()))->z < WaterHeight;
+                PathingRequest* v16 = spCurrentRequest.m_pObject;
+                PathingLocation* v17 = static_cast<PathingLocation*>(&v16->GetDestination());
+                NiPoint3* v18 = &(v43 = v17->GetLocation());
+                double v19 = TES::pInstance->GetWaterHeight(*v18, Cell);
+                PathingRequest* v20 = spCurrentRequest.m_pObject;
+                PathingLocation* v21 = static_cast<PathingLocation*>(&v20->GetDestination());
+                char v54 = (&(v42 = v21->GetLocation()))->z < v19;
+                if (v55 != v54) {
+                    v59 = 1;
                 }
             }
+
             PathingLocation apLocation(pActor);
             apLocation.ResolveNavMeshInfo(nullptr);
             if (!apLocation.HasNavMeshData()) {

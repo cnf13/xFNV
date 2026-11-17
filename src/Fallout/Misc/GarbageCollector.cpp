@@ -411,10 +411,8 @@ void GarbageCollector::Add(TESObjectREFR* apRef) {
         apRef->RemoveFromDataStructures();
         if (apRef->GetObjectReference()->TESForm::GetHasSpokenFlag()) {
             TESWorldSpace* pworld = apRef->GetWorldSpace();
-            if (pworld) {
-                if (pworld->GetTerrainManager()) {
-                    pworld->GetTerrainManager()->ReleaseTree(apRef);
-                }
+            if ((pworld) && (pworld->GetTerrainManager())) {
+                pworld->GetTerrainManager()->ReleaseTree(apRef);
             }
         }
         apRef->SetParentCell(nullptr);
@@ -493,13 +491,11 @@ void GarbageCollector::Remove(TESObjectREFR* apRef) {
 }
 
 void GarbageCollector::ClearTempEffects() {
-    if (EffectGarbageA.GetSize()) {
-        if (pModelLoader->TryLockModelMap()) {
-            EnterCrit("GarbageCollector::ClearTempEffects()", true);
-            EffectGarbageA.RemoveAll();
-            pModelLoader->UnlockModelMap();
-            LeaveCrit(true);
-        }
+    if ((EffectGarbageA.GetSize()) && (pModelLoader->TryLockModelMap())) {
+        EnterCrit("GarbageCollector::ClearTempEffects()", true);
+        EffectGarbageA.RemoveAll();
+        pModelLoader->UnlockModelMap();
+        LeaveCrit(true);
     }
 }
 

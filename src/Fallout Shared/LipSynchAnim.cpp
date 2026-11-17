@@ -42,9 +42,8 @@ float LipSynchAnim::GetStartingDelay() const {
     if (iStartingFrame >= 0) {
         return (float)0.0;
     }
-    else {
-        return (float)(((double)(-iStartingFrame)) * 0.03333333507180214);
-    }
+
+    return (float)(((double)(-iStartingFrame)) * 0.03333333507180214);
 }
 
 float LipSynchAnim::GetPuppetValue(int32_t aiFrame) {
@@ -82,9 +81,8 @@ float LipSynchAnim::GetPuppetValue(int32_t aiFrame) {
         }
         return v9 * fPhonemeCoefficients[v11];
     }
-    else {
-        return 0.0f;
-    }
+
+    return 0.0f;
 }
 
 bool LipSynchAnim::ApplyToNode(BSFaceGenAnimationData* apData, float afEmptyAtEnd) {

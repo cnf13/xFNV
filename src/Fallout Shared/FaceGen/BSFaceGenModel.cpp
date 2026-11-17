@@ -213,36 +213,32 @@ BSFaceGenMorph* BSFaceGenMorphDataHead::GetExpressionMorph(BS_FACEGEN_EXPRESSION
     if (ppExpressionMorphs && (((uint32_t)aeIndex) <= 14)) {
         return ppExpressionMorphs[(int32_t)aeIndex];
     }
-    else {
-        return nullptr;
-    }
+
+    return nullptr;
 }
 
 BSFaceGenMorph* BSFaceGenMorphDataHead::GetModifierMorph(BS_FACEGEN_MODIFIER aeIndex) {
     if (ppModifierMorphs && (((uint32_t)aeIndex) <= 16)) {
         return ppModifierMorphs[(int32_t)aeIndex];
     }
-    else {
-        return nullptr;
-    }
+
+    return nullptr;
 }
 
 BSFaceGenMorph* BSFaceGenMorphDataHead::GetPhonemeMorph(BS_FACEGEN_PHONEME aeIndex) {
     if (ppPhonemeMorphs && (((uint32_t)aeIndex) < 16)) {
         return ppPhonemeMorphs[(int32_t)aeIndex];
     }
-    else {
-        return nullptr;
-    }
+
+    return nullptr;
 }
 
 BSFaceGenMorph* BSFaceGenMorphDataHead::GetCustomMorph(BS_FACEGEN_CUSTOM_MORPH aeIndex) {
     if ((!ppCustomMorphs) || aeIndex) {
         return nullptr;
     }
-    else {
-        return *ppCustomMorphs;
-    }
+
+    return *ppCustomMorphs;
 }
 
 BSFaceGenModel::BSFaceGenModel() : pMeshData(nullptr), pTextureData(nullptr) {}
@@ -439,15 +435,14 @@ bool BSFaceGenModel::CreateNewMesh(NiPointer<NiTriBasedGeom>& aspReturnMesh) {
         NiTriBasedGeom* v6 = aspReturnMesh.m_pObject;
         v6->SetModelData(spdata.m_pObject);
         NiSkinInstance* pskin = aspReturnMesh.m_pObject->GetSkinInstance();
-        if (pskin) {
-            if (pskin->GetSkinPartition()) {
-                NiPointer<NiObject> spTempSkinObject(static_cast<NiObject*>(nullptr));
-                pskin->GetSkinPartition()->CreateDeepCopy(spTempSkinObject);
-                spskinPartition.operator=(static_cast<NiSkinPartition*>(spTempSkinObject.m_pObject));
-                NiSkinPartition* v3 = spskinPartition.m_pObject;
-                pskin->SetSkinPartition(v3);
-            }
+        if ((pskin) && (pskin->GetSkinPartition())) {
+            NiPointer<NiObject> spTempSkinObject(static_cast<NiObject*>(nullptr));
+            pskin->GetSkinPartition()->CreateDeepCopy(spTempSkinObject);
+            spskinPartition.operator=(static_cast<NiSkinPartition*>(spTempSkinObject.m_pObject));
+            NiSkinPartition* v3 = spskinPartition.m_pObject;
+            pskin->SetSkinPartition(v3);
         }
+
         BSFaceGenBaseMorphExtraData* apMemory =
             static_cast<BSFaceGenBaseMorphExtraData*>(NiMemObject::operator new(sizeof(BSFaceGenBaseMorphExtraData)));
         if (apMemory) {
@@ -473,9 +468,8 @@ bool BSFaceGenModel::CreateNewMesh(NiPointer<NiTriBasedGeom>& aspReturnMesh) {
         aspReturnMesh.m_pObject->AddExtraData(pmorphBase_2);
         return true;
     }
-    else {
-        return false;
-    }
+
+    return false;
 }
 
 bool BSFaceGenModel::ApplyCoordinateToNewMesh(
@@ -654,11 +648,10 @@ bool BSFaceGenModel::ApplyCoordinateToExistingMesh(
             }
         }
     }
-    if (apMesh->GetVertices()) {
-        if (apMesh->GetModelData()->GetConsistency() != NiGeometryData::STATIC) {
-            apMesh->GetModelData()->MarkAsChanged(NiGeometryData::VERTEX_MASK);
-        }
+    if ((apMesh->GetVertices()) && (apMesh->GetModelData()->GetConsistency() != NiGeometryData::STATIC)) {
+        apMesh->GetModelData()->MarkAsChanged(NiGeometryData::VERTEX_MASK);
     }
+
     apMesh->GetModelData()->UnlockPackedVertexData();
     BSFaceGenManager::UnlockFaceGenAccess();
     return true;
@@ -699,18 +692,17 @@ void BSFaceGenModel::UnloadEGTData() {
 
 uint32_t BSFaceGenModel::GetEGMDataSize() {
     uint32_t size = 0;
-    if (pMeshData) {
-        if (pMeshData->pEGMData) {
-            size = 52;
-            for (uint32_t i = 0; i < 2; ++i) {
-                size += 24 * pMeshData->pEGMData->EGMBasis[i].size();
-                for (uint32_t a2 = 0; a2 < pMeshData->pEGMData->EGMBasis[i].size(); ++a2) {
-                    FffModeGS* v1 = &pMeshData->pEGMData->EGMBasis[i].operator[](a2);
-                    size += 6 * v1->vertPos.size();
-                }
+    if ((pMeshData) && (pMeshData->pEGMData)) {
+        size = 52;
+        for (uint32_t i = 0; i < 2; ++i) {
+            size += 24 * pMeshData->pEGMData->EGMBasis[i].size();
+            for (uint32_t a2 = 0; a2 < pMeshData->pEGMData->EGMBasis[i].size(); ++a2) {
+                FffModeGS* v1 = &pMeshData->pEGMData->EGMBasis[i].operator[](a2);
+                size += 6 * v1->vertPos.size();
             }
         }
     }
+
     return size;
 }
 
@@ -718,18 +710,17 @@ uint32_t BSFaceGenModel::GetEGMDataSize() {
 // of the first one, times three).
 uint32_t BSFaceGenModel::GetEGTDataSize() {
     uint32_t size = 0;
-    if (pTextureData) {
-        if (pTextureData->pEGTData) {
-            size = sizeof(EGTData);
-            for (uint32_t i = 0; i < 2; ++i) {
-                size += static_cast<uint32_t>(sizeof(FffModeTexS) * pTextureData->pEGTData->EGTBasis[i].size());
-                for (uint32_t j = 0; j < pTextureData->pEGTData->EGTBasis[i].size(); ++j) {
-                    const FffModeTexS& rMode = pTextureData->pEGTData->EGTBasis[i][j];
-                    size += static_cast<uint32_t>(3 * rMode.img[0].size());
-                }
+    if ((pTextureData) && (pTextureData->pEGTData)) {
+        size = sizeof(EGTData);
+        for (uint32_t i = 0; i < 2; ++i) {
+            size += static_cast<uint32_t>(sizeof(FffModeTexS) * pTextureData->pEGTData->EGTBasis[i].size());
+            for (uint32_t j = 0; j < pTextureData->pEGTData->EGTBasis[i].size(); ++j) {
+                const FffModeTexS& rMode = pTextureData->pEGTData->EGTBasis[i][j];
+                size += static_cast<uint32_t>(3 * rMode.img[0].size());
             }
         }
     }
+
     return size;
 }
 
@@ -968,9 +959,8 @@ EGTData* EGTData::Create(const char* apEGTFilename) {
     if (v3) {
         return ::new (v3) EGTData(const_cast<char*>(apEGTFilename));
     }
-    else {
-        return nullptr;
-    }
+
+    return nullptr;
 }
 
 void EGTData::operator delete(void* apMemory) {
@@ -1059,9 +1049,8 @@ uint32_t BSMIN(uint16_t a, uint32_t b) {
     if (((uint32_t)((int32_t)a)) < b) {
         return (uint32_t)a;
     }
-    else {
-        return b;
-    }
+
+    return b;
 }
 
 void Destroy(FffModeTexS* apThis) {

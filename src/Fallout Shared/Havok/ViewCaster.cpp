@@ -156,324 +156,287 @@ TESObjectREFR* ViewCaster::FindActivateREFR(
     );
     ViewCaster::pFuzzyBody = nullptr;
     TESObjectREFR* presult = nullptr;
-    if (bInit) {
-        if (GetObject()) {
-            if (GetWorld()) {
-                hkVector4 hkto;
-                hkVector4 hkfrom;
-                hkpAllCdPointCollector PointCollector;
-                bhkWorld* pw = GetWorld();
-                NiPoint3 nito = aOrigin + aDirection * afPickDistance;
-                abIsFuzzy = false;
-                afObjectDistance = 3.4028235e+38f;
-                alignas(16) NiPick activatePick(0, 8u);
-                activatePick.SetFrontOnly(false);
-                activatePick.SetObserveAppCullFlag(true);
-                uiInterfaceCheckpoint = 3501;
-                NI2HK(hkfrom, aOrigin);
-                NI2HK(hkto, nito);
-                bool bhits = false;
-                hkpLinearCastInput input;
-                input.m_startPointTolerance = 0.01f;
-                input.m_maxExtraPenetration = 0.01f;
-                input.m_to.operator=(hkto);
-                SetCustomPickCollisions();
-                static_cast<bhkShapePhantom*>(GetObject())
-                    ->SetPositionAndLinearCast(hkfrom, input, PointCollector, nullptr);
-                hkBool* pHasHit = PointCollector.hasHit(&v84);
-                if (pHasHit->operator bool()) {
-                    PointCollector.sortHits();
-                    bhits = true;
+    if ((bInit) && (GetObject()) && (GetWorld())) {
+        hkVector4 hkto;
+        hkVector4 hkfrom;
+        hkpAllCdPointCollector PointCollector;
+        bhkWorld* pw = GetWorld();
+        NiPoint3 nito = aOrigin + aDirection * afPickDistance;
+        abIsFuzzy = false;
+        afObjectDistance = 3.4028235e+38f;
+        alignas(16) NiPick activatePick(0, 8u);
+        activatePick.SetFrontOnly(false);
+        activatePick.SetObserveAppCullFlag(true);
+        uiInterfaceCheckpoint = 3501;
+        NI2HK(hkfrom, aOrigin);
+        NI2HK(hkto, nito);
+        bool bhits = false;
+        hkpLinearCastInput input;
+        input.m_startPointTolerance = 0.01f;
+        input.m_maxExtraPenetration = 0.01f;
+        input.m_to.operator=(hkto);
+        SetCustomPickCollisions();
+        static_cast<bhkShapePhantom*>(GetObject())->SetPositionAndLinearCast(hkfrom, input, PointCollector, nullptr);
+        hkBool* pHasHit = PointCollector.hasHit(&v84);
+        if (pHasHit->operator bool()) {
+            PointCollector.sortHits();
+            bhits = true;
+        }
+        TESObjectREFR* phavokPickRef = nullptr;
+        float fhavokPickDistance = 3.4028235e+38f;
+        TESObjectREFR* pshapeCastRef = nullptr;
+        float fshapeCastDistance = 3.4028235e+38f;
+        float fshapeCastCenterPointDistance = 3.4028235e+38f;
+        bhkRigidBody* pfuzzyBody = nullptr;
+        bool buseFuzzy = bUseFuzzyPicking.Bool();
+        int32_t ifuzzyPicks = 0;
+        int32_t ihavokPicks = 0;
+        int32_t igamebryoPicks = 0;
+        if (bhits) {
+            uiInterfaceCheckpoint = 3502;
+            TESObjectREFR* plast = nullptr;
+            TESObjectREFR* pcurrent = nullptr;
+            hkpRigidBody* plastBody = nullptr;
+            for (int32_t i = 0;; ++i) {
+                int32_t iHitCount = (&PointCollector.getHits())->m_size;
+                if (i >= iHitCount) {
+                    break;
                 }
-                TESObjectREFR* phavokPickRef = nullptr;
-                float fhavokPickDistance = 3.4028235e+38f;
-                TESObjectREFR* pshapeCastRef = nullptr;
-                float fshapeCastDistance = 3.4028235e+38f;
-                float fshapeCastCenterPointDistance = 3.4028235e+38f;
-                bhkRigidBody* pfuzzyBody = nullptr;
-                bool buseFuzzy = bUseFuzzyPicking.Bool();
-                int32_t ifuzzyPicks = 0;
-                int32_t ihavokPicks = 0;
-                int32_t igamebryoPicks = 0;
-                if (bhits) {
-                    uiInterfaceCheckpoint = 3502;
-                    TESObjectREFR* plast = nullptr;
-                    TESObjectREFR* pcurrent = nullptr;
-                    hkpRigidBody* plastBody = nullptr;
-                    for (int32_t i = 0;; ++i) {
-                        int32_t iHitCount = (&PointCollector.getHits())->m_size;
-                        if (i >= iHitCount) {
-                            break;
+                uiInterfaceCheckpoint = 3503;
+                const hkpRootCdPoint* pHit = &(&PointCollector.getHits())->operator[]<hkpRootCdPoint>(i);
+                hkpRootCdPoint point(*pHit);
+                if (point.m_rootCollidableB) {
+                    uiInterfaceCheckpoint = 3504;
+                    NiAVObject* pav = GetAVObjectForCollidable(point.m_rootCollidableB);
+                    uiInterfaceCheckpoint = 3505;
+                    if (pav) {
+                        pcurrent = TESObjectREFR::FindReferenceFor3D(pav);
+                    }
+                    if ((pcurrent) && (pcurrent != pPlayer)) {
+                        bool bculled = false;
+                        NiAVObject* pcullTest = pav;
+                        NiNode* p3D = pcurrent->Get3D();
+                        while (!bculled && (pcullTest && pcullTest != p3D)) {
+                            int32_t iCulled = bculled;
+                            bool AppCulled = pcullTest->GetAppCulled();
+                            bculled = AppCulled || iCulled;
+                            pcullTest = pcullTest->m_pkParent;
                         }
-                        uiInterfaceCheckpoint = 3503;
-                        const hkpRootCdPoint* pHit = &(&PointCollector.getHits())->operator[]<hkpRootCdPoint>(i);
-                        hkpRootCdPoint point(*pHit);
-                        if (point.m_rootCollidableB) {
-                            uiInterfaceCheckpoint = 3504;
-                            NiAVObject* pav = GetAVObjectForCollidable(point.m_rootCollidableB);
-                            uiInterfaceCheckpoint = 3505;
-                            if (pav) {
-                                pcurrent = TESObjectREFR::FindReferenceFor3D(pav);
+                        if (!bculled) {
+                            hkpRigidBody* prb = hkpGetRigidBody(point.m_rootCollidableB);
+                            bool v62 = false;
+                            fltr.iFilter = point.m_rootCollidableB->getCollisionFilterInfo();
+                            COL_LAYER Layer = fltr.GetLayer();
+                            if (Layer == L_STATIC) {
+                                const hkpShape* Shape = point.m_rootCollidableB->m_shape;
+                                if ((Shape) && (Shape->getType() == HK_SHAPE_MOPP)) {
+                                    v62 = true;
+                                }
                             }
-                            if (pcurrent) {
-                                if (pcurrent != pPlayer) {
-                                    bool bculled = false;
-                                    NiAVObject* pcullTest = pav;
-                                    NiNode* p3D = pcurrent->Get3D();
-                                    while (!bculled && (pcullTest && pcullTest != p3D)) {
-                                        int32_t iCulled = bculled;
-                                        bool AppCulled = pcullTest->GetAppCulled();
-                                        bculled = AppCulled || iCulled;
-                                        pcullTest = pcullTest->m_pkParent;
-                                    }
-                                    if (!bculled) {
-                                        hkpRigidBody* prb = hkpGetRigidBody(point.m_rootCollidableB);
-                                        bool v62 = false;
-                                        fltr.iFilter = point.m_rootCollidableB->getCollisionFilterInfo();
-                                        COL_LAYER Layer = fltr.GetLayer();
-                                        if (Layer == L_STATIC) {
-                                            const hkpShape* Shape = point.m_rootCollidableB->m_shape;
-                                            if (Shape) {
-                                                if (Shape->getType() == HK_SHAPE_MOPP) {
-                                                    v62 = true;
-                                                }
-                                            }
-                                        }
-                                        else {
-                                            if (Layer > L_TRANSPARENT && Layer <= L_PROJECTILE) {
-                                                v62 = true;
-                                            }
-                                        }
-                                        TESObjectSTAT* ObjectReference =
-                                            static_cast<TESObjectSTAT*>(pcurrent->GetObjectReference());
-                                        if (ObjectReference == pCollisionMarker) {
-                                            v62 = true;
-                                        }
-                                        if (prb && (prb != plastBody && v62)) {
-                                            plastBody = prb;
-                                            int32_t* piMaxPicks = &iMaxViewCasterPicksHavok.Int();
-                                            if (ihavokPicks < *piMaxPicks) {
-                                                ++ihavokPicks;
-                                                rci.~hkpShapeRayCastInput();
-                                                ::new (&rci) hkpShapeRayCastInput;
-                                                rci.m_filterInfo = static_cast<bhkWorldObject*>(GetObject())
-                                                                       ->GetCollisionFilter(&v57)
-                                                                       ->iFilter;
-                                                const hkTransform* Transform = &prb->getTransform();
-                                                hkTransform hkt(*Transform);
-                                                rci.m_from.setTransformedInversePos(hkt, hkfrom);
-                                                rci.m_to.setTransformedInversePos(hkt, hkto);
-                                                hkpShapeRayCastOutput rco;
-                                                rco.reset_0();
-                                                const hkpShape* pcurShape = point.m_rootCollidableB->m_shape;
-                                                hkBool bCastHit = pcurShape->castRay(rci, rco);
-                                                if (rco.hasHit().operator bool() &&
-                                                    fhavokPickDistance > static_cast<double>(rco.m_hitFraction)) {
-                                                    phavokPickRef = pcurrent;
-                                                    fhavokPickDistance = rco.m_hitFraction;
-                                                }
-                                            }
-                                        }
-                                        else {
-                                            uiInterfaceCheckpoint = 3506;
-                                            if (plast != pcurrent) {
-                                                if (pcurrent->Get3D()) {
-                                                    int32_t* piMaxPicks = &iMaxViewCasterPicksGamebryo.Int();
-                                                    if (igamebryoPicks < *piMaxPicks) {
-                                                        ++igamebryoPicks;
-                                                        NiNode* pcurrent3D = pcurrent->Get3D();
-                                                        PickDistance(
-                                                            &activatePick, aOrigin, aDirection, afPickDistance,
-                                                            pcurrent3D, false
-                                                        );
-                                                    }
-                                                }
-                                            }
-                                        }
-                                        bool v51 = true;
-                                        switch (fltr.GetLayer()) {
-                                            case L_STATIC:
-                                            case L_TERRAIN:
-                                            case L_GROUND:
-                                            case L_PORTAL: {
-                                                v51 = false;
-                                                break;
-                                            }
-                                            case L_PROJECTILE: {
-                                                if (!prb) {
-                                                    v51 = false;
-                                                }
-                                                break;
-                                            }
-                                            case L_CHARCONTROLLER: {
-                                                if (pcurrent->IsActor()) {
-                                                    MobileObject* pmobile = static_cast<MobileObject*>(pcurrent);
-                                                    BaseProcess* pprocess = pmobile->GetCurrentAIProcess();
-                                                    bhkCharacterController* pcon =
-                                                        pmobile->MobileObject::GetCharController();
-                                                    if (pprocess) {
-                                                        if (pcon) {
-                                                            if (pcon->GetSize() == bhkCharacterController::CS_SIZED) {
-                                                                SIT_SLEEP_STATE estate = pprocess->GetSitSleepState();
-                                                                if (estate == SIT_SLEEP_IS_SLEEPING ||
-                                                                    estate == SIT_SLEEP_IS_SITTING) {
-                                                                    v51 = false;
-                                                                }
-                                                            }
-                                                        }
-                                                    }
-                                                }
-                                                break;
-                                            }
-                                            default: {
-                                                break;
-                                            }
-                                        }
-                                        if (v51 && buseFuzzy) {
-                                            if (pw) {
-                                                hkVector4 distanceFromPick;
-                                                hkVector4 pickDirection;
-                                                hkVector4 distanceToContact;
-                                                distanceToContact.setSub4(point.m_contact.getPosition(), hkfrom);
-                                                pickDirection.setSub4(hkto, hkfrom);
-                                                pickDirection.normalize3();
-                                                pickDirection.mul4(pickDirection.dot3(distanceToContact));
-                                                distanceFromPick.setSub4(distanceToContact, pickDirection);
-                                                float fScalar = distanceFromPick.length3().operator float();
-                                                float fdistancePick = HK2NI(fScalar);
-                                                if (fshapeCastCenterPointDistance >
-                                                    static_cast<double>(fdistancePick)) {
-                                                    int32_t* piMaxPicks = &iMaxViewCasterPicksFuzzy.Int();
-                                                    if (ifuzzyPicks < *piMaxPicks) {
-                                                        if (pshapeCastRef && pshapeCastRef == pcurrent) {
-                                                            float fScalara =
-                                                                distanceToContact.length3().operator float();
-                                                            fshapeCastDistance = HK2NI(fScalara);
-                                                            fshapeCastCenterPointDistance = fdistancePick;
-                                                        }
-                                                        else {
-                                                            ++ifuzzyPicks;
-                                                            bhkPickData pd;
-                                                            CFilter* CollisionFilter =
-                                                                static_cast<bhkWorldObject*>(GetObject())
-                                                                    ->GetCollisionFilter(&v38);
-                                                            pd.SetFilter(*CollisionFilter);
-                                                            pd.SetFrom(hkfrom);
-                                                            pd.SetTo(point.m_contact.getPosition());
-                                                            hkpAllRayHitCollector pcollector;
-                                                            pd.SetAllCollector(&pcollector);
-                                                            pw->PickObject(pd);
-                                                            if (!pd.bPickFailed) {
-                                                                if ((&pcollector.getHits())->m_size <= 0) {
-                                                                    pshapeCastRef = pcurrent;
-                                                                    float fScalarc =
-                                                                        distanceToContact.length3().operator float();
-                                                                    fshapeCastDistance = HK2NI(fScalarc);
-                                                                    fshapeCastCenterPointDistance = fdistancePick;
-                                                                    pfuzzyBody = static_cast<bhkRigidBody*>(
-                                                                        bhkEntity::Getbhk(prb)
-                                                                    );
-                                                                }
-                                                                else {
-                                                                    const hkpWorldRayCastOutput* pRayHit =
-                                                                        &(&pcollector.getHits())
-                                                                             ->operator[]<hkpWorldRayCastOutput>(0);
-                                                                    NiAVObject* pav_2 = GetAVObjectForCollidable(
-                                                                        pRayHit->m_rootCollidable
-                                                                    );
-                                                                    if (pav_2) {
-                                                                        TESObjectREFR* pref =
-                                                                            TESObjectREFR::FindReferenceFor3D(pav_2);
-                                                                        if (pref) {
-                                                                            if (pref == pcurrent) {
-                                                                                pshapeCastRef = pcurrent;
-                                                                                float fScalarb =
-                                                                                    distanceToContact.length3()
-                                                                                        .operator float();
-                                                                                fshapeCastDistance = HK2NI(fScalarb);
-                                                                                fshapeCastCenterPointDistance =
-                                                                                    fdistancePick;
-                                                                                pfuzzyBody = static_cast<bhkRigidBody*>(
-                                                                                    bhkEntity::Getbhk(prb)
-                                                                                );
-                                                                            }
-                                                                        }
-                                                                    }
-                                                                }
-                                                            }
-                                                        }
-                                                    }
-                                                }
-                                            }
-                                        }
-                                        uiInterfaceCheckpoint = 3507;
-                                        plast = pcurrent;
+                            else {
+                                if (Layer > L_TRANSPARENT && Layer <= L_PROJECTILE) {
+                                    v62 = true;
+                                }
+                            }
+                            TESObjectSTAT* ObjectReference =
+                                static_cast<TESObjectSTAT*>(pcurrent->GetObjectReference());
+                            if (ObjectReference == pCollisionMarker) {
+                                v62 = true;
+                            }
+                            if (prb && (prb != plastBody && v62)) {
+                                plastBody = prb;
+                                int32_t* piMaxPicks = &iMaxViewCasterPicksHavok.Int();
+                                if (ihavokPicks < *piMaxPicks) {
+                                    ++ihavokPicks;
+                                    rci.~hkpShapeRayCastInput();
+                                    ::new (&rci) hkpShapeRayCastInput;
+                                    rci.m_filterInfo =
+                                        static_cast<bhkWorldObject*>(GetObject())->GetCollisionFilter(&v57)->iFilter;
+                                    const hkTransform* Transform = &prb->getTransform();
+                                    hkTransform hkt(*Transform);
+                                    rci.m_from.setTransformedInversePos(hkt, hkfrom);
+                                    rci.m_to.setTransformedInversePos(hkt, hkto);
+                                    hkpShapeRayCastOutput rco;
+                                    rco.reset_0();
+                                    const hkpShape* pcurShape = point.m_rootCollidableB->m_shape;
+                                    hkBool bCastHit = pcurShape->castRay(rci, rco);
+                                    if (rco.hasHit().operator bool() &&
+                                        fhavokPickDistance > static_cast<double>(rco.m_hitFraction)) {
+                                        phavokPickRef = pcurrent;
+                                        fhavokPickDistance = rco.m_hitFraction;
                                     }
                                 }
                             }
-                        }
-                    }
-                }
-                fhavokPickDistance = fhavokPickDistance * afPickDistance;
-                uiInterfaceCheckpoint = 3509;
-                if ((&activatePick.m_pickResults)->m_uiValidResults) {
-                    uiInterfaceCheckpoint = 3510;
-                    NiAVObject* pav_3 = (&activatePick.m_pickResults)->GetAt(0)->GetAVObject();
-                    uiInterfaceCheckpoint = 3511;
-                    presult = TESObjectREFR::FindReferenceFor3D(pav_3);
-                    uiInterfaceCheckpoint = 3512;
-                    afObjectDistance = (&activatePick.m_pickResults)->GetAt(0)->m_fDistance;
-                    uiInterfaceCheckpoint = 3513;
-                    if (fhavokPickDistance < static_cast<double>(afObjectDistance)) {
-                        afObjectDistance = fhavokPickDistance;
-                        presult = phavokPickRef;
-                    }
-                }
-                else {
-                    if (phavokPickRef) {
-                        afObjectDistance = fhavokPickDistance;
-                        presult = phavokPickRef;
-                    }
-                }
-                uiInterfaceCheckpoint = 3514;
-                if (buseFuzzy) {
-                    bool bfuzzyOverride = true;
-                    if (presult) {
-                        if (presult->GetObjectReference()) {
-                            bfuzzyOverride = false;
-                            switch (presult->GetObjectReference()->GetFormType()) {
-                                case LIGH_ID: {
-                                    if (!static_cast<TESObjectLIGH*>(presult->GetObjectReference())->GetCanCarry()) {
-                                        bfuzzyOverride = true;
+                            else {
+                                uiInterfaceCheckpoint = 3506;
+                                if ((plast != pcurrent) && (pcurrent->Get3D())) {
+                                    int32_t* piMaxPicks = &iMaxViewCasterPicksGamebryo.Int();
+                                    if (igamebryoPicks < *piMaxPicks) {
+                                        ++igamebryoPicks;
+                                        NiNode* pcurrent3D = pcurrent->Get3D();
+                                        PickDistance(
+                                            &activatePick, aOrigin, aDirection, afPickDistance, pcurrent3D, false
+                                        );
+                                    }
+                                }
+                            }
+                            bool v51 = true;
+                            switch (fltr.GetLayer()) {
+                                case L_STATIC:
+                                case L_TERRAIN:
+                                case L_GROUND:
+                                case L_PORTAL: {
+                                    v51 = false;
+                                    break;
+                                }
+                                case L_PROJECTILE: {
+                                    if (!prb) {
+                                        v51 = false;
                                     }
                                     break;
                                 }
-                                case STAT_ID:
-                                case SCOL_ID:
-                                case TREE_ID: {
-                                    bfuzzyOverride = true;
+                                case L_CHARCONTROLLER: {
+                                    if (pcurrent->IsActor()) {
+                                        MobileObject* pmobile = static_cast<MobileObject*>(pcurrent);
+                                        BaseProcess* pprocess = pmobile->GetCurrentAIProcess();
+                                        bhkCharacterController* pcon = pmobile->MobileObject::GetCharController();
+                                        if ((pprocess) && (pcon) &&
+                                            (pcon->GetSize() == bhkCharacterController::CS_SIZED)) {
+                                            SIT_SLEEP_STATE estate = pprocess->GetSitSleepState();
+                                            if (estate == SIT_SLEEP_IS_SLEEPING || estate == SIT_SLEEP_IS_SITTING) {
+                                                v51 = false;
+                                            }
+                                        }
+                                    }
                                     break;
                                 }
                                 default: {
                                     break;
                                 }
                             }
-                        }
-                    }
-                    if (bfuzzyOverride) {
-                        if (pshapeCastRef) {
-                            if (presult != pshapeCastRef) {
-                                afObjectDistance = fshapeCastDistance;
-                                presult = pshapeCastRef;
-                                abIsFuzzy = true;
-                                ViewCaster::pFuzzyBody = pfuzzyBody;
+                            if ((v51 && buseFuzzy) && (pw)) {
+                                hkVector4 distanceFromPick;
+                                hkVector4 pickDirection;
+                                hkVector4 distanceToContact;
+                                distanceToContact.setSub4(point.m_contact.getPosition(), hkfrom);
+                                pickDirection.setSub4(hkto, hkfrom);
+                                pickDirection.normalize3();
+                                pickDirection.mul4(pickDirection.dot3(distanceToContact));
+                                distanceFromPick.setSub4(distanceToContact, pickDirection);
+                                float fScalar = distanceFromPick.length3().operator float();
+                                float fdistancePick = HK2NI(fScalar);
+                                if (fshapeCastCenterPointDistance > static_cast<double>(fdistancePick)) {
+                                    int32_t* piMaxPicks = &iMaxViewCasterPicksFuzzy.Int();
+                                    if (ifuzzyPicks < *piMaxPicks) {
+                                        if (pshapeCastRef && pshapeCastRef == pcurrent) {
+                                            float fScalara = distanceToContact.length3().operator float();
+                                            fshapeCastDistance = HK2NI(fScalara);
+                                            fshapeCastCenterPointDistance = fdistancePick;
+                                        }
+                                        else {
+                                            ++ifuzzyPicks;
+                                            bhkPickData pd;
+                                            CFilter* CollisionFilter =
+                                                static_cast<bhkWorldObject*>(GetObject())->GetCollisionFilter(&v38);
+                                            pd.SetFilter(*CollisionFilter);
+                                            pd.SetFrom(hkfrom);
+                                            pd.SetTo(point.m_contact.getPosition());
+                                            hkpAllRayHitCollector pcollector;
+                                            pd.SetAllCollector(&pcollector);
+                                            pw->PickObject(pd);
+                                            if (!pd.bPickFailed) {
+                                                if ((&pcollector.getHits())->m_size <= 0) {
+                                                    pshapeCastRef = pcurrent;
+                                                    float fScalarc = distanceToContact.length3().operator float();
+                                                    fshapeCastDistance = HK2NI(fScalarc);
+                                                    fshapeCastCenterPointDistance = fdistancePick;
+                                                    pfuzzyBody = static_cast<bhkRigidBody*>(bhkEntity::Getbhk(prb));
+                                                }
+                                                else {
+                                                    const hkpWorldRayCastOutput* pRayHit =
+                                                        &(&pcollector.getHits())->operator[]<hkpWorldRayCastOutput>(0);
+                                                    NiAVObject* pav_2 =
+                                                        GetAVObjectForCollidable(pRayHit->m_rootCollidable);
+                                                    if (pav_2) {
+                                                        TESObjectREFR* pref = TESObjectREFR::FindReferenceFor3D(pav_2);
+                                                        if ((pref) && (pref == pcurrent)) {
+                                                            pshapeCastRef = pcurrent;
+                                                            float fScalarb =
+                                                                distanceToContact.length3().operator float();
+                                                            fshapeCastDistance = HK2NI(fScalarb);
+                                                            fshapeCastCenterPointDistance = fdistancePick;
+                                                            pfuzzyBody =
+                                                                static_cast<bhkRigidBody*>(bhkEntity::Getbhk(prb));
+                                                        }
+                                                    }
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
                             }
+
+                            uiInterfaceCheckpoint = 3507;
+                            plast = pcurrent;
                         }
                     }
                 }
             }
         }
+        fhavokPickDistance = fhavokPickDistance * afPickDistance;
+        uiInterfaceCheckpoint = 3509;
+        if ((&activatePick.m_pickResults)->m_uiValidResults) {
+            uiInterfaceCheckpoint = 3510;
+            NiAVObject* pav_3 = (&activatePick.m_pickResults)->GetAt(0)->GetAVObject();
+            uiInterfaceCheckpoint = 3511;
+            presult = TESObjectREFR::FindReferenceFor3D(pav_3);
+            uiInterfaceCheckpoint = 3512;
+            afObjectDistance = (&activatePick.m_pickResults)->GetAt(0)->m_fDistance;
+            uiInterfaceCheckpoint = 3513;
+            if (fhavokPickDistance < static_cast<double>(afObjectDistance)) {
+                afObjectDistance = fhavokPickDistance;
+                presult = phavokPickRef;
+            }
+        }
+        else {
+            if (phavokPickRef) {
+                afObjectDistance = fhavokPickDistance;
+                presult = phavokPickRef;
+            }
+        }
+        uiInterfaceCheckpoint = 3514;
+        if (buseFuzzy) {
+            bool bfuzzyOverride = true;
+            if ((presult) && (presult->GetObjectReference())) {
+                bfuzzyOverride = false;
+                switch (presult->GetObjectReference()->GetFormType()) {
+                    case LIGH_ID: {
+                        if (!static_cast<TESObjectLIGH*>(presult->GetObjectReference())->GetCanCarry()) {
+                            bfuzzyOverride = true;
+                        }
+                        break;
+                    }
+                    case STAT_ID:
+                    case SCOL_ID:
+                    case TREE_ID: {
+                        bfuzzyOverride = true;
+                        break;
+                    }
+                    default: {
+                        break;
+                    }
+                }
+            }
+
+            if ((bfuzzyOverride) && (pshapeCastRef) && (presult != pshapeCastRef)) {
+                afObjectDistance = fshapeCastDistance;
+                presult = pshapeCastRef;
+                abIsFuzzy = true;
+                ViewCaster::pFuzzyBody = pfuzzyBody;
+            }
+        }
     }
+
     return presult;
 }
 

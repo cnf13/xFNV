@@ -39,39 +39,37 @@ void SetCameraShakeData(float afMult, float afCurrentTime) {
 }
 
 void ShakeCamera(float afMult, const NiPoint3& arPos) {
-    if (ShakeData_pModel) {
-        if (afMult > 0.0) {
-            SceneGraph* WorldSceneGraph = Main::GetWorldSceneGraph();
-            NiPoint3 cameraPos = WorldSceneGraph->GetCameraRoot()->GetTranslate();
-            float fdelta = (cameraPos - arPos).Length();
-            float fFadeStart = fCameraShakeDistFadeStart.Float() * afMult;
-            float fFadeDelta = fCameraShakeDistFadeDelta.Float() * afMult;
-            float* v4 = &fCameraShakeDistMin.Float();
-            if (*v4 > static_cast<double>(fFadeStart)) {
-                fFadeStart = fCameraShakeDistMin.Float();
+    if ((ShakeData_pModel) && (afMult > 0.0)) {
+        SceneGraph* WorldSceneGraph = Main::GetWorldSceneGraph();
+        NiPoint3 cameraPos = WorldSceneGraph->GetCameraRoot()->GetTranslate();
+        float fdelta = (cameraPos - arPos).Length();
+        float fFadeStart = fCameraShakeDistFadeStart.Float() * afMult;
+        float fFadeDelta = fCameraShakeDistFadeDelta.Float() * afMult;
+        float* v4 = &fCameraShakeDistMin.Float();
+        if (*v4 > static_cast<double>(fFadeStart)) {
+            fFadeStart = fCameraShakeDistMin.Float();
+        }
+        if (fdelta < fFadeStart + fFadeDelta) {
+            if (fFadeStart < static_cast<double>(fdelta)) {
+                afMult = (1.0 - (fdelta - fFadeStart) / fFadeDelta) * afMult;
             }
-            if (fdelta < fFadeStart + fFadeDelta) {
-                if (fFadeStart < static_cast<double>(fdelta)) {
-                    afMult = (1.0 - (fdelta - fFadeStart) / fFadeDelta) * afMult;
+            if (!(afMult > 1.0)) {
+                if (fCameraShakeMultMin.Float() > static_cast<double>(afMult)) {
+                    afMult = fCameraShakeMultMin.Float();
                 }
-                if (!(afMult > 1.0)) {
-                    if (fCameraShakeMultMin.Float() > static_cast<double>(afMult)) {
-                        afMult = fCameraShakeMultMin.Float();
-                    }
-                }
-                else {
-                    afMult = 1.0f;
-                }
-                fCameraShakeMult = afMult;
-                fCameraShakeCurrentTime = fCameraShakeTime.Float();
-                if (!Interface::IsInMenuMode()) {
-                    Controls* pcontrols = appMain->GetControls();
-                    double v8 = fCameraShakeCurrentTime * 1000.0;
-                    int32_t v5 = static_cast<int32_t>(fRumbleShakeTimeMult.Float() * v8);
-                    float v7 = fCameraShakeMult * fRumbleShakeRadiusMult.Float();
-                    float v6 = fCameraShakeMult * fRumbleShakeRadiusMult.Float();
-                    pcontrols->Rumble(v6, v7, v5, 0, CONSTANT, false, false);
-                }
+            }
+            else {
+                afMult = 1.0f;
+            }
+            fCameraShakeMult = afMult;
+            fCameraShakeCurrentTime = fCameraShakeTime.Float();
+            if (!Interface::IsInMenuMode()) {
+                Controls* pcontrols = appMain->GetControls();
+                double v8 = fCameraShakeCurrentTime * 1000.0;
+                int32_t v5 = static_cast<int32_t>(fRumbleShakeTimeMult.Float() * v8);
+                float v7 = fCameraShakeMult * fRumbleShakeRadiusMult.Float();
+                float v6 = fCameraShakeMult * fRumbleShakeRadiusMult.Float();
+                pcontrols->Rumble(v6, v7, v5, 0, CONSTANT, false, false);
             }
         }
     }

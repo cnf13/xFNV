@@ -172,14 +172,12 @@ void ImageSpaceModifierInstanceForm::Stop(TESImageSpaceModifier* apMod) {
                 ::new (&spInstance) NiPointer<ImageSpaceModifierInstance>(pInstance);
                 pkList->Remove(spInstance);
                 spInstance.~NiPointer<ImageSpaceModifierInstance>();
-                if (apMod->pOutroSound) {
-                    if (!bHasPlayed) {
-                        bHasPlayed = true;
-                        uint32_t uiSoundID = apMod->pOutroSound->iFormID;
-                        BSAudio* pAudio = &BSAudio::QInstance();
-                        BSSoundHandle* pSound = pAudio->GetSoundHandleByNumericID(&kSound, uiSoundID, 0x200000u);
-                        pSound->Play(false);
-                    }
+                if ((apMod->pOutroSound) && (!bHasPlayed)) {
+                    bHasPlayed = true;
+                    uint32_t uiSoundID = apMod->pOutroSound->iFormID;
+                    BSAudio* pAudio = &BSAudio::QInstance();
+                    BSSoundHandle* pSound = pAudio->GetSoundHandleByNumericID(&kSound, uiSoundID, 0x200000u);
+                    pSound->Play(false);
                 }
             }
             else {

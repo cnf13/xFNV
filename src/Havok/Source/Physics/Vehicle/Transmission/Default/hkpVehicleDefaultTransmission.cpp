@@ -136,10 +136,9 @@ float hkpVehicleDefaultTransmission::calcMainTransmittedTorque(
     if (transmissionOut.m_delayed.m_bool) {
         return 0.0;
     }
-    else {
-        float transmissionOuta = vehicle->m_torque;
-        return getCurrentRatio(vehicle, transmissionOut) * transmissionOuta;
-    }
+
+    float transmissionOuta = vehicle->m_torque;
+    return getCurrentRatio(vehicle, transmissionOut) * transmissionOuta;
 }
 
 // The wheels' RPM weighted by their torque share, times the current gear ratio, never below zero. Each wheel's RPM

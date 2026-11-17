@@ -82,45 +82,44 @@ void CombatProcedureMove::Update() {
             if (spQueuedPathingRequest.m_pObject && !pattacker->IsWaitingOnPath()) {
                 PathingRequestCoveredMove* prequest =
                     static_cast<PathingRequestCoveredMove*>(spQueuedPathingRequest.m_pObject);
-                if (prequest->GetType() == 8) {
-                    if (prequest->bFinished) {
-                        pcombatState->SetSecondaryCoverSearchInfo(prequest->pCombatCoverSearchInfo);
-                        CombatCoverLocation* pcombatCoverLocation = prequest->pCombatCoverLocation;
-                        pcombatState->SetSecondaryCoverLocation(pcombatCoverLocation);
-                        prequest->pCombatCoverLocation = nullptr;
-                        if (pcombatCoverLocation) {
-                            TESForm* a2 = pattacker->GetSpace();
-                            NiPoint3* ScriptList = &prequest->CoverLocation;
-                            CurrentDestination.SetLocation(*ScriptList, a2);
-                            if (!pcombatState->TryReserveSecondaryCoverLocation()) {
-                                spQueuedPathingRequest.operator=(static_cast<PathingRequest*>(nullptr));
-                                CurrentDestination.Point.x = Destination.Point.x;
-                                CurrentDestination.Point.y = Destination.Point.y;
-                                CurrentDestination.Point.z = Destination.Point.z;
-                                CurrentDestination.pSpace = Destination.pSpace;
-                                eState = CombatProcedureMove::MOVE_STATE_MOVING;
-                                CreatePath();
-                                return;
-                            }
-                            eState = CombatProcedureMove::MOVE_STATE_MOVING_USING_COVER;
-                            bReservedSecondaryLocation = true;
-                            CombatCoverLocation* SecondaryCoverLocation = pcombatState->GetSecondaryCoverLocation();
-                            CombatUtilities::CalculateCoverPositions(
-                                pCombatController, SecondaryCoverLocation, &coverLocation, &LookAtPosition
-                            );
-                            LookAtPosition.z =
-                                CombatUtilities::GetTargetFiringZOffset(pattacker, ACTOR_SEGMENT_INVIEW_TOP, false) +
-                                LookAtPosition.z;
-                            CheckCoverTimer.Reset(0.5f);
-                        }
-                        else {
+                if ((prequest->GetType() == 8) && (prequest->bFinished)) {
+                    pcombatState->SetSecondaryCoverSearchInfo(prequest->pCombatCoverSearchInfo);
+                    CombatCoverLocation* pcombatCoverLocation = prequest->pCombatCoverLocation;
+                    pcombatState->SetSecondaryCoverLocation(pcombatCoverLocation);
+                    prequest->pCombatCoverLocation = nullptr;
+                    if (pcombatCoverLocation) {
+                        TESForm* a2 = pattacker->GetSpace();
+                        NiPoint3* ScriptList = &prequest->CoverLocation;
+                        CurrentDestination.SetLocation(*ScriptList, a2);
+                        if (!pcombatState->TryReserveSecondaryCoverLocation()) {
+                            spQueuedPathingRequest.operator=(static_cast<PathingRequest*>(nullptr));
                             CurrentDestination.Point.x = Destination.Point.x;
                             CurrentDestination.Point.y = Destination.Point.y;
                             CurrentDestination.Point.z = Destination.Point.z;
                             CurrentDestination.pSpace = Destination.pSpace;
+                            eState = CombatProcedureMove::MOVE_STATE_MOVING;
+                            CreatePath();
+                            return;
                         }
+                        eState = CombatProcedureMove::MOVE_STATE_MOVING_USING_COVER;
+                        bReservedSecondaryLocation = true;
+                        CombatCoverLocation* SecondaryCoverLocation = pcombatState->GetSecondaryCoverLocation();
+                        CombatUtilities::CalculateCoverPositions(
+                            pCombatController, SecondaryCoverLocation, &coverLocation, &LookAtPosition
+                        );
+                        LookAtPosition.z =
+                            CombatUtilities::GetTargetFiringZOffset(pattacker, ACTOR_SEGMENT_INVIEW_TOP, false) +
+                            LookAtPosition.z;
+                        CheckCoverTimer.Reset(0.5f);
+                    }
+                    else {
+                        CurrentDestination.Point.x = Destination.Point.x;
+                        CurrentDestination.Point.y = Destination.Point.y;
+                        CurrentDestination.Point.z = Destination.Point.z;
+                        CurrentDestination.pSpace = Destination.pSpace;
                     }
                 }
+
                 spQueuedPathingRequest.operator=(static_cast<PathingRequest*>(nullptr));
             }
             if (pattacker->DidPathingFail()) {
@@ -150,11 +149,9 @@ void CombatProcedureMove::Update() {
                             }
                         }
                         CombatCoverLocation* pcoverLocation = pcombatState->GetCoverLocation();
-                        if (pcoverLocation) {
-                            if (pcoverLocation->iLocation == iLocation) {
-                                pcombatState->AddUnreachableCoverLocation(pcoverLocation->iCoverLocationKey);
-                                pcombatState->ClearCoverLocation(false);
-                            }
+                        if ((pcoverLocation) && (pcoverLocation->iLocation == iLocation)) {
+                            pcombatState->AddUnreachableCoverLocation(pcoverLocation->iCoverLocationKey);
+                            pcombatState->ClearCoverLocation(false);
                         }
                     }
                     pcombatState->AddUnreachableLocation(CurrentDestination);
@@ -208,31 +205,23 @@ void CombatProcedureMove::Update() {
                         }
                     }
                     if (eState == CombatProcedureMove::MOVE_STATE_MOVING_USING_COVER && CheckCoverTimer.Check()) {
-                        if (!bcreateNewPath) {
-                            if (ptarget) {
-                                if (pcombatState->GetHasBufferedDetection()) {
-                                    CombatCoverLocation* pcoverLocation_2 = pcombatState->GetSecondaryCoverLocation();
-                                    if (pcoverLocation_2) {
-                                        ptarget->GetWorldLocation(&targetWorldLoc);
-                                        pattacker->GetWorldLocation(&attackerWorldLoc);
-                                        if (attackerWorldLoc.GetDistanceSquared(targetWorldLoc) < 16777216.0) {
-                                            NiPoint3* a2a = &pcoverLocation_2->CoverLocation.RightVertex;
-                                            NiPoint3* afMinDistance = &pcoverLocation_2->CoverLocation.LeftVertex;
-                                            const NiPoint3* v14 = &ptarget->GetLocationOnReference();
-                                            if (NavMeshMath::Find2DIntersection3(
-                                                    pcoverLocation_2->CoverLocation.GetLocation(), *v14, *afMinDistance,
-                                                    *a2a
-                                                )) {
-                                                NiPoint3* Point = &(&CurrentDestination)->Point;
-                                                if (!pcombatState->CheckCoverSafe(
-                                                        pcoverLocation_2->CoverLocation, *Point, ptarget, 0
-                                                    )) {
-                                                    bcreateNewPath = true;
-                                                }
-                                            }
-                                            else {
-                                                bcreateNewPath = true;
-                                            }
+                        if ((!bcreateNewPath) && (ptarget) && (pcombatState->GetHasBufferedDetection())) {
+                            CombatCoverLocation* pcoverLocation_2 = pcombatState->GetSecondaryCoverLocation();
+                            if (pcoverLocation_2) {
+                                ptarget->GetWorldLocation(&targetWorldLoc);
+                                pattacker->GetWorldLocation(&attackerWorldLoc);
+                                if (attackerWorldLoc.GetDistanceSquared(targetWorldLoc) < 16777216.0) {
+                                    NiPoint3* a2a = &pcoverLocation_2->CoverLocation.RightVertex;
+                                    NiPoint3* afMinDistance = &pcoverLocation_2->CoverLocation.LeftVertex;
+                                    const NiPoint3* v14 = &ptarget->GetLocationOnReference();
+                                    if (NavMeshMath::Find2DIntersection3(
+                                            pcoverLocation_2->CoverLocation.GetLocation(), *v14, *afMinDistance, *a2a
+                                        )) {
+                                        NiPoint3* Point = &(&CurrentDestination)->Point;
+                                        if (!pcombatState->CheckCoverSafe(
+                                                pcoverLocation_2->CoverLocation, *Point, ptarget, 0
+                                            )) {
+                                            bcreateNewPath = true;
                                         }
                                     }
                                     else {
@@ -240,7 +229,11 @@ void CombatProcedureMove::Update() {
                                     }
                                 }
                             }
+                            else {
+                                bcreateNewPath = true;
+                            }
                         }
+
                         CheckCoverTimer.Reset(0.5f);
                     }
                     if (bcreateNewPath) {
@@ -601,58 +594,56 @@ bool CombatProcedureMove::CreatePath(NiPointer<PathingAvoidNodeArray>& arspAvoid
         }
     }
     CombatLocationTarget* plocationTarget = pcombatState->pLocationTarget;
-    if (plocationTarget) {
-        if (plocationTarget->cType == 1 && !pcombatState->GetLocationUnreachable(256) && this->iLocation != 8) {
-            TESForm* Space = plocationTarget->WorldLoc.pSpace;
-            if (Space == pattacker->GetSpace()) {
-                center = plocationTarget->WorldLoc.Point;
-                fcenterRadius = pcombatState->GetLocationTargetDistance();
-                const NiPoint3* v3 = &pattacker->GetLocationOnReference();
-                NiPoint3 vec = center - *v3;
-                double v4 = vec.SqrLength();
-                if (fcenterRadius * fcenterRadius < v4) {
-                    fcenterRadius = 0.0f;
-                }
+    if ((plocationTarget) &&
+        (plocationTarget->cType == 1 && !pcombatState->GetLocationUnreachable(256) && this->iLocation != 8)) {
+        TESForm* Space = plocationTarget->WorldLoc.pSpace;
+        if (Space == pattacker->GetSpace()) {
+            center = plocationTarget->WorldLoc.Point;
+            fcenterRadius = pcombatState->GetLocationTargetDistance();
+            const NiPoint3* v3 = &pattacker->GetLocationOnReference();
+            NiPoint3 vec = center - *v3;
+            double v4 = vec.SqrLength();
+            if (fcenterRadius * fcenterRadius < v4) {
+                fcenterRadius = 0.0f;
             }
         }
     }
+
     float fradius = 0.0f;
     if (eState == CombatProcedureMove::MOVE_STATE_MOVING) {
         fradius = fTargetRadius;
     }
-    if (this->iLocation == 1 && eState == CombatProcedureMove::MOVE_STATE_MOVING) {
-        if (pTargetRef) {
-            NiPoint3* afRadius = &(&Destination)->Point;
-            ::new (&faceTargetLocation)
-                NiPoint3(CombatUtilities::ComputeFaceTargetLocation(pattacker, pTargetRef, *afRadius, -1.0f));
-            PathingLocation pathingLocation(faceTargetLocation, pattacker);
-            float a3 = pattacker->GetRadius();
-            if (pathingLocation.IsValidLocation(a3)) {
-                NiPoint3* Point = &(&Destination)->Point;
-                if (CombatUtilities::CalculateLOS(pattacker, pTargetRef, faceTargetLocation, *Point, false, -1)) {
-                    CurrentDestination.SetPoint(faceTargetLocation);
-                    if (!arspAvoidNodeArray.m_pObject) {
-                        PathingAvoidNodeArray* v17;
-                        PathingAvoidNodeArray* v21 = static_cast<PathingAvoidNodeArray*>(
-                            NiMemObject::operator new(sizeof(PathingAvoidNodeArray))
-                        );
-                        if (v21) {
-                            v17 = ::new (v21) PathingAvoidNodeArray;
-                        }
-                        else {
-                            v17 = nullptr;
-                        }
-                        arspAvoidNodeArray.operator=(v17);
+    if ((this->iLocation == 1 && eState == CombatProcedureMove::MOVE_STATE_MOVING) && (pTargetRef)) {
+        NiPoint3* afRadius = &(&Destination)->Point;
+        ::new (&faceTargetLocation)
+            NiPoint3(CombatUtilities::ComputeFaceTargetLocation(pattacker, pTargetRef, *afRadius, -1.0f));
+        PathingLocation pathingLocation(faceTargetLocation, pattacker);
+        float a3 = pattacker->GetRadius();
+        if (pathingLocation.IsValidLocation(a3)) {
+            NiPoint3* Point = &(&Destination)->Point;
+            if (CombatUtilities::CalculateLOS(pattacker, pTargetRef, faceTargetLocation, *Point, false, -1)) {
+                CurrentDestination.SetPoint(faceTargetLocation);
+                if (!arspAvoidNodeArray.m_pObject) {
+                    PathingAvoidNodeArray* v17;
+                    PathingAvoidNodeArray* v21 =
+                        static_cast<PathingAvoidNodeArray*>(NiMemObject::operator new(sizeof(PathingAvoidNodeArray)));
+                    if (v21) {
+                        v17 = ::new (v21) PathingAvoidNodeArray;
                     }
-                    float a3a = fMovementNearTargetAvoidCost.Float();
-                    float afRadiusa = fMovementNearTargetAvoidRadius.Float();
-                    const NiPoint3* v5 = &pTargetRef->GetLocationOnReference();
-                    PathingAvoidNode* v6 = FNVD_RECONSTRUCT(PathingAvoidNode)(&v20, *v5, afRadiusa, a3a);
-                    arspAvoidNodeArray.m_pObject->Add(*v6);
+                    else {
+                        v17 = nullptr;
+                    }
+                    arspAvoidNodeArray.operator=(v17);
                 }
+                float a3a = fMovementNearTargetAvoidCost.Float();
+                float afRadiusa = fMovementNearTargetAvoidRadius.Float();
+                const NiPoint3* v5 = &pTargetRef->GetLocationOnReference();
+                PathingAvoidNode* v6 = FNVD_RECONSTRUCT(PathingAvoidNode)(&v20, *v5, afRadiusa, a3a);
+                arspAvoidNodeArray.m_pObject->Add(*v6);
             }
         }
     }
+
     PathingRequest* prequest = nullptr;
     PathingRequest request;
     PathingRequestCoveredMove coveredMoveRequest;
@@ -685,10 +676,9 @@ bool CombatProcedureMove::CreatePath(NiPointer<PathingAvoidNodeArray>& arspAvoid
         SetMoveMode(ecombatMoveMode);
         return true;
     }
-    else {
-        SetFailed("Cannot setup path to destination");
-        return false;
-    }
+
+    SetFailed("Cannot setup path to destination");
+    return false;
 }
 
 void CombatProcedureMove::CreateAvoidNodeArray(NiPointer<PathingAvoidNodeArray>& arspAvoidNodeArray) {

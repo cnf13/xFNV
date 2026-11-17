@@ -80,9 +80,8 @@ float BGSWorldLocation::GetDistance(const BGSWorldLocation& arWorldLocation) con
         v3 = &(v5 = (&(&arWorldLocation)->Point)->operator-(Point));
         return v3->Length();
     }
-    else {
-        return 0x1.fffffe0000000p+127f;
-    }
+
+    return 0x1.fffffe0000000p+127f;
 }
 
 float BGSWorldLocation::GetModifiedDistanceSquared(
@@ -110,16 +109,14 @@ bool BGSWorldLocation::GetCellOrWorld(TESObjectCELL*& arpCell, TESWorldSpace*& a
         arpCell = nullptr;
         return true;
     }
-    else {
-        if (FormType == 57) {
-            arpCell = static_cast<TESObjectCELL*>(pSpace);
-            arpWorld = nullptr;
-            return true;
-        }
-        else {
-            return false;
-        }
+
+    if (FormType == 57) {
+        arpCell = static_cast<TESObjectCELL*>(pSpace);
+        arpWorld = nullptr;
+        return true;
     }
+
+    return false;
 }
 
 char BGSWorldLocation::CheckSpace(TESObjectCELL* a1) {

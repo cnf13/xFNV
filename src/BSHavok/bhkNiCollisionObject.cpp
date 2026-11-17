@@ -331,12 +331,11 @@ void bhkNiCollisionObject::SetDebugDisplay(bool abTF) {
                 pDisplay->Update(kUpdateData);
             }
         }
-        else if (pParent) {
-            if (pNode) {
-                NiPointer<NiAVObject> spDetached;
-                pParent->DetachChild(pNode, spDetached);
-            }
+        else if ((pParent) && (pNode)) {
+            NiPointer<NiAVObject> spDetached;
+            pParent->DetachChild(pNode, spDetached);
         }
+
         usFlags |= 0x10;
     }
     else {
@@ -490,9 +489,8 @@ bhkNiCollisionObject* bhkNiCollisionObject::GetbhkNiCollisionObject(NiAVObject* 
     if (collisionObject) {
         return collisionObject->IsBhkNiCollisionObject();
     }
-    else {
-        return nullptr;
-    }
+
+    return nullptr;
 }
 
 // Whether the object below apRoot named apName (apRoot itself when apName is null or names no object) faces up: its

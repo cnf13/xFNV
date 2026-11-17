@@ -53,10 +53,9 @@ NiObject* NiPSysMeshUpdateModifier::CreateClone(NiCloningProcess& kCloning) {
         CopyMembers(pkObject, kCloning);
         return pkObject;
     }
-    else {
-        CopyMembers(nullptr, kCloning);
-        return nullptr;
-    }
+
+    CopyMembers(nullptr, kCloning);
+    return nullptr;
 }
 
 // The stored order is overridden; the mesh links are read here and resolved in LinkObject.

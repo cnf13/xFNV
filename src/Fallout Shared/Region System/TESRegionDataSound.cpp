@@ -223,9 +223,8 @@ TESRegionData* TESRegionDataSound::Copy() {
     if (v4) {
         return ::new (v4) TESRegionDataSound(this);
     }
-    else {
-        return nullptr;
-    }
+
+    return nullptr;
 }
 
 TESRegionData* TESRegionDataSound::Blend(const TESRegionData* apRegionData) {

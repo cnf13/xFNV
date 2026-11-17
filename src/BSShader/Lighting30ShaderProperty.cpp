@@ -344,18 +344,15 @@ BSShaderProperty::RenderPassArray* Lighting30ShaderProperty::GetRenderPasses(
                     pPass->ppSceneLights[0] = pLight ? pLight : pSunLight;
                 }
             }
-            else if (usPass >= 452 && usPass <= 455) {
-                if (pPass->ucNumLights == 1) {
-                    void* pIter;
-                    ShadowSceneLight* pLight = GetFirstActiveLight(pIter);
-                    // No shadow-casting light left, or its light is culled: rebuild the list.
-                    if (!pLight || !pLight->bCastShadow ||
-                        (pLight->spLight.m_pObject->m_uFlags & NiAVObject::APP_CULLED)) {
-                        iLastRenderPassState = 0;
-                        break;
-                    }
-                    pPass->ppSceneLights[0] = pLight;
+            else if ((usPass >= 452 && usPass <= 455) && (pPass->ucNumLights == 1)) {
+                void* pIter;
+                ShadowSceneLight* pLight = GetFirstActiveLight(pIter);
+                // No shadow-casting light left, or its light is culled: rebuild the list.
+                if (!pLight || !pLight->bCastShadow || (pLight->spLight.m_pObject->m_uFlags & NiAVObject::APP_CULLED)) {
+                    iLastRenderPassState = 0;
+                    break;
                 }
+                pPass->ppSceneLights[0] = pLight;
             }
         }
         bLightListChanged = false;

@@ -239,19 +239,15 @@ void cleanupLoadedObjecthkpIgnoreModifierConstraintAtom(void* p) {
 
 void finishLoadedObjecthkpBridgeConstraintAtom(void* p, int32_t finishing) {
     hkpBridgeConstraintAtom* a1 = static_cast<hkpBridgeConstraintAtom*>(p);
-    if (a1) {
-        if (finishing) {
-            a1->init(a1->m_constraintData);
-        }
+    if ((a1) && (finishing)) {
+        a1->init(a1->m_constraintData);
     }
 }
 
 void finishLoadedObjecthkpBridgeAtoms(void* p, int32_t finishing) {
     hkpBridgeConstraintAtom* a1 = static_cast<hkpBridgeConstraintAtom*>(p);
-    if (a1) {
-        if (finishing) {
-            a1->init(a1->m_constraintData);
-        }
+    if ((a1) && (finishing)) {
+        a1->init(a1->m_constraintData);
     }
 }
 
@@ -673,64 +669,63 @@ double nearestDistanceBetweenLines(__m128* a1, __m128* a2, __m128* a3, __m128* a
         *a5 = 0.0f;
         return 3.40282e+38f;
     }
+
+    double v20;
+    double v21;
+    float v29;
+    float v35 = v31 * v34 - v12 * v14;
+    float v36 = -v35 / v18;
+    double v19 = 1.0;
+    if (!(v36 < 0.0f)) {
+        if (!(v36 > 1.0f)) {
+            v19 = v36;
+        }
+        v29 = v19;
+        v20 = 0.0;
+        v21 = 1.0;
+    }
     else {
-        double v20;
-        double v21;
-        float v29;
-        float v35 = v31 * v34 - v12 * v14;
-        float v36 = -v35 / v18;
-        double v19 = 1.0;
-        if (!(v36 < 0.0f)) {
-            if (!(v36 > 1.0f)) {
-                v19 = v36;
-            }
-            v29 = v19;
-            v20 = 0.0;
-            v21 = 1.0;
-        }
-        else {
-            v20 = 0.0;
-            v21 = 1.0;
-            v29 = 0.0f;
-        }
-        *a6 = v29;
-        __m128 v22 = _mm_add_ps(
+        v20 = 0.0;
+        v21 = 1.0;
+        v29 = 0.0f;
+    }
+    *a6 = v29;
+    __m128 v22 = _mm_add_ps(
+        _mm_mul_ps(
+            _mm_shuffle_ps(
+                _mm_set_ss(std::bit_cast<float>(*reinterpret_cast<uint32_t*>(a6))),
+                _mm_set_ss(std::bit_cast<float>(*reinterpret_cast<uint32_t*>(a6))), 0
+            ),
+            v6
+        ),
+        *a3
+    );
+    __m128 v23 = _mm_mul_ps(_mm_sub_ps(*a1, v22), v8);
+    float v24 = (_mm_shuffle_ps(v23, v23, 170)[0] + (_mm_shuffle_ps(v23, v23, 85)[0] + v23[0])) /
+        (_mm_shuffle_ps(v16, v16, 170)[0] + (_mm_shuffle_ps(v16, v16, 85)[0] + v16[0]));
+    double v25 = (0.0f - v24);
+    if (v25 < v20 || (v20 = (0.0f - v24), !(v25 > v21))) {
+        v21 = v20;
+    }
+    float v30 = v21;
+    *a5 = v30;
+    __m128 v26 = _mm_sub_ps(
+        _mm_add_ps(
             _mm_mul_ps(
                 _mm_shuffle_ps(
-                    _mm_set_ss(std::bit_cast<float>(*reinterpret_cast<uint32_t*>(a6))),
-                    _mm_set_ss(std::bit_cast<float>(*reinterpret_cast<uint32_t*>(a6))), 0
+                    _mm_set_ss(std::bit_cast<float>(*reinterpret_cast<uint32_t*>(a5))),
+                    _mm_set_ss(std::bit_cast<float>(*reinterpret_cast<uint32_t*>(a5))), 0
                 ),
-                v6
+                v8
             ),
-            *a3
-        );
-        __m128 v23 = _mm_mul_ps(_mm_sub_ps(*a1, v22), v8);
-        float v24 = (_mm_shuffle_ps(v23, v23, 170)[0] + (_mm_shuffle_ps(v23, v23, 85)[0] + v23[0])) /
-            (_mm_shuffle_ps(v16, v16, 170)[0] + (_mm_shuffle_ps(v16, v16, 85)[0] + v16[0]));
-        double v25 = (0.0f - v24);
-        if (v25 < v20 || (v20 = (0.0f - v24), !(v25 > v21))) {
-            v21 = v20;
-        }
-        float v30 = v21;
-        *a5 = v30;
-        __m128 v26 = _mm_sub_ps(
-            _mm_add_ps(
-                _mm_mul_ps(
-                    _mm_shuffle_ps(
-                        _mm_set_ss(std::bit_cast<float>(*reinterpret_cast<uint32_t*>(a5))),
-                        _mm_set_ss(std::bit_cast<float>(*reinterpret_cast<uint32_t*>(a5))), 0
-                    ),
-                    v8
-                ),
-                *a1
-            ),
-            v22
-        );
-        __m128 v27 = _mm_mul_ps(v26, v26);
-        return _mm_cvtss_f32(
-            _mm_sqrt_ss(_mm_set_ss((_mm_shuffle_ps(v27, v27, 170)[0] + (_mm_shuffle_ps(v27, v27, 85)[0] + v27[0]))))
-        );
-    }
+            *a1
+        ),
+        v22
+    );
+    __m128 v27 = _mm_mul_ps(v26, v26);
+    return _mm_cvtss_f32(
+        _mm_sqrt_ss(_mm_set_ss((_mm_shuffle_ps(v27, v27, 170)[0] + (_mm_shuffle_ps(v27, v27, 85)[0] + v27[0]))))
+    );
 }
 
 bool isPointInsideTriangle(__m128* a1, __m128* a2, __m128* a3, __m128* a4, float a5) {

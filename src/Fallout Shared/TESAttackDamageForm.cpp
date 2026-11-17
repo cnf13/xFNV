@@ -45,7 +45,6 @@ uint16_t TESAttackDamageForm::GetAttackDamage_0(TESForm* apForm) {
     if (v2) {
         return v2->GetAttackDamage();
     }
-    else {
-        return 0;
-    }
+
+    return 0;
 }

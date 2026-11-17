@@ -471,25 +471,24 @@ bool BGSNote::Activate(
         return false;
     }
     TESForm* powner = apItemActivated->GetOwner();
-    if (powner) {
-        if (!apItemActivated->IsAnOwner(pPlayer, true)) {
-            if (powner->GetFormType() == FACT_ID) {
-                v12 = !static_cast<TESFaction*>(powner)->TESFaction::GetIsEvil();
-            }
-            else {
-                // The owner is an actor base: its karma is read through its ActorValueOwner.
-                TESActorBase* pbase = static_cast<TESActorBase*>(powner);
-                if (pbase) {
-                    ActorValueOwner* pAVOwner = pbase;
-                    float afKarma = pAVOwner->GetActorFloatValue(ActorValue::KARMA);
-                    TESActorBaseData::ALIGNMENT ealign = TESActorBaseData::GetAlignmentForKarma(afKarma);
-                    if (ealign != TESActorBaseData::ALIGNMENT_EVIL) {
-                        v12 = ealign != TESActorBaseData::ALIGNMENT_VERY_EVIL;
-                    }
+    if ((powner) && (!apItemActivated->IsAnOwner(pPlayer, true))) {
+        if (powner->GetFormType() == FACT_ID) {
+            v12 = !static_cast<TESFaction*>(powner)->TESFaction::GetIsEvil();
+        }
+        else {
+            // The owner is an actor base: its karma is read through its ActorValueOwner.
+            TESActorBase* pbase = static_cast<TESActorBase*>(powner);
+            if (pbase) {
+                ActorValueOwner* pAVOwner = pbase;
+                float afKarma = pAVOwner->GetActorFloatValue(ActorValue::KARMA);
+                TESActorBaseData::ALIGNMENT ealign = TESActorBaseData::GetAlignmentForKarma(afKarma);
+                if (ealign != TESActorBaseData::ALIGNMENT_EVIL) {
+                    v12 = ealign != TESActorBaseData::ALIGNMENT_VERY_EVIL;
                 }
             }
         }
     }
+
     if (v12) {
         double v6 = fKarmaModStealing.Float();
         pPlayer->RewardKarma(static_cast<int32_t>(v6));
@@ -523,9 +522,8 @@ TESSound* BGSNote::GetNoteSound() {
     if (GetNoteType() != NT_SOUND) {
         return nullptr;
     }
-    else {
-        return pNoteSound;
-    }
+
+    return pNoteSound;
 }
 
 void BGSNote::SetNoteSound(TESSound* apSound) {
@@ -538,9 +536,8 @@ TESActorBase* BGSNote::GetNoteSpeaker() {
     if (GetNoteType() == NT_VOICE) {
         return pSpeaker;
     }
-    else {
-        return nullptr;
-    }
+
+    return nullptr;
 }
 
 void BGSNote::SetNoteSpeaker(TESActorBase* apSpeaker) {
@@ -553,18 +550,16 @@ TESTexture* BGSNote::GetNoteImage() {
     if (GetNoteType() == NT_IMAGE) {
         return this->pNoteImage;
     }
-    else {
-        return nullptr;
-    }
+
+    return nullptr;
 }
 
 TESDescription* BGSNote::GetNoteText() {
     if (GetNoteType() == NT_TEXT) {
         return this->pNoteText;
     }
-    else {
-        return nullptr;
-    }
+
+    return nullptr;
 }
 
 void BGSNote::SetNoteType(NOTE_TYPE aeVal) {
@@ -635,7 +630,6 @@ TESTopic* BGSNote::GetNoteTopic() {
     if (GetNoteType() == NT_VOICE) {
         return this->pNoteTopic;
     }
-    else {
-        return nullptr;
-    }
+
+    return nullptr;
 }

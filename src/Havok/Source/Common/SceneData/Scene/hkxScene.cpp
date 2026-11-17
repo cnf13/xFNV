@@ -53,9 +53,8 @@ hkxNode* hkxScene::findNodeByName(const char* name) const {
         )) {
         return m_rootNode.val()->findDescendantByName(name);
     }
-    else {
-        return m_rootNode.val();
-    }
+
+    return m_rootNode.val();
 }
 
 hkResult

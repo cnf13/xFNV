@@ -280,17 +280,15 @@ BSShaderProperty::RenderPassArray* NoFaderShaderProperty::GetRenderPasses(
                         pPass->ppSceneLights[0] = pLight ? pLight : pSunLight;
                     }
                 }
-                else if (usPass >= 452 && usPass <= 455) {
-                    if (pPass->ucNumLights == 1) {
-                        void* pIter;
-                        ShadowSceneLight* pLight = GetFirstActiveLight(pIter);
-                        if (!pLight || !pLight->bCastShadow ||
-                            (pLight->spLight.m_pObject->m_uFlags & NiAVObject::APP_CULLED)) {
-                            iLastRenderPassState = 0;
-                            break;
-                        }
-                        pPass->ppSceneLights[0] = pLight;
+                else if ((usPass >= 452 && usPass <= 455) && (pPass->ucNumLights == 1)) {
+                    void* pIter;
+                    ShadowSceneLight* pLight = GetFirstActiveLight(pIter);
+                    if (!pLight || !pLight->bCastShadow ||
+                        (pLight->spLight.m_pObject->m_uFlags & NiAVObject::APP_CULLED)) {
+                        iLastRenderPassState = 0;
+                        break;
                     }
+                    pPass->ppSceneLights[0] = pLight;
                 }
             }
             bLightListChanged = false;

@@ -63,19 +63,15 @@ void ShadowLightShader::UpdateDiffuseNormalStages(uint32_t auiCurrentPass, BSSha
             v8 = (int32_t)apProp->GetClampNI();
             v6->SetClampMode(static_cast<NiTexturingProperty::ClampMode>(v8));
         }
-        if (((uint32_t)(BSShaderManager::eCurrentPass - 452)) <= 3) {
-            if (apProp->GetUnk68()) {
-                v9 = *BSShaderManager::pCurrentRenderPass->ppSceneLights;
-                if (v9->bCastShadow) {
-                    v10 = v9->spDynamicShadowMap.m_pObject;
-                    if (v10) {
-                        if (BSShaderManager::pCurrentRenderPass->ucNumLights) {
-                            v11 = v3->m_kStages.m_pBase[2].m_pObject;
-                            v11->m_spTexture = v10->GetTexture(0);
-                            v11->SetFilterMode(NiTexturingProperty::FILTER_BILERP);
-                            v11->SetClampMode(NiTexturingProperty::CLAMP_S_CLAMP_T);
-                        }
-                    }
+        if ((((uint32_t)(BSShaderManager::eCurrentPass - 452)) <= 3) && (apProp->GetUnk68())) {
+            v9 = *BSShaderManager::pCurrentRenderPass->ppSceneLights;
+            if (v9->bCastShadow) {
+                v10 = v9->spDynamicShadowMap.m_pObject;
+                if ((v10) && (BSShaderManager::pCurrentRenderPass->ucNumLights)) {
+                    v11 = v3->m_kStages.m_pBase[2].m_pObject;
+                    v11->m_spTexture = v10->GetTexture(0);
+                    v11->SetFilterMode(NiTexturingProperty::FILTER_BILERP);
+                    v11->SetClampMode(NiTexturingProperty::CLAMP_S_CLAMP_T);
                 }
             }
         }

@@ -91,100 +91,97 @@ NiPixelData* ScreenShot::TakeSaveGameScreenShot(int32_t& aiWidth, int32_t& aiHei
             Warning("DEFAULT: (ScreenShot) Unable to create image surface.");
             return nullptr;
         }
+
+        NiPixelData* ppixelData;
+        pD3DDevice->GetRenderTargetData(prenderedTextureCopy, pLocalSurf);
+        prenderedTextureCopy->Release();
+        pLocalSurf->LockRect(&kLockedRect, nullptr, D3DLOCK_NOSYSLOCK);
+        const NiPixelFormat* kPixFmt = &NiPixelFormat_RGB24;
+        aiHeight = inewHeight;
+        NiPixelData* apMemory = static_cast<NiPixelData*>(NiMemObject::operator new(sizeof(NiPixelData)));
+        if (apMemory) {
+            ppixelData = ::new (apMemory)
+                NiPixelData(static_cast<uint32_t>(aiWidth), static_cast<uint32_t>(aiHeight), *kPixFmt, 1u, 1u);
+        }
         else {
-            NiPixelData* ppixelData;
-            pD3DDevice->GetRenderTargetData(prenderedTextureCopy, pLocalSurf);
-            prenderedTextureCopy->Release();
-            pLocalSurf->LockRect(&kLockedRect, nullptr, D3DLOCK_NOSYSLOCK);
-            const NiPixelFormat* kPixFmt = &NiPixelFormat_RGB24;
-            aiHeight = inewHeight;
-            NiPixelData* apMemory = static_cast<NiPixelData*>(NiMemObject::operator new(sizeof(NiPixelData)));
-            if (apMemory) {
-                ppixelData = ::new (apMemory)
-                    NiPixelData(static_cast<uint32_t>(aiWidth), static_cast<uint32_t>(aiHeight), *kPixFmt, 1u, 1u);
+            ppixelData = nullptr;
+        }
+        uint8_t* pSrc = static_cast<uint8_t*>(kLockedRect.pBits);
+        uint8_t* pdataOut = ppixelData->GetPixels(0u, 0u);
+        int32_t offset = 0;
+        for (int32_t i = 0; i < 4 * (aiHeight * aiWidth); i += 4) {
+            pdataOut[offset] = pSrc[i + 2];
+            ++offset;
+            pdataOut[offset] = pSrc[i + 1];
+            ++offset;
+            pdataOut[offset] = pSrc[i];
+            ++offset;
+        }
+        pLocalSurf->UnlockRect();
+        pLocalSurf->Release();
+        sptexture.operator=(static_cast<BSRenderedTexture*>(nullptr));
+        if ((apScreenshotFileName) && (BSstrlen(apScreenshotFileName))) {
+            BSFile* pfile;
+            BSSystemFile::DeleteFileA(apScreenshotFileName);
+            BSFile* v16 = static_cast<BSFile*>(ourMalloc(sizeof(BSFile)));
+            if (v16) {
+                pfile = ::new (v16) BSFile(apScreenshotFileName, NiFile::WRITE_ONLY, 0x4000u, false);
             }
             else {
-                ppixelData = nullptr;
+                pfile = nullptr;
             }
-            uint8_t* pSrc = static_cast<uint8_t*>(kLockedRect.pBits);
-            uint8_t* pdataOut = ppixelData->GetPixels(0u, 0u);
-            int32_t offset = 0;
-            for (int32_t i = 0; i < 4 * (aiHeight * aiWidth); i += 4) {
-                pdataOut[offset] = pSrc[i + 2];
-                ++offset;
-                pdataOut[offset] = pSrc[i + 1];
-                ++offset;
-                pdataOut[offset] = pSrc[i];
-                ++offset;
-            }
-            pLocalSurf->UnlockRect();
-            pLocalSurf->Release();
-            sptexture.operator=(static_cast<BSRenderedTexture*>(nullptr));
-            if (apScreenshotFileName) {
-                if (BSstrlen(apScreenshotFileName)) {
-                    BSFile* pfile;
-                    BSSystemFile::DeleteFileA(apScreenshotFileName);
-                    BSFile* v16 = static_cast<BSFile*>(ourMalloc(sizeof(BSFile)));
-                    if (v16) {
-                        pfile = ::new (v16) BSFile(apScreenshotFileName, NiFile::WRITE_ONLY, 0x4000u, false);
-                    }
-                    else {
-                        pfile = nullptr;
-                    }
-                    if (pfile->Open(false, false)) {
-                        BMPHeader bmpHeader;
-                        uint32_t width = aiWidth;
-                        uint32_t height = aiHeight;
-                        uint32_t pixelStride = ppixelData->m_uiPixelStride;
-                        uint8_t* pData = ppixelData->GetPixels(0u, 0u);
-                        uint8_t* pDataOut = static_cast<uint8_t*>(ourMalloc(width * height * 3));
-                        uint32_t outOffset = 0;
-                        for (int32_t n = height - 1; n >= 0; --n) {
-                            for (uint32_t m = 0; m < width; ++m) {
-                                uint32_t offset_2 = width * pixelStride * n + m * pixelStride;
-                                pDataOut[outOffset] = pData[offset_2 + 2];
-                                pDataOut[outOffset + 1] = pData[offset_2 + 1];
-                                pDataOut[outOffset + 2] = pData[offset_2];
-                                outOffset += 3;
-                            }
-                        }
-                        pixelStride = 3;
-                        // "BM".
-                        bmpHeader.bhType = 0x4D42;
-                        bmpHeader.bhSize = width * height * pixelStride + static_cast<uint32_t>(sizeof(BMPHeader));
-                        bmpHeader.bhReserved1 = 0;
-                        bmpHeader.bhReserved2 = 0;
-                        bmpHeader.bhOffset = static_cast<uint32_t>(sizeof(BMPHeader));
-                        bmpHeader.biSize = 40;
-                        bmpHeader.biWidth = width;
-                        bmpHeader.biHeight = height;
-                        bmpHeader.biPlanes = 1;
-                        bmpHeader.biBitCount = static_cast<uint16_t>(pixelStride << 3);
-                        bmpHeader.biCompression = 0;
-                        bmpHeader.biSizeImage = width * height * pixelStride;
-                        bmpHeader.biXPelsPerMeter = 0;
-                        bmpHeader.biYPelsPerMeter = 0;
-                        bmpHeader.biClrUsed = 0;
-                        bmpHeader.biClrImportant = 0;
-                        pfile->WriteHere(&bmpHeader, sizeof(BMPHeader));
-                        pfile->WriteHere(pDataOut, width * height * pixelStride);
-                        ourFree(pDataOut);
-                    }
-                    else {
-                        Warning("SAVELOAD: (ScreenShot) Unable to create file '%s'.", apScreenshotFileName);
-                    }
-                    if (pfile) {
-                        delete pfile;
+            if (pfile->Open(false, false)) {
+                BMPHeader bmpHeader;
+                uint32_t width = aiWidth;
+                uint32_t height = aiHeight;
+                uint32_t pixelStride = ppixelData->m_uiPixelStride;
+                uint8_t* pData = ppixelData->GetPixels(0u, 0u);
+                uint8_t* pDataOut = static_cast<uint8_t*>(ourMalloc(width * height * 3));
+                uint32_t outOffset = 0;
+                for (int32_t n = height - 1; n >= 0; --n) {
+                    for (uint32_t m = 0; m < width; ++m) {
+                        uint32_t offset_2 = width * pixelStride * n + m * pixelStride;
+                        pDataOut[outOffset] = pData[offset_2 + 2];
+                        pDataOut[outOffset + 1] = pData[offset_2 + 1];
+                        pDataOut[outOffset + 2] = pData[offset_2];
+                        outOffset += 3;
                     }
                 }
+                pixelStride = 3;
+                // "BM".
+                bmpHeader.bhType = 0x4D42;
+                bmpHeader.bhSize = width * height * pixelStride + static_cast<uint32_t>(sizeof(BMPHeader));
+                bmpHeader.bhReserved1 = 0;
+                bmpHeader.bhReserved2 = 0;
+                bmpHeader.bhOffset = static_cast<uint32_t>(sizeof(BMPHeader));
+                bmpHeader.biSize = 40;
+                bmpHeader.biWidth = width;
+                bmpHeader.biHeight = height;
+                bmpHeader.biPlanes = 1;
+                bmpHeader.biBitCount = static_cast<uint16_t>(pixelStride << 3);
+                bmpHeader.biCompression = 0;
+                bmpHeader.biSizeImage = width * height * pixelStride;
+                bmpHeader.biXPelsPerMeter = 0;
+                bmpHeader.biYPelsPerMeter = 0;
+                bmpHeader.biClrUsed = 0;
+                bmpHeader.biClrImportant = 0;
+                pfile->WriteHere(&bmpHeader, sizeof(BMPHeader));
+                pfile->WriteHere(pDataOut, width * height * pixelStride);
+                ourFree(pDataOut);
             }
-            return ppixelData;
+            else {
+                Warning("SAVELOAD: (ScreenShot) Unable to create file '%s'.", apScreenshotFileName);
+            }
+            if (pfile) {
+                delete pfile;
+            }
         }
+
+        return ppixelData;
     }
-    else {
-        Warning("DEFAULT: (ScreenShot) Unable to create render texture.");
-        return nullptr;
-    }
+
+    Warning("DEFAULT: (ScreenShot) Unable to create render texture.");
+    return nullptr;
 }
 
 void ScreenShot::TakeScreenShot(char* apName) {

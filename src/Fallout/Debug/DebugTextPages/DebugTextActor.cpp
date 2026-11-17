@@ -12,11 +12,9 @@ float BaseProcess::GetCachedEndurance(CachedValuesOwner* apOwner) {
         if (pCachedValues->IsDirty(CachedValues::CVF_ENDURANCE)) {
             return apOwner->CalculateCachedEndurance();
         }
-        else {
-            return pCachedValues->fCachedEndurance;
-        }
+
+        return pCachedValues->fCachedEndurance;
     }
-    else {
-        return 0.0f;
-    }
+
+    return 0.0f;
 }

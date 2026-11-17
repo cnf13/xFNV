@@ -484,9 +484,8 @@ bool TESObjectLAND::Load(TESFile* pFile) {
         MarkLoaded(bloaddata);
         return true;
     }
-    else {
-        return false;
-    }
+
+    return false;
 }
 
 // The chunks include padding bytes that are never written from the locals: VHGT's 0x448 bytes end in FILE_HEIGHT_DATA's
@@ -717,24 +716,20 @@ bool TESObjectLAND::SavesBefore(TESForm* apForm) {
 
 bool TESObjectLAND::SavesBefore(FORM* apGroupFORM) {
     bool bretval = false;
-    if (apGroupFORM) {
-        if (apGroupFORM->form == formEnumString[2].uiFormString) {
-            uint32_t iFormID = apGroupFORM->iFormID;
-            if (iFormID < 8 || iFormID > 9) {
-                TESObjectCELL* pcell_2 = pParentCell;
-                return pcell_2->SavesBefore(apGroupFORM);
-            }
-            else {
-                TESForm* FormByNumericID = TESForm::GetFormByNumericID(apGroupFORM->flags);
-                TESObjectCELL* pcell = dynamic_cast<TESObjectCELL*>(FormByNumericID);
-                if (pcell) {
-                    if (pParentCell == pcell) {
-                        return false;
-                    }
-                }
-            }
+    if ((apGroupFORM) && (apGroupFORM->form == formEnumString[2].uiFormString)) {
+        uint32_t iFormID = apGroupFORM->iFormID;
+        if (iFormID < 8 || iFormID > 9) {
+            TESObjectCELL* pcell_2 = pParentCell;
+            return pcell_2->SavesBefore(apGroupFORM);
+        }
+
+        TESForm* FormByNumericID = TESForm::GetFormByNumericID(apGroupFORM->flags);
+        TESObjectCELL* pcell = dynamic_cast<TESObjectCELL*>(FormByNumericID);
+        if ((pcell) && (pParentCell == pcell)) {
+            return false;
         }
     }
+
     return bretval;
 }
 
@@ -847,117 +842,113 @@ TESObjectCELL* TESObjectLAND::GetSaveParentCell() {
 void TESObjectLAND::Attach3D() {
     NiPoint3 dst;
     hkMoppBvTreeShapeCinfo cinfo;
-    if (pParentCell) {
-        if (pParentCell->Get3D()) {
-            if (!pLoadedData->ppMesh) {
-                NiTriStrips* pquadstrips[4];
-                bool pbculled[4];
-                NiNode** v17 = static_cast<NiNode**>(ourMalloc(4 * sizeof(NiNode*)));
-                pLoadedData->ppMesh = v17;
-                ourMemset(pbculled, 0, 4u);
-                ourMemset(pquadstrips, 0, sizeof(pquadstrips));
-                NiPoint2 landminmax(3.4028235e+38f, -3.4028235e+38f);
-                for (int32_t iblock_2 = 0; iblock_2 < 4; ++iblock_2) {
-                    NiNode* QuadLandNode = GetQuadLandNode(iblock_2);
-                    pLoadedData->ppMesh[iblock_2] = QuadLandNode;
-                    if (pLoadedData->ppMesh[iblock_2]) {
-                        bool AppCulled = pLoadedData->ppMesh[iblock_2]->GetAppCulled();
-                        pbculled[iblock_2] = AppCulled;
-                        pLoadedData->ppMesh[iblock_2]->SetAppCulled(true);
-                        NiTexturingProperty* z = TESObjectLAND::spTexturingProperty.m_pObject;
-                        pLoadedData->ppMesh[iblock_2]->AttachProperty(z);
-                        NiTriStrips* ptrigeom = MakeLandTriStrips(iblock_2);
-                        pquadstrips[iblock_2] = ptrigeom;
-                        pLoadedData->ppMesh[iblock_2]->SetAt(0, ptrigeom);
-                        uint16_t I = ptrigeom->GetVertexCount();
-                        NiPoint3* pTmp = ptrigeom->GetVertices();
-                        NiPoint3* pTmp_2 = pTmp;
-                        int32_t I_2 = I;
-                        NiBound* ModelBound = &ptrigeom->GetModelBound();
-                        ModelBound->ComputeFromData(I_2, pTmp_2);
-                        ptrigeom->GetModelData()->MarkAsChanged(15);
-                        BSMultiBoundNode* pbsmbnode = static_cast<BSMultiBoundNode*>(pLoadedData->ppMesh[iblock_2]);
-                        BSMultiBoundAABB* pbmbaabb = static_cast<BSMultiBoundAABB*>(pbsmbnode->QMultiBound()->QShape());
-                        NiPoint2 kminmax = GetMinMaxBlockHeight(iblock_2);
-                        float v14 = (kminmax.y - kminmax.x) / 2.0;
-                        NiPoint3* v4 = ::new (&dst) NiPoint3(1024.0f, 1024.0f, v14);
-                        pbmbaabb->SetHalfExtents(*v4);
-                        NiPoint3 kcenter = NiPoint3_ZERO;
-                        double v5 = GetWorldCellX() + 1024.0;
-                        kcenter.x = v5 + static_cast<double>(iblock_2 % 2 << 11);
-                        double WorldCellY = GetWorldCellY();
-                        kcenter.y = WorldCellY + 1024.0 + static_cast<double>(iblock_2 / 2 << 11);
-                        kcenter.z = (kminmax.x + kminmax.y) / 2.0;
-                        pbmbaabb->SetCenter(kcenter);
-                        if (kminmax.x < static_cast<double>(landminmax.x)) {
-                            landminmax.x = kminmax.x;
-                        }
-                        if (kminmax.y > static_cast<double>(landminmax.y)) {
-                            landminmax.y = kminmax.y;
-                        }
+    if ((pParentCell) && (pParentCell->Get3D())) {
+        if (!pLoadedData->ppMesh) {
+            NiTriStrips* pquadstrips[4];
+            bool pbculled[4];
+            NiNode** v17 = static_cast<NiNode**>(ourMalloc(4 * sizeof(NiNode*)));
+            pLoadedData->ppMesh = v17;
+            ourMemset(pbculled, 0, 4u);
+            ourMemset(pquadstrips, 0, sizeof(pquadstrips));
+            NiPoint2 landminmax(3.4028235e+38f, -3.4028235e+38f);
+            for (int32_t iblock_2 = 0; iblock_2 < 4; ++iblock_2) {
+                NiNode* QuadLandNode = GetQuadLandNode(iblock_2);
+                pLoadedData->ppMesh[iblock_2] = QuadLandNode;
+                if (pLoadedData->ppMesh[iblock_2]) {
+                    bool AppCulled = pLoadedData->ppMesh[iblock_2]->GetAppCulled();
+                    pbculled[iblock_2] = AppCulled;
+                    pLoadedData->ppMesh[iblock_2]->SetAppCulled(true);
+                    NiTexturingProperty* z = TESObjectLAND::spTexturingProperty.m_pObject;
+                    pLoadedData->ppMesh[iblock_2]->AttachProperty(z);
+                    NiTriStrips* ptrigeom = MakeLandTriStrips(iblock_2);
+                    pquadstrips[iblock_2] = ptrigeom;
+                    pLoadedData->ppMesh[iblock_2]->SetAt(0, ptrigeom);
+                    uint16_t I = ptrigeom->GetVertexCount();
+                    NiPoint3* pTmp = ptrigeom->GetVertices();
+                    NiPoint3* pTmp_2 = pTmp;
+                    int32_t I_2 = I;
+                    NiBound* ModelBound = &ptrigeom->GetModelBound();
+                    ModelBound->ComputeFromData(I_2, pTmp_2);
+                    ptrigeom->GetModelData()->MarkAsChanged(15);
+                    BSMultiBoundNode* pbsmbnode = static_cast<BSMultiBoundNode*>(pLoadedData->ppMesh[iblock_2]);
+                    BSMultiBoundAABB* pbmbaabb = static_cast<BSMultiBoundAABB*>(pbsmbnode->QMultiBound()->QShape());
+                    NiPoint2 kminmax = GetMinMaxBlockHeight(iblock_2);
+                    float v14 = (kminmax.y - kminmax.x) / 2.0;
+                    NiPoint3* v4 = ::new (&dst) NiPoint3(1024.0f, 1024.0f, v14);
+                    pbmbaabb->SetHalfExtents(*v4);
+                    NiPoint3 kcenter = NiPoint3_ZERO;
+                    double v5 = GetWorldCellX() + 1024.0;
+                    kcenter.x = v5 + static_cast<double>(iblock_2 % 2 << 11);
+                    double WorldCellY = GetWorldCellY();
+                    kcenter.y = WorldCellY + 1024.0 + static_cast<double>(iblock_2 / 2 << 11);
+                    kcenter.z = (kminmax.x + kminmax.y) / 2.0;
+                    pbmbaabb->SetCenter(kcenter);
+                    if (kminmax.x < static_cast<double>(landminmax.x)) {
+                        landminmax.x = kminmax.x;
                     }
-                }
-                CellMopp* pcm = pParentCell->GetCellMopp();
-                pcm->Kill();
-                cinfo.~hkMoppBvTreeShapeCinfo();
-                ::new (&cinfo) hkMoppBvTreeShapeCinfo;
-                cinfo.m_code = pLoadedData->pMoppCode;
-                pcm->Create(pquadstrips, 4u, pLoadedData->fBaseHeight);
-                CalculateGrassParams();
-                MergeSameFileTextures();
-                InitLandscape();
-                for (int32_t iblock_3 = 0; iblock_3 < 4; ++iblock_3) {
-                    if (pquadstrips[iblock_3]) {
-                        ShadowLightShader* v13;
-                        NiGeometryData* pgeodata = pquadstrips[iblock_3]->GetModelData();
-                        pgeodata->SetConsistency(NiGeometryData::STATIC);
-                        pgeodata->SetCompressFlags(1u);
-                        uint32_t ikeep = 23;
-                        pgeodata->m_ucKeepFlags = 23u;
-                        BSShader* pshade = pquadstrips[iblock_3]->GetShader();
-                        if (pshade) {
-                            ShadowLightShader* pshade_2;
-                            // Shader types 1 to 5 are the ShadowLightShader family; the type is read as signed.
-                            if (pshade->GetShaderType() < 1 || pshade->GetShaderType() > 5) {
-                                pshade_2 = nullptr;
-                            }
-                            else {
-                                pshade_2 = static_cast<ShadowLightShader*>(pshade);
-                            }
-                            v13 = pshade_2;
-                        }
-                        else {
-                            v13 = nullptr;
-                        }
-                        ShadowLightShader* pslshader = v13;
-                        if (v13) {
-                            NiDX9Renderer* prend = static_cast<NiDX9Renderer*>(NiRenderer::GetRenderer());
-                            NiD3DShaderDeclaration* pdecl = pslshader->GetLandShaderDecl();
-                            prend->PrecacheGeometry(pquadstrips[iblock_3], 0, 0, pdecl);
-                            prend->PerformPrecache();
-                        }
-                    }
-                    if (pLoadedData->ppMesh[iblock_3]) {
-                        pLoadedData->ppMesh[iblock_3]->SetAppCulled(pbculled[iblock_3]);
-                        NiUpdateData UpdateData(0.0f, false, false);
-                        pLoadedData->ppMesh[iblock_3]->Update(UpdateData);
-                        pLoadedData->ppMesh[iblock_3]->UpdateProperties();
+                    if (kminmax.y > static_cast<double>(landminmax.y)) {
+                        landminmax.y = kminmax.y;
                     }
                 }
             }
-            if (pLoadedData->ppMesh) {
-                if (pParentCell) {
-                    bool bforce = false;
-                    bool bEmpty = GetLandRemapped() && !pParentCell->TESObjectCELL::HasReferences();
-                    bforce = bEmpty;
-                    for (int32_t iblock = 0; iblock < 4; ++iblock) {
-                        if (bforce || pParentCell->TESObjectCELL::GetHideLand(static_cast<uint32_t>(iblock))) {
-                            pLoadedData->ppMesh[iblock]->SetAppCulled(true);
+            CellMopp* pcm = pParentCell->GetCellMopp();
+            pcm->Kill();
+            cinfo.~hkMoppBvTreeShapeCinfo();
+            ::new (&cinfo) hkMoppBvTreeShapeCinfo;
+            cinfo.m_code = pLoadedData->pMoppCode;
+            pcm->Create(pquadstrips, 4u, pLoadedData->fBaseHeight);
+            CalculateGrassParams();
+            MergeSameFileTextures();
+            InitLandscape();
+            for (int32_t iblock_3 = 0; iblock_3 < 4; ++iblock_3) {
+                if (pquadstrips[iblock_3]) {
+                    ShadowLightShader* v13;
+                    NiGeometryData* pgeodata = pquadstrips[iblock_3]->GetModelData();
+                    pgeodata->SetConsistency(NiGeometryData::STATIC);
+                    pgeodata->SetCompressFlags(1u);
+                    uint32_t ikeep = 23;
+                    pgeodata->m_ucKeepFlags = 23u;
+                    BSShader* pshade = pquadstrips[iblock_3]->GetShader();
+                    if (pshade) {
+                        ShadowLightShader* pshade_2;
+                        // Shader types 1 to 5 are the ShadowLightShader family; the type is read as signed.
+                        if (pshade->GetShaderType() < 1 || pshade->GetShaderType() > 5) {
+                            pshade_2 = nullptr;
                         }
                         else {
-                            pLoadedData->ppMesh[iblock]->SetAppCulled(false);
+                            pshade_2 = static_cast<ShadowLightShader*>(pshade);
                         }
+                        v13 = pshade_2;
                     }
+                    else {
+                        v13 = nullptr;
+                    }
+                    ShadowLightShader* pslshader = v13;
+                    if (v13) {
+                        NiDX9Renderer* prend = static_cast<NiDX9Renderer*>(NiRenderer::GetRenderer());
+                        NiD3DShaderDeclaration* pdecl = pslshader->GetLandShaderDecl();
+                        prend->PrecacheGeometry(pquadstrips[iblock_3], 0, 0, pdecl);
+                        prend->PerformPrecache();
+                    }
+                }
+                if (pLoadedData->ppMesh[iblock_3]) {
+                    pLoadedData->ppMesh[iblock_3]->SetAppCulled(pbculled[iblock_3]);
+                    NiUpdateData UpdateData(0.0f, false, false);
+                    pLoadedData->ppMesh[iblock_3]->Update(UpdateData);
+                    pLoadedData->ppMesh[iblock_3]->UpdateProperties();
+                }
+            }
+        }
+        if ((pLoadedData->ppMesh) && (pParentCell)) {
+            bool bforce = false;
+            bool bEmpty = GetLandRemapped() && !pParentCell->TESObjectCELL::HasReferences();
+            bforce = bEmpty;
+            for (int32_t iblock = 0; iblock < 4; ++iblock) {
+                if (bforce || pParentCell->TESObjectCELL::GetHideLand(static_cast<uint32_t>(iblock))) {
+                    pLoadedData->ppMesh[iblock]->SetAppCulled(true);
+                }
+                else {
+                    pLoadedData->ppMesh[iblock]->SetAppCulled(false);
                 }
             }
         }
@@ -1350,17 +1341,15 @@ bool TESObjectLAND::GetCoordData(COORD_DATA* cdata, const NiPoint3& coord, bool 
     cdata->Cellpoint.x = coord.x - v28;
     cdata->Cellpoint.y = coord.y - v30;
     cdata->Block.x = static_cast<int32_t>(cdata->Cellpoint.x / 2048.0);
-    if (!(static_cast<int32_t>(cdata->Cellpoint.x) % 2048)) {
-        if (static_cast<int32_t>(cdata->Cellpoint.x)) {
-            --cdata->Block.x;
-        }
+    if ((!(static_cast<int32_t>(cdata->Cellpoint.x) % 2048)) && (static_cast<int32_t>(cdata->Cellpoint.x))) {
+        --cdata->Block.x;
     }
+
     cdata->Block.y = static_cast<int32_t>(cdata->Cellpoint.y / 2048.0);
-    if (!(static_cast<int32_t>(cdata->Cellpoint.y) % 2048)) {
-        if (static_cast<int32_t>(cdata->Cellpoint.y)) {
-            --cdata->Block.y;
-        }
+    if ((!(static_cast<int32_t>(cdata->Cellpoint.y) % 2048)) && (static_cast<int32_t>(cdata->Cellpoint.y))) {
+        --cdata->Block.y;
     }
+
     cdata->iBlock = cdata->Block.x + 2 * cdata->Block.y;
     float v27 = static_cast<double>(cdata->Block.x << 11) + v28;
     float v29 = static_cast<double>(cdata->Block.y << 11) + v30;
@@ -1370,17 +1359,15 @@ bool TESObjectLAND::GetCoordData(COORD_DATA* cdata, const NiPoint3& coord, bool 
     float x = GetWorldCellX() + 2048.0;
     NiPoint3 ecx0 = *::new (&dst) NiPoint3(x, y, static_cast<float>(0.0));
     cdata->Tile.x = static_cast<int32_t>(cdata->Blockpoint.x / 128.0);
-    if (!(static_cast<int32_t>(cdata->Blockpoint.x) % 128)) {
-        if (static_cast<int32_t>(cdata->Blockpoint.x)) {
-            --cdata->Tile.x;
-        }
+    if ((!(static_cast<int32_t>(cdata->Blockpoint.x) % 128)) && (static_cast<int32_t>(cdata->Blockpoint.x))) {
+        --cdata->Tile.x;
     }
+
     cdata->Tile.y = static_cast<int32_t>(cdata->Blockpoint.y / 128.0);
-    if (!(static_cast<int32_t>(cdata->Blockpoint.y) % 128)) {
-        if (static_cast<int32_t>(cdata->Blockpoint.y)) {
-            --cdata->Tile.y;
-        }
+    if ((!(static_cast<int32_t>(cdata->Blockpoint.y) % 128)) && (static_cast<int32_t>(cdata->Blockpoint.y))) {
+        --cdata->Tile.y;
     }
+
     float v26 = static_cast<double>(cdata->Tile.x << 7) + v27;
     float v24 = static_cast<double>(cdata->Tile.y << 7) + v29;
     cdata->Tilepoint.x = coord.x - v26;
@@ -1498,9 +1485,8 @@ NiGeometry* TESObjectLAND::GetGeometry(const COORD_DATA& cdata) {
     if (pLoadedData && (pLoadedData->ppMesh && pLoadedData->ppMesh[cdata.iBlock])) {
         return static_cast<NiGeometry*>(pLoadedData->ppMesh[cdata.iBlock]->GetAtChecked(0));
     }
-    else {
-        return nullptr;
-    }
+
+    return nullptr;
 }
 
 // The flags are tested in the game's order: 1, then 4, then 2.
@@ -1560,9 +1546,8 @@ bool TESObjectLAND::GetLandNormal(const NiPoint3& aCoord, NiPoint3& aNormal, NiP
     if (GetCoordData(&coordData, aCoord, false)) {
         return (bool)((int8_t)GetLandNormal(coordData, aNormal, aFaceNormal));
     }
-    else {
-        return false;
-    }
+
+    return false;
 }
 
 bool TESObjectLAND::GetLandNormal(const COORD_DATA& cdata, NiPoint3& aNormal, NiPoint3& aFaceNormal) {
@@ -1736,89 +1721,85 @@ void TESObjectLAND::InitDistantTextureBlending() {
     kcellcenter.y = (static_cast<double>(pLoadedData->iCellY) + 0.5) * 4096.0;
     NiPoint2 kcellOffset = NiPoint2::ZERO;
     for (int32_t i = 0; i < 4; ++i) {
-        if (pLoadedData->ppMesh) {
-            if (pterrainManager) {
-                int32_t v13;
-                NiAVObject* v1 = pLoadedData->ppMesh[i]->GetAtChecked(0);
-                NiShadeProperty* pprop = static_cast<NiShadeProperty*>(v1->GetProperty(3));
-                if (pprop) {
-                    int32_t v12 = pprop->iShaderPropertyType >= 8 && pprop->iShaderPropertyType <= 12;
-                    v13 = v12;
-                }
-                else {
-                    v13 = 0;
-                }
-                BSShaderPPLightingProperty* pshprop = v13 ? static_cast<BSShaderPPLightingProperty*>(pprop) : nullptr;
-                if (pshprop) {
-                    if (!pshprop->GetDiffuseTextures(9) || !pshprop->GetNormalTexture(9u)) {
-                        FNVD_INLINED_LOCAL(NiColorA, kbaseCoord, std::nullopt, std::nullopt);
-                        NiTexture* pdiffuse = pterrainManager->GetDiffuseTextureForPoint(kcellcenter);
-                        NiTexture* pnormal = pterrainManager->GetNormalTextureForPoint(kcellcenter);
-                        pshprop->SetDiffuseTexture(9u, pdiffuse);
-                        pshprop->SetNormalTexture(9u, pnormal);
-                        kbaseCoord = NiColorA_BLACK;
-                        switch (i) {
-                            case 0: {
-                                NiPoint2* v2 = ::new (&v19) NiPoint2(0.0f, 0.0f);
-                                float y = v2->y;
-                                kcellOffset.x = v2->x;
-                                kcellOffset.y = y;
-                                break;
-                            }
-                            case 1: {
-                                NiPoint2* v4 = ::new (&v18) NiPoint2(0.5f, 0.0f);
-                                float v5 = v4->y;
-                                kcellOffset.x = v4->x;
-                                kcellOffset.y = v5;
-                                break;
-                            }
-                            case 2: {
-                                NiPoint2* v6 = ::new (&v17) NiPoint2(0.0f, 0.5f);
-                                float v7 = v6->y;
-                                kcellOffset.x = v6->x;
-                                kcellOffset.y = v7;
-                                break;
-                            }
-                            case 3: {
-                                NiPoint2* v8 = ::new (&v16) NiPoint2(0.5f, 0.5f);
-                                float v9 = v8->y;
-                                kcellOffset.x = v8->x;
-                                kcellOffset.y = v9;
-                                break;
-                            }
-                            default: {
-                                break;
-                            }
-                        }
-                        BGSTerrainChunk* pchunk = pterrainManager->GetChunkForPoint(kcellcenter);
-                        if (pchunk) {
-                            int16_t sx = pchunk->pNode->sBaseCellX;
-                            int16_t sy = pchunk->pNode->sBaseCellY;
-                            int32_t ilevel = pchunk->pNode->iLevel;
-                            float foriginX = static_cast<double>(pLoadedData->iCellX) - static_cast<double>(sx);
-                            float foriginY = static_cast<double>(pLoadedData->iCellY) - static_cast<double>(sy);
-                            double v11 = foriginX + kcellOffset.x;
-                            kbaseCoord.r = v11 / static_cast<double>(pchunk->pNode->iLevel);
-                            double v10 = foriginY + kcellOffset.y;
-                            kbaseCoord.g = v10 / static_cast<double>(pchunk->pNode->iLevel);
-                            while (kbaseCoord.r > 1.0) {
-                                kbaseCoord.r = kbaseCoord.r - 1.0;
-                            }
-                            while (kbaseCoord.r < 0.0) {
-                                kbaseCoord.r = kbaseCoord.r + 1.0;
-                            }
-                            while (kbaseCoord.g > 1.0) {
-                                kbaseCoord.g = kbaseCoord.g - 1.0;
-                            }
-                            while (kbaseCoord.g < 0.0) {
-                                kbaseCoord.g = kbaseCoord.g + 1.0;
-                            }
-                            pshprop->LandBlendParamsA.x = kbaseCoord.r;
-                            pshprop->LandBlendParamsA.y = kbaseCoord.g;
-                            pshprop->LandBlendParamsA.z = kbaseCoord.b;
-                            pshprop->LandBlendParamsA.w = kbaseCoord.a;
-                        }
+        if ((pLoadedData->ppMesh) && (pterrainManager)) {
+            int32_t v13;
+            NiAVObject* v1 = pLoadedData->ppMesh[i]->GetAtChecked(0);
+            NiShadeProperty* pprop = static_cast<NiShadeProperty*>(v1->GetProperty(3));
+            if (pprop) {
+                int32_t v12 = pprop->iShaderPropertyType >= 8 && pprop->iShaderPropertyType <= 12;
+                v13 = v12;
+            }
+            else {
+                v13 = 0;
+            }
+            BSShaderPPLightingProperty* pshprop = v13 ? static_cast<BSShaderPPLightingProperty*>(pprop) : nullptr;
+            if ((pshprop) && (!pshprop->GetDiffuseTextures(9) || !pshprop->GetNormalTexture(9u))) {
+                FNVD_INLINED_LOCAL(NiColorA, kbaseCoord, std::nullopt, std::nullopt);
+                NiTexture* pdiffuse = pterrainManager->GetDiffuseTextureForPoint(kcellcenter);
+                NiTexture* pnormal = pterrainManager->GetNormalTextureForPoint(kcellcenter);
+                pshprop->SetDiffuseTexture(9u, pdiffuse);
+                pshprop->SetNormalTexture(9u, pnormal);
+                kbaseCoord = NiColorA_BLACK;
+                switch (i) {
+                    case 0: {
+                        NiPoint2* v2 = ::new (&v19) NiPoint2(0.0f, 0.0f);
+                        float y = v2->y;
+                        kcellOffset.x = v2->x;
+                        kcellOffset.y = y;
+                        break;
                     }
+                    case 1: {
+                        NiPoint2* v4 = ::new (&v18) NiPoint2(0.5f, 0.0f);
+                        float v5 = v4->y;
+                        kcellOffset.x = v4->x;
+                        kcellOffset.y = v5;
+                        break;
+                    }
+                    case 2: {
+                        NiPoint2* v6 = ::new (&v17) NiPoint2(0.0f, 0.5f);
+                        float v7 = v6->y;
+                        kcellOffset.x = v6->x;
+                        kcellOffset.y = v7;
+                        break;
+                    }
+                    case 3: {
+                        NiPoint2* v8 = ::new (&v16) NiPoint2(0.5f, 0.5f);
+                        float v9 = v8->y;
+                        kcellOffset.x = v8->x;
+                        kcellOffset.y = v9;
+                        break;
+                    }
+                    default: {
+                        break;
+                    }
+                }
+                BGSTerrainChunk* pchunk = pterrainManager->GetChunkForPoint(kcellcenter);
+                if (pchunk) {
+                    int16_t sx = pchunk->pNode->sBaseCellX;
+                    int16_t sy = pchunk->pNode->sBaseCellY;
+                    int32_t ilevel = pchunk->pNode->iLevel;
+                    float foriginX = static_cast<double>(pLoadedData->iCellX) - static_cast<double>(sx);
+                    float foriginY = static_cast<double>(pLoadedData->iCellY) - static_cast<double>(sy);
+                    double v11 = foriginX + kcellOffset.x;
+                    kbaseCoord.r = v11 / static_cast<double>(pchunk->pNode->iLevel);
+                    double v10 = foriginY + kcellOffset.y;
+                    kbaseCoord.g = v10 / static_cast<double>(pchunk->pNode->iLevel);
+                    while (kbaseCoord.r > 1.0) {
+                        kbaseCoord.r = kbaseCoord.r - 1.0;
+                    }
+                    while (kbaseCoord.r < 0.0) {
+                        kbaseCoord.r = kbaseCoord.r + 1.0;
+                    }
+                    while (kbaseCoord.g > 1.0) {
+                        kbaseCoord.g = kbaseCoord.g - 1.0;
+                    }
+                    while (kbaseCoord.g < 0.0) {
+                        kbaseCoord.g = kbaseCoord.g + 1.0;
+                    }
+                    pshprop->LandBlendParamsA.x = kbaseCoord.r;
+                    pshprop->LandBlendParamsA.y = kbaseCoord.g;
+                    pshprop->LandBlendParamsA.z = kbaseCoord.b;
+                    pshprop->LandBlendParamsA.w = kbaseCoord.a;
                 }
             }
         }
@@ -1833,9 +1814,8 @@ TESWorldSpace* TESObjectLAND::GetWorldSpace() {
     if (pParentCell) {
         return pParentCell->GetWorldSpace();
     }
-    else {
-        return nullptr;
-    }
+
+    return nullptr;
 }
 
 TESLandTexture* TESObjectLAND::GetDefaultTexture(uint8_t acBlock) {
@@ -1850,9 +1830,8 @@ float TESObjectLAND::GetBaseHeight() {
     if (pLoadedData) {
         return pLoadedData->fBaseHeight;
     }
-    else {
-        return (float)0.0;
-    }
+
+    return (float)0.0;
 }
 
 // aiBlock is never read. The two sums are made with the double 2048.0.
@@ -1897,11 +1876,10 @@ NiPoint2 TESObjectLAND::GetMinMaxLandHeight() {
     }
     float fMin = pLoadedData->HeightExtents.x;
     float fMax = pLoadedData->HeightExtents.y;
-    if (!(fMin == 3.4028234663852886e+38)) {
-        if (!(fMax == -3.4028234663852886e+38)) {
-            return pLoadedData->HeightExtents;
-        }
+    if ((!(fMin == 3.4028234663852886e+38)) && (!(fMax == -3.4028234663852886e+38))) {
+        return pLoadedData->HeightExtents;
     }
+
     if ((Data.iFlags & 1) != 0) {
         for (int32_t i = 0; i < 4; ++i) {
             NiPoint2 kBlock = GetMinMaxBlockHeight(i);
@@ -1964,11 +1942,10 @@ void TESObjectLAND::SetGoodNormals(bool abVal) {
 
 NiNode* TESObjectLAND::GetQuadLandNode(int32_t aiBlock) {
     NiNode* v3 = nullptr;
-    if (pParentCell) {
-        if (aiBlock < 4) {
-            return static_cast<NiNode*>(pParentCell->GetLandNode(aiBlock));
-        }
+    if ((pParentCell) && (aiBlock < 4)) {
+        return static_cast<NiNode*>(pParentCell->GetLandNode(aiBlock));
     }
+
     return v3;
 }
 
@@ -1984,25 +1961,21 @@ void TESObjectLAND::MarkLoaded(bool loaded) {
 }
 
 void TESObjectLAND::SetTexture(uint8_t acBlock, uint16_t asTexIndex, TESLandTexture* apTexture) {
-    if ((((uint32_t)((int32_t)acBlock)) < 4u) && (((uint32_t)((int32_t)asTexIndex)) < 6u)) {
-        if (pLoadedData) {
-            pLoadedData->pQuadTextureArray[acBlock][asTexIndex] = apTexture;
-        }
+    if (((((uint32_t)((int32_t)acBlock)) < 4u) && (((uint32_t)((int32_t)asTexIndex)) < 6u)) && (pLoadedData)) {
+        pLoadedData->pQuadTextureArray[acBlock][asTexIndex] = apTexture;
     }
 }
 
 float TESObjectLAND::GetDefaultTexturePercent(uint8_t acBlock, uint16_t asVertIndex) {
     int32_t i;
     float v7 = (float)0.0;
-    if ((((uint32_t)((int32_t)acBlock)) < 4u) && (((uint32_t)((int32_t)asVertIndex)) < 0x121u)) {
-        if (pLoadedData) {
-            if (pLoadedData->ppPercentArrays[acBlock]) {
-                for (i = 0; i < 6; ++i) {
-                    v7 = v7 + pLoadedData->ppPercentArrays[acBlock][asVertIndex][i];
-                }
-            }
+    if (((((uint32_t)((int32_t)acBlock)) < 4u) && (((uint32_t)((int32_t)asVertIndex)) < 0x121u)) && (pLoadedData) &&
+        (pLoadedData->ppPercentArrays[acBlock])) {
+        for (i = 0; i < 6; ++i) {
+            v7 = v7 + pLoadedData->ppPercentArrays[acBlock][asVertIndex][i];
         }
     }
+
     return (float)(1.0 - v7);
 }
 
@@ -2022,17 +1995,16 @@ float TESObjectLAND::GetTexturePercent(uint8_t acBlock, uint16_t asVertIndex, ui
 }
 
 void TESObjectLAND::SetTexturePercent(uint8_t acBlock, uint16_t asVertIndex, uint16_t asTexIndex, float afPercent) {
-    if (((((uint32_t)((int32_t)acBlock)) < 4u) && (((uint32_t)((int32_t)asVertIndex)) < 0x121u)) &&
-        (((uint32_t)((int32_t)asTexIndex)) < 6u)) {
-        if (pLoadedData) {
-            if (!(afPercent > 0.0)) {
-                if (pLoadedData->ppPercentArrays[acBlock]) {
-                    pLoadedData->ppPercentArrays[acBlock][asVertIndex][asTexIndex] = (float)0.0;
-                }
+    if ((((((uint32_t)((int32_t)acBlock)) < 4u) && (((uint32_t)((int32_t)asVertIndex)) < 0x121u)) &&
+         (((uint32_t)((int32_t)asTexIndex)) < 6u)) &&
+        (pLoadedData)) {
+        if (!(afPercent > 0.0)) {
+            if (pLoadedData->ppPercentArrays[acBlock]) {
+                pLoadedData->ppPercentArrays[acBlock][asVertIndex][asTexIndex] = (float)0.0;
             }
-            else {
-                pLoadedData->ppPercentArrays[acBlock][asVertIndex][asTexIndex] = afPercent;
-            }
+        }
+        else {
+            pLoadedData->ppPercentArrays[acBlock][asVertIndex][asTexIndex] = afPercent;
         }
     }
 }
@@ -2041,19 +2013,17 @@ void TESObjectLAND::RemoveTextureFromArrays(uint8_t acBlock, uint16_t asRemoveIn
     int32_t k;
     int32_t j;
     int32_t i;
-    if ((((uint32_t)((int32_t)acBlock)) < 4u) && (((uint32_t)((int32_t)asRemoveIndex)) < 6u)) {
-        if (pLoadedData) {
-            for (i = (int32_t)asRemoveIndex; i < 5; ++i) {
-                pLoadedData->pQuadTextureArray[acBlock][i] = pLoadedData->pQuadTextureArray[acBlock][i + 1];
-            }
-            pLoadedData->pQuadTextureArray[acBlock][5] = nullptr;
-            if (pLoadedData->ppPercentArrays[acBlock]) {
-                for (j = 0; j < 289; ++j) {
-                    for (k = (int32_t)asRemoveIndex; k < 5; ++k) {
-                        pLoadedData->ppPercentArrays[acBlock][j][k] = pLoadedData->ppPercentArrays[acBlock][j][k + 1];
-                    }
-                    pLoadedData->ppPercentArrays[acBlock][j][5] = (float)0.0;
+    if (((((uint32_t)((int32_t)acBlock)) < 4u) && (((uint32_t)((int32_t)asRemoveIndex)) < 6u)) && (pLoadedData)) {
+        for (i = (int32_t)asRemoveIndex; i < 5; ++i) {
+            pLoadedData->pQuadTextureArray[acBlock][i] = pLoadedData->pQuadTextureArray[acBlock][i + 1];
+        }
+        pLoadedData->pQuadTextureArray[acBlock][5] = nullptr;
+        if (pLoadedData->ppPercentArrays[acBlock]) {
+            for (j = 0; j < 289; ++j) {
+                for (k = (int32_t)asRemoveIndex; k < 5; ++k) {
+                    pLoadedData->ppPercentArrays[acBlock][j][k] = pLoadedData->ppPercentArrays[acBlock][j][k + 1];
                 }
+                pLoadedData->ppPercentArrays[acBlock][j][5] = (float)0.0;
             }
         }
     }
@@ -2110,13 +2080,13 @@ void TESObjectLAND::SetHasMopp(uint8_t a2) {
 float TESObjectLAND::GetTextureUsePercent(uint8_t acBlock, uint16_t asTexIndex) {
     int32_t i;
     float v7 = (float)0.0;
-    if ((((uint32_t)((int32_t)acBlock)) < 4u) && (((uint32_t)((int32_t)asTexIndex)) < 6u)) {
-        if (GetQuadTexture(acBlock, asTexIndex)) {
-            for (i = 0; i < 289; ++i) {
-                v7 = GetTexturePercent(acBlock, i, asTexIndex) + v7;
-            }
+    if (((((uint32_t)((int32_t)acBlock)) < 4u) && (((uint32_t)((int32_t)asTexIndex)) < 6u)) &&
+        (GetQuadTexture(acBlock, asTexIndex))) {
+        for (i = 0; i < 289; ++i) {
+            v7 = GetTexturePercent(acBlock, i, asTexIndex) + v7;
         }
     }
+
     return v7;
 }
 
@@ -2128,25 +2098,21 @@ void TESObjectLAND::GetColorA(int32_t iblock, int32_t index, NiColorA& color) {
             bGotVertexColors = 1;
         }
         else {
-            if (pLoadedData->ppMesh) {
-                if (pLoadedData->ppMesh[iblock]) {
-                    NiGeometry* shape = static_cast<NiGeometry*>(pLoadedData->ppMesh[iblock]->GetAt(0));
-                    if (shape->GetNormals()) {
-                        color = shape->GetColors()[index];
+            if ((pLoadedData->ppMesh) && (pLoadedData->ppMesh[iblock])) {
+                NiGeometry* shape = static_cast<NiGeometry*>(pLoadedData->ppMesh[iblock]->GetAt(0));
+                if (shape->GetNormals()) {
+                    color = shape->GetColors()[index];
+                    bGotVertexColors = 1;
+                }
+                else {
+                    NiGeometryData* pgeodata = shape->GetModelData();
+                    NiTConvertingStrideIterator<NiColorA> apMemory;
+                    NiAdditionalGeometryData* pkAGD = pgeodata->GetAdditionalGeometryData();
+                    if ((pkAGD) && (pkAGD->GetVBReady() && pgeodata->LockPackedVertexData(true))) {
+                        pgeodata->GetColorsIterator(*static_cast<NiGeometryDataIteratorNiColorA*>(&apMemory));
+                        apMemory.Get(index, color);
+                        pgeodata->UnlockPackedVertexData();
                         bGotVertexColors = 1;
-                    }
-                    else {
-                        NiGeometryData* pgeodata = shape->GetModelData();
-                        NiTConvertingStrideIterator<NiColorA> apMemory;
-                        NiAdditionalGeometryData* pkAGD = pgeodata->GetAdditionalGeometryData();
-                        if (pkAGD) {
-                            if (pkAGD->GetVBReady() && pgeodata->LockPackedVertexData(true)) {
-                                pgeodata->GetColorsIterator(*static_cast<NiGeometryDataIteratorNiColorA*>(&apMemory));
-                                apMemory.Get(index, color);
-                                pgeodata->UnlockPackedVertexData();
-                                bGotVertexColors = 1;
-                            }
-                        }
                     }
                 }
             }
@@ -2162,53 +2128,52 @@ void TESObjectLAND::GetColorA(int32_t iblock, int32_t index, NiColorA& color) {
 
 NiTriStrips* TESObjectLAND::MakeLandTriStrips(uint8_t aiBlock) {
     NiTriStrips* ptrigeom = nullptr;
-    if (aiBlock < 4u) {
-        if (pLoadedData) {
-            NiTriStrips* ptrigeom_2;
-            NiPoint3* pnormalcopy_2;
-            NiPoint2* ptextures_2;
-            char apDest[264];
-            NiPoint2* ptextures = static_cast<NiPoint2*>(ourMalloc(289 * sizeof(NiPoint2)));
-            if (ptextures) {
-                rt::eh_vector_constructor_iterator(ptextures, sizeof(NiPoint2), 289, &emptyPointConstructor);
-                ptextures_2 = ptextures;
-            }
-            else {
-                ptextures_2 = nullptr;
-            }
-            ourMemcpy(ptextures_2, TESObjectLAND::pDefTextureBLOCK, sizeof(NiPoint2) * 289);
-            uint16_t* pstriplength = static_cast<uint16_t*>(_NiMalloc(sizeof(uint16_t)));
-            uint16_t* ptriplist = static_cast<uint16_t*>(_NiMalloc(1021 * sizeof(uint16_t)));
-            *pstriplength = 1021;
-            ourMemcpy(ptriplist, TESObjectLAND::pTriStripListBLOCK, sizeof(uint16_t) * 1021);
-            NiPoint3* pnormalcopy = static_cast<NiPoint3*>(ourMalloc(289 * sizeof(NiPoint3)));
-            if (pnormalcopy) {
-                rt::eh_vector_constructor_iterator(pnormalcopy, sizeof(NiPoint3), 289, &emptyPointConstructor);
-                pnormalcopy_2 = pnormalcopy;
-            }
-            else {
-                pnormalcopy_2 = nullptr;
-            }
-            ourMemcpy(pnormalcopy_2, pLoadedData->ppNormals[aiBlock], sizeof(NiPoint3) * 289);
-            void* apMemory = NiMemObject::operator new(sizeof(NiTriStrips));
-            if (apMemory) {
-                ptrigeom_2 = ::new (apMemory) NiTriStrips(
-                    289, pLoadedData->ppVertices[aiBlock], pnormalcopy_2, pLoadedData->ppColorsA[aiBlock], ptextures_2,
-                    1, 0, *pstriplength - 2, 1, pstriplength, ptriplist
-                );
-            }
-            else {
-                ptrigeom_2 = nullptr;
-            }
-            ptrigeom = ptrigeom_2;
-            NiPoint3 blockcenter = GetWorldOffsetForBlock(aiBlock);
-            ptrigeom->SetTranslate(blockcenter);
-            BSsprintf(apDest, 260, "Block (%i, %i)", aiBlock & 3, aiBlock / 4);
-            NiFixedString apString(static_cast<const char*>(apDest));
-            NiFixedString* kName = &apString;
-            ptrigeom->SetName(*kName);
+    if ((aiBlock < 4u) && (pLoadedData)) {
+        NiTriStrips* ptrigeom_2;
+        NiPoint3* pnormalcopy_2;
+        NiPoint2* ptextures_2;
+        char apDest[264];
+        NiPoint2* ptextures = static_cast<NiPoint2*>(ourMalloc(289 * sizeof(NiPoint2)));
+        if (ptextures) {
+            rt::eh_vector_constructor_iterator(ptextures, sizeof(NiPoint2), 289, &emptyPointConstructor);
+            ptextures_2 = ptextures;
         }
+        else {
+            ptextures_2 = nullptr;
+        }
+        ourMemcpy(ptextures_2, TESObjectLAND::pDefTextureBLOCK, sizeof(NiPoint2) * 289);
+        uint16_t* pstriplength = static_cast<uint16_t*>(_NiMalloc(sizeof(uint16_t)));
+        uint16_t* ptriplist = static_cast<uint16_t*>(_NiMalloc(1021 * sizeof(uint16_t)));
+        *pstriplength = 1021;
+        ourMemcpy(ptriplist, TESObjectLAND::pTriStripListBLOCK, sizeof(uint16_t) * 1021);
+        NiPoint3* pnormalcopy = static_cast<NiPoint3*>(ourMalloc(289 * sizeof(NiPoint3)));
+        if (pnormalcopy) {
+            rt::eh_vector_constructor_iterator(pnormalcopy, sizeof(NiPoint3), 289, &emptyPointConstructor);
+            pnormalcopy_2 = pnormalcopy;
+        }
+        else {
+            pnormalcopy_2 = nullptr;
+        }
+        ourMemcpy(pnormalcopy_2, pLoadedData->ppNormals[aiBlock], sizeof(NiPoint3) * 289);
+        void* apMemory = NiMemObject::operator new(sizeof(NiTriStrips));
+        if (apMemory) {
+            ptrigeom_2 = ::new (apMemory) NiTriStrips(
+                289, pLoadedData->ppVertices[aiBlock], pnormalcopy_2, pLoadedData->ppColorsA[aiBlock], ptextures_2, 1,
+                0, *pstriplength - 2, 1, pstriplength, ptriplist
+            );
+        }
+        else {
+            ptrigeom_2 = nullptr;
+        }
+        ptrigeom = ptrigeom_2;
+        NiPoint3 blockcenter = GetWorldOffsetForBlock(aiBlock);
+        ptrigeom->SetTranslate(blockcenter);
+        BSsprintf(apDest, 260, "Block (%i, %i)", aiBlock & 3, aiBlock / 4);
+        NiFixedString apString(static_cast<const char*>(apDest));
+        NiFixedString* kName = &apString;
+        ptrigeom->SetName(*kName);
     }
+
     return ptrigeom;
 }
 
@@ -2341,9 +2306,8 @@ bool TESObjectLAND::InitLandscape() {
         }
         return true;
     }
-    else {
-        return false;
-    }
+
+    return false;
 }
 
 // The buffer holds one total per texture and one for the default texture after them.
@@ -2413,25 +2377,21 @@ void TESObjectLAND::MergeSameFileTextures() {
                         BaseFormComponent* apCompareFC = static_cast<BaseFormComponent*>(
                             FNVD_DYNAMIC_CAST_VOID(TESTexture)(v14, RTTI_TESLandTexture, RTTI_TESTexture)
                         );
-                        if (apCompareFC) {
-                            if (!v17->TESTexture::CompareComponent(apCompareFC)) {
-                                for (int32_t m = 0; m < 289; ++m) {
-                                    pLoadedData->ppPercentArrays[i][m][j] =
-                                        pLoadedData->ppPercentArrays[i][m][j] + pLoadedData->ppPercentArrays[i][m][k];
-                                    pLoadedData->ppPercentArrays[i][m][k] = 0.0f;
-                                }
-                                SetTexture(i, k, nullptr);
+                        if ((apCompareFC) && (!v17->TESTexture::CompareComponent(apCompareFC))) {
+                            for (int32_t m = 0; m < 289; ++m) {
+                                pLoadedData->ppPercentArrays[i][m][j] =
+                                    pLoadedData->ppPercentArrays[i][m][j] + pLoadedData->ppPercentArrays[i][m][k];
+                                pLoadedData->ppPercentArrays[i][m][k] = 0.0f;
                             }
+                            SetTexture(i, k, nullptr);
                         }
                     }
                 }
-                if (v20) {
-                    if (!v17->TESTexture::CompareComponent(v20)) {
-                        for (int32_t n = 0; n < 289; ++n) {
-                            pLoadedData->ppPercentArrays[i][n][j] = 0.0f;
-                        }
-                        SetTexture(i, j, nullptr);
+                if ((v20) && (!v17->TESTexture::CompareComponent(v20))) {
+                    for (int32_t n = 0; n < 289; ++n) {
+                        pLoadedData->ppPercentArrays[i][n][j] = 0.0f;
                     }
+                    SetTexture(i, j, nullptr);
                 }
             }
             for (int32_t ii = 0; ii < 289; ++ii) {
@@ -2615,150 +2575,135 @@ char TESObjectLAND::CalculateGrassParams() {
                     }
                 }
                 for (int32_t ii = 0; ii < 6; ++ii) {
-                    if (pLoadedData->pQuadTextureArray[i][ii]) {
-                        if (pLoadedData->ppPercentArrays[i]) {
-                            if (pLoadedData->ppPercentArrays[i][aiVertIndex - 18][ii] > 0.10000000149011612 ||
-                                (pLoadedData->ppPercentArrays[i][aiVertIndex - 17][ii] > 0.10000000149011612 ||
-                                 (pLoadedData->ppPercentArrays[i][aiVertIndex - 16][ii] > 0.10000000149011612 ||
-                                  (pLoadedData->ppPercentArrays[i][aiVertIndex - 1][ii] > 0.10000000149011612 ||
-                                   (pLoadedData->ppPercentArrays[i][aiVertIndex][ii] > 0.10000000149011612 ||
-                                    (pLoadedData->ppPercentArrays[i][aiVertIndex + 1][ii] > 0.10000000149011612 ||
-                                     (pLoadedData->ppPercentArrays[i][aiVertIndex + 16][ii] > 0.10000000149011612 ||
-                                      (pLoadedData->ppPercentArrays[i][aiVertIndex + 17][ii] > 0.10000000149011612 ||
-                                       pLoadedData->ppPercentArrays[i][aiVertIndex + 18][ii] >
-                                           0.10000000149011612)))))))) {
-                                int32_t iTypea = 0;
-                                for (BSSimpleList<TESGrass*>* pLista =
-                                         &pLoadedData->pQuadTextureArray[i][ii]->TextureGrassList;
-                                     pLista && (iParam < 16 && iTypea <= iMaxGrassTypesPerTexure);
-                                     pLista = pLista->m_pkNext) {
-                                    TESGrass* v48 = pLista->m_item;
-                                    if (v48) {
-                                        float v2;
-                                        float v3;
-                                        float v4;
-                                        float v5;
-                                        float v6;
-                                        float v7;
-                                        float v8;
-                                        float v9;
-                                        float v10;
-                                        TESGrassAreaParam* v11;
-                                        TESGrassAreaParam* v25 =
-                                            static_cast<TESGrassAreaParam*>(ourMalloc(sizeof(TESGrassAreaParam)));
-                                        if (v25) {
-                                            v11 = ::new (v25) TESGrassAreaParam;
-                                        }
-                                        else {
-                                            v11 = nullptr;
-                                        }
-                                        apParam[iParam] = v11;
-                                        ++iTypea;
-                                        ourMemset(apParam[iParam], 0, sizeof(TESGrassAreaParam));
-                                        ourMemset(apParam[iParam]->pfDensity, 0, sizeof(apParam[iParam]->pfDensity));
-                                        apParam[iParam]->kGrassParam.pcGeomFilename = v48->GetModelPath();
-                                        apParam[iParam]->kGrassParam.iGrassID = v48->iFormID;
-                                        apParam[iParam]->kGrassParam.fWaveOffsetRange = TESGrass::GetWaveOffsetRange();
-                                        apParam[iParam]->kGrassParam.fWavePeriod = v48->GetWavePeriod();
-                                        apParam[iParam]->kGrassParam.fColorRange = v48->GetColorRange();
-                                        apParam[iParam]->kGrassParam.fPositionRange = v48->GetPositionRange();
-                                        apParam[iParam]->kGrassParam.fHeightRange = v48->GetHeightRange();
-                                        apParam[iParam]->kGrassParam.bVertexLighting = v48->GetVertexLighting();
-                                        apParam[iParam]->kGrassParam.bFitToSlope = v48->GetFitToSlope();
-                                        apParam[iParam]->kGrassParam.bUniformScaing = v48->GetUniformScaling();
-                                        float v46 = static_cast<double>(v48->GetDensity()) / 100.0;
-                                        if (!(v42 < static_cast<double>(
-                                                        pLoadedData->ppPercentArrays[i][aiVertIndex - 16][ii]
-                                                    ))) {
-                                            v10 = 0.0f;
-                                        }
-                                        else {
-                                            v10 = v46;
-                                        }
-                                        apParam[iParam]->pfDensity[2] = v10;
-                                        if (!(v42 < static_cast<double>(
-                                                        pLoadedData->ppPercentArrays[i][aiVertIndex - 17][ii]
-                                                    ))) {
-                                            v9 = 0.0f;
-                                        }
-                                        else {
-                                            v9 = v46;
-                                        }
-                                        apParam[iParam]->pfDensity[1] = v9;
-                                        if (!(v42 < static_cast<double>(
-                                                        pLoadedData->ppPercentArrays[i][aiVertIndex - 18][ii]
-                                                    ))) {
-                                            v8 = 0.0f;
-                                        }
-                                        else {
-                                            v8 = v46;
-                                        }
-                                        apParam[iParam]->pfDensity[0u] = v8;
-                                        if (!(v42 < static_cast<double>(
-                                                        pLoadedData->ppPercentArrays[i][aiVertIndex + 1][ii]
-                                                    ))) {
-                                            v7 = 0.0f;
-                                        }
-                                        else {
-                                            v7 = v46;
-                                        }
-                                        apParam[iParam]->pfDensity[5] = v7;
-                                        if (!(v42 <
-                                              static_cast<double>(pLoadedData->ppPercentArrays[i][aiVertIndex][ii]))) {
-                                            v6 = 0.0f;
-                                        }
-                                        else {
-                                            v6 = v46;
-                                        }
-                                        apParam[iParam]->pfDensity[4] = v6;
-                                        if (!(v42 < static_cast<double>(
-                                                        pLoadedData->ppPercentArrays[i][aiVertIndex - 1][ii]
-                                                    ))) {
-                                            v5 = 0.0f;
-                                        }
-                                        else {
-                                            v5 = v46;
-                                        }
-                                        apParam[iParam]->pfDensity[3] = v5;
-                                        if (!(v42 < static_cast<double>(
-                                                        pLoadedData->ppPercentArrays[i][aiVertIndex + 18][ii]
-                                                    ))) {
-                                            v4 = 0.0f;
-                                        }
-                                        else {
-                                            v4 = v46;
-                                        }
-                                        apParam[iParam]->pfDensity[8] = v4;
-                                        if (!(v42 < static_cast<double>(
-                                                        pLoadedData->ppPercentArrays[i][aiVertIndex + 17][ii]
-                                                    ))) {
-                                            v3 = 0.0f;
-                                        }
-                                        else {
-                                            v3 = v46;
-                                        }
-                                        apParam[iParam]->pfDensity[7] = v3;
-                                        if (!(v42 < static_cast<double>(
-                                                        pLoadedData->ppPercentArrays[i][aiVertIndex + 16][ii]
-                                                    ))) {
-                                            v2 = 0.0f;
-                                        }
-                                        else {
-                                            v2 = v46;
-                                        }
-                                        apParam[iParam]->pfDensity[6] = v2;
-                                        float v44 = 0.0f;
-                                        for (int32_t jj = 0; jj < 9; ++jj) {
-                                            v44 = v44 + apParam[iParam]->pfDensity[jj];
-                                        }
-                                        if (v42 > v44 / 9.0) {
-                                            for (int32_t kk = 0; kk < 9; ++kk) {
-                                                apParam[iParam]->pfDensity[kk] = 0.0f;
-                                            }
-                                        }
-                                        ++iParam;
+                    if ((pLoadedData->pQuadTextureArray[i][ii]) && (pLoadedData->ppPercentArrays[i]) &&
+                        (pLoadedData->ppPercentArrays[i][aiVertIndex - 18][ii] > 0.10000000149011612 ||
+                         (pLoadedData->ppPercentArrays[i][aiVertIndex - 17][ii] > 0.10000000149011612 ||
+                          (pLoadedData->ppPercentArrays[i][aiVertIndex - 16][ii] > 0.10000000149011612 ||
+                           (pLoadedData->ppPercentArrays[i][aiVertIndex - 1][ii] > 0.10000000149011612 ||
+                            (pLoadedData->ppPercentArrays[i][aiVertIndex][ii] > 0.10000000149011612 ||
+                             (pLoadedData->ppPercentArrays[i][aiVertIndex + 1][ii] > 0.10000000149011612 ||
+                              (pLoadedData->ppPercentArrays[i][aiVertIndex + 16][ii] > 0.10000000149011612 ||
+                               (pLoadedData->ppPercentArrays[i][aiVertIndex + 17][ii] > 0.10000000149011612 ||
+                                pLoadedData->ppPercentArrays[i][aiVertIndex + 18][ii] > 0.10000000149011612))))))))) {
+                        int32_t iTypea = 0;
+                        for (BSSimpleList<TESGrass*>* pLista = &pLoadedData->pQuadTextureArray[i][ii]->TextureGrassList;
+                             pLista && (iParam < 16 && iTypea <= iMaxGrassTypesPerTexure); pLista = pLista->m_pkNext) {
+                            TESGrass* v48 = pLista->m_item;
+                            if (v48) {
+                                float v2;
+                                float v3;
+                                float v4;
+                                float v5;
+                                float v6;
+                                float v7;
+                                float v8;
+                                float v9;
+                                float v10;
+                                TESGrassAreaParam* v11;
+                                TESGrassAreaParam* v25 =
+                                    static_cast<TESGrassAreaParam*>(ourMalloc(sizeof(TESGrassAreaParam)));
+                                if (v25) {
+                                    v11 = ::new (v25) TESGrassAreaParam;
+                                }
+                                else {
+                                    v11 = nullptr;
+                                }
+                                apParam[iParam] = v11;
+                                ++iTypea;
+                                ourMemset(apParam[iParam], 0, sizeof(TESGrassAreaParam));
+                                ourMemset(apParam[iParam]->pfDensity, 0, sizeof(apParam[iParam]->pfDensity));
+                                apParam[iParam]->kGrassParam.pcGeomFilename = v48->GetModelPath();
+                                apParam[iParam]->kGrassParam.iGrassID = v48->iFormID;
+                                apParam[iParam]->kGrassParam.fWaveOffsetRange = TESGrass::GetWaveOffsetRange();
+                                apParam[iParam]->kGrassParam.fWavePeriod = v48->GetWavePeriod();
+                                apParam[iParam]->kGrassParam.fColorRange = v48->GetColorRange();
+                                apParam[iParam]->kGrassParam.fPositionRange = v48->GetPositionRange();
+                                apParam[iParam]->kGrassParam.fHeightRange = v48->GetHeightRange();
+                                apParam[iParam]->kGrassParam.bVertexLighting = v48->GetVertexLighting();
+                                apParam[iParam]->kGrassParam.bFitToSlope = v48->GetFitToSlope();
+                                apParam[iParam]->kGrassParam.bUniformScaing = v48->GetUniformScaling();
+                                float v46 = static_cast<double>(v48->GetDensity()) / 100.0;
+                                if (!(v42 <
+                                      static_cast<double>(pLoadedData->ppPercentArrays[i][aiVertIndex - 16][ii]))) {
+                                    v10 = 0.0f;
+                                }
+                                else {
+                                    v10 = v46;
+                                }
+                                apParam[iParam]->pfDensity[2] = v10;
+                                if (!(v42 <
+                                      static_cast<double>(pLoadedData->ppPercentArrays[i][aiVertIndex - 17][ii]))) {
+                                    v9 = 0.0f;
+                                }
+                                else {
+                                    v9 = v46;
+                                }
+                                apParam[iParam]->pfDensity[1] = v9;
+                                if (!(v42 <
+                                      static_cast<double>(pLoadedData->ppPercentArrays[i][aiVertIndex - 18][ii]))) {
+                                    v8 = 0.0f;
+                                }
+                                else {
+                                    v8 = v46;
+                                }
+                                apParam[iParam]->pfDensity[0u] = v8;
+                                if (!(v42 <
+                                      static_cast<double>(pLoadedData->ppPercentArrays[i][aiVertIndex + 1][ii]))) {
+                                    v7 = 0.0f;
+                                }
+                                else {
+                                    v7 = v46;
+                                }
+                                apParam[iParam]->pfDensity[5] = v7;
+                                if (!(v42 < static_cast<double>(pLoadedData->ppPercentArrays[i][aiVertIndex][ii]))) {
+                                    v6 = 0.0f;
+                                }
+                                else {
+                                    v6 = v46;
+                                }
+                                apParam[iParam]->pfDensity[4] = v6;
+                                if (!(v42 <
+                                      static_cast<double>(pLoadedData->ppPercentArrays[i][aiVertIndex - 1][ii]))) {
+                                    v5 = 0.0f;
+                                }
+                                else {
+                                    v5 = v46;
+                                }
+                                apParam[iParam]->pfDensity[3] = v5;
+                                if (!(v42 <
+                                      static_cast<double>(pLoadedData->ppPercentArrays[i][aiVertIndex + 18][ii]))) {
+                                    v4 = 0.0f;
+                                }
+                                else {
+                                    v4 = v46;
+                                }
+                                apParam[iParam]->pfDensity[8] = v4;
+                                if (!(v42 <
+                                      static_cast<double>(pLoadedData->ppPercentArrays[i][aiVertIndex + 17][ii]))) {
+                                    v3 = 0.0f;
+                                }
+                                else {
+                                    v3 = v46;
+                                }
+                                apParam[iParam]->pfDensity[7] = v3;
+                                if (!(v42 <
+                                      static_cast<double>(pLoadedData->ppPercentArrays[i][aiVertIndex + 16][ii]))) {
+                                    v2 = 0.0f;
+                                }
+                                else {
+                                    v2 = v46;
+                                }
+                                apParam[iParam]->pfDensity[6] = v2;
+                                float v44 = 0.0f;
+                                for (int32_t jj = 0; jj < 9; ++jj) {
+                                    v44 = v44 + apParam[iParam]->pfDensity[jj];
+                                }
+                                if (v42 > v44 / 9.0) {
+                                    for (int32_t kk = 0; kk < 9; ++kk) {
+                                        apParam[iParam]->pfDensity[kk] = 0.0f;
                                     }
                                 }
+                                ++iParam;
                             }
                         }
                     }
@@ -2863,25 +2808,21 @@ void TESObjectLAND::GetNormal(int32_t iblock, int32_t index, NiPoint3& norm) {
             bset = true;
         }
         else {
-            if (pLoadedData->ppMesh) {
-                if (pLoadedData->ppMesh[iblock]) {
-                    NiGeometry* shape = static_cast<NiGeometry*>(pLoadedData->ppMesh[iblock]->GetAt(0));
-                    if (shape->GetNormals()) {
-                        norm = shape->GetNormals()[index];
+            if ((pLoadedData->ppMesh) && (pLoadedData->ppMesh[iblock])) {
+                NiGeometry* shape = static_cast<NiGeometry*>(pLoadedData->ppMesh[iblock]->GetAt(0));
+                if (shape->GetNormals()) {
+                    norm = shape->GetNormals()[index];
+                    bset = true;
+                }
+                else {
+                    NiGeometryData* pgeodata = shape->GetModelData();
+                    NiTConvertingStrideIterator<NiPoint3> apMemory;
+                    NiAdditionalGeometryData* pkAGD = pgeodata->GetAdditionalGeometryData();
+                    if ((pkAGD) && (pkAGD->GetVBReady() && pgeodata->LockPackedVertexData(true))) {
+                        pgeodata->GetNormalsIterator(*static_cast<NiGeometryDataIteratorNiPoint3*>(&apMemory));
+                        apMemory.Get(index, norm);
+                        pgeodata->UnlockPackedVertexData();
                         bset = true;
-                    }
-                    else {
-                        NiGeometryData* pgeodata = shape->GetModelData();
-                        NiTConvertingStrideIterator<NiPoint3> apMemory;
-                        NiAdditionalGeometryData* pkAGD = pgeodata->GetAdditionalGeometryData();
-                        if (pkAGD) {
-                            if (pkAGD->GetVBReady() && pgeodata->LockPackedVertexData(true)) {
-                                pgeodata->GetNormalsIterator(*static_cast<NiGeometryDataIteratorNiPoint3*>(&apMemory));
-                                apMemory.Get(index, norm);
-                                pgeodata->UnlockPackedVertexData();
-                                bset = true;
-                            }
-                        }
                     }
                 }
             }
@@ -2960,311 +2901,305 @@ bool TESObjectLAND::LoadVerticesIntoArrays() {
         MessageHandler::IncDisableWarningCount(true);
         return false;
     }
-    else {
-        TESFile* pFile_2 = pFile;
-        if (pFile->SetOffset(ifindoffset)) {
-            bool loadedhgt = false;
-            bool loadednorms = false;
-            bool badjusttextures = false;
-            do {
-                CHUNK_ID eChunk = pFile_2->GetTESChunk();
-                if (eChunk > VHGT_ID) {
-                    if (eChunk == ATXT_ID) {
-                        if ((Data.iFlags & 4) != 0) {
-                            ourMemset(&texdata_2, 0, sizeof(FILE_TEX_DATA));
-                            pFile_2->GetChunkData(&texdata_2, sizeof(FILE_TEX_DATA));
-                            if (pFile_2->QEndian()) {
-                                texdata_2.Endian();
-                            }
-                            if (texdata_2.sIndex > 5u) {
-                                int32_t a6b = texdata_2.cBlock;
-                                int32_t fBb = texdata_2.sIndex;
-                                int32_t iCellYc = GetDataY();
-                                Warning(
-                                    "CELLS: Land (%i, %i) clamping invalid index %i for block %i.", GetDataX(), iCellYc,
-                                    fBb, a6b
-                                );
-                                texdata_2.sIndex = 5;
-                                badjusttextures = true;
-                            }
-                            TESLandTexture* ptex_2 = nullptr;
-                            if (texdata_2.iTextureID) {
-                                TESForm::AddCompileIndex(texdata_2.iTextureID, pFile_2);
-                                TESForm* FormByNumericID = TESForm::GetFormByNumericID(texdata_2.iTextureID);
-                                ptex_2 = dynamic_cast<TESLandTexture*>(FormByNumericID);
-                                if (!ptex_2) {
-                                    int32_t a6c = texdata_2.cBlock;
-                                    uint32_t fBc = texdata_2.iTextureID;
-                                    int32_t iCellYd = GetDataY();
-                                    Warning(
-                                        "TEXTURES: Land (%i, %i) unable to find additional texture ID (%08X) for "
-                                        "block %i.",
-                                        GetDataX(), iCellYd, fBc, a6c
-                                    );
-                                    badjusttextures = true;
-                                }
-                            }
-                            else {
-                                ptex_2 = TESObjectLAND::GetDefaultTexture();
-                            }
-                            this->pLoadedData->pQuadTextureArray[texdata_2.cBlock][texdata_2.sIndex] = ptex_2;
-                            if (ptex_2) {
-                                if (!spQueuedTextures.m_pObject) {
-                                    QueuedFile* v31;
-                                    QueuedFile* v39 = static_cast<QueuedFile*>(ourMalloc(sizeof(QueuedFile)));
-                                    if (v39) {
-                                        v31 = ::new (v39) QueuedFile(IO_TASK_PRIORITY_VERY_LOW);
-                                    }
-                                    else {
-                                        v31 = nullptr;
-                                    }
-                                    spQueuedTextures.operator=(v31);
-                                }
-                                QueuedFile* a6d = spQueuedTextures.m_pObject;
-                                ptex_2->QueueTexture(IO_TASK_PRIORITY_VERY_LOW, a6d);
-                            }
-                            ilastblock = texdata_2.cBlock;
-                            ilasttexindex = texdata_2.sIndex;
+
+    TESFile* pFile_2 = pFile;
+    if (pFile->SetOffset(ifindoffset)) {
+        bool loadedhgt = false;
+        bool loadednorms = false;
+        bool badjusttextures = false;
+        do {
+            CHUNK_ID eChunk = pFile_2->GetTESChunk();
+            if (eChunk > VHGT_ID) {
+                if (eChunk == ATXT_ID) {
+                    if ((Data.iFlags & 4) != 0) {
+                        ourMemset(&texdata_2, 0, sizeof(FILE_TEX_DATA));
+                        pFile_2->GetChunkData(&texdata_2, sizeof(FILE_TEX_DATA));
+                        if (pFile_2->QEndian()) {
+                            texdata_2.Endian();
                         }
-                    }
-                    else {
-                        if (eChunk == BTXT_ID) {
-                            if ((Data.iFlags & 4) != 0) {
-                                ourMemset(&texdata, 0, sizeof(FILE_TEX_DATA));
-                                pFile_2->GetChunkData(&texdata, sizeof(FILE_TEX_DATA));
-                                if (pFile_2->QEndian()) {
-                                    texdata.Endian();
-                                }
-                                TESForm::AddCompileIndex(texdata.iTextureID, pFile_2);
-                                TESForm* v10 = TESForm::GetFormByNumericID(texdata.iTextureID);
-                                TESLandTexture* v11 = dynamic_cast<TESLandTexture*>(v10);
-                                this->pLoadedData->pDefQuadTexture[texdata.cBlock] = v11;
-                                if (this->pLoadedData->pDefQuadTexture[texdata.cBlock]) {
-                                    TESLandTexture* ptex = this->pLoadedData->pDefQuadTexture[texdata.cBlock];
-                                    if (!spQueuedTextures.m_pObject) {
-                                        QueuedFile* v32;
-                                        QueuedFile* v40 = static_cast<QueuedFile*>(ourMalloc(sizeof(QueuedFile)));
-                                        if (v40) {
-                                            v32 = ::new (v40) QueuedFile(IO_TASK_PRIORITY_VERY_LOW);
-                                        }
-                                        else {
-                                            v32 = nullptr;
-                                        }
-                                        spQueuedTextures.operator=(v32);
-                                    }
-                                    QueuedFile* a6a = spQueuedTextures.m_pObject;
-                                    ptex->QueueTexture(IO_TASK_PRIORITY_VERY_LOW, a6a);
-                                }
-                                else {
-                                    int32_t a6 = texdata.cBlock;
-                                    uint32_t fBa = texdata.iTextureID;
-                                    int32_t iCellYb = GetDataY();
-                                    Warning(
-                                        "TEXTURES: Land (%i, %i) unable to find base texture ID (%08X) for block "
-                                        "%i.",
-                                        GetDataX(), iCellYb, fBa, a6
-                                    );
-                                    badjusttextures = true;
-                                }
+                        if (texdata_2.sIndex > 5u) {
+                            int32_t a6b = texdata_2.cBlock;
+                            int32_t fBb = texdata_2.sIndex;
+                            int32_t iCellYc = GetDataY();
+                            Warning(
+                                "CELLS: Land (%i, %i) clamping invalid index %i for block %i.", GetDataX(), iCellYc,
+                                fBb, a6b
+                            );
+                            texdata_2.sIndex = 5;
+                            badjusttextures = true;
+                        }
+                        TESLandTexture* ptex_2 = nullptr;
+                        if (texdata_2.iTextureID) {
+                            TESForm::AddCompileIndex(texdata_2.iTextureID, pFile_2);
+                            TESForm* FormByNumericID = TESForm::GetFormByNumericID(texdata_2.iTextureID);
+                            ptex_2 = dynamic_cast<TESLandTexture*>(FormByNumericID);
+                            if (!ptex_2) {
+                                int32_t a6c = texdata_2.cBlock;
+                                uint32_t fBc = texdata_2.iTextureID;
+                                int32_t iCellYd = GetDataY();
+                                Warning(
+                                    "TEXTURES: Land (%i, %i) unable to find additional texture ID (%08X) for "
+                                    "block %i.",
+                                    GetDataX(), iCellYd, fBc, a6c
+                                );
+                                badjusttextures = true;
                             }
                         }
                         else {
-                            if (eChunk == VTXT_ID && (Data.iFlags & 4) != 0) {
-                                if (ilastblock >= 0 && ilasttexindex >= 0) {
-                                    uint32_t ifilesize = pFile_2->GetChunkSize();
-                                    if (ifilesize % 8) {
-                                        const char* a6e = pFile_2->GetFilename();
-                                        int32_t fBd = GetDataY();
-                                        Warning(
-                                            "TEXTURES: Land (%i, %i) found unrecognized vertex texture data in "
-                                            "file %s.",
-                                            GetDataX(), fBd, a6e
-                                        );
-                                        badjusttextures = true;
-                                    }
-                                    else {
-                                        FILE_TEX_VERT_DATA* pvertdata =
-                                            static_cast<FILE_TEX_VERT_DATA*>(ourMalloc(ifilesize));
-                                        pFile_2->GetChunkData(pvertdata, ifilesize);
-                                        uint32_t ivertcount = ifilesize >> 3;
-                                        for (uint32_t i_2 = 0; i_2 < ivertcount; ++i_2) {
-                                            if (pFile_2->QEndian()) {
-                                                pvertdata[i_2].Endian();
-                                            }
-                                            SetTexturePercent(
-                                                ilastblock, pvertdata[i_2].iVertIndex, ilasttexindex,
-                                                pvertdata[i_2].fPercent
-                                            );
-                                        }
-                                        ourFree(pvertdata);
-                                        pvertdata = nullptr;
-                                    }
-                                }
-                                ilastblock = -1;
-                                ilasttexindex = -1;
-                            }
+                            ptex_2 = TESObjectLAND::GetDefaultTexture();
                         }
+                        this->pLoadedData->pQuadTextureArray[texdata_2.cBlock][texdata_2.sIndex] = ptex_2;
+                        if (ptex_2) {
+                            if (!spQueuedTextures.m_pObject) {
+                                QueuedFile* v31;
+                                QueuedFile* v39 = static_cast<QueuedFile*>(ourMalloc(sizeof(QueuedFile)));
+                                if (v39) {
+                                    v31 = ::new (v39) QueuedFile(IO_TASK_PRIORITY_VERY_LOW);
+                                }
+                                else {
+                                    v31 = nullptr;
+                                }
+                                spQueuedTextures.operator=(v31);
+                            }
+                            QueuedFile* a6d = spQueuedTextures.m_pObject;
+                            ptex_2->QueueTexture(IO_TASK_PRIORITY_VERY_LOW, a6d);
+                        }
+                        ilastblock = texdata_2.cBlock;
+                        ilasttexindex = texdata_2.sIndex;
                     }
                 }
                 else {
-                    int32_t j;
-                    int32_t i;
-                    if (eChunk == VHGT_ID) {
-                        if ((Data.iFlags & 1) != 0) {
-                            float afHeights[1089];
-                            pFile_2->GetChunkData(&kHeightData, sizeof(FILE_HEIGHT_DATA));
+                    if (eChunk == BTXT_ID) {
+                        if ((Data.iFlags & 4) != 0) {
+                            ourMemset(&texdata, 0, sizeof(FILE_TEX_DATA));
+                            pFile_2->GetChunkData(&texdata, sizeof(FILE_TEX_DATA));
                             if (pFile_2->QEndian()) {
-                                kHeightData.Endian();
+                                texdata.Endian();
                             }
-                            NiPoint2* v4 = ::new (&v42) NiPoint2(3.4028235e+38f, -3.4028235e+38f);
-                            float x = v4->x;
-                            float y = v4->y;
-                            TESObjectLAND::LoadedLandData* pLoadedData = this->pLoadedData;
-                            pLoadedData->HeightExtents.x = x;
-                            pLoadedData->HeightExtents.y = y;
-                            float lastheight = kHeightData.fOffset;
-                            // Each step adds to the vertex before it in the row; a row's first vertex steps from the
-                            // first vertex of the row before.
-                            for (i = 0; i < 1089; ++i) {
-                                afHeights[i] = static_cast<double>(kHeightData.cHeightData[i]) + lastheight;
-                                if ((i + 1) % 33) {
-                                    lastheight = afHeights[i];
-                                }
-                                else {
-                                    lastheight = afHeights[i - 32];
-                                }
-                            }
-                            for (i = 0; i < 4; ++i) {
-                                int32_t v63 = 16 * (i % 2) + 528 * (i / 2);
-                                for (j = 0; j < 289; ++j) {
-                                    int32_t v61 = j % 17;
-                                    int32_t v62 = j / 17;
-                                    int32_t curvert = j % 17 + (v63 + 33 * (j / 17));
-                                    float v59 = static_cast<float>(8 * FloatToInt(afHeights[curvert]));
-                                    this->pLoadedData->ppVertices[i][j].x =
-                                        static_cast<double>(v61 << 7) + TESObjectLAND::pXOffsetBLOCK[i];
-                                    this->pLoadedData->ppVertices[i][j].y =
-                                        static_cast<double>(v62 << 7) + TESObjectLAND::pYOffsetBLOCK[i];
-                                    this->pLoadedData->ppVertices[i][j].z = v59;
-                                    if (!(this->pLoadedData->HeightExtents.x > static_cast<double>(v59))) {
-                                        if (this->pLoadedData->HeightExtents.y < static_cast<double>(v59)) {
-                                            this->pLoadedData->HeightExtents.y = v59;
-                                        }
+                            TESForm::AddCompileIndex(texdata.iTextureID, pFile_2);
+                            TESForm* v10 = TESForm::GetFormByNumericID(texdata.iTextureID);
+                            TESLandTexture* v11 = dynamic_cast<TESLandTexture*>(v10);
+                            this->pLoadedData->pDefQuadTexture[texdata.cBlock] = v11;
+                            if (this->pLoadedData->pDefQuadTexture[texdata.cBlock]) {
+                                TESLandTexture* ptex = this->pLoadedData->pDefQuadTexture[texdata.cBlock];
+                                if (!spQueuedTextures.m_pObject) {
+                                    QueuedFile* v32;
+                                    QueuedFile* v40 = static_cast<QueuedFile*>(ourMalloc(sizeof(QueuedFile)));
+                                    if (v40) {
+                                        v32 = ::new (v40) QueuedFile(IO_TASK_PRIORITY_VERY_LOW);
                                     }
                                     else {
-                                        this->pLoadedData->HeightExtents.x = v59;
+                                        v32 = nullptr;
                                     }
+                                    spQueuedTextures.operator=(v32);
                                 }
+                                QueuedFile* a6a = spQueuedTextures.m_pObject;
+                                ptex->QueueTexture(IO_TASK_PRIORITY_VERY_LOW, a6a);
                             }
-                            this->pLoadedData->fBaseHeight =
-                                (this->pLoadedData->HeightExtents.x + this->pLoadedData->HeightExtents.y) * 0.5;
-                            for (i = 0; i < 4; ++i) {
-                                for (j = 0; j < 289; ++j) {
-                                    this->pLoadedData->ppVertices[i][j].z =
-                                        this->pLoadedData->ppVertices[i][j].z - this->pLoadedData->fBaseHeight;
-                                }
+                            else {
+                                int32_t a6 = texdata.cBlock;
+                                uint32_t fBa = texdata.iTextureID;
+                                int32_t iCellYb = GetDataY();
+                                Warning(
+                                    "TEXTURES: Land (%i, %i) unable to find base texture ID (%08X) for block "
+                                    "%i.",
+                                    GetDataX(), iCellYb, fBa, a6
+                                );
+                                badjusttextures = true;
                             }
-                            loadedhgt = true;
                         }
                     }
                     else {
-                        if (eChunk > VNML_ID) {
-                            if (eChunk == VCLR_ID && (Data.iFlags & 2) != 0) {
-                                pFile_2->GetChunkData(v55, 3267u);
-                                for (i = 0; i < 4; ++i) {
-                                    int32_t orig = 16 * (i % 2) + 528 * (i / 2);
-                                    for (j = 0; j < 289; ++j) {
-                                        int32_t curvert_2 = j % 17 + (orig + 33 * (j / 17));
-                                        float v35 = static_cast<double>(v55[3 * curvert_2 + 2]) / 255.0;
-                                        float v34 = static_cast<double>(v55[3 * curvert_2 + 1]) / 255.0;
-                                        float fR = static_cast<double>(v55[3 * curvert_2]) / 255.0;
-                                        NiColorA* v8 = FNVD_RECONSTRUCT(NiColorA)(&kColor, fR, v34, v35, 1.0f);
-                                        NiColorA* v9 = &this->pLoadedData->ppColorsA[i][j];
-                                        v9->r = v8->r;
-                                        v9->g = v8->g;
-                                        v9->b = v8->b;
-                                        v9->a = v8->a;
+                        if (eChunk == VTXT_ID && (Data.iFlags & 4) != 0) {
+                            if (ilastblock >= 0 && ilasttexindex >= 0) {
+                                uint32_t ifilesize = pFile_2->GetChunkSize();
+                                if (ifilesize % 8) {
+                                    const char* a6e = pFile_2->GetFilename();
+                                    int32_t fBd = GetDataY();
+                                    Warning(
+                                        "TEXTURES: Land (%i, %i) found unrecognized vertex texture data in "
+                                        "file %s.",
+                                        GetDataX(), fBd, a6e
+                                    );
+                                    badjusttextures = true;
+                                }
+                                else {
+                                    FILE_TEX_VERT_DATA* pvertdata =
+                                        static_cast<FILE_TEX_VERT_DATA*>(ourMalloc(ifilesize));
+                                    pFile_2->GetChunkData(pvertdata, ifilesize);
+                                    uint32_t ivertcount = ifilesize >> 3;
+                                    for (uint32_t i_2 = 0; i_2 < ivertcount; ++i_2) {
+                                        if (pFile_2->QEndian()) {
+                                            pvertdata[i_2].Endian();
+                                        }
+                                        SetTexturePercent(
+                                            ilastblock, pvertdata[i_2].iVertIndex, ilasttexindex,
+                                            pvertdata[i_2].fPercent
+                                        );
                                     }
+                                    ourFree(pvertdata);
+                                    pvertdata = nullptr;
+                                }
+                            }
+                            ilastblock = -1;
+                            ilasttexindex = -1;
+                        }
+                    }
+                }
+            }
+            else {
+                int32_t j;
+                int32_t i;
+                if (eChunk == VHGT_ID) {
+                    if ((Data.iFlags & 1) != 0) {
+                        float afHeights[1089];
+                        pFile_2->GetChunkData(&kHeightData, sizeof(FILE_HEIGHT_DATA));
+                        if (pFile_2->QEndian()) {
+                            kHeightData.Endian();
+                        }
+                        NiPoint2* v4 = ::new (&v42) NiPoint2(3.4028235e+38f, -3.4028235e+38f);
+                        float x = v4->x;
+                        float y = v4->y;
+                        TESObjectLAND::LoadedLandData* pLoadedData = this->pLoadedData;
+                        pLoadedData->HeightExtents.x = x;
+                        pLoadedData->HeightExtents.y = y;
+                        float lastheight = kHeightData.fOffset;
+                        // Each step adds to the vertex before it in the row; a row's first vertex steps from the
+                        // first vertex of the row before.
+                        for (i = 0; i < 1089; ++i) {
+                            afHeights[i] = static_cast<double>(kHeightData.cHeightData[i]) + lastheight;
+                            if ((i + 1) % 33) {
+                                lastheight = afHeights[i];
+                            }
+                            else {
+                                lastheight = afHeights[i - 32];
+                            }
+                        }
+                        for (i = 0; i < 4; ++i) {
+                            int32_t v63 = 16 * (i % 2) + 528 * (i / 2);
+                            for (j = 0; j < 289; ++j) {
+                                int32_t v61 = j % 17;
+                                int32_t v62 = j / 17;
+                                int32_t curvert = j % 17 + (v63 + 33 * (j / 17));
+                                float v59 = static_cast<float>(8 * FloatToInt(afHeights[curvert]));
+                                this->pLoadedData->ppVertices[i][j].x =
+                                    static_cast<double>(v61 << 7) + TESObjectLAND::pXOffsetBLOCK[i];
+                                this->pLoadedData->ppVertices[i][j].y =
+                                    static_cast<double>(v62 << 7) + TESObjectLAND::pYOffsetBLOCK[i];
+                                this->pLoadedData->ppVertices[i][j].z = v59;
+                                if (!(this->pLoadedData->HeightExtents.x > static_cast<double>(v59))) {
+                                    if (this->pLoadedData->HeightExtents.y < static_cast<double>(v59)) {
+                                        this->pLoadedData->HeightExtents.y = v59;
+                                    }
+                                }
+                                else {
+                                    this->pLoadedData->HeightExtents.x = v59;
                                 }
                             }
                         }
-                        else {
-                            switch (eChunk) {
-                                case VNML_ID: {
-                                    if ((Data.iFlags & 1) != 0) {
-                                        pFile_2->GetChunkData(acNormals, 3267u);
-                                        for (i = 0; i < 4; ++i) {
-                                            int32_t v57 = 16 * (i % 2) + 528 * (i / 2);
-                                            for (j = 0; j < 289; ++j) {
-                                                int32_t v56 = j % 17 + (v57 + 33 * (j / 17));
-                                                this->pLoadedData->ppNormals[i][j].x =
-                                                    static_cast<double>(acNormals[3 * v56]) / 127.0;
-                                                this->pLoadedData->ppNormals[i][j].y =
-                                                    static_cast<double>(acNormals[3 * v56 + 1]) / 127.0;
-                                                this->pLoadedData->ppNormals[i][j].z =
-                                                    static_cast<double>(acNormals[3 * v56 + 2]) / 127.0;
-                                                this->pLoadedData->ppNormals[i][j].Unitize();
-                                            }
+                        this->pLoadedData->fBaseHeight =
+                            (this->pLoadedData->HeightExtents.x + this->pLoadedData->HeightExtents.y) * 0.5;
+                        for (i = 0; i < 4; ++i) {
+                            for (j = 0; j < 289; ++j) {
+                                this->pLoadedData->ppVertices[i][j].z =
+                                    this->pLoadedData->ppVertices[i][j].z - this->pLoadedData->fBaseHeight;
+                            }
+                        }
+                        loadedhgt = true;
+                    }
+                }
+                else {
+                    if (eChunk > VNML_ID) {
+                        if (eChunk == VCLR_ID && (Data.iFlags & 2) != 0) {
+                            pFile_2->GetChunkData(v55, 3267u);
+                            for (i = 0; i < 4; ++i) {
+                                int32_t orig = 16 * (i % 2) + 528 * (i / 2);
+                                for (j = 0; j < 289; ++j) {
+                                    int32_t curvert_2 = j % 17 + (orig + 33 * (j / 17));
+                                    float v35 = static_cast<double>(v55[3 * curvert_2 + 2]) / 255.0;
+                                    float v34 = static_cast<double>(v55[3 * curvert_2 + 1]) / 255.0;
+                                    float fR = static_cast<double>(v55[3 * curvert_2]) / 255.0;
+                                    NiColorA* v8 = FNVD_RECONSTRUCT(NiColorA)(&kColor, fR, v34, v35, 1.0f);
+                                    NiColorA* v9 = &this->pLoadedData->ppColorsA[i][j];
+                                    v9->r = v8->r;
+                                    v9->g = v8->g;
+                                    v9->b = v8->b;
+                                    v9->a = v8->a;
+                                }
+                            }
+                        }
+                    }
+                    else {
+                        switch (eChunk) {
+                            case VNML_ID: {
+                                if ((Data.iFlags & 1) != 0) {
+                                    pFile_2->GetChunkData(acNormals, 3267u);
+                                    for (i = 0; i < 4; ++i) {
+                                        int32_t v57 = 16 * (i % 2) + 528 * (i / 2);
+                                        for (j = 0; j < 289; ++j) {
+                                            int32_t v56 = j % 17 + (v57 + 33 * (j / 17));
+                                            this->pLoadedData->ppNormals[i][j].x =
+                                                static_cast<double>(acNormals[3 * v56]) / 127.0;
+                                            this->pLoadedData->ppNormals[i][j].y =
+                                                static_cast<double>(acNormals[3 * v56 + 1]) / 127.0;
+                                            this->pLoadedData->ppNormals[i][j].z =
+                                                static_cast<double>(acNormals[3 * v56 + 2]) / 127.0;
+                                            this->pLoadedData->ppNormals[i][j].Unitize();
                                         }
-                                        loadednorms = true;
                                     }
-                                    break;
+                                    loadednorms = true;
                                 }
-                                case DATA_ID: {
-                                    // A remapped land keeps its own flags but for the three data bits, taken from the
-                                    // file.
-                                    if (GetLandRemapped()) {
-                                        pFile_2->GetChunkData(&tempdata, sizeof(OBJ_LAND));
-                                        if (pFile_2->QEndian()) {
-                                            tempdata.Endian();
-                                        }
-                                        tempdata.iFlags = tempdata.iFlags & 7;
-                                        Data.iFlags &= ~7u;
-                                        Data.iFlags |= tempdata.iFlags;
+                                break;
+                            }
+                            case DATA_ID: {
+                                // A remapped land keeps its own flags but for the three data bits, taken from the
+                                // file.
+                                if (GetLandRemapped()) {
+                                    pFile_2->GetChunkData(&tempdata, sizeof(OBJ_LAND));
+                                    if (pFile_2->QEndian()) {
+                                        tempdata.Endian();
                                     }
-                                    break;
+                                    tempdata.iFlags = tempdata.iFlags & 7;
+                                    Data.iFlags &= ~7u;
+                                    Data.iFlags |= tempdata.iFlags;
                                 }
-                                case MPCD_ID: {
-                                    uint32_t ibuffersize = pFile_2->GetChunkSize();
-                                    char* pbuffer = static_cast<char*>(ourMalloc(ibuffersize));
-                                    char* pbuffer__pvertdata = pbuffer;
-                                    pFile_2->GetChunkData(pbuffer, ibuffersize);
-                                    if (this->pLoadedData->pMoppCode) {
-                                        this->pLoadedData->pMoppCode->removeReference();
-                                        this->pLoadedData->pMoppCode = nullptr;
-                                    }
-                                    ReadMoppCodeFromBuffer(
-                                        pbuffer__pvertdata, ibuffersize, &this->pLoadedData->pMoppCode
-                                    );
-                                    if (this->pLoadedData->pMoppCode) {
-                                        this->pLoadedData->pMoppCode->addReference();
-                                        SetHasMopp(1);
-                                    }
-                                    ourFree(pbuffer__pvertdata);
-                                    break;
+                                break;
+                            }
+                            case MPCD_ID: {
+                                uint32_t ibuffersize = pFile_2->GetChunkSize();
+                                char* pbuffer = static_cast<char*>(ourMalloc(ibuffersize));
+                                char* pbuffer__pvertdata = pbuffer;
+                                pFile_2->GetChunkData(pbuffer, ibuffersize);
+                                if (this->pLoadedData->pMoppCode) {
+                                    this->pLoadedData->pMoppCode->removeReference();
+                                    this->pLoadedData->pMoppCode = nullptr;
                                 }
+                                ReadMoppCodeFromBuffer(pbuffer__pvertdata, ibuffersize, &this->pLoadedData->pMoppCode);
+                                if (this->pLoadedData->pMoppCode) {
+                                    this->pLoadedData->pMoppCode->addReference();
+                                    SetHasMopp(1);
+                                }
+                                ourFree(pbuffer__pvertdata);
+                                break;
                             }
                         }
                     }
                 }
             }
-            while (pFile_2->NextChunk());
-            if (badjusttextures) {
-                AdjustTextureArrays();
-            }
-            if (loadedhgt && !loadednorms) {
-                const char* a6f = pFile_2->GetFilename();
-                int32_t fBe = GetDataY();
-                Warning(
-                    "CELLS: Land for cell (%i, %i) in file '%s' does not contain Normal Data.", GetDataX(), fBe, a6f
-                );
-            }
-            return true;
         }
-        else {
-            return false;
+        while (pFile_2->NextChunk());
+        if (badjusttextures) {
+            AdjustTextureArrays();
         }
+        if (loadedhgt && !loadednorms) {
+            const char* a6f = pFile_2->GetFilename();
+            int32_t fBe = GetDataY();
+            Warning("CELLS: Land for cell (%i, %i) in file '%s' does not contain Normal Data.", GetDataX(), fBe, a6f);
+        }
+        return true;
     }
+
+    return false;
 }
 
 void TESObjectLAND::Detach3D() {
@@ -3278,11 +3213,10 @@ void TESObjectLAND::Detach3D() {
             else {
                 phw = nullptr;
             }
-            if (phw) {
-                if (pLoadedData->spLandRB.operator!=(nullptr)) {
-                    phw->RemoveBody(pLoadedData->spLandRB.m_pObject);
-                }
+            if ((phw) && (pLoadedData->spLandRB.operator!=(nullptr))) {
+                phw->RemoveBody(pLoadedData->spLandRB.m_pObject);
             }
+
             pLoadedData->spLandRB.operator=(static_cast<bhkRigidBody*>(nullptr));
             for (int32_t iblock = 0; iblock < 4; ++iblock) {
                 if (pLoadedData->ppMesh[iblock]) {
@@ -3312,34 +3246,31 @@ void TESObjectLAND::Detach3D() {
 
 bool TESObjectLAND::ReadMoppCodeFromBuffer(char* apBuffer, uint32_t aiBufferSize, hkpMoppCode** apOutCode) {
     bool bretval = false;
-    if (apBuffer) {
-        if (aiBufferSize) {
-            if (apOutCode) {
-                hkpMoppCode* pcode;
-                hkpMoppCode* apMemory = static_cast<hkpMoppCode*>(hkReferencedObject::newObject(sizeof(hkpMoppCode)));
-                if (apMemory) {
-                    pcode = ::new (apMemory) hkpMoppCode;
-                }
-                else {
-                    pcode = nullptr;
-                }
-                *apOutCode = pcode;
-                if (aiBufferSize > 16) {
-                    ourMemcpy(&pcode->m_info, apBuffer, sizeof(pcode->m_info));
-                    // The remaining byte count is passed as is: hkArray::setSize takes Havok's int.
-                    pcode->m_data.setSize(static_cast<int32_t>(aiBufferSize - 16));
-                    ourMemcpy(pcode->m_data.m_data, apBuffer + 16, aiBufferSize - 16);
-                    bretval = true;
-                }
-                if (!bretval) {
-                    if (pcode) {
-                        delete pcode;
-                    }
-                    *apOutCode = nullptr;
-                }
+    if ((apBuffer) && (aiBufferSize) && (apOutCode)) {
+        hkpMoppCode* pcode;
+        hkpMoppCode* apMemory = static_cast<hkpMoppCode*>(hkReferencedObject::newObject(sizeof(hkpMoppCode)));
+        if (apMemory) {
+            pcode = ::new (apMemory) hkpMoppCode;
+        }
+        else {
+            pcode = nullptr;
+        }
+        *apOutCode = pcode;
+        if (aiBufferSize > 16) {
+            ourMemcpy(&pcode->m_info, apBuffer, sizeof(pcode->m_info));
+            // The remaining byte count is passed as is: hkArray::setSize takes Havok's int.
+            pcode->m_data.setSize(static_cast<int32_t>(aiBufferSize - 16));
+            ourMemcpy(pcode->m_data.m_data, apBuffer + 16, aiBufferSize - 16);
+            bretval = true;
+        }
+        if (!bretval) {
+            if (pcode) {
+                delete pcode;
             }
+            *apOutCode = nullptr;
         }
     }
+
     return bretval;
 }
 
@@ -3358,31 +3289,28 @@ TESLandTexture* TESObjectLAND::GetMainTexture(uint8_t acBlock, uint16_t asVertIn
         if (v8) {
             return GetQuadTexture(acBlock, v8 - 1);
         }
-        else {
-            return GetDefaultTexture(acBlock);
-        }
+
+        return GetDefaultTexture(acBlock);
     }
     return v9;
 }
 
 void TESObjectLAND::SetNewDefaultTexture(uint8_t acBlock, uint16_t asNewDefaultIndex) {
-    if (acBlock < 4u && asNewDefaultIndex < 6u) {
-        if (pLoadedData) {
-            TESLandTexture* v8 = pLoadedData->pDefQuadTexture[acBlock];
-            pLoadedData->pDefQuadTexture[acBlock] = pLoadedData->pQuadTextureArray[acBlock][asNewDefaultIndex];
-            pLoadedData->pQuadTextureArray[acBlock][asNewDefaultIndex] = v8;
-            if (pLoadedData->ppPercentArrays[acBlock]) {
-                for (int32_t i = 0; i < 289; ++i) {
-                    float v6 = 0.0;
-                    for (uint32_t j = 0; j < 6; ++j) {
-                        v6 = GetTexturePercent(acBlock, i, j) + v6;
-                    }
-                    float v5 = 1.0 - v6;
-                    if (v5 < 0.0) {
-                        v5 = 0.0;
-                    }
-                    pLoadedData->ppPercentArrays[acBlock][i][asNewDefaultIndex] = v5;
+    if ((acBlock < 4u && asNewDefaultIndex < 6u) && (pLoadedData)) {
+        TESLandTexture* v8 = pLoadedData->pDefQuadTexture[acBlock];
+        pLoadedData->pDefQuadTexture[acBlock] = pLoadedData->pQuadTextureArray[acBlock][asNewDefaultIndex];
+        pLoadedData->pQuadTextureArray[acBlock][asNewDefaultIndex] = v8;
+        if (pLoadedData->ppPercentArrays[acBlock]) {
+            for (int32_t i = 0; i < 289; ++i) {
+                float v6 = 0.0;
+                for (uint32_t j = 0; j < 6; ++j) {
+                    v6 = GetTexturePercent(acBlock, i, j) + v6;
                 }
+                float v5 = 1.0 - v6;
+                if (v5 < 0.0) {
+                    v5 = 0.0;
+                }
+                pLoadedData->ppPercentArrays[acBlock][i][asNewDefaultIndex] = v5;
             }
         }
     }
@@ -3404,9 +3332,8 @@ NiPoint3** TESObjectLAND::GetNormalArray() {
     if (pLoadedData) {
         return pLoadedData->ppNormals;
     }
-    else {
-        return nullptr;
-    }
+
+    return nullptr;
 }
 
 void TESObjectLAND::InvalidateNormals(tagRECT* apInvalidateRect) {
@@ -3751,22 +3678,9 @@ void TESObjectLAND::SetLandNormals(LANDS8* pL8, tagRECT* apCalcRect) {
                 }
             }
         }
-        if (pL8->pNELand) {
-            if (pL8->pNLand) {
-                if (pL8->pNWLand) {
-                    if (pL8->pSELand) {
-                        if (pL8->pSLand) {
-                            if (pL8->pSWLand) {
-                                if (pL8->pELand) {
-                                    if (pL8->pWLand) {
-                                        SetGoodNormals(true);
-                                    }
-                                }
-                            }
-                        }
-                    }
-                }
-            }
+        if ((pL8->pNELand) && (pL8->pNLand) && (pL8->pNWLand) && (pL8->pSELand) && (pL8->pSLand) && (pL8->pSWLand) &&
+            (pL8->pELand) && (pL8->pWLand)) {
+            SetGoodNormals(true);
         }
     }
 }

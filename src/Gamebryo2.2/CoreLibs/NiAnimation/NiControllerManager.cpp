@@ -57,10 +57,9 @@ NiObject* NiControllerManager::CreateClone(NiCloningProcess& kCloning) {
         CopyMembers(v4, kCloning);
         return v4;
     }
-    else {
-        CopyMembers(nullptr, kCloning);
-        return nullptr;
-    }
+
+    CopyMembers(nullptr, kCloning);
+    return nullptr;
 }
 
 // The object palette is in files from 10.1.0.104 on.
@@ -659,9 +658,8 @@ NiObject* NiControllerManager::CreateObject() {
     if (v0) {
         return ::new (v0) NiControllerManager;
     }
-    else {
-        return nullptr;
-    }
+
+    return nullptr;
 }
 
 NiAVObjectPalette::~NiAVObjectPalette() {}

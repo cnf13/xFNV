@@ -387,44 +387,43 @@ bool TESObjectDOOR::Activate(
             if (pTel && pActionActor) {
                 if (!pPlayer->IsSleepingorResting() &&
                     (!pprocess->eLevel && pprocess->GetFadeState() != BaseProcess::FADE_TELEPORT_OUT)) {
-                    if (pOpenSound) {
-                        if (apItemActivated->Get3D()) {
-                            BSSoundHandle SoundHandle;
-                            if (pActionActor == pPlayer) {
-                                TESForm* FormTwo = pOpenSound;
-                                uint32_t arPos_4 = FormTwo->iFormID;
-                                BSAudio* v12 = &BSAudio::QInstance();
-                                BSSoundHandle* arHandle = v12->GetSoundHandleByNumericID(
-                                    &apHandle, arPos_4,
-                                    BSGameSound::SOUND_FLAG_IS_2D | BSGameSound::SOUND_FLAG_SYSTEM_SOUND |
-                                        BSGameSound::SOUND_FLAG_ONE_SHOT | BSGameSound::SOUND_FLAG_UNKBIT31
-                                );
-                                SoundHandle.operator=(*arHandle);
-                            }
-                            else {
-                                TESForm* v13 = pOpenSound;
-                                uint32_t arPos_4a = v13->iFormID;
-                                BSAudio* v14 = &BSAudio::QInstance();
-                                BSSoundHandle* SoundHandleByNumericID =
-                                    v14->GetSoundHandleByNumericID(&th_s, arPos_4a, 258u);
-                                SoundHandle.operator=(*SoundHandleByNumericID);
-                            }
-                            if (pActionActor != pPlayer) {
-                                NiPoint3 v33 = apItemActivated->GetLocationOnReference();
-                                SoundHandle.SetPosition(v33.x, v33.y, v33.z);
-                            }
-                            SoundHandle.Play(false);
-                            if (pActionActor == pPlayer) {
-                                BSAudio* v15 = &BSAudio::QInstance();
-                                if (!v15->bMultiThread) {
-                                    for (int32_t i = 0; i < 4; ++i) {
-                                        BSAudio* v16 = &BSAudio::QInstance();
-                                        v16->Update(false);
-                                    }
+                    if ((pOpenSound) && (apItemActivated->Get3D())) {
+                        BSSoundHandle SoundHandle;
+                        if (pActionActor == pPlayer) {
+                            TESForm* FormTwo = pOpenSound;
+                            uint32_t arPos_4 = FormTwo->iFormID;
+                            BSAudio* v12 = &BSAudio::QInstance();
+                            BSSoundHandle* arHandle = v12->GetSoundHandleByNumericID(
+                                &apHandle, arPos_4,
+                                BSGameSound::SOUND_FLAG_IS_2D | BSGameSound::SOUND_FLAG_SYSTEM_SOUND |
+                                    BSGameSound::SOUND_FLAG_ONE_SHOT | BSGameSound::SOUND_FLAG_UNKBIT31
+                            );
+                            SoundHandle.operator=(*arHandle);
+                        }
+                        else {
+                            TESForm* v13 = pOpenSound;
+                            uint32_t arPos_4a = v13->iFormID;
+                            BSAudio* v14 = &BSAudio::QInstance();
+                            BSSoundHandle* SoundHandleByNumericID =
+                                v14->GetSoundHandleByNumericID(&th_s, arPos_4a, 258u);
+                            SoundHandle.operator=(*SoundHandleByNumericID);
+                        }
+                        if (pActionActor != pPlayer) {
+                            NiPoint3 v33 = apItemActivated->GetLocationOnReference();
+                            SoundHandle.SetPosition(v33.x, v33.y, v33.z);
+                        }
+                        SoundHandle.Play(false);
+                        if (pActionActor == pPlayer) {
+                            BSAudio* v15 = &BSAudio::QInstance();
+                            if (!v15->bMultiThread) {
+                                for (int32_t i = 0; i < 4; ++i) {
+                                    BSAudio* v16 = &BSAudio::QInstance();
+                                    v16->Update(false);
                                 }
                             }
                         }
                     }
+
                     static_cast<HighProcess*>(pprocess)->HighProcess::FadeOut(pActionActor, apItemActivated, true);
                     return pActionActor == pPlayer;
                 }
@@ -491,45 +490,43 @@ bool TESObjectDOOR::Activate(
         pstaticdoor = nullptr;
         return true;
     }
-    else {
-        if (pActionActor != pPlayer) {
-            if (!blockpick) {
-                return false;
-            }
-            Animation* panim_2 = pActionActor->GetAnimation();
-            if (panim_2) {
-                panim_2->SpecialIdleFree(true, false);
-            }
-            TESIdleManager::SetUsedItem(pLockpick);
-            TESIdleManager::SetUsedItemActivate(true);
-            TESIdleManager::SetUsedItemLevel(1);
-            pprocess->SetupSpecialIdle(pActionActor, nullptr, AnimIdle::PLAY_TYPE_AUTO, true, false, true);
-            TESIdleManager::SetUsedItem(nullptr);
-            TESIdleManager::SetUsedItemActivate(false);
-            TESIdleManager::SetUsedItemLevel(-1);
-            ExtraLock* pextralock_5 = apItemActivated->GetExtraLock();
-            if (pextralock_5) {
-                pextralock_5->UnLockDoor();
-                apItemActivated->AddLockChange();
-            }
-            goto LABEL_60;
+
+    if (pActionActor != pPlayer) {
+        if (!blockpick) {
+            return false;
         }
-        ExtraLock* pextralock_4 = apItemActivated->GetExtraLock();
-        *reinterpret_cast<float*>(&fdoPunishment_2) = 0.0f;
-        BGSEntryPoint::HandleEntryPoint(BGSEntryPoint::IGNORE_BROKEN_LOCK, pPlayer, &fdoPunishment_2);
-        if (pextralock_4 &&
-            (pextralock_4->pLock->GetLockLevel(apItemActivated) == 5 || pextralock_4->pLock->IsBroken())) {
-            const char* v10 = sImpossibleLock.String();
-            Interface::ShowMessage(
-                v10, 0, "Interface\\Icons\\Message Icons\\glow_message_padlock.dds", nullptr, 2.0f, false
-            );
-            Interface::PlayMenuSound(18);
+        Animation* panim_2 = pActionActor->GetAnimation();
+        if (panim_2) {
+            panim_2->SpecialIdleFree(true, false);
         }
-        else {
-            _ShowLockPickMenu(apItemActivated, 0, false);
+        TESIdleManager::SetUsedItem(pLockpick);
+        TESIdleManager::SetUsedItemActivate(true);
+        TESIdleManager::SetUsedItemLevel(1);
+        pprocess->SetupSpecialIdle(pActionActor, nullptr, AnimIdle::PLAY_TYPE_AUTO, true, false, true);
+        TESIdleManager::SetUsedItem(nullptr);
+        TESIdleManager::SetUsedItemActivate(false);
+        TESIdleManager::SetUsedItemLevel(-1);
+        ExtraLock* pextralock_5 = apItemActivated->GetExtraLock();
+        if (pextralock_5) {
+            pextralock_5->UnLockDoor();
+            apItemActivated->AddLockChange();
         }
-        return false;
+        goto LABEL_60;
     }
+    ExtraLock* pextralock_4 = apItemActivated->GetExtraLock();
+    *reinterpret_cast<float*>(&fdoPunishment_2) = 0.0f;
+    BGSEntryPoint::HandleEntryPoint(BGSEntryPoint::IGNORE_BROKEN_LOCK, pPlayer, &fdoPunishment_2);
+    if (pextralock_4 && (pextralock_4->pLock->GetLockLevel(apItemActivated) == 5 || pextralock_4->pLock->IsBroken())) {
+        const char* v10 = sImpossibleLock.String();
+        Interface::ShowMessage(
+            v10, 0, "Interface\\Icons\\Message Icons\\glow_message_padlock.dds", nullptr, 2.0f, false
+        );
+        Interface::PlayMenuSound(18);
+    }
+    else {
+        _ShowLockPickMenu(apItemActivated, 0, false);
+    }
+    return false;
 }
 
 NiAVObject* TESObjectDOOR::Clone3D(TESObjectREFR* apRequester) {
@@ -626,54 +623,51 @@ bool TESObjectDOOR::IsAutomatic() {
 }
 
 void TESObjectDOOR::HandlePlayerTeleport(TESObjectREFR* apActivatedDoor) {
-    if (apActivatedDoor) {
-        if (apActivatedDoor->GetObjectReference() == this) {
-            DoorTeleportData* pTel = apActivatedDoor->GetTeleport();
-            if (pTel) {
-                bool Interior;
-                PLAYER_TARGET_LOC* ploc;
-                TESObjectCELL* ptelcell = pTel->GetTeleportCell();
-                TESWorldSpace* ptelworld = pTel->GetTeleportWorldSpace();
-                PLAYER_TARGET_LOC* apMemory = static_cast<PLAYER_TARGET_LOC*>(ourMalloc(sizeof(PLAYER_TARGET_LOC)));
-                if (apMemory) {
-                    ploc = ::new (apMemory) PLAYER_TARGET_LOC;
-                }
-                else {
-                    ploc = nullptr;
-                }
-                ploc->Location = *&pTel->position;
-                ploc->Angle = *&pTel->rotation;
-                ploc->bResetWeather = false;
-                ploc->pfnArrivalFunc = &TESObjectDOOR::DoorTeleportPlayerArrivalCallback;
-                // The arrival data is an integer field; the callback takes the door reference back out of it.
-                ploc->iArrivalFuncData = reinterpret_cast<uintptr_t>(apActivatedDoor);
-                if (ptelcell && ptelcell->GetInterior()) {
-                    ploc->pInterior = ptelcell;
-                }
-                else {
-                    ploc->pWorld = ptelworld;
-                }
-                pPlayer->RequestPositionPlayer(ploc);
-                TESObjectCELL* poriginalParentCell = pPlayer->GetParentCell();
-                if (poriginalParentCell) {
-                    Interior = poriginalParentCell->GetInterior();
-                }
-                else {
-                    Interior = false;
-                }
-                bStaticWasInInterior = Interior;
+    if ((apActivatedDoor) && (apActivatedDoor->GetObjectReference() == this)) {
+        DoorTeleportData* pTel = apActivatedDoor->GetTeleport();
+        if (pTel) {
+            bool Interior;
+            PLAYER_TARGET_LOC* ploc;
+            TESObjectCELL* ptelcell = pTel->GetTeleportCell();
+            TESWorldSpace* ptelworld = pTel->GetTeleportWorldSpace();
+            PLAYER_TARGET_LOC* apMemory = static_cast<PLAYER_TARGET_LOC*>(ourMalloc(sizeof(PLAYER_TARGET_LOC)));
+            if (apMemory) {
+                ploc = ::new (apMemory) PLAYER_TARGET_LOC;
             }
+            else {
+                ploc = nullptr;
+            }
+            ploc->Location = *&pTel->position;
+            ploc->Angle = *&pTel->rotation;
+            ploc->bResetWeather = false;
+            ploc->pfnArrivalFunc = &TESObjectDOOR::DoorTeleportPlayerArrivalCallback;
+            // The arrival data is an integer field; the callback takes the door reference back out of it.
+            ploc->iArrivalFuncData = reinterpret_cast<uintptr_t>(apActivatedDoor);
+            if (ptelcell && ptelcell->GetInterior()) {
+                ploc->pInterior = ptelcell;
+            }
+            else {
+                ploc->pWorld = ptelworld;
+            }
+            pPlayer->RequestPositionPlayer(ploc);
+            TESObjectCELL* poriginalParentCell = pPlayer->GetParentCell();
+            if (poriginalParentCell) {
+                Interior = poriginalParentCell->GetInterior();
+            }
+            else {
+                Interior = false;
+            }
+            bStaticWasInInterior = Interior;
         }
     }
 }
 
 bool TESObjectDOOR::RandomlyTeleportsTo(TESForm* apSpace) {
     char v4 = 0;
-    if (apSpace) {
-        if (TESForm::IsInteriorCellOrWorldspace(apSpace)) {
-            return RandomTeleports.IsInList(apSpace);
-        }
+    if ((apSpace) && (TESForm::IsInteriorCellOrWorldspace(apSpace))) {
+        return RandomTeleports.IsInList(apSpace);
     }
+
     return v4;
 }
 
@@ -683,13 +677,10 @@ TESObjectREFR* TESObjectDOOR::FindRandomTeleportTarget(TESObjectREFR* apStartDoo
     pbackup = nullptr;
     if (apStartDoor) {
         TESForm* pstartspace = (TESForm*)apStartDoor->GetWorldSpace();
-        if (!pstartspace) {
-            if (apStartDoor->GetParentCell()) {
-                if (apStartDoor->GetParentCell()->GetInterior()) {
-                    pstartspace = (TESForm*)apStartDoor->GetParentCell();
-                }
-            }
+        if ((!pstartspace) && (apStartDoor->GetParentCell()) && (apStartDoor->GetParentCell()->GetInterior())) {
+            pstartspace = (TESForm*)apStartDoor->GetParentCell();
         }
+
         if (pstartspace) {
             using checked_t = NiTPointerMap<int32_t, bool>;
             checked_t checked(37u);
@@ -715,18 +706,16 @@ TESObjectREFR* TESObjectDOOR::FindRandomTeleportTarget(TESObjectREFR* apStartDoo
                     ++iindex;
                 }
                 pretdoor = TESObjectCELL::PickRandomTeleportDoorInSpace(ptryspace, pstartspace, &pbackup);
-                if (pbackup) {
-                    if (ibackuptry == -1) {
-                        ibackuptry = itry;
-                    }
+                if ((pbackup) && (ibackuptry == -1)) {
+                    ibackuptry = itry;
                 }
-                if (pretdoor) {
-                    if (itry == ilasttry) {
-                        pbackup = pretdoor;
-                        ibackuptry = itry;
-                        pretdoor = nullptr;
-                    }
+
+                if ((pretdoor) && (itry == ilasttry)) {
+                    pbackup = pretdoor;
+                    ibackuptry = itry;
+                    pretdoor = nullptr;
                 }
+
                 checked.SetAt(iindex, true);
             }
             if (itry != -1) {
@@ -775,10 +764,8 @@ void TESObjectDOOR::AutoDoorCallback(NiAVObject* apDoor3D) {
         if ((((int32_t)pBaseForm->TESForm::GetFormType()) == 28) && (!pRef->TESForm::GetDestroyed())) {
             pBaseProc = pPlayer->MobileObject::GetCurrentAIProcess();
             pHighProc = dynamic_cast<HighProcess*>(pBaseProc);
-            if (pHighProc) {
-                if (((int32_t)pHighProc->GetFadeState()) != 4) {
-                    pPlayer->SetForceActivateRef(pRef);
-                }
+            if ((pHighProc) && (((int32_t)pHighProc->GetFadeState()) != 4)) {
+                pPlayer->SetForceActivateRef(pRef);
             }
         }
     }
@@ -791,34 +778,28 @@ void TESObjectDOOR::DoorTeleportPlayerArrivalCallback(uintptr_t aiArrivalData) {
     TESObjectREFR* pdoorref = reinterpret_cast<TESObjectREFR*>(aiArrivalData);
     if (aiArrivalData) {
         TESObjectDOOR::PlayerPullFollower();
-        if (pPlayer->GetParentCell()) {
-            if (pPlayer->GetParentCell()->GetInterior()) {
-                pPlayer->GetParentCell()->ProcessActors();
-            }
+        if ((pPlayer->GetParentCell()) && (pPlayer->GetParentCell()->GetInterior())) {
+            pPlayer->GetParentCell()->ProcessActors();
         }
+
         TESObjectDOOR* pdoor = static_cast<TESObjectDOOR*>(pdoorref->GetObjectReference());
-        if (pdoor->pCloseSound) {
-            if (pdoorref->GetTeleport()->pLinkedDoor) {
-                TESObjectREFR* LinkedDoor = pdoorref->GetTeleport()->pLinkedDoor;
-                if (LinkedDoor->Get3D()) {
-                    uint32_t CastingType = pdoor->pCloseSound->iFormID;
-                    BSAudio* v1 = &BSAudio::QInstance();
-                    v1->GetSoundHandleByNumericID(&SoundHandle, CastingType, 289u);
-                    SoundHandle.Play(false);
-                }
+        if ((pdoor->pCloseSound) && (pdoorref->GetTeleport()->pLinkedDoor)) {
+            TESObjectREFR* LinkedDoor = pdoorref->GetTeleport()->pLinkedDoor;
+            if (LinkedDoor->Get3D()) {
+                uint32_t CastingType = pdoor->pCloseSound->iFormID;
+                BSAudio* v1 = &BSAudio::QInstance();
+                v1->GetSoundHandleByNumericID(&SoundHandle, CastingType, 289u);
+                SoundHandle.Play(false);
             }
         }
     }
     TESObjectCELL* pnewParentCell_3 = pPlayer->GetParentCell();
-    if (pnewParentCell_3) {
-        if (!pnewParentCell_3->GetInterior()) {
-            pnewParentCell_3->ForceLODFadeInLoadedCells();
-        }
+    if ((pnewParentCell_3) && (!pnewParentCell_3->GetInterior())) {
+        pnewParentCell_3->ForceLODFadeInLoadedCells();
     }
-    if (gs_bSaveOnTravel_GamePlay.Bool()) {
-        if (pnewParentCell_3) {
-            pSaveLoadManager->SetAutoSaveTimerTo1();
-        }
+
+    if ((gs_bSaveOnTravel_GamePlay.Bool()) && (pnewParentCell_3)) {
+        pSaveLoadManager->SetAutoSaveTimerTo1();
     }
 }
 
@@ -880,71 +861,61 @@ void TESObjectDOOR::LinkRandomTeleportDoors(TESObjectREFR* apDoor1, TESObjectREF
     NiPoint3 dst;
     NiPoint3 delta_2;
     NiPoint3 delta;
-    if (apDoor1) {
-        if (apDoor2) {
-            if (apDoor1 != apDoor2) {
-                TESObjectDOOR* pbasedoor1 = dynamic_cast<TESObjectDOOR*>(apDoor1->GetObjectReference());
-                TESObjectDOOR* pbasedoor2 = dynamic_cast<TESObjectDOOR*>(apDoor2->GetObjectReference());
-                if (pbasedoor1) {
-                    if (pbasedoor2) {
-                        if (!apDoor1->GetTeleport() && !apDoor2->GetTeleport()) {
-                            DoorTeleportData* ptel1 = apDoor1->AddTeleport();
-                            DoorTeleportData* ptel2 = apDoor2->AddTeleport();
-                            if (ptel1) {
-                                if (ptel2) {
-                                    float fdefdist = gs_fRandomDoorDistance.Float();
-                                    float fAutoDoorActivateDistance = gs_fAutoDoorActivateDistance.Float() + 100.0;
-                                    float fautodist = BSMAX(fdefdist, fAutoDoorActivateDistance);
-                                    float f180 = 3.1415927f;
-                                    ptel1->pLinkedDoor = apDoor2;
-                                    TESObjectREFR* pmark = apDoor2->GetRandomTeleportMarker();
-                                    if (pmark) {
-                                        const NiPoint3* v2 = &pmark->GetLocationOnReference();
-                                        ptel1->SetTeleportPosition(*v2);
-                                        ptel1->SetTeleportRotation(pmark->GetAngleOnReference());
-                                    }
-                                    else {
-                                        apDoor2->GetDeltaForAngle(&delta, f180);
-                                        if (pbasedoor2->IsAutomatic()) {
-                                            delta.operator*=(fautodist);
-                                        }
-                                        else {
-                                            delta.operator*=(fdefdist);
-                                        }
-                                        const NiPoint3* v3 = &apDoor2->GetLocationOnReference();
-                                        ptel1->SetTeleportPosition(*v3 + delta);
-                                        const NiPoint3* AngleOnReference = &apDoor2->GetAngleOnReference();
-                                        float v14 = AngleOnReference->z + f180;
-                                        NiPoint3* v6 = ::new (&dst) NiPoint3(0.0f, 0.0f, v14);
-                                        ptel1->SetTeleportRotation(*v6);
-                                    }
-                                    ptel2->pLinkedDoor = apDoor1;
-                                    pmark = apDoor1->GetRandomTeleportMarker();
-                                    if (pmark) {
-                                        const NiPoint3* v7 = &pmark->GetLocationOnReference();
-                                        ptel2->SetTeleportPosition(*v7);
-                                        const NiPoint3* a2 = &pmark->GetAngleOnReference();
-                                        ptel2->SetTeleportRotation(*a2);
-                                    }
-                                    else {
-                                        apDoor1->GetDeltaForAngle(&delta_2, f180);
-                                        if (pbasedoor1->IsAutomatic()) {
-                                            delta_2.operator*=(fautodist);
-                                        }
-                                        else {
-                                            delta_2.operator*=(fdefdist);
-                                        }
-                                        const NiPoint3* v8 = &apDoor1->GetLocationOnReference();
-                                        ptel2->SetTeleportPosition(*v8 + delta_2);
-                                        const NiPoint3* v10 = &apDoor1->GetAngleOnReference();
-                                        float v13 = v10->z + f180;
-                                        NiPoint3* v11 = ::new (&v16) NiPoint3(0.0f, 0.0f, v13);
-                                        ptel2->SetTeleportRotation(*v11);
-                                    }
-                                }
-                            }
-                        }
+    if ((apDoor1) && (apDoor2) && (apDoor1 != apDoor2)) {
+        TESObjectDOOR* pbasedoor1 = dynamic_cast<TESObjectDOOR*>(apDoor1->GetObjectReference());
+        TESObjectDOOR* pbasedoor2 = dynamic_cast<TESObjectDOOR*>(apDoor2->GetObjectReference());
+        if ((pbasedoor1) && (pbasedoor2) && (!apDoor1->GetTeleport() && !apDoor2->GetTeleport())) {
+            DoorTeleportData* ptel1 = apDoor1->AddTeleport();
+            DoorTeleportData* ptel2 = apDoor2->AddTeleport();
+            if ((ptel1) && (ptel2)) {
+                float fdefdist = gs_fRandomDoorDistance.Float();
+                float fAutoDoorActivateDistance = gs_fAutoDoorActivateDistance.Float() + 100.0;
+                float fautodist = BSMAX(fdefdist, fAutoDoorActivateDistance);
+                float f180 = 3.1415927f;
+                ptel1->pLinkedDoor = apDoor2;
+                TESObjectREFR* pmark = apDoor2->GetRandomTeleportMarker();
+                if (pmark) {
+                    const NiPoint3* v2 = &pmark->GetLocationOnReference();
+                    ptel1->SetTeleportPosition(*v2);
+                    ptel1->SetTeleportRotation(pmark->GetAngleOnReference());
+                }
+                else {
+                    apDoor2->GetDeltaForAngle(&delta, f180);
+                    if (pbasedoor2->IsAutomatic()) {
+                        delta.operator*=(fautodist);
                     }
+                    else {
+                        delta.operator*=(fdefdist);
+                    }
+                    const NiPoint3* v3 = &apDoor2->GetLocationOnReference();
+                    ptel1->SetTeleportPosition(*v3 + delta);
+                    const NiPoint3* AngleOnReference = &apDoor2->GetAngleOnReference();
+                    float v14 = AngleOnReference->z + f180;
+                    NiPoint3* v6 = ::new (&dst) NiPoint3(0.0f, 0.0f, v14);
+                    ptel1->SetTeleportRotation(*v6);
+                }
+                ptel2->pLinkedDoor = apDoor1;
+                pmark = apDoor1->GetRandomTeleportMarker();
+                if (pmark) {
+                    const NiPoint3* v7 = &pmark->GetLocationOnReference();
+                    ptel2->SetTeleportPosition(*v7);
+                    const NiPoint3* a2 = &pmark->GetAngleOnReference();
+                    ptel2->SetTeleportRotation(*a2);
+                }
+                else {
+                    apDoor1->GetDeltaForAngle(&delta_2, f180);
+                    if (pbasedoor1->IsAutomatic()) {
+                        delta_2.operator*=(fautodist);
+                    }
+                    else {
+                        delta_2.operator*=(fdefdist);
+                    }
+                    const NiPoint3* v8 = &apDoor1->GetLocationOnReference();
+                    ptel2->SetTeleportPosition(*v8 + delta_2);
+                    const NiPoint3* v10 = &apDoor1->GetAngleOnReference();
+                    float v13 = v10->z + f180;
+                    NiPoint3* v11 = ::new (&v16) NiPoint3(0.0f, 0.0f, v13);
+                    ptel2->SetTeleportRotation(*v11);
                 }
             }
         }

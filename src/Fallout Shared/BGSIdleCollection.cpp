@@ -241,18 +241,16 @@ uint32_t BGSIdleCollection::GetIdlesForActor(
         }
         for (int32_t i = 0; i < cIdleCount; ++i) {
             TESIdleForm* pidle = pIdleArray[i];
-            if (pidle) {
-                if (apActor->CanUseIdle(pidle) && pidle->CheckConditions(apActor, apTargetRef, true)) {
-                    if (apOutIdleArray) {
-                        if (iidlecount >= iarraysize) {
-                            apOutIdleArray->Add(pidle);
-                        }
-                        else {
-                            apOutIdleArray->SetAt(iidlecount, pidle);
-                        }
+            if ((pidle) && (apActor->CanUseIdle(pidle) && pidle->CheckConditions(apActor, apTargetRef, true))) {
+                if (apOutIdleArray) {
+                    if (iidlecount >= iarraysize) {
+                        apOutIdleArray->Add(pidle);
                     }
-                    ++iidlecount;
+                    else {
+                        apOutIdleArray->SetAt(iidlecount, pidle);
+                    }
                 }
+                ++iidlecount;
             }
         }
     }

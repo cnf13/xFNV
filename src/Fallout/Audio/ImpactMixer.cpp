@@ -156,15 +156,14 @@ void ImpactMixer::PlayJumpSound(TESObjectREFR* apRef, int32_t aiFootType) {
             char bUnderwater = 0;
             // The stairs flag is set as PlayFootstep does, but is never read here, as the game does.
             [[maybe_unused]] bool bStairs = false;
-            if (!pActor->IsSwimming()) {
-                if (pInterior) {
-                    double RelevantWaterHeight = pActor->GetRelevantWaterHeight();
-                    if (kRefPos.z < RelevantWaterHeight &&
-                        ((pInterior->GetInterior() && pInterior->HasWater()) || !pInterior->GetInterior())) {
-                        bUnderwater = 1;
-                    }
+            if ((!pActor->IsSwimming()) && (pInterior)) {
+                double RelevantWaterHeight = pActor->GetRelevantWaterHeight();
+                if (kRefPos.z < RelevantWaterHeight &&
+                    ((pInterior->GetInterior() && pInterior->HasWater()) || !pInterior->GetInterior())) {
+                    bUnderwater = 1;
                 }
             }
+
             MobileObject* v59 = (MobileObject*)pActor;
             bhkCharacterController* CharController = pActor->GetCharController();
             if (static_cast<uint8_t>(CharController->GetOnStairs())) {
@@ -203,10 +202,8 @@ void ImpactMixer::PlayJumpSound(TESObjectREFR* apRef, int32_t aiFootType) {
                     eMaterialType = BHK_MATERIAL_WATER;
                 }
                 else {
-                    if (v59) {
-                        if (v59->GetCharController()) {
-                            eMaterialType = v59->GetCharController()->eSupportMaterial;
-                        }
+                    if ((v59) && (v59->GetCharController())) {
+                        eMaterialType = v59->GetCharController()->eSupportMaterial;
                     }
                 }
             }
@@ -336,14 +333,14 @@ void ImpactMixer::PlayGunshot(
         uint8_t ucMinF = 0;
         uint8_t ucMaxN = 0;
         uint8_t ucMaxF = 0;
-        if (pPlayer->GetParentCell()) {
-            if (pPlayer->GetParentCell()->GetInterior() && !pPlayer->GetParentCell()->GetFakeExterior()) {
-                fModNV = gs_fWeaponInteriorNearVolumeMod.Float();
-                fModFV = gs_fWeaponInteriorFarVolumeMod.Float();
-                fModNA = gs_fWeaponInteriorNearAttenuationMod.Float();
-                fModFA = gs_fWeaponInteriorFarAttenuationMod.Float();
-            }
+        if ((pPlayer->GetParentCell()) &&
+            (pPlayer->GetParentCell()->GetInterior() && !pPlayer->GetParentCell()->GetFakeExterior())) {
+            fModNV = gs_fWeaponInteriorNearVolumeMod.Float();
+            fModFV = gs_fWeaponInteriorFarVolumeMod.Float();
+            fModNA = gs_fWeaponInteriorNearAttenuationMod.Float();
+            fModFA = gs_fWeaponInteriorFarAttenuationMod.Float();
         }
+
         if (abPlayer) {
             iflags |= BSGameSound::SOUND_FLAG_IGNORE_TIMESCALE;
             if (pPlayer->pCurrentProcess) {
@@ -351,20 +348,17 @@ void ImpactMixer::PlayGunshot(
                 if (CurrentAIProcess->GetCurrentWeapon()) {
                     BaseProcess* v22 = pPlayer->pCurrentProcess;
                     ItemChange* pweap = v22->GetCurrentWeapon();
-                    if (pweap) {
-                        if (pweap->HasModEffectActive(11) || pweap->HasModEffectActive(16)) {
-                            bUseModSound = true;
-                        }
+                    if ((pweap) && (pweap->HasModEffectActive(11) || pweap->HasModEffectActive(16))) {
+                        bUseModSound = true;
                     }
                 }
             }
         }
         if (apWeapon) {
-            if (abPlayer) {
-                if (apWeapon->GetAttackSound2D(false)) {
-                    b2DAttackSound = true;
-                }
+            if ((abPlayer) && (apWeapon->GetAttackSound2D(false))) {
+                b2DAttackSound = true;
             }
+
             if (b2DAttackSound) {
                 iflags = static_cast<BSGameSound::SoundFlags>(
                     BSGameSound::SOUND_FLAG_IS_2D | BSGameSound::SOUND_FLAG_BATTLE_SOUND |
@@ -492,13 +486,11 @@ void ImpactMixer::PlayGunshot(
                         ucMaxF = psound2->GetMaxDistance();
                     }
                     if (abPlayer || !aOriginNode) {
-                        if (apSource->Get3D()) {
-                            if (!abPlayer || !bin1stPerson) {
-                                NiNode* v8 = apSource->Get3D();
-                                pcurrImpactHandle->soundNear.SetObjectToFollow(v8);
-                                NiNode* v9 = apSource->Get3D();
-                                pcurrImpactHandle->soundFar.SetObjectToFollow(v9);
-                            }
+                        if ((apSource->Get3D()) && (!abPlayer || !bin1stPerson)) {
+                            NiNode* v8 = apSource->Get3D();
+                            pcurrImpactHandle->soundNear.SetObjectToFollow(v8);
+                            NiNode* v9 = apSource->Get3D();
+                            pcurrImpactHandle->soundFar.SetObjectToFollow(v9);
                         }
                     }
                     else {
@@ -537,9 +529,8 @@ const char* ImpactMixer::GetMaterialSoundName(int32_t aiMat) {
     if (ImpactMixer::pAltMaterialSoundNames[aiMat]) {
         return ImpactMixer::pAltMaterialSoundNames[aiMat];
     }
-    else {
-        return ImpactMixer::pMaterialSoundNames[aiMat];
-    }
+
+    return ImpactMixer::pMaterialSoundNames[aiMat];
 }
 
 void ImpactMixer::InitFootsteps() {
@@ -704,29 +695,29 @@ void ImpactMixer::PlayCollisionSound(ImpactMixer::COLLISION_SOUND& arDataIn) {
                 double velFreq;
                 double v11;
                 ImpactMixer::pImpactMap.SetAt(arDataIn.iID, uiCurrentTime);
-                if (info) {
-                    if (arDataIn.cMaterialType1 != BHK_MATERIAL_SKIN || arDataIn.cMaterialType2 != BHK_MATERIAL_SKIN) {
-                        uint32_t arPos_8 = ibattleFlag |
-                            (BSGameSound::SOUND_FLAG_IS_3D | BSGameSound::SOUND_FLAG_ONE_SHOT |
-                             BSGameSound::SOUND_FLAG_IMPACT);
-                        uint32_t arPos_4 = info->iFormID;
-                        BSAudio* v4 = &BSAudio::QInstance();
-                        BSSoundHandle* arHandle = v4->GetSoundHandleByNumericID(&a1, arPos_4, arPos_8);
-                        SoundHand.operator=(*arHandle);
-                    }
+                if ((info) &&
+                    (arDataIn.cMaterialType1 != BHK_MATERIAL_SKIN || arDataIn.cMaterialType2 != BHK_MATERIAL_SKIN)) {
+                    uint32_t arPos_8 = ibattleFlag |
+                        (BSGameSound::SOUND_FLAG_IS_3D | BSGameSound::SOUND_FLAG_ONE_SHOT |
+                         BSGameSound::SOUND_FLAG_IMPACT);
+                    uint32_t arPos_4 = info->iFormID;
+                    BSAudio* v4 = &BSAudio::QInstance();
+                    BSSoundHandle* arHandle = v4->GetSoundHandleByNumericID(&a1, arPos_4, arPos_8);
+                    SoundHand.operator=(*arHandle);
                 }
-                if (info2) {
-                    if (arDataIn.cMaterialType1 != BHK_MATERIAL_SKIN || arDataIn.cMaterialType2 != BHK_MATERIAL_SKIN) {
-                        uint32_t arPos_8a = ibattleFlag |
-                            (BSGameSound::SOUND_FLAG_IS_3D | BSGameSound::SOUND_FLAG_ONE_SHOT |
-                             BSGameSound::SOUND_FLAG_IMPACT);
-                        uint32_t arPos_4a = info2->iFormID;
-                        BSAudio* v5 = &BSAudio::QInstance();
-                        BSSoundHandle* SoundHandleByNumericID =
-                            v5->GetSoundHandleByNumericID(&apHandle, arPos_4a, arPos_8a);
-                        SoundHand2.operator=(*SoundHandleByNumericID);
-                    }
+
+                if ((info2) &&
+                    (arDataIn.cMaterialType1 != BHK_MATERIAL_SKIN || arDataIn.cMaterialType2 != BHK_MATERIAL_SKIN)) {
+                    uint32_t arPos_8a = ibattleFlag |
+                        (BSGameSound::SOUND_FLAG_IS_3D | BSGameSound::SOUND_FLAG_ONE_SHOT |
+                         BSGameSound::SOUND_FLAG_IMPACT);
+                    uint32_t arPos_4a = info2->iFormID;
+                    BSAudio* v5 = &BSAudio::QInstance();
+                    BSSoundHandle* SoundHandleByNumericID =
+                        v5->GetSoundHandleByNumericID(&apHandle, arPos_4a, arPos_8a);
+                    SoundHand2.operator=(*SoundHandleByNumericID);
                 }
+
                 if (!(arDataIn.fVelocity / 400.0 > 1.0)) {
                     v11 = arDataIn.fVelocity / 400.0;
                 }
@@ -877,15 +868,14 @@ void ImpactMixer::PlayFootstep(TESObjectREFR* apRef, int32_t aiFootType) {
             }
             bool bWaterStep = false;
             bool bStairs = false;
-            if (!static_cast<Actor*>(pmob)->Actor::IsSwimming()) {
-                if (pcell) {
-                    double RelevantWaterHeight = pmob->GetRelevantWaterHeight();
-                    if (loc.z < RelevantWaterHeight &&
-                        ((pcell->GetInterior() && pcell->HasWater()) || !pcell->GetInterior())) {
-                        bWaterStep = true;
-                    }
+            if ((!static_cast<Actor*>(pmob)->Actor::IsSwimming()) && (pcell)) {
+                double RelevantWaterHeight = pmob->GetRelevantWaterHeight();
+                if (loc.z < RelevantWaterHeight &&
+                    ((pcell->GetInterior() && pcell->HasWater()) || !pcell->GetInterior())) {
+                    bWaterStep = true;
                 }
             }
+
             bhkCharacterController* CharController = pmob->GetCharController();
             if (static_cast<uint8_t>(CharController->GetOnStairs())) {
                 bStairs = true;
@@ -924,10 +914,8 @@ void ImpactMixer::PlayFootstep(TESObjectREFR* apRef, int32_t aiFootType) {
                     groundType = BHK_MATERIAL_WATER;
                 }
                 else {
-                    if (pmob) {
-                        if (pmob->GetCharController()) {
-                            groundType = pmob->GetCharController()->eSupportMaterial;
-                        }
+                    if ((pmob) && (pmob->GetCharController())) {
+                        groundType = pmob->GetCharController()->eSupportMaterial;
                     }
                 }
             }
@@ -1467,9 +1455,8 @@ int32_t ImpactMixer::GetFootstepIndexForType(HavokMaterialType aiType) {
     if (aiType > BHK_MATERIAL_STONE && aiType < BHK_MATERIAL_MAX) {
         return MaterialEquivalents[aiType];
     }
-    else {
-        return 0;
-    }
+
+    return 0;
 }
 
 void ImpactMixer::PlayEquipSound(TESObjectREFR* apRef, int32_t aiType) {

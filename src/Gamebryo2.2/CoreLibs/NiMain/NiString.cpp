@@ -37,10 +37,8 @@ bool NiString::ToFloat(float& f) {
         }
         if (m_kHandle) {
             const char* v4 = std::strpbrk(static_cast<const char*>(m_kHandle), "-0");
-            if (v4) {
-                if (v4 - m_kHandle >= 0) {
-                    return true;
-                }
+            if ((v4) && (v4 - m_kHandle >= 0)) {
+                return true;
             }
         }
     }

@@ -331,10 +331,8 @@ void DialoguePackage::LoadGame(BGSLoadFormBuffer* apLoadGameBuffer) {
         }
         v7 = -1;
         apLoadGameBuffer->LoadData(&v7, 2u);
-        if (pCurrentItem) {
-            if (v7 != -1) {
-                pCurrentResponse = pCurrentItem->GetDialogueResponseByIndex(v7);
-            }
+        if ((pCurrentItem) && (v7 != -1)) {
+            pCurrentResponse = pCurrentItem->GetDialogueResponseByIndex(v7);
         }
     }
 }
@@ -492,11 +490,10 @@ void DialoguePackage::SaveGame() {
         }
         SaveGameDataOLD(&icurrentItemIndex, 2);
         icurrentResponseIndex = -1;
-        if (pCurrentItem) {
-            if (pCurrentResponse) {
-                icurrentResponseIndex = pCurrentItem->GetDialogueResponseIndex(pCurrentResponse);
-            }
+        if ((pCurrentItem) && (pCurrentResponse)) {
+            icurrentResponseIndex = pCurrentItem->GetDialogueResponseIndex(pCurrentResponse);
         }
+
         SaveGameDataOLD(&icurrentResponseIndex, 2);
     }
     if (bDebugSaveBuffer.Bool()) {
@@ -544,11 +541,10 @@ void DialoguePackage::InitLoadGame() {
     pActor = static_cast<MobileObject*>(FNVD_DYNAMIC_CAST_VOID(Actor)(v2, RTTI_TESForm, RTTI_Actor));
     TESForm* v3 = TESForm::GetFormByNumericID(static_cast<uint32_t>(reinterpret_cast<uintptr_t>(pTargetActor)));
     pTargetActor = static_cast<MobileObject*>(FNVD_DYNAMIC_CAST_VOID(Actor)(v3, RTTI_TESForm, RTTI_Actor));
-    if (pSaveLoadGameOLD->GetCurrentVersion() >= 32u) {
-        if (pConversation) {
-            pConversation->InitLoadGameTES();
-        }
+    if ((pSaveLoadGameOLD->GetCurrentVersion() >= 32u) && (pConversation)) {
+        pConversation->InitLoadGameTES();
     }
+
     if (pSaveLoadGameOLD->GetCurrentVersion() < 32u) {
         // Old saves: LoadGame left the item and response indices in the pointer fields; their low 16 bits are read.
         Conversation* pOldConversation = pConversation;
@@ -880,21 +876,22 @@ void DialoguePackage::Speak(bool abUseSound) {
                 handle.PlayAfter(1, 0);
             }
         }
-        if (this == pPlayer->pClosestConversation || ReferenceProcessLists.bShowSubtitle) {
-            if (pConversation->GetCurrentItem() && pConversation->GetCurrentItem()->GetCurrentResponse() &&
-                pConversation->GetCurrentItem()->GetCurrentResponse()->cText.String()) {
-                // GetShowSubtitles: only the low byte of the result is tested.
-                if (gs_bGeneralSubtitles_Gameplay.Bool() ||
-                    (pspeaker->IsActor() && static_cast<uint8_t>(static_cast<Actor*>(pspeaker)->GetShowSubtitles()))) {
-                    // Copies the location, then the handle with operator=, then reads the text.
-                    NiPoint3 kSpeakerLoc = pspeaker->GetLocationOnReference();
-                    FNVD_INLINED_LOCAL(BSSoundHandle, subtitleHandle, std::nullopt, std::nullopt);
-                    subtitleHandle = handle;
-                    const char* pText = pConversation->GetCurrentItem()->GetCurrentResponse()->cText.String();
-                    Interface::ShowSubtitle(pText, subtitleHandle, kSpeakerLoc, pTargetActor, false);
-                }
-            }
+        if ((this == pPlayer->pClosestConversation || ReferenceProcessLists.bShowSubtitle) &&
+            (pConversation->GetCurrentItem() && pConversation->GetCurrentItem()->GetCurrentResponse() &&
+             pConversation->GetCurrentItem()->GetCurrentResponse()->cText.String()) &&
+            (gs_bGeneralSubtitles_Gameplay.Bool() ||
+             (pspeaker->IsActor() && static_cast<uint8_t>(static_cast<Actor*>(pspeaker)->GetShowSubtitles()))))
+
+        // GetShowSubtitles: only the low byte of the result is tested.
+        {
+            // Copies the location, then the handle with operator=, then reads the text.
+            NiPoint3 kSpeakerLoc = pspeaker->GetLocationOnReference();
+            FNVD_INLINED_LOCAL(BSSoundHandle, subtitleHandle, std::nullopt, std::nullopt);
+            subtitleHandle = handle;
+            const char* pText = pConversation->GetCurrentItem()->GetCurrentResponse()->cText.String();
+            Interface::ShowSubtitle(pText, subtitleHandle, kSpeakerLoc, pTargetActor, false);
         }
+
         if (flistentimer <= 0.0 && pTargetActor != pspeaker) {
             flistentimer = 10.0f;
         }

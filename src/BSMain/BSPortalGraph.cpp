@@ -341,11 +341,10 @@ void* AlwaysRenderArray_DeleteBase(NiPointer<NiAVObject>* apBase, uint32_t auiFl
         }
         return reinterpret_cast<size_t*>(apBase) - 1;
     }
-    else {
-        apBase->~NiPointer<NiAVObject>();
-        if ((auiFlags & 1) != 0) {
-            ourFree(apBase);
-        }
-        return (void*)apBase;
+
+    apBase->~NiPointer<NiAVObject>();
+    if ((auiFlags & 1) != 0) {
+        ourFree(apBase);
     }
+    return (void*)apBase;
 }

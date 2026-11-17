@@ -101,9 +101,8 @@ const char* BGSChangeFlags::GetFlagName(int32_t aiFlag, uint32_t aiFormType, boo
         if (abShortName) {
             return "Flags";
         }
-        else {
-            return "CHANGE_FORM_FLAGS";
-        }
+
+        return "CHANGE_FORM_FLAGS";
     }
     switch (eFormType) {
         case CLAS_ID: {
@@ -113,9 +112,8 @@ const char* BGSChangeFlags::GetFlagName(int32_t aiFlag, uint32_t aiFormType, boo
             if (abShortName) {
                 return "Tag Skills";
             }
-            else {
-                return "CHANGE_CLASS_TAG_SKILLS";
-            }
+
+            return "CHANGE_CLASS_TAG_SKILLS";
         }
         case FACT_ID: {
             switch (aiFlag) {
@@ -123,25 +121,22 @@ const char* BGSChangeFlags::GetFlagName(int32_t aiFlag, uint32_t aiFormType, boo
                     if (abShortName) {
                         return "Faction Crime Counts";
                     }
-                    else {
-                        return "CHANGE_FACTION_CRIME_COUNTS";
-                    }
+
+                    return "CHANGE_FACTION_CRIME_COUNTS";
                 }
                 case 2: {
                     if (abShortName) {
                         return "Faction Flags";
                     }
-                    else {
-                        return "CHANGE_FACTION_FLAGS";
-                    }
+
+                    return "CHANGE_FACTION_FLAGS";
                 }
                 case 4: {
                     if (abShortName) {
                         return "Faction Reactions";
                     }
-                    else {
-                        return "CHANGE_FACTION_REACTIONS";
-                    }
+
+                    return "CHANGE_FACTION_REACTIONS";
                 }
                 default: {
                     return "Bad Flag Name";
@@ -302,9 +297,8 @@ const char* BGSChangeFlags::GetFlagName(int32_t aiFlag, uint32_t aiFormType, boo
             if (abShortName) {
                 return "Added Object";
             }
-            else {
-                return "CHANGE_LEVELED_LIST_ADDED_OBJECT";
-            }
+
+            return "CHANGE_LEVELED_LIST_ADDED_OBJECT";
         }
         case NOTE_ID: {
             if (aiFlag != CHANGE_NOTE_READ) {
@@ -313,9 +307,8 @@ const char* BGSChangeFlags::GetFlagName(int32_t aiFlag, uint32_t aiFormType, boo
             if (abShortName) {
                 return "Note Read";
             }
-            else {
-                return "CHANGE_NOTE_READ";
-            }
+
+            return "CHANGE_NOTE_READ";
         }
         case CELL_ID: {
             if (aiFlag > 8) {
@@ -324,25 +317,22 @@ const char* BGSChangeFlags::GetFlagName(int32_t aiFlag, uint32_t aiFormType, boo
                         if (abShortName) {
                             return "Exterior Short";
                         }
-                        else {
-                            return "CHANGE_CELL_EXTERIOR_SHORT";
-                        }
+
+                        return "CHANGE_CELL_EXTERIOR_SHORT";
                     }
                     case 0x20000000: {
                         if (abShortName) {
                             return "Exterior Char";
                         }
-                        else {
-                            return "CHANGE_CELL_EXTERIOR_CHAR";
-                        }
+
+                        return "CHANGE_CELL_EXTERIOR_CHAR";
                     }
                     case 0x40000000: {
                         if (abShortName) {
                             return "Detach Time";
                         }
-                        else {
-                            return "CHANGE_CELL_DETACHTIME";
-                        }
+
+                        return "CHANGE_CELL_DETACHTIME";
                     }
                     default: {
                         return "Bad Flag Name";
@@ -355,33 +345,29 @@ const char* BGSChangeFlags::GetFlagName(int32_t aiFlag, uint32_t aiFormType, boo
                         if (abShortName) {
                             return "Ownership";
                         }
-                        else {
-                            return "CHANGE_CELL_OWNERSHIP";
-                        }
+
+                        return "CHANGE_CELL_OWNERSHIP";
                     }
                     case (-2147483647 - 1): {
                         if (abShortName) {
                             return "Seen Data";
                         }
-                        else {
-                            return "CHANGE_CELL_SEENDATA";
-                        }
+
+                        return "CHANGE_CELL_SEENDATA";
                     }
                     case 2: {
                         if (abShortName) {
                             return "Flags";
                         }
-                        else {
-                            return "CHANGE_CELL_FLAGS";
-                        }
+
+                        return "CHANGE_CELL_FLAGS";
                     }
                     case 4: {
                         if (abShortName) {
                             return "Full name";
                         }
-                        else {
-                            return "CHANGE_CELL_FULLNAME";
-                        }
+
+                        return "CHANGE_CELL_FULLNAME";
                     }
                     default: {
                         return "Bad Flag Name";
@@ -403,17 +389,15 @@ const char* BGSChangeFlags::GetFlagName(int32_t aiFlag, uint32_t aiFormType, boo
                         if (abShortName) {
                             return "Enc Zone Extra";
                         }
-                        else {
-                            return "CHANGE_REFR_EXTRA_ENCOUNTER_ZONE";
-                        }
+
+                        return "CHANGE_REFR_EXTRA_ENCOUNTER_ZONE";
                     }
                     if (aiFlag == CHANGE_REFR_EXTRA_CREATED_ONLY) {
                         if (abShortName) {
                             return "Created Only Extra";
                         }
-                        else {
-                            return "CHANGE_REFR_EXTRA_CREATED_ONLY";
-                        }
+
+                        return "CHANGE_REFR_EXTRA_CREATED_ONLY";
                     }
                 }
                 else {
@@ -422,25 +406,22 @@ const char* BGSChangeFlags::GetFlagName(int32_t aiFlag, uint32_t aiFormType, boo
                             if (abShortName) {
                                 return "Animation";
                             }
-                            else {
-                                return "CHANGE_REFR_ANIMATION";
-                            }
+
+                            return "CHANGE_REFR_ANIMATION";
                         }
                         case 0x4000000: {
                             if (abShortName) {
                                 return "Activating Children";
                             }
-                            else {
-                                return "CHANGE_REFR_EXTRA_ACTIVATING_CHILDREN";
-                            }
+
+                            return "CHANGE_REFR_EXTRA_ACTIVATING_CHILDREN";
                         }
                         case 0x8000000: {
                             if (abShortName) {
                                 return "Leveled Inventory";
                             }
-                            else {
-                                return "CHANGE_REFR_LEVELED_INVENTORY";
-                            }
+
+                            return "CHANGE_REFR_LEVELED_INVENTORY";
                         }
                     }
                 }
@@ -450,26 +431,23 @@ const char* BGSChangeFlags::GetFlagName(int32_t aiFlag, uint32_t aiFormType, boo
                     if (abShortName) {
                         return "Ownership Extra";
                     }
-                    else {
-                        return "CHANGE_REFR_EXTRA_OWNERSHIP";
-                    }
+
+                    return "CHANGE_REFR_EXTRA_OWNERSHIP";
                 }
                 if (aiFlag > 8) {
                     if (aiFlag == 16) {
                         if (abShortName) {
                             return "Scale";
                         }
-                        else {
-                            return "CHANGE_REFR_SCALE";
-                        }
+
+                        return "CHANGE_REFR_SCALE";
                     }
                     if (aiFlag == 32) {
                         if (abShortName) {
                             return "Inventory";
                         }
-                        else {
-                            return "CHANGE_REFR_INVENTORY";
-                        }
+
+                        return "CHANGE_REFR_INVENTORY";
                     }
                 }
                 else {
@@ -478,33 +456,29 @@ const char* BGSChangeFlags::GetFlagName(int32_t aiFlag, uint32_t aiFormType, boo
                             if (abShortName) {
                                 return "Cell Changed";
                             }
-                            else {
-                                return "CHANGE_REFR_CELL_CHANGED";
-                            }
+
+                            return "CHANGE_REFR_CELL_CHANGED";
                         }
                         case (-2147483647 - 1): {
                             if (abShortName) {
                                 return "Game Only Extra";
                             }
-                            else {
-                                return "CHANGE_REFR_EXTRA_GAME_ONLY";
-                            }
+
+                            return "CHANGE_REFR_EXTRA_GAME_ONLY";
                         }
                         case 2: {
                             if (abShortName) {
                                 return "Moved";
                             }
-                            else {
-                                return "CHANGE_REFR_MOVE";
-                            }
+
+                            return "CHANGE_REFR_MOVE";
                         }
                         case 4: {
                             if (abShortName) {
                                 return "Havok Moved";
                             }
-                            else {
-                                return "CHANGE_REFR_HAVOK_MOVE";
-                            }
+
+                            return "CHANGE_REFR_HAVOK_MOVE";
                         }
                     }
                 }
@@ -515,17 +489,15 @@ const char* BGSChangeFlags::GetFlagName(int32_t aiFlag, uint32_t aiFormType, boo
                         if (abShortName) {
                             return "Open Default State";
                         }
-                        else {
-                            return "CHANGE_OBJECT_OPEN_DEFAULT_STATE";
-                        }
+
+                        return "CHANGE_OBJECT_OPEN_DEFAULT_STATE";
                     }
                     if (aiFlag == CHANGE_OBJECT_OPEN_STATE) {
                         if (abShortName) {
                             return "Open State";
                         }
-                        else {
-                            return "CHANGE_OBJECT_OPEN_STATE";
-                        }
+
+                        return "CHANGE_OBJECT_OPEN_STATE";
                     }
                 }
                 else {
@@ -534,25 +506,22 @@ const char* BGSChangeFlags::GetFlagName(int32_t aiFlag, uint32_t aiFormType, boo
                             if (abShortName) {
                                 return "Lock Extra";
                             }
-                            else {
-                                return "CHANGE_OBJECT_EXTRA_LOCK";
-                            }
+
+                            return "CHANGE_OBJECT_EXTRA_LOCK";
                         }
                         case 1024: {
                             if (abShortName) {
                                 return "Item Data Extra";
                             }
-                            else {
-                                return "CHANGE_OBJECT_EXTRA_ITEM_DATA";
-                            }
+
+                            return "CHANGE_OBJECT_EXTRA_ITEM_DATA";
                         }
                         case 2048: {
                             if (abShortName) {
                                 return "Ammo Extra";
                             }
-                            else {
-                                return "CHANGE_OBJECT_EXTRA_AMMO";
-                            }
+
+                            return "CHANGE_OBJECT_EXTRA_AMMO";
                         }
                     }
                 }
@@ -562,117 +531,101 @@ const char* BGSChangeFlags::GetFlagName(int32_t aiFlag, uint32_t aiFormType, boo
                 if (abShortName) {
                     return "Teleport Extra";
                 }
-                else {
-                    return "CHANGE_DOOR_EXTRA_TELEPORT";
+
+                return "CHANGE_DOOR_EXTRA_TELEPORT";
+            }
+
+            if (aiFlag > 0x80000) {
+                if (aiFlag > 0x400000) {
+                    if (aiFlag != CHANGE_ACTOR_PERMANENT_MODIFIERS) {
+                        return "Bad Flag Name";
+                    }
+                    if (abShortName) {
+                        return "Permanent Modifiers";
+                    }
+
+                    return "CHANGE_ACTOR_PERMANENT_MODIFIERS";
+                }
+
+                switch (aiFlag) {
+                    case 0x400000: {
+                        if (abShortName) {
+                            return "Override Modifiers";
+                        }
+
+                        return "CHANGE_ACTOR_OVERRIDE_MODIFIERS";
+                    }
+                    case 0x100000: {
+                        if (abShortName) {
+                            return "Temp Modifiers";
+                        }
+
+                        return "CHANGE_ACTOR_TEMP_MODIFIERS";
+                    }
+                    case 0x200000: {
+                        if (abShortName) {
+                            return "Damage Modifiers";
+                        }
+
+                        return "CHANGE_ACTOR_DAMAGE_MODIFIERS";
+                    }
+                    default: {
+                        return "Bad Flag Name";
+                    }
                 }
             }
             else {
-                if (aiFlag > 0x80000) {
-                    if (aiFlag > 0x400000) {
-                        if (aiFlag != CHANGE_ACTOR_PERMANENT_MODIFIERS) {
-                            return "Bad Flag Name";
-                        }
-                        if (abShortName) {
-                            return "Permanent Modifiers";
-                        }
-                        else {
-                            return "CHANGE_ACTOR_PERMANENT_MODIFIERS";
-                        }
+                if (aiFlag == CHANGE_ACTOR_DISPOSITION_MODIFIERS) {
+                    if (abShortName) {
+                        return "Disp Modifiers";
                     }
-                    else {
-                        switch (aiFlag) {
-                            case 0x400000: {
-                                if (abShortName) {
-                                    return "Override Modifiers";
-                                }
-                                else {
-                                    return "CHANGE_ACTOR_OVERRIDE_MODIFIERS";
-                                }
-                            }
-                            case 0x100000: {
-                                if (abShortName) {
-                                    return "Temp Modifiers";
-                                }
-                                else {
-                                    return "CHANGE_ACTOR_TEMP_MODIFIERS";
-                                }
-                            }
-                            case 0x200000: {
-                                if (abShortName) {
-                                    return "Damage Modifiers";
-                                }
-                                else {
-                                    return "CHANGE_ACTOR_DAMAGE_MODIFIERS";
-                                }
-                            }
-                            default: {
-                                return "Bad Flag Name";
-                            }
-                        }
-                    }
+
+                    return "CHANGE_ACTOR_DISPOSITION_MODIFIERS";
                 }
-                else {
-                    if (aiFlag == CHANGE_ACTOR_DISPOSITION_MODIFIERS) {
+
+                if (aiFlag > 0x1000) {
+                    if (aiFlag == CHANGE_ACTOR_EXTRA_DISMEMBERED_LIMBS) {
                         if (abShortName) {
-                            return "Disp Modifiers";
+                            return "Dismembered Limbs";
                         }
-                        else {
-                            return "CHANGE_ACTOR_DISPOSITION_MODIFIERS";
-                        }
+
+                        return "CHANGE_ACTOR_EXTRA_DISMEMBERED_LIMBS";
                     }
-                    else {
-                        if (aiFlag > 0x1000) {
-                            if (aiFlag == CHANGE_ACTOR_EXTRA_DISMEMBERED_LIMBS) {
-                                if (abShortName) {
-                                    return "Dismembered Limbs";
-                                }
-                                else {
-                                    return "CHANGE_ACTOR_EXTRA_DISMEMBERED_LIMBS";
-                                }
-                            }
-                            else {
-                                if (aiFlag != CHANGE_ACTOR_EXTRA_LEVELED_ACTOR) {
-                                    return "Bad Flag Name";
-                                }
-                                if (abShortName) {
-                                    return "Leveled Actor";
-                                }
-                                else {
-                                    return "CHANGE_ACTOR_LEVELED_ACTOR";
-                                }
-                            }
+
+                    if (aiFlag != CHANGE_ACTOR_EXTRA_LEVELED_ACTOR) {
+                        return "Bad Flag Name";
+                    }
+                    if (abShortName) {
+                        return "Leveled Actor";
+                    }
+
+                    return "CHANGE_ACTOR_LEVELED_ACTOR";
+                }
+
+                switch (aiFlag) {
+                    case 0x1000: {
+                        if (abShortName) {
+                            return "Merchant Container";
                         }
-                        else {
-                            switch (aiFlag) {
-                                case 0x1000: {
-                                    if (abShortName) {
-                                        return "Merchant Container";
-                                    }
-                                    else {
-                                        return "CHANGE_ACTOR_EXTRA_MERCHANT_CONTAINER";
-                                    }
-                                }
-                                case 1024: {
-                                    if (abShortName) {
-                                        return "Life State";
-                                    }
-                                    else {
-                                        return "CHANGE_ACTOR_LIFESTATE";
-                                    }
-                                }
-                                case 2048: {
-                                    if (abShortName) {
-                                        return "Package Data Extra";
-                                    }
-                                    else {
-                                        return "CHANGE_ACTOR_EXTRA_PACKAGE_DATA";
-                                    }
-                                }
-                                default: {
-                                    return "Bad Flag Name";
-                                }
-                            }
+
+                        return "CHANGE_ACTOR_EXTRA_MERCHANT_CONTAINER";
+                    }
+                    case 1024: {
+                        if (abShortName) {
+                            return "Life State";
                         }
+
+                        return "CHANGE_ACTOR_LIFESTATE";
+                    }
+                    case 2048: {
+                        if (abShortName) {
+                            return "Package Data Extra";
+                        }
+
+                        return "CHANGE_ACTOR_EXTRA_PACKAGE_DATA";
+                    }
+                    default: {
+                        return "Bad Flag Name";
                     }
                 }
             }
@@ -684,9 +637,8 @@ const char* BGSChangeFlags::GetFlagName(int32_t aiFlag, uint32_t aiFormType, boo
             if (abShortName) {
                 return "Said Once";
             }
-            else {
-                return "CHANGE_TOPIC_SAIDONCE";
-            }
+
+            return "CHANGE_TOPIC_SAIDONCE";
         }
         case QUST_ID: {
             if (aiFlag > 4) {
@@ -694,51 +646,44 @@ const char* BGSChangeFlags::GetFlagName(int32_t aiFlag, uint32_t aiFormType, boo
                     if (abShortName) {
                         return "Quest Objectives";
                     }
-                    else {
-                        return "CHANGE_QUEST_OBJECTIVES";
-                    }
+
+                    return "CHANGE_QUEST_OBJECTIVES";
                 }
-                else {
-                    if (aiFlag != CHANGE_QUEST_SCRIPT) {
-                        return "Bad Flag Name";
-                    }
-                    if (abShortName) {
-                        return "Quest Script";
-                    }
-                    else {
-                        return "CHANGE_QUEST_SCRIPT";
-                    }
+
+                if (aiFlag != CHANGE_QUEST_SCRIPT) {
+                    return "Bad Flag Name";
                 }
+                if (abShortName) {
+                    return "Quest Script";
+                }
+
+                return "CHANGE_QUEST_SCRIPT";
             }
-            else {
-                switch (aiFlag) {
-                    case 4: {
-                        if (abShortName) {
-                            return "Quest Script Delay";
-                        }
-                        else {
-                            return "CHANGE_QUEST_SCRIPT_DELAY";
-                        }
+
+            switch (aiFlag) {
+                case 4: {
+                    if (abShortName) {
+                        return "Quest Script Delay";
                     }
-                    case (-2147483647 - 1): {
-                        if (abShortName) {
-                            return "Quest Stages";
-                        }
-                        else {
-                            return "CHANGE_QUEST_STAGES";
-                        }
+
+                    return "CHANGE_QUEST_SCRIPT_DELAY";
+                }
+                case (-2147483647 - 1): {
+                    if (abShortName) {
+                        return "Quest Stages";
                     }
-                    case 2: {
-                        if (abShortName) {
-                            return "Quest Flags";
-                        }
-                        else {
-                            return "CHANGE_QUEST_FLAGS";
-                        }
+
+                    return "CHANGE_QUEST_STAGES";
+                }
+                case 2: {
+                    if (abShortName) {
+                        return "Quest Flags";
                     }
-                    default: {
-                        return "Bad Flag Name";
-                    }
+
+                    return "CHANGE_QUEST_FLAGS";
+                }
+                default: {
+                    return "Bad Flag Name";
                 }
             }
         }
@@ -747,21 +692,18 @@ const char* BGSChangeFlags::GetFlagName(int32_t aiFlag, uint32_t aiFormType, boo
                 if (abShortName) {
                     return "Never Run Flag";
                 }
-                else {
-                    return "CHANGE_PACKAGE_NEVER_RUN";
-                }
+
+                return "CHANGE_PACKAGE_NEVER_RUN";
             }
-            else {
-                if (aiFlag != CHANGE_PACKAGE_WAITING) {
-                    return "Bad Flag Name";
-                }
-                if (abShortName) {
-                    return "Waiting Flag";
-                }
-                else {
-                    return "CHANGE_PACKAGE_WAITING";
-                }
+
+            if (aiFlag != CHANGE_PACKAGE_WAITING) {
+                return "Bad Flag Name";
             }
+            if (abShortName) {
+                return "Waiting Flag";
+            }
+
+            return "CHANGE_PACKAGE_WAITING";
         }
         case WATR_ID: {
             if (aiFlag != CHANGE_WATER_REMAPPED) {
@@ -770,9 +712,8 @@ const char* BGSChangeFlags::GetFlagName(int32_t aiFlag, uint32_t aiFormType, boo
             if (abShortName) {
                 return "Remapped";
             }
-            else {
-                return "CHANGE_WATER_REMAPPED";
-            }
+
+            return "CHANGE_WATER_REMAPPED";
         }
         case FLST_ID: {
             if (aiFlag != CHANGE_FORM_LIST_ADDED_FORM) {
@@ -781,72 +722,62 @@ const char* BGSChangeFlags::GetFlagName(int32_t aiFlag, uint32_t aiFormType, boo
             if (abShortName) {
                 return "Added Form";
             }
-            else {
-                return "CHANGE_FORM_LIST_ADDED_FORM";
-            }
+
+            return "CHANGE_FORM_LIST_ADDED_FORM";
         }
         case ECZN_ID: {
             if (aiFlag == CHANGE_ENCOUNTER_ZONE_GAME_DATA) {
                 if (abShortName) {
                     return "Game Data";
                 }
-                else {
-                    return "CHANGE_ENCOUNTER_ZONE_GAME_DATA";
-                }
+
+                return "CHANGE_ENCOUNTER_ZONE_GAME_DATA";
             }
-            else {
-                if (aiFlag != 2) {
-                    return "Bad Flag Name";
-                }
-                if (abShortName) {
-                    return "Zone Flags";
-                }
-                else {
-                    return "CHANGE_ENCOUNTER_ZONE_FLAGS";
-                }
+
+            if (aiFlag != 2) {
+                return "Bad Flag Name";
             }
+            if (abShortName) {
+                return "Zone Flags";
+            }
+
+            return "CHANGE_ENCOUNTER_ZONE_FLAGS";
         }
         default: {
             if (aiFlag == 2) {
                 if (abShortName) {
                     return "Object Value";
                 }
-                else {
-                    return "CHANGE_BASE_OBJECT_VALUE";
-                }
+
+                return "CHANGE_BASE_OBJECT_VALUE";
             }
-            else {
-                if (aiFlag == 4) {
-                    if (abShortName) {
-                        return "Object Full Name";
-                    }
-                    else {
-                        return "CHANGE_BASE_OBJECT_FULLNAME";
-                    }
+
+            if (aiFlag == 4) {
+                if (abShortName) {
+                    return "Object Full Name";
                 }
-                else {
-                    if (aiFormType != 22) {
-                        if (aiFormType == 25 && aiFlag == 32) {
-                            if (abShortName) {
-                                return "Teaches Skill";
-                            }
-                            else {
-                                return "CHANGE_BOOK_TEACHES_SKILL";
-                            }
-                        }
-                        return "Bad Flag Name";
-                    }
-                    if (aiFlag != CHANGE_TALKING_ACTIVATOR_SPEAKER) {
-                        return "Bad Flag Name";
-                    }
-                    if (abShortName) {
-                        return "Speaker";
-                    }
-                    else {
-                        return "CHANGE_TALKING_ACTIVATOR_SPEAKER";
-                    }
-                }
+
+                return "CHANGE_BASE_OBJECT_FULLNAME";
             }
+
+            if (aiFormType != 22) {
+                if (aiFormType == 25 && aiFlag == 32) {
+                    if (abShortName) {
+                        return "Teaches Skill";
+                    }
+
+                    return "CHANGE_BOOK_TEACHES_SKILL";
+                }
+                return "Bad Flag Name";
+            }
+            if (aiFlag != CHANGE_TALKING_ACTIVATOR_SPEAKER) {
+                return "Bad Flag Name";
+            }
+            if (abShortName) {
+                return "Speaker";
+            }
+
+            return "CHANGE_TALKING_ACTIVATOR_SPEAKER";
         }
     }
 }

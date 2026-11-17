@@ -11,10 +11,10 @@ template <class TKEY, class TVAL>
 class BSScrapMap : public BSMapBase<TKEY, TVAL> {
 public:
     BSScrapMap(uint32_t uiHashSize, bool abClearOnDestruct);
-    virtual ~BSScrapMap();
+    ~BSScrapMap() override;
 
-    virtual BSMapItem<TKEY, TVAL>* NewItem();
-    virtual void DeleteItem(BSMapItem<TKEY, TVAL>* pkItem);
+    BSMapItem<TKEY, TVAL>* NewItem() override;
+    void DeleteItem(BSMapItem<TKEY, TVAL>* pkItem) override;
 
     // Clears every item's value in every bucket (the map's ClearValue) and zeroes the count; the destructor calls it
     // when bClearOnDestruct is set.

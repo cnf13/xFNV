@@ -199,11 +199,10 @@ NiGPUProgram* NiD3DGPUProgramCache::GenerateProgram(
         NiGPUProgram* pkOldProgram = pkDesc->m_spProgram;
         NiGPUProgram* pkNewProgram = spProgram;
         if (pkOldProgram != pkNewProgram) {
-            if (pkOldProgram) {
-                if (!InterlockedDecrementUInt32(&pkOldProgram->m_uiRefCount)) {
-                    pkOldProgram->DeleteThis();
-                }
+            if ((pkOldProgram) && (!InterlockedDecrementUInt32(&pkOldProgram->m_uiRefCount))) {
+                pkOldProgram->DeleteThis();
             }
+
             pkDesc->m_spProgram.m_pObject = pkNewProgram;
             if (pkNewProgram) {
                 InterlockedIncrementUInt32(&pkNewProgram->m_uiRefCount);

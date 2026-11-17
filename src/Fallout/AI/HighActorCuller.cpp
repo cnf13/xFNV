@@ -32,35 +32,32 @@ void HighActorCuller::Operate(MobileObject* apMob) {
         NiCullingProcess* pCuller = &Culler;
         pCuller->Process(pobj);
         BSFadeNode* pn = pobj->IsFadeNode();
-        if (pn) {
-            if (!static_cast<uint8_t>(pn->GetNotVisible())) {
-                NiBound kbound = pn->GetWorldBound();
-                BSMultiBoundSphere* pSphere = spMBSphere.m_pObject;
-                pSphere->SetCenter(kbound.m_kCenter);
-                float fBoundRadius = kbound.m_fRadius;
-                spMBSphere.m_pObject->SetRadius(fBoundRadius);
-                BSPortalGraph* pgraph = nullptr;
-                if (TES::pInstance->pInteriorCell) {
-                    pgraph = TES::pInstance->pInteriorCell->GetPortalGraph();
+        if ((pn) && (!static_cast<uint8_t>(pn->GetNotVisible()))) {
+            NiBound kbound = pn->GetWorldBound();
+            BSMultiBoundSphere* pSphere = spMBSphere.m_pObject;
+            pSphere->SetCenter(kbound.m_kCenter);
+            float fBoundRadius = kbound.m_fRadius;
+            spMBSphere.m_pObject->SetRadius(fBoundRadius);
+            BSPortalGraph* pgraph = nullptr;
+            if (TES::pInstance->pInteriorCell) {
+                pgraph = TES::pInstance->pInteriorCell->GetPortalGraph();
+            }
+            else {
+                if (TES::pInstance->pWorldSpace) {
+                    pgraph = TES::pInstance->pWorldSpace->QPortalGraph();
                 }
-                else {
-                    if (TES::pInstance->pWorldSpace) {
-                        pgraph = TES::pInstance->pWorldSpace->QPortalGraph();
-                    }
-                }
-                if (pgraph) {
-                    const NiTPointerList<BSOcclusionPlane*>* poccluders = &pgraph->lOccluderList;
-                    NiTListItem<BSOcclusionPlane*>* kiter = poccluders->m_pkHead;
-                    while (kiter) {
-                        BSOcclusionPlane* poccluder = poccluders->GetNext(kiter);
-                        if (poccluder) {
-                            if (poccluder->kCullResult == BSMultiBoundShape::BS_CULL_VISIBLE &&
-                                !spMBNode.m_pObject->VisibleAgainstActiveOccluders(
-                                    Culler.m_pkCamera->GetWorldTranslate(), Culler, poccluder
-                                )) {
-                                pn->SetNotVisible(true);
-                            }
-                        }
+            }
+            if (pgraph) {
+                const NiTPointerList<BSOcclusionPlane*>* poccluders = &pgraph->lOccluderList;
+                NiTListItem<BSOcclusionPlane*>* kiter = poccluders->m_pkHead;
+                while (kiter) {
+                    BSOcclusionPlane* poccluder = poccluders->GetNext(kiter);
+                    if ((poccluder) &&
+                        (poccluder->kCullResult == BSMultiBoundShape::BS_CULL_VISIBLE &&
+                         !spMBNode.m_pObject->VisibleAgainstActiveOccluders(
+                             Culler.m_pkCamera->GetWorldTranslate(), Culler, poccluder
+                         ))) {
+                        pn->SetNotVisible(true);
                     }
                 }
             }

@@ -758,10 +758,9 @@ NiObject* NiScreenSpaceCamera::CreateClone(NiCloningProcess& kCloning) {
         CopyMembers(pkObject, kCloning);
         return pkObject;
     }
-    else {
-        CopyMembers(nullptr, kCloning);
-        return nullptr;
-    }
+
+    CopyMembers(nullptr, kCloning);
+    return nullptr;
 }
 
 void NiScreenSpaceCamera::LoadBinary(NiStream& kStream) {
@@ -869,7 +868,6 @@ NiObject* NiScreenSpaceCamera::CreateObject() {
     if (v0) {
         return ::new (v0) NiScreenSpaceCamera;
     }
-    else {
-        return nullptr;
-    }
+
+    return nullptr;
 }

@@ -65,13 +65,12 @@ void bhkCharacterListenerArrow::processConstraintsCallback(
 
 void bhkCharacterListenerArrow::contactPointAddedCallback(const hkpRootCdPoint& point) {
     TESForm* pprojectile = pProj;
-    if (pprojectile) {
-        if (!static_cast<TESObjectCONT*>(pprojectile)->TESObjectCONT::GetOpenSound() && !pprojectile->GetDelete()) {
-            bhkCharacterListenerArrow::ProcessCollision(
-                static_cast<ArrowProjectile*>(pprojectile), point.m_rootCollidableB, (&point.m_contact)->m_position,
-                point.m_contact.getNormal()
-            );
-        }
+    if ((pprojectile) &&
+        (!static_cast<TESObjectCONT*>(pprojectile)->TESObjectCONT::GetOpenSound() && !pprojectile->GetDelete())) {
+        bhkCharacterListenerArrow::ProcessCollision(
+            static_cast<ArrowProjectile*>(pprojectile), point.m_rootCollidableB, (&point.m_contact)->m_position,
+            point.m_contact.getNormal()
+        );
     }
 }
 

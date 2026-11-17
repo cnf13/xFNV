@@ -49,21 +49,19 @@ NiObject* bhkForceController::CreateClone(NiCloningProcess& kCloning) {
 void bhkForceController::Update(NiUpdateData& UpdateData) {
     char m_usFlags = this->m_usFlags;
     fDeltaTime = 0.016f;
-    if ((m_usFlags & 8) != 0) {
-        if (m_pkTarget) {
-            double m_fLastTime = this->m_fLastTime;
-            if (m_fLastTime != -3.4028234663852886e+38) {
-                float arUpdateDataa = UpdateData.fTime - this->m_fLastTime;
-                fDeltaTime = arUpdateDataa;
-                if (arUpdateDataa < 0.0) {
-                    fDeltaTime = 0.016f;
-                }
+    if (((m_usFlags & 8) != 0) && (m_pkTarget)) {
+        double m_fLastTime = this->m_fLastTime;
+        if (m_fLastTime != -3.4028234663852886e+38) {
+            float arUpdateDataa = UpdateData.fTime - this->m_fLastTime;
+            fDeltaTime = arUpdateDataa;
+            if (arUpdateDataa < 0.0) {
+                fDeltaTime = 0.016f;
             }
-            float fScaledTime = ComputeScaledTime(UpdateData.fTime);
-            ApplyForce();
-            if (m_fHiKeyTime == fScaledTime) {
-                this->m_usFlags &= ~8u;
-            }
+        }
+        float fScaledTime = ComputeScaledTime(UpdateData.fTime);
+        ApplyForce();
+        if (m_fHiKeyTime == fScaledTime) {
+            this->m_usFlags &= ~8u;
         }
     }
 }

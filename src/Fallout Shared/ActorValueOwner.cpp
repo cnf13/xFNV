@@ -34,9 +34,8 @@ float ActorValueOwner::CalculateFlySpeed(ActorValueOwner* apOwner, float afFlyIn
     if (!(fMoveMinFlySpeed < 0.0)) {
         return fMoveMinFlySpeed;
     }
-    else {
-        return 0.0;
-    }
+
+    return 0.0;
 }
 
 char ActorValueOwner::ShouldDamageKnockdownTarget(ActorValueOwner* a1, int32_t a2) {

@@ -91,10 +91,8 @@ void bhkSerializable::SethkObject(hkReferencedObject* aphkObject) {
     if (static_cast<const void*>(aphkObject) != static_cast<const void*>(phkObject)) {
         if (phkObject) {
             v4 = static_cast<ahkpWorld*>(const_cast<hkpWorld*>(GethkWorld()));
-            if (v4) {
-                if (v4->m_userData) {
-                    Remove();
-                }
+            if ((v4) && (v4->m_userData)) {
+                Remove();
             }
         }
         bhkRefObject::SethkObject(aphkObject);

@@ -263,12 +263,10 @@ double hkMath::asin(float r) {
     if (!(a1a >= 1.0f)) {
         return static_cast<float>(std::asin(v1));
     }
-    else {
-        if (!(v1 > 0.0)) {
-            return -1.5707964f;
-        }
-        else {
-            return 1.5707964f;
-        }
+
+    if (!(v1 > 0.0)) {
+        return -1.5707964f;
     }
+
+    return 1.5707964f;
 }

@@ -357,21 +357,16 @@ bool TESObjectCONT::Activate(
         }
         return false;
     }
-    if (pActionActor != pPlayer) {
-        if (GetOpenSound()) {
-            if (apItemActivated) {
-                if (apItemActivated->Get3D()) {
-                    TESSound* OpenSound = GetOpenSound();
-                    uint32_t time = OpenSound->iFormID;
-                    BSAudio* v10 = &BSAudio::QInstance();
-                    v10->GetSoundHandleByNumericID(&soundHand, time, 258u);
-                    NiPoint3 v17 = apItemActivated->GetLocationOnReference();
-                    soundHand.SetPosition(v17.x, v17.y, v17.z);
-                    soundHand.Play(false);
-                }
-            }
-        }
+    if ((pActionActor != pPlayer) && (GetOpenSound()) && (apItemActivated) && (apItemActivated->Get3D())) {
+        TESSound* OpenSound = GetOpenSound();
+        uint32_t time = OpenSound->iFormID;
+        BSAudio* v10 = &BSAudio::QInstance();
+        v10->GetSoundHandleByNumericID(&soundHand, time, 258u);
+        NiPoint3 v17 = apItemActivated->GetLocationOnReference();
+        soundHand.SetPosition(v17.x, v17.y, v17.z);
+        soundHand.Play(false);
     }
+
     if (pActionActor == pPlayer) {
         if (BGSOpenCloseForm::GetOpenState(apItemActivated) == BGSOpenCloseForm::OBJECT_OPEN) {
             HandleOpenFinish(apItemActivated, pActionActor);
@@ -381,19 +376,17 @@ bool TESObjectCONT::Activate(
         }
         return true;
     }
-    else {
-        if (apObjecttoGet) {
-            apItemActivated->RemoveItem(
-                apObjecttoGet, nullptr, aicount, false, false, pActionActor, nullptr, nullptr, true, false
-            );
-        }
-        if (pActionActor->IsNpc() && !apItemActivated->IsAnOwner(pActionActor, true)) {
-            if (apItemActivated->GetOwner()) {
-                pActionActor->StealAlarm(apItemActivated, apObjecttoGet, aicount, 1, pownership);
-            }
-        }
-        return true;
+
+    if (apObjecttoGet) {
+        apItemActivated->RemoveItem(
+            apObjecttoGet, nullptr, aicount, false, false, pActionActor, nullptr, nullptr, true, false
+        );
     }
+    if ((pActionActor->IsNpc() && !apItemActivated->IsAnOwner(pActionActor, true)) && (apItemActivated->GetOwner())) {
+        pActionActor->StealAlarm(apItemActivated, apObjecttoGet, aicount, 1, pownership);
+    }
+
+    return true;
 }
 
 // Once the player's open animation finishes, opens the container menu and runs the activation.

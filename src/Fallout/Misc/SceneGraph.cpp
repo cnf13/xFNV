@@ -52,19 +52,18 @@ float SceneGraph::GetFarDistance() {
             float* v7 = &BSSceneGraph::fNoLODFarDistanceMin.Float();
             return FLerp(*v7, fClipDistance, 0.0, 1.0, fNoLODFarDistancePct);
         }
-        else {
-            Sky* v3;
-            if (TES::pInstance &&
-                (TES::pInstance->GetInterior() && (v3 = TES::pInstance->GetSky(), v3->GetMode() == Sky::SM_INTERIOR))) {
-                TESObjectCELL* v4 = TES::pInstance->GetInterior();
-                DataClipDist = v4->GetDataClipDist();
-                if (DataClipDist <= 0.0 || DataClipDist > 353840.0f) {
-                    return 353840.0f;
-                }
-            }
-            else {
+
+        Sky* v3;
+        if (TES::pInstance &&
+            (TES::pInstance->GetInterior() && (v3 = TES::pInstance->GetSky(), v3->GetMode() == Sky::SM_INTERIOR))) {
+            TESObjectCELL* v4 = TES::pInstance->GetInterior();
+            DataClipDist = v4->GetDataClipDist();
+            if (DataClipDist <= 0.0 || DataClipDist > 353840.0f) {
                 return 353840.0f;
             }
+        }
+        else {
+            return 353840.0f;
         }
     }
     return DataClipDist;

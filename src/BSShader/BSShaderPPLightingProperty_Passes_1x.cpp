@@ -227,14 +227,15 @@ ExplicitPasses:
 			AddSpecularPass_1x(apGeom, psunlight, asCount, abUpdateList, bfirst, bskinned, false, false, bbasespecular,
 				false, btreebranch);
 			bfirst = false;
-		} else if (plight) {
-			if (plight->spLight.m_pObject->m_kDiff != NiColor_BLACK) {
-				AddSpecularPass_1x(apGeom, plight, asCount, abUpdateList, bfirst, bskinned, true, false, bbasespecular,
-					false, btreebranch);
-				plight = GetNextActiveNonShadowLight(pLightIter);
-			}
 		}
-		// A first light whose colour is black is tested again here, as the game does.
+        else if ((plight) && (plight->spLight.m_pObject->m_kDiff != NiColor_BLACK)) {
+            AddSpecularPass_1x(
+                apGeom, plight, asCount, abUpdateList, bfirst, bskinned, true, false, bbasespecular, false, btreebranch
+            );
+            plight = GetNextActiveNonShadowLight(pLightIter);
+        }
+
+        // A first light whose colour is black is tested again here, as the game does.
 		for (; plight; plight = GetNextActiveNonShadowLight(pLightIter)) {
 			if (plight->spLight.m_pObject->m_kDiff != NiColor_BLACK) {
 				AddSpecularPass_1x(apGeom, plight, asCount, abUpdateList, bfirst, bskinned, true, false, bbasespecular,

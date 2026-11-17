@@ -203,70 +203,66 @@ float SunDamageEffect::GetDamageAmount() {
 void SunDamageEffect::UpdateHitEffect(bool abDamaging) {
     EffectSetting* EffectSetting_ = GetEffectSetting();
     TESEffectShader* pEffectData = EffectSetting_->data.pEffectShader;
-    if (pEffectData) {
-        if (pTarget) {
-            if (eSpellType == MagicSystem::ABILITY) {
-                if (abDamaging) {
-                    if (!this->pHitEffects || this->pHitEffects->IsEmpty()) {
-                        MagicShaderHitEffect* peffect;
-                        if (this->pHitEffects) {
-                            this->pHitEffects->RemoveAll();
-                            BSSimpleList<MagicHitEffect*>* pHitEffects = this->pHitEffects;
-                            if (pHitEffects) {
-                                delete pHitEffects;
-                            }
-                            this->pHitEffects = nullptr;
-                        }
-                        void* apMemory = NiMemObject::operator new(sizeof(MagicShaderHitEffect));
-                        if (apMemory) {
-                            MagicTarget* Target = pTarget;
-                            TESObjectREFR* v3 = Target->GetTargetStatsObject();
-                            peffect = ::new (apMemory) MagicShaderHitEffect(v3, pEffectData, -1.0f);
-                        }
-                        else {
-                            peffect = nullptr;
-                        }
-                        MagicShaderHitEffect* peffect_2 = peffect;
-                        if (peffect->Init()) {
-                            BSSimpleList<MagicHitEffect*>* v7;
-                            ReferenceProcessLists.AddTempEffect(peffect_2);
-                            void* v12 = ourMalloc(sizeof(BSSimpleList<MagicHitEffect*>));
-                            if (v12) {
-                                MagicHitEffect* item = peffect_2;
-                                v7 = ::new (v12) BSSimpleList<MagicHitEffect*>(item);
-                            }
-                            else {
-                                v7 = nullptr;
-                            }
-                            this->pHitEffects = v7;
-                            peffect_2->pEffect = this;
-                        }
-                        else {
-                            if (peffect_2) {
-                                delete peffect_2;
-                            }
-                            peffect_2 = nullptr;
-                        }
+    if ((pEffectData) && (pTarget) && (eSpellType == MagicSystem::ABILITY)) {
+        if (abDamaging) {
+            if (!this->pHitEffects || this->pHitEffects->IsEmpty()) {
+                MagicShaderHitEffect* peffect;
+                if (this->pHitEffects) {
+                    this->pHitEffects->RemoveAll();
+                    BSSimpleList<MagicHitEffect*>* pHitEffects = this->pHitEffects;
+                    if (pHitEffects) {
+                        delete pHitEffects;
                     }
+                    this->pHitEffects = nullptr;
+                }
+                void* apMemory = NiMemObject::operator new(sizeof(MagicShaderHitEffect));
+                if (apMemory) {
+                    MagicTarget* Target = pTarget;
+                    TESObjectREFR* v3 = Target->GetTargetStatsObject();
+                    peffect = ::new (apMemory) MagicShaderHitEffect(v3, pEffectData, -1.0f);
                 }
                 else {
-                    if (this->pHitEffects) {
-                        for (BSSimpleList<MagicHitEffect*>* plist = this->pHitEffects; plist && !plist->IsEmpty();
-                             plist = plist->m_pkNext) {
-                            MagicHitEffect* peffect_3 = plist->m_item;
-                            peffect_3->bFinished = true;
-                            peffect_3->pEffect = nullptr;
-                        }
-                        this->pHitEffects->RemoveAll();
-                        if (this->pHitEffects) {
-                            delete this->pHitEffects;
-                        }
-                        this->pHitEffects = nullptr;
-                        MagicTarget* v6 = pTarget;
-                        TESObjectREFR* v5 = v6->GetTargetStatsObject();
-                        ReferenceProcessLists.FinishMagicShaderHitEffect(v5, pEffectData);
-                    }
+                    peffect = nullptr;
                 }
+                MagicShaderHitEffect* peffect_2 = peffect;
+                if (peffect->Init()) {
+                    BSSimpleList<MagicHitEffect*>* v7;
+                    ReferenceProcessLists.AddTempEffect(peffect_2);
+                    void* v12 = ourMalloc(sizeof(BSSimpleList<MagicHitEffect*>));
+                    if (v12) {
+                        MagicHitEffect* item = peffect_2;
+                        v7 = ::new (v12) BSSimpleList<MagicHitEffect*>(item);
+                    }
+                    else {
+                        v7 = nullptr;
+                    }
+                    this->pHitEffects = v7;
+                    peffect_2->pEffect = this;
+                }
+                else {
+                    if (peffect_2) {
+                        delete peffect_2;
+                    }
+                    peffect_2 = nullptr;
+                }
+            }
+        }
+        else {
+            if (this->pHitEffects) {
+                for (BSSimpleList<MagicHitEffect*>* plist = this->pHitEffects; plist && !plist->IsEmpty();
+                     plist = plist->m_pkNext) {
+                    MagicHitEffect* peffect_3 = plist->m_item;
+                    peffect_3->bFinished = true;
+                    peffect_3->pEffect = nullptr;
+                }
+                this->pHitEffects->RemoveAll();
+                if (this->pHitEffects) {
+                    delete this->pHitEffects;
+                }
+                this->pHitEffects = nullptr;
+                MagicTarget* v6 = pTarget;
+                TESObjectREFR* v5 = v6->GetTargetStatsObject();
+                ReferenceProcessLists.FinishMagicShaderHitEffect(v5, pEffectData);
             }
         }
     }
@@ -277,7 +273,6 @@ ActiveEffect* SunDamageEffect::Create(MagicCaster* a1, MagicItem* a2, EffectItem
     if (v5) {
         return ::new (v5) SunDamageEffect(a1, a2, a3);
     }
-    else {
-        return nullptr;
-    }
+
+    return nullptr;
 }

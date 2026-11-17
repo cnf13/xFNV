@@ -161,11 +161,9 @@ void hkpGskBaseAgent::linearCast(
     kPoint.m_cdBodyA = &bodyA;
     kPoint.m_cdBodyB = &bodyB;
     double fDist = kPoint.m_contact.m_separatingNormal.m_quad[3];
-    if (input.m_tolerance > fDist) {
-        if (startCollector) {
-            startCollector->addCdPoint(kPoint);
-            fDist = kPoint.m_contact.m_separatingNormal.m_quad[3];
-        }
+    if ((input.m_tolerance > fDist) && (startCollector)) {
+        startCollector->addCdPoint(kPoint);
+        fDist = kPoint.m_contact.m_separatingNormal.m_quad[3];
     }
 
     const hkQuadReal& rPath = input.m_path.m_quad;

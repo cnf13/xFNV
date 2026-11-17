@@ -137,10 +137,9 @@ hkBool* invert2x2(hkBool* apResult, const float* apMatrix, float* apInverse, flo
         apResult->m_bool = 1;
         return apResult;
     }
-    else {
-        apResult->m_bool = 0;
-        return apResult;
-    }
+
+    apResult->m_bool = 0;
+    return apResult;
 }
 
 void hkVehicleFrictionSolverCalcRelativeForces(

@@ -29,13 +29,12 @@ uint32_t BSDLCSystemUtility::MountDLC(uint32_t anPlayerIndex, BSDLCSystemUtility
         cb(-1, -1, false, nullptr);
         return 0;
     }
-    else {
-        uint32_t count = 0;
-        for (BSContentPackage*& rpItem : m_validDLC) {
-            if (rpItem) {
-                ++count;
-            }
+
+    uint32_t count = 0;
+    for (BSContentPackage*& rpItem : m_validDLC) {
+        if (rpItem) {
+            ++count;
         }
-        return count;
     }
+    return count;
 }

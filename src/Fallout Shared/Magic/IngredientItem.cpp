@@ -65,9 +65,8 @@ float IngredientItem::GetCost(Actor* apActor) {
     if (IsFlagSet(IngredientItem::COST_OVERRIDE)) {
         return static_cast<float>(data.iCostOverride);
     }
-    else {
-        return static_cast<EffectItemList*>(this)->EffectItemList::GetCost(nullptr);
-    }
+
+    return static_cast<EffectItemList*>(this)->EffectItemList::GetCost(nullptr);
 }
 
 int32_t IngredientItem::GetMaxEffectCount() {

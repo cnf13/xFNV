@@ -454,11 +454,9 @@ void NiDX9FragmentShader::PrepareTextureStage(
                 for (NiDynamicEffectState::ListItem* pkItem = pkEffects->m_pProjShadowList; pkItem;) {
                     NiTextureEffect* pkProjShadow = static_cast<NiTextureEffect*>(pkItem->m_pItem);
                     pkItem = pkItem->m_pNext;
-                    if (pkProjShadow && pkProjShadow->m_bOn == true) {
-                        if (usIndex++ == usObjectIndex) {
-                            pkTextureEffect = pkProjShadow;
-                            break;
-                        }
+                    if ((pkProjShadow && pkProjShadow->m_bOn) && (usIndex++ == usObjectIndex)) {
+                        pkTextureEffect = pkProjShadow;
+                        break;
                     }
                 }
                 break;
@@ -468,11 +466,9 @@ void NiDX9FragmentShader::PrepareTextureStage(
                 for (NiDynamicEffectState::ListItem* pkItem = pkEffects->m_pProjLightList; pkItem;) {
                     NiTextureEffect* pkProjLight = static_cast<NiTextureEffect*>(pkItem->m_pItem);
                     pkItem = pkItem->m_pNext;
-                    if (pkProjLight && pkProjLight->m_bOn == true) {
-                        if (usIndex++ == usObjectIndex) {
-                            pkTextureEffect = pkProjLight;
-                            break;
-                        }
+                    if ((pkProjLight && pkProjLight->m_bOn) && (usIndex++ == usObjectIndex)) {
+                        pkTextureEffect = pkProjLight;
+                        break;
                     }
                 }
                 break;

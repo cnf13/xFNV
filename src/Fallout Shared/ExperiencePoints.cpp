@@ -140,7 +140,6 @@ int32_t ExperiencePoints::GetExperiencePoints(
     if (v7 >= 0) {
         return (uint32_t)v7;
     }
-    else {
-        return v6;
-    }
+
+    return v6;
 }

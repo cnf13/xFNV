@@ -106,18 +106,16 @@ void DemoralizeEffect::Start() {
     else {
         pcasterActor = nullptr;
     }
-    if (ptargetActor) {
-        if (pcasterActor) {
-            if (ptargetActor->GetCombatController()) {
-                ptargetActor->GetCombatController()->ForceFlee(pcasterActor, false);
+    if ((ptargetActor) && (pcasterActor)) {
+        if (ptargetActor->GetCombatController()) {
+            ptargetActor->GetCombatController()->ForceFlee(pcasterActor, false);
+            bTurned = true;
+        }
+        else {
+            if (!ptargetActor->IsFleeing(false)) {
+                ptargetActor->EndInterruptPackage(false);
+                ptargetActor->InitiateFlee(pcasterActor, true, true, true, nullptr, nullptr, -1.0f, -1.0f);
                 bTurned = true;
-            }
-            else {
-                if (!ptargetActor->IsFleeing(false)) {
-                    ptargetActor->EndInterruptPackage(false);
-                    ptargetActor->InitiateFlee(pcasterActor, true, true, true, nullptr, nullptr, -1.0f, -1.0f);
-                    bTurned = true;
-                }
             }
         }
     }
@@ -147,14 +145,12 @@ void DemoralizeEffect::Finish() {
         if (targetAsActor) {
             if (targetAsActor->IsInCombat()) {
                 targetAsActor->StopCombat(casterAsActor);
-                if (casterAsActor) {
-                    if (targetAsActor->MobileObject::GetCurrentAIProcess()) {
-                        currentAIProcess = targetAsActor->MobileObject::GetCurrentAIProcess();
-                        currentAIProcess->EnterCombat(
-                            targetAsActor, casterAsActor, true, false, nullptr, false, false, false, false, false,
-                            false, true, nullptr
-                        );
-                    }
+                if ((casterAsActor) && (targetAsActor->MobileObject::GetCurrentAIProcess())) {
+                    currentAIProcess = targetAsActor->MobileObject::GetCurrentAIProcess();
+                    currentAIProcess->EnterCombat(
+                        targetAsActor, casterAsActor, true, false, nullptr, false, false, false, false, false, false,
+                        true, nullptr
+                    );
                 }
             }
             else {
@@ -171,7 +167,6 @@ ActiveEffect* DemoralizeEffect::Create(MagicCaster* a1, MagicItem* a2, EffectIte
     if (apMemory) {
         return ::new (apMemory) DemoralizeEffect(a1, a2, a3);
     }
-    else {
-        return nullptr;
-    }
+
+    return nullptr;
 }

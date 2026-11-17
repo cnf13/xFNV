@@ -85,10 +85,9 @@ NiObject* NiCollisionData::CreateClone(NiCloningProcess& kCloning) {
         CopyMembers(v4, kCloning);
         return v4;
     }
-    else {
-        CopyMembers(nullptr, kCloning);
-        return nullptr;
-    }
+
+    CopyMembers(nullptr, kCloning);
+    return nullptr;
 }
 
 // KEEP (niread:): the exe reads each mode and the volume flag into a stack slot, then stores or tests it; a short
@@ -282,18 +281,16 @@ void NiCollisionData::CreateWorldVertices() {
     NiAVObject* m_pkSceneObject = this->m_pkSceneObject;
     if (m_pkSceneObject) {
         NiTriBasedGeom* pkGeom = m_pkSceneObject->IsTriBasedGeom();
-        if (pkGeom) {
-            if (!m_pkWorldVertex) {
-                uint16_t m_usVertices = pkGeom->m_spModelData.m_pObject->m_usVertices;
-                if (m_usVertices) {
-                    m_usNumVertices = m_usVertices;
-                    m_pkWorldVertex = static_cast<NiPoint3*>(MemoryManager_Singleton.Allocate(
-                        m_usVertices <= SIZE_MAX / sizeof(NiPoint3) ? sizeof(NiPoint3) * m_usVertices : SIZE_MAX
-                    ));
-                    m_bWorldVerticesNeedUpdate = true;
-                    // The source's pkGeom->GetTriangleCount(): a tri-based geometry's model data is NiTriBasedGeomData.
-                    m_usNumTriangles = static_cast<NiTriBasedGeomData*>(pkGeom->m_spModelData.m_pObject)->m_usTriangles;
-                }
+        if ((pkGeom) && (!m_pkWorldVertex)) {
+            uint16_t m_usVertices = pkGeom->m_spModelData.m_pObject->m_usVertices;
+            if (m_usVertices) {
+                m_usNumVertices = m_usVertices;
+                m_pkWorldVertex = static_cast<NiPoint3*>(MemoryManager_Singleton.Allocate(
+                    m_usVertices <= SIZE_MAX / sizeof(NiPoint3) ? sizeof(NiPoint3) * m_usVertices : SIZE_MAX
+                ));
+                m_bWorldVerticesNeedUpdate = true;
+                // The source's pkGeom->GetTriangleCount(): a tri-based geometry's model data is NiTriBasedGeomData.
+                m_usNumTriangles = static_cast<NiTriBasedGeomData*>(pkGeom->m_spModelData.m_pObject)->m_usTriangles;
             }
         }
     }
@@ -304,18 +301,14 @@ void NiCollisionData::UpdateWorldVertices() {
     NiAVObject* pkSceneObject = m_pkSceneObject;
     if (pkSceneObject) {
         NiGeometry* pkGeom = pkSceneObject->IsGeometry();
-        if (pkGeom) {
-            if (m_pkWorldVertex) {
-                if (m_bWorldVerticesNeedUpdate) {
-                    NiGeometryData* pkData = pkGeom->m_spModelData.m_pObject;
-                    NiPoint3* pkVertex = pkData->m_pkVertex;
-                    uint16_t usVertices = pkData->GetActiveVertexCount();
-                    NiProcessorSpecificCode::ms_pPointsTransform(
-                        usVertices, &pkVertex->x, &m_pkWorldVertex->x, &pkGeom->m_kWorld
-                    );
-                    m_bWorldVerticesNeedUpdate = false;
-                }
-            }
+        if ((pkGeom) && (m_pkWorldVertex) && (m_bWorldVerticesNeedUpdate)) {
+            NiGeometryData* pkData = pkGeom->m_spModelData.m_pObject;
+            NiPoint3* pkVertex = pkData->m_pkVertex;
+            uint16_t usVertices = pkData->GetActiveVertexCount();
+            NiProcessorSpecificCode::ms_pPointsTransform(
+                usVertices, &pkVertex->x, &m_pkWorldVertex->x, &pkGeom->m_kWorld
+            );
+            m_bWorldVerticesNeedUpdate = false;
         }
     }
 }
@@ -453,7 +446,6 @@ NiObject* NiCollisionData::CreateObject() {
     if (v0) {
         return ::new (v0) NiCollisionData;
     }
-    else {
-        return nullptr;
-    }
+
+    return nullptr;
 }

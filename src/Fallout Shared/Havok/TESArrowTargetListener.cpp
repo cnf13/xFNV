@@ -28,34 +28,32 @@ TESArrowTargetListener::~TESArrowTargetListener() {}
 void TESArrowTargetListener::entityRemovedCallback(hkpEntity* apEntity) {
     bhkEntity* pe = bhkEntity::Getbhk(apEntity);
     bhkRigidBody* pb = static_cast<bhkRigidBody*>(NiObject::DynamicCastStatic(&bhkRigidBody::ms_RTTI, pe));
-    if (pb) {
-        if (pb->GetFlag(bhkWorldObject::STICKING_TARGET)) {
-            NiAVObject* pav;
-            bhkCollisionObject* pcol = bhkCollisionObject::Getbhk(pb->operator*());
-            if (pcol) {
-                pav = pcol->m_pkSceneObject;
+    if ((pb) && (pb->GetFlag(bhkWorldObject::STICKING_TARGET))) {
+        NiAVObject* pav;
+        bhkCollisionObject* pcol = bhkCollisionObject::Getbhk(pb->operator*());
+        if (pcol) {
+            pav = pcol->m_pkSceneObject;
+        }
+        else {
+            pav = nullptr;
+        }
+        TESObjectREFR::FindReferenceFor3D(pav);
+        ProcessArray* pMobArray = &ReferenceProcessLists.MobProcessArray;
+        uint32_t i_2 = 0;
+        for (uint32_t i = pMobArray->GetProcessLevelTail(PROCESS_TYPE_HIGH); i_2 < i;
+             i = pMobArray->GetProcessLevelTail(PROCESS_TYPE_HIGH)) {
+            Projectile* pprojectile = static_cast<Projectile*>(pMobArray->GetItem(i_2));
+            if ((pprojectile) &&
+                (pprojectile->IsProjectile() && pprojectile->IsFlagSet(Projectile::POST_PROCESS) &&
+                 pprojectile->GetFormType() == PMIS_ID && (pprojectile->iFormFlags & 32) == 0 &&
+                 pprojectile->GetImpactData()->pTargetWorldObject == apEntity &&
+                 static_cast<MissileProjectile*>(pprojectile)->GetImpactResult() == MissileProjectile::IR_STICK))
+            // A PMIS_ID projectile is a MissileProjectile.
+            {
+                pprojectile->Kill();
             }
-            else {
-                pav = nullptr;
-            }
-            TESObjectREFR::FindReferenceFor3D(pav);
-            ProcessArray* pMobArray = &ReferenceProcessLists.MobProcessArray;
-            uint32_t i_2 = 0;
-            for (uint32_t i = pMobArray->GetProcessLevelTail(PROCESS_TYPE_HIGH); i_2 < i;
-                 i = pMobArray->GetProcessLevelTail(PROCESS_TYPE_HIGH)) {
-                Projectile* pprojectile = static_cast<Projectile*>(pMobArray->GetItem(i_2));
-                if (pprojectile) {
-                    // A PMIS_ID projectile is a MissileProjectile.
-                    if (pprojectile->IsProjectile() && pprojectile->IsFlagSet(Projectile::POST_PROCESS) &&
-                        pprojectile->GetFormType() == PMIS_ID && (pprojectile->iFormFlags & 32) == 0 &&
-                        pprojectile->GetImpactData()->pTargetWorldObject == apEntity &&
-                        static_cast<MissileProjectile*>(pprojectile)->GetImpactResult() ==
-                            MissileProjectile::IR_STICK) {
-                        pprojectile->Kill();
-                    }
-                }
-                ++i_2;
-            }
+
+            ++i_2;
         }
     }
 }
@@ -64,34 +62,32 @@ void TESArrowTargetListener::entityRemovedCallback(hkpEntity* apEntity) {
 void TESArrowTargetListener::entityDeletedCallback(hkpEntity* apEntity) {
     bhkEntity* pe = bhkEntity::Getbhk(apEntity);
     bhkRigidBody* pb = static_cast<bhkRigidBody*>(NiObject::DynamicCastStatic(&bhkRigidBody::ms_RTTI, pe));
-    if (pb) {
-        if (pb->GetFlag(bhkWorldObject::STICKING_TARGET)) {
-            NiAVObject* pav;
-            bhkCollisionObject* pcol = bhkCollisionObject::Getbhk(pb->operator*());
-            if (pcol) {
-                pav = pcol->m_pkSceneObject;
+    if ((pb) && (pb->GetFlag(bhkWorldObject::STICKING_TARGET))) {
+        NiAVObject* pav;
+        bhkCollisionObject* pcol = bhkCollisionObject::Getbhk(pb->operator*());
+        if (pcol) {
+            pav = pcol->m_pkSceneObject;
+        }
+        else {
+            pav = nullptr;
+        }
+        TESObjectREFR::FindReferenceFor3D(pav);
+        ProcessArray* pMobArray = &ReferenceProcessLists.MobProcessArray;
+        uint32_t i_2 = 0;
+        for (uint32_t i = pMobArray->GetProcessLevelTail(PROCESS_TYPE_HIGH); i_2 < i;
+             i = pMobArray->GetProcessLevelTail(PROCESS_TYPE_HIGH)) {
+            Projectile* pprojectile = static_cast<Projectile*>(pMobArray->GetItem(i_2));
+            if ((pprojectile) &&
+                (pprojectile->IsProjectile() && pprojectile->IsFlagSet(Projectile::POST_PROCESS) &&
+                 pprojectile->GetFormType() == PMIS_ID &&
+                 pprojectile->GetImpactData()->pTargetWorldObject == apEntity &&
+                 static_cast<MissileProjectile*>(pprojectile)->GetImpactResult() == MissileProjectile::IR_STICK))
+            // A PMIS_ID projectile is a MissileProjectile.
+            {
+                pprojectile->Kill();
             }
-            else {
-                pav = nullptr;
-            }
-            TESObjectREFR::FindReferenceFor3D(pav);
-            ProcessArray* pMobArray = &ReferenceProcessLists.MobProcessArray;
-            uint32_t i_2 = 0;
-            for (uint32_t i = pMobArray->GetProcessLevelTail(PROCESS_TYPE_HIGH); i_2 < i;
-                 i = pMobArray->GetProcessLevelTail(PROCESS_TYPE_HIGH)) {
-                Projectile* pprojectile = static_cast<Projectile*>(pMobArray->GetItem(i_2));
-                if (pprojectile) {
-                    // A PMIS_ID projectile is a MissileProjectile.
-                    if (pprojectile->IsProjectile() && pprojectile->IsFlagSet(Projectile::POST_PROCESS) &&
-                        pprojectile->GetFormType() == PMIS_ID &&
-                        pprojectile->GetImpactData()->pTargetWorldObject == apEntity &&
-                        static_cast<MissileProjectile*>(pprojectile)->GetImpactResult() ==
-                            MissileProjectile::IR_STICK) {
-                        pprojectile->Kill();
-                    }
-                }
-                ++i_2;
-            }
+
+            ++i_2;
         }
     }
 }

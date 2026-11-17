@@ -49,10 +49,9 @@ NiObject* BSMultiTargetTreadTransfController::CreateClone(NiCloningProcess& kClo
         CopyMembers(pkObject, kCloning);
         return pkObject;
     }
-    else {
-        CopyMembers(nullptr, kCloning);
-        return nullptr;
-    }
+
+    CopyMembers(nullptr, kCloning);
+    return nullptr;
 }
 
 // Only the base's part is streamed.

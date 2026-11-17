@@ -50,20 +50,17 @@ bool TextEditMenu::DoKey(int32_t aiKey) {
             DoClick(1, pTiles[1]);
             return true;
         }
-        else {
-            return false;
-        }
+
+        return false;
     }
-    else {
-        if (EditField.EditingText()) {
-            EditField.HandleKey(aiKey);
-            UpdateText();
-            return true;
-        }
-        else {
-            return false;
-        }
+
+    if (EditField.EditingText()) {
+        EditField.HandleKey(aiKey);
+        UpdateText();
+        return true;
     }
+
+    return false;
 }
 
 int32_t TextEditMenu::GetClass() {
@@ -136,12 +133,10 @@ char TextEditMenu::Create(const char* apTitle, const char* apDefaultText, bool (
         Menu_->PrepForVisibility(false);
         return 1;
     }
-    else {
-        if (Menu_) {
-            if (Menu_->pMenu) {
-                delete Menu_;
-            }
-        }
-        return 0;
+
+    if ((Menu_) && (Menu_->pMenu)) {
+        delete Menu_;
     }
+
+    return 0;
 }

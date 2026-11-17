@@ -134,9 +134,8 @@ float BGSMusicType::GetAttenuation() {
     if (!(fAttenuation > 0.0)) {
         return fAttenuation;
     }
-    else {
-        return (-fAttenuation);
-    }
+
+    return (-fAttenuation);
 }
 
 void BGSMusicType::BuildFileList() {
@@ -210,9 +209,8 @@ char* BGSMusicType::GetRandomEntry() {
     if (pentry && pentry->m_item) {
         return pentry->m_item;
     }
-    else {
-        return const_cast<char*>(GetSoundFile());
-    }
+
+    return const_cast<char*>(GetSoundFile());
 }
 
 TESSoundFile::TESSoundFile() : BaseFormComponent(), cSoundFile() {}
@@ -259,9 +257,8 @@ const char* TESSoundFile::GetSoundFile() {
     if (cSoundFile.pString) {
         return cSoundFile.pString;
     }
-    else {
-        return "";
-    }
+
+    return "";
 }
 
 uint32_t TESSoundFile::GetSoundFileLength() {

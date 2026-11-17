@@ -243,12 +243,12 @@ hkRefVariant* hkxAttributeGroup::findAttributeVariantByName(hkRefVariant* apResu
         pValue->m_pntr->addReference();
     }
     apResult->m_pntr = pValue->m_pntr;
-    if (bNullValueBuilt) {
-        // EXE-INLINED 0xC6CCA0
-        if (nullValue.m_pntr) {
-            nullValue.m_pntr->removeReference();
-        }
+    if ((bNullValueBuilt) && (nullValue.m_pntr))
+    // EXE-INLINED 0xC6CCA0
+    {
+        nullValue.m_pntr->removeReference();
     }
+
     return apResult;
 }
 

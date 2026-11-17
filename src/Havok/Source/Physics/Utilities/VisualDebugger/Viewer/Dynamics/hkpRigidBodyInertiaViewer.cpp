@@ -336,9 +336,8 @@ hkProcess* hkpRigidBodyInertiaViewer::create(const hkArray<hkProcessContext*, hk
     if (v3) {
         return &static_cast<hkProcess&>(static_cast<hkpWorldViewerBase&>(*v3));
     }
-    else {
-        return nullptr;
-    }
+
+    return nullptr;
 }
 
 void hkpRigidBodyInertiaViewer::registerViewer() {

@@ -164,10 +164,9 @@ hkDataObject* Writer::ListenerCache::getCachedDataObject(hkDataObject* apResult,
         ::new (apResult) hkDataObject(h);
         return apResult;
     }
-    else {
-        ::new (apResult) hkDataObject(m_cachedObjects.m_data[v4]->m_impl);
-        return apResult;
-    }
+
+    ::new (apResult) hkDataObject(m_cachedObjects.m_data[v4]->m_impl);
+    return apResult;
 }
 
 // The listener's answer is built in a plain local and destroyed with hkDataObject's destructor on both paths.

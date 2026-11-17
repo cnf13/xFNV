@@ -286,33 +286,32 @@ void NiGeometry::ApplyTransform(const NiMatrix3& kMat, const NiPoint3& kTrn, boo
         float v46 = v43 * v54;
         float v49 = v58 * v43;
         float v52 = v43 * v62;
-        if (m_pkVertex) {
-            if (v5) {
-                double v11 = kInvMat.m_pEntry[2][2];
-                float* p_z = &m_pkVertex->z;
-                double v13 = kInvMat.m_pEntry[2][1];
-                int32_t v14 = v5;
-                double v15 = kInvMat.m_pEntry[2][0];
-                double v16 = kInvMat.m_pEntry[1][2];
-                double v17 = kInvMat.m_pEntry[1][1];
-                do {
-                    double v18 = *(p_z - 2);
-                    p_z += 3;
-                    --v14;
-                    float v55 = v18 * kInvMat.m_pEntry[0][0] + *(p_z - 4) * kInvMat.m_pEntry[0][1] +
-                        *(p_z - 3) * kInvMat.m_pEntry[0][2];
-                    float v59 = *(p_z - 5) * kInvMat.m_pEntry[1][0] + *(p_z - 4) * v17 + *(p_z - 3) * v16;
-                    float v63 = *(p_z - 5) * v15 + *(p_z - 4) * v13 + *(p_z - 3) * v11;
-                    float v65 = v55 + v46;
-                    *(p_z - 5) = v65;
-                    float v69 = v59 + v49;
-                    *(p_z - 4) = v69;
-                    float a3 = v63 + v52;
-                    *(p_z - 3) = a3;
-                }
-                while (v14);
+        if ((m_pkVertex) && (v5)) {
+            double v11 = kInvMat.m_pEntry[2][2];
+            float* p_z = &m_pkVertex->z;
+            double v13 = kInvMat.m_pEntry[2][1];
+            int32_t v14 = v5;
+            double v15 = kInvMat.m_pEntry[2][0];
+            double v16 = kInvMat.m_pEntry[1][2];
+            double v17 = kInvMat.m_pEntry[1][1];
+            do {
+                double v18 = *(p_z - 2);
+                p_z += 3;
+                --v14;
+                float v55 = v18 * kInvMat.m_pEntry[0][0] + *(p_z - 4) * kInvMat.m_pEntry[0][1] +
+                    *(p_z - 3) * kInvMat.m_pEntry[0][2];
+                float v59 = *(p_z - 5) * kInvMat.m_pEntry[1][0] + *(p_z - 4) * v17 + *(p_z - 3) * v16;
+                float v63 = *(p_z - 5) * v15 + *(p_z - 4) * v13 + *(p_z - 3) * v11;
+                float v65 = v55 + v46;
+                *(p_z - 5) = v65;
+                float v69 = v59 + v49;
+                *(p_z - 4) = v69;
+                float a3 = v63 + v52;
+                *(p_z - 3) = a3;
             }
+            while (v14);
         }
+
         if (m_pkNormal) {
             kInvMat.Inverse(inv);
             if (v5) {
@@ -341,31 +340,30 @@ void NiGeometry::ApplyTransform(const NiMatrix3& kMat, const NiPoint3& kTrn, boo
         }
     }
     else {
-        if (m_pkVertex) {
-            if (v5) {
-                float* v29 = &m_pkVertex->z;
-                int32_t v30 = v5;
-                do {
-                    v29 += 3;
-                    --v30;
-                    float v67 = kMat.m_pEntry[0][1] * *(v29 - 4) + kMat.m_pEntry[0][0] * *(v29 - 5) +
-                        *(v29 - 3) * kMat.m_pEntry[0][2];
-                    float v71 = kMat.m_pEntry[1][1] * *(v29 - 4) + *(v29 - 5) * kMat.m_pEntry[1][0] +
-                        *(v29 - 3) * kMat.m_pEntry[1][2];
-                    float a3b = kMat.m_pEntry[2][0] * *(v29 - 5) + *(v29 - 4) * kMat.m_pEntry[2][1] +
-                        *(v29 - 3) * kMat.m_pEntry[2][2];
-                    float v56 = kTrn.x + v67;
-                    float v60 = v71 + kTrn.y;
-                    double v31 = a3b + kTrn.z;
-                    *(v29 - 5) = v56;
-                    *(v29 - 4) = v60;
-                    float v64 = v31;
-                    *(v29 - 3) = v64;
-                }
-                while (v30);
-                m_pkNormal = pkData;
+        if ((m_pkVertex) && (v5)) {
+            float* v29 = &m_pkVertex->z;
+            int32_t v30 = v5;
+            do {
+                v29 += 3;
+                --v30;
+                float v67 = kMat.m_pEntry[0][1] * *(v29 - 4) + kMat.m_pEntry[0][0] * *(v29 - 5) +
+                    *(v29 - 3) * kMat.m_pEntry[0][2];
+                float v71 = kMat.m_pEntry[1][1] * *(v29 - 4) + *(v29 - 5) * kMat.m_pEntry[1][0] +
+                    *(v29 - 3) * kMat.m_pEntry[1][2];
+                float a3b = kMat.m_pEntry[2][0] * *(v29 - 5) + *(v29 - 4) * kMat.m_pEntry[2][1] +
+                    *(v29 - 3) * kMat.m_pEntry[2][2];
+                float v56 = kTrn.x + v67;
+                float v60 = v71 + kTrn.y;
+                double v31 = a3b + kTrn.z;
+                *(v29 - 5) = v56;
+                *(v29 - 4) = v60;
+                float v64 = v31;
+                *(v29 - 3) = v64;
             }
+            while (v30);
+            m_pkNormal = pkData;
         }
+
         if (m_pkNormal) {
             kMat.Inverse(inv);
             if (v5) {

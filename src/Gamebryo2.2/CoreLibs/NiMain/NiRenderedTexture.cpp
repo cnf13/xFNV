@@ -27,9 +27,8 @@ uint32_t NiRenderedTexture::GetWidth() const {
     if (m_spBuffer) {
         return m_spBuffer->m_uiWidth;
     }
-    else {
-        return (uint32_t)0;
-    }
+
+    return (uint32_t)0;
 }
 
 uint32_t NiRenderedTexture::GetHeight() const {
@@ -38,9 +37,8 @@ uint32_t NiRenderedTexture::GetHeight() const {
     if (m_spBuffer) {
         return m_spBuffer->m_uiHeight;
     }
-    else {
-        return (uint32_t)0;
-    }
+
+    return (uint32_t)0;
 }
 
 // A size that is not a power of two in both dimensions needs a renderer with either non-power-of-two caps flag;
@@ -84,8 +82,7 @@ NiRenderedTexture* NiRenderedTexture::Create(
         pkThis->pAliasTexture = nullptr;
         return pkThis;
     }
-    else {
-        delete pkThis;
-        return nullptr;
-    }
+
+    delete pkThis;
+    return nullptr;
 }

@@ -79,15 +79,14 @@ MagicModelHitEffect::~MagicModelHitEffect() {
             pparent->DetachChild(spObject.m_pObject);
         }
     }
-    if (pFilename) {
-        if (*pFilename) {
-            pModelLoader->ReleaseModel(pFilename, false, 1u);
-            if (bOwnPath) {
-                // An owned path is the block this effect allocated.
-                ourFree(const_cast<char*>(pFilename));
-            }
+    if ((pFilename) && (*pFilename)) {
+        pModelLoader->ReleaseModel(pFilename, false, 1u);
+        if (bOwnPath) {
+            // An owned path is the block this effect allocated.
+            ourFree(const_cast<char*>(pFilename));
         }
     }
+
     pFilename = nullptr;
 }
 
@@ -111,14 +110,11 @@ bool MagicModelHitEffect::Update(float a1) {
             apString.~NiFixedString();
             if (pseq) {
                 double v3 = pseq->m_fLastTime;
-                if (pseq->m_fEndKeyTime < v3) {
-                    if (pseq->GetState()) {
-                        if (pseq->m_eCycleType == NiControllerSequence::CYCLE_CLAMP || bFinished) {
-                            bFinished = true;
-                            pseq->Deactivate(0.0f, false);
-                            fLifetime = this->MagicHitEffect::fAge;
-                        }
-                    }
+                if ((pseq->m_fEndKeyTime < v3) && (pseq->GetState()) &&
+                    (pseq->m_eCycleType == NiControllerSequence::CYCLE_CLAMP || bFinished)) {
+                    bFinished = true;
+                    pseq->Deactivate(0.0f, false);
+                    fLifetime = this->MagicHitEffect::fAge;
                 }
             }
         }
@@ -217,17 +213,14 @@ void MagicModelHitEffect::SaveGame(ActiveEffect* a1, TESObjectREFR* a2) {
         else {
             pactor = nullptr;
         }
-        if (pactor) {
-            if (a1) {
-                MiddleHighProcess* pprocess = dynamic_cast<MiddleHighProcess*>(pactor->pCurrentProcess);
-                if (pprocess) {
-                    if (pprocess->GetAnimation()) {
-                        Animation* v3 = pprocess->GetAnimation();
-                        ftime = v3->GetTime();
-                    }
-                }
+        if ((pactor) && (a1)) {
+            MiddleHighProcess* pprocess = dynamic_cast<MiddleHighProcess*>(pactor->pCurrentProcess);
+            if ((pprocess) && (pprocess->GetAnimation())) {
+                Animation* v3 = pprocess->GetAnimation();
+                ftime = v3->GetTime();
             }
         }
+
         TESObjectREFR::SaveControllerManager(pmanager, ftime);
     }
 }
@@ -262,11 +255,9 @@ void MagicModelHitEffect::LoadGame(BGSLoadGameBuffer* a1) {
     pFilename = a1->LoadString(nullptr);
     bOwnPath = true;
     LoadedDataSubBuffer.LoadGame(a1);
-    if (pEffect) {
-        if (pEffect->pEffect->pEffectSetting->GetModel()) {
-            const char* v2 = pEffect->pEffect->pEffectSetting->GetModel();
-            pModelLoader->QueueModel(v2, IO_TASK_PRIORITY_VERY_LOW, nullptr, LOD_MULT_NONE, true, false, false);
-        }
+    if ((pEffect) && (pEffect->pEffect->pEffectSetting->GetModel())) {
+        const char* v2 = pEffect->pEffect->pEffectSetting->GetModel();
+        pModelLoader->QueueModel(v2, IO_TASK_PRIORITY_VERY_LOW, nullptr, LOD_MULT_NONE, true, false, false);
     }
 }
 
@@ -275,12 +266,11 @@ void MagicModelHitEffect::LoadGame(BGSLoadGameBuffer* a1) {
 void MagicModelHitEffect::LoadGame(ActiveEffect* a1, TESObjectREFR* a2) {
     uint16_t isize;
     MagicHitEffect::LoadGame(a1, a2);
-    if (a1) {
-        if (a1->pEffect->pEffectSetting->GetModel()) {
-            const char* v3 = a1->pEffect->pEffectSetting->GetModel();
-            pModelLoader->QueueModel(v3, IO_TASK_PRIORITY_VERY_LOW, nullptr, LOD_MULT_NONE, true, false, false);
-        }
+    if ((a1) && (a1->pEffect->pEffectSetting->GetModel())) {
+        const char* v3 = a1->pEffect->pEffectSetting->GetModel();
+        pModelLoader->QueueModel(v3, IO_TASK_PRIORITY_VERY_LOW, nullptr, LOD_MULT_NONE, true, false, false);
     }
+
     pSaveLoadGameOLD->LoadGameDataOLD(&isize, sizeof(isize));
     if (isize) {
         char* pdata = static_cast<char*>(ourMalloc(static_cast<uint32_t>(isize + sizeof(isize))));
@@ -332,17 +322,14 @@ void MagicModelHitEffect::FinishInitLoadGame(ActiveEffect* a1, TESObjectREFR* a2
             else {
                 pactor = nullptr;
             }
-            if (pactor) {
-                if (a1) {
-                    MiddleHighProcess* pprocess = dynamic_cast<MiddleHighProcess*>(pactor->pCurrentProcess);
-                    if (pprocess) {
-                        if (pprocess->GetAnimation()) {
-                            Animation* v4 = pprocess->GetAnimation();
-                            ftime = v4->GetTime();
-                        }
-                    }
+            if ((pactor) && (a1)) {
+                MiddleHighProcess* pprocess = dynamic_cast<MiddleHighProcess*>(pactor->pCurrentProcess);
+                if ((pprocess) && (pprocess->GetAnimation())) {
+                    Animation* v4 = pprocess->GetAnimation();
+                    ftime = v4->GetTime();
                 }
             }
+
             TESObjectREFR::LoadControllerManager(pmanager, spObject.m_pObject, ftime);
         }
     }
@@ -474,35 +461,30 @@ void MagicModelHitEffect::UpdatePosition() {
         if ((pTarget->IsActor() && pTarget->IsDead(false)) || pTarget->IsKnockedOut()) {
             bool buseShift = true;
             NiNode* pnode = ptarget->IsNode();
-            if (pnode) {
-                if (pnode->GetArrayCount()) {
-                    NiNode* pbip;
-                    NiAVObject* pchild = pnode->GetAt(0);
-                    if (pchild) {
-                        pbip = pchild->IsNode();
+            if ((pnode) && (pnode->GetArrayCount())) {
+                NiNode* pbip;
+                NiAVObject* pchild = pnode->GetAt(0);
+                if (pchild) {
+                    pbip = pchild->IsNode();
+                }
+                else {
+                    pbip = nullptr;
+                }
+                if ((pbip) && (pbip->GetArrayCount())) {
+                    NiNode* paccum;
+                    NiAVObject* pchild_2 = pbip->GetAt(0);
+                    if (pchild_2) {
+                        paccum = pchild_2->IsNode();
                     }
                     else {
-                        pbip = nullptr;
+                        paccum = nullptr;
                     }
-                    if (pbip) {
-                        if (pbip->GetArrayCount()) {
-                            NiNode* paccum;
-                            NiAVObject* pchild_2 = pbip->GetAt(0);
-                            if (pchild_2) {
-                                paccum = pchild_2->IsNode();
-                            }
-                            else {
-                                paccum = nullptr;
-                            }
-                            if (paccum) {
-                                if ((&paccum->GetTranslate())->operator!=(NiPoint3_ZERO)) {
-                                    buseShift = false;
-                                }
-                            }
-                        }
+                    if ((paccum) && ((&paccum->GetTranslate())->operator!=(NiPoint3_ZERO))) {
+                        buseShift = false;
                     }
                 }
             }
+
             position = ptarget->GetWorldTranslate();
             if (buseShift) {
                 position.z = position.z - 64.0;

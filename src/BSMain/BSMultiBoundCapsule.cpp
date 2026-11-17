@@ -101,7 +101,6 @@ NiObject* BSMultiBoundCapsule::CreateObject() {
     if (v2) {
         return ::new (v2) BSMultiBoundCapsule;
     }
-    else {
-        return nullptr;
-    }
+
+    return nullptr;
 }

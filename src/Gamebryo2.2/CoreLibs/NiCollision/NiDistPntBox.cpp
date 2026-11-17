@@ -1317,18 +1317,17 @@ float NiSqrDistance::Compute(
     if (!(v17 < 0.0)) {
         return 0.0f;
     }
-    else {
-        float v62 = kTri.m_kOrigin.y;
-        kTriSeg.m_kOrigin.x = kTri.m_kOrigin.x;
-        kTriSeg.m_kOrigin.z = kTri.m_kOrigin.z;
-        kTriSeg.m_kDirection.y = p_m_kEdge0->y;
-        kTriSeg.m_kOrigin.y = v62;
-        kTriSeg.m_kDirection.x = p_m_kEdge0->x;
-        kTriSeg.m_kDirection.z = p_m_kEdge0->z;
-        float kTrir = NiSqrDistance::Compute(kSeg, kTriSeg, fSegParm, fTriParm0);
-        fTriParm1 = 0.0f;
-        return kTrir;
-    }
+
+    float v62 = kTri.m_kOrigin.y;
+    kTriSeg.m_kOrigin.x = kTri.m_kOrigin.x;
+    kTriSeg.m_kOrigin.z = kTri.m_kOrigin.z;
+    kTriSeg.m_kDirection.y = p_m_kEdge0->y;
+    kTriSeg.m_kOrigin.y = v62;
+    kTriSeg.m_kDirection.x = p_m_kEdge0->x;
+    kTriSeg.m_kDirection.z = p_m_kEdge0->z;
+    float kTrir = NiSqrDistance::Compute(kSeg, kTriSeg, fSegParm, fTriParm0);
+    fTriParm1 = 0.0f;
+    return kTrir;
 }
 
 float NiSqrDistance::Compute(
@@ -1574,161 +1573,156 @@ float NiSqrDistance::Compute(const NiPoint3& kPnt, const NiTrigon& kTri, float& 
                 float kTrij = v5 + (v8 + v8) + kTria;
                 return std::fabs((double)kTrij);
             }
-            else {
-                float kPnth = v8 + v4;
-                float fTriParam0f = v9 + v7;
-                double v21 = fTriParam0f;
-                if (kPnth < static_cast<double>(fTriParam0f)) {
-                    float fTriParam0b = v21 - kPnth;
-                    float kPnti = v7 - v4 * 2.0 + v5;
-                    if (!(kPnti <= static_cast<double>(fTriParam0b))) {
-                        float kPntt = fTriParam0b / kPnti;
-                        fTriParam1 = kPntt;
-                        fTriParam0 = 1.0 - kPntt;
-                        kTria = v7 + 2.0 * v9 + kTria - fTriParam0b * fTriParam1;
-                    }
-                    else {
-                        fTriParam1 = 1.0f;
-                        fTriParam0 = 0.0f;
-                        kTria = 2.0 * v8 + v5 + kTria;
-                    }
-                    return std::fabs((double)kTria);
-                }
-                fTriParam1 = 0.0f;
-                if (!(v21 <= 0.0)) {
-                    if (!(v9 >= 0.0)) {
-                        float kPntu = -v9 / v7;
-                        fTriParam0 = kPntu;
-                        kTria = v9 * kPntu + kTria;
-                    }
-                    else {
-                        fTriParam0 = 0.0f;
-                    }
-                    return std::fabs((double)kTria);
-                }
-                fTriParam0 = 1.0f;
-                float kTrih = v7 + (v9 + v9) + kTria;
-                return std::fabs((double)kTrih);
-            }
-        }
-        else {
-            float kPntf = v9 + v4;
-            float fTriParam0e = v8 + v5;
-            double v20 = fTriParam0e;
-            if (kPntf < static_cast<double>(fTriParam0e)) {
-                float fTriParam0a = v20 - kPntf;
-                float kPntg = v7 - v4 * 2.0 + v5;
-                if (!(kPntg <= static_cast<double>(fTriParam0a))) {
-                    float kPntr = fTriParam0a / kPntg;
-                    fTriParam0 = kPntr;
-                    fTriParam1 = 1.0 - kPntr;
-                    kTria = 2.0 * v8 + v5 + kTria - fTriParam0a * fTriParam0;
+
+            float kPnth = v8 + v4;
+            float fTriParam0f = v9 + v7;
+            double v21 = fTriParam0f;
+            if (kPnth < static_cast<double>(fTriParam0f)) {
+                float fTriParam0b = v21 - kPnth;
+                float kPnti = v7 - v4 * 2.0 + v5;
+                if (!(kPnti <= static_cast<double>(fTriParam0b))) {
+                    float kPntt = fTriParam0b / kPnti;
+                    fTriParam1 = kPntt;
+                    fTriParam0 = 1.0 - kPntt;
+                    kTria = v7 + 2.0 * v9 + kTria - fTriParam0b * fTriParam1;
                 }
                 else {
-                    fTriParam0 = 1.0f;
-                    fTriParam1 = 0.0f;
-                    kTria = 2.0 * v9 + v7 + kTria;
+                    fTriParam1 = 1.0f;
+                    fTriParam0 = 0.0f;
+                    kTria = 2.0 * v8 + v5 + kTria;
                 }
                 return std::fabs((double)kTria);
-            }
-            fTriParam0 = 0.0f;
-            if (!(v20 <= 0.0)) {
-                if (!(v8 >= 0.0)) {
-                    float kPnts = -v8 / v23;
-                    fTriParam1 = kPnts;
-                    kTria = v8 * kPnts + kTria;
-                }
-                else {
-                    fTriParam1 = 0.0f;
-                }
-                return std::fabs((double)kTria);
-            }
-            fTriParam1 = 1.0f;
-            float kTrif = v5 + (v8 + v8) + kTria;
-            return std::fabs((double)kTrif);
-        }
-    }
-    else {
-        if (v17 || v18) {
-            if (!(v10 < 0.0)) {
-                float fInvDet = 1.0 / kPnta;
-                fTriParam0 = fTriParam0 * fInvDet;
-                float kPntq = fInvDet * fTriParam1;
-                fTriParam1 = kPntq;
-                float kTrid = (v4 * fTriParam1 + v7 * fTriParam0 + 2.0 * v9) * fTriParam0 +
-                    (v8 * 2.0 + (v5 * kPntq + fTriParam0 * v4)) * kPntq + kTria;
-                return std::fabs((double)kTrid);
-            }
-            else {
-                fTriParam1 = 0.0f;
-                if (!(v9 >= 0.0)) {
-                    float kPnte = -v9;
-                    if (!(kPnte >= v7)) {
-                        float kPntp = kPnte / v7;
-                        fTriParam0 = kPntp;
-                        kTria = v9 * kPntp + kTria;
-                    }
-                    else {
-                        fTriParam0 = 1.0f;
-                        kTria = v7 + (v9 + v9) + kTria;
-                    }
-                    return std::fabs((double)kTria);
-                }
-                fTriParam0 = 0.0f;
-                return std::fabs((double)kTria);
-            }
-        }
-        else {
-            if (!(v10 < 0.0)) {
-                fTriParam0 = 0.0f;
-                if (!(v8 >= 0.0)) {
-                    float kPntd = -v8;
-                    if (!(kPntd >= v5)) {
-                        float kPnto = kPntd / v5;
-                        fTriParam1 = kPnto;
-                        kTria = v8 * kPnto + kTria;
-                    }
-                    else {
-                        fTriParam1 = 1.0f;
-                        kTria = v5 + (v8 + v8) + kTria;
-                    }
-                    return std::fabs((double)kTria);
-                }
-            }
-            else {
-                if (v9 < 0.0) {
-                    fTriParam1 = 0.0f;
-                    float kPntb = -v9;
-                    if (!(kPntb >= v7)) {
-                        float kPntm = kPntb / v7;
-                        fTriParam0 = kPntm;
-                        kTria = v9 * kPntm + kTria;
-                    }
-                    else {
-                        fTriParam0 = 1.0f;
-                        kTria = v7 + (v9 + v9) + kTria;
-                    }
-                    return std::fabs((double)kTria);
-                }
-                fTriParam0 = 0.0f;
-                if (!(v8 >= 0.0)) {
-                    float kPntc = -v8;
-                    if (!(kPntc >= v5)) {
-                        float kPntn = kPntc / v5;
-                        fTriParam1 = kPntn;
-                        kTria = v8 * kPntn + kTria;
-                    }
-                    else {
-                        fTriParam1 = 1.0f;
-                        kTria = v5 + (v8 + v8) + kTria;
-                    }
-                    return std::fabs((double)kTria);
-                }
             }
             fTriParam1 = 0.0f;
+            if (!(v21 <= 0.0)) {
+                if (!(v9 >= 0.0)) {
+                    float kPntu = -v9 / v7;
+                    fTriParam0 = kPntu;
+                    kTria = v9 * kPntu + kTria;
+                }
+                else {
+                    fTriParam0 = 0.0f;
+                }
+                return std::fabs((double)kTria);
+            }
+            fTriParam0 = 1.0f;
+            float kTrih = v7 + (v9 + v9) + kTria;
+            return std::fabs((double)kTrih);
+        }
+
+        float kPntf = v9 + v4;
+        float fTriParam0e = v8 + v5;
+        double v20 = fTriParam0e;
+        if (kPntf < static_cast<double>(fTriParam0e)) {
+            float fTriParam0a = v20 - kPntf;
+            float kPntg = v7 - v4 * 2.0 + v5;
+            if (!(kPntg <= static_cast<double>(fTriParam0a))) {
+                float kPntr = fTriParam0a / kPntg;
+                fTriParam0 = kPntr;
+                fTriParam1 = 1.0 - kPntr;
+                kTria = 2.0 * v8 + v5 + kTria - fTriParam0a * fTriParam0;
+            }
+            else {
+                fTriParam0 = 1.0f;
+                fTriParam1 = 0.0f;
+                kTria = 2.0 * v9 + v7 + kTria;
+            }
+            return std::fabs((double)kTria);
+        }
+        fTriParam0 = 0.0f;
+        if (!(v20 <= 0.0)) {
+            if (!(v8 >= 0.0)) {
+                float kPnts = -v8 / v23;
+                fTriParam1 = kPnts;
+                kTria = v8 * kPnts + kTria;
+            }
+            else {
+                fTriParam1 = 0.0f;
+            }
+            return std::fabs((double)kTria);
+        }
+        fTriParam1 = 1.0f;
+        float kTrif = v5 + (v8 + v8) + kTria;
+        return std::fabs((double)kTrif);
+    }
+
+    if (v17 || v18) {
+        if (!(v10 < 0.0)) {
+            float fInvDet = 1.0 / kPnta;
+            fTriParam0 = fTriParam0 * fInvDet;
+            float kPntq = fInvDet * fTriParam1;
+            fTriParam1 = kPntq;
+            float kTrid = (v4 * fTriParam1 + v7 * fTriParam0 + 2.0 * v9) * fTriParam0 +
+                (v8 * 2.0 + (v5 * kPntq + fTriParam0 * v4)) * kPntq + kTria;
+            return std::fabs((double)kTrid);
+        }
+
+        fTriParam1 = 0.0f;
+        if (!(v9 >= 0.0)) {
+            float kPnte = -v9;
+            if (!(kPnte >= v7)) {
+                float kPntp = kPnte / v7;
+                fTriParam0 = kPntp;
+                kTria = v9 * kPntp + kTria;
+            }
+            else {
+                fTriParam0 = 1.0f;
+                kTria = v7 + (v9 + v9) + kTria;
+            }
+            return std::fabs((double)kTria);
+        }
+        fTriParam0 = 0.0f;
+        return std::fabs((double)kTria);
+    }
+
+    if (!(v10 < 0.0)) {
+        fTriParam0 = 0.0f;
+        if (!(v8 >= 0.0)) {
+            float kPntd = -v8;
+            if (!(kPntd >= v5)) {
+                float kPnto = kPntd / v5;
+                fTriParam1 = kPnto;
+                kTria = v8 * kPnto + kTria;
+            }
+            else {
+                fTriParam1 = 1.0f;
+                kTria = v5 + (v8 + v8) + kTria;
+            }
             return std::fabs((double)kTria);
         }
     }
+    else {
+        if (v9 < 0.0) {
+            fTriParam1 = 0.0f;
+            float kPntb = -v9;
+            if (!(kPntb >= v7)) {
+                float kPntm = kPntb / v7;
+                fTriParam0 = kPntm;
+                kTria = v9 * kPntm + kTria;
+            }
+            else {
+                fTriParam0 = 1.0f;
+                kTria = v7 + (v9 + v9) + kTria;
+            }
+            return std::fabs((double)kTria);
+        }
+        fTriParam0 = 0.0f;
+        if (!(v8 >= 0.0)) {
+            float kPntc = -v8;
+            if (!(kPntc >= v5)) {
+                float kPntn = kPntc / v5;
+                fTriParam1 = kPntn;
+                kTria = v8 * kPntn + kTria;
+            }
+            else {
+                fTriParam1 = 1.0f;
+                kTria = v5 + (v8 + v8) + kTria;
+            }
+            return std::fabs((double)kTria);
+        }
+    }
+    fTriParam1 = 0.0f;
+    return std::fabs((double)kTria);
 }
 
 float NiSqrDistance::Compute(const NiPoint3& kPnt, const NiParallelogram& kPgm, float& fPgmParam0, float& fPgmParam1) {
@@ -1763,101 +1757,69 @@ float NiSqrDistance::Compute(const NiPoint3& kPnt, const NiParallelogram& kPgm, 
             fPgmParam0 = 0.0f;
             return NiSqrDistance::Compute(kPnt, kSeg, fPgmParam1);
         }
-        else {
-            kSeg.m_kDirection.x = kPgm.m_kEdge0.x;
-            float v18 = kPgm.m_kEdge0.y;
-            float v19 = kPgm.m_kEdge0.z;
-            kSeg.m_kDirection.y = v18;
-            kSeg.m_kDirection.z = v19;
-            fPgmParam1 = 0.0f;
-            return NiSqrDistance::Compute(kPnt, kSeg, fPgmParam0);
-        }
+
+        kSeg.m_kDirection.x = kPgm.m_kEdge0.x;
+        float v18 = kPgm.m_kEdge0.y;
+        float v19 = kPgm.m_kEdge0.z;
+        kSeg.m_kDirection.y = v18;
+        kSeg.m_kDirection.z = v19;
+        fPgmParam1 = 0.0f;
+        return NiSqrDistance::Compute(kPnt, kSeg, fPgmParam0);
     }
-    else {
-        double v10 = v32;
-        double v11 = kSeg.m_kOrigin.x;
-        fPgmParam0 = v32 * v7 - kSeg.m_kOrigin.x * v8;
-        float v24 = v11 * v7 - v32 * v9;
-        double v12 = v24;
-        fPgmParam1 = v24;
-        if (!(fPgmParam0 < 0.0f)) {
-            double v16 = v24;
-            if (!(kPnta >= static_cast<double>(fPgmParam0))) {
-                if (!(v24 < 0.0f)) {
-                    if (!(kPnta >= v16)) {
-                        // d + b is kept as a double and converted to float below.
-                        double dDPlusB = v11 + v7;
-                        float v29 = dDPlusB;
-                        float kPntl = -v29;
-                        if (kPntl < v9) {
-                            fPgmParam1 = 1.0f;
-                            if (!(v29 >= 0.0f)) {
-                                float kPntbb = kPntl / v9;
-                                fPgmParam0 = kPntbb;
-                                kPgma = v29 * kPntbb + v8 + (v10 + v10) + kPgma;
-                            }
-                            else {
-                                fPgmParam0 = 0.0f;
-                                kPgma = v8 + (v10 + v10) + kPgma;
-                            }
-                            return std::fabs((double)kPgma);
-                        }
-                        fPgmParam0 = 1.0f;
-                        float v30 = v7 + v10;
-                        if (!(v30 >= 0.0f)) {
-                            float kPntm = -v30;
-                            if (!(kPntm >= v8)) {
-                                float kPntbc = kPntm / v8;
-                                fPgmParam1 = kPntbc;
-                                kPgma = v9 + v30 * kPntbc + (v11 + v11) + kPgma;
-                            }
-                            else {
-                                fPgmParam1 = 1.0f;
-                                kPgma = v9 + v8 + kPgma + (v10 + dDPlusB + (v10 + dDPlusB));
-                            }
-                            return std::fabs((double)kPgma);
-                        }
-                    }
-                    else {
-                        fPgmParam0 = 1.0f;
-                        float v28 = v10 + v7;
-                        if (!(v28 >= 0.0f)) {
-                            float kPntk = -v28;
-                            if (!(kPntk >= v8)) {
-                                float kPntba = kPntk / v8;
-                                fPgmParam1 = kPntba;
-                                kPgma = v9 + v28 * kPntba + (v11 + v11) + kPgma;
-                            }
-                            else {
-                                fPgmParam1 = 1.0f;
-                                kPgma = v7 + v11 + v10 + (v7 + v11 + v10) + (v9 + v8 + kPgma);
-                            }
-                            return std::fabs((double)kPgma);
-                        }
-                    }
-                }
-                else {
-                    float kPnti = -v11;
-                    if (kPnti < v9) {
-                        fPgmParam1 = 0.0f;
-                        if (!(v11 >= 0.0)) {
-                            float kPnty = kPnti / v9;
-                            fPgmParam0 = kPnty;
-                            kPgma = v11 * kPnty + kPgma;
+
+    double v10 = v32;
+    double v11 = kSeg.m_kOrigin.x;
+    fPgmParam0 = v32 * v7 - kSeg.m_kOrigin.x * v8;
+    float v24 = v11 * v7 - v32 * v9;
+    double v12 = v24;
+    fPgmParam1 = v24;
+    if (!(fPgmParam0 < 0.0f)) {
+        double v16 = v24;
+        if (!(kPnta >= static_cast<double>(fPgmParam0))) {
+            if (!(v24 < 0.0f)) {
+                if (!(kPnta >= v16)) {
+                    // d + b is kept as a double and converted to float below.
+                    double dDPlusB = v11 + v7;
+                    float v29 = dDPlusB;
+                    float kPntl = -v29;
+                    if (kPntl < v9) {
+                        fPgmParam1 = 1.0f;
+                        if (!(v29 >= 0.0f)) {
+                            float kPntbb = kPntl / v9;
+                            fPgmParam0 = kPntbb;
+                            kPgma = v29 * kPntbb + v8 + (v10 + v10) + kPgma;
                         }
                         else {
                             fPgmParam0 = 0.0f;
+                            kPgma = v8 + (v10 + v10) + kPgma;
                         }
                         return std::fabs((double)kPgma);
                     }
                     fPgmParam0 = 1.0f;
-                    float v27 = v10 + v7;
-                    if (!(v27 >= 0.0f)) {
-                        float kPntj = -v27;
-                        if (!(kPntj >= v8)) {
-                            float kPntz = kPntj / v8;
-                            fPgmParam1 = kPntz;
-                            kPgma = v9 + v27 * kPntz + (v11 + v11) + kPgma;
+                    float v30 = v7 + v10;
+                    if (!(v30 >= 0.0f)) {
+                        float kPntm = -v30;
+                        if (!(kPntm >= v8)) {
+                            float kPntbc = kPntm / v8;
+                            fPgmParam1 = kPntbc;
+                            kPgma = v9 + v30 * kPntbc + (v11 + v11) + kPgma;
+                        }
+                        else {
+                            fPgmParam1 = 1.0f;
+                            kPgma = v9 + v8 + kPgma + (v10 + dDPlusB + (v10 + dDPlusB));
+                        }
+                        return std::fabs((double)kPgma);
+                    }
+                }
+                else {
+                    fPgmParam0 = 1.0f;
+                    float v28 = v10 + v7;
+                    if (!(v28 >= 0.0f)) {
+                        float kPntk = -v28;
+                        if (!(kPntk >= v8)) {
+                            float kPntba = kPntk / v8;
+                            fPgmParam1 = kPntba;
+                            kPgma = v9 + v28 * kPntba + (v11 + v11) + kPgma;
                         }
                         else {
                             fPgmParam1 = 1.0f;
@@ -1866,147 +1828,173 @@ float NiSqrDistance::Compute(const NiPoint3& kPnt, const NiParallelogram& kPgm, 
                         return std::fabs((double)kPgma);
                     }
                 }
-                fPgmParam1 = 0.0f;
-                float kPgmh = v9 + (v11 + v11) + kPgma;
-                return std::fabs((double)kPgmh);
             }
             else {
-                if (!(v24 < 0.0f)) {
-                    if (!(kPnta >= v16)) {
-                        fPgmParam1 = 1.0f;
-                        double v17 = v7 + v11;
-                        float v26 = v17;
-                        if (!(v26 >= 0.0f)) {
-                            float kPnth = -v26;
-                            if (!(kPnth >= v9)) {
-                                float kPntx = kPnth / v9;
-                                fPgmParam0 = kPntx;
-                                kPgma = v26 * kPntx + v8 + (v10 + v10) + kPgma;
-                            }
-                            else {
-                                fPgmParam0 = 1.0f;
-                                kPgma = v9 + v8 + kPgma + (v17 + v10 + (v17 + v10));
-                            }
-                            return std::fabs((double)kPgma);
-                        }
-                        fPgmParam0 = 0.0f;
-                        float kPgmf = v8 + (v10 + v10) + kPgma;
-                        return std::fabs((double)kPgmf);
-                    }
-                    else {
-                        float kPntv = 1.0 / kPnta;
-                        fPgmParam0 = fPgmParam0 * kPntv;
-                        float kPntw = kPntv * fPgmParam1;
-                        fPgmParam1 = kPntw;
-                        float kPgmd = (v7 * fPgmParam1 + v9 * fPgmParam0 + 2.0 * v11) * fPgmParam0 +
-                            (v10 * 2.0 + (v8 * kPntw + fPgmParam0 * v7)) * kPntw + kPgma;
-                        return std::fabs((double)kPgmd);
-                    }
-                }
-                else {
+                float kPnti = -v11;
+                if (kPnti < v9) {
                     fPgmParam1 = 0.0f;
                     if (!(v11 >= 0.0)) {
-                        float kPntg = -v11;
-                        if (!(kPntg >= v9)) {
-                            float kPntu = kPntg / v9;
-                            fPgmParam0 = kPntu;
-                            kPgma = v11 * kPntu + kPgma;
-                        }
-                        else {
-                            fPgmParam0 = 1.0f;
-                            kPgma = v9 + (v11 + v11) + kPgma;
-                        }
-                        return std::fabs((double)kPgma);
-                    }
-                    fPgmParam0 = 0.0f;
-                    return std::fabs((double)kPgma);
-                }
-            }
-        }
-        else {
-            if (!(v12 < 0.0)) {
-                if (!(kPnta >= v12)) {
-                    double v13 = v7 + v11;
-                    float v25 = v13;
-                    double v14 = v25;
-                    if (v25 < 0.0f) {
-                        fPgmParam1 = 1.0f;
-                        float kPnte = -v14;
-                        if (!(kPnte >= v9)) {
-                            float kPnts = kPnte / v9;
-                            fPgmParam0 = kPnts;
-                            kPgma = v14 * kPnts + v8 + (v10 + v10) + kPgma;
-                        }
-                        else {
-                            fPgmParam0 = 1.0f;
-                            kPgma = v9 + v8 + kPgma + (v13 + v10 + (v13 + v10));
-                        }
-                        return std::fabs((double)kPgma);
-                    }
-                    fPgmParam0 = 0.0f;
-                    if (!(v10 >= 0.0)) {
-                        float kPntf = -v10;
-                        if (!(kPntf >= v8)) {
-                            float kPntt = kPntf / v8;
-                            fPgmParam1 = kPntt;
-                            kPgma = v10 * kPntt + kPgma;
-                        }
-                        else {
-                            fPgmParam1 = 1.0f;
-                            kPgma = v8 + (v10 + v10) + kPgma;
-                        }
-                        return std::fabs((double)kPgma);
-                    }
-                }
-                else {
-                    fPgmParam0 = 0.0f;
-                    if (!(v10 >= 0.0)) {
-                        float kPntd = -v10;
-                        if (!(kPntd >= v8)) {
-                            float kPntr = kPntd / v8;
-                            fPgmParam1 = kPntr;
-                            kPgma = v10 * kPntr + kPgma;
-                        }
-                        else {
-                            fPgmParam1 = 1.0f;
-                            kPgma = v8 + (v10 + v10) + kPgma;
-                        }
-                        return std::fabs((double)kPgma);
-                    }
-                }
-            }
-            else {
-                if (v11 < 0.0) {
-                    fPgmParam1 = 0.0f;
-                    float kPntb = -v11;
-                    if (!(kPntb >= v9)) {
-                        float kPntp = kPntb / v9;
-                        fPgmParam0 = kPntp;
-                        kPgma = v11 * kPntp + kPgma;
+                        float kPnty = kPnti / v9;
+                        fPgmParam0 = kPnty;
+                        kPgma = v11 * kPnty + kPgma;
                     }
                     else {
-                        fPgmParam0 = 1.0f;
-                        kPgma = v9 + (v11 + v11) + kPgma;
+                        fPgmParam0 = 0.0f;
                     }
                     return std::fabs((double)kPgma);
                 }
-                fPgmParam0 = 0.0f;
-                if (!(v10 >= 0.0)) {
-                    float kPntc = -v10;
-                    if (!(kPntc >= v8)) {
-                        float kPntq = kPntc / v8;
-                        fPgmParam1 = kPntq;
-                        kPgma = v10 * kPntq + kPgma;
+                fPgmParam0 = 1.0f;
+                float v27 = v10 + v7;
+                if (!(v27 >= 0.0f)) {
+                    float kPntj = -v27;
+                    if (!(kPntj >= v8)) {
+                        float kPntz = kPntj / v8;
+                        fPgmParam1 = kPntz;
+                        kPgma = v9 + v27 * kPntz + (v11 + v11) + kPgma;
                     }
                     else {
                         fPgmParam1 = 1.0f;
-                        kPgma = v8 + (v10 + v10) + kPgma;
+                        kPgma = v7 + v11 + v10 + (v7 + v11 + v10) + (v9 + v8 + kPgma);
                     }
                     return std::fabs((double)kPgma);
                 }
             }
             fPgmParam1 = 0.0f;
+            float kPgmh = v9 + (v11 + v11) + kPgma;
+            return std::fabs((double)kPgmh);
+        }
+
+        if (!(v24 < 0.0f)) {
+            if (!(kPnta >= v16)) {
+                fPgmParam1 = 1.0f;
+                double v17 = v7 + v11;
+                float v26 = v17;
+                if (!(v26 >= 0.0f)) {
+                    float kPnth = -v26;
+                    if (!(kPnth >= v9)) {
+                        float kPntx = kPnth / v9;
+                        fPgmParam0 = kPntx;
+                        kPgma = v26 * kPntx + v8 + (v10 + v10) + kPgma;
+                    }
+                    else {
+                        fPgmParam0 = 1.0f;
+                        kPgma = v9 + v8 + kPgma + (v17 + v10 + (v17 + v10));
+                    }
+                    return std::fabs((double)kPgma);
+                }
+                fPgmParam0 = 0.0f;
+                float kPgmf = v8 + (v10 + v10) + kPgma;
+                return std::fabs((double)kPgmf);
+            }
+
+            float kPntv = 1.0 / kPnta;
+            fPgmParam0 = fPgmParam0 * kPntv;
+            float kPntw = kPntv * fPgmParam1;
+            fPgmParam1 = kPntw;
+            float kPgmd = (v7 * fPgmParam1 + v9 * fPgmParam0 + 2.0 * v11) * fPgmParam0 +
+                (v10 * 2.0 + (v8 * kPntw + fPgmParam0 * v7)) * kPntw + kPgma;
+            return std::fabs((double)kPgmd);
+        }
+
+        fPgmParam1 = 0.0f;
+        if (!(v11 >= 0.0)) {
+            float kPntg = -v11;
+            if (!(kPntg >= v9)) {
+                float kPntu = kPntg / v9;
+                fPgmParam0 = kPntu;
+                kPgma = v11 * kPntu + kPgma;
+            }
+            else {
+                fPgmParam0 = 1.0f;
+                kPgma = v9 + (v11 + v11) + kPgma;
+            }
+            return std::fabs((double)kPgma);
+        }
+        fPgmParam0 = 0.0f;
+        return std::fabs((double)kPgma);
+    }
+
+    if (!(v12 < 0.0)) {
+        if (!(kPnta >= v12)) {
+            double v13 = v7 + v11;
+            float v25 = v13;
+            double v14 = v25;
+            if (v25 < 0.0f) {
+                fPgmParam1 = 1.0f;
+                float kPnte = -v14;
+                if (!(kPnte >= v9)) {
+                    float kPnts = kPnte / v9;
+                    fPgmParam0 = kPnts;
+                    kPgma = v14 * kPnts + v8 + (v10 + v10) + kPgma;
+                }
+                else {
+                    fPgmParam0 = 1.0f;
+                    kPgma = v9 + v8 + kPgma + (v13 + v10 + (v13 + v10));
+                }
+                return std::fabs((double)kPgma);
+            }
+            fPgmParam0 = 0.0f;
+            if (!(v10 >= 0.0)) {
+                float kPntf = -v10;
+                if (!(kPntf >= v8)) {
+                    float kPntt = kPntf / v8;
+                    fPgmParam1 = kPntt;
+                    kPgma = v10 * kPntt + kPgma;
+                }
+                else {
+                    fPgmParam1 = 1.0f;
+                    kPgma = v8 + (v10 + v10) + kPgma;
+                }
+                return std::fabs((double)kPgma);
+            }
+        }
+        else {
+            fPgmParam0 = 0.0f;
+            if (!(v10 >= 0.0)) {
+                float kPntd = -v10;
+                if (!(kPntd >= v8)) {
+                    float kPntr = kPntd / v8;
+                    fPgmParam1 = kPntr;
+                    kPgma = v10 * kPntr + kPgma;
+                }
+                else {
+                    fPgmParam1 = 1.0f;
+                    kPgma = v8 + (v10 + v10) + kPgma;
+                }
+                return std::fabs((double)kPgma);
+            }
+        }
+    }
+    else {
+        if (v11 < 0.0) {
+            fPgmParam1 = 0.0f;
+            float kPntb = -v11;
+            if (!(kPntb >= v9)) {
+                float kPntp = kPntb / v9;
+                fPgmParam0 = kPntp;
+                kPgma = v11 * kPntp + kPgma;
+            }
+            else {
+                fPgmParam0 = 1.0f;
+                kPgma = v9 + (v11 + v11) + kPgma;
+            }
+            return std::fabs((double)kPgma);
+        }
+        fPgmParam0 = 0.0f;
+        if (!(v10 >= 0.0)) {
+            float kPntc = -v10;
+            if (!(kPntc >= v8)) {
+                float kPntq = kPntc / v8;
+                fPgmParam1 = kPntq;
+                kPgma = v10 * kPntq + kPgma;
+            }
+            else {
+                fPgmParam1 = 1.0f;
+                kPgma = v8 + (v10 + v10) + kPgma;
+            }
             return std::fabs((double)kPgma);
         }
     }
+    fPgmParam1 = 0.0f;
+    return std::fabs((double)kPgma);
 }

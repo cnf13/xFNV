@@ -45,7 +45,7 @@ class TESWaterListener;
 // +0xF0, where bhkSerializable::pInfo points).
 struct bhkWorldCinfo : public hkSerializableCinfo, public hkpWorldCinfo {
     bhkWorldCinfo();
-    ~bhkWorldCinfo();
+    ~bhkWorldCinfo() override;
 
     static void SetSimulationType(uint32_t aiType);
     // Deleting returns the block to the Havok heap, of the size in m_memSizeAndFlags.

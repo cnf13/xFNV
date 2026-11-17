@@ -353,18 +353,16 @@ ActiveEffect* TelekinesisEffect::Instantiate(MagicCaster* apCaster, MagicItem* a
     if (v5) {
         return ::new (v5) TelekinesisEffect(apCaster, apSpell, apEffect);
     }
-    else {
-        return nullptr;
-    }
+
+    return nullptr;
 }
 
 hkpMouseSpringAction* bhkMouseSpringAction::operator*() const {
     if (this) {
         return static_cast<hkpMouseSpringAction*>(GethkObject());
     }
-    else {
-        return nullptr;
-    }
+
+    return nullptr;
 }
 
 // The game-unit overload.

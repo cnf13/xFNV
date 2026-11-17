@@ -666,11 +666,10 @@ bool TESObjectWEAP::Load(TESFile* apFile) {
             break;
         }
     }
-    if (!GetNumProjectiles(false, true, nullptr)) {
-        if (GetProjectile(nullptr)) {
-            SetNumProjectiles(true);
-        }
+    if ((!GetNumProjectiles(false, true, nullptr)) && (GetProjectile(nullptr))) {
+        SetNumProjectiles(true);
     }
+
     if (data.eType >= 14) {
         // GetFormID is called before GetFormEditorID, as the game evaluates the arguments right to left.
         uint32_t uiFormID = GetFormID();
@@ -1918,33 +1917,33 @@ void TESObjectWEAP::Fire(TESObjectREFR* apSource) {
         }
         if (pfireObject) {
             releasePoint = pfireObject->GetWorldTranslate();
-            if (pVATS.GetMode() != VATS::VATS_PLAYBACK && pactor == pPlayer && pPlayer->GetIronSights()) {
-                if (GetScopeModel()->GetModelLength()) {
-                    // Whether the scope is in use: always for a built-in scope, else when the scope mod is on.
-                    bool bRoot = false;
-                    if (HasModScope()) {
-                        BaseProcess* pProc = pPlayer->GetCurrentAIProcess();
-                        if (pProc && pProc->GetCurrentWeapon() &&
-                            pProc->GetCurrentWeapon()->HasModEffectActive(WEAPON_MOD_IRON_SITES)) {
-                            bRoot = true;
-                        }
-                    }
-                    else {
+            if ((pVATS.GetMode() != VATS::VATS_PLAYBACK && pactor == pPlayer && pPlayer->GetIronSights()) &&
+                (GetScopeModel()->GetModelLength())) {
+                // Whether the scope is in use: always for a built-in scope, else when the scope mod is on.
+                bool bRoot = false;
+                if (HasModScope()) {
+                    BaseProcess* pProc = pPlayer->GetCurrentAIProcess();
+                    if (pProc && pProc->GetCurrentWeapon() &&
+                        pProc->GetCurrentWeapon()->HasModEffectActive(WEAPON_MOD_IRON_SITES)) {
                         bRoot = true;
                     }
-                    // Move the projectile node back 5 units when using a scope.
-                    NiCamera* pcam = Main::WorldRootCamera();
-                    if (bRoot && pcam) {
-                        if (!(uiOffsetGuard & 1)) {
-                            uiOffsetGuard |= 1;
-                            ::new (&offset) NiPoint3(0.0f, -5.0f, 0.0f);
-                        }
-                        const NiTransform* pCamWorld;
-                        pCamWorld = &pcam->GetWorldTransform();
-                        releasePoint = *pCamWorld * offset;
+                }
+                else {
+                    bRoot = true;
+                }
+                // Move the projectile node back 5 units when using a scope.
+                NiCamera* pcam = Main::WorldRootCamera();
+                if (bRoot && pcam) {
+                    if (!(uiOffsetGuard & 1)) {
+                        uiOffsetGuard |= 1;
+                        ::new (&offset) NiPoint3(0.0f, -5.0f, 0.0f);
                     }
+                    const NiTransform* pCamWorld;
+                    pCamWorld = &pcam->GetWorldTransform();
+                    releasePoint = *pCamWorld * offset;
                 }
             }
+
             if (apSource == pPlayer && !pPlayer->IsActually3rdPerson()) {
                 faimHeading = pPlayer->GetHeading(false);
                 faimLooking = pPlayer->GetLooking();
@@ -2467,9 +2466,8 @@ const char* TESObjectWEAP::GetEmbeddedWeaponNode() {
     if (IsEmbeddedWeapon()) {
         return EmbeddedWeaponNode.pString;
     }
-    else {
-        return nullptr;
-    }
+
+    return nullptr;
 }
 
 ActorValue::Index TESObjectWEAP::GetEmbeddedWeaponConditionValue() {
@@ -2535,37 +2533,30 @@ TESObjectSTAT* TESObjectWEAP::Get1stPersonModObject(uint8_t iModSlots) {
             if ((iModSlots & 4) != 0) {
                 return p1stPersonMod123Object;
             }
-            else {
-                return p1stPersonMod12Object;
-            }
+
+            return p1stPersonMod12Object;
         }
-        else {
-            if ((iModSlots & 4) != 0) {
-                return p1stPersonMod13Object;
-            }
-            else {
-                return p1stPersonMod1Object;
-            }
+
+        if ((iModSlots & 4) != 0) {
+            return p1stPersonMod13Object;
         }
+
+        return p1stPersonMod1Object;
     }
-    else {
-        if ((iModSlots & 2) != 0) {
-            if ((iModSlots & 4) != 0) {
-                return p1stPersonMod23Object;
-            }
-            else {
-                return p1stPersonMod2Object;
-            }
+
+    if ((iModSlots & 2) != 0) {
+        if ((iModSlots & 4) != 0) {
+            return p1stPersonMod23Object;
         }
-        else {
-            if ((iModSlots & 4) != 0) {
-                return p1stPersonMod3Object;
-            }
-            else {
-                return p1stPersonObject;
-            }
-        }
+
+        return p1stPersonMod2Object;
     }
+
+    if ((iModSlots & 4) != 0) {
+        return p1stPersonMod3Object;
+    }
+
+    return p1stPersonObject;
 }
 
 TESModelTextureSwap* TESObjectWEAP::GetModTESModel(uint8_t iSlots, bool abNoHandToHand) {
@@ -2611,10 +2602,8 @@ TESModelTextureSwap* TESObjectWEAP::GetModTESModel(uint8_t iSlots, bool abNoHand
                 }
             }
             else {
-                if ((iSlots & 4) != 0) {
-                    if (*(&WorldModelMod3)->GetModel()) {
-                        p_WorldModelMod123 = &WorldModelMod3;
-                    }
+                if (((iSlots & 4) != 0) && (*(&WorldModelMod3)->GetModel())) {
+                    p_WorldModelMod123 = &WorldModelMod3;
                 }
             }
         }
@@ -2622,25 +2611,21 @@ TESModelTextureSwap* TESObjectWEAP::GetModTESModel(uint8_t iSlots, bool abNoHand
             if (this) {
                 return static_cast<TESModelTextureSwap*>(this);
             }
-            else {
-                return nullptr;
-            }
+
+            return nullptr;
         }
         return p_WorldModelMod123;
     }
-    else {
-        if (*(&WorldModel)->GetModel()) {
-            return static_cast<TESModelTextureSwap*>(&WorldModel);
-        }
-        else {
-            if (this) {
-                return static_cast<TESModelTextureSwap*>(this);
-            }
-            else {
-                return nullptr;
-            }
-        }
+
+    if (*(&WorldModel)->GetModel()) {
+        return static_cast<TESModelTextureSwap*>(&WorldModel);
     }
+
+    if (this) {
+        return static_cast<TESModelTextureSwap*>(this);
+    }
+
+    return nullptr;
 }
 
 TESSound* TESObjectWEAP::GetAttackSound(bool bModSound) const {
@@ -2760,9 +2745,8 @@ const char* TESObjectWEAP::GetFireNodeName() {
     if (IsEmbeddedWeapon() && (GetEmbeddedWeaponNode() && *GetEmbeddedWeaponNode())) {
         return GetEmbeddedWeaponNode();
     }
-    else {
-        return "ProjectileNode";
-    }
+
+    return "ProjectileNode";
 }
 
 float TESObjectWEAP::GetModEffectValue(WEAPON_MOD_EFFECT eEffect, uint8_t cValue) {
@@ -2852,9 +2836,8 @@ float TESObjectWEAP::GetAmmoRegenRate(bool bModValue) {
     if (bModValue) {
         return (GetModEffectValue(static_cast<WEAPON_MOD_EFFECT>(6), 0) + data.fAmmoRegenRate);
     }
-    else {
-        return data.fAmmoRegenRate;
-    }
+
+    return data.fAmmoRegenRate;
 }
 
 bool TESObjectWEAP::IsMeleeWeapon() {
@@ -2969,9 +2952,8 @@ uint8_t TESObjectWEAP::GetVATSToHitChance(bool bModValue) {
     if (bModValue) {
         return (uint8_t)(data.cVATSToHitChance + ((int32_t)GetModEffectValue(static_cast<WEAPON_MOD_EFFECT>(13), 0)));
     }
-    else {
-        return data.cVATSToHitChance;
-    }
+
+    return data.cVATSToHitChance;
 }
 
 bool TESObjectWEAP::GetCantDrop() {
@@ -3144,9 +3126,8 @@ SOUND_LEVEL TESObjectWEAP::GetSoundLevel(char a1) {
     if (a1) {
         return SOUND_LEVEL_SILENT;
     }
-    else {
-        return eSoundLevel;
-    }
+
+    return eSoundLevel;
 }
 
 TESObjectREFR* UseWeaponActorPackageData::GetAttackTarget() {

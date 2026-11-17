@@ -36,10 +36,9 @@ NiObject* NiIntegersExtraData::CreateClone(NiCloningProcess& kCloning) {
         CopyMembers(pkClone, kCloning);
         return pkClone;
     }
-    else {
-        CopyMembers(nullptr, kCloning);
-        return nullptr;
-    }
+
+    CopyMembers(nullptr, kCloning);
+    return nullptr;
 }
 
 // The old array is not freed.

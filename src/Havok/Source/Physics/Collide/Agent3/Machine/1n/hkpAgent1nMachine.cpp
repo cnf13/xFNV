@@ -824,15 +824,14 @@ int32_t contactPointIsValid(
         return 0;
     }
     uint32_t id = point->m_contactPointId.m_storage;
-    if (id == HK_INVALID_CONTACT_POINT && cosNormals < 0.800000011920929) {
-        if (v16 + v19 < 0.10000000149011612) {
-            // Negates v18 and adds it to itself, as the game does.
-            float v20 = -v18 + -v18;
-            if (v20 > reference->m_separatingNormal(3) + point->m_contact.m_separatingNormal(3)) {
-                return 2;
-            }
+    if ((id == HK_INVALID_CONTACT_POINT && cosNormals < 0.800000011920929) && (v16 + v19 < 0.10000000149011612)) {
+        // Negates v18 and adds it to itself, as the game does.
+        float v20 = -v18 + -v18;
+        if (v20 > reference->m_separatingNormal(3) + point->m_contact.m_separatingNormal(3)) {
+            return 2;
         }
     }
+
     float v17 = 0.0f;
     if (id != HK_INVALID_CONTACT_POINT) {
         v17 = *a3 * 0.05000000074505806;

@@ -51,8 +51,8 @@ public:
     // than references.
     static void filterRays(
         const Tree* tree,
-        const typename Tree::Node* nodeSpu,
-        const typename Tree::Node* skipNode,
+        const Tree::Node* nodeSpu,
+        const Tree::Node* skipNode,
         const hkAabbTreeData::Ray* rays,
         hkCpuWorldRayCastCollector* collectors,
         hkpFixedBufferRayHitCollector* fixedBufferCollectors,
@@ -68,8 +68,8 @@ public:
         int32_t* numRaysOut0,
         int32_t* raysIdxOut1,
         int32_t* numRaysOut1,
-        typename Tree::Node* child0Out,
-        typename Tree::Node* child1Out
+        Tree::Node* child0Out,
+        Tree::Node* child1Out
     );
     // Casts numRays rays through tree, filtered by filter, each into its command's collector.
     static void castRayFiltering(
@@ -90,8 +90,8 @@ extern template class hkAabbTreeRayCastUtil<hkAabbTreeData::hkAabbTreeAabb16, ui
 // active there (the last m_numActiveRays indices of lane m_activeRayLane).
 template <typename BOUNDING_VOLUME, typename IDX>
 struct Task {
-    typename hkAabbTree<BOUNDING_VOLUME, IDX>::Node m_root;
-    const typename hkAabbTree<BOUNDING_VOLUME, IDX>::Node* m_skipNode;
+    hkAabbTree<BOUNDING_VOLUME, IDX>::Node m_root;
+    const hkAabbTree<BOUNDING_VOLUME, IDX>::Node* m_skipNode;
     int32_t m_activeRayLane;
     int32_t m_numActiveRays;
 };

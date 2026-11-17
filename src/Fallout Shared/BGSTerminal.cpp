@@ -569,30 +569,29 @@ bool BGSTerminal::Activate(
                 return false;
             }
             Actor* pActionActor = static_cast<Actor*>(apActionRef);
-            if (apItemActivated->GetOwner()) {
-                if (!apItemActivated->IsAnOwner(pActionActor, true) && !IsUnlocked()) {
-                    bool bkarma = false;
-                    TESForm* powner = apItemActivated->GetOwner();
-                    int32_t pactor = 0;
-                    if (powner->GetFormType() == FACT_ID) {
-                        bkarma = !static_cast<TESFaction*>(powner)->TESFaction::GetIsEvil();
-                    }
-                    else {
-                        if (powner) {
-                            float afTimea = static_cast<ActorValueOwner*>(static_cast<TESActorBase*>(powner))
-                                                ->GetActorFloatValue(ActorValue::KARMA);
-                            TESActorBaseData::ALIGNMENT ealign = TESActorBaseData::GetAlignmentForKarma(afTimea);
-                            if (ealign != TESActorBaseData::ALIGNMENT_EVIL) {
-                                bkarma = ealign != TESActorBaseData::ALIGNMENT_VERY_EVIL;
-                            }
+            if ((apItemActivated->GetOwner()) && (!apItemActivated->IsAnOwner(pActionActor, true) && !IsUnlocked())) {
+                bool bkarma = false;
+                TESForm* powner = apItemActivated->GetOwner();
+                int32_t pactor = 0;
+                if (powner->GetFormType() == FACT_ID) {
+                    bkarma = !static_cast<TESFaction*>(powner)->TESFaction::GetIsEvil();
+                }
+                else {
+                    if (powner) {
+                        float afTimea = static_cast<ActorValueOwner*>(static_cast<TESActorBase*>(powner))
+                                            ->GetActorFloatValue(ActorValue::KARMA);
+                        TESActorBaseData::ALIGNMENT ealign = TESActorBaseData::GetAlignmentForKarma(afTimea);
+                        if (ealign != TESActorBaseData::ALIGNMENT_EVIL) {
+                            bkarma = ealign != TESActorBaseData::ALIGNMENT_VERY_EVIL;
                         }
                     }
-                    if (bkarma) {
-                        double v9 = fKarmaModStealing.Float();
-                        pPlayer->RewardKarma(static_cast<int32_t>(v9));
-                    }
+                }
+                if (bkarma) {
+                    double v9 = fKarmaModStealing.Float();
+                    pPlayer->RewardKarma(static_cast<int32_t>(v9));
                 }
             }
+
             BGSOpenCloseForm::HandleActivate(apItemActivated, apActionRef, nullptr);
         }
     }

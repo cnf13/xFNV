@@ -65,18 +65,14 @@ HackingText* HackingText::init() {
 char HackingText::Update() {
     uint32_t v1;
     if (GetDisplayMode() && BSGetTickCount() >= uiNextDisplayTime && !bIsTextRemaining) {
-        if (pTileValueVisibility) {
-            if (!GetFlashMode()) {
-                pTileValueVisibility->SetFloat(1.0f, true);
-            }
+        if ((pTileValueVisibility) && (!GetFlashMode())) {
+            pTileValueVisibility->SetFloat(1.0f, true);
         }
-        if (pTileValueVisibility) {
-            if (pTileText) {
-                if (!strText.pString) {
-                    pTileValueVisibility->SetFloat(0.0f, true);
-                }
-            }
+
+        if ((pTileValueVisibility) && (pTileText) && (!strText.pString)) {
+            pTileValueVisibility->SetFloat(0.0f, true);
         }
+
         if (pTileText &&
             (pCurrentlyDisplayedText && strText.operator!=(static_cast<const char*>(pCurrentlyDisplayedText)))) {
             uint32_t v3;
@@ -120,25 +116,19 @@ char HackingText::Update() {
 
 void HackingText::ForceFinish() {
     if (GetDisplayMode() && !bIsTextRemaining) {
-        if (pTileValueVisibility) {
-            if (!GetFlashMode()) {
-                pTileValueVisibility->SetFloat(1.0f, true);
-            }
+        if ((pTileValueVisibility) && (!GetFlashMode())) {
+            pTileValueVisibility->SetFloat(1.0f, true);
         }
-        if (pTileValueVisibility) {
-            if (pTileText) {
-                if (!strText.pString) {
-                    pTileValueVisibility->SetFloat(0.0f, true);
-                }
-            }
+
+        if ((pTileValueVisibility) && (pTileText) && (!strText.pString)) {
+            pTileValueVisibility->SetFloat(0.0f, true);
         }
-        if (pTileText) {
-            if (pCurrentlyDisplayedText) {
-                uint32_t v1 = BSstrlen(strText.pString);
-                ourMemcpy(pCurrentlyDisplayedText, strText.pString, v1);
-                pTileText->SetString(pCurrentlyDisplayedText, true);
-                bIsTextRemaining = true;
-            }
+
+        if ((pTileText) && (pCurrentlyDisplayedText)) {
+            uint32_t v1 = BSstrlen(strText.pString);
+            ourMemcpy(pCurrentlyDisplayedText, strText.pString, v1);
+            pTileText->SetString(pCurrentlyDisplayedText, true);
+            bIsTextRemaining = true;
         }
     }
 }

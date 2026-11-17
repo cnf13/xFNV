@@ -136,11 +136,9 @@ void bhkBvTreeShape::CopyMembers(bhkSerializable* apDest, NiCloningProcess& arCl
     hkpShapeCollection* pCollection = pCinfo->m_shapeCollection;
     if (pCollection) {
         bhkShape* pShape = pCollection->m_userData;
-        if (pShape) {
-            if (!pShape->CanShare(arCloneData)) {
-                bhkShape* pClone = static_cast<bhkShape*>(pShape->CreateClone(arCloneData));
-                pCinfo->m_shapeCollection = pClone ? static_cast<hkpShapeCollection*>(pClone->phkObject) : nullptr;
-            }
+        if ((pShape) && (!pShape->CanShare(arCloneData))) {
+            bhkShape* pClone = static_cast<bhkShape*>(pShape->CreateClone(arCloneData));
+            pCinfo->m_shapeCollection = pClone ? static_cast<hkpShapeCollection*>(pClone->phkObject) : nullptr;
         }
     }
     bhkShape::CopyMembers(apDest, arCloneData);

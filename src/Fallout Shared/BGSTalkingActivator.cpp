@@ -243,12 +243,10 @@ bool BGSTalkingActivator::Activate(
     MobileObject* pactor;
     if (apActionRef == pPlayer) {
         ExtraTalkingActor* pextratalk = (&apItemActivated->m_Extra)->GetTalkingActorExtra();
-        if (pextratalk) {
-            if (pextratalk->pTalkObject) {
-                const char* v6 = sObjectInUse.String();
-                Interface::ShowMessage(v6, 0, nullptr, nullptr, 2.0f, false);
-                return false;
-            }
+        if ((pextratalk) && (pextratalk->pTalkObject)) {
+            const char* v6 = sObjectInUse.String();
+            Interface::ShowMessage(v6, 0, nullptr, nullptr, 2.0f, false);
+            return false;
         }
     }
     if (apItemActivated->IsMobileObject()) {
@@ -530,10 +528,8 @@ bool BGSTalkingActivator::IsRadioStation(TESForm* apForm, int32_t aiData) {
 }
 
 void BGSTalkingActivator::AddRadioStation(TESObjectREFR* apRef) {
-    if (apRef) {
-        if (IsRadioStation(apRef->GetObjectReference(), 0)) {
-            RadioStationList.AddHead(apRef);
-        }
+    if ((apRef) && (IsRadioStation(apRef->GetObjectReference(), 0))) {
+        RadioStationList.AddHead(apRef);
     }
 }
 

@@ -36,10 +36,9 @@ hkBool* hkpMoppEarlyExitObbVirtualMachine::queryObb(
         apResult->m_bool = m_hitFound.m_bool;
         return apResult;
     }
-    else {
-        apResult->m_bool = 0;
-        return apResult;
-    }
+
+    apResult->m_bool = 0;
+    return apResult;
 }
 
 // Walks the MOPP code from PC until a terminal under the box sets m_hitFound. scaledQuery holds the box in the current

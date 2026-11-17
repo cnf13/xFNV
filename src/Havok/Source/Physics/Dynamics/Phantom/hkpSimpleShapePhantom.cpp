@@ -149,22 +149,20 @@ hkpPhantomType hkpSimpleShapePhantom::getType() const {
 }
 
 void hkpSimpleShapePhantom::addOverlappingCollidable(hkpCollidable* collidable) {
-    if (collidable->m_shape) {
-        if (fireCollidableAdded(collidable) == HK_COLLIDABLE_ACCEPT) {
-            hkMemoryRouter* Instance = &hkMemoryRouter::getInstance();
-            if (m_collisionDetails.m_size ==
-                (m_collisionDetails.m_capacityAndFlags &
-                 hkArrayBase<hkpSimpleShapePhantom::CollisionDetail>::CAPACITY_MASK)) {
-                hkArrayUtil::_reserveMore(
-                    *Instance->m_heap, &m_collisionDetails, sizeof(hkpSimpleShapePhantom::CollisionDetail)
-                );
-            }
-            int32_t m_size = m_collisionDetails.m_size;
-            hkpSimpleShapePhantom::CollisionDetail* v5 = &m_collisionDetails.m_data[m_size];
-            m_collisionDetails.m_size = m_size + 1;
-            v5->m_collidable = collidable;
-            m_orderDirty.m_bool = 1;
+    if ((collidable->m_shape) && (fireCollidableAdded(collidable) == HK_COLLIDABLE_ACCEPT)) {
+        hkMemoryRouter* Instance = &hkMemoryRouter::getInstance();
+        if (m_collisionDetails.m_size ==
+            (m_collisionDetails.m_capacityAndFlags &
+             hkArrayBase<hkpSimpleShapePhantom::CollisionDetail>::CAPACITY_MASK)) {
+            hkArrayUtil::_reserveMore(
+                *Instance->m_heap, &m_collisionDetails, sizeof(hkpSimpleShapePhantom::CollisionDetail)
+            );
         }
+        int32_t m_size = m_collisionDetails.m_size;
+        hkpSimpleShapePhantom::CollisionDetail* v5 = &m_collisionDetails.m_data[m_size];
+        m_collisionDetails.m_size = m_size + 1;
+        v5->m_collidable = collidable;
+        m_orderDirty.m_bool = 1;
     }
 }
 
@@ -176,19 +174,18 @@ hkBool* hkpSimpleShapePhantom::isOverlappingCollidableAdded(hkBool* arResult, co
         arResult->m_bool = 0;
         return arResult;
     }
-    else {
-        hkpSimpleShapePhantom::CollisionDetail* m_data =
-            static_cast<hkArrayBase<hkpSimpleShapePhantom::CollisionDetail>&>(m_collisionDetails).begin();
-        while (m_data->m_collidable != apCollidable) {
-            ++v4;
-            ++m_data;
-            if (v4 >= m_size) {
-                goto LABEL_5;
-            }
+
+    hkpSimpleShapePhantom::CollisionDetail* m_data =
+        static_cast<hkArrayBase<hkpSimpleShapePhantom::CollisionDetail>&>(m_collisionDetails).begin();
+    while (m_data->m_collidable != apCollidable) {
+        ++v4;
+        ++m_data;
+        if (v4 >= m_size) {
+            goto LABEL_5;
         }
-        arResult->m_bool = 1;
-        return arResult;
     }
+    arResult->m_bool = 1;
+    return arResult;
 }
 
 void hkpSimpleShapePhantom::removeOverlappingCollidable(hkpCollidable* collidable) {

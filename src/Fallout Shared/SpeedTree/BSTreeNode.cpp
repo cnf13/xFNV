@@ -395,132 +395,129 @@ void BSTreeNode::UpdateBSTreeNode(float afTime) {
     }
     if (this->CheckForCollision(afTime)) {
         bhkSimpleShapePhantom* pTree = this->GetLeafObject();
-        if (pTree) {
-            if (pTree->GethkWorld()) {
-                int32_t v56;
-                const char* UserData = this->spModel.m_pObject->pSpeedTree->GetUserData();
-                const char* pCollisionFreq = std::strstr(UserData, "~CF");
-                if (pCollisionFreq) {
-                    v56 = pCollisionFreq[3] - 48;
+        if ((pTree) && (pTree->GethkWorld())) {
+            int32_t v56;
+            const char* UserData = this->spModel.m_pObject->pSpeedTree->GetUserData();
+            const char* pCollisionFreq = std::strstr(UserData, "~CF");
+            if (pCollisionFreq) {
+                v56 = pCollisionFreq[3] - 48;
+            }
+            else {
+                v56 = gs_iCollFreq.Int();
+            }
+            double v55 = static_cast<double>(v56);
+            float v54 = fUpdateInterval.Float() * v55 * 100.0;
+            alignas(16) hkpAllCdBodyPairCollector collector;
+            pTree->GetPenetrations(&collector);
+            const hkArray<hkpRootCdBodyPair, hkContainerHeapAllocator>* collArray = &collector.m_hits;
+            for (int32_t i = 0;; ++i) {
+                int32_t FormHealth_0 = collArray->m_size;
+                if (i >= FormHealth_0) {
+                    break;
                 }
-                else {
-                    v56 = gs_iCollFreq.Int();
-                }
-                double v55 = static_cast<double>(v56);
-                float v54 = fUpdateInterval.Float() * v55 * 100.0;
-                alignas(16) hkpAllCdBodyPairCollector collector;
-                pTree->GetPenetrations(&collector);
-                const hkArray<hkpRootCdBodyPair, hkContainerHeapAllocator>* collArray = &collector.m_hits;
-                for (int32_t i = 0;; ++i) {
-                    int32_t FormHealth_0 = collArray->m_size;
-                    if (i >= FormHealth_0) {
-                        break;
-                    }
-                    hkpPhantom* phkpPhantom =
-                        hkpGetPhantom((&collArray->operator[]<hkpRootCdBodyPair>(i))->m_rootCollidableB);
-                    hkpRigidBody* pRigidBody =
-                        hkpGetRigidBody((&collArray->operator[]<hkpRootCdBodyPair>(i))->m_rootCollidableB);
-                    if (phkpPhantom) {
-                        MobileObject* pMobObj =
-                            static_cast<MobileObject*>(bhkCharacterController::FindBSReference(1000u, phkpPhantom));
-                        if (pMobObj) {
-                            bhkCharacterController* pc = pMobObj->GetCharController();
-                            if (pc) {
-                                alignas(16) NiPoint3 dum;
-                                hkpRootCdPoint point;
-                                float a4 = RandomFloat0To1();
-                                float a3 = RandomFloat0To1();
-                                float v10 = RandomFloat0To1();
-                                hkVector4 normal(v10, a3, a4, 0.0f);
-                                normal.fastNormalize3();
-                                FNVD_RECONSTRUCT(hkVector4)(
-                                    &vLocation,
-                                    (&collArray->operator[]<hkpRootCdBodyPair>(i))
-                                        ->m_rootCollidableB->m_motion.pState->m_transform.m_translation
-                                );
-                                point.m_contact.set(vLocation, normal, 0.0f);
-                                point.m_rootCollidableA = pTree->GetCollidable();
-                                point.m_rootCollidableB =
-                                    (&collArray->operator[]<hkpRootCdBodyPair>(i))->m_rootCollidableB;
-                                point.m_shapeKeyB = 0;
-                                point.m_shapeKeyA = 0;
-                                pc->contactPointAddedCallback(nullptr, point);
-                                ::new (&csdata) NiBound;
-                                csdata.cMaterialType1 = 4;
-                                csdata.cMaterialType2 = 7;
-                                csdata.fFriction = 1.0f;
-                                pc->GetLinearVelocity(dum);
-                                csdata.fVelocity = dum.Length();
-                                // The source's sound ID is the sum of the two objects' (32-bit) addresses.
-                                csdata.iID = static_cast<int32_t>(
-                                    reinterpret_cast<uintptr_t>(phkpPhantom) + reinterpret_cast<uintptr_t>(pTree)
-                                );
-                                csdata.Location = HK2NI(dum, vLocation);
-                                csdata.pBody1 = nullptr;
-                                csdata.pBody2 = nullptr;
-                                ImpactMixer::PlayCollisionSound(csdata);
-                            }
+                hkpPhantom* phkpPhantom =
+                    hkpGetPhantom((&collArray->operator[]<hkpRootCdBodyPair>(i))->m_rootCollidableB);
+                hkpRigidBody* pRigidBody =
+                    hkpGetRigidBody((&collArray->operator[]<hkpRootCdBodyPair>(i))->m_rootCollidableB);
+                if (phkpPhantom) {
+                    MobileObject* pMobObj =
+                        static_cast<MobileObject*>(bhkCharacterController::FindBSReference(1000u, phkpPhantom));
+                    if (pMobObj) {
+                        bhkCharacterController* pc = pMobObj->GetCharController();
+                        if (pc) {
+                            alignas(16) NiPoint3 dum;
+                            hkpRootCdPoint point;
+                            float a4 = RandomFloat0To1();
+                            float a3 = RandomFloat0To1();
+                            float v10 = RandomFloat0To1();
+                            hkVector4 normal(v10, a3, a4, 0.0f);
+                            normal.fastNormalize3();
+                            FNVD_RECONSTRUCT(hkVector4)(
+                                &vLocation,
+                                (&collArray->operator[]<hkpRootCdBodyPair>(i))
+                                    ->m_rootCollidableB->m_motion.pState->m_transform.m_translation
+                            );
+                            point.m_contact.set(vLocation, normal, 0.0f);
+                            point.m_rootCollidableA = pTree->GetCollidable();
+                            point.m_rootCollidableB = (&collArray->operator[]<hkpRootCdBodyPair>(i))->m_rootCollidableB;
+                            point.m_shapeKeyB = 0;
+                            point.m_shapeKeyA = 0;
+                            pc->contactPointAddedCallback(nullptr, point);
+                            ::new (&csdata) NiBound;
+                            csdata.cMaterialType1 = 4;
+                            csdata.cMaterialType2 = 7;
+                            csdata.fFriction = 1.0f;
+                            pc->GetLinearVelocity(dum);
+                            csdata.fVelocity = dum.Length();
+                            // The source's sound ID is the sum of the two objects' (32-bit) addresses.
+                            csdata.iID = static_cast<int32_t>(
+                                reinterpret_cast<uintptr_t>(phkpPhantom) + reinterpret_cast<uintptr_t>(pTree)
+                            );
+                            csdata.Location = HK2NI(dum, vLocation);
+                            csdata.pBody1 = nullptr;
+                            csdata.pBody2 = nullptr;
+                            ImpactMixer::PlayCollisionSound(csdata);
                         }
                     }
-                    else {
-                        if (pRigidBody) {
-                            int32_t v41 = RandomInt(0, 100);
-                            if (v54 >= static_cast<double>(v41)) {
-                                HavokMaterialType Material;
-                                alignas(16) NiPoint3 dum_2;
-                                FNVD_RECONSTRUCT(hkVector4)(&vLV, pRigidBody->getLinearVelocity());
-                                FNVD_RECONSTRUCT(hkVector4)(&vAV, pRigidBody->getAngularVelocity());
-                                if (vLV.lengthSquared3().operator float() > 1.0) {
-                                    double v36 = vLV.length3().operator float();
-                                    int32_t v35 = RandomInt(iLowDamp.Int(), gs_iHighDamp.Int());
-                                    float v34 = (1.0 - static_cast<double>(v35) / 100.0) * v36;
-                                    float fNewX = RandomFloatNeg1To1();
-                                    float fNewY = RandomFloatNeg1To1();
-                                    float fNewZ = RandomFloatNeg1To1() - 0.25;
-                                    hkVector4 vNewVel(fNewX, fNewY, fNewZ, 0.0f);
-                                    vNewVel.fastNormalize3();
-                                    hkSimdReal v29(v34);
-                                    vNewVel.mul4(v29);
-                                    pRigidBody->setLinearVelocity(vNewVel);
-                                }
-                                if (vAV.lengthSquared3().operator float() > 1.0) {
-                                    double v26 = vAV.length3().operator float();
-                                    int32_t v25 = RandomInt(0, 20);
-                                    float v24 = (static_cast<double>(v25) / 100.0 + 90.0) * v26;
-                                    float fNewX_2 = RandomFloatNeg1To1();
-                                    float fNewY_2 = RandomFloatNeg1To1();
-                                    float fNewZ_2 = RandomFloatNeg1To1() - 0.25;
-                                    hkVector4 vNewVel_2(fNewX_2, fNewY_2, fNewZ_2, 0.0f);
-                                    vNewVel_2.fastNormalize3();
-                                    hkSimdReal v19(v24);
-                                    vNewVel_2.mul4(v19);
-                                    pRigidBody->setAngularVelocity(vNewVel_2);
-                                }
-                                ::new (&csdata_2) NiBound;
-                                bhkShape* pShape = bhkShape::Getbhk(
-                                    (&collArray->operator[]<hkpRootCdBodyPair>(i))->m_rootCollidableB->m_shape
-                                );
-                                csdata_2.cMaterialType1 = 4;
-                                if (pShape) {
-                                    Material = pShape->GetMaterial();
-                                }
-                                else {
-                                    Material = BHK_MATERIAL_STONE;
-                                }
-                                csdata_2.cMaterialType2 = Material;
-                                csdata_2.fFriction = 1.0f;
-                                float a5 = vLV.length3().operator float();
-                                csdata_2.fVelocity = HK2NI(a5);
-                                // The source's sound ID is the sum of the two objects' (32-bit) addresses.
-                                csdata_2.iID = static_cast<int32_t>(
-                                    reinterpret_cast<uintptr_t>(pRigidBody) + reinterpret_cast<uintptr_t>(pTree)
-                                );
-                                const hkTransform* Transform = &pRigidBody->getTransform();
-                                csdata_2.Location = HK2NI(dum_2, Transform->m_translation);
-                                csdata_2.pBody1 = static_cast<bhkRigidBody*>(bhkEntity::Getbhk(pRigidBody));
-                                csdata_2.pBody2 = nullptr;
-                                ImpactMixer::PlayCollisionSound(csdata_2);
+                }
+                else {
+                    if (pRigidBody) {
+                        int32_t v41 = RandomInt(0, 100);
+                        if (v54 >= static_cast<double>(v41)) {
+                            HavokMaterialType Material;
+                            alignas(16) NiPoint3 dum_2;
+                            FNVD_RECONSTRUCT(hkVector4)(&vLV, pRigidBody->getLinearVelocity());
+                            FNVD_RECONSTRUCT(hkVector4)(&vAV, pRigidBody->getAngularVelocity());
+                            if (vLV.lengthSquared3().operator float() > 1.0) {
+                                double v36 = vLV.length3().operator float();
+                                int32_t v35 = RandomInt(iLowDamp.Int(), gs_iHighDamp.Int());
+                                float v34 = (1.0 - static_cast<double>(v35) / 100.0) * v36;
+                                float fNewX = RandomFloatNeg1To1();
+                                float fNewY = RandomFloatNeg1To1();
+                                float fNewZ = RandomFloatNeg1To1() - 0.25;
+                                hkVector4 vNewVel(fNewX, fNewY, fNewZ, 0.0f);
+                                vNewVel.fastNormalize3();
+                                hkSimdReal v29(v34);
+                                vNewVel.mul4(v29);
+                                pRigidBody->setLinearVelocity(vNewVel);
                             }
+                            if (vAV.lengthSquared3().operator float() > 1.0) {
+                                double v26 = vAV.length3().operator float();
+                                int32_t v25 = RandomInt(0, 20);
+                                float v24 = (static_cast<double>(v25) / 100.0 + 90.0) * v26;
+                                float fNewX_2 = RandomFloatNeg1To1();
+                                float fNewY_2 = RandomFloatNeg1To1();
+                                float fNewZ_2 = RandomFloatNeg1To1() - 0.25;
+                                hkVector4 vNewVel_2(fNewX_2, fNewY_2, fNewZ_2, 0.0f);
+                                vNewVel_2.fastNormalize3();
+                                hkSimdReal v19(v24);
+                                vNewVel_2.mul4(v19);
+                                pRigidBody->setAngularVelocity(vNewVel_2);
+                            }
+                            ::new (&csdata_2) NiBound;
+                            bhkShape* pShape = bhkShape::Getbhk(
+                                (&collArray->operator[]<hkpRootCdBodyPair>(i))->m_rootCollidableB->m_shape
+                            );
+                            csdata_2.cMaterialType1 = 4;
+                            if (pShape) {
+                                Material = pShape->GetMaterial();
+                            }
+                            else {
+                                Material = BHK_MATERIAL_STONE;
+                            }
+                            csdata_2.cMaterialType2 = Material;
+                            csdata_2.fFriction = 1.0f;
+                            float a5 = vLV.length3().operator float();
+                            csdata_2.fVelocity = HK2NI(a5);
+                            // The source's sound ID is the sum of the two objects' (32-bit) addresses.
+                            csdata_2.iID = static_cast<int32_t>(
+                                reinterpret_cast<uintptr_t>(pRigidBody) + reinterpret_cast<uintptr_t>(pTree)
+                            );
+                            const hkTransform* Transform = &pRigidBody->getTransform();
+                            csdata_2.Location = HK2NI(dum_2, Transform->m_translation);
+                            csdata_2.pBody1 = static_cast<bhkRigidBody*>(bhkEntity::Getbhk(pRigidBody));
+                            csdata_2.pBody2 = nullptr;
+                            ImpactMixer::PlayCollisionSound(csdata_2);
                         }
                     }
                 }
@@ -546,14 +543,13 @@ bool BSTreeNode::CheckForCollision(float afTime) {
             (uint8_t)(((int32_t)BSTreeNode::ucNextGroup) % ((int32_t)(&gs_iUpdateGroups)->UInt()));
         return true;
     }
-    else {
-        v6 = 0;
-        if (!(fNextCollisionCheck < ((double)afTime))) {
-            return (bool)v6;
-        }
-        fNextCollisionCheck = (afTime + (&fUpdateInterval)->Float());
-        return true;
+
+    v6 = 0;
+    if (!(fNextCollisionCheck < ((double)afTime))) {
+        return (bool)v6;
     }
+    fNextCollisionCheck = (afTime + (&fUpdateInterval)->Float());
+    return true;
 }
 
 // Gives the tree's leaf node a simple-shape phantom built from the tree's collision objects, converted to Havok units
@@ -708,9 +704,8 @@ hkpTransformShape* bhkTransformShape::operator*() const {
     if (this) {
         return static_cast<hkpTransformShape*>(GethkObject());
     }
-    else {
-        return nullptr;
-    }
+
+    return nullptr;
 }
 
 hkTransformShapeCinfo::hkTransformShapeCinfo() : m_childShape(nullptr) {

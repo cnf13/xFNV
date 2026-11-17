@@ -580,40 +580,36 @@ void ParticleShader::Stop(NiAVObject* apObject, ParticleShaderProperty* apProp) 
     NiTriShape* v8;
     if (apObject) {
         v2 = apObject->IsNode();
-        if (v2) {
-            if (apProp) {
-                for (i = 0; i < ((uint32_t)((int32_t)v2->m_kChildren.m_usSize)); ++i) {
-                    m_pObject = v2->m_kChildren.m_pBase[i].m_pObject;
-                    if (m_pObject) {
-                        property = m_pObject->GetProperty(3);
-                        if (property) {
-                            v6 = (int32_t)(property[1].m_uiRefCount == 17);
-                        }
-                        else {
-                            v6 = 0;
-                        }
+        if ((v2) && (apProp)) {
+            for (i = 0; i < ((uint32_t)((int32_t)v2->m_kChildren.m_usSize)); ++i) {
+                m_pObject = v2->m_kChildren.m_pBase[i].m_pObject;
+                if (m_pObject) {
+                    property = m_pObject->GetProperty(3);
+                    if (property) {
+                        v6 = (int32_t)(property[1].m_uiRefCount == 17);
                     }
                     else {
-                        property = nullptr;
                         v6 = 0;
                     }
-                    v7 = v6 ? static_cast<ParticleShaderProperty*>(property) : nullptr;
-                    if (v7) {
-                        if (v7 == apProp) {
-                            v2->DetachChildAt(i);
-                        }
-                    }
                 }
-                if ((--ParticleShader::iNumParticles) <= 0) {
-                    if (ParticleShader::spBaseGeometry.m_pObject) {
-                        v8 = ParticleShader::spBaseGeometry.m_pObject;
-                        if (!InterlockedDecrementUInt32(&ParticleShader::spBaseGeometry.m_pObject->m_uiRefCount)) {
-                            v8->DeleteThis();
-                        }
-                        ParticleShader::spBaseGeometry.m_pObject = nullptr;
-                    }
-                    ParticleShader::iNumParticles = 0;
+                else {
+                    property = nullptr;
+                    v6 = 0;
                 }
+                v7 = v6 ? static_cast<ParticleShaderProperty*>(property) : nullptr;
+                if ((v7) && (v7 == apProp)) {
+                    v2->DetachChildAt(i);
+                }
+            }
+            if ((--ParticleShader::iNumParticles) <= 0) {
+                if (ParticleShader::spBaseGeometry.m_pObject) {
+                    v8 = ParticleShader::spBaseGeometry.m_pObject;
+                    if (!InterlockedDecrementUInt32(&ParticleShader::spBaseGeometry.m_pObject->m_uiRefCount)) {
+                        v8->DeleteThis();
+                    }
+                    ParticleShader::spBaseGeometry.m_pObject = nullptr;
+                }
+                ParticleShader::iNumParticles = 0;
             }
         }
     }

@@ -59,7 +59,7 @@ public:
     NiObject* CreateClone(NiCloningProcess& arCloneData) override;
     bool IsEqual(NiObject* apObject) override;
     void GetViewerStrings(NiTPrimitiveArray<char*>* apStrings) override;
-    virtual ~bhkBlendController();
+    ~bhkBlendController() override;
     bool IsTransformController() const override {
         return true;
     }

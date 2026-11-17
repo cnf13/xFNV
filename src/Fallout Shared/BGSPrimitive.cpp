@@ -597,15 +597,13 @@ BSMultiBoundShape* BGSPrimitiveBox::MakeMultiBoundShape(NiPoint3& a1) {
         v4->SetAxis(ecx0);
         return v4;
     }
-    else {
-        BSMultiBoundAABB* v6 = static_cast<BSMultiBoundAABB*>(NiMemObject::operator new(sizeof(BSMultiBoundAABB)));
-        if (v6) {
-            return ::new (v6) BSMultiBoundAABB(&NiPoint3_ZERO, &Radii);
-        }
-        else {
-            return nullptr;
-        }
+
+    BSMultiBoundAABB* v6 = static_cast<BSMultiBoundAABB*>(NiMemObject::operator new(sizeof(BSMultiBoundAABB)));
+    if (v6) {
+        return ::new (v6) BSMultiBoundAABB(&NiPoint3_ZERO, &Radii);
     }
+
+    return nullptr;
 }
 
 BSMultiBoundSphere::~BSMultiBoundSphere() {}

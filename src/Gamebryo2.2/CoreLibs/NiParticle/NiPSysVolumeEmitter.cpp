@@ -76,10 +76,7 @@ bool NiPSysVolumeEmitter::IsEqual(NiObject* pkObject) {
     }
 
     NiPSysVolumeEmitter* pkOther = static_cast<NiPSysVolumeEmitter*>(pkObject);
-    if ((m_pkEmitterObj && !pkOther->m_pkEmitterObj) || (!m_pkEmitterObj && pkOther->m_pkEmitterObj)) {
-        return false;
-    }
-    return true;
+    return !((m_pkEmitterObj && !pkOther->m_pkEmitterObj) || (!m_pkEmitterObj && pkOther->m_pkEmitterObj));
 }
 
 // No line is added when there is no emitter object.

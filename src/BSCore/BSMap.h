@@ -76,10 +76,10 @@ template <class TKEY, class TVAL>
 class BSMap : public BSMapBase<TKEY, TVAL> {
 public:
     BSMap(uint32_t auiHashSize);
-    virtual ~BSMap();
+    ~BSMap() override;
 
-    virtual BSMapItem<TKEY, TVAL>* NewItem();
-    virtual void DeleteItem(BSMapItem<TKEY, TVAL>* pkItem);
+    BSMapItem<TKEY, TVAL>* NewItem() override;
+    void DeleteItem(BSMapItem<TKEY, TVAL>* pkItem) override;
 };
 
 // The hash table of uiHashSize null buckets; none for a size of 0. The thread scrap heap map's instance takes its

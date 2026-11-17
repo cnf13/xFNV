@@ -535,14 +535,13 @@ bool MediaLocationController::GetDayNight() {
         }
         return (bool)v6;
     }
-    else {
-        if (!pSky) {
-            return true;
-        }
-        v4 = ((double)uiDayStart) * 0.09375;
-        return (bool)((uint8_t)((pSky->GetCurrentGameHour() >= v4) &&
-                                ((((double)uiNightStart) * 0.09375) >= pSky->GetCurrentGameHour())));
+
+    if (!pSky) {
+        return true;
     }
+    v4 = ((double)uiDayStart) * 0.09375;
+    return (bool)((uint8_t)((pSky->GetCurrentGameHour() >= v4) &&
+                            ((((double)uiNightStart) * 0.09375) >= pSky->GetCurrentGameHour())));
 }
 
 MediaLocationController::DEADREPFLAGS MediaLocationController::GetDeadRep() {
@@ -625,22 +624,20 @@ bool MediaLocationController::Update(bool abInCombat) {
     uiFoundHostileActors = 0;
     while (pNearList && !pNearList->IsEmpty()) {
         CompassTarget* pact = pNearList->m_item;
-        if (pact) {
-            if (pact->pTarget) {
-                if (pFaction) {
-                    if (pact->pTarget->IsInFaction(pFaction)) {
-                        ++uiFoundFactionActors;
-                        bFoundHostile = true;
-                        if (pact->bIsHostile) {
-                            v19 = FIGHT_REACTION_ENEMY;
-                        }
-                    }
-                }
+        if ((pact) && (pact->pTarget)) {
+            if ((pFaction) && (pact->pTarget->IsInFaction(pFaction))) {
+                ++uiFoundFactionActors;
+                bFoundHostile = true;
                 if (pact->bIsHostile) {
-                    ++uiFoundHostileActors;
+                    v19 = FIGHT_REACTION_ENEMY;
                 }
             }
+
+            if (pact->bIsHostile) {
+                ++uiFoundHostileActors;
+            }
         }
+
         pNearList = pNearList->m_pkNext;
     }
     PlayerCharacter::kPerceivedActorsLock.Unlock();
@@ -739,11 +736,10 @@ bool MediaLocationController::Update(bool abInCombat) {
             pCurrentMediaSet = GetRandomListItem(&lBattleList);
         }
     }
-    if (!bIsActive) {
-        if (pCurrentMediaSet) {
-            bIsActive = pCurrentMediaSet->Update(ticks, abInCombat, this);
-        }
+    if ((!bIsActive) && (pCurrentMediaSet)) {
+        bIsActive = pCurrentMediaSet->Update(ticks, abInCombat, this);
     }
+
     if (bIsActive) {
         uiLocationDelay = static_cast<int64_t>(static_cast<double>(ticks) + fLocationDelay * 1000.0);
     }

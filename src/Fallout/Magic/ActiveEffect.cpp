@@ -585,52 +585,51 @@ void ActiveEffect::UpdateEffect(float afSecondsElapsed) {
             if (!bDone && !bFinished) {
                 if (!IsFlagSet(ActiveEffect::NO_HITEFFECT_FORCED)) {
                     EffectSetting* EffectSetting_ = GetEffectSetting();
-                    if (!EffectSetting_->IsFlagSet(EffectSetting::NO_HIT_EFFECT)) {
-                        if (eSpellType != MagicSystem::ABILITY ||
-                            ((GetEffectSetting(), NiAlphaProperty::GetType()) && fMagnitude < 100.0)) {
-                            if (eSpellType == MagicSystem::ABILITY) {
-                                SetFlag(ActiveEffect::NO_HITEFFECT_NIF);
-                            }
-                            // Food shows no hit effect: the spell as an ingredient or a potion, each asked through its
-                            // EffectItemList's IsFood.
-                            IngredientItem* pingredient = nullptr;
-                            if (pspell->GetSpellType() == MagicSystem::WORTCRAFT) {
-                                pingredient = static_cast<IngredientItem*>(pspell);
-                            }
-                            AlchemyItem* ppotion = nullptr;
-                            if (pspell->GetSpellType() == MagicSystem::POTION) {
-                                ppotion = static_cast<AlchemyItem*>(pspell);
-                            }
-                            bool bfood;
-                            if (pingredient) {
-                                bfood = static_cast<EffectItemList*>(pingredient)->IsFood();
-                            }
-                            else if (ppotion) {
-                                bfood = static_cast<EffectItemList*>(ppotion)->IsFood();
+                    if ((!EffectSetting_->IsFlagSet(EffectSetting::NO_HIT_EFFECT)) &&
+                        (eSpellType != MagicSystem::ABILITY ||
+                         ((GetEffectSetting(), NiAlphaProperty::GetType()) && fMagnitude < 100.0))) {
+                        if (eSpellType == MagicSystem::ABILITY) {
+                            SetFlag(ActiveEffect::NO_HITEFFECT_NIF);
+                        }
+                        // Food shows no hit effect: the spell as an ingredient or a potion, each asked through its
+                        // EffectItemList's IsFood.
+                        IngredientItem* pingredient = nullptr;
+                        if (pspell->GetSpellType() == MagicSystem::WORTCRAFT) {
+                            pingredient = static_cast<IngredientItem*>(pspell);
+                        }
+                        AlchemyItem* ppotion = nullptr;
+                        if (pspell->GetSpellType() == MagicSystem::POTION) {
+                            ppotion = static_cast<AlchemyItem*>(pspell);
+                        }
+                        bool bfood;
+                        if (pingredient) {
+                            bfood = static_cast<EffectItemList*>(pingredient)->IsFood();
+                        }
+                        else if (ppotion) {
+                            bfood = static_cast<EffectItemList*>(ppotion)->IsFood();
+                        }
+                        else {
+                            bfood = false;
+                        }
+                        if (!bfood) {
+                            if (ptargetStatsObject == pPlayer && Interface::IsInMenuMode()) {
+                                SetFlag(ActiveEffect::DEFERRED_HITEFFECT);
                             }
                             else {
-                                bfood = false;
-                            }
-                            if (!bfood) {
-                                if (ptargetStatsObject == pPlayer && Interface::IsInMenuMode()) {
-                                    SetFlag(ActiveEffect::DEFERRED_HITEFFECT);
+                                if (this->pHitEffects) {
+                                    this->pHitEffects->RemoveAll();
+                                    BSSimpleList<MagicHitEffect*>* pHitEffects = this->pHitEffects;
+                                    if (pHitEffects) {
+                                        delete pHitEffects;
+                                    }
+                                    this->pHitEffects = nullptr;
+                                }
+                                if (AILinearTaskThreadManager::ShouldQueue3DTask()) {
+                                    TaskQueueInterface* Instance = TaskQueueInterface::GetInstance();
+                                    Instance->QueueMHEInstantiateHitEffects(this);
                                 }
                                 else {
-                                    if (this->pHitEffects) {
-                                        this->pHitEffects->RemoveAll();
-                                        BSSimpleList<MagicHitEffect*>* pHitEffects = this->pHitEffects;
-                                        if (pHitEffects) {
-                                            delete pHitEffects;
-                                        }
-                                        this->pHitEffects = nullptr;
-                                    }
-                                    if (AILinearTaskThreadManager::ShouldQueue3DTask()) {
-                                        TaskQueueInterface* Instance = TaskQueueInterface::GetInstance();
-                                        Instance->QueueMHEInstantiateHitEffects(this);
-                                    }
-                                    else {
-                                        this->pHitEffects = MagicHitEffect::InstantiateHitEffects(this);
-                                    }
+                                    this->pHitEffects = MagicHitEffect::InstantiateHitEffects(this);
                                 }
                             }
                         }
@@ -686,12 +685,10 @@ void ActiveEffect::UpdateEffect(float afSecondsElapsed) {
             }
             if (pTarget->MagicTargetIsActor()) {
                 Actor* pActor = static_cast<Actor*>(pTarget);
-                if (pActor) {
-                    if (pActor->IsDead(true)) {
-                        EffectSetting* v4 = GetEffectSetting();
-                        if (!v4->IsFlagSet(EffectSetting::NO_DEATH_DISPEL)) {
-                            bDone = true;
-                        }
+                if ((pActor) && (pActor->IsDead(true))) {
+                    EffectSetting* v4 = GetEffectSetting();
+                    if (!v4->IsFlagSet(EffectSetting::NO_DEATH_DISPEL)) {
+                        bDone = true;
                     }
                 }
             }
@@ -709,28 +706,26 @@ void ActiveEffect::UpdateEffect(float afSecondsElapsed) {
 void ActiveEffect::EvaluateConditions(float afTimeDelta, bool abForceUpdate) {
     if (HasConditions() || GetDisplacementSpell()) {
         MagicTarget* pTarget = GetTarget();
-        if (pTarget) {
-            if (pTarget->GetTargetStatsObject()) {
-                float v8;
-                double v9;
-                float v10;
-                float fActiveEffectConditionUpdateInterval = ::fActiveEffectConditionUpdateInterval.Float();
-                if (abForceUpdate ||
-                    (v10 = fElapsedSeconds / fActiveEffectConditionUpdateInterval,
-                     (v9 = std::floor(v10),
-                      (v8 = (fElapsedSeconds + afTimeDelta) / fActiveEffectConditionUpdateInterval,
-                       v9 != std::floor(v8))))) {
-                    TESObjectREFR* pTargetActor = pTarget->GetTargetStatsObject();
-                    EffectItem* CastingType = GetEffectItem();
-                    TESCondition* Data = &CastingType->Conditions;
-                    bool bIsTrue = Data->IsTrue(pTargetActor, nullptr);
-                    bool v12 = !CheckDisplacementSpellOnTarget() && bIsTrue;
-                    if (v12 && !bActive && bFinished && !bDone) {
-                        bStarted = false;
-                        bFinished = false;
-                    }
-                    bActive = v12;
+        if ((pTarget) && (pTarget->GetTargetStatsObject())) {
+            float v8;
+            double v9;
+            float v10;
+            float fActiveEffectConditionUpdateInterval = ::fActiveEffectConditionUpdateInterval.Float();
+            if (abForceUpdate ||
+                (v10 = fElapsedSeconds / fActiveEffectConditionUpdateInterval,
+                 (v9 = std::floor(v10),
+                  (v8 = (fElapsedSeconds + afTimeDelta) / fActiveEffectConditionUpdateInterval,
+                   v9 != std::floor(v8))))) {
+                TESObjectREFR* pTargetActor = pTarget->GetTargetStatsObject();
+                EffectItem* CastingType = GetEffectItem();
+                TESCondition* Data = &CastingType->Conditions;
+                bool bIsTrue = Data->IsTrue(pTargetActor, nullptr);
+                bool v12 = !CheckDisplacementSpellOnTarget() && bIsTrue;
+                if (v12 && !bActive && bFinished && !bDone) {
+                    bStarted = false;
+                    bFinished = false;
                 }
+                bActive = v12;
             }
         }
     }
@@ -739,10 +734,8 @@ void ActiveEffect::EvaluateConditions(float afTimeDelta, bool abForceUpdate) {
 // Effects cast from worn armour or clothing are marked as coming from a worn enchantment.
 void ActiveEffect::SetEnchantmentSource(TESBoundObject* apSource) {
     pSource = apSource;
-    if (pSource) {
-        if (pSource->GetFormType() == ARMO_ID || pSource->GetFormType() == CLOT_ID) {
-            SetFlag(FROM_WORN_ENCHANTMENT);
-        }
+    if ((pSource) && (pSource->GetFormType() == ARMO_ID || pSource->GetFormType() == CLOT_ID)) {
+        SetFlag(FROM_WORN_ENCHANTMENT);
     }
 }
 
@@ -808,37 +801,32 @@ bool ActiveEffect::CheckDisplacementSpellOnTarget() {
     bool bignoreAddiction = false;
     if (this->pTarget->MagicTargetIsActor()) {
         Actor* pactor = static_cast<Actor*>(this->pTarget);
-        if (pactor) {
-            if (pactor->GetActorValue(ActorValue::IGNORE_CRIPPLED_LIMBS) > 0) {
-                bignoreAddiction = true;
-            }
+        if ((pactor) && (pactor->GetActorValue(ActorValue::IGNORE_CRIPPLED_LIMBS) > 0)) {
+            bignoreAddiction = true;
         }
     }
     SpellItem* pspell = dynamic_cast<SpellItem*>(pSpell);
-    if (pDisplacementSpell) {
-        if (this->pTarget) {
-            MagicTarget* Target = this->pTarget;
-            for (BSSimpleList<ActiveEffect*>* plist = Target->GetActiveEffectList(); plist && !bresult;
-                 plist = plist->m_pkNext) {
-                ActiveEffect* pitem = plist->m_item;
-                if (pitem) {
-                    if (pitem->bActive) {
-                        if (pitem->pSpell == pDisplacementSpell) {
-                            bresult = true;
-                        }
-                        else {
-                            if (pitem->pSpell->GetSpellType() == MagicSystem::POTION) {
-                                AlchemyItem* ppotion = dynamic_cast<AlchemyItem*>(pitem->pSpell);
-                                if (ppotion) {
-                                    bresult = ppotion->GetAddictionItem() == pspell;
-                                }
-                            }
+    if ((pDisplacementSpell) && (this->pTarget)) {
+        MagicTarget* Target = this->pTarget;
+        for (BSSimpleList<ActiveEffect*>* plist = Target->GetActiveEffectList(); plist && !bresult;
+             plist = plist->m_pkNext) {
+            ActiveEffect* pitem = plist->m_item;
+            if ((pitem) && (pitem->bActive)) {
+                if (pitem->pSpell == pDisplacementSpell) {
+                    bresult = true;
+                }
+                else {
+                    if (pitem->pSpell->GetSpellType() == MagicSystem::POTION) {
+                        AlchemyItem* ppotion = dynamic_cast<AlchemyItem*>(pitem->pSpell);
+                        if (ppotion) {
+                            bresult = ppotion->GetAddictionItem() == pspell;
                         }
                     }
                 }
             }
         }
     }
+
     if (bresult && bignoreAddiction) {
         return false;
     }
@@ -857,49 +845,47 @@ void ActiveEffect::StartSound() {
     else {
         isoundFileID = 0;
     }
-    if (isoundFileID) {
-        if (pTarget) {
-            MagicItem* Spell = pSpell;
-            if (Spell->GetSpellType() != MagicSystem::ABILITY) {
-                Actor* ptargetActor;
-                BSSoundHandle soundHandle;
-                if (pTarget) {
-                    ptargetActor = pTarget->GetTargetAsActor();
+    if ((isoundFileID) && (pTarget)) {
+        MagicItem* Spell = pSpell;
+        if (Spell->GetSpellType() != MagicSystem::ABILITY) {
+            Actor* ptargetActor;
+            BSSoundHandle soundHandle;
+            if (pTarget) {
+                ptargetActor = pTarget->GetTargetAsActor();
+            }
+            else {
+                ptargetActor = nullptr;
+            }
+            EffectSetting* v4 = GetEffectSetting();
+            bool bpersistent = v4->IsFlagSet(EffectSetting::PERSIST);
+            EffectSetting* v5 = GetEffectSetting();
+            if (v5->data.pHitSound) {
+                EffectSetting* v6 = GetEffectSetting();
+                TESSound* v7 = v6->data.pHitSound;
+                bpersistent = TESSound::ConvertLoopFlag(v7->GetData().iFlags) != 0;
+            }
+            if (ptargetActor) {
+                uint32_t uiflags = bpersistent ? 274 : 258;
+                BSSoundHandle* arHandle = ptargetActor->PlaySound(&a2, isoundFileID, bpersistent, uiflags, false);
+                soundHandle.operator=(*arHandle);
+            }
+            else {
+                MagicTarget* Target = pTarget;
+                TESObjectREFR* ptargetObject = Target->GetTargetStatsObject();
+                if (ptargetObject) {
+                    BSAudio* v9 = &BSAudio::QInstance();
+                    v9->GetSoundHandleByNumericID(&soundHandle_2, isoundFileID, 258u);
+                    NiPoint3 v20 = ptargetObject->GetLocationOnReference();
+                    soundHandle_2.SetPosition(v20.x, v20.y, v20.z);
+                    soundHandle_2.Play(bpersistent);
                 }
-                else {
-                    ptargetActor = nullptr;
+            }
+            if (bpersistent) {
+                if (PersistentSound.IsValid()) {
+                    PersistentSound.Stop();
+                    PersistentSound.Release();
                 }
-                EffectSetting* v4 = GetEffectSetting();
-                bool bpersistent = v4->IsFlagSet(EffectSetting::PERSIST);
-                EffectSetting* v5 = GetEffectSetting();
-                if (v5->data.pHitSound) {
-                    EffectSetting* v6 = GetEffectSetting();
-                    TESSound* v7 = v6->data.pHitSound;
-                    bpersistent = TESSound::ConvertLoopFlag(v7->GetData().iFlags) != 0;
-                }
-                if (ptargetActor) {
-                    uint32_t uiflags = bpersistent ? 274 : 258;
-                    BSSoundHandle* arHandle = ptargetActor->PlaySound(&a2, isoundFileID, bpersistent, uiflags, false);
-                    soundHandle.operator=(*arHandle);
-                }
-                else {
-                    MagicTarget* Target = pTarget;
-                    TESObjectREFR* ptargetObject = Target->GetTargetStatsObject();
-                    if (ptargetObject) {
-                        BSAudio* v9 = &BSAudio::QInstance();
-                        v9->GetSoundHandleByNumericID(&soundHandle_2, isoundFileID, 258u);
-                        NiPoint3 v20 = ptargetObject->GetLocationOnReference();
-                        soundHandle_2.SetPosition(v20.x, v20.y, v20.z);
-                        soundHandle_2.Play(bpersistent);
-                    }
-                }
-                if (bpersistent) {
-                    if (PersistentSound.IsValid()) {
-                        PersistentSound.Stop();
-                        PersistentSound.Release();
-                    }
-                    PersistentSound.operator=(soundHandle);
-                }
+                PersistentSound.operator=(soundHandle);
             }
         }
     }
@@ -955,15 +941,14 @@ ActiveEffect* ActiveEffect::LoadActiveEffect(BGSLoadFormBuffer* apLoadGameBuffer
         pactiveEffect->LoadGame(apLoadGameBuffer);
         return pactiveEffect;
     }
-    else {
-        apLoadGameBuffer->AdvanceBuffer(apLoadGameBuffer->LoadVariableSizedValue());
-        SaveGameWarning(
-            "GAME EFFECTS: Could not load active effect with spell %08X, effect index %i, and archetype ID "
-            "%i",
-            isavedSpellID, ceffectIndex, ieffectArchetypeID
-        );
-        return nullptr;
-    }
+
+    apLoadGameBuffer->AdvanceBuffer(apLoadGameBuffer->LoadVariableSizedValue());
+    SaveGameWarning(
+        "GAME EFFECTS: Could not load active effect with spell %08X, effect index %i, and archetype ID "
+        "%i",
+        isavedSpellID, ceffectIndex, ieffectArchetypeID
+    );
+    return nullptr;
 }
 
 void ActiveEffect::LoadActiveEffectList(
@@ -1025,9 +1010,8 @@ void ActiveEffect::LoadActiveEffectListTES(BSSimpleList<ActiveEffect*>* apActive
     for (int32_t i = 0; i < icount; ++i) {
         ActiveEffect* peffect_2 = ActiveEffect::LoadActiveEffectTES(apActor);
         // The game reads apActor's current AI process here (a trivial accessor) and drops the result.
-        if (dynamic_cast<VampirismEffect*>(peffect_2)) {
-            if (apActor) {}
-        }
+        if ((dynamic_cast<VampirismEffect*>(peffect_2)) && (apActor)) {}
+
         if (peffect_2) {
             apActiveEffectList->Insert(peffect_2, &MagicTarget::ActiveEffectListCompareFn);
         }
@@ -1116,11 +1100,9 @@ void ActiveEffect::FinishInitLoadGameActiveEffectList(BSSimpleList<ActiveEffect*
         m_item->FinishInitLoadGame(apActor);
         apActiveEffectList = apActiveEffectList->m_pkNext;
     }
-    if (apActor) {
-        if (apActor->pCurrentProcess) {
-            BaseProcess* CurrentAIProcess = apActor->pCurrentProcess;
-            CurrentAIProcess->SetShouldRefreshMagicShadersEffects(true, true, true);
-        }
+    if ((apActor) && (apActor->pCurrentProcess)) {
+        BaseProcess* CurrentAIProcess = apActor->pCurrentProcess;
+        CurrentAIProcess->SetShouldRefreshMagicShadersEffects(true, true, true);
     }
 }
 
@@ -1297,11 +1279,10 @@ ActiveEffect* ActiveEffect::LoadActiveEffectTES(Actor* a1) {
         v2->LoadGame(a1);
         return v2;
     }
-    else {
-        pSaveLoadGameOLD->AdvanceBuffer(apData);
-        Warning("GAME EFFECTS: Could not load active effect with actor effect %08X and effect index %i", apFormID, v4);
-        return nullptr;
-    }
+
+    pSaveLoadGameOLD->AdvanceBuffer(apData);
+    Warning("GAME EFFECTS: Could not load active effect with actor effect %08X and effect index %i", apFormID, v4);
+    return nullptr;
 }
 
 void ActiveEffect::InitLoadActiveEffectList(

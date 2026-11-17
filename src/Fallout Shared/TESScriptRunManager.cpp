@@ -318,13 +318,11 @@ bool ScriptRunner::EvaluateLine(
         SCRIPT_PARAMETER* pParameterDef = scriptBlocks[eBlockType].pParameters;
         auto pExecute = scriptBlocks[eBlockType].pExecuteFunction;
         if (abEndian) {
-            if (pParameterDef) {
-                if (aiLineSize) {
-                    Script::ParseParameters(
-                        pParameterDef, pCompiledData, uiCurrentOffset, apFunctionOwner, m_currentContainer, apScript,
-                        m_currentVars
-                    );
-                }
+            if ((pParameterDef) && (aiLineSize)) {
+                Script::ParseParameters(
+                    pParameterDef, pCompiledData, uiCurrentOffset, apFunctionOwner, m_currentContainer, apScript,
+                    m_currentVars
+                );
             }
         }
         else {
@@ -477,20 +475,17 @@ bool ScriptRunner::EvaluateLine(
                         if ((pRefObj && pRefObj->form) || apFunctionOwner) {
                             TESObjectREFR* pref = nullptr;
                             if (pRefObj) {
-                                if (pRefObj->form) {
-                                    if (pRefObj->form->IsReference()) {
-                                        pref = static_cast<TESObjectREFR*>(pRefObj->form);
-                                    }
+                                if ((pRefObj->form) && (pRefObj->form->IsReference())) {
+                                    pref = static_cast<TESObjectREFR*>(pRefObj->form);
                                 }
                             }
                             else {
                                 pref = apFunctionOwner;
                             }
-                            if (pref) {
-                                if (!pref->GetTemporary() &&
-                                    (!pref->GetParentCell() || !pref->GetParentCell()->GetAttached())) {
-                                    pref->AddChange(CHANGE_REFR_EXTRA_GAME_ONLY);
-                                }
+                            if ((pref) &&
+                                (!pref->GetTemporary() &&
+                                 (!pref->GetParentCell() || !pref->GetParentCell()->GetAttached()))) {
+                                pref->AddChange(CHANGE_REFR_EXTRA_GAME_ONLY);
                             }
                         }
                     }
@@ -602,24 +597,22 @@ bool ScriptRunner::EvaluateLine(
                         return false;
                     }
                     if (abEndian) {
-                        if (pParameterDef_2) {
-                            if (aiLineSize) {
-                                Script::ParseParameters(
-                                    pParameterDef_2, pCompiledData, uiCurrentOffset, apFunctionOwner,
-                                    m_currentContainer, apScript, m_currentVars
-                                );
-                                if (aeExp == FUNCTION_MESSAGE) {
-                                    int16_t sVarCount = *reinterpret_cast<uint16_t*>(&pCompiledData[uiCurrentOffset]);
-                                    uiCurrentOffset += 2;
-                                    for (int16_t n = 0; n < sVarCount; ++n) {
-                                        double dtmp;
-                                        Script::GetValue(
-                                            dtmp, pCompiledData, uiCurrentOffset, apFunctionOwner, m_currentContainer,
-                                            apScript, m_currentVars, true
-                                        );
-                                    }
-                                    uiCurrentOffset += 4;
+                        if ((pParameterDef_2) && (aiLineSize)) {
+                            Script::ParseParameters(
+                                pParameterDef_2, pCompiledData, uiCurrentOffset, apFunctionOwner, m_currentContainer,
+                                apScript, m_currentVars
+                            );
+                            if (aeExp == FUNCTION_MESSAGE) {
+                                int16_t sVarCount = *reinterpret_cast<uint16_t*>(&pCompiledData[uiCurrentOffset]);
+                                uiCurrentOffset += 2;
+                                for (int16_t n = 0; n < sVarCount; ++n) {
+                                    double dtmp;
+                                    Script::GetValue(
+                                        dtmp, pCompiledData, uiCurrentOffset, apFunctionOwner, m_currentContainer,
+                                        apScript, m_currentVars, true
+                                    );
                                 }
+                                uiCurrentOffset += 4;
                             }
                         }
                     }

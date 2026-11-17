@@ -226,38 +226,36 @@ void ScreenCustomSplatter::Activate(
 ) {
     FNVD_INLINED_LOCAL(NiFixedString, sName, std::nullopt, std::nullopt);
     BSSplatterData splatterData;
-    if (ScreenCustomSplatter::bEnabled) {
-        if (auiCount) {
-            BSCustomSplatterExtraData* ped;
-            NiNode* pnode = ScreenCustomSplatter::CreateGeometry(auiCount, fSplatScale, fOpacityScale);
-            ScreenCustomSplatter::uiCount += auiCount;
-            splatterData.fAlpha = 1.0f;
-            splatterData.fAge = 0.0;
-            if (!(afDuration > 0.0)) {
-                splatterData.fDuration = fBloodSplatterDuration.Float();
-            }
-            else {
-                splatterData.fDuration = afDuration;
-            }
-            splatterData.uiCount = auiCount;
-            void* apMemory = NiMemObject::operator new(sizeof(BSCustomSplatterExtraData));
-            if (apMemory) {
-                ped = ::new (apMemory) BSCustomSplatterExtraData(&splatterData);
-            }
-            else {
-                ped = nullptr;
-            }
-            pnode->AddExtraData(ped);
-            NiFixedString* pName = ::new (static_cast<void*>(&sName)) NiFixedString("ScreenSplatterRoot");
-            pnode->SetName(*pName);
-            sName.~NiFixedString();
-            NiNode* pRootNode = ScreenCustomSplatter::spRoot.m_pObject;
-            pRootNode->AttachChild(pnode, 1);
-            float* BroadPhaseHandle = &ped->SplatterData.fAlpha;
-            BSShaderBloodSplatterProperty::SetFadeSourceRecurse(pnode, BroadPhaseHandle);
-            NiUpdateData UpdateData(0.0f, false, false);
-            ScreenCustomSplatter::spRoot.m_pObject->Update(UpdateData);
+    if ((ScreenCustomSplatter::bEnabled) && (auiCount)) {
+        BSCustomSplatterExtraData* ped;
+        NiNode* pnode = ScreenCustomSplatter::CreateGeometry(auiCount, fSplatScale, fOpacityScale);
+        ScreenCustomSplatter::uiCount += auiCount;
+        splatterData.fAlpha = 1.0f;
+        splatterData.fAge = 0.0;
+        if (!(afDuration > 0.0)) {
+            splatterData.fDuration = fBloodSplatterDuration.Float();
         }
+        else {
+            splatterData.fDuration = afDuration;
+        }
+        splatterData.uiCount = auiCount;
+        void* apMemory = NiMemObject::operator new(sizeof(BSCustomSplatterExtraData));
+        if (apMemory) {
+            ped = ::new (apMemory) BSCustomSplatterExtraData(&splatterData);
+        }
+        else {
+            ped = nullptr;
+        }
+        pnode->AddExtraData(ped);
+        NiFixedString* pName = ::new (static_cast<void*>(&sName)) NiFixedString("ScreenSplatterRoot");
+        pnode->SetName(*pName);
+        sName.~NiFixedString();
+        NiNode* pRootNode = ScreenCustomSplatter::spRoot.m_pObject;
+        pRootNode->AttachChild(pnode, 1);
+        float* BroadPhaseHandle = &ped->SplatterData.fAlpha;
+        BSShaderBloodSplatterProperty::SetFadeSourceRecurse(pnode, BroadPhaseHandle);
+        NiUpdateData UpdateData(0.0f, false, false);
+        ScreenCustomSplatter::spRoot.m_pObject->Update(UpdateData);
     }
 }
 

@@ -219,11 +219,10 @@ void BSMultiBoundRoom::RemoveFrustum() {
 }
 
 void BSMultiBoundRoom::SetCompoundFrustum(BSCompoundFrustum* apFrustum) {
-    if (pCompoundFrustum) {
-        if (pCompoundFrustum != apFrustum) {
-            RemoveFrustum();
-        }
+    if ((pCompoundFrustum) && (pCompoundFrustum != apFrustum)) {
+        RemoveFrustum();
     }
+
     pCompoundFrustum = apFrustum;
 }
 
@@ -245,9 +244,8 @@ BSMultiBoundShape::BSMBCullResult BSMultiBoundRoom::GetCullResult() {
     if (m_pObject->spShape.m_pObject) {
         return static_cast<BSMultiBoundShape::BSMBCullResult>((int32_t)m_pObject->spShape.m_pObject->kCullResult);
     }
-    else {
-        return BSMultiBoundShape::BS_CULL_UNTESTED;
-    }
+
+    return BSMultiBoundShape::BS_CULL_UNTESTED;
 }
 
 void BSMultiBoundRoom::AddOccluder(BSOcclusionPlane* apOccluder) {

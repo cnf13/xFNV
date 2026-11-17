@@ -60,12 +60,11 @@ void MagicItem::Preload(bool abNow) {
     if (brunNow) {
         EffectItemList* plist_2;
         if (pavEffectSetting) {
-            if (bloadNow) {
-                if (pavEffectSetting->GetModelLength()) {
-                    const char* v2 = pavEffectSetting->GetModel();
-                    pModelLoader->LoadFile(v2, LOD_MULT_NONE, true, false, false, false);
-                }
+            if ((bloadNow) && (pavEffectSetting->GetModelLength())) {
+                const char* v2 = pavEffectSetting->GetModel();
+                pModelLoader->LoadFile(v2, LOD_MULT_NONE, true, false, false, false);
             }
+
             pavEffectSetting->IncEffectLoadedCount();
         }
         if (this) {
@@ -84,11 +83,9 @@ void MagicItem::Preload(bool abNow) {
                         TESForm* pform = pes->GetAssociatedItem();
                         if (pform && pes->IsFlagSet(EffectSetting::USE_ASSOCIATED_WEAPON)) {
                             TESObjectWEAP* pweapon = dynamic_cast<TESObjectWEAP*>(pform);
-                            if (pweapon) {
-                                if (pweapon->GetModelLength()) {
-                                    const char* v3 = pweapon->GetModel();
-                                    pModelLoader->LoadFile(v3, LOD_MULT_NONE, true, false, false, false);
-                                }
+                            if ((pweapon) && (pweapon->GetModelLength())) {
+                                const char* v3 = pweapon->GetModel();
+                                pModelLoader->LoadFile(v3, LOD_MULT_NONE, true, false, false, false);
                             }
                         }
                         else {
@@ -102,78 +99,68 @@ void MagicItem::Preload(bool abNow) {
                                 }
                             }
                             else {
-                                if (pform) {
-                                    if (pes->IsFlagSet(EffectSetting::USE_ASSOCIATED_CREATURE)) {
-                                        TESNPC* pnpc = dynamic_cast<TESNPC*>(pform);
-                                        if (pnpc) {
-                                            BSSimpleList<const char*>* pmodelList =
-                                                pnpc->BuildDefaultModelList(true, true);
-                                            for (BSSimpleList<const char*>* plist_4 = pmodelList;
-                                                 plist_4 && !plist_4->IsEmpty(); plist_4 = plist_4->GetNext()) {
-                                                const char* pfilename = plist_4->m_item;
-                                                pModelLoader->LoadFile(
-                                                    pfilename, LOD_MULT_NONE, true, false, false, false
-                                                );
-                                            }
-                                            pmodelList->RemoveAll();
-                                            if (pmodelList) {
-                                                delete pmodelList;
+                                if ((pform) && (pes->IsFlagSet(EffectSetting::USE_ASSOCIATED_CREATURE))) {
+                                    TESNPC* pnpc = dynamic_cast<TESNPC*>(pform);
+                                    if (pnpc) {
+                                        BSSimpleList<const char*>* pmodelList = pnpc->BuildDefaultModelList(true, true);
+                                        for (BSSimpleList<const char*>* plist_4 = pmodelList;
+                                             plist_4 && !plist_4->IsEmpty(); plist_4 = plist_4->GetNext()) {
+                                            const char* pfilename = plist_4->m_item;
+                                            pModelLoader->LoadFile(pfilename, LOD_MULT_NONE, true, false, false, false);
+                                        }
+                                        pmodelList->RemoveAll();
+                                        if (pmodelList) {
+                                            delete pmodelList;
+                                        }
+                                    }
+                                    TESCreature* pcreature = dynamic_cast<TESCreature*>(pform);
+                                    if (pcreature) {
+                                        char Dst[264];
+                                        const char* v6 = pcreature->GetModel();
+                                        pModelLoader->LoadFile(v6, LOD_MULT_NONE, true, false, false, false);
+                                        const char* pfilename_2 = pcreature->GetModel();
+                                        BSSimpleList<const char*>* pcreatureFileList = &pcreature->nifFilenames;
+                                        BSstrcpy(Dst, 260, pfilename_2);
+                                        char* plastSlash = std::strrchr(Dst, 92);
+                                        for (BSSimpleList<const char*>* pfilelist = pcreatureFileList;
+                                             plastSlash && pfilelist; pfilelist = pfilelist->GetNext()) {
+                                            plastSlash[1] = 0;
+                                            const char* pitem_2 = pfilelist->m_item;
+                                            if (pitem_2) {
+                                                BSstrcat(Dst, 260, pitem_2);
+                                                pModelLoader->LoadFile(Dst, LOD_MULT_NONE, true, false, false, false);
                                             }
                                         }
-                                        TESCreature* pcreature = dynamic_cast<TESCreature*>(pform);
-                                        if (pcreature) {
-                                            char Dst[264];
-                                            const char* v6 = pcreature->GetModel();
-                                            pModelLoader->LoadFile(v6, LOD_MULT_NONE, true, false, false, false);
-                                            const char* pfilename_2 = pcreature->GetModel();
-                                            BSSimpleList<const char*>* pcreatureFileList = &pcreature->nifFilenames;
-                                            BSstrcpy(Dst, 260, pfilename_2);
-                                            char* plastSlash = std::strrchr(Dst, 92);
-                                            for (BSSimpleList<const char*>* pfilelist = pcreatureFileList;
-                                                 plastSlash && pfilelist; pfilelist = pfilelist->GetNext()) {
-                                                plastSlash[1] = 0;
-                                                const char* pitem_2 = pfilelist->m_item;
-                                                if (pitem_2) {
-                                                    BSstrcat(Dst, 260, pitem_2);
-                                                    pModelLoader->LoadFile(
-                                                        Dst, LOD_MULT_NONE, true, false, false, false
-                                                    );
+                                        const char* plastBackSlash = std::strrchr(pfilename_2, 92);
+                                        if ((plastBackSlash) && (!_strnicmp(plastBackSlash + 1, "Skeleton", 8u))) {
+                                            BSSimpleList<const char*>* pFilenameList =
+                                                pModelLoader->BuildKFFileList(pfilename_2, false, false, AGW_NONE);
+                                            for (BSSimpleList<const char*>* pnode = pFilenameList; pnode;
+                                                 pnode = pnode->GetNext()) {
+                                                const char* pitem_3 = pnode->m_item;
+                                                if (pitem_3) {
+                                                    pModelLoader->LoadKF(pitem_3);
                                                 }
+                                                // The list holds the heap copies BuildKFFileList made, typed
+                                                // const char*; the item is freed here.
+                                                ourFree(const_cast<char*>(pitem_3));
                                             }
-                                            const char* plastBackSlash = std::strrchr(pfilename_2, 92);
-                                            if (plastBackSlash) {
-                                                if (!_strnicmp(plastBackSlash + 1, "Skeleton", 8u)) {
-                                                    BSSimpleList<const char*>* pFilenameList =
-                                                        pModelLoader->BuildKFFileList(
-                                                            pfilename_2, false, false, AGW_NONE
-                                                        );
-                                                    for (BSSimpleList<const char*>* pnode = pFilenameList; pnode;
-                                                         pnode = pnode->GetNext()) {
-                                                        const char* pitem_3 = pnode->m_item;
-                                                        if (pitem_3) {
-                                                            pModelLoader->LoadKF(pitem_3);
-                                                        }
-                                                        // The list holds the heap copies BuildKFFileList made, typed
-                                                        // const char*; the item is freed here.
-                                                        ourFree(const_cast<char*>(pitem_3));
-                                                    }
-                                                    pFilenameList->RemoveAll();
-                                                    if (pFilenameList) {
-                                                        delete pFilenameList;
-                                                    }
-                                                }
+                                            pFilenameList->RemoveAll();
+                                            if (pFilenameList) {
+                                                delete pFilenameList;
                                             }
-                                            if (pcreature->HasKFFiles()) {
+                                        }
+
+                                        if (pcreature->HasKFFiles()) {
+                                            plastSlash[1] = 0;
+                                            BSstrcat(Dst, 260, "SpecialAnims");
+                                            BSstrcat(Dst, 260, "\\");
+                                            plastSlash = std::strrchr(Dst, 92);
+                                            for (char* pitem_4 : pcreature->kfFilenames) {
                                                 plastSlash[1] = 0;
-                                                BSstrcat(Dst, 260, "SpecialAnims");
-                                                BSstrcat(Dst, 260, "\\");
-                                                plastSlash = std::strrchr(Dst, 92);
-                                                for (char* pitem_4 : pcreature->kfFilenames) {
-                                                    plastSlash[1] = 0;
-                                                    if (pitem_4) {
-                                                        BSstrcat(Dst, 260, pitem_4);
-                                                        pModelLoader->LoadKF(Dst);
-                                                    }
+                                                if (pitem_4) {
+                                                    BSstrcat(Dst, 260, pitem_4);
+                                                    pModelLoader->LoadKF(Dst);
                                                 }
                                             }
                                         }
@@ -203,15 +190,14 @@ void MagicItem::Unload(bool abRelease) {
         EffectItemList* plist_2;
         EffectSetting* pavEffectSetting = GetAVEffect(MagicSystem::SELF);
         bool binProgess = IsLoading();
-        if (pavEffectSetting) {
-            if (pavEffectSetting->GetModelLength()) {
-                if (!binProgess) {
-                    const char* v2 = pavEffectSetting->GetModel();
-                    pModelLoader->ReleaseModel(v2, abRelease, 1u);
-                }
-                pavEffectSetting->DecEffectLoadedCount();
+        if ((pavEffectSetting) && (pavEffectSetting->GetModelLength())) {
+            if (!binProgess) {
+                const char* v2 = pavEffectSetting->GetModel();
+                pModelLoader->ReleaseModel(v2, abRelease, 1u);
             }
+            pavEffectSetting->DecEffectLoadedCount();
         }
+
         if (this) {
             plist_2 = static_cast<EffectItemList*>(this);
         }
@@ -228,11 +214,9 @@ void MagicItem::Unload(bool abRelease) {
                         TESForm* pform = pes->GetAssociatedItem();
                         if (pform && pes->IsFlagSet(EffectSetting::USE_ASSOCIATED_WEAPON)) {
                             TESObjectWEAP* pweapon = dynamic_cast<TESObjectWEAP*>(pform);
-                            if (pweapon) {
-                                if (pweapon->GetModelLength()) {
-                                    const char* v3 = pweapon->GetModel();
-                                    pModelLoader->ReleaseModel(v3, abRelease, 1u);
-                                }
+                            if ((pweapon) && (pweapon->GetModelLength())) {
+                                const char* v3 = pweapon->GetModel();
+                                pModelLoader->ReleaseModel(v3, abRelease, 1u);
                             }
                         }
                         else {
@@ -246,74 +230,68 @@ void MagicItem::Unload(bool abRelease) {
                                 }
                             }
                             else {
-                                if (pform) {
-                                    if (pes->IsFlagSet(EffectSetting::USE_ASSOCIATED_CREATURE)) {
-                                        TESNPC* pnpc = dynamic_cast<TESNPC*>(pform);
-                                        if (pnpc) {
-                                            BSSimpleList<const char*>* pmodelList =
-                                                pnpc->BuildDefaultModelList(true, true);
-                                            for (BSSimpleList<const char*>* plist_4 = pmodelList;
-                                                 plist_4 && !plist_4->IsEmpty(); plist_4 = plist_4->GetNext()) {
-                                                const char* pfilename = plist_4->m_item;
-                                                pModelLoader->ReleaseModel(pfilename, abRelease, 1u);
-                                            }
-                                            pmodelList->RemoveAll();
-                                            if (pmodelList) {
-                                                delete pmodelList;
+                                if ((pform) && (pes->IsFlagSet(EffectSetting::USE_ASSOCIATED_CREATURE))) {
+                                    TESNPC* pnpc = dynamic_cast<TESNPC*>(pform);
+                                    if (pnpc) {
+                                        BSSimpleList<const char*>* pmodelList = pnpc->BuildDefaultModelList(true, true);
+                                        for (BSSimpleList<const char*>* plist_4 = pmodelList;
+                                             plist_4 && !plist_4->IsEmpty(); plist_4 = plist_4->GetNext()) {
+                                            const char* pfilename = plist_4->m_item;
+                                            pModelLoader->ReleaseModel(pfilename, abRelease, 1u);
+                                        }
+                                        pmodelList->RemoveAll();
+                                        if (pmodelList) {
+                                            delete pmodelList;
+                                        }
+                                    }
+                                    TESCreature* pcreature = dynamic_cast<TESCreature*>(pform);
+                                    if (pcreature) {
+                                        char Dst[268];
+                                        const char* v6 = pcreature->GetModel();
+                                        pModelLoader->ReleaseModel(v6, abRelease, 1u);
+                                        const char* pfilename_2 = pcreature->GetModel();
+                                        BSSimpleList<const char*>* pcreatureFileList = &pcreature->nifFilenames;
+                                        BSstrcpy(Dst, 260, pfilename_2);
+                                        char* plastSlash = std::strrchr(Dst, 92);
+                                        for (BSSimpleList<const char*>* pfilelist = pcreatureFileList;
+                                             plastSlash && pfilelist; pfilelist = pfilelist->GetNext()) {
+                                            plastSlash[1] = 0;
+                                            const char* pitem_2 = pfilelist->m_item;
+                                            if (pitem_2) {
+                                                BSstrcat(Dst, 260, pitem_2);
+                                                pModelLoader->ReleaseModel(Dst, abRelease, 1u);
                                             }
                                         }
-                                        TESCreature* pcreature = dynamic_cast<TESCreature*>(pform);
-                                        if (pcreature) {
-                                            char Dst[268];
-                                            const char* v6 = pcreature->GetModel();
-                                            pModelLoader->ReleaseModel(v6, abRelease, 1u);
-                                            const char* pfilename_2 = pcreature->GetModel();
-                                            BSSimpleList<const char*>* pcreatureFileList = &pcreature->nifFilenames;
-                                            BSstrcpy(Dst, 260, pfilename_2);
-                                            char* plastSlash = std::strrchr(Dst, 92);
-                                            for (BSSimpleList<const char*>* pfilelist = pcreatureFileList;
-                                                 plastSlash && pfilelist; pfilelist = pfilelist->GetNext()) {
-                                                plastSlash[1] = 0;
-                                                const char* pitem_2 = pfilelist->m_item;
-                                                if (pitem_2) {
-                                                    BSstrcat(Dst, 260, pitem_2);
-                                                    pModelLoader->ReleaseModel(Dst, abRelease, 1u);
+                                        const char* plastBackSlash = std::strrchr(pfilename_2, 92);
+                                        if ((plastBackSlash) && (!_strnicmp(plastBackSlash + 1, "Skeleton", 8u))) {
+                                            BSSimpleList<const char*>* pFilenameList =
+                                                pModelLoader->BuildKFFileList(pfilename_2, false, false, AGW_NONE);
+                                            for (BSSimpleList<const char*>* pnode = pFilenameList; pnode;
+                                                 pnode = pnode->GetNext()) {
+                                                const char* pitem_3 = pnode->m_item;
+                                                if (pitem_3) {
+                                                    pModelLoader->ReleaseKF(pitem_3, abRelease);
                                                 }
+                                                // The list holds the heap copies BuildKFFileList made, typed
+                                                // const char*; the item is freed here.
+                                                ourFree(const_cast<char*>(pitem_3));
                                             }
-                                            const char* plastBackSlash = std::strrchr(pfilename_2, 92);
-                                            if (plastBackSlash) {
-                                                if (!_strnicmp(plastBackSlash + 1, "Skeleton", 8u)) {
-                                                    BSSimpleList<const char*>* pFilenameList =
-                                                        pModelLoader->BuildKFFileList(
-                                                            pfilename_2, false, false, AGW_NONE
-                                                        );
-                                                    for (BSSimpleList<const char*>* pnode = pFilenameList; pnode;
-                                                         pnode = pnode->GetNext()) {
-                                                        const char* pitem_3 = pnode->m_item;
-                                                        if (pitem_3) {
-                                                            pModelLoader->ReleaseKF(pitem_3, abRelease);
-                                                        }
-                                                        // The list holds the heap copies BuildKFFileList made, typed
-                                                        // const char*; the item is freed here.
-                                                        ourFree(const_cast<char*>(pitem_3));
-                                                    }
-                                                    pFilenameList->RemoveAll();
-                                                    if (pFilenameList) {
-                                                        delete pFilenameList;
-                                                    }
-                                                }
+                                            pFilenameList->RemoveAll();
+                                            if (pFilenameList) {
+                                                delete pFilenameList;
                                             }
-                                            if (pcreature->HasKFFiles()) {
+                                        }
+
+                                        if (pcreature->HasKFFiles()) {
+                                            plastSlash[1] = 0;
+                                            BSstrcat(Dst, 260, "SpecialAnims");
+                                            BSstrcat(Dst, 260, "\\");
+                                            plastSlash = std::strrchr(Dst, 92);
+                                            for (char* pitem_4 : pcreature->kfFilenames) {
                                                 plastSlash[1] = 0;
-                                                BSstrcat(Dst, 260, "SpecialAnims");
-                                                BSstrcat(Dst, 260, "\\");
-                                                plastSlash = std::strrchr(Dst, 92);
-                                                for (char* pitem_4 : pcreature->kfFilenames) {
-                                                    plastSlash[1] = 0;
-                                                    if (pitem_4) {
-                                                        BSstrcat(Dst, 260, pitem_4);
-                                                        pModelLoader->ReleaseKF(Dst, abRelease);
-                                                    }
+                                                if (pitem_4) {
+                                                    BSstrcat(Dst, 260, pitem_4);
+                                                    pModelLoader->ReleaseKF(Dst, abRelease);
                                                 }
                                             }
                                         }
@@ -372,16 +350,13 @@ bool MagicItem::IsLoading() {
     EffectItemList* plist_2;
     EffectSetting* pavEffectSetting = GetAVEffect(MagicSystem::SELF);
     bool bfinished = true;
-    if (pavEffectSetting) {
-        if (pavEffectSetting->GetModelLength()) {
-            if (!pavEffectSetting->IsEffectLoaded()) {
-                bfinished = false;
-                if (!pavEffectSetting->IsEffectQueued()) {
-                    return false;
-                }
-            }
+    if ((pavEffectSetting) && (pavEffectSetting->GetModelLength()) && (!pavEffectSetting->IsEffectLoaded())) {
+        bfinished = false;
+        if (!pavEffectSetting->IsEffectQueued()) {
+            return false;
         }
     }
+
     if (this) {
         plist_2 = static_cast<EffectItemList*>(this);
     }
@@ -399,14 +374,13 @@ bool MagicItem::IsLoading() {
             else {
                 pes = nullptr;
             }
-            if (pes) {
-                if (pes->getArchType() && !pes->IsAssociatedItemLoaded()) {
-                    bfinished = false;
-                    if (!pes->IsAssociatedItemQueued()) {
-                        return false;
-                    }
+            if ((pes) && (pes->getArchType() && !pes->IsAssociatedItemLoaded())) {
+                bfinished = false;
+                if (!pes->IsAssociatedItemQueued()) {
+                    return false;
                 }
             }
+
             BSSimpleList<EffectItem*>* pNext = plist_3->m_pkNext;
             plist_3 = pNext ? static_cast<EffectItemList*>(pNext) : nullptr;
         }
@@ -458,16 +432,14 @@ void MagicItem::FinishedLoading() {
                 if (icount_2) {
                     if (pform && pes->IsFlagSet(EffectSetting::USE_ASSOCIATED_WEAPON)) {
                         TESObjectWEAP* pweapon = dynamic_cast<TESObjectWEAP*>(pform);
-                        if (pweapon) {
-                            if (pweapon->GetModelLength()) {
-                                ::new (&spmodel_2) NiPointer<Model>(static_cast<Model*>(nullptr));
-                                const char* v2 = pweapon->GetModel();
-                                pModelLoader->FindModel(v2, spmodel_2);
-                                if (spmodel_2.m_pObject) {
-                                    spmodel_2.m_pObject->ModManualRefCount(icount_2);
-                                }
-                                NiPointer<Model>::Destroy(&spmodel_2);
+                        if ((pweapon) && (pweapon->GetModelLength())) {
+                            ::new (&spmodel_2) NiPointer<Model>(static_cast<Model*>(nullptr));
+                            const char* v2 = pweapon->GetModel();
+                            pModelLoader->FindModel(v2, spmodel_2);
+                            if (spmodel_2.m_pObject) {
+                                spmodel_2.m_pObject->ModManualRefCount(icount_2);
                             }
+                            NiPointer<Model>::Destroy(&spmodel_2);
                         }
                     }
                     else {
@@ -489,98 +461,93 @@ void MagicItem::FinishedLoading() {
                             }
                         }
                         else {
-                            if (pform) {
-                                if (pes->IsFlagSet(EffectSetting::USE_ASSOCIATED_CREATURE)) {
-                                    TESNPC* pnpc = dynamic_cast<TESNPC*>(pform);
-                                    if (pnpc) {
-                                        BSSimpleList<const char*>* pmodelList = pnpc->BuildDefaultModelList(true, true);
-                                        BSSimpleList<const char*>* plist_4 = pmodelList;
-                                        while (plist_4 && !plist_4->IsEmpty()) {
-                                            const char* pfilename = plist_4->m_item;
-                                            ::new (&spmodel_4) NiPointer<Model>(static_cast<Model*>(nullptr));
-                                            pModelLoader->FindModel(pfilename, spmodel_4);
-                                            if (spmodel_4.m_pObject) {
-                                                spmodel_4.m_pObject->ModManualRefCount(icount_2);
-                                            }
-                                            plist_4 = plist_4->GetNext();
-                                            NiPointer<Model>::Destroy(&spmodel_4);
+                            if ((pform) && (pes->IsFlagSet(EffectSetting::USE_ASSOCIATED_CREATURE))) {
+                                TESNPC* pnpc = dynamic_cast<TESNPC*>(pform);
+                                if (pnpc) {
+                                    BSSimpleList<const char*>* pmodelList = pnpc->BuildDefaultModelList(true, true);
+                                    BSSimpleList<const char*>* plist_4 = pmodelList;
+                                    while (plist_4 && !plist_4->IsEmpty()) {
+                                        const char* pfilename = plist_4->m_item;
+                                        ::new (&spmodel_4) NiPointer<Model>(static_cast<Model*>(nullptr));
+                                        pModelLoader->FindModel(pfilename, spmodel_4);
+                                        if (spmodel_4.m_pObject) {
+                                            spmodel_4.m_pObject->ModManualRefCount(icount_2);
                                         }
-                                        pmodelList->RemoveAll();
-                                        if (pmodelList) {
-                                            delete pmodelList;
+                                        plist_4 = plist_4->GetNext();
+                                        NiPointer<Model>::Destroy(&spmodel_4);
+                                    }
+                                    pmodelList->RemoveAll();
+                                    if (pmodelList) {
+                                        delete pmodelList;
+                                    }
+                                }
+                                TESCreature* pcreature = dynamic_cast<TESCreature*>(pform);
+                                if (pcreature) {
+                                    ::new (&spmodel_5) NiPointer<Model>(static_cast<Model*>(nullptr));
+                                    const char* v5 = pcreature->GetModel();
+                                    pModelLoader->FindModel(v5, spmodel_5);
+                                    if (spmodel_5.m_pObject) {
+                                        char Dst[268];
+                                        for (int32_t i = 0; i < icount_2; ++i) {
+                                            spmodel_5.m_pObject->IncManualRefCount();
+                                        }
+                                        const char* pfilename_2 = spmodel_5.m_pObject->pFilename;
+                                        BSSimpleList<const char*>* pcreatureFileList = &pcreature->nifFilenames;
+                                        BSstrcpy(Dst, 260, pfilename_2);
+                                        char* plastSlash = std::strrchr(Dst, 92);
+                                        for (BSSimpleList<const char*>* pfilelist = pcreatureFileList;
+                                             plastSlash && pfilelist; pfilelist = pfilelist->GetNext()) {
+                                            plastSlash[1] = 0;
+                                            const char* pitem_2 = pfilelist->m_item;
+                                            if (pitem_2) {
+                                                BSstrcat(Dst, 260, pitem_2);
+                                                ::new (&spmodel_6) NiPointer<Model>(static_cast<Model*>(nullptr));
+                                                pModelLoader->FindModel(Dst, spmodel_6);
+                                                if (spmodel_6.m_pObject) {
+                                                    spmodel_6.m_pObject->ModManualRefCount(icount_2);
+                                                }
+                                                NiPointer<Model>::Destroy(&spmodel_6);
+                                            }
+                                        }
+                                        const char* plastBackSlash = std::strrchr(pfilename_2, 92);
+                                        if ((plastBackSlash) && (!_strnicmp(plastBackSlash + 1, "Skeleton", 8u))) {
+                                            BSSimpleList<const char*>* pFilenameList =
+                                                pModelLoader->BuildKFFileList(pfilename_2, false, false, AGW_NONE);
+                                            for (BSSimpleList<const char*>* pnode = pFilenameList; pnode;
+                                                 pnode = pnode->GetNext()) {
+                                                const char* pitem_3 = pnode->m_item;
+                                                if (pitem_3) {
+                                                    for (int32_t i_2 = 0; i_2 < icount_2; ++i_2) {
+                                                        pModelLoader->LoadKF(pitem_3);
+                                                    }
+                                                }
+                                                // The list holds the heap copies BuildKFFileList made, typed
+                                                // const char*; the item is freed here.
+                                                ourFree(const_cast<char*>(pitem_3));
+                                            }
+                                            pFilenameList->RemoveAll();
+                                            if (pFilenameList) {
+                                                delete pFilenameList;
+                                            }
+                                        }
+
+                                        if (pcreature->HasKFFiles()) {
+                                            plastSlash[1] = 0;
+                                            BSstrcat(Dst, 260, "SpecialAnims");
+                                            BSstrcat(Dst, 260, "\\");
+                                            plastSlash = std::strrchr(Dst, 92);
+                                            for (char* pitem_4 : pcreature->kfFilenames) {
+                                                plastSlash[1] = 0;
+                                                if (pitem_4) {
+                                                    BSstrcat(Dst, 260, pitem_4);
+                                                    for (int32_t i_3 = 0; i_3 < icount_2; ++i_3) {
+                                                        pModelLoader->LoadKF(Dst);
+                                                    }
+                                                }
+                                            }
                                         }
                                     }
-                                    TESCreature* pcreature = dynamic_cast<TESCreature*>(pform);
-                                    if (pcreature) {
-                                        ::new (&spmodel_5) NiPointer<Model>(static_cast<Model*>(nullptr));
-                                        const char* v5 = pcreature->GetModel();
-                                        pModelLoader->FindModel(v5, spmodel_5);
-                                        if (spmodel_5.m_pObject) {
-                                            char Dst[268];
-                                            for (int32_t i = 0; i < icount_2; ++i) {
-                                                spmodel_5.m_pObject->IncManualRefCount();
-                                            }
-                                            const char* pfilename_2 = spmodel_5.m_pObject->pFilename;
-                                            BSSimpleList<const char*>* pcreatureFileList = &pcreature->nifFilenames;
-                                            BSstrcpy(Dst, 260, pfilename_2);
-                                            char* plastSlash = std::strrchr(Dst, 92);
-                                            for (BSSimpleList<const char*>* pfilelist = pcreatureFileList;
-                                                 plastSlash && pfilelist; pfilelist = pfilelist->GetNext()) {
-                                                plastSlash[1] = 0;
-                                                const char* pitem_2 = pfilelist->m_item;
-                                                if (pitem_2) {
-                                                    BSstrcat(Dst, 260, pitem_2);
-                                                    ::new (&spmodel_6) NiPointer<Model>(static_cast<Model*>(nullptr));
-                                                    pModelLoader->FindModel(Dst, spmodel_6);
-                                                    if (spmodel_6.m_pObject) {
-                                                        spmodel_6.m_pObject->ModManualRefCount(icount_2);
-                                                    }
-                                                    NiPointer<Model>::Destroy(&spmodel_6);
-                                                }
-                                            }
-                                            const char* plastBackSlash = std::strrchr(pfilename_2, 92);
-                                            if (plastBackSlash) {
-                                                if (!_strnicmp(plastBackSlash + 1, "Skeleton", 8u)) {
-                                                    BSSimpleList<const char*>* pFilenameList =
-                                                        pModelLoader->BuildKFFileList(
-                                                            pfilename_2, false, false, AGW_NONE
-                                                        );
-                                                    for (BSSimpleList<const char*>* pnode = pFilenameList; pnode;
-                                                         pnode = pnode->GetNext()) {
-                                                        const char* pitem_3 = pnode->m_item;
-                                                        if (pitem_3) {
-                                                            for (int32_t i_2 = 0; i_2 < icount_2; ++i_2) {
-                                                                pModelLoader->LoadKF(pitem_3);
-                                                            }
-                                                        }
-                                                        // The list holds the heap copies BuildKFFileList made, typed
-                                                        // const char*; the item is freed here.
-                                                        ourFree(const_cast<char*>(pitem_3));
-                                                    }
-                                                    pFilenameList->RemoveAll();
-                                                    if (pFilenameList) {
-                                                        delete pFilenameList;
-                                                    }
-                                                }
-                                            }
-                                            if (pcreature->HasKFFiles()) {
-                                                plastSlash[1] = 0;
-                                                BSstrcat(Dst, 260, "SpecialAnims");
-                                                BSstrcat(Dst, 260, "\\");
-                                                plastSlash = std::strrchr(Dst, 92);
-                                                for (char* pitem_4 : pcreature->kfFilenames) {
-                                                    plastSlash[1] = 0;
-                                                    if (pitem_4) {
-                                                        BSstrcat(Dst, 260, pitem_4);
-                                                        for (int32_t i_3 = 0; i_3 < icount_2; ++i_3) {
-                                                            pModelLoader->LoadKF(Dst);
-                                                        }
-                                                    }
-                                                }
-                                            }
-                                        }
-                                        NiPointer<Model>::Destroy(&spmodel_5);
-                                    }
+                                    NiPointer<Model>::Destroy(&spmodel_5);
                                 }
                             }
                         }
@@ -638,9 +605,8 @@ EffectSetting* MagicItem::GetAVEffect(MagicSystem::Range aeRange) {
     if (pavEffect) {
         return pavEffect->pEffectSetting;
     }
-    else {
-        return nullptr;
-    }
+
+    return nullptr;
 }
 
 BSStringT<char>* MagicItem::GetCannotCastString(BSStringT<char>* apString, CannotCastReason aeReason) {
@@ -760,9 +726,8 @@ MagicItem* MagicItem::GetMagicItemByNumericID(uint32_t aiFormID) {
     if (v3) {
         return static_cast<MagicItem*>(v3);
     }
-    else {
-        return nullptr;
-    }
+
+    return nullptr;
 }
 
 int32_t MagicItem::IncSummonedCreatureLoadedCount() {

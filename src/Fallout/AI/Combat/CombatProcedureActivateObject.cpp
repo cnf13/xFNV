@@ -63,10 +63,8 @@ void CombatProcedureActivateObject::Update() {
                 uint32_t icount = 0;
                 for (uint32_t i = 0; i < 5; ++i) {
                     CombatState::TargetedObject* pcombatItem = pcombatState->GetTargetedObject(i);
-                    if (pcombatItem) {
-                        if (pcombatItem->pRef == pTargetRef) {
-                            pboundObjects[icount++] = pcombatItem->pObject;
-                        }
+                    if ((pcombatItem) && (pcombatItem->pRef == pTargetRef)) {
+                        pboundObjects[icount++] = pcombatItem->pObject;
                     }
                 }
                 pcombatState->PreActivateReference(pTargetRef);

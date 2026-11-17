@@ -102,9 +102,8 @@ uint8_t Max(uint8_t a1, uint8_t a2) {
     if (((int32_t)a1) <= ((int32_t)a2)) {
         return a2;
     }
-    else {
-        return a1;
-    }
+
+    return a1;
 }
 
 int32_t RandomCompare(void* a1, void* a2) {
@@ -542,11 +541,11 @@ void HackingMenu::DoIdle() {
                         if (iNumGuesses == 1) {
                             IOLines[1]->Animation.Update();
                         }
-                        if (HackingMenu::pim->pOverTileTarget) {
-                            if (HackingMenu::pim->pOverTileTarget->pParent == pTiles[2]) {
-                                DoInGame();
-                            }
+                        if ((HackingMenu::pim->pOverTileTarget) &&
+                            (HackingMenu::pim->pOverTileTarget->pParent == pTiles[2])) {
+                            DoInGame();
                         }
+
                         break;
                     }
                     case HackingMenu::HMS_SHUTDOWN: {
@@ -556,11 +555,10 @@ void HackingMenu::DoIdle() {
                     }
                     case HackingMenu::HMS_FINISHED: {
                         UpdateCursorPos();
-                        if (iNumGuesses) {
-                            if (xFadeState != Interface::FADING_OUT) {
-                                AccessTerminal();
-                            }
+                        if ((iNumGuesses) && (xFadeState != Interface::FADING_OUT)) {
+                            AccessTerminal();
                         }
+
                         break;
                     }
                     default: {
@@ -803,9 +801,8 @@ int32_t HackingMenu::GetSelectedTileIndex() {
     if ((realX > uiControllerSelectedTileIdx) || (uiControllerSelectedTileIdx > v6)) {
         return (-1);
     }
-    else {
-        return (uiControllerSelectedTileIdx - realX) / 17;
-    }
+
+    return (uiControllerSelectedTileIdx - realX) / 17;
 }
 
 void HackingMenu::ClearEntry() {
@@ -1445,26 +1442,23 @@ void HackingMenu::RemoveDud() {
         newbuffer[ibufferpos++ + 7] = 46;
     }
     ptile->Set(4036, newbuffer, true);
-    if (IOLines[i]) {
-        if (IOLines[i]->pTextTile) {
-            if (IOLines[i]->pTextTile->IsTrue(4015) && icnt < this->iWordLength) {
-                int32_t v8 = 0;
-                ptile = IOLines[i]->pTextTile;
-                const char* v3 = ptile->GetString(4036);
-                ourMemcpy(newbuffer, v3, 20u);
-                while (true) {
-                    uint32_t v4 = icnt;
-                    uint32_t iWordLength = this->iWordLength;
-                    ++icnt;
-                    if (v4 >= iWordLength) {
-                        break;
-                    }
-                    newbuffer[v8++ + 7] = 46;
-                }
-                ptile->Set(4036, newbuffer, true);
+    if ((IOLines[i]) && (IOLines[i]->pTextTile) && (IOLines[i]->pTextTile->IsTrue(4015) && icnt < this->iWordLength)) {
+        int32_t v8 = 0;
+        ptile = IOLines[i]->pTextTile;
+        const char* v3 = ptile->GetString(4036);
+        ourMemcpy(newbuffer, v3, 20u);
+        while (true) {
+            uint32_t v4 = icnt;
+            uint32_t iWordLength = this->iWordLength;
+            ++icnt;
+            if (v4 >= iWordLength) {
+                break;
             }
+            newbuffer[v8++ + 7] = 46;
         }
+        ptile->Set(4036, newbuffer, true);
     }
+
     while (iword < iWordsHave - 1) {
         iBufferPos[iword] = iBufferPos[iword + 1];
         ++iword;
@@ -1520,26 +1514,24 @@ void HackingMenu::UpdateCursorPos() {
 }
 
 void HackingMenu::UpdateScrollingCursor(HackingMenu::TerminalIO* apIO) {
-    if (apIO) {
-        if (apIO->pTextTile) {
-            int32_t ichars;
-            const char* ptext = apIO->pTextTile->GetString(4036);
-            if (!ptext || *ptext == 32) {
-                ichars = 0;
-            }
-            else {
-                ichars = BSstrlen(ptext);
-            }
-            int32_t ix = static_cast<int32_t>(apIO->pTextTile->GetFloat(4001) + static_cast<double>(17 * ichars));
-            int32_t iy = static_cast<int32_t>(apIO->pTextTile->GetFloat(4002));
-            for (Tile* pparent = apIO->pTextTile->pParent; pparent && pparent != pTiles[4]->pParent;
-                 pparent = pparent->pParent) {
-                ix += static_cast<int32_t>(pparent->GetFloat(4001));
-                iy += static_cast<int32_t>(pparent->GetFloat(4002));
-            }
-            pTiles[4]->Set(4001, ix);
-            pTiles[4]->Set(4002, iy);
+    if ((apIO) && (apIO->pTextTile)) {
+        int32_t ichars;
+        const char* ptext = apIO->pTextTile->GetString(4036);
+        if (!ptext || *ptext == 32) {
+            ichars = 0;
         }
+        else {
+            ichars = BSstrlen(ptext);
+        }
+        int32_t ix = static_cast<int32_t>(apIO->pTextTile->GetFloat(4001) + static_cast<double>(17 * ichars));
+        int32_t iy = static_cast<int32_t>(apIO->pTextTile->GetFloat(4002));
+        for (Tile* pparent = apIO->pTextTile->pParent; pparent && pparent != pTiles[4]->pParent;
+             pparent = pparent->pParent) {
+            ix += static_cast<int32_t>(pparent->GetFloat(4001));
+            iy += static_cast<int32_t>(pparent->GetFloat(4002));
+        }
+        pTiles[4]->Set(4001, ix);
+        pTiles[4]->Set(4002, iy);
     }
 }
 
@@ -1760,21 +1752,16 @@ Tile* HackingMenu::Create(TESObjectREFR* apTerminalRef) {
             pmenu->PrepForVisibility(false);
             return ptile;
         }
-        else {
-            Warning("MENUS: Hacking Menu Creation Failed... Missing index = #%d", imissingIndex);
-            return nullptr;
-        }
-    }
-    else {
-        if (pmenu) {
-            if (pmenu->pMenu) {
-                if (pmenu) {
-                    delete pmenu;
-                }
-            }
-        }
+
+        Warning("MENUS: Hacking Menu Creation Failed... Missing index = #%d", imissingIndex);
         return nullptr;
     }
+
+    if ((pmenu) && (pmenu->pMenu) && (pmenu)) {
+        delete pmenu;
+    }
+
+    return nullptr;
 }
 
 void HackingMenu::Close() {

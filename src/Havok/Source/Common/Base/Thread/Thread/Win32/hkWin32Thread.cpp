@@ -44,7 +44,7 @@ hkResult hkThread::startThread(void* (*func)(void*), void* arg, const char* name
     std::promise<uint32_t> kId;
     std::future<uint32_t> kIdReady = kId.get_future();
     m_thread = new hkThreadHandle{
-        std::thread([func, arg, spRunning, kId = std::move(kId)]() mutable {
+        std::thread([func, arg, spRunning, kId = std::move(kId)] mutable {
             kId.set_value(GetCurrentThreadId());
             func(arg);
             spRunning->store(false);

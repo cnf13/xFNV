@@ -79,9 +79,8 @@ TESTextureList* TESTextureListArray::GetAt(uint32_t aiIndex) {
     if (aiIndex >= iTextureListCount) {
         return nullptr;
     }
-    else {
-        return pTextureLists[aiIndex];
-    }
+
+    return pTextureLists[aiIndex];
 }
 
 void TESTextureListArray::Copy(TESTextureListArray* apTextureListArray) {
@@ -177,24 +176,22 @@ void TESModelList::AddModel(const char* apFilename) {
 }
 
 void TESModelList::LoadModelListChunk(TESModelList* apModelList, TESFile* apFile) {
-    if (apFile) {
-        if (apModelList) {
-            CHUNK_ID chunk = apFile->GetTESChunk();
-            if (chunk == NIFT_ID) {
-                TextureListArray.Load(apModelList, apFile);
-            }
-            else {
-                if (chunk == NIFZ_ID) {
-                    uint32_t ChunkSize = apFile->GetChunkSize();
-                    char* pmessage = static_cast<char*>(ourMalloc(ChunkSize));
-                    char* pcurrentFile = pmessage;
-                    apFile->GetChunkData(pmessage, 0);
-                    while (*pcurrentFile) {
-                        AddModel(pcurrentFile);
-                        pcurrentFile += BSstrlen(pcurrentFile) + 1;
-                    }
-                    ourFree(pmessage);
+    if ((apFile) && (apModelList)) {
+        CHUNK_ID chunk = apFile->GetTESChunk();
+        if (chunk == NIFT_ID) {
+            TextureListArray.Load(apModelList, apFile);
+        }
+        else {
+            if (chunk == NIFZ_ID) {
+                uint32_t ChunkSize = apFile->GetChunkSize();
+                char* pmessage = static_cast<char*>(ourMalloc(ChunkSize));
+                char* pcurrentFile = pmessage;
+                apFile->GetChunkData(pmessage, 0);
+                while (*pcurrentFile) {
+                    AddModel(pcurrentFile);
+                    pcurrentFile += BSstrlen(pcurrentFile) + 1;
                 }
+                ourFree(pmessage);
             }
         }
     }

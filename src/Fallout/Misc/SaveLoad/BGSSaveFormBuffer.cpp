@@ -21,9 +21,8 @@ TESObjectREFR* BGSSaveFormBuffer::GetReference() {
     if (v2 && v2->IsReference()) {
         return v2;
     }
-    else {
-        return nullptr;
-    }
+
+    return nullptr;
 }
 
 Actor* BGSSaveFormBuffer::GetActor() {
@@ -31,9 +30,8 @@ Actor* BGSSaveFormBuffer::GetActor() {
     if (v2 && v2->IsActor()) {
         return v2;
     }
-    else {
-        return nullptr;
-    }
+
+    return nullptr;
 }
 
 ENUM_FORM_ID BGSSaveFormBuffer::GetFormType() {

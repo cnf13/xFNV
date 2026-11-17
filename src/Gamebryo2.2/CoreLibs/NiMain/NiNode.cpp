@@ -90,10 +90,9 @@ NiObject* NiNode::CreateClone(NiCloningProcess& kCloning) {
         CopyMembers(v4, kCloning);
         return v4;
     }
-    else {
-        CopyMembers(nullptr, kCloning);
-        return nullptr;
-    }
+
+    CopyMembers(nullptr, kCloning);
+    return nullptr;
 }
 
 // Two link ID blocks follow the base object's data; the pick-off flag is cleared afterwards.
@@ -340,12 +339,13 @@ NiAVObject* NiNode::GetObjectByName(const NiFixedString& kName) {
 // whole value is passed on to each child.
 void NiNode::SetSelectiveUpdateFlags(bool& bSelectiveUpdate, int32_t bSelectiveUpdateTransforms, bool& bRigid) {
     bool bTransformController = HasTransformController();
-    if (!static_cast<uint8_t>(bSelectiveUpdateTransforms)) {
-        // The low byte is zero here: or-ing the bool in sets it, the upper bytes stay the caller's.
-        if (bTransformController || (m_uFlags & SELECTIVE_UPDATE_TRANSFORMS_OVERRIDE)) {
-            bSelectiveUpdateTransforms |= 1;
-        }
+    if ((!static_cast<uint8_t>(bSelectiveUpdateTransforms)) &&
+        (bTransformController || (m_uFlags & SELECTIVE_UPDATE_TRANSFORMS_OVERRIDE)))
+    // The low byte is zero here: or-ing the bool in sets it, the upper bytes stay the caller's.
+    {
+        bSelectiveUpdateTransforms |= 1;
     }
+
     // The flag's raw low byte is stored and the stored bytes are tested against 0: a bool store would normalise the
     // byte to 0/1, and a bool load of any other byte is undefined in clang. So the flags are written and read as
     // untyped bytes, as the game does.
@@ -427,10 +427,8 @@ void NiNode::UpdateDownwardPass(NiUpdateData& UpdateData, uint32_t uFlags) {
                     if ((this->m_uFlags & NiAVObject::FIXED_BOUND) == 0 &&
                         (this->m_uFlags & NiAVObject::HAS_ORPHANED_BOUND) != 0) {
                         NiBound* m_kWorldBound = pkChild_2->m_kWorldBound;
-                        if (m_kWorldBound) {
-                            if (0.0f != m_kWorldBound->m_fRadius) {
-                                this->m_kWorldBound->Merge(m_kWorldBound);
-                            }
+                        if ((m_kWorldBound) && (0.0f != m_kWorldBound->m_fRadius)) {
+                            this->m_kWorldBound->Merge(m_kWorldBound);
                         }
                     }
                 }
@@ -451,10 +449,8 @@ void NiNode::UpdateDownwardPass(NiUpdateData& UpdateData, uint32_t uFlags) {
             if (pkChild) {
                 pkChild->UpdateDownwardPass(UpdateData, uFlags);
                 NiBound* v10 = pkChild->m_kWorldBound;
-                if (v10) {
-                    if (0.0f != v10->m_fRadius) {
-                        break;
-                    }
+                if ((v10) && (0.0f != v10->m_fRadius)) {
+                    break;
                 }
             }
             if (++i >= apData) {
@@ -516,10 +512,8 @@ void NiNode::UpdateSelectedDownwardPass(NiUpdateData& UpdateData, uint32_t uFlag
                     if ((this->m_uFlags & NiAVObject::FIXED_BOUND) == 0 &&
                         (this->m_uFlags & NiAVObject::HAS_ORPHANED_BOUND) != 0) {
                         NiBound* m_kWorldBound = m_pObject->m_kWorldBound;
-                        if (m_kWorldBound) {
-                            if (0.0 != m_kWorldBound->m_fRadius) {
-                                this->m_kWorldBound->Merge(m_kWorldBound);
-                            }
+                        if ((m_kWorldBound) && (0.0 != m_kWorldBound->m_fRadius)) {
+                            this->m_kWorldBound->Merge(m_kWorldBound);
                         }
                     }
                 }
@@ -549,10 +543,8 @@ void NiNode::UpdateSelectedDownwardPass(NiUpdateData& UpdateData, uint32_t uFlag
                     }
                 }
                 NiBound* v12 = v11->m_kWorldBound;
-                if (v12) {
-                    if (0.0 != v12->m_fRadius && v6) {
-                        break;
-                    }
+                if ((v12) && (0.0 != v12->m_fRadius && v6)) {
+                    break;
                 }
             }
             if (++v9 >= v18) {
@@ -595,10 +587,8 @@ void NiNode::UpdateRigidDownwardPass(NiUpdateData& UpdateData, uint32_t uFlags) 
     m_usSize = (uint32_t)m_kChildren.m_usSize;
     for (i = 0; i < m_usSize; ++i) {
         m_pObject = m_kChildren.m_pBase[i].m_pObject;
-        if (m_pObject) {
-            if ((((int32_t)m_pObject->m_uFlags) & 2) != 0) {
-                m_pObject->UpdateRigidDownwardPass(UpdateData, uFlags);
-            }
+        if ((m_pObject) && ((((int32_t)m_pObject->m_uFlags) & 2) != 0)) {
+            m_pObject->UpdateRigidDownwardPass(UpdateData, uFlags);
         }
     }
 }
@@ -618,11 +608,9 @@ void NiNode::UpdatePropertiesDownward(NiPropertyState* pkParentState) {
         }
     }
     NiPropertyState* pState = pkParentState;
-    if (pParentState != pState) {
-        if (pState) {
-            pState->~NiPropertyState();
-            MemoryManager_Singleton.Deallocate(pState);
-        }
+    if ((pParentState != pState) && (pState)) {
+        pState->~NiPropertyState();
+        MemoryManager_Singleton.Deallocate(pState);
     }
 }
 
@@ -674,10 +662,8 @@ void NiNode::UpdateTransformAndBounds(NiUpdateData& UpdateData) {
                 m_pObject->UpdateTransformAndBounds(UpdateData);
                 if ((m_uFlags & NiAVObject::FIXED_BOUND) == 0 && (m_uFlags & NiAVObject::HAS_ORPHANED_BOUND) != 0) {
                     NiBound* m_kWorldBound = m_pObject->m_kWorldBound;
-                    if (m_kWorldBound) {
-                        if (0.0 != m_kWorldBound->m_fRadius) {
-                            this->m_kWorldBound->Merge(m_kWorldBound);
-                        }
+                    if ((m_kWorldBound) && (0.0 != m_kWorldBound->m_fRadius)) {
+                        this->m_kWorldBound->Merge(m_kWorldBound);
                     }
                 }
             }
@@ -696,10 +682,8 @@ void NiNode::UpdateTransformAndBounds(NiUpdateData& UpdateData) {
             if (v6) {
                 v6->UpdateTransformAndBounds(UpdateData);
                 NiBound* v7 = v6->m_kWorldBound;
-                if (v7) {
-                    if (0.0 != v7->m_fRadius) {
-                        break;
-                    }
+                if ((v7) && (0.0 != v7->m_fRadius)) {
+                    break;
                 }
             }
             if (++v4 >= m_usSize) {
@@ -989,11 +973,9 @@ void NiNode::UpdatePropertiesUpward(NiPropertyState*& aspPropertyState) {
         pState = pvMemory ? ::new (pvMemory) NiPropertyState : nullptr;
     }
     PushLocalProperties(pState, false, aspPropertyState);
-    if (pState != aspPropertyState) {
-        if (pState) {
-            pState->~NiPropertyState();
-            MemoryManager_Singleton.Deallocate(pState);
-        }
+    if ((pState != aspPropertyState) && (pState)) {
+        pState->~NiPropertyState();
+        MemoryManager_Singleton.Deallocate(pState);
     }
 }
 

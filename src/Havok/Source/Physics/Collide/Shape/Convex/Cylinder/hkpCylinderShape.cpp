@@ -69,11 +69,10 @@ hkpCylinderShape::hkpCylinderShape(
 }
 
 hkpCylinderShape::hkpCylinderShape(hkFinishLoadedObjectFlag flag) : hkpConvexShape(flag) {
-    if (flag.m_finishing) {
-        if (hkpCylinderShape_s_intRoundUpThreshold < 0.0f) {
-            hkpCylinderShape_s_intRoundUpThreshold = 1.0f - minValueRoundedUpTo1();
-        }
+    if ((flag.m_finishing) && (hkpCylinderShape_s_intRoundUpThreshold < 0.0f)) {
+        hkpCylinderShape_s_intRoundUpThreshold = 1.0f - minValueRoundedUpTo1();
     }
+
     m_type = HK_SHAPE_CYLINDER;
 }
 

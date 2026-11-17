@@ -1707,9 +1707,8 @@ bhkCharacterController* bhkCharacterController::GetBumpedCharacterController() {
             static_cast<bhkCharacterProxy*>(static_cast<ahkpCharacterProxy*>(pProxy)->m_userData)
         );
     }
-    else {
-        return nullptr;
-    }
+
+    return nullptr;
 }
 
 bhkRigidBody* bhkCharacterController::GetBumpedBody() {
@@ -1717,9 +1716,8 @@ bhkRigidBody* bhkCharacterController::GetBumpedBody() {
     if (m_pntr) {
         return static_cast<bhkRigidBody*>(m_pntr->m_userData);
     }
-    else {
-        return nullptr;
-    }
+
+    return nullptr;
 }
 
 void bhkCharacterController::SetShapeType(bhkCharacterController::SHAPE_TYPES aeType) {
@@ -1769,13 +1767,11 @@ float bhkCharacterController::GetRadius() {
         if (phkObject) {
             return phkObject->m_radius;
         }
-        else {
-            return 0.10000000149011612f;
-        }
+
+        return 0.10000000149011612f;
     }
-    else {
-        return fRadius;
-    }
+
+    return fRadius;
 }
 
 void bhkCharacterController::SetWantState(hkpCharacterStateType aeType) {
@@ -2333,16 +2329,15 @@ float bhkCharacterController::ApplyRotationModifier(float afOldRotation, float a
         fRotMod = (float)0.0;
         return afOldRotation;
     }
-    else {
-        fRotModTime = this->fRotModTime;
-        if (fRotModTime > ((double)afDeltaTime)) {
-            fRotModTime = afDeltaTime;
-        }
-        v6 = (float)(v3 + (fRotMod * fRotModTime));
-        this->fRotModTime = (this->fRotModTime - afDeltaTime);
-        fRotMod = (float)(fRotMod - 0.05000000074505806);
-        return v6;
+
+    fRotModTime = this->fRotModTime;
+    if (fRotModTime > ((double)afDeltaTime)) {
+        fRotModTime = afDeltaTime;
     }
+    v6 = (float)(v3 + (fRotMod * fRotModTime));
+    this->fRotModTime = (this->fRotModTime - afDeltaTime);
+    fRotMod = (float)(fRotMod - 0.05000000074505806);
+    return v6;
 }
 
 bhkRigidBody* bhkCharacterController::GetSupportBody() const {
@@ -2351,9 +2346,8 @@ bhkRigidBody* bhkCharacterController::GetSupportBody() const {
     if (spSupportBody) {
         return static_cast<bhkRigidBody*>(spSupportBody->m_userData);
     }
-    else {
-        return nullptr;
-    }
+
+    return nullptr;
 }
 
 uint32_t bhkCharacterController::GetFilterGroup() {

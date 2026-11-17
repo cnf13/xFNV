@@ -494,21 +494,20 @@ bool Cmd_RemoveFromAllFactions(
     ExtraDataList* v5;
     TESActorBase* actorBase;
     ExtraFactionChanges* factionChangesExtra;
-    if (apRefObject) {
-        if (apRefObject->IsActor()) {
-            apRefObject->AddChange(0x80000000u);
-            extra = apRefObject->TESObjectREFR::GetExtra();
-            factionChangesExtra = extra->GetFactionChangesExtra();
-            if (!factionChangesExtra) {
-                v4 = apRefObject->TESObjectREFR::GetExtra();
-                v4->AddFactionChangesExtra();
-                v5 = apRefObject->TESObjectREFR::GetExtra();
-                factionChangesExtra = v5->GetFactionChangesExtra();
-            }
-            actorBase = static_cast<Actor*>(apRefObject)->GetActorBase();
-            factionChangesExtra->ExpelFromAllFactions(actorBase);
+    if ((apRefObject) && (apRefObject->IsActor())) {
+        apRefObject->AddChange(0x80000000u);
+        extra = apRefObject->TESObjectREFR::GetExtra();
+        factionChangesExtra = extra->GetFactionChangesExtra();
+        if (!factionChangesExtra) {
+            v4 = apRefObject->TESObjectREFR::GetExtra();
+            v4->AddFactionChangesExtra();
+            v5 = apRefObject->TESObjectREFR::GetExtra();
+            factionChangesExtra = v5->GetFactionChangesExtra();
         }
+        actorBase = static_cast<Actor*>(apRefObject)->GetActorBase();
+        factionChangesExtra->ExpelFromAllFactions(actorBase);
     }
+
     return true;
 }
 
@@ -641,17 +640,15 @@ bool Cmd_DrawSkeleton(
         v10 = (uint8_t)(a8 != 0);
         v13 = (uint8_t)(v15 != 0);
         v11 = (uint8_t)(v16 != 0);
-        if (pActor) {
-            if (pActor->pRagdollController) {
-                pNode = pActor->TESObjectREFR::Get3D();
-                if (v10 || (v13 || v11)) {
-                    pActor->SetNonLinesAlpha(pNode, 0x1p-1f);
-                }
-                else {
-                    pActor->SetNonLinesAlpha(pNode, 1.0);
-                }
-                pActor->pRagdollController->ShowDebugLines(v10, v13, v11);
+        if ((pActor) && (pActor->pRagdollController)) {
+            pNode = pActor->TESObjectREFR::Get3D();
+            if (v10 || (v13 || v11)) {
+                pActor->SetNonLinesAlpha(pNode, 0x1p-1f);
             }
+            else {
+                pActor->SetNonLinesAlpha(pNode, 1.0);
+            }
+            pActor->pRagdollController->ShowDebugLines(v10, v13, v11);
         }
     }
     return true;
@@ -732,19 +729,18 @@ bool Cmd_AddCardToPlayer(
         )) {
         Warning("Invalid Parameter used in script AddCardToPlayer");
     }
-    if (apRefObject) {
-        if (apRefObject->TESObjectREFR::GetObjectReference()) {
-            objectReference = apRefObject->TESObjectREFR::GetObjectReference();
-            v11 = dynamic_cast<TESCaravanCard*>(objectReference);
-            if (v11) {
-                pPlayer->AddCaravanCard(v11);
-            }
-            else {
-                v9 = apRefObject->GetFormEditorID();
-                Warning("%s is not a valid CaravanCard object", v9);
-            }
+    if ((apRefObject) && (apRefObject->TESObjectREFR::GetObjectReference())) {
+        objectReference = apRefObject->TESObjectREFR::GetObjectReference();
+        v11 = dynamic_cast<TESCaravanCard*>(objectReference);
+        if (v11) {
+            pPlayer->AddCaravanCard(v11);
+        }
+        else {
+            v9 = apRefObject->GetFormEditorID();
+            Warning("%s is not a valid CaravanCard object", v9);
         }
     }
+
     return true;
 }
 
@@ -1048,14 +1044,13 @@ bool Cmd_RemoveMe_Execute(
     TESObjectREFR* v11 =
         static_cast<TESObjectREFR*>(FNVD_DYNAMIC_CAST_VOID(Actor)(apContainer, RTTI_TESObjectREFR, RTTI_Actor));
     ExtraDataList* v10 = nullptr;
-    if (v11) {
-        if (v11->WearingObject(apRefObject->GetObjectReference())) {
-            InventoryChanges* InventoryChanges_ = InventoryChanges::GetInventoryChanges(apContainer);
-            if (InventoryChanges_) {
-                v10 = InventoryChanges_->WearingObject(apRefObject->GetObjectReference(), false);
-            }
+    if ((v11) && (v11->WearingObject(apRefObject->GetObjectReference()))) {
+        InventoryChanges* InventoryChanges_ = InventoryChanges::GetInventoryChanges(apContainer);
+        if (InventoryChanges_) {
+            v10 = InventoryChanges_->WearingObject(apRefObject->GetObjectReference(), false);
         }
     }
+
     apContainer->RemoveItem(apRefObject->GetObjectReference(), v10, 1, false, false, a8, nullptr, nullptr, true, false);
     pPlayer->CheckForQuestTargetUpdate(apRefObject);
     if (apContainer == pPlayer) {
@@ -1263,14 +1258,13 @@ bool Cmd_IsActionRef(
         )) {
         return false;
     }
-    if (apRefObject) {
-        if (a8) {
-            TESObjectREFR* ActionRef = apRefObject->GetActionRef();
-            if (a8 == ActionRef) {
-                afReturnValue = 1.0;
-            }
+    if ((apRefObject) && (a8)) {
+        TESObjectREFR* ActionRef = apRefObject->GetActionRef();
+        if (a8 == ActionRef) {
+            afReturnValue = 1.0;
         }
     }
+
     if (GetThreadTLSData()->bSystemOutput) {
         Interface::PrintLine("IsActionRef >> %0.2f", afReturnValue);
     }
@@ -1290,16 +1284,15 @@ bool Cmd_PlayerSpellBook(
     BSSimpleList<void*>* pNode = &pDataHandler->listSpellItems;
     int32_t iCount = 0;
     while (pNode && pNode->ItemsInList()) {
-        if (pNode->m_item) {
-            if (static_cast<MagicItem*>(static_cast<SpellItem*>(pNode->m_item))->GetSpellType() == MagicSystem::SPELL ||
-                static_cast<MagicItem*>(static_cast<SpellItem*>(pNode->m_item))->GetSpellType() == MagicSystem::POWER ||
-                static_cast<MagicItem*>(static_cast<SpellItem*>(pNode->m_item))->GetSpellType() ==
-                    MagicSystem::LESSER_POWER) {
-                if (pPlayer->AddSpell(static_cast<SpellItem*>(pNode->m_item))) {
-                    ++iCount;
-                }
-            }
+        if ((pNode->m_item) &&
+            (static_cast<MagicItem*>(static_cast<SpellItem*>(pNode->m_item))->GetSpellType() == MagicSystem::SPELL ||
+             static_cast<MagicItem*>(static_cast<SpellItem*>(pNode->m_item))->GetSpellType() == MagicSystem::POWER ||
+             static_cast<MagicItem*>(static_cast<SpellItem*>(pNode->m_item))->GetSpellType() ==
+                 MagicSystem::LESSER_POWER) &&
+            (pPlayer->AddSpell(static_cast<SpellItem*>(pNode->m_item)))) {
+            ++iCount;
         }
+
         pNode = pNode->m_pkNext;
     }
     Interface::PrintLine("%d spells added to Player Character", iCount);
@@ -1588,10 +1581,8 @@ bool Cmd_CastImmediateOnSelf(
         MagicTarget* v10 = apRefObject->GetMagicTarget();
         v9->InterruptCast();
         TESObjectCELL* a1 = apRefObject->GetParentCell();
-        if (a1) {
-            if (TES::pInstance->IsCellLoaded(a1, true) && TES::pInstance->IsCellLoaded(a1, false)) {
-                v9->CastSpellImmediate(a8, false, v10, 1.0, false);
-            }
+        if ((a1) && (TES::pInstance->IsCellLoaded(a1, true) && TES::pInstance->IsCellLoaded(a1, false))) {
+            v9->CastSpellImmediate(a8, false, v10, 1.0, false);
         }
     }
     return true;
@@ -1643,11 +1634,9 @@ bool Cmd_DisableAllActors(
     for (uint32_t uiIndex = 0;
          uiIndex < (&ReferenceProcessLists.MobProcessArray)->GetProcessLevelTail(PROCESS_TYPE_LOW); ++uiIndex) {
         MobileObject* Item = (&ReferenceProcessLists.MobProcessArray)->GetItem(uiIndex);
-        if (Item) {
-            if (Item->IsActor() && Item != v11 && !Item->GetDisabled()) {
-                Script::AddPendingDisabledReference(Item, true);
-                apScriptLocals->m_cFlags |= 1;
-            }
+        if ((Item) && (Item->IsActor() && Item != v11 && !Item->GetDisabled())) {
+            Script::AddPendingDisabledReference(Item, true);
+            apScriptLocals->m_cFlags |= 1;
         }
     }
     return true;
@@ -1810,11 +1799,10 @@ bool Cmd_ModFactionRank_Execute(
         return true;
     }
     TESActorBase* ActorBase = v10->GetActorBase();
-    if (v10) {
-        if (a8) {
-            v10->ModFactionRank(a8, v12, v10 == pPlayer);
-        }
+    if ((v10) && (a8)) {
+        v10->ModFactionRank(a8, v12, v10 == pPlayer);
     }
+
     return true;
 }
 
@@ -1839,11 +1827,10 @@ bool Cmd_GetFactionReaction(
         )) {
         return false;
     }
-    if (a8) {
-        if (pFaction) {
-            afReturnValue = static_cast<double>(a8->GetFactionReaction(pFaction));
-        }
+    if ((a8) && (pFaction)) {
+        afReturnValue = static_cast<double>(a8->GetFactionReaction(pFaction));
     }
+
     if (GetThreadTLSData()->bSystemOutput) {
         double v10 = afReturnValue;
         const char* FullName = pFaction->GetFullName();
@@ -1875,11 +1862,10 @@ bool Cmd_SetFactionReaction(
         return false;
     }
     afReturnValue = 0.0;
-    if (pFaction) {
-        if (a8) {
-            a8->SetFactionReaction_0(pFaction, reaction);
-        }
+    if ((pFaction) && (a8)) {
+        a8->SetFactionReaction_0(pFaction, reaction);
     }
+
     return true;
 }
 
@@ -1908,22 +1894,21 @@ bool Cmd_SetAlly(
         return false;
     }
     afReturnValue = 0.0;
-    if (a2) {
-        if (a8) {
-            if (v12) {
-                a8->SetFactionReaction(static_cast<TESFaction*>(a2), 3);
-            }
-            else {
-                a8->SetFactionReaction(static_cast<TESFaction*>(a2), 2);
-            }
-            if (v11) {
-                static_cast<TESFaction*>(a2)->TESFaction::SetFactionReaction(a8, 3);
-            }
-            else {
-                static_cast<TESFaction*>(a2)->TESFaction::SetFactionReaction(a8, 2);
-            }
+    if ((a2) && (a8)) {
+        if (v12) {
+            a8->SetFactionReaction(static_cast<TESFaction*>(a2), 3);
+        }
+        else {
+            a8->SetFactionReaction(static_cast<TESFaction*>(a2), 2);
+        }
+        if (v11) {
+            static_cast<TESFaction*>(a2)->TESFaction::SetFactionReaction(a8, 3);
+        }
+        else {
+            static_cast<TESFaction*>(a2)->TESFaction::SetFactionReaction(a8, 2);
         }
     }
+
     return true;
 }
 
@@ -1952,22 +1937,21 @@ bool Cmd_SetEnemy(
         return false;
     }
     afReturnValue = 0.0;
-    if (a2) {
-        if (a8) {
-            if (v12) {
-                a8->SetFactionReaction(static_cast<TESFaction*>(a2), 0);
-            }
-            else {
-                a8->SetFactionReaction(static_cast<TESFaction*>(a2), 1);
-            }
-            if (v11) {
-                static_cast<TESFaction*>(a2)->TESFaction::SetFactionReaction(a8, 0);
-            }
-            else {
-                static_cast<TESFaction*>(a2)->TESFaction::SetFactionReaction(a8, 1);
-            }
+    if ((a2) && (a8)) {
+        if (v12) {
+            a8->SetFactionReaction(static_cast<TESFaction*>(a2), 0);
+        }
+        else {
+            a8->SetFactionReaction(static_cast<TESFaction*>(a2), 1);
+        }
+        if (v11) {
+            static_cast<TESFaction*>(a2)->TESFaction::SetFactionReaction(a8, 0);
+        }
+        else {
+            static_cast<TESFaction*>(a2)->TESFaction::SetFactionReaction(a8, 1);
         }
     }
+
     return true;
 }
 
@@ -1994,11 +1978,10 @@ bool Cmd_ModFactionReaction(
         return false;
     }
     afReturnValue = 0.0;
-    if (pOtherFaction) {
-        if (pFaction) {
-            pFaction->ModFactionReaction(pOtherFaction, iReaction);
-        }
+    if ((pOtherFaction) && (pFaction)) {
+        pFaction->ModFactionReaction(pOtherFaction, iReaction);
     }
+
     return true;
 }
 
@@ -2257,31 +2240,25 @@ bool Cmd_ShowCaravanMenu(
             Warning("Invalid Parameters used in script ShowCaravanMenu ");
             return true;
         }
-        if (apRefObject) {
-            if (apRefObject != pPlayer) {
-                if (a8) {
-                    if (apRefObject->IsMobileObject()) {
-                        pMobile = static_cast<MobileObject*>(apRefObject);
-                    }
-                    else {
-                        BGSTalkingActivator* pActivator =
-                            dynamic_cast<BGSTalkingActivator*>(apRefObject->GetObjectReference());
-                        arg0 = pActivator ? pActivator->pTempRef : nullptr;
-                    }
-                    if (pMobile) {
-                        if (pMobile->IsActor()) {
-                            arg0 = static_cast<Actor*>(pMobile);
-                        }
-                        else if (pMobile->IsTalkingActivator()) {
-                            // The talking activator reference's base object is the BGSTalkingActivator.
-                            arg0 =
-                                static_cast<BGSTalkingActivator*>(pMobile->GetTalkingActivator()->GetObjectReference())
-                                    ->pTempRef;
-                        }
-                    }
-                    CaravanMenu::Create(arg0, a8, aiDiffLevel, afBetPercentage, false);
+        if ((apRefObject) && (apRefObject != pPlayer) && (a8)) {
+            if (apRefObject->IsMobileObject()) {
+                pMobile = static_cast<MobileObject*>(apRefObject);
+            }
+            else {
+                BGSTalkingActivator* pActivator = dynamic_cast<BGSTalkingActivator*>(apRefObject->GetObjectReference());
+                arg0 = pActivator ? pActivator->pTempRef : nullptr;
+            }
+            if (pMobile) {
+                if (pMobile->IsActor()) {
+                    arg0 = static_cast<Actor*>(pMobile);
+                }
+                else if (pMobile->IsTalkingActivator()) {
+                    // The talking activator reference's base object is the BGSTalkingActivator.
+                    arg0 = static_cast<BGSTalkingActivator*>(pMobile->GetTalkingActivator()->GetObjectReference())
+                               ->pTempRef;
                 }
             }
+            CaravanMenu::Create(arg0, a8, aiDiffLevel, afBetPercentage, false);
         }
     }
     return true;
@@ -2398,22 +2375,19 @@ bool Cmd_StartMisterSandMan(
         )) {
         return false;
     }
-    if (apRefObject->IsActor()) {
-        if (pTarget) {
-            if (pTarget->IsActor()) {
-                Actor* pActor = static_cast<Actor*>(apRefObject);
-                BaseProcess* pProcess1 = pActor->GetCurrentAIProcess();
-                BaseProcess* pProcess2 = pActor->GetCurrentAIProcess();
-                BaseProcess* pProcess3 = pActor->GetCurrentAIProcess();
-                // The arguments are evaluated right to left, as the game does: the index, then the marker, then the
-                // furniture.
-                uint32_t uiIndex = pProcess1->GetCurrentFurnitureIndex();
-                FurnitureMark* pMarker = pProcess2->GetFurnitureMarker();
-                TESObjectREFR* pFurniture = pProcess3->GetCurrentFurniture();
-                pTarget->InitiateSandmanPackage(pActor, pFurniture, pMarker, static_cast<uint8_t>(uiIndex));
-            }
-        }
+    if ((apRefObject->IsActor()) && (pTarget) && (pTarget->IsActor())) {
+        Actor* pActor = static_cast<Actor*>(apRefObject);
+        BaseProcess* pProcess1 = pActor->GetCurrentAIProcess();
+        BaseProcess* pProcess2 = pActor->GetCurrentAIProcess();
+        BaseProcess* pProcess3 = pActor->GetCurrentAIProcess();
+        // The arguments are evaluated right to left, as the game does: the index, then the marker, then the
+        // furniture.
+        uint32_t uiIndex = pProcess1->GetCurrentFurnitureIndex();
+        FurnitureMark* pMarker = pProcess2->GetFurnitureMarker();
+        TESObjectREFR* pFurniture = pProcess3->GetCurrentFurniture();
+        pTarget->InitiateSandmanPackage(pActor, pFurniture, pMarker, static_cast<uint8_t>(uiIndex));
     }
+
     return true;
 }
 
@@ -2433,13 +2407,10 @@ bool Cmd_StartCannibal(
         )) {
         return false;
     }
-    if (apRefObject->IsActor()) {
-        if (pTarget) {
-            if (pTarget->IsActor()) {
-                pTarget->InitiateCannibalPackage(static_cast<Actor*>(apRefObject));
-            }
-        }
+    if ((apRefObject->IsActor()) && (pTarget) && (pTarget->IsActor())) {
+        pTarget->InitiateCannibalPackage(static_cast<Actor*>(apRefObject));
     }
+
     return true;
 }
 
@@ -2671,14 +2642,12 @@ bool Cmd_SetClass_Execute(
     }
     if (apRefObject) {
         Actor* v11 = dynamic_cast<Actor*>(apRefObject);
-        if (v11) {
-            if (a8) {
-                TESBoundObject* ObjectReference = v11->GetObjectReference();
-                TESNPC* v10 = dynamic_cast<TESNPC*>(ObjectReference);
-                if (v10) {
-                    v10->SetClass(a8);
-                    v10->InitValues(false);
-                }
+        if ((v11) && (a8)) {
+            TESBoundObject* ObjectReference = v11->GetObjectReference();
+            TESNPC* v10 = dynamic_cast<TESNPC*>(ObjectReference);
+            if (v10) {
+                v10->SetClass(a8);
+                v10->InitValues(false);
             }
         }
     }
@@ -2927,15 +2896,10 @@ bool Cmd_ShowWarning_Execute(
         return false;
     }
     BSStringT<char> out;
-    if (Script::ParseString(
-            apParameters, apCompiledParams, apRefObject, apContainer, apScript, apScriptLocals, &afReturnValue,
-            &auiOffset, &result[2], &out
-        )) {
-        return true;
-    }
-    else {
-        return false;
-    }
+    return Script::ParseString(
+        apParameters, apCompiledParams, apRefObject, apContainer, apScript, apScriptLocals, &afReturnValue, &auiOffset,
+        &result[2], &out
+    );
 }
 
 bool Cmd_EnterTrigger_Execute(
@@ -3036,11 +3000,10 @@ bool Cmd_SetPlayerTeammate_Execute(
         )) {
         return false;
     }
-    if (apRefObject) {
-        if (apRefObject->IsActor()) {
-            static_cast<Actor*>(apRefObject)->Actor::SetPlayerTeammate(a8 != 0);
-        }
+    if ((apRefObject) && (apRefObject->IsActor())) {
+        static_cast<Actor*>(apRefObject)->Actor::SetPlayerTeammate(a8 != 0);
     }
+
     return true;
 }
 
@@ -3055,20 +3018,19 @@ bool Cmd_OpenTeammateContainer(
     uint32_t& auiOffset
 ) {
     uint32_t a8;
-    if (apRefObject) {
-        if (apRefObject->IsActor()) {
-            Actor* pActor = static_cast<Actor*>(apRefObject);
-            a8 = 0;
-            Script::ParseParameters(
-                apParameters, apCompiledParams, auiOffset, apRefObject, apContainer, apScript, apScriptLocals, &a8
+    if ((apRefObject) && (apRefObject->IsActor())) {
+        Actor* pActor = static_cast<Actor*>(apRefObject);
+        a8 = 0;
+        Script::ParseParameters(
+            apParameters, apCompiledParams, auiOffset, apRefObject, apContainer, apScript, apScriptLocals, &a8
+        );
+        if (pActor->IsPlayerTeammate() || a8) {
+            Interface::QueueMenuCreate(
+                Interface::OPEN_CONTAINER, apRefObject, nullptr, nullptr, Interface::CMM_TEAMMATE, false
             );
-            if (pActor->IsPlayerTeammate() || a8) {
-                Interface::QueueMenuCreate(
-                    Interface::OPEN_CONTAINER, apRefObject, nullptr, nullptr, Interface::CMM_TEAMMATE, false
-                );
-            }
         }
     }
+
     return true;
 }
 
@@ -3209,33 +3171,33 @@ bool Cmd_SetWeaponHealthPerc(
         )) {
         return false;
     }
-    if (apRefObject) {
-        if (apRefObject->IsActor()) {
-            Actor* pactor = static_cast<Actor*>(apRefObject);
-            if (pactor->GetCurrentAIProcess()) {
-                BaseProcess* pProc = pactor->GetCurrentAIProcess();
-                ItemChange* v19 = pProc->GetCurrentWeapon();
-                if (v19) {
-                    a8 = a8 / 100.0;
-                    bool HasModEffectActive_0 = v19->HasModEffectActive(10);
-                    float FormHealth = static_cast<float>(static_cast<TESObjectWEAP*>(v19->pContainerObj)
-                                                              ->TESObjectWEAP::GetFormHealth(HasModEffectActive_0));
-                    float afA = FormHealth * a8;
-                    float v15 = afA - v19->GetItemHealth(false);
-                    if (!(v15 > 0.0)) {
-                        pactor->DamageEquipment(v19, -v15, true);
-                    }
-                    else {
-                        ExtraDataList* m_item = v19->pExtraObjectList->m_item;
-                        InventoryChanges* ContainerChanges = pactor->m_Extra.GetContainerChanges();
-                        float v13 = FormHealth - 1.0;
-                        float arg0 = BSMIN(afA, v13);
-                        v19->SetItemHealth(arg0, ContainerChanges, m_item, true);
-                    }
+    if ((apRefObject) && (apRefObject->IsActor())) {
+        Actor* pactor = static_cast<Actor*>(apRefObject);
+        if (pactor->GetCurrentAIProcess()) {
+            BaseProcess* pProc = pactor->GetCurrentAIProcess();
+            ItemChange* v19 = pProc->GetCurrentWeapon();
+            if (v19) {
+                a8 = a8 / 100.0;
+                bool HasModEffectActive_0 = v19->HasModEffectActive(10);
+                float FormHealth = static_cast<float>(
+                    static_cast<TESObjectWEAP*>(v19->pContainerObj)->TESObjectWEAP::GetFormHealth(HasModEffectActive_0)
+                );
+                float afA = FormHealth * a8;
+                float v15 = afA - v19->GetItemHealth(false);
+                if (!(v15 > 0.0)) {
+                    pactor->DamageEquipment(v19, -v15, true);
+                }
+                else {
+                    ExtraDataList* m_item = v19->pExtraObjectList->m_item;
+                    InventoryChanges* ContainerChanges = pactor->m_Extra.GetContainerChanges();
+                    float v13 = FormHealth - 1.0;
+                    float arg0 = BSMIN(afA, v13);
+                    v19->SetItemHealth(arg0, ContainerChanges, m_item, true);
                 }
             }
         }
     }
+
     return true;
 }
 
@@ -3256,34 +3218,33 @@ bool Cmd_ModWeaponHealthPerc(
         )) {
         return false;
     }
-    if (apRefObject) {
-        if (apRefObject->IsActor()) {
-            Actor* pactor = static_cast<Actor*>(apRefObject);
-            if (pactor->GetCurrentAIProcess()) {
-                BaseProcess* pProc = pactor->GetCurrentAIProcess();
-                ItemChange* v17 = pProc->GetCurrentWeapon();
-                if (v17) {
-                    double ItemHealth = v17->GetItemHealth(true);
-                    a8 = ItemHealth + a8;
-                    a8 = a8 / 100.0;
-                    if (a8 < 0.0) {
-                        a8 = 0.0f;
-                    }
-                    float FormHealth = static_cast<float>(TESHealthForm::GetFormHealth(v17->pContainerObj));
-                    float v16 = FormHealth * a8;
-                    float v14 = v16 - v17->GetItemHealth(false);
-                    if (!(v14 > 0.0)) {
-                        pactor->DamageEquipment(v17, -v14, true);
-                    }
-                    else {
-                        ExtraDataList* m_item = v17->pExtraObjectList->m_item;
-                        InventoryChanges* ContainerChanges = pactor->m_Extra.GetContainerChanges();
-                        v17->SetItemHealth(v16, ContainerChanges, m_item, true);
-                    }
+    if ((apRefObject) && (apRefObject->IsActor())) {
+        Actor* pactor = static_cast<Actor*>(apRefObject);
+        if (pactor->GetCurrentAIProcess()) {
+            BaseProcess* pProc = pactor->GetCurrentAIProcess();
+            ItemChange* v17 = pProc->GetCurrentWeapon();
+            if (v17) {
+                double ItemHealth = v17->GetItemHealth(true);
+                a8 = ItemHealth + a8;
+                a8 = a8 / 100.0;
+                if (a8 < 0.0) {
+                    a8 = 0.0f;
+                }
+                float FormHealth = static_cast<float>(TESHealthForm::GetFormHealth(v17->pContainerObj));
+                float v16 = FormHealth * a8;
+                float v14 = v16 - v17->GetItemHealth(false);
+                if (!(v14 > 0.0)) {
+                    pactor->DamageEquipment(v17, -v14, true);
+                }
+                else {
+                    ExtraDataList* m_item = v17->pExtraObjectList->m_item;
+                    InventoryChanges* ContainerChanges = pactor->m_Extra.GetContainerChanges();
+                    v17->SetItemHealth(v16, ContainerChanges, m_item, true);
                 }
             }
         }
     }
+
     return true;
 }
 
@@ -3328,25 +3289,25 @@ bool Cmd_SetNoActivationSound(
 ) {
     TESSound* a1;
     a1 = nullptr;
-    if (Script::ParseParameters(
+    if ((Script::ParseParameters(
             apParameters, apCompiledParams, auiOffset, apRefObject, apContainer, apScript, apScriptLocals, &a1
-        )) {
-        if (a1) {
-            TESSound* v15 = a1;
-            const char* Filename = a1->GetFilename();
-            BSAudio* v8 = &BSAudio::QInstance();
-            v8->PrecacheSound(Filename, 0x20000121u, v15);
-            TESSound* v16 = a1;
-            const char* v13 = a1->GetFilename();
-            BSAudio* v9 = &BSAudio::QInstance();
-            v9->PrecacheSound(v13, 0x20000121u, v16);
-            TESSound* v17 = a1;
-            const char* v14 = a1->GetFilename();
-            BSAudio* v10 = &BSAudio::QInstance();
-            v10->PrecacheSound(v14, 0x20000121u, v17);
-            FalloutAudio::SetNoActivationSound(a1);
-        }
+        )) &&
+        (a1)) {
+        TESSound* v15 = a1;
+        const char* Filename = a1->GetFilename();
+        BSAudio* v8 = &BSAudio::QInstance();
+        v8->PrecacheSound(Filename, 0x20000121u, v15);
+        TESSound* v16 = a1;
+        const char* v13 = a1->GetFilename();
+        BSAudio* v9 = &BSAudio::QInstance();
+        v9->PrecacheSound(v13, 0x20000121u, v16);
+        TESSound* v17 = a1;
+        const char* v14 = a1->GetFilename();
+        BSAudio* v10 = &BSAudio::QInstance();
+        v10->PrecacheSound(v14, 0x20000121u, v17);
+        FalloutAudio::SetNoActivationSound(a1);
     }
+
     return true;
 }
 
@@ -3558,12 +3519,11 @@ bool Cmd_DetonatePlacedExplosives(
             Projectile* Item = static_cast<Projectile*>(ProcessArray_->GetItem(uiIndex));
             if ((!Item || !Item->IsStillLoading()) && Item->IsProjectile()) {
                 TESActorBase* Owner;
-                if (Item->GetShooter() == apRefObject ||
-                    (Owner = static_cast<TESActorBase*>(Item->GetOwner()),
-                     Owner == apRefObject->GetTemplateActorBase())) {
-                    if (Item->GetProjectileBase()->GetHasExplosionDetonates()) {
-                        Item->SetFlag(Projectile::DETONATE, true);
-                    }
+                if ((Item->GetShooter() == apRefObject ||
+                     (Owner = static_cast<TESActorBase*>(Item->GetOwner()),
+                      Owner == apRefObject->GetTemplateActorBase())) &&
+                    (Item->GetProjectileBase()->GetHasExplosionDetonates())) {
+                    Item->SetFlag(Projectile::DETONATE, true);
                 }
             }
         }
@@ -3699,10 +3659,8 @@ bool Cmd_PersistentRefCount(
     afReturnValue = 0.0;
     while (a2) {
         TESForm::pAllForms->GetNext(a2, a3, a4);
-        if (a4) {
-            if (a4->IsReference() && (a4->iFormFlags & 1024) != 0) {
-                ++v12;
-            }
+        if ((a4) && (a4->IsReference() && (a4->iFormFlags & 1024) != 0)) {
+            ++v12;
         }
     }
     afReturnValue = static_cast<double>(v12);
@@ -3768,536 +3726,476 @@ bool Cmd_ModWaterShader(
             WaterShaderProperty* Property = static_cast<WaterShaderProperty*>(WaterGeometry->GetProperty(3));
             v22 = Property;
         }
-        if (BSstricmp(apString1, "velocity")) {
-            if (BSstricmp(apString1, "direction")) {
-                if (BSstricmp(apString1, "amplitude")) {
-                    if (BSstricmp(apString1, "frequency")) {
-                        if (BSstricmp(apString1, "reflectamt")) {
-                            if (BSstricmp(apString1, "distort")) {
-                                if (BSstricmp(apString1, "fresnel")) {
-                                    if (BSstricmp(apString1, "opacity")) {
-                                        if (BSstricmp(apString1, "blend")) {
-                                            if (BSstricmp(apString1, "noise")) {
-                                                if (BSstricmp(apString1, "off")) {
-                                                    if (BSstricmp(apString1, "displaceforce")) {
-                                                        if (BSstricmp(apString1, "displacevelocity")) {
-                                                            if (BSstricmp(apString1, "displacefalloff")) {
-                                                                if (BSstricmp(apString1, "displacedampener")) {
-                                                                    if (BSstricmp(apString1, "rainforce")) {
-                                                                        if (BSstricmp(apString1, "rainvelocity")) {
-                                                                            if (BSstricmp(apString1, "rainfalloff")) {
-                                                                                if (BSstricmp(apString1, "rainsize")) {
-                                                                                    if (BSstricmp(
-                                                                                            apString1, "reflect"
-                                                                                        )) {
+        if ((BSstricmp(apString1, "velocity")) && (BSstricmp(apString1, "direction")) &&
+            (BSstricmp(apString1, "amplitude")) && (BSstricmp(apString1, "frequency"))) {
+            if (BSstricmp(apString1, "reflectamt")) {
+                if (BSstricmp(apString1, "distort")) {
+                    if (BSstricmp(apString1, "fresnel")) {
+                        if (BSstricmp(apString1, "opacity")) {
+                            if (BSstricmp(apString1, "blend")) {
+                                if (BSstricmp(apString1, "noise")) {
+                                    if (BSstricmp(apString1, "off")) {
+                                        if (BSstricmp(apString1, "displaceforce")) {
+                                            if (BSstricmp(apString1, "displacevelocity")) {
+                                                if (BSstricmp(apString1, "displacefalloff")) {
+                                                    if (BSstricmp(apString1, "displacedampener")) {
+                                                        if (BSstricmp(apString1, "rainforce")) {
+                                                            if (BSstricmp(apString1, "rainvelocity")) {
+                                                                if (BSstricmp(apString1, "rainfalloff")) {
+                                                                    if (BSstricmp(apString1, "rainsize")) {
+                                                                        if (BSstricmp(apString1, "reflect")) {
+                                                                            if (BSstricmp(apString1, "refract")) {
+                                                                                if (BSstricmp(apString1, "depth")) {
+                                                                                    if (BSstricmp(apString1, "fog")) {
                                                                                         if (BSstricmp(
-                                                                                                apString1, "refract"
+                                                                                                apString1, "lod"
                                                                                             )) {
-                                                                                            if (BSstricmp(
-                                                                                                    apString1, "depth"
+                                                                                            if (!BSstricmp(
+                                                                                                    apString1,
+                                                                                                    "autowa"
+                                                                                                    "te"
+                                                                                                    "r"
                                                                                                 )) {
-                                                                                                if (BSstricmp(
-                                                                                                        apString1, "fog"
-                                                                                                    )) {
-                                                                                                    if (BSstricmp(
-                                                                                                            apString1,
-                                                                                                            "lod"
-                                                                                                        )) {
-                                                                                                        if (!BSstricmp(
-                                                                                                                apString1,
-                                                                                                                "autowa"
-                                                                                                                "te"
-                                                                                                                "r"
-                                                                                                            )) {
-                                                                                                            char a[256];
-                                                                                                            double v17 =
-                                                                                                                1000.0;
-                                                                                                            PerformanceCount
-                                                                                                                .u
-                                                                                                                .LowPart =
-                                                                                                                0;
-                                                                                                            QueryPerformanceFrequency(
-                                                                                                                &Frequency
-                                                                                                            );
-                                                                                                            v17 =
-                                                                                                                static_cast<
-                                                                                                                    double>(
-                                                                                                                    Frequency
-                                                                                                                        .QuadPart
-                                                                                                                ) *
-                                                                                                                1e-06;
-                                                                                                            QueryPerformanceCounter(
-                                                                                                                &PerformanceCount
-                                                                                                            );
-                                                                                                            TESObjectCELL* CurrentCell =
-                                                                                                                TES::pInstance
-                                                                                                                    ->GetCurrentCell();
-                                                                                                            BGSAutoWater::
-                                                                                                                GeneratePlaceableWaterForCell(
-                                                                                                                    CurrentCell
-                                                                                                                );
-                                                                                                            QueryPerformanceCounter(
-                                                                                                                &v13
-                                                                                                            );
-                                                                                                            double microSeconds =
-                                                                                                                static_cast<
-                                                                                                                    double>(
-                                                                                                                    v13.QuadPart -
-                                                                                                                    PerformanceCount
-                                                                                                                        .QuadPart
-                                                                                                                ) /
-                                                                                                                v17;
-                                                                                                            int64_t v11 =
-                                                                                                                v13.QuadPart -
-                                                                                                                PerformanceCount
-                                                                                                                    .QuadPart;
-                                                                                                            TESObjectCELL* v10 =
-                                                                                                                TES::pInstance
-                                                                                                                    ->GetCurrentCell();
-                                                                                                            // The
-                                                                                                            // 64-bit
-                                                                                                            // conversion
-                                                                                                            // is
-                                                                                                            // spelled
-                                                                                                            // %lld, the
-                                                                                                            // standard
-                                                                                                            // length,
-                                                                                                            // rather
-                                                                                                            // than
-                                                                                                            // MSVC's
-                                                                                                            // own
-                                                                                                            // %I64d.
-                                                                                                            BSsprintf(
-                                                                                                                a, 255,
-                                                                                                                "Genera"
-                                                                                                                "tePlac"
-                                                                                                                "eableW"
-                                                                                                                "aterFo"
-                                                                                                                "rCell("
-                                                                                                                ") for "
-                                                                                                                "cell "
-                                                                                                                "%s: "
-                                                                                                                "Ticks:"
-                                                                                                                " %lld,"
-                                                                                                                " Micro"
-                                                                                                                "second"
-                                                                                                                "s: %f",
-                                                                                                                v10->GetCellName(),
-                                                                                                                v11,
-                                                                                                                microSeconds
-                                                                                                            );
-                                                                                                            InitializationFlow(
-                                                                                                                a, 0
-                                                                                                            );
-                                                                                                            if (
-                                                                                                                !TESWaterSystem::
-                                                                                                                    GetWaterEnabled()
-                                                                                                            ) {
-                                                                                                                TES::pInstance
-                                                                                                                    ->GetWaterSystem()
-                                                                                                                    ->EnableWaterSystem();
-                                                                                                            }
-                                                                                                        }
-                                                                                                    }
-                                                                                                    else {
-                                                                                                        if (
-                                                                                                            TES::pInstance
-                                                                                                                ->GetWaterSystem()
-                                                                                                        ) {
-                                                                                                            TES::pInstance
-                                                                                                                ->GetWaterSystem()
-                                                                                                                ->DisplayWater(
-                                                                                                                    true,
-                                                                                                                    true,
-                                                                                                                    true
-                                                                                                                );
-                                                                                                        }
-                                                                                                        Interface::
-                                                                                                            PrintLine(
-                                                                                                                "Toggle"
-                                                                                                                " LOD "
-                                                                                                                "Wate"
-                                                                                                                "r"
-                                                                                                            );
-                                                                                                    }
-                                                                                                }
-                                                                                                else {
-                                                                                                    if (v21 >= 0.0 &&
-                                                                                                        v21 <= 100.0) {
-                                                                                                        if (v22) {
-                                                                                                            v22->fFogAmount =
-                                                                                                                v21 /
-                                                                                                                100.0;
-                                                                                                            Interface::PrintLine(
-                                                                                                                "set "
-                                                                                                                "fog "
-                                                                                                                "amount"
-                                                                                                                " to "
-                                                                                                                "%d",
-                                                                                                                static_cast<
-                                                                                                                    int32_t>(
-                                                                                                                    v21
-                                                                                                                )
-                                                                                                            );
-                                                                                                            v22->bUpdateConstants =
-                                                                                                                false;
-                                                                                                        }
-                                                                                                        else {
-                                                                                                            WaterShader::
-                                                                                                                pFogColor
-                                                                                                                    .a =
-                                                                                                                v21 /
-                                                                                                                100.0;
-                                                                                                            Interface::PrintLine(
-                                                                                                                "set "
-                                                                                                                "fog "
-                                                                                                                "amount"
-                                                                                                                " to "
-                                                                                                                "%d",
-                                                                                                                static_cast<
-                                                                                                                    int32_t>(
-                                                                                                                    v21
-                                                                                                                )
-                                                                                                            );
-                                                                                                            g_bIsUseModdedWaterShaders =
-                                                                                                                1;
-                                                                                                        }
-                                                                                                    }
-                                                                                                }
-                                                                                            }
-                                                                                            else {
-                                                                                                if (v22) {
-                                                                                                    if (v22->bDepth) {
-                                                                                                        v22->bDepth =
-                                                                                                            false;
-                                                                                                        Interface::
-                                                                                                            PrintLine(
-                                                                                                                "Toggle"
-                                                                                                                " Depth"
-                                                                                                                " : "
-                                                                                                                "OFF"
-                                                                                                            );
-                                                                                                    }
-                                                                                                    else {
-                                                                                                        v22->bDepth =
-                                                                                                            true;
-                                                                                                        Interface::
-                                                                                                            PrintLine(
-                                                                                                                "Toggle"
-                                                                                                                " Depth"
-                                                                                                                " : "
-                                                                                                                "ON"
-                                                                                                            );
-                                                                                                    }
-                                                                                                }
-                                                                                                else {
-                                                                                                    if (
-                                                                                                        TESWaterSystem::
-                                                                                                            bUseWaterDepth
-                                                                                                                .Bool()
-                                                                                                    ) {
-                                                                                                        TESWaterSystem::
-                                                                                                            bUseWaterDepth =
-                                                                                                                false;
-                                                                                                        Interface::
-                                                                                                            PrintLine(
-                                                                                                                "Toggle"
-                                                                                                                " Globa"
-                                                                                                                "l "
-                                                                                                                "Water "
-                                                                                                                "Depth "
-                                                                                                                ": "
-                                                                                                                "OFF"
-                                                                                                            );
-                                                                                                    }
-                                                                                                    else {
-                                                                                                        TESWaterSystem::
-                                                                                                            bUseWaterDepth =
-                                                                                                                true;
-                                                                                                        Interface::
-                                                                                                            PrintLine(
-                                                                                                                "Toggle"
-                                                                                                                " Globa"
-                                                                                                                "l "
-                                                                                                                "Water "
-                                                                                                                "Depth "
-                                                                                                                ": ON"
-                                                                                                            );
-                                                                                                    }
+                                                                                                char a[256];
+                                                                                                double v17 = 1000.0;
+                                                                                                PerformanceCount.u
+                                                                                                    .LowPart = 0;
+                                                                                                QueryPerformanceFrequency(
+                                                                                                    &Frequency
+                                                                                                );
+                                                                                                v17 =
+                                                                                                    static_cast<double>(
+                                                                                                        Frequency
+                                                                                                            .QuadPart
+                                                                                                    ) *
+                                                                                                    1e-06;
+                                                                                                QueryPerformanceCounter(
+                                                                                                    &PerformanceCount
+                                                                                                );
+                                                                                                TESObjectCELL* CurrentCell =
+                                                                                                    TES::pInstance
+                                                                                                        ->GetCurrentCell();
+                                                                                                BGSAutoWater::
+                                                                                                    GeneratePlaceableWaterForCell(
+                                                                                                        CurrentCell
+                                                                                                    );
+                                                                                                QueryPerformanceCounter(
+                                                                                                    &v13
+                                                                                                );
+                                                                                                double microSeconds =
+                                                                                                    static_cast<double>(
+                                                                                                        v13.QuadPart -
+                                                                                                        PerformanceCount
+                                                                                                            .QuadPart
+                                                                                                    ) /
+                                                                                                    v17;
+                                                                                                int64_t v11 =
+                                                                                                    v13.QuadPart -
+                                                                                                    PerformanceCount
+                                                                                                        .QuadPart;
+                                                                                                TESObjectCELL* v10 =
+                                                                                                    TES::pInstance
+                                                                                                        ->GetCurrentCell();
+                                                                                                // The
+                                                                                                // 64-bit
+                                                                                                // conversion
+                                                                                                // is
+                                                                                                // spelled
+                                                                                                // %lld, the
+                                                                                                // standard
+                                                                                                // length,
+                                                                                                // rather
+                                                                                                // than
+                                                                                                // MSVC's
+                                                                                                // own
+                                                                                                // %I64d.
+                                                                                                BSsprintf(
+                                                                                                    a, 255,
+                                                                                                    "Genera"
+                                                                                                    "tePlac"
+                                                                                                    "eableW"
+                                                                                                    "aterFo"
+                                                                                                    "rCell("
+                                                                                                    ") for "
+                                                                                                    "cell "
+                                                                                                    "%s: "
+                                                                                                    "Ticks:"
+                                                                                                    " %lld,"
+                                                                                                    " Micro"
+                                                                                                    "second"
+                                                                                                    "s: %f",
+                                                                                                    v10->GetCellName(),
+                                                                                                    v11, microSeconds
+                                                                                                );
+                                                                                                InitializationFlow(
+                                                                                                    a, 0
+                                                                                                );
+                                                                                                if (
+                                                                                                    !TESWaterSystem::
+                                                                                                        GetWaterEnabled()
+                                                                                                ) {
+                                                                                                    TES::pInstance
+                                                                                                        ->GetWaterSystem()
+                                                                                                        ->EnableWaterSystem();
                                                                                                 }
                                                                                             }
                                                                                         }
                                                                                         else {
-                                                                                            if (v22) {
-                                                                                                if (v22->bRefractions) {
-                                                                                                    v22->bRefractions =
-                                                                                                        false;
-                                                                                                    Interface::
-                                                                                                        PrintLine(
-                                                                                                            "Toggle "
-                                                                                                            "Refraction"
-                                                                                                            "s : OFF"
-                                                                                                        );
-                                                                                                }
-                                                                                                else {
-                                                                                                    v22->bReflections =
-                                                                                                        true;
-                                                                                                    Interface::
-                                                                                                        PrintLine(
-                                                                                                            "Toggle "
-                                                                                                            "Refraction"
-                                                                                                            "s : ON"
-                                                                                                        );
-                                                                                                }
+                                                                                            if (
+                                                                                                TES::pInstance
+                                                                                                    ->GetWaterSystem()
+                                                                                            ) {
+                                                                                                TES::pInstance
+                                                                                                    ->GetWaterSystem()
+                                                                                                    ->DisplayWater(
+                                                                                                        true, true, true
+                                                                                                    );
                                                                                             }
-                                                                                            else {
-                                                                                                if (TESWaterSystem::
-                                                                                                        bUseWaterRefractions
-                                                                                                            .Bool()) {
-                                                                                                    TESWaterSystem::
-                                                                                                        bUseWaterRefractions =
-                                                                                                            false;
-                                                                                                    Interface::
-                                                                                                        PrintLine(
-                                                                                                            "Toggle "
-                                                                                                            "Global "
-                                                                                                            "Water "
-                                                                                                            "Refraction"
-                                                                                                            "s : OFF"
-                                                                                                        );
-                                                                                                }
-                                                                                                else {
-                                                                                                    TESWaterSystem::
-                                                                                                        bUseWaterRefractions =
-                                                                                                            true;
-                                                                                                    Interface::
-                                                                                                        PrintLine(
-                                                                                                            "Toggle "
-                                                                                                            "Global "
-                                                                                                            "Water "
-                                                                                                            "Refraction"
-                                                                                                            "s : ON"
-                                                                                                        );
-                                                                                                }
-                                                                                            }
+                                                                                            Interface::PrintLine(
+                                                                                                "Toggle"
+                                                                                                " LOD "
+                                                                                                "Wate"
+                                                                                                "r"
+                                                                                            );
                                                                                         }
                                                                                     }
                                                                                     else {
-                                                                                        if (v22) {
-                                                                                            if (v22->bReflections) {
-                                                                                                v22->bReflections =
+                                                                                        if (v21 >= 0.0 &&
+                                                                                            v21 <= 100.0) {
+                                                                                            if (v22) {
+                                                                                                v22->fFogAmount =
+                                                                                                    v21 / 100.0;
+                                                                                                Interface::PrintLine(
+                                                                                                    "set "
+                                                                                                    "fog "
+                                                                                                    "amount"
+                                                                                                    " to "
+                                                                                                    "%d",
+                                                                                                    static_cast<
+                                                                                                        int32_t>(v21)
+                                                                                                );
+                                                                                                v22->bUpdateConstants =
                                                                                                     false;
-                                                                                                Interface::PrintLine(
-                                                                                                    "Toggle "
-                                                                                                    "Reflections : "
-                                                                                                    "OFF"
-                                                                                                );
                                                                                             }
                                                                                             else {
-                                                                                                v22->bReflections =
-                                                                                                    true;
+                                                                                                WaterShader::pFogColor
+                                                                                                    .a = v21 / 100.0;
                                                                                                 Interface::PrintLine(
-                                                                                                    "Toggle "
-                                                                                                    "Reflections : ON"
+                                                                                                    "set "
+                                                                                                    "fog "
+                                                                                                    "amount"
+                                                                                                    " to "
+                                                                                                    "%d",
+                                                                                                    static_cast<
+                                                                                                        int32_t>(v21)
                                                                                                 );
-                                                                                            }
-                                                                                        }
-                                                                                        else {
-                                                                                            if (TESWaterSystem::
-                                                                                                    bUseWaterReflections
-                                                                                                        .Bool()) {
-                                                                                                TESWaterSystem::
-                                                                                                    bUseWaterReflections =
-                                                                                                        false;
-                                                                                                Interface::PrintLine(
-                                                                                                    "Toggle Global "
-                                                                                                    "Water Reflections "
-                                                                                                    ": OFF"
-                                                                                                );
-                                                                                            }
-                                                                                            else {
-                                                                                                TESWaterSystem::
-                                                                                                    bUseWaterReflections =
-                                                                                                        true;
-                                                                                                Interface::PrintLine(
-                                                                                                    "Toggle Global "
-                                                                                                    "Water Reflections "
-                                                                                                    ": ON"
-                                                                                                );
+                                                                                                g_bIsUseModdedWaterShaders =
+                                                                                                    1;
                                                                                             }
                                                                                         }
                                                                                     }
                                                                                 }
                                                                                 else {
-                                                                                    if (v21 >= 0.0 && v21 <= 1.0) {
-                                                                                        ImageSpaceEffectWaterDisplacement::
-                                                                                            RainVariables.a = v21;
-                                                                                        g_bIsUseModdedWaterShaders = 1;
+                                                                                    if (v22) {
+                                                                                        if (v22->bDepth) {
+                                                                                            v22->bDepth = false;
+                                                                                            Interface::PrintLine(
+                                                                                                "Toggle"
+                                                                                                " Depth"
+                                                                                                " : "
+                                                                                                "OFF"
+                                                                                            );
+                                                                                        }
+                                                                                        else {
+                                                                                            v22->bDepth = true;
+                                                                                            Interface::PrintLine(
+                                                                                                "Toggle"
+                                                                                                " Depth"
+                                                                                                " : "
+                                                                                                "ON"
+                                                                                            );
+                                                                                        }
+                                                                                    }
+                                                                                    else {
+                                                                                        if (TESWaterSystem::
+                                                                                                bUseWaterDepth.Bool()) {
+                                                                                            TESWaterSystem::
+                                                                                                bUseWaterDepth = false;
+                                                                                            Interface::PrintLine(
+                                                                                                "Toggle"
+                                                                                                " Globa"
+                                                                                                "l "
+                                                                                                "Water "
+                                                                                                "Depth "
+                                                                                                ": "
+                                                                                                "OFF"
+                                                                                            );
+                                                                                        }
+                                                                                        else {
+                                                                                            TESWaterSystem::
+                                                                                                bUseWaterDepth = true;
+                                                                                            Interface::PrintLine(
+                                                                                                "Toggle"
+                                                                                                " Globa"
+                                                                                                "l "
+                                                                                                "Water "
+                                                                                                "Depth "
+                                                                                                ": ON"
+                                                                                            );
+                                                                                        }
                                                                                     }
                                                                                 }
                                                                             }
                                                                             else {
-                                                                                if (v21 >= 0.0 && v21 <= 1.0) {
-                                                                                    ImageSpaceEffectWaterDisplacement::
-                                                                                        RainVariables.b = v21;
-                                                                                    g_bIsUseModdedWaterShaders = 1;
+                                                                                if (v22) {
+                                                                                    if (v22->bRefractions) {
+                                                                                        v22->bRefractions = false;
+                                                                                        Interface::PrintLine(
+                                                                                            "Toggle "
+                                                                                            "Refraction"
+                                                                                            "s : OFF"
+                                                                                        );
+                                                                                    }
+                                                                                    else {
+                                                                                        v22->bReflections = true;
+                                                                                        Interface::PrintLine(
+                                                                                            "Toggle "
+                                                                                            "Refraction"
+                                                                                            "s : ON"
+                                                                                        );
+                                                                                    }
+                                                                                }
+                                                                                else {
+                                                                                    if (TESWaterSystem::
+                                                                                            bUseWaterRefractions
+                                                                                                .Bool()) {
+                                                                                        TESWaterSystem::
+                                                                                            bUseWaterRefractions =
+                                                                                                false;
+                                                                                        Interface::PrintLine(
+                                                                                            "Toggle "
+                                                                                            "Global "
+                                                                                            "Water "
+                                                                                            "Refraction"
+                                                                                            "s : OFF"
+                                                                                        );
+                                                                                    }
+                                                                                    else {
+                                                                                        TESWaterSystem::
+                                                                                            bUseWaterRefractions = true;
+                                                                                        Interface::PrintLine(
+                                                                                            "Toggle "
+                                                                                            "Global "
+                                                                                            "Water "
+                                                                                            "Refraction"
+                                                                                            "s : ON"
+                                                                                        );
+                                                                                    }
                                                                                 }
                                                                             }
                                                                         }
                                                                         else {
-                                                                            if (v21 >= 0.0 && v21 <= 1.0) {
-                                                                                ImageSpaceEffectWaterDisplacement::
-                                                                                    RainVariables.g = v21;
-                                                                                g_bIsUseModdedWaterShaders = 1;
+                                                                            if (v22) {
+                                                                                if (v22->bReflections) {
+                                                                                    v22->bReflections = false;
+                                                                                    Interface::PrintLine(
+                                                                                        "Toggle "
+                                                                                        "Reflections : "
+                                                                                        "OFF"
+                                                                                    );
+                                                                                }
+                                                                                else {
+                                                                                    v22->bReflections = true;
+                                                                                    Interface::PrintLine(
+                                                                                        "Toggle "
+                                                                                        "Reflections : ON"
+                                                                                    );
+                                                                                }
+                                                                            }
+                                                                            else {
+                                                                                if (TESWaterSystem::bUseWaterReflections
+                                                                                        .Bool()) {
+                                                                                    TESWaterSystem::
+                                                                                        bUseWaterReflections = false;
+                                                                                    Interface::PrintLine(
+                                                                                        "Toggle Global "
+                                                                                        "Water Reflections "
+                                                                                        ": OFF"
+                                                                                    );
+                                                                                }
+                                                                                else {
+                                                                                    TESWaterSystem::
+                                                                                        bUseWaterReflections = true;
+                                                                                    Interface::PrintLine(
+                                                                                        "Toggle Global "
+                                                                                        "Water Reflections "
+                                                                                        ": ON"
+                                                                                    );
+                                                                                }
                                                                             }
                                                                         }
                                                                     }
                                                                     else {
                                                                         if (v21 >= 0.0 && v21 <= 1.0) {
                                                                             ImageSpaceEffectWaterDisplacement::
-                                                                                RainVariables.r = v21;
+                                                                                RainVariables.a = v21;
                                                                             g_bIsUseModdedWaterShaders = 1;
                                                                         }
                                                                     }
                                                                 }
                                                                 else {
-                                                                    if (v21 >= 0.0 && v21 <= 20.0) {
-                                                                        g_fWaterDisplaceDampener = v21;
+                                                                    if (v21 >= 0.0 && v21 <= 1.0) {
+                                                                        ImageSpaceEffectWaterDisplacement::RainVariables
+                                                                            .b = v21;
                                                                         g_bIsUseModdedWaterShaders = 1;
                                                                     }
                                                                 }
                                                             }
                                                             else {
                                                                 if (v21 >= 0.0 && v21 <= 1.0) {
-                                                                    ImageSpaceEffectWaterDisplacement::WadingVariables
-                                                                        .b = v21;
+                                                                    ImageSpaceEffectWaterDisplacement::RainVariables.g =
+                                                                        v21;
                                                                     g_bIsUseModdedWaterShaders = 1;
                                                                 }
                                                             }
                                                         }
                                                         else {
                                                             if (v21 >= 0.0 && v21 <= 1.0) {
-                                                                ImageSpaceEffectWaterDisplacement::WadingVariables.g =
+                                                                ImageSpaceEffectWaterDisplacement::RainVariables.r =
                                                                     v21;
                                                                 g_bIsUseModdedWaterShaders = 1;
                                                             }
                                                         }
                                                     }
                                                     else {
-                                                        if (v21 >= 0.0 && v21 <= 1.0) {
-                                                            ImageSpaceEffectWaterDisplacement::WadingVariables.r = v21;
+                                                        if (v21 >= 0.0 && v21 <= 20.0) {
+                                                            g_fWaterDisplaceDampener = v21;
                                                             g_bIsUseModdedWaterShaders = 1;
                                                         }
                                                     }
                                                 }
                                                 else {
-                                                    if (v22) {
-                                                        v22->bUpdateConstants = true;
-                                                    }
-                                                    else {
-                                                        g_bIsUseModdedWaterShaders = 0;
-                                                    }
-                                                }
-                                            }
-                                            else {
-                                                if (!(v21 >= 0.0) || !(v21 <= 100.0)) {
-                                                    Interface::PrintLine("usage : mws noise (0.0 - 100.0)", v21);
-                                                }
-                                                else {
-                                                    if (v22) {
-                                                        v22->fNoiseScale = v21;
-                                                        Interface::PrintLine("set noise scale to %f", v21);
-                                                        v22->bUpdateConstants = false;
-                                                    }
-                                                    else {
-                                                        ImageSpaceEffectNoise::fNoiseScale = v21;
-                                                        Interface::PrintLine("set noise to %f", v21);
+                                                    if (v21 >= 0.0 && v21 <= 1.0) {
+                                                        ImageSpaceEffectWaterDisplacement::WadingVariables.b = v21;
                                                         g_bIsUseModdedWaterShaders = 1;
                                                     }
                                                 }
                                             }
-                                        }
-                                    }
-                                    else {
-                                        if (!(v21 >= 0.0) || !(v21 <= 100.0)) {
-                                            Interface::PrintLine("usage : mws opacity (0.0 - 100.0)", v21);
+                                            else {
+                                                if (v21 >= 0.0 && v21 <= 1.0) {
+                                                    ImageSpaceEffectWaterDisplacement::WadingVariables.g = v21;
+                                                    g_bIsUseModdedWaterShaders = 1;
+                                                }
+                                            }
                                         }
                                         else {
-                                            if (v22) {
-                                                v22->pVarAmounts.z = v21 / 100.0;
-                                                Interface::PrintLine(
-                                                    "set water opacity to %d", static_cast<int32_t>(v21)
-                                                );
-                                                v22->bUpdateConstants = false;
-                                            }
-                                            else {
-                                                WaterShader::pVarAmounts.b = v21 / 100.0;
-                                                Interface::PrintLine(
-                                                    "set water opacity to %d", static_cast<int32_t>(v21)
-                                                );
+                                            if (v21 >= 0.0 && v21 <= 1.0) {
+                                                ImageSpaceEffectWaterDisplacement::WadingVariables.r = v21;
                                                 g_bIsUseModdedWaterShaders = 1;
                                             }
                                         }
                                     }
+                                    else {
+                                        if (v22) {
+                                            v22->bUpdateConstants = true;
+                                        }
+                                        else {
+                                            g_bIsUseModdedWaterShaders = 0;
+                                        }
+                                    }
                                 }
                                 else {
-                                    if (!(v21 >= 0.0) || !(v21 <= 1.0)) {
-                                        Interface::PrintLine("usage : mws fresnel (0.0 - 1.0)", v21);
+                                    if (!(v21 >= 0.0) || !(v21 <= 100.0)) {
+                                        Interface::PrintLine("usage : mws noise (0.0 - 100.0)", v21);
                                     }
                                     else {
                                         if (v22) {
-                                            v22->fFresnelAmount = v21;
-                                            Interface::PrintLine("set fresnel term to %f", v21);
+                                            v22->fNoiseScale = v21;
+                                            Interface::PrintLine("set noise scale to %f", v21);
                                             v22->bUpdateConstants = false;
                                         }
                                         else {
-                                            g_fWaterFresnelTerm = v21;
-                                            Interface::PrintLine("set fresnel term to %f", v21);
+                                            ImageSpaceEffectNoise::fNoiseScale = v21;
+                                            Interface::PrintLine("set noise to %f", v21);
                                             g_bIsUseModdedWaterShaders = 1;
                                         }
                                     }
                                 }
                             }
-                            else {
-                                if (v22) {
-                                    v22->pVarAmounts.w = v21;
-                                    Interface::PrintLine("set water distortion amount to %f", v21);
-                                    v22->bUpdateConstants = false;
-                                }
-                                else {
-                                    WaterShader::pVarAmounts.a = v21;
-                                    Interface::PrintLine("set water distortion amount to %f", v21);
-                                    g_bIsUseModdedWaterShaders = 1;
-                                }
-                            }
                         }
                         else {
-                            if (!(v21 >= 0.0) || !(v21 <= 1.0)) {
-                                Interface::PrintLine("usage : mws reflectamt (0.0 - 1.0)", v21);
+                            if (!(v21 >= 0.0) || !(v21 <= 100.0)) {
+                                Interface::PrintLine("usage : mws opacity (0.0 - 100.0)", v21);
                             }
                             else {
                                 if (v22) {
-                                    v22->pVarAmounts.y = v21;
-                                    Interface::PrintLine("set water reflectivity amount to %f", v21);
+                                    v22->pVarAmounts.z = v21 / 100.0;
+                                    Interface::PrintLine("set water opacity to %d", static_cast<int32_t>(v21));
                                     v22->bUpdateConstants = false;
                                 }
                                 else {
-                                    WaterShader::pVarAmounts.g = v21;
-                                    Interface::PrintLine("set water reflectivity amount to %f", v21);
+                                    WaterShader::pVarAmounts.b = v21 / 100.0;
+                                    Interface::PrintLine("set water opacity to %d", static_cast<int32_t>(v21));
                                     g_bIsUseModdedWaterShaders = 1;
                                 }
                             }
                         }
                     }
+                    else {
+                        if (!(v21 >= 0.0) || !(v21 <= 1.0)) {
+                            Interface::PrintLine("usage : mws fresnel (0.0 - 1.0)", v21);
+                        }
+                        else {
+                            if (v22) {
+                                v22->fFresnelAmount = v21;
+                                Interface::PrintLine("set fresnel term to %f", v21);
+                                v22->bUpdateConstants = false;
+                            }
+                            else {
+                                g_fWaterFresnelTerm = v21;
+                                Interface::PrintLine("set fresnel term to %f", v21);
+                                g_bIsUseModdedWaterShaders = 1;
+                            }
+                        }
+                    }
+                }
+                else {
+                    if (v22) {
+                        v22->pVarAmounts.w = v21;
+                        Interface::PrintLine("set water distortion amount to %f", v21);
+                        v22->bUpdateConstants = false;
+                    }
+                    else {
+                        WaterShader::pVarAmounts.a = v21;
+                        Interface::PrintLine("set water distortion amount to %f", v21);
+                        g_bIsUseModdedWaterShaders = 1;
+                    }
+                }
+            }
+            else {
+                if (!(v21 >= 0.0) || !(v21 <= 1.0)) {
+                    Interface::PrintLine("usage : mws reflectamt (0.0 - 1.0)", v21);
+                }
+                else {
+                    if (v22) {
+                        v22->pVarAmounts.y = v21;
+                        Interface::PrintLine("set water reflectivity amount to %f", v21);
+                        v22->bUpdateConstants = false;
+                    }
+                    else {
+                        WaterShader::pVarAmounts.g = v21;
+                        Interface::PrintLine("set water reflectivity amount to %f", v21);
+                        g_bIsUseModdedWaterShaders = 1;
+                    }
                 }
             }
         }
+
         return true;
     }
-    else {
-        Interface::PrintLine("reflectamt, fresnel, opacity, speed, noise, reflect, refract, lod");
-        return false;
-    }
+
+    Interface::PrintLine("reflectamt, fresnel, opacity, speed, noise, reflect, refract, lod");
+    return false;
 }
 
 bool Cmd_EssentialDeathReload_Parse(
@@ -5196,9 +5094,8 @@ bool Cmd_SpeakSound(
         }
         return true;
     }
-    else {
-        return false;
-    }
+
+    return false;
 }
 
 bool Cmd_Help(
@@ -5281,11 +5178,10 @@ bool Cmd_Help(
             }
             char* apString1 = v16[uiIndex];
             if (apString1) {
-                if (uiIndex) {
-                    if (BSstristr(apString1, a8)) {
-                        Interface::PrintLine("%s", apString1);
-                    }
+                if ((uiIndex) && (BSstristr(apString1, a8))) {
+                    Interface::PrintLine("%s", apString1);
                 }
+
                 ourFree(apString1);
             }
         }
@@ -5300,11 +5196,10 @@ bool Cmd_Help(
             }
             char* v13 = v15[uiIndex];
             if (v13) {
-                if (uiIndex) {
-                    if (BSstristr(v13, a8)) {
-                        Interface::PrintLine("%s", v13);
-                    }
+                if ((uiIndex) && (BSstristr(v13, a8))) {
+                    Interface::PrintLine("%s", v13);
                 }
+
                 ourFree(v13);
             }
         }
@@ -5332,12 +5227,11 @@ bool Cmd_DisableNavMesh_Execute(
     aiID = 0;
     std::sscanf(a8, "%x", &aiID);
     if (aiID) {
-        if (apScript) {
-            if (apScript->GetFile(-1)) {
-                TESFile* File = apScript->GetFile(-1);
-                TESForm::AddCompileIndex(aiID, File);
-            }
+        if ((apScript) && (apScript->GetFile(-1))) {
+            TESFile* File = apScript->GetFile(-1);
+            TESForm::AddCompileIndex(aiID, File);
         }
+
         uint32_t v11 = aiID;
         NavMeshObstacleManager* Instance = NavMeshObstacleManager::GetInstance();
         Instance->DisableNavMesh(v11);
@@ -5365,12 +5259,11 @@ bool Cmd_EnableNavmesh_Execute(
     aiID = 0;
     std::sscanf(a8, "%x", &aiID);
     if (aiID) {
-        if (apScript) {
-            if (apScript->GetFile(-1)) {
-                TESFile* File = apScript->GetFile(-1);
-                TESForm::AddCompileIndex(aiID, File);
-            }
+        if ((apScript) && (apScript->GetFile(-1))) {
+            TESFile* File = apScript->GetFile(-1);
+            TESForm::AddCompileIndex(aiID, File);
         }
+
         uint32_t v11 = aiID;
         NavMeshObstacleManager* Instance = NavMeshObstacleManager::GetInstance();
         Instance->EnableNavMesh(v11);
@@ -5605,10 +5498,8 @@ bool Cmd_KillAllActors(
         }
         ProcessArray* v10 = ReferenceProcessLists.GetProcessArray();
         Actor* v11 = static_cast<Actor*>(v10->GetItem(uiIndex));
-        if (v11) {
-            if (v11->IsActor()) {
-                v11->Kill(killer, 0.0);
-            }
+        if ((v11) && (v11->IsActor())) {
+            v11->Kill(killer, 0.0);
         }
     }
     return true;
@@ -5684,9 +5575,8 @@ bool Cmd_GetBaseActorValue_Execute(
         )) {
         return Script::GetBaseActorValue_Eval(static_cast<Actor*>(apRefObject), a8, 0, &afReturnValue);
     }
-    else {
-        return false;
-    }
+
+    return false;
 }
 
 bool Cmd_GetCauseOfDeath_Eval(
@@ -5712,15 +5602,14 @@ bool Cmd_FriendDispositionBoost(
     double& afReturnValue,
     uint32_t& auiOffset
 ) {
-    if (apRefObject) {
-        if (apRefObject->IsActor()) {
-            int32_t v5 = static_cast<Actor*>(apRefObject)->GetDisposition(pPlayer, nullptr);
-            if (v5 < iDialogueDispositionFriendValue.Int()) {
-                float v4 = static_cast<float>(iDialogueDispositionFriendValue.Int() - v5);
-                static_cast<Actor*>(apRefObject)->ModifyDispositionTowardActor(pPlayer, v4);
-            }
+    if ((apRefObject) && (apRefObject->IsActor())) {
+        int32_t v5 = static_cast<Actor*>(apRefObject)->GetDisposition(pPlayer, nullptr);
+        if (v5 < iDialogueDispositionFriendValue.Int()) {
+            float v4 = static_cast<float>(iDialogueDispositionFriendValue.Int() - v5);
+            static_cast<Actor*>(apRefObject)->ModifyDispositionTowardActor(pPlayer, v4);
         }
     }
+
     return true;
 }
 
@@ -6208,11 +6097,10 @@ bool Cmd_ToggleCellNode(
             // is passed unchanged to both.
             bool IsNodeCulled = TESObjectCELL::IsNodeCulled(static_cast<TESObjectCELL::CELL_CULL_NODE>(a8));
             TES::pInstance->ShowCellNode(static_cast<int32_t>(a8), IsNodeCulled, false);
-            if (a8 == TESObjectCELL::CN_PORTAL) {
-                if (TES::pInstance->GetWaterSystem()) {
-                    TES::pInstance->GetWaterSystem()->DisplayWater(IsNodeCulled, false, false);
-                }
+            if ((a8 == TESObjectCELL::CN_PORTAL) && (TES::pInstance->GetWaterSystem())) {
+                TES::pInstance->GetWaterSystem()->DisplayWater(IsNodeCulled, false, false);
             }
+
             if (IsNodeCulled) {
                 v9 = "DISPLAYED";
             }
@@ -6448,12 +6336,7 @@ bool Cmd_SetShowQuestItems(
         )) {
         return false;
     }
-    if (a8 <= 0) {
-        pPlayer->bShowQuestItemsInInventory = false;
-    }
-    else {
-        pPlayer->bShowQuestItemsInInventory = true;
-    }
+    pPlayer->bShowQuestItemsInInventory = a8 > 0;
     return true;
 }
 
@@ -6467,22 +6350,21 @@ bool Cmd_ResetHealth(
     double& afReturnValue,
     uint32_t& auiOffset
 ) {
-    if (apRefObject) {
-        if (apRefObject->IsActor()) {
-            Actor* pActor = static_cast<Actor*>(apRefObject);
-            float v5 = pActor->GetActorFloatValue(ActorValue::HEALTH);
-            float v4 = pActor->GetPermanentActorFloatValue(ActorValue::HEALTH);
-            float afAmount = v4 - v5;
-            pActor->RestoreActorValue(ActorValue::HEALTH, afAmount);
-            pActor->RestoreActorValue(ActorValue::LEFT_MOBILITY_CONDITION, 999.0f);
-            pActor->RestoreActorValue(ActorValue::RIGHT_MOBILITY_CONDITION, 999.0f);
-            pActor->RestoreActorValue(ActorValue::LEFT_ATTACK_CONDITION, 999.0f);
-            pActor->RestoreActorValue(ActorValue::RIGHT_ATTACK_CONDITION, 999.0f);
-            pActor->RestoreActorValue(ActorValue::PERCEPTION_CONDITION, 999.0f);
-            pActor->RestoreActorValue(ActorValue::ENDURANCE_CONDITION, 999.0f);
-            pActor->RestoreActorValue(ActorValue::BRAIN_CONDITION, 999.0f);
-        }
+    if ((apRefObject) && (apRefObject->IsActor())) {
+        Actor* pActor = static_cast<Actor*>(apRefObject);
+        float v5 = pActor->GetActorFloatValue(ActorValue::HEALTH);
+        float v4 = pActor->GetPermanentActorFloatValue(ActorValue::HEALTH);
+        float afAmount = v4 - v5;
+        pActor->RestoreActorValue(ActorValue::HEALTH, afAmount);
+        pActor->RestoreActorValue(ActorValue::LEFT_MOBILITY_CONDITION, 999.0f);
+        pActor->RestoreActorValue(ActorValue::RIGHT_MOBILITY_CONDITION, 999.0f);
+        pActor->RestoreActorValue(ActorValue::LEFT_ATTACK_CONDITION, 999.0f);
+        pActor->RestoreActorValue(ActorValue::RIGHT_ATTACK_CONDITION, 999.0f);
+        pActor->RestoreActorValue(ActorValue::PERCEPTION_CONDITION, 999.0f);
+        pActor->RestoreActorValue(ActorValue::ENDURANCE_CONDITION, 999.0f);
+        pActor->RestoreActorValue(ActorValue::BRAIN_CONDITION, 999.0f);
     }
+
     return true;
 }
 
@@ -6702,65 +6584,60 @@ bool Cmd_SayTo_Execute(
     }
     if (pSpeaker && pTarget) {
         pSpeaker->StopCurrentDialogue();
-        if (pSpeaker->pCurrentProcess) {
-            if (!pSpeaker->IsDead(true)) {
-                if (pTarget->pCurrentProcess) {
-                    pSpeaker->pCurrentProcess->SetWaitingforLipFile(false);
-                    pSpeaker->pCurrentProcess->ClearGreetingInfoData();
-                    if (pSpeaker->GetCurrentProcessType() == PROCESS_TYPE_HIGH) {
-                        if (!iNoTargetLook) {
-                            pTarget->pCurrentProcess->ClearScriptHeadTrackTarget(false);
-                            pTarget->pCurrentProcess->SetActionHeadTrackTarget(pSpeaker);
-                            pTarget->SetDialogueItemTarget(pSpeaker);
-                        }
-                        pSpeaker->pCurrentProcess->ClearScriptHeadTrackTarget(false);
-                        pSpeaker->pCurrentProcess->SetActionHeadTrackTarget(pTarget);
-                    }
-                    if (pPlayer->IsSleepingorResting() ||
-                        (pSpeaker->pCurrentProcess->eLevel ||
-                         (pSpeaker->GetEssential() && pSpeaker->GetLifeState() == ACTOR_LIFE_STATE_ESSENTIAL_DOWN))) {
-                        DialogueItem* pItem = static_cast<TESTopic*>(pTopic)->TESTopic::CreateDialogueItem(
-                            pSpeaker, pTarget, nullptr, nullptr, true
-                        );
-                        if (pItem) {
-                            pItem->FirstResponse();
-                            pItem->GetCurrentResponse();
-                            pItem->RunResult(TIRS_BEGIN);
-                            pItem->RunResult(TIRS_END);
-                            Script::SetActionFlag(pTopic, &pSpeaker->m_Extra, SCRIPT_ACTION_ONSAYTODONE);
-                            delete pItem;
-                        }
-                    }
-                    else {
-                        pSpeaker->SetDialogueItemTarget(pTarget);
-                        pSpeaker->pCurrentProcess->ProcessGreet(
-                            pSpeaker, static_cast<TESTopic*>(pTopic), bForceSubtitles, false, true, true
-                        );
-                    }
+        if ((pSpeaker->pCurrentProcess) && (!pSpeaker->IsDead(true)) && (pTarget->pCurrentProcess)) {
+            pSpeaker->pCurrentProcess->SetWaitingforLipFile(false);
+            pSpeaker->pCurrentProcess->ClearGreetingInfoData();
+            if (pSpeaker->GetCurrentProcessType() == PROCESS_TYPE_HIGH) {
+                if (!iNoTargetLook) {
+                    pTarget->pCurrentProcess->ClearScriptHeadTrackTarget(false);
+                    pTarget->pCurrentProcess->SetActionHeadTrackTarget(pSpeaker);
+                    pTarget->SetDialogueItemTarget(pSpeaker);
                 }
+                pSpeaker->pCurrentProcess->ClearScriptHeadTrackTarget(false);
+                pSpeaker->pCurrentProcess->SetActionHeadTrackTarget(pTarget);
+            }
+            if (pPlayer->IsSleepingorResting() ||
+                (pSpeaker->pCurrentProcess->eLevel ||
+                 (pSpeaker->GetEssential() && pSpeaker->GetLifeState() == ACTOR_LIFE_STATE_ESSENTIAL_DOWN))) {
+                DialogueItem* pItem = static_cast<TESTopic*>(pTopic)->TESTopic::CreateDialogueItem(
+                    pSpeaker, pTarget, nullptr, nullptr, true
+                );
+                if (pItem) {
+                    pItem->FirstResponse();
+                    pItem->GetCurrentResponse();
+                    pItem->RunResult(TIRS_BEGIN);
+                    pItem->RunResult(TIRS_END);
+                    Script::SetActionFlag(pTopic, &pSpeaker->m_Extra, SCRIPT_ACTION_ONSAYTODONE);
+                    delete pItem;
+                }
+            }
+            else {
+                pSpeaker->SetDialogueItemTarget(pTarget);
+                pSpeaker->pCurrentProcess->ProcessGreet(
+                    pSpeaker, static_cast<TESTopic*>(pTopic), bForceSubtitles, false, true, true
+                );
             }
         }
     }
     else {
-        if (apRefObject) {
-            if (apRefObject->Get3D() ||
-                (apRefObject->IsMobileObject() &&
-                 static_cast<MobileObject*>(apRefObject)->GetTalkingActivator()->Get3D())) {
-                apRefObject->SetSayToTopic(static_cast<TESTopic*>(pTopic));
-                DialogueItem* pItem = static_cast<TESTopic*>(pTopic)->TESTopic::CreateDialogueItem(
-                    apRefObject, nullptr, nullptr, nullptr, false
-                );
-                if (pItem) {
-                    apRefObject->SetSayToTopicInfo(pItem->pInfo);
-                }
-                BSSoundHandle kVoice = apRefObject->VoiceSoundFunction(
-                    static_cast<TESTopic*>(pTopic), pTarget, false, false, false, false, bForceSubtitles
-                );
-                // The callback's context is untyped: the speaker's form ID is passed in it.
-                kVoice.SetCompletionCallback(
-                    &TESObjectREFR::SayToCallBack, reinterpret_cast<void*>(static_cast<uintptr_t>(apRefObject->iFormID))
-                );
+        if ((apRefObject) &&
+            (apRefObject->Get3D() ||
+             (apRefObject->IsMobileObject() &&
+              static_cast<MobileObject*>(apRefObject)->GetTalkingActivator()->Get3D()))) {
+            apRefObject->SetSayToTopic(static_cast<TESTopic*>(pTopic));
+            DialogueItem* pItem = static_cast<TESTopic*>(pTopic)->TESTopic::CreateDialogueItem(
+                apRefObject, nullptr, nullptr, nullptr, false
+            );
+            if (pItem) {
+                apRefObject->SetSayToTopicInfo(pItem->pInfo);
             }
+            BSSoundHandle kVoice = apRefObject->VoiceSoundFunction(
+                static_cast<TESTopic*>(pTopic), pTarget, false, false, false, false, bForceSubtitles
+            );
+            // The callback's context is untyped: the speaker's form ID is passed in it.
+            kVoice.SetCompletionCallback(
+                &TESObjectREFR::SayToCallBack, reinterpret_cast<void*>(static_cast<uintptr_t>(apRefObject->iFormID))
+            );
         }
     }
     iSpeakSoundLipDistance.operator=(aiValue);
@@ -6778,11 +6655,10 @@ bool Cmd_ResetAI(
     uint32_t& auiOffset
 ) {
     Actor* v4 = dynamic_cast<Actor*>(apRefObject);
-    if (v4) {
-        if (((!v4->GetDisabled()) && (!v4->GetDelete())) && (!v4->IsPc())) {
-            v4->EvaluatePackage(false, true);
-        }
+    if ((v4) && (((!v4->GetDisabled()) && (!v4->GetDelete())) && (!v4->IsPc()))) {
+        v4->EvaluatePackage(false, true);
     }
+
     return true;
 }
 
@@ -6797,11 +6673,10 @@ bool Cmd_EvaluatePackage_Execute(
     uint32_t& auiOffset
 ) {
     Actor* v4 = dynamic_cast<Actor*>(apRefObject);
-    if (v4) {
-        if (((!v4->GetDisabled()) && (!v4->GetDelete())) && (!v4->IsPc())) {
-            v4->EvaluatePackage(false, false);
-        }
+    if ((v4) && (((!v4->GetDisabled()) && (!v4->GetDelete())) && (!v4->IsPc()))) {
+        v4->EvaluatePackage(false, false);
     }
+
     return true;
 }
 
@@ -6918,28 +6793,25 @@ bool Cmd_Look(
         )) {
         return false;
     }
-    if (apRefObject) {
-        if (a8) {
-            Actor* v11 = dynamic_cast<Actor*>(apRefObject);
-            if (v11) {
-                if (v11->pCurrentProcess) {
-                    if (v12) {
-                        NiPoint3 v14 = a8->GetLocationOnReference();
-                        v11->SetLookAtTarget(v14);
-                        BaseProcess* CurrentAIProcess = v11->pCurrentProcess;
-                        CurrentAIProcess->SetPathLookAtTarget(a8);
-                        a8->SetTargeted(true);
-                    }
-                    else {
-                        BaseProcess* v10 = v11->pCurrentProcess;
-                        v10->SetScriptHeadTrackTarget(a8);
-                        (&v11->m_Extra)->SetHeadTrackTargetExtra(a8);
-                    }
-                    v11->AddChange(CHANGE_REFR_EXTRA_GAME_ONLY);
-                }
+    if ((apRefObject) && (a8)) {
+        Actor* v11 = dynamic_cast<Actor*>(apRefObject);
+        if ((v11) && (v11->pCurrentProcess)) {
+            if (v12) {
+                NiPoint3 v14 = a8->GetLocationOnReference();
+                v11->SetLookAtTarget(v14);
+                BaseProcess* CurrentAIProcess = v11->pCurrentProcess;
+                CurrentAIProcess->SetPathLookAtTarget(a8);
+                a8->SetTargeted(true);
             }
+            else {
+                BaseProcess* v10 = v11->pCurrentProcess;
+                v10->SetScriptHeadTrackTarget(a8);
+                (&v11->m_Extra)->SetHeadTrackTargetExtra(a8);
+            }
+            v11->AddChange(CHANGE_REFR_EXTRA_GAME_ONLY);
         }
     }
+
     return true;
 }
 
@@ -7146,16 +7018,14 @@ char Cmd_OnNPCActivate_Execute(
     *afReturnValue = 0.0;
     Actor* pActor = nullptr;
     // GetActorCause is called through the vtable each time rather than cached, as the game does.
-    if (thisObj->GetActorCause()) {
-        if (thisObj->GetActorCause()->IsValid()) {
-            pActor = thisObj->GetActorCause()->pActor;
-        }
+    if ((thisObj->GetActorCause()) && (thisObj->GetActorCause()->IsValid())) {
+        pActor = thisObj->GetActorCause()->pActor;
     }
-    if (thisObj) {
-        if (!pActor) {
-            *afReturnValue = 1.0;
-        }
+
+    if ((thisObj) && (!pActor)) {
+        *afReturnValue = 1.0;
     }
+
     return 1;
 }
 
@@ -7761,45 +7631,41 @@ bool Cmd_PickIdle(
     uint32_t& auiOffset
 ) {
     Actor* v18 = dynamic_cast<Actor*>(apRefObject);
-    if (v18) {
-        if (v18->GetCurrentAIProcess()) {
-            BaseProcess* CurrentAIProcess = v18->GetCurrentAIProcess();
-            TESIdleForm* IdleToPlay = pIdleManager->GetIdleToPlay(v18, CurrentAIProcess->GetTarget());
-            if (IdleToPlay) {
-                Animation* v16 = v18->GetAnimation();
-                if (!v16) {
-                    return true;
+    if ((v18) && (v18->GetCurrentAIProcess())) {
+        BaseProcess* CurrentAIProcess = v18->GetCurrentAIProcess();
+        TESIdleForm* IdleToPlay = pIdleManager->GetIdleToPlay(v18, CurrentAIProcess->GetTarget());
+        if (IdleToPlay) {
+            Animation* v16 = v18->GetAnimation();
+            if (!v16) {
+                return true;
+            }
+            bool v15 = !v16->SpecialIdleDonePlaying();
+            if (v16->spAnimIdleQueued.m_pObject && v16->spAnimIdleQueued.m_pObject->pIdleForm == IdleToPlay) {
+                return true;
+            }
+            if ((v15) && (v16->spAnimIdle.m_pObject) &&
+                (v16->spAnimIdle.m_pObject->eType != AnimIdle::PLAY_TYPE_AUTO_EXCLUSIVE ||
+                 (v16->spAnimIdle.m_pObject->GetSequence() &&
+                  v16->spAnimIdle.m_pObject->GetSequence()->m_eCycleType == NiControllerSequence::CYCLE_LOOP))) {
+                v15 = false;
+            }
+
+            if (!v15) {
+                if (v18->GetCurrentAIProcess()) {
+                    v18->GetCurrentAIProcess()->SetCurrentProcessIdle(IdleToPlay);
+                    v18->GetCurrentAIProcess()->AddPostAnimationAction(BaseProcess::POSTANIM_ACTION_PICK_IDLE_CALL);
                 }
-                bool v15 = !v16->SpecialIdleDonePlaying();
-                if (v16->spAnimIdleQueued.m_pObject && v16->spAnimIdleQueued.m_pObject->pIdleForm == IdleToPlay) {
-                    return true;
-                }
-                if (v15) {
-                    if (v16->spAnimIdle.m_pObject) {
-                        if (v16->spAnimIdle.m_pObject->eType != AnimIdle::PLAY_TYPE_AUTO_EXCLUSIVE ||
-                            (v16->spAnimIdle.m_pObject->GetSequence() &&
-                             v16->spAnimIdle.m_pObject->GetSequence()->m_eCycleType ==
-                                 NiControllerSequence::CYCLE_LOOP)) {
-                            v15 = false;
-                        }
-                    }
-                }
-                if (!v15) {
-                    if (v18->GetCurrentAIProcess()) {
-                        v18->GetCurrentAIProcess()->SetCurrentProcessIdle(IdleToPlay);
-                        v18->GetCurrentAIProcess()->AddPostAnimationAction(BaseProcess::POSTANIM_ACTION_PICK_IDLE_CALL);
-                    }
-                    if (GetThreadTLSData()->bSystemOutput) {
-                        const char* v11 = IdleToPlay->GetModel();
-                        int32_t CastingType = IdleToPlay->iFormID;
-                        Interface::PrintLine(
-                            "Picked Idle '%s' (%08X) file: %s", IdleToPlay->GetFormEditorID(), CastingType, v11
-                        );
-                    }
+                if (GetThreadTLSData()->bSystemOutput) {
+                    const char* v11 = IdleToPlay->GetModel();
+                    int32_t CastingType = IdleToPlay->iFormID;
+                    Interface::PrintLine(
+                        "Picked Idle '%s' (%08X) file: %s", IdleToPlay->GetFormEditorID(), CastingType, v11
+                    );
                 }
             }
         }
     }
+
     return true;
 }
 
@@ -7820,48 +7686,44 @@ bool Cmd_PlayIdle(
         )) {
         return false;
     }
-    if (v18) {
-        if (v18->pCurrentProcess) {
-            TESForm* FormByEditorID = TESForm::GetFormByEditorID(a8);
-            TESIdleForm* pIdleForm = dynamic_cast<TESIdleForm*>(FormByEditorID);
-            if (pIdleForm) {
-                Animation* pAnimation = v18->GetAnimation();
-                if (!pAnimation) {
-                    return true;
+    if ((v18) && (v18->pCurrentProcess)) {
+        TESForm* FormByEditorID = TESForm::GetFormByEditorID(a8);
+        TESIdleForm* pIdleForm = dynamic_cast<TESIdleForm*>(FormByEditorID);
+        if (pIdleForm) {
+            Animation* pAnimation = v18->GetAnimation();
+            if (!pAnimation) {
+                return true;
+            }
+            bool bPlaying = !pAnimation->SpecialIdleDonePlaying();
+            if (pAnimation->spAnimIdleQueued.m_pObject &&
+                pAnimation->spAnimIdleQueued.m_pObject->pIdleForm == pIdleForm) {
+                return true;
+            }
+            if ((bPlaying) && (pAnimation->spAnimIdle.m_pObject) &&
+                (pAnimation->spAnimIdle.m_pObject->eType != AnimIdle::PLAY_TYPE_AUTO_EXCLUSIVE ||
+                 (pAnimation->spAnimIdle.m_pObject->GetSequence() &&
+                  pAnimation->spAnimIdle.m_pObject->GetSequence()->m_eCycleType == NiControllerSequence::CYCLE_LOOP))) {
+                bPlaying = false;
+            }
+
+            if (!bPlaying) {
+                if (v18->pCurrentProcess) {
+                    BaseProcess* CurrentAIProcess = v18->pCurrentProcess;
+                    CurrentAIProcess->SetCurrentProcessIdle(pIdleForm);
+                    BaseProcess* v11 = v18->pCurrentProcess;
+                    v11->AddPostAnimationAction(BaseProcess::POSTANIM_ACTION_PICK_IDLE_CALL);
                 }
-                bool bPlaying = !pAnimation->SpecialIdleDonePlaying();
-                if (pAnimation->spAnimIdleQueued.m_pObject &&
-                    pAnimation->spAnimIdleQueued.m_pObject->pIdleForm == pIdleForm) {
-                    return true;
-                }
-                if (bPlaying) {
-                    if (pAnimation->spAnimIdle.m_pObject) {
-                        if (pAnimation->spAnimIdle.m_pObject->eType != AnimIdle::PLAY_TYPE_AUTO_EXCLUSIVE ||
-                            (pAnimation->spAnimIdle.m_pObject->GetSequence() &&
-                             pAnimation->spAnimIdle.m_pObject->GetSequence()->m_eCycleType ==
-                                 NiControllerSequence::CYCLE_LOOP)) {
-                            bPlaying = false;
-                        }
-                    }
-                }
-                if (!bPlaying) {
-                    if (v18->pCurrentProcess) {
-                        BaseProcess* CurrentAIProcess = v18->pCurrentProcess;
-                        CurrentAIProcess->SetCurrentProcessIdle(pIdleForm);
-                        BaseProcess* v11 = v18->pCurrentProcess;
-                        v11->AddPostAnimationAction(BaseProcess::POSTANIM_ACTION_PICK_IDLE_CALL);
-                    }
-                    if (GetThreadTLSData()->bSystemOutput) {
-                        const char* v10 = pIdleForm->GetModel();
-                        int32_t CastingType = pIdleForm->iFormID;
-                        Interface::PrintLine(
-                            "PlayIdle found '%s' (%08X) file: %s", pIdleForm->GetFormEditorID(), CastingType, v10
-                        );
-                    }
+                if (GetThreadTLSData()->bSystemOutput) {
+                    const char* v10 = pIdleForm->GetModel();
+                    int32_t CastingType = pIdleForm->iFormID;
+                    Interface::PrintLine(
+                        "PlayIdle found '%s' (%08X) file: %s", pIdleForm->GetFormEditorID(), CastingType, v10
+                    );
                 }
             }
         }
     }
+
     return true;
 }
 
@@ -7922,9 +7784,8 @@ bool Cmd_IsLeftUp_Execute(
     if (apRefObject) {
         return Script::IsLeftUpConditionFunction(apRefObject, nullptr, nullptr, afReturnValue);
     }
-    else {
-        return true;
-    }
+
+    return true;
 }
 
 bool au_re_Cmd_GetKnockedState(
@@ -7940,9 +7801,8 @@ bool au_re_Cmd_GetKnockedState(
     if (apRefObject) {
         return Script::GetKnockedStateConditionFunction(apRefObject, nullptr, nullptr, afReturnValue);
     }
-    else {
-        return true;
-    }
+
+    return true;
 }
 
 bool IsWeaponSkillTypeFunction(
@@ -7981,9 +7841,8 @@ bool Cmd_GetCurrentAIPackage_Execute(
     if (apRefObject) {
         return Script::GetCurrentAIPackageConditionFunction(apRefObject, nullptr, nullptr, afReturnValue);
     }
-    else {
-        return true;
-    }
+
+    return true;
 }
 
 bool au_re_Cmd_IsWaiting(
@@ -7999,9 +7858,8 @@ bool au_re_Cmd_IsWaiting(
     if (apRefObject) {
         return Script::IsWaitingConditionFunction(apRefObject, nullptr, nullptr, afReturnValue);
     }
-    else {
-        return true;
-    }
+
+    return true;
 }
 
 bool au_re_Cmd_IsIdlePlaying(
@@ -8017,9 +7875,8 @@ bool au_re_Cmd_IsIdlePlaying(
     if (apRefObject) {
         return (int8_t)Script::IsIdlePlayingConditionFunction(apRefObject, nullptr, nullptr, afReturnValue);
     }
-    else {
-        return true;
-    }
+
+    return true;
 }
 
 bool Cmd_ShowQuestTargets_Execute(
@@ -8052,27 +7909,25 @@ bool Cmd_ShowQuestTargets_Execute(
             apString.Set("Same cell/exterior", 0);
             TESObjectREFR* Reference = v20->GetReference(false);
             TESObjectREFR* v18 = v20->GetReference(true);
-            if (v18) {
-                if (Reference) {
-                    if (v18 == Reference) {
-                        int32_t CastingType = Reference->iFormID;
-                        v21.SPrintF("%s (%08X)", Reference->GetFormEditorID(), CastingType);
-                    }
-                    else {
-                        int32_t v13 = Reference->iFormID;
-                        const char* v10 = Reference->GetFormEditorID();
-                        int32_t v9 = v18->iFormID;
-                        v21.SPrintF("%s (%08X) (carrying %s (%08X))", v18->GetFormEditorID(), v9, v10, v13);
-                    }
+            if ((v18) && (Reference)) {
+                if (v18 == Reference) {
+                    int32_t CastingType = Reference->iFormID;
+                    v21.SPrintF("%s (%08X)", Reference->GetFormEditorID(), CastingType);
+                }
+                else {
+                    int32_t v13 = Reference->iFormID;
+                    const char* v10 = Reference->GetFormEditorID();
+                    int32_t v9 = v18->iFormID;
+                    v21.SPrintF("%s (%08X) (carrying %s (%08X))", v18->GetFormEditorID(), v9, v10, v13);
                 }
             }
+
             TESObjectREFR* v22 = v20->QTrackingRef();
-            if (v22) {
-                if (v22->GetObjectReference()->GetFormType() == DOOR_ID) {
-                    int32_t v14 = v22->iFormID;
-                    apString.SPrintF("%s (%08X)", v22->GetFormEditorID(), v14);
-                }
+            if ((v22) && (v22->GetObjectReference()->GetFormType() == DOOR_ID)) {
+                int32_t v14 = v22->iFormID;
+                apString.SPrintF("%s (%08X)", v22->GetFormEditorID(), v14);
             }
+
             char* v15 = apString.pString;
             char* v11 = v21.pString;
             Interface::PrintLine("Target %d:  Reference: %s, load door: %s", v25++, v11, v15);
@@ -8306,12 +8161,11 @@ bool Cmd_GetContainer(
 ) {
     afReturnValue = 0.0;
     uint32_t apID = 0;
-    if (apRefObject) {
-        if (apContainer) {
-            apID = apContainer->TESForm::GetFormID();
-            Script::PutNumericIDInDouble(apID, afReturnValue);
-        }
+    if ((apRefObject) && (apContainer)) {
+        apID = apContainer->TESForm::GetFormID();
+        Script::PutNumericIDInDouble(apID, afReturnValue);
     }
+
     if (Script::GetThreadSystemOutput()) {
         Interface::PrintLine("GetContainer >>(%08x)", apID);
     }
@@ -8331,13 +8185,12 @@ bool Cmd_GetParentRef(
     uint32_t apID;
     afReturnValue = 0.0;
     apID = 0;
-    if (apRefObject) {
-        if (apRefObject->GetEnableStateParent()) {
-            TESObjectREFR* EnableStateParent = apRefObject->GetEnableStateParent();
-            apID = EnableStateParent->GetFormID();
-            Script::PutNumericIDInDouble(apID, afReturnValue);
-        }
+    if ((apRefObject) && (apRefObject->GetEnableStateParent())) {
+        TESObjectREFR* EnableStateParent = apRefObject->GetEnableStateParent();
+        apID = EnableStateParent->GetFormID();
+        Script::PutNumericIDInDouble(apID, afReturnValue);
     }
+
     if (GetThreadTLSData()->bSystemOutput) {
         Interface::PrintLine("GetParentRef >> (%08x)", apID);
     }
@@ -8357,13 +8210,12 @@ bool Cmd_GetLinkedRef(
     uint32_t apID;
     afReturnValue = 0.0;
     apID = 0;
-    if (apRefObject) {
-        if (apRefObject->GetLinkedRef()) {
-            TESObjectREFR* LinkedRef = apRefObject->GetLinkedRef();
-            apID = LinkedRef->GetFormID();
-            Script::PutNumericIDInDouble(apID, afReturnValue);
-        }
+    if ((apRefObject) && (apRefObject->GetLinkedRef())) {
+        TESObjectREFR* LinkedRef = apRefObject->GetLinkedRef();
+        apID = LinkedRef->GetFormID();
+        Script::PutNumericIDInDouble(apID, afReturnValue);
     }
+
     if (GetThreadTLSData()->bSystemOutput) {
         Interface::PrintLine("GetLinkedRef >> (%08x)", apID);
     }
@@ -8382,11 +8234,10 @@ bool Cmd_GetForceRun(
 ) {
     afReturnValue = 0.0;
     Actor* v8 = dynamic_cast<Actor*>(apRefObject);
-    if (v8) {
-        if (v8->GetForceRun()) {
-            afReturnValue = 1.0;
-        }
+    if ((v8) && (v8->GetForceRun())) {
+        afReturnValue = 1.0;
     }
+
     if (Script::GetThreadSystemOutput()) {
         Interface::PrintLine("GetForceRun >> %0.2f", afReturnValue);
     }
@@ -8413,12 +8264,7 @@ bool Cmd_SetForceRun(
             )) {
             return false;
         }
-        if (a8) {
-            v10->bForceRun = true;
-        }
-        else {
-            v10->bForceRun = false;
-        }
+        v10->bForceRun = a8 != 0;
         if (GetThreadTLSData()->bSystemOutput) {
             Interface::PrintLine("SetForceRun >> %0.2f", a8);
         }
@@ -8438,11 +8284,10 @@ bool Cmd_GetForceSneak(
 ) {
     afReturnValue = 0.0;
     Actor* pActor = dynamic_cast<Actor*>(apRefObject);
-    if (pActor) {
-        if (pActor->bForceSneak) {
-            afReturnValue = 1.0;
-        }
+    if ((pActor) && (pActor->bForceSneak)) {
+        afReturnValue = 1.0;
     }
+
     if (GetThreadTLSData()->bSystemOutput) {
         Interface::PrintLine("GetForceSneak >> %0.2f", afReturnValue);
     }
@@ -8696,9 +8541,8 @@ bool Cmd_ShowNameMenu(
             apParameters, apCompiledParams, apRefObject, apContainer, apScript, apScriptLocals, afReturnValue, auiOffset
         );
     }
-    else {
-        return true;
-    }
+
+    return true;
 }
 
 bool Cmd_ShowBarterMenu(
@@ -8716,43 +8560,42 @@ bool Cmd_ShowBarterMenu(
     Script::ParseParameters(
         apParameters, apCompiledParams, auiOffset, apRefObject, apContainer, apScript, apScriptLocals, &a8
     );
-    if (apRefObject) {
-        if (apRefObject != pPlayer) {
-            TESObjectREFR* v11 = nullptr;
-            TESObjectREFR* apRef = nullptr;
-            if (apRefObject->IsMobileObject()) {
-                v11 = apRefObject;
+    if ((apRefObject) && (apRefObject != pPlayer)) {
+        TESObjectREFR* v11 = nullptr;
+        TESObjectREFR* apRef = nullptr;
+        if (apRefObject->IsMobileObject()) {
+            v11 = apRefObject;
+        }
+        else {
+            TESObjectREFR* CloseSound;
+            BGSTalkingActivator* v10 = dynamic_cast<BGSTalkingActivator*>(apRefObject->GetObjectReference());
+            if (v10) {
+                CloseSound = v10->pTempRef;
             }
             else {
-                TESObjectREFR* CloseSound;
-                BGSTalkingActivator* v10 = dynamic_cast<BGSTalkingActivator*>(apRefObject->GetObjectReference());
-                if (v10) {
-                    CloseSound = v10->pTempRef;
-                }
-                else {
-                    CloseSound = nullptr;
-                }
-                apRef = CloseSound;
+                CloseSound = nullptr;
             }
-            if (v11) {
-                if (v11->IsActor()) {
-                    apRef = v11;
-                }
-                else {
-                    MobileObject* pMobile = static_cast<MobileObject*>(v11);
-                    if (pMobile->bTalkingActivator) {
-                        // The talking activator's base object is read as a BGSTalkingActivator without a type check, as
-                        // the game does.
-                        apRef = static_cast<BGSTalkingActivator*>(pMobile->pTalkingActivator->GetObjectReference())
-                                    ->pTempRef;
-                    }
-                }
+            apRef = CloseSound;
+        }
+        if (v11) {
+            if (v11->IsActor()) {
+                apRef = v11;
             }
-            if (apRef) {
-                ShowBarterMenu_(apRef, a8);
+            else {
+                MobileObject* pMobile = static_cast<MobileObject*>(v11);
+                if (pMobile->bTalkingActivator) {
+                    // The talking activator's base object is read as a BGSTalkingActivator without a type check, as
+                    // the game does.
+                    apRef =
+                        static_cast<BGSTalkingActivator*>(pMobile->pTalkingActivator->GetObjectReference())->pTempRef;
+                }
             }
         }
+        if (apRef) {
+            ShowBarterMenu_(apRef, a8);
+        }
     }
+
     return true;
 }
 
@@ -8793,30 +8636,28 @@ bool Cmd_ForceFlee(
     }
     if (apRefObject) {
         Actor* v14 = dynamic_cast<Actor*>(apRefObject);
-        if (v14) {
-            if (v14->GetCurrentAIProcess()) {
-                CombatController* pCombatController = v14->GetCombatController();
-                if (pCombatController) {
-                    pCombatController->ForceFlee(pCombatController->pTarget, 0.0f);
-                    BaseProcess* CurrentAIProcess = v14->GetCurrentAIProcess();
-                    FleePackage* v12 = dynamic_cast<FleePackage*>(CurrentAIProcess->GetPackageThatIsRunning());
-                    if (v12) {
-                        PackageLocation* Location_ = v12->pPackLoc;
-                        if (a2) {
-                            Location_->SetLocReference(a2);
+        if ((v14) && (v14->GetCurrentAIProcess())) {
+            CombatController* pCombatController = v14->GetCombatController();
+            if (pCombatController) {
+                pCombatController->ForceFlee(pCombatController->pTarget, 0.0f);
+                BaseProcess* CurrentAIProcess = v14->GetCurrentAIProcess();
+                FleePackage* v12 = dynamic_cast<FleePackage*>(CurrentAIProcess->GetPackageThatIsRunning());
+                if (v12) {
+                    PackageLocation* Location_ = v12->pPackLoc;
+                    if (a2) {
+                        Location_->SetLocReference(a2);
+                        v12->SetEvaluatePoint(false);
+                    }
+                    else {
+                        if (pCell) {
+                            Location_->SetLocCell(pCell);
                             v12->SetEvaluatePoint(false);
-                        }
-                        else {
-                            if (pCell) {
-                                Location_->SetLocCell(pCell);
-                                v12->SetEvaluatePoint(false);
-                            }
                         }
                     }
                 }
-                else {
-                    v14->InitiateFlee(nullptr, false, false, true, pCell, a2, -1.0f, -1.0f);
-                }
+            }
+            else {
+                v14->InitiateFlee(nullptr, false, false, true, pCell, a2, -1.0f, -1.0f);
             }
         }
     }
@@ -8848,12 +8689,10 @@ bool Cmd_ForceTakeCover(
     }
     if (apRefObject) {
         Actor* v11 = dynamic_cast<Actor*>(apRefObject);
-        if (v11) {
-            if (v11->GetCurrentAIProcess()) {
-                CombatController* v10 = v11->GetCombatController();
-                if (v10) {
-                    v10->ForceTakeCover(a8, static_cast<float>(v13));
-                }
+        if ((v11) && (v11->GetCurrentAIProcess())) {
+            CombatController* v10 = v11->GetCombatController();
+            if (v10) {
+                v10->ForceTakeCover(a8, static_cast<float>(v13));
             }
         }
     }
@@ -8988,23 +8827,22 @@ bool Cmd_SetLevel_Execute(
             }
             TESContainer* pContainer = pActor->HasContainer();
             InventoryChanges* pInvChanges = InventoryChanges::GetInventoryChanges(pActor);
-            if (pContainer) {
-                if (pInvChanges) {
-                    pInvChanges->RemoveAllObjectsWorn(false, nullptr);
-                    pInvChanges->RemoveDefaultLeveledItems();
-                    pInvChanges->InitLeveledItems();
-                    TESNPC* v11 = dynamic_cast<TESNPC*>(ActorBase);
-                    TESCreature* v10 = dynamic_cast<TESCreature*>(ActorBase);
-                    if (v11) {
-                        v11->InitDefaultWorn(pActor, true, true, false, true);
-                    }
-                    else {
-                        if (v10) {
-                            v10->InitDefaultWorn(pActor, true, true, true);
-                        }
+            if ((pContainer) && (pInvChanges)) {
+                pInvChanges->RemoveAllObjectsWorn(false, nullptr);
+                pInvChanges->RemoveDefaultLeveledItems();
+                pInvChanges->InitLeveledItems();
+                TESNPC* v11 = dynamic_cast<TESNPC*>(ActorBase);
+                TESCreature* v10 = dynamic_cast<TESCreature*>(ActorBase);
+                if (v11) {
+                    v11->InitDefaultWorn(pActor, true, true, false, true);
+                }
+                else {
+                    if (v10) {
+                        v10->InitDefaultWorn(pActor, true, true, true);
                     }
                 }
             }
+
             if (pActor->IsNpc()) {
                 TESNPC* v9 = dynamic_cast<TESNPC*>(pActor->GetObjectReference());
                 if (v9) {
@@ -9210,12 +9048,11 @@ bool Cmd_SetCellFullName(
         )) {
         return false;
     }
-    if (pCell) {
-        if (pMessage) {
-            pCell->TESFullName::SetFullName(pMessage->TESFullName::GetFullName());
-            pCell->AddChange(CHANGE_CELL_FULLNAME);
-        }
+    if ((pCell) && (pMessage)) {
+        pCell->TESFullName::SetFullName(pMessage->TESFullName::GetFullName());
+        pCell->AddChange(CHANGE_CELL_FULLNAME);
     }
+
     return true;
 }
 
@@ -9428,22 +9265,21 @@ bool Cmd_PlayMagicEffectVisuals(
     }
     if (apRefObject->Get3D()) {
         MagicHitEffect* pEffect = nullptr;
-        if (pEffectSetting) {
-            if (pEffectSetting->GetModelLength()) {
-                MagicModelHitEffect* v19;
-                MagicModelHitEffect* apMemory =
-                    static_cast<MagicModelHitEffect*>(NiMemObject::operator new(sizeof(MagicModelHitEffect)));
-                if (apMemory) {
-                    float z = fTime;
-                    const char* yb = pEffectSetting->GetModel();
-                    v19 = ::new (apMemory) MagicModelHitEffect(apRefObject, yb, z);
-                }
-                else {
-                    v19 = nullptr;
-                }
-                pEffect = v19;
+        if ((pEffectSetting) && (pEffectSetting->GetModelLength())) {
+            MagicModelHitEffect* v19;
+            MagicModelHitEffect* apMemory =
+                static_cast<MagicModelHitEffect*>(NiMemObject::operator new(sizeof(MagicModelHitEffect)));
+            if (apMemory) {
+                float z = fTime;
+                const char* yb = pEffectSetting->GetModel();
+                v19 = ::new (apMemory) MagicModelHitEffect(apRefObject, yb, z);
             }
+            else {
+                v19 = nullptr;
+            }
+            pEffect = v19;
         }
+
         if (pEffect && pEffect->Init()) {
             ReferenceProcessLists.AddTempEffect(pEffect);
             if (GetThreadTLSData()->bSystemOutput) {
@@ -9472,29 +9308,28 @@ bool Cmd_PlayMagicEffectVisuals(
         }
         return true;
     }
-    else {
-        NiPoint3 v29 = apRefObject->GetAngleOnReference();
-        NiPoint3 v30 = apRefObject->GetLocationOnReference();
-        float ya = NiCos(-v29.z);
-        float xa = -NiSin(-v29.z);
-        NiPoint3 dst(xa, ya, 0.0f);
-        NiPoint3 v28 = dst;
-        // The effect's model is read without testing the parsed effect for null on this path, as the game does.
-        const char* v9 = pEffectSetting->GetModel();
-        BSTempEffectParticle* v22 =
-            BSTempEffectParticle::Spawn(apRefObject->GetParentCell(), 1.0f, v9, v28, v30, 1.0f, 7u, nullptr);
-        v22->PlaySequence("SpecialIdle_HitEffect");
-        if (GetThreadTLSData()->bSystemOutput) {
-            if (apRefObject->GetFullName()) {
-                const char* v10 = apRefObject->GetFullName();
-                Interface::PrintLine("Visual effect has been applied to %s", v10);
-            }
-            else {
-                Interface::PrintLine("Visual effect has been applied to reference");
-            }
+
+    NiPoint3 v29 = apRefObject->GetAngleOnReference();
+    NiPoint3 v30 = apRefObject->GetLocationOnReference();
+    float ya = NiCos(-v29.z);
+    float xa = -NiSin(-v29.z);
+    NiPoint3 dst(xa, ya, 0.0f);
+    NiPoint3 v28 = dst;
+    // The effect's model is read without testing the parsed effect for null on this path, as the game does.
+    const char* v9 = pEffectSetting->GetModel();
+    BSTempEffectParticle* v22 =
+        BSTempEffectParticle::Spawn(apRefObject->GetParentCell(), 1.0f, v9, v28, v30, 1.0f, 7u, nullptr);
+    v22->PlaySequence("SpecialIdle_HitEffect");
+    if (GetThreadTLSData()->bSystemOutput) {
+        if (apRefObject->GetFullName()) {
+            const char* v10 = apRefObject->GetFullName();
+            Interface::PrintLine("Visual effect has been applied to %s", v10);
         }
-        return true;
+        else {
+            Interface::PrintLine("Visual effect has been applied to reference");
+        }
     }
+    return true;
 }
 
 bool Cmd_StopMagicShaderVisuals(
@@ -9552,13 +9387,12 @@ bool Cmd_StopMagicEffectVisuals(
     if (!apRefObject) {
         apRefObject = pPlayer;
     }
-    if (pEffectSetting) {
-        if (pEffectSetting->GetModelLength()) {
-            // Calls TESModel's virtual GetModel on the base subobject and passes its result to the callee's char*
-            // parameter.
-            ReferenceProcessLists.FinishMagicModelHitEffect(apRefObject, const_cast<char*>(pEffectSetting->GetModel()));
-        }
+    if ((pEffectSetting) && (pEffectSetting->GetModelLength())) {
+        // Calls TESModel's virtual GetModel on the base subobject and passes its result to the callee's char*
+        // parameter.
+        ReferenceProcessLists.FinishMagicModelHitEffect(apRefObject, const_cast<char*>(pEffectSetting->GetModel()));
     }
+
     if (GetThreadTLSData()->bSystemOutput) {
         if (apRefObject->GetFullName()) {
             Interface::PrintLine("Visual effect has been removed from %s", apRefObject->GetFullName());
@@ -9589,17 +9423,16 @@ bool Cmd_PreloadMagicEffect(
         )) {
         return false;
     }
-    if (pEffectSetting) {
-        if (pEffectSetting->GetModelLength()) {
-            ::new (&spModel) NiPointer<Model>(static_cast<Model*>(nullptr));
-            if (!pModelLoader->FindModel(pEffectSetting->GetModel(), spModel)) {
-                pModelLoader->QueueModel(
-                    pEffectSetting->GetModel(), IO_TASK_PRIORITY_VERY_LOW, nullptr, LOD_MULT_NONE, true, false, false
-                );
-            }
-            NiPointer<Model>::Destroy(&spModel);
+    if ((pEffectSetting) && (pEffectSetting->GetModelLength())) {
+        ::new (&spModel) NiPointer<Model>(static_cast<Model*>(nullptr));
+        if (!pModelLoader->FindModel(pEffectSetting->GetModel(), spModel)) {
+            pModelLoader->QueueModel(
+                pEffectSetting->GetModel(), IO_TASK_PRIORITY_VERY_LOW, nullptr, LOD_MULT_NONE, true, false, false
+            );
         }
+        NiPointer<Model>::Destroy(&spModel);
     }
+
     return true;
 }
 
@@ -9706,42 +9539,41 @@ bool Cmd_SetActorRefraction(
     float a1 = BSMIN(a8, 10.0f);
     a8 = BSMAX(a1, 0.0f);
     Actor* v18 = dynamic_cast<Actor*>(apRefObject);
-    if (v18) {
-        if (v18->pCurrentProcess) {
-            BaseProcess* CurrentAIProcess = v18->pCurrentProcess;
-            CurrentAIProcess->SetScriptRefractionPower(a8);
-            if (BSShaderManager::IsRefractionEnabled()) {
-                float a2 = BSMAX(static_cast<float>(0.0), 0.0);
-                float v16 = BSMIN(1.0f, a2);
-                if (static_cast<float>(0.0) > 0.0 && v18 == pPlayer) {
-                    v18->SetAlpha(1.0f);
-                    v18->SetRefraction(true, 0.05f);
-                }
-                else {
-                    if (!(v16 > 0.0)) {
-                        if (!(a8 > 0.0)) {
-                            v18->SetRefraction(false, 0.0f);
-                            v18->UpdateAlpha();
-                        }
-                        else {
-                            v18->SetRefraction(true, a8);
-                        }
+    if ((v18) && (v18->pCurrentProcess)) {
+        BaseProcess* CurrentAIProcess = v18->pCurrentProcess;
+        CurrentAIProcess->SetScriptRefractionPower(a8);
+        if (BSShaderManager::IsRefractionEnabled()) {
+            float a2 = BSMAX(static_cast<float>(0.0), 0.0);
+            float v16 = BSMIN(1.0f, a2);
+            if (static_cast<float>(0.0) > 0.0 && v18 == pPlayer) {
+                v18->SetAlpha(1.0f);
+                v18->SetRefraction(true, 0.05f);
+            }
+            else {
+                if (!(v16 > 0.0)) {
+                    if (!(a8 > 0.0)) {
+                        v18->SetRefraction(false, 0.0f);
+                        v18->UpdateAlpha();
                     }
                     else {
-                        v18->SetAlpha(1.0f);
-                        float v13 = 1.0 - v16 / 100.0;
-                        float fChameleonMaxRefraction_4 = MagicSystem::GetChameleonMaxRefraction();
-                        float fChameleonMaxRefraction = MagicSystem::GetChameleonMinRefraction();
-                        float v15 = FLerp(fChameleonMaxRefraction, fChameleonMaxRefraction_4, 0.0f, 1.0f, v13);
-                        v18->SetRefraction(true, v15);
+                        v18->SetRefraction(true, a8);
                     }
                 }
-            }
-            if (GetThreadTLSData()->bSystemOutput) {
-                Interface::PrintLine("%s refraction has been set to %f", apRefObject->GetFullName(), a8);
+                else {
+                    v18->SetAlpha(1.0f);
+                    float v13 = 1.0 - v16 / 100.0;
+                    float fChameleonMaxRefraction_4 = MagicSystem::GetChameleonMaxRefraction();
+                    float fChameleonMaxRefraction = MagicSystem::GetChameleonMinRefraction();
+                    float v15 = FLerp(fChameleonMaxRefraction, fChameleonMaxRefraction_4, 0.0f, 1.0f, v13);
+                    v18->SetRefraction(true, v15);
+                }
             }
         }
+        if (GetThreadTLSData()->bSystemOutput) {
+            Interface::PrintLine("%s refraction has been set to %f", apRefObject->GetFullName(), a8);
+        }
     }
+
     return true;
 }
 
@@ -9875,12 +9707,11 @@ bool Cmd_SetTalkingActivatorActor(
     Script::ParseParameters(
         apParameters, apCompiledParams, auiOffset, apRefObject, apContainer, apScript, apScriptLocals, &a8
     );
-    if (apRefObject) {
-        if (apRefObject->GetObjectReference()->GetFormType() == TACT_ID) {
-            BGSTalkingActivator* ObjectReference = static_cast<BGSTalkingActivator*>(apRefObject->GetObjectReference());
-            ObjectReference->SetTempRef(a8);
-        }
+    if ((apRefObject) && (apRefObject->GetObjectReference()->GetFormType() == TACT_ID)) {
+        BGSTalkingActivator* ObjectReference = static_cast<BGSTalkingActivator*>(apRefObject->GetObjectReference());
+        ObjectReference->SetTempRef(a8);
     }
+
     return true;
 }
 
@@ -9902,25 +9733,24 @@ bool Cmd_AddPerk_Execute(
         return false;
     }
     bool bAlt = iAlt != 0;
-    if (pPerk) {
-        if (apRefObject->IsActor()) {
-            Actor* pActor = static_cast<Actor*>(apRefObject);
-            uint8_t ucRank = pActor->GetPerkRank(pPerk, bAlt);
-            if (pPerk->GetNumRanks() <= ucRank) {
-                afReturnValue = static_cast<double>(ucRank);
+    if ((pPerk) && (apRefObject->IsActor())) {
+        Actor* pActor = static_cast<Actor*>(apRefObject);
+        uint8_t ucRank = pActor->GetPerkRank(pPerk, bAlt);
+        if (pPerk->GetNumRanks() <= ucRank) {
+            afReturnValue = static_cast<double>(ucRank);
+        }
+        else {
+            pActor->AddPerk(pPerk, ucRank + 1, bAlt);
+            if (GetThreadTLSData()->bSystemOutput) {
+                const char* FullName = pActor->GetFullName();
+                Interface::PrintLine(
+                    "Added Perk %s to %s with rank %i", pPerk->TESFullName::GetFullName(), FullName, ucRank + 1
+                );
             }
-            else {
-                pActor->AddPerk(pPerk, ucRank + 1, bAlt);
-                if (GetThreadTLSData()->bSystemOutput) {
-                    const char* FullName = pActor->GetFullName();
-                    Interface::PrintLine(
-                        "Added Perk %s to %s with rank %i", pPerk->TESFullName::GetFullName(), FullName, ucRank + 1
-                    );
-                }
-                afReturnValue = static_cast<double>(ucRank + 1);
-            }
+            afReturnValue = static_cast<double>(ucRank + 1);
         }
     }
+
     return true;
 }
 
@@ -9944,11 +9774,10 @@ bool Cmd_RemovePerk(
         return false;
     }
     bool v10 = v11 != 0;
-    if (pperk) {
-        if (apRefObject->IsActor()) {
-            static_cast<Actor*>(apRefObject)->RemovePerk(pperk, v10);
-        }
+    if ((pperk) && (apRefObject->IsActor())) {
+        static_cast<Actor*>(apRefObject)->RemovePerk(pperk, v10);
     }
+
     return true;
 }
 
@@ -10061,11 +9890,10 @@ bool Cmd_ShowRepairMenu(
     double& afReturnValue,
     uint32_t& auiOffset
 ) {
-    if (apRefObject) {
-        if (apRefObject->IsActor()) {
-            Interface::CreateRepairServicesMenu(static_cast<Actor*>(apRefObject));
-        }
+    if ((apRefObject) && (apRefObject->IsActor())) {
+        Interface::CreateRepairServicesMenu(static_cast<Actor*>(apRefObject));
     }
+
     return true;
 }
 
@@ -10137,11 +9965,10 @@ bool Cmd_AddToFaction(
         )) {
         return false;
     }
-    if (a8) {
-        if (apRefObject->IsActor()) {
-            static_cast<Actor*>(apRefObject)->Actor::AddFaction(a8, aiRank);
-        }
+    if ((a8) && (apRefObject->IsActor())) {
+        static_cast<Actor*>(apRefObject)->Actor::AddFaction(a8, aiRank);
     }
+
     return true;
 }
 
@@ -10162,11 +9989,10 @@ bool Cmd_RemoveFromFaction(
         )) {
         return false;
     }
-    if (a8) {
-        if (apRefObject->IsActor()) {
-            static_cast<Actor*>(apRefObject)->Actor::RemoveFaction(a8);
-        }
+    if ((a8) && (apRefObject->IsActor())) {
+        static_cast<Actor*>(apRefObject)->Actor::RemoveFaction(a8);
     }
+
     return true;
 }
 
@@ -10193,12 +10019,11 @@ bool Cmd_SetDisposition(
         )) {
         return false;
     }
-    if (a8) {
-        if (v13) {
-            int32_t v10 = v13->GetDisposition(a8, nullptr);
-            v13->ModifyDispositionTowardActor(a8, static_cast<float>(v12 - v10));
-        }
+    if ((a8) && (v13)) {
+        int32_t v10 = v13->GetDisposition(a8, nullptr);
+        v13->ModifyDispositionTowardActor(a8, static_cast<float>(v12 - v10));
     }
+
     return true;
 }
 
@@ -10569,107 +10394,106 @@ bool Cmd_ShowInventory(
             // The index compare is unsigned.
             for (uint32_t i = 0; i < static_cast<uint32_t>(iCount); ++i) {
                 ItemChange* pItem = apRefObject->GetInventoryItem_005754A0(i, false);
-                if (pItem) {
-                    if (pItem->pContainerObj) {
-                        TESBoundObject* pObject = pItem->pContainerObj;
-                        int32_t iFormType = pObject->GetFormType();
-                        if (iFormType == 24) {
-                            const char* pName;
-                            const char* pWorn;
-                            if (pItem->GetWorn(false)) {
-                                pWorn = " - Worn";
-                            }
-                            else {
-                                pWorn = "";
-                            }
-                            if (pObject->GetFormEditorIDLength()) {
-                                pName = pObject->GetFormEditorID();
-                            }
-                            else {
-                                pName = TESFullName::GetFullName(pObject);
-                            }
-                            double fHealthPercent = pItem->GetItemHealth(true);
-                            double fHealth = pItem->GetItemHealth(false);
-                            Interface::PrintLine(
-                                "%d - %s (%08X) (%.0f,%0.2f%%)%s", pItem->iNumber, pName, pObject->iFormID, fHealth,
-                                fHealthPercent, pWorn
-                            );
-                        }
-                        else if (iFormType == 40) {
-                            const char* pName;
-                            const char* pWorn;
-                            const char* pCannotEquip;
-                            if (!pActor || pActor->CanUseWeapon(static_cast<TESObjectWEAP*>(pObject), true)) {
-                                pCannotEquip = "";
-                            }
-                            else {
-                                pCannotEquip = " [CANNOT EQUIP]";
-                            }
-                            if (pItem->GetWorn(false)) {
-                                pWorn = " - Worn";
-                            }
-                            else {
-                                pWorn = "";
-                            }
-                            if (pObject->GetFormEditorIDLength()) {
-                                pName = pObject->GetFormEditorID();
-                            }
-                            else {
-                                pName = TESFullName::GetFullName(pObject);
-                            }
-                            double fHealthPercent = pItem->GetItemHealth(true);
-                            double fHealth = pItem->GetItemHealth(false);
-                            Interface::PrintLine(
-                                "%d - %s (%08X) (%.0f,%0.2f%%)%s%s", pItem->iNumber, pName, pObject->iFormID, fHealth,
-                                fHealthPercent, pWorn, pCannotEquip
-                            );
+                if ((pItem) && (pItem->pContainerObj)) {
+                    TESBoundObject* pObject = pItem->pContainerObj;
+                    int32_t iFormType = pObject->GetFormType();
+                    if (iFormType == 24) {
+                        const char* pName;
+                        const char* pWorn;
+                        if (pItem->GetWorn(false)) {
+                            pWorn = " - Worn";
                         }
                         else {
-                            const char* pName;
-                            const char* pWorn;
-                            if (pItem->GetWorn(false)) {
-                                pWorn = " - Worn";
-                            }
-                            else {
-                                pWorn = "";
-                            }
-                            if (pObject->GetFormEditorIDLength()) {
-                                pName = pObject->GetFormEditorID();
-                            }
-                            else {
-                                pName = TESFullName::GetFullName(pObject);
-                            }
-                            Interface::PrintLine("%d - %s (%08X)%s", pItem->iNumber, pName, pObject->iFormID, pWorn);
+                            pWorn = "";
                         }
-                        BGSBipedModelList* pModelList = BGSBipedModelList::GetFormAsBipedModelList(pObject);
-                        if (pModelList) {
-                            BGSListForm* pListForm = pModelList->pListForm;
-                            if (pListForm) {
-                                BSSimpleList<TESForm*>* pIter = &pListForm->ListOfForms;
-                                const char* pListName;
-                                if (pListForm->GetFormEditorIDLength()) {
-                                    pListName = pListForm->GetFormEditorID();
+                        if (pObject->GetFormEditorIDLength()) {
+                            pName = pObject->GetFormEditorID();
+                        }
+                        else {
+                            pName = TESFullName::GetFullName(pObject);
+                        }
+                        double fHealthPercent = pItem->GetItemHealth(true);
+                        double fHealth = pItem->GetItemHealth(false);
+                        Interface::PrintLine(
+                            "%d - %s (%08X) (%.0f,%0.2f%%)%s", pItem->iNumber, pName, pObject->iFormID, fHealth,
+                            fHealthPercent, pWorn
+                        );
+                    }
+                    else if (iFormType == 40) {
+                        const char* pName;
+                        const char* pWorn;
+                        const char* pCannotEquip;
+                        if (!pActor || pActor->CanUseWeapon(static_cast<TESObjectWEAP*>(pObject), true)) {
+                            pCannotEquip = "";
+                        }
+                        else {
+                            pCannotEquip = " [CANNOT EQUIP]";
+                        }
+                        if (pItem->GetWorn(false)) {
+                            pWorn = " - Worn";
+                        }
+                        else {
+                            pWorn = "";
+                        }
+                        if (pObject->GetFormEditorIDLength()) {
+                            pName = pObject->GetFormEditorID();
+                        }
+                        else {
+                            pName = TESFullName::GetFullName(pObject);
+                        }
+                        double fHealthPercent = pItem->GetItemHealth(true);
+                        double fHealth = pItem->GetItemHealth(false);
+                        Interface::PrintLine(
+                            "%d - %s (%08X) (%.0f,%0.2f%%)%s%s", pItem->iNumber, pName, pObject->iFormID, fHealth,
+                            fHealthPercent, pWorn, pCannotEquip
+                        );
+                    }
+                    else {
+                        const char* pName;
+                        const char* pWorn;
+                        if (pItem->GetWorn(false)) {
+                            pWorn = " - Worn";
+                        }
+                        else {
+                            pWorn = "";
+                        }
+                        if (pObject->GetFormEditorIDLength()) {
+                            pName = pObject->GetFormEditorID();
+                        }
+                        else {
+                            pName = TESFullName::GetFullName(pObject);
+                        }
+                        Interface::PrintLine("%d - %s (%08X)%s", pItem->iNumber, pName, pObject->iFormID, pWorn);
+                    }
+                    BGSBipedModelList* pModelList = BGSBipedModelList::GetFormAsBipedModelList(pObject);
+                    if (pModelList) {
+                        BGSListForm* pListForm = pModelList->pListForm;
+                        if (pListForm) {
+                            BSSimpleList<TESForm*>* pIter = &pListForm->ListOfForms;
+                            const char* pListName;
+                            if (pListForm->GetFormEditorIDLength()) {
+                                pListName = pListForm->GetFormEditorID();
+                            }
+                            else {
+                                pListName = TESFullName::GetFullName(pListForm);
+                            }
+                            Interface::PrintLine("  === %s (%08X) ===", pListName, pListForm->iFormID);
+                            while (pIter) {
+                                TESForm* pForm = pIter->m_item;
+                                const char* pFormName;
+                                if (pForm->GetFormEditorIDLength()) {
+                                    pFormName = pForm->GetFormEditorID();
                                 }
                                 else {
-                                    pListName = TESFullName::GetFullName(pListForm);
+                                    pFormName = TESFullName::GetFullName(pForm);
                                 }
-                                Interface::PrintLine("  === %s (%08X) ===", pListName, pListForm->iFormID);
-                                while (pIter) {
-                                    TESForm* pForm = pIter->m_item;
-                                    const char* pFormName;
-                                    if (pForm->GetFormEditorIDLength()) {
-                                        pFormName = pForm->GetFormEditorID();
-                                    }
-                                    else {
-                                        pFormName = TESFullName::GetFullName(pForm);
-                                    }
-                                    Interface::PrintLine("  ---> %s (%08X)", pFormName, pForm->iFormID);
-                                    pIter = pIter->m_pkNext;
-                                }
+                                Interface::PrintLine("  ---> %s (%08X)", pFormName, pForm->iFormID);
+                                pIter = pIter->m_pkNext;
                             }
                         }
                     }
                 }
+
                 if (pItem) {
                     delete pItem;
                 }
@@ -11231,40 +11055,37 @@ bool Cmd_AgeRace_Execute(
         )) {
         return false;
     }
-    if (a8) {
-        if (apRefObject) {
-            if (apRefObject->IsNpc()) {
-                TESNPC* ObjectReference = static_cast<TESNPC*>(apRefObject->GetObjectReference());
-                TESRace* FormRace = ObjectReference->pFormRace;
-                TESRace* apRace = FormRace;
-                while (a8) {
-                    if ((a8 & 0x80000000u) == 0) {
-                        if (apRace->GetOlderRace()) {
-                            apRace = apRace->GetOlderRace();
-                            --a8;
-                        }
-                        else {
-                            a8 = 0;
-                        }
-                    }
-                    else {
-                        if (apRace->GetYoungerRace()) {
-                            apRace = apRace->GetYoungerRace();
-                            ++a8;
-                        }
-                        else {
-                            a8 = 0;
-                        }
-                    }
+    if ((a8) && (apRefObject) && (apRefObject->IsNpc())) {
+        TESNPC* ObjectReference = static_cast<TESNPC*>(apRefObject->GetObjectReference());
+        TESRace* FormRace = ObjectReference->pFormRace;
+        TESRace* apRace = FormRace;
+        while (a8) {
+            if ((a8 & 0x80000000u) == 0) {
+                if (apRace->GetOlderRace()) {
+                    apRace = apRace->GetOlderRace();
+                    --a8;
                 }
-                if (apRace != FormRace) {
-                    bool v9 = apRefObject->IsActor();
-                    ObjectReference->SwitchRace(apRace, v9 ? static_cast<Actor*>(apRefObject) : nullptr);
-                    static_cast<Character*>(apRefObject)->Character::Reset3D();
+                else {
+                    a8 = 0;
+                }
+            }
+            else {
+                if (apRace->GetYoungerRace()) {
+                    apRace = apRace->GetYoungerRace();
+                    ++a8;
+                }
+                else {
+                    a8 = 0;
                 }
             }
         }
+        if (apRace != FormRace) {
+            bool v9 = apRefObject->IsActor();
+            ObjectReference->SwitchRace(apRace, v9 ? static_cast<Actor*>(apRefObject) : nullptr);
+            static_cast<Character*>(apRefObject)->Character::Reset3D();
+        }
     }
+
     return true;
 }
 
@@ -11397,11 +11218,10 @@ bool Cmd_SetCriticalStage(
         )) {
         return false;
     }
-    if (apRefObject) {
-        if (apRefObject->IsActor()) {
-            static_cast<Actor*>(apRefObject)->Actor::SetCriticalStage(a8);
-        }
+    if ((apRefObject) && (apRefObject->IsActor())) {
+        static_cast<Actor*>(apRefObject)->Actor::SetCriticalStage(a8);
     }
+
     return true;
 }
 
@@ -11661,11 +11481,10 @@ bool Cmd_AddFormToFormList_Execute(
         )) {
         return false;
     }
-    if (a2) {
-        if (a8) {
-            a8->AddForm(a2);
-        }
+    if ((a2) && (a8)) {
+        a8->AddForm(a2);
     }
+
     return true;
 }
 
@@ -11694,13 +11513,12 @@ bool Cmd_AddNPCToLeveledList(
         )) {
         return false;
     }
-    if (pList) {
-        if (pForm) {
-            static_cast<TESLeveledList*>(pList)->AddScriptAddedLeveledObject(
-                pList, static_cast<uint16_t>(iLevel), 1, pForm, nullptr
-            );
-        }
+    if ((pList) && (pForm)) {
+        static_cast<TESLeveledList*>(pList)->AddScriptAddedLeveledObject(
+            pList, static_cast<uint16_t>(iLevel), 1, pForm, nullptr
+        );
     }
+
     return true;
 }
 
@@ -11731,25 +11549,22 @@ bool Cmd_AddItemToLeveledList(
         )) {
         return false;
     }
-    if (pList) {
-        if (pForm) {
-            if (iCount) {
-                ContainerItemExtra* pExtra;
-                fHealth = fHealth / 100.0;
-                ContainerItemExtra* apMemory = static_cast<ContainerItemExtra*>(ourMalloc(sizeof(ContainerItemExtra)));
-                if (apMemory) {
-                    pExtra = ::new (apMemory) ContainerItemExtra;
-                }
-                else {
-                    pExtra = nullptr;
-                }
-                pExtra->AdjustHealthPercent(fHealth);
-                static_cast<TESLeveledList*>(pList)->AddScriptAddedLeveledObject(
-                    pList, static_cast<uint16_t>(iLevel), static_cast<uint16_t>(iCount), pForm, pExtra
-                );
-            }
+    if ((pList) && (pForm) && (iCount)) {
+        ContainerItemExtra* pExtra;
+        fHealth = fHealth / 100.0;
+        ContainerItemExtra* apMemory = static_cast<ContainerItemExtra*>(ourMalloc(sizeof(ContainerItemExtra)));
+        if (apMemory) {
+            pExtra = ::new (apMemory) ContainerItemExtra;
         }
+        else {
+            pExtra = nullptr;
+        }
+        pExtra->AdjustHealthPercent(fHealth);
+        static_cast<TESLeveledList*>(pList)->AddScriptAddedLeveledObject(
+            pList, static_cast<uint16_t>(iLevel), static_cast<uint16_t>(iCount), pForm, pExtra
+        );
     }
+
     return true;
 }
 
@@ -11781,11 +11596,10 @@ bool Cmd_RemapWaterType(
         Warning("Invalid water type for water to remap to.");
         a2 = nullptr;
     }
-    if (v9) {
-        if (a2) {
-            static_cast<TESWaterForm*>(v9)->TESWaterForm::SetRemappedWaterForm(static_cast<TESWaterForm*>(a2));
-        }
+    if ((v9) && (a2)) {
+        static_cast<TESWaterForm*>(v9)->TESWaterForm::SetRemappedWaterForm(static_cast<TESWaterForm*>(a2));
     }
+
     return true;
 }
 
@@ -11826,10 +11640,9 @@ bool Cmd_SetHardcore_Execute(
         }
         return true;
     }
-    else {
-        Warning("Attempting to set hardcore on an invalid player!");
-        return false;
-    }
+
+    Warning("Attempting to set hardcore on an invalid player!");
+    return false;
 }
 
 bool Cmd_ObjectUnderReticle_Execute(
@@ -11931,10 +11744,9 @@ bool Cmd_GetDLCCount(
         Interface::PrintLine(Format);
         return true;
     }
-    else {
-        afReturnValue = 0.0;
-        return false;
-    }
+
+    afReturnValue = 0.0;
+    return false;
 }
 
 // The IsDLCInstalled script command: looks for a valid DLC package whose file name matches the parameter.
@@ -12209,90 +12021,85 @@ void Script::MatchFaceGeometryBase(TESObjectREFR* apRef, TESObjectREFR* apMatchA
     FNVD_INLINED_LOCAL(std::type_identity_t<FR2MatrixVTC<float>[2][2]>, blendedcoord, std::nullopt, std::nullopt);
     using xPresetHeads_t = BSSimpleArray<TESNPC*, 1024>;
     FNVD_INLINED_LOCAL(xPresetHeads_t, xPresetHeads, std::nullopt, std::nullopt);
-    if (apRef) {
-        if (apMatchActor) {
-            FR2MatrixVTC<float>(*pNewCoord)[2][2];
-            FNVD_INLINED_LOCAL(
-                std::type_identity_t<FR2MatrixVTC<float>[2][2]>, chargenoffset, std::nullopt, std::nullopt
-            );
-            float fval = static_cast<double>(aiValue) / 100.0;
-            TESNPC* pnpcToMatch = dynamic_cast<TESNPC*>(apMatchActor->GetObjectReference());
-            TESNPC* pnpcToChange = dynamic_cast<TESNPC*>(apRef->GetObjectReference());
-            rt::eh_vector_constructor_iterator(
-                blendedcoord, sizeof(FR2MatrixVTC<float>), 4, &fnvd::constructElement<FR2MatrixVTC<float>>,
-                &fnvd::destructElement<FR2MatrixVTC<float>>
-            );
-            rt::eh_vector_constructor_iterator(
-                chargenoffset, sizeof(FR2MatrixVTC<float>), 4, &fnvd::constructElement<FR2MatrixVTC<float>>,
-                &fnvd::destructElement<FR2MatrixVTC<float>>
-            );
-            ::new (&xPresetHeads) BSSimpleArray<TESNPC*, 1024>;
-            TESActorBase::SEX Sex = pnpcToMatch->GetSex();
-            TESRace* Race = pnpcToMatch->GetRace();
-            TESNPC::FillCharGenPresetList(Race, Sex, &xPresetHeads);
-            TESNPC* ppresetNPC = nullptr;
-            if (xPresetHeads.GetAt(0)) {
-                ppresetNPC = xPresetHeads.GetAt(0);
-            }
-            FR2MatrixVTC<float>(*pcoord)[2][2] = pnpcToChange->pAlternateFaceOffsetCoord;
-            if (pcoord) {
-                (*pcoord)[0][0].DeleteArray(3u);
-                pcoord = nullptr;
-                pnpcToChange->pAlternateFaceOffsetCoord = nullptr;
-            }
-            FR2MatrixVTC<float>(*coordToChange)[2][2] = pnpcToChange->GetOffsetFaceCoord();
-            FR2MatrixVTC<float>(*coordToMatch)[2][2] = pnpcToMatch->GetOffsetFaceCoord();
-            FR2MatrixVTC<float>(*presetOffsetCoord)[2][2] = ppresetNPC->GetOffsetFaceCoord();
-            BSFaceGenManager::OffsetFaceGenCoord(presetOffsetCoord, coordToMatch, &chargenoffset, false);
-            float fvalOldGeo = BSFaceGenManager::GetFaceCoordAttribute(*coordToChange, FANATT_AGE, FANTYPE_GEO);
-            BSFaceGenManager::InitFaceGenCoord(&blendedcoord);
-            BSFaceGenManager::ScaleFaceCoord(fval, &chargenoffset, true);
-            BSFaceGenManager::MergeFaceGenCoord(coordToChange, &chargenoffset, &blendedcoord, true, 0.0f);
-            BSFaceGenManager::SetFaceCoordAttribute(blendedcoord, FANATT_AGE, FANTYPE_GEO, fvalOldGeo);
-            // new FR2MatrixVTC<float>[2][2]: new[]'s cookie, the element count, is written by hand in the size_t before
-            // the elements.
-            size_t* pCookie = static_cast<size_t*>(ourMalloc(sizeof(size_t) + sizeof(FR2MatrixVTC<float>[2][2])));
-            if (pCookie) {
-                *pCookie = 4;
-                rt::eh_vector_constructor_iterator(
-                    &pCookie[1], sizeof(FR2MatrixVTC<float>), 4, &fnvd::constructElement<FR2MatrixVTC<float>>,
-                    &fnvd::destructElement<FR2MatrixVTC<float>>
-                );
-                pNewCoord = reinterpret_cast<FR2MatrixVTC<float>(*)[2][2]>(&pCookie[1]);
-            }
-            else {
-                pNewCoord = nullptr;
-            }
-            pcoord = pNewCoord;
-            BSFaceGenManager::InitFaceGenCoord(pcoord);
-            TESRace* v4 = pnpcToChange->GetRace();
-            BSFaceGenManager::OffsetFaceGenCoord(
-                v4->GetMeanFaceCoord(TESActorBase::SEX_MALE), &blendedcoord, pcoord, false
-            );
-            BSFaceGenManager::CopyFaceGenCoord(coordToChange, pcoord, false, true);
-            pnpcToChange->pAlternateFaceOffsetCoord = pcoord;
-            pnpcToChange->AddChange(2048);
-            if (apRef->Get3D()) {
-                static_cast<Character*>(apRef)->Character::Reset3D();
-            }
-            xPresetHeads.~BSSimpleArray<TESNPC*, 1024>();
-            rt::eh_vector_destructor_iterator(
-                chargenoffset, sizeof(FR2MatrixVTC<float>), 4, &fnvd::destructElement<FR2MatrixVTC<float>>
-            );
-            rt::eh_vector_destructor_iterator(
-                blendedcoord, sizeof(FR2MatrixVTC<float>), 4, &fnvd::destructElement<FR2MatrixVTC<float>>
-            );
+    if ((apRef) && (apMatchActor)) {
+        FR2MatrixVTC<float>(*pNewCoord)[2][2];
+        FNVD_INLINED_LOCAL(std::type_identity_t<FR2MatrixVTC<float>[2][2]>, chargenoffset, std::nullopt, std::nullopt);
+        float fval = static_cast<double>(aiValue) / 100.0;
+        TESNPC* pnpcToMatch = dynamic_cast<TESNPC*>(apMatchActor->GetObjectReference());
+        TESNPC* pnpcToChange = dynamic_cast<TESNPC*>(apRef->GetObjectReference());
+        rt::eh_vector_constructor_iterator(
+            blendedcoord, sizeof(FR2MatrixVTC<float>), 4, &fnvd::constructElement<FR2MatrixVTC<float>>,
+            &fnvd::destructElement<FR2MatrixVTC<float>>
+        );
+        rt::eh_vector_constructor_iterator(
+            chargenoffset, sizeof(FR2MatrixVTC<float>), 4, &fnvd::constructElement<FR2MatrixVTC<float>>,
+            &fnvd::destructElement<FR2MatrixVTC<float>>
+        );
+        ::new (&xPresetHeads) BSSimpleArray<TESNPC*, 1024>;
+        TESActorBase::SEX Sex = pnpcToMatch->GetSex();
+        TESRace* Race = pnpcToMatch->GetRace();
+        TESNPC::FillCharGenPresetList(Race, Sex, &xPresetHeads);
+        TESNPC* ppresetNPC = nullptr;
+        if (xPresetHeads.GetAt(0)) {
+            ppresetNPC = xPresetHeads.GetAt(0);
         }
+        FR2MatrixVTC<float>(*pcoord)[2][2] = pnpcToChange->pAlternateFaceOffsetCoord;
+        if (pcoord) {
+            (*pcoord)[0][0].DeleteArray(3u);
+            pcoord = nullptr;
+            pnpcToChange->pAlternateFaceOffsetCoord = nullptr;
+        }
+        FR2MatrixVTC<float>(*coordToChange)[2][2] = pnpcToChange->GetOffsetFaceCoord();
+        FR2MatrixVTC<float>(*coordToMatch)[2][2] = pnpcToMatch->GetOffsetFaceCoord();
+        FR2MatrixVTC<float>(*presetOffsetCoord)[2][2] = ppresetNPC->GetOffsetFaceCoord();
+        BSFaceGenManager::OffsetFaceGenCoord(presetOffsetCoord, coordToMatch, &chargenoffset, false);
+        float fvalOldGeo = BSFaceGenManager::GetFaceCoordAttribute(*coordToChange, FANATT_AGE, FANTYPE_GEO);
+        BSFaceGenManager::InitFaceGenCoord(&blendedcoord);
+        BSFaceGenManager::ScaleFaceCoord(fval, &chargenoffset, true);
+        BSFaceGenManager::MergeFaceGenCoord(coordToChange, &chargenoffset, &blendedcoord, true, 0.0f);
+        BSFaceGenManager::SetFaceCoordAttribute(blendedcoord, FANATT_AGE, FANTYPE_GEO, fvalOldGeo);
+        // new FR2MatrixVTC<float>[2][2]: new[]'s cookie, the element count, is written by hand in the size_t before
+        // the elements.
+        size_t* pCookie = static_cast<size_t*>(ourMalloc(sizeof(size_t) + sizeof(FR2MatrixVTC<float>[2][2])));
+        if (pCookie) {
+            *pCookie = 4;
+            rt::eh_vector_constructor_iterator(
+                &pCookie[1], sizeof(FR2MatrixVTC<float>), 4, &fnvd::constructElement<FR2MatrixVTC<float>>,
+                &fnvd::destructElement<FR2MatrixVTC<float>>
+            );
+            pNewCoord = reinterpret_cast<FR2MatrixVTC<float>(*)[2][2]>(&pCookie[1]);
+        }
+        else {
+            pNewCoord = nullptr;
+        }
+        pcoord = pNewCoord;
+        BSFaceGenManager::InitFaceGenCoord(pcoord);
+        TESRace* v4 = pnpcToChange->GetRace();
+        BSFaceGenManager::OffsetFaceGenCoord(
+            v4->GetMeanFaceCoord(TESActorBase::SEX_MALE), &blendedcoord, pcoord, false
+        );
+        BSFaceGenManager::CopyFaceGenCoord(coordToChange, pcoord, false, true);
+        pnpcToChange->pAlternateFaceOffsetCoord = pcoord;
+        pnpcToChange->AddChange(2048);
+        if (apRef->Get3D()) {
+            static_cast<Character*>(apRef)->Character::Reset3D();
+        }
+        xPresetHeads.~BSSimpleArray<TESNPC*, 1024>();
+        rt::eh_vector_destructor_iterator(
+            chargenoffset, sizeof(FR2MatrixVTC<float>), 4, &fnvd::destructElement<FR2MatrixVTC<float>>
+        );
+        rt::eh_vector_destructor_iterator(
+            blendedcoord, sizeof(FR2MatrixVTC<float>), 4, &fnvd::destructElement<FR2MatrixVTC<float>>
+        );
     }
 }
 
 bool Script::GetBaseActorValue_Eval(Actor* apActor, ActorValue::Index aeActorValue, int32_t aiArg2, double* apResult) {
     Actor* v5 = nullptr;
-    if (apActor) {
-        if (apActor->IsActor()) {
-            v5 = apActor;
-        }
+    if ((apActor) && (apActor->IsActor())) {
+        v5 = apActor;
     }
+
     if (v5) {
         *apResult = static_cast<double>(v5->GetBaseActorValue(aeActorValue));
         if (GetThreadTLSData()->bSystemOutput) {
@@ -12466,25 +12273,24 @@ bool Script::ActivateFunction(
         if (!apActivator) {
             apActivator = static_cast<MobileObject*>(apRefObject->GetActionRef());
         }
-        if (apActivator) {
-            if (!apActivator->GetDisabled()) {
-                if (v10) {
-                    apRefObject->Activate(apActivator, false, nullptr, 1);
+        if ((apActivator) && (!apActivator->GetDisabled())) {
+            if (v10) {
+                apRefObject->Activate(apActivator, false, nullptr, 1);
+            }
+            else {
+                bool Action = apRefObject->GetAction(OBJECT_ACTION_USE_DEFAULT);
+                if (!Action) {
+                    apRefObject->SetAction(OBJECT_ACTION_USE_DEFAULT);
                 }
-                else {
-                    bool Action = apRefObject->GetAction(OBJECT_ACTION_USE_DEFAULT);
-                    if (!Action) {
-                        apRefObject->SetAction(OBJECT_ACTION_USE_DEFAULT);
-                    }
-                    apRefObject->SetAction(OBJECT_ACTION_ACTIVATE);
-                    apRefObject->Activate(apActivator, false, nullptr, 1);
-                    apRefObject->ClearAction(OBJECT_ACTION_ACTIVATE);
-                    if (!Action) {
-                        apRefObject->ClearAction(OBJECT_ACTION_USE_DEFAULT);
-                    }
+                apRefObject->SetAction(OBJECT_ACTION_ACTIVATE);
+                apRefObject->Activate(apActivator, false, nullptr, 1);
+                apRefObject->ClearAction(OBJECT_ACTION_ACTIVATE);
+                if (!Action) {
+                    apRefObject->ClearAction(OBJECT_ACTION_USE_DEFAULT);
                 }
             }
         }
+
         GetThreadTLSData()->uiActivateRecursionDepth = GetThreadTLSData()->uiActivateRecursionDepth - 1;
     }
     return true;
@@ -12672,113 +12478,104 @@ bool Script::ExistsFunction(
 }
 
 void Script::MoveToFunctionBase(TESObjectREFR* apMoveRef, TESObjectREFR* apTargetRef, float afX, float afY, float afZ) {
-    if (apMoveRef != pPlayer || !pPlayer->IsDead(false)) {
-        if (apMoveRef) {
-            if (apTargetRef) {
-                NiPoint3 position;
-                bool bactor = apMoveRef->IsActor();
-                if (bactor) {
-                    Actor* pact = static_cast<Actor*>(apMoveRef);
-                    ReferenceProcessLists.StopCombatandAlarmonActor(static_cast<Actor*>(apMoveRef), false);
-                    BaseProcess* pcurProc = pact->GetCurrentAIProcess();
-                    if (pcurProc) {
-                        if (pcurProc->GetSitSleepState()) {
-                            pact->GetOutofFurnitureQuick();
-                        }
-                    }
-                }
-                TESObjectCELL* pCell = apTargetRef->GetParentCell();
-                TESWorldSpace* pWorld = apTargetRef->GetWorldSpace();
-                NiPoint3 afz = apTargetRef->GetAngleOnReference();
-                const NiPoint3* v5 = &apTargetRef->GetLocationOnReference();
-                position.x = v5->x;
-                position.y = v5->y;
-                float z = v5->z;
-                position.x = position.x + afX;
-                position.y = position.y + afY;
-                position.z = z + afZ;
-                if (apMoveRef == pPlayer) {
-                    PLAYER_TARGET_LOC* ploc;
-                    void* apMemory = ourMalloc(sizeof(PLAYER_TARGET_LOC));
-                    if (apMemory) {
-                        ploc = ::new (apMemory) PLAYER_TARGET_LOC;
-                    }
-                    else {
-                        ploc = nullptr;
-                    }
-                    ploc->Location = position;
-                    ploc->Angle.z = afz.z;
-                    ploc->Angle.x = afz.x;
-                    ploc->bResetWeather = true;
-                    if (pWorld) {
-                        ploc->pWorld = pWorld;
-                    }
-                    else {
-                        if (pCell) {
-                            if (pCell->GetInterior()) {
-                                ploc->pInterior = pCell;
-                            }
-                        }
-                    }
-                    ploc->pFurnitureRef = apTargetRef;
-                    pPlayer->RequestPositionPlayer(ploc);
-                    Interface::CloseConsole();
-                }
-                else {
-                    bool bmob = apMoveRef->IsMobileObject();
-                    apMoveRef->SetLocationOnReference(position);
-                    if (pCell && TES::pInstance->IsCellLoaded(pCell, false)) {
-                        apMoveRef->SetAngleOnReferenceZ(afz.z);
-                        apMoveRef->SetAngleOnReferenceX(0.0f);
-                        NiAVObject* p3D = (NiAVObject*)apMoveRef->Get3D();
-                        if (p3D) {
-                            const NiPoint3* v7 = &apMoveRef->GetLocationOnReference();
-                            p3D->SetTranslate(*v7);
-                            p3D->SetRotate(apMoveRef->GetOrientation());
-                            bhkNiCollisionObject::ResetSim(p3D, true);
-                            NiUpdateData UpdateData(0.0f, false, false);
-                            p3D->Update(UpdateData);
-                        }
-                    }
-                    else {
-                        if (apMoveRef != pPlayer && bmob) {
-                            apMoveRef->SetAngleOnReferenceX(3.4028235e+38f);
-                        }
-                    }
-                    TESObjectREFR::MoveRefToNewSpace(apMoveRef, pCell, pWorld);
-                    if (apMoveRef->GetParentCell()) {
-                        TESObjectCELL* ParentCell = apMoveRef->GetParentCell();
-                        if (TES::pInstance->IsCellLoaded(ParentCell, false)) {
-                            apMoveRef->InitHavok();
-                        }
-                    }
-                    if (bmob) {
-                        MobileObject* pmob = static_cast<MobileObject*>(apMoveRef);
-                        bhkCharacterController* pcon =
-                            static_cast<MobileObject*>(apMoveRef)->MobileObject::GetCharController();
-                        if (pcon) {
-                            pcon->SetPosition(position);
-                        }
-                    }
-                    if (bactor) {
-                        Actor* pactor = static_cast<Actor*>(apMoveRef);
-                        if (pactor->GetCurrentAIProcess()) {
-                            BaseProcess* CurrentAIProcess = pactor->pCurrentProcess;
-                            CurrentAIProcess->ComputeLastTimeProcessed();
-                            pactor->StopMoving();
-                            BaseProcess* v10 = pactor->pCurrentProcess;
-                            v10->CheckforNewPackage(pactor, true);
-                            pactor->FadeIn();
-                            pactor->UpdateAlpha();
-                        }
-                        else {
-                            Warning("AI: Actor being moved is Disabled he has no process");
-                        }
-                    }
-                }
-                pPlayer->CheckForQuestTargetUpdate(apMoveRef);
+    if ((apMoveRef != pPlayer || !pPlayer->IsDead(false)) && (apMoveRef) && (apTargetRef)) {
+        NiPoint3 position;
+        bool bactor = apMoveRef->IsActor();
+        if (bactor) {
+            Actor* pact = static_cast<Actor*>(apMoveRef);
+            ReferenceProcessLists.StopCombatandAlarmonActor(static_cast<Actor*>(apMoveRef), false);
+            BaseProcess* pcurProc = pact->GetCurrentAIProcess();
+            if ((pcurProc) && (pcurProc->GetSitSleepState())) {
+                pact->GetOutofFurnitureQuick();
             }
         }
+        TESObjectCELL* pCell = apTargetRef->GetParentCell();
+        TESWorldSpace* pWorld = apTargetRef->GetWorldSpace();
+        NiPoint3 afz = apTargetRef->GetAngleOnReference();
+        const NiPoint3* v5 = &apTargetRef->GetLocationOnReference();
+        position.x = v5->x;
+        position.y = v5->y;
+        float z = v5->z;
+        position.x = position.x + afX;
+        position.y = position.y + afY;
+        position.z = z + afZ;
+        if (apMoveRef == pPlayer) {
+            PLAYER_TARGET_LOC* ploc;
+            void* apMemory = ourMalloc(sizeof(PLAYER_TARGET_LOC));
+            if (apMemory) {
+                ploc = ::new (apMemory) PLAYER_TARGET_LOC;
+            }
+            else {
+                ploc = nullptr;
+            }
+            ploc->Location = position;
+            ploc->Angle.z = afz.z;
+            ploc->Angle.x = afz.x;
+            ploc->bResetWeather = true;
+            if (pWorld) {
+                ploc->pWorld = pWorld;
+            }
+            else {
+                if ((pCell) && (pCell->GetInterior())) {
+                    ploc->pInterior = pCell;
+                }
+            }
+            ploc->pFurnitureRef = apTargetRef;
+            pPlayer->RequestPositionPlayer(ploc);
+            Interface::CloseConsole();
+        }
+        else {
+            bool bmob = apMoveRef->IsMobileObject();
+            apMoveRef->SetLocationOnReference(position);
+            if (pCell && TES::pInstance->IsCellLoaded(pCell, false)) {
+                apMoveRef->SetAngleOnReferenceZ(afz.z);
+                apMoveRef->SetAngleOnReferenceX(0.0f);
+                NiAVObject* p3D = (NiAVObject*)apMoveRef->Get3D();
+                if (p3D) {
+                    const NiPoint3* v7 = &apMoveRef->GetLocationOnReference();
+                    p3D->SetTranslate(*v7);
+                    p3D->SetRotate(apMoveRef->GetOrientation());
+                    bhkNiCollisionObject::ResetSim(p3D, true);
+                    NiUpdateData UpdateData(0.0f, false, false);
+                    p3D->Update(UpdateData);
+                }
+            }
+            else {
+                if (apMoveRef != pPlayer && bmob) {
+                    apMoveRef->SetAngleOnReferenceX(3.4028235e+38f);
+                }
+            }
+            TESObjectREFR::MoveRefToNewSpace(apMoveRef, pCell, pWorld);
+            if (apMoveRef->GetParentCell()) {
+                TESObjectCELL* ParentCell = apMoveRef->GetParentCell();
+                if (TES::pInstance->IsCellLoaded(ParentCell, false)) {
+                    apMoveRef->InitHavok();
+                }
+            }
+            if (bmob) {
+                MobileObject* pmob = static_cast<MobileObject*>(apMoveRef);
+                bhkCharacterController* pcon = static_cast<MobileObject*>(apMoveRef)->MobileObject::GetCharController();
+                if (pcon) {
+                    pcon->SetPosition(position);
+                }
+            }
+            if (bactor) {
+                Actor* pactor = static_cast<Actor*>(apMoveRef);
+                if (pactor->GetCurrentAIProcess()) {
+                    BaseProcess* CurrentAIProcess = pactor->pCurrentProcess;
+                    CurrentAIProcess->ComputeLastTimeProcessed();
+                    pactor->StopMoving();
+                    BaseProcess* v10 = pactor->pCurrentProcess;
+                    v10->CheckforNewPackage(pactor, true);
+                    pactor->FadeIn();
+                    pactor->UpdateAlpha();
+                }
+                else {
+                    Warning("AI: Actor being moved is Disabled he has no process");
+                }
+            }
+        }
+        pPlayer->CheckForQuestTargetUpdate(apMoveRef);
     }
 }
 
@@ -14043,23 +13840,20 @@ TESObjectREFR* Script::PlaceAtMeFunctionBase(
             for (BSSimpleList<ContainerObject*>* pcontlist = &tempcont.objectList; pcontlist && !pcontlist->IsEmpty();
                  pcontlist = pcontlist->m_pkNext) {
                 ContainerObject* pCO = pcontlist->m_item;
-                if (pCO) {
-                    if (pCO->pObj) {
-                        while (pCO->i_count > 0) {
-                            TESWorldSpace* X_4a = apPlaceAtRef->GetWorldSpace();
-                            TESObjectCELL* Xa = apPlaceAtRef->GetParentCell();
-                            pplacedref = pDataHandler->CreateReferenceAtLocation(
-                                pCO->pObj, pos, rotation, Xa, X_4a, nullptr, nullptr, nullptr
-                            );
-                            if (pplacedref) {
-                                if (pplacedref->IsActor()) {
-                                    Actor* pActor = static_cast<Actor*>(pplacedref);
-                                    pActor->SetAlpha(0.0f);
-                                    pActor->FadeIn();
-                                }
-                            }
-                            --pCO->i_count;
+                if ((pCO) && (pCO->pObj)) {
+                    while (pCO->i_count > 0) {
+                        TESWorldSpace* X_4a = apPlaceAtRef->GetWorldSpace();
+                        TESObjectCELL* Xa = apPlaceAtRef->GetParentCell();
+                        pplacedref = pDataHandler->CreateReferenceAtLocation(
+                            pCO->pObj, pos, rotation, Xa, X_4a, nullptr, nullptr, nullptr
+                        );
+                        if ((pplacedref) && (pplacedref->IsActor())) {
+                            Actor* pActor = static_cast<Actor*>(pplacedref);
+                            pActor->SetAlpha(0.0f);
+                            pActor->FadeIn();
                         }
+
+                        --pCO->i_count;
                     }
                 }
             }
@@ -15212,9 +15006,8 @@ bool Script::GetCurrentAIProcedureFunction(
     if (apRefObject) {
         return Script::GetCurrentAIProcedureConditionFunction(apRefObject, nullptr, nullptr, afReturnValue);
     }
-    else {
-        return true;
-    }
+
+    return true;
 }
 
 bool Script::ToggleWaterRadius(
@@ -15498,11 +15291,10 @@ bool Script::ScriptEffectElapsedTimeFunction(
     uint32_t& auiOffset
 ) {
     afReturnValue = 0.0;
-    if (apScriptLocals) {
-        if (apScriptLocals->m_pScriptEffectData) {
-            afReturnValue = (double)apScriptLocals->m_pScriptEffectData->m_fSecondsElapsed;
-        }
+    if ((apScriptLocals) && (apScriptLocals->m_pScriptEffectData)) {
+        afReturnValue = (double)apScriptLocals->m_pScriptEffectData->m_fSecondsElapsed;
     }
+
     return true;
 }
 
@@ -15781,9 +15573,8 @@ bool Script::IsGuard(
     if (apRefObject) {
         return Script::IsGuardConditionFunction(apRefObject, nullptr, nullptr, afReturnValue);
     }
-    else {
-        return false;
-    }
+
+    return false;
 }
 
 bool Script::IsTalkingFunction(
@@ -15799,9 +15590,8 @@ bool Script::IsTalkingFunction(
     if (apRefObject) {
         return Script::IsTalkingConditionFunction(apRefObject, nullptr, nullptr, afReturnValue);
     }
-    else {
-        return false;
-    }
+
+    return false;
 }
 
 bool Script::GetTrespassWarningLevelFunction(
@@ -15817,9 +15607,8 @@ bool Script::GetTrespassWarningLevelFunction(
     if (apRefObject) {
         return Script::GetTrespassWarningLevelConditionFunction(apRefObject, nullptr, nullptr, afReturnValue);
     }
-    else {
-        return true;
-    }
+
+    return true;
 }
 
 bool Script::IsInMyOwnedCellFunction(
@@ -15835,9 +15624,8 @@ bool Script::IsInMyOwnedCellFunction(
     if (apRefObject) {
         return Script::IsInMyOwnedCellConditionFunction(apRefObject, nullptr, nullptr, afReturnValue);
     }
-    else {
-        return true;
-    }
+
+    return true;
 }
 
 bool Script::IsContinuingPackagePCNearFunction(
@@ -15853,9 +15641,8 @@ bool Script::IsContinuingPackagePCNearFunction(
     if (apRefObject) {
         return Script::IsContinuingPackagePCNearConditionFunction(apRefObject, nullptr, nullptr, afReturnValue);
     }
-    else {
-        return true;
-    }
+
+    return true;
 }
 
 bool Script::CanHaveFlamesFunction(
@@ -15871,9 +15658,8 @@ bool Script::CanHaveFlamesFunction(
     if (apRefObject) {
         return Script::CanHaveFlamesConditionFunction(apRefObject, nullptr, nullptr, afReturnValue);
     }
-    else {
-        return true;
-    }
+
+    return true;
 }
 
 bool Script::HasFlamesFunction(
@@ -15889,9 +15675,8 @@ bool Script::HasFlamesFunction(
     if (apRefObject) {
         return Script::HasFlamesConditionFunction(apRefObject, nullptr, nullptr, afReturnValue);
     }
-    else {
-        return true;
-    }
+
+    return true;
 }
 
 bool Script::GetOpenStateFunction(
@@ -15907,9 +15692,8 @@ bool Script::GetOpenStateFunction(
     if (apRefObject) {
         return Script::GetOpenStateConditionFunction(apRefObject, nullptr, nullptr, afReturnValue);
     }
-    else {
-        return true;
-    }
+
+    return true;
 }
 
 bool Script::GetDayOfWeekFunction(
@@ -15964,9 +15748,8 @@ bool Script::IsSwimming(
     if (apRefObject) {
         return Script::IsSwimmingConditionFunction(apRefObject, nullptr, nullptr, afReturnValue);
     }
-    else {
-        return false;
-    }
+
+    return false;
 }
 
 bool Script::GetPlayerSleepHours(
@@ -16484,25 +16267,24 @@ bool Script::AddFlamesFunction(
     NiUpdateData a2;
     NiNode* v9;
     NiNode* apNode;
-    if (apRefObject) {
-        if (apRefObject->Get3D()) {
-            v9 = apRefObject->Get3D();
-            apNode = nullptr;
-            if (v9) {
-                apNode = v9->IsNode();
-            }
-            afReturnValue = (double)TESObjectREFR::AddAddonNodes(apNode);
-            if (0.0 != afReturnValue) {
-                apNode->UpdateProperties();
-                a2.~NiUpdateData();
-                ::new (&a2) NiUpdateData(0.0, true, false);
-                apNode->Update(a2);
-            }
-            if (Script::GetThreadSystemOutput()) {
-                Interface::PrintLine("AddFlames >> %0.2f", afReturnValue);
-            }
+    if ((apRefObject) && (apRefObject->Get3D())) {
+        v9 = apRefObject->Get3D();
+        apNode = nullptr;
+        if (v9) {
+            apNode = v9->IsNode();
+        }
+        afReturnValue = (double)TESObjectREFR::AddAddonNodes(apNode);
+        if (0.0 != afReturnValue) {
+            apNode->UpdateProperties();
+            a2.~NiUpdateData();
+            ::new (&a2) NiUpdateData(0.0, true, false);
+            apNode->Update(a2);
+        }
+        if (Script::GetThreadSystemOutput()) {
+            Interface::PrintLine("AddFlames >> %0.2f", afReturnValue);
         }
     }
+
     return true;
 }
 
@@ -16752,20 +16534,19 @@ bool Script::StopCombatFunction(
 ) {
     CombatController* v3;
     ExtraDataList* extra;
-    if (apRefObject) {
-        if (apRefObject->IsActor()) {
-            if (static_cast<Actor*>(apRefObject)->bInCombat) {
-                if (static_cast<Actor*>(apRefObject)->GetCombatController()) {
-                    v3 = static_cast<Actor*>(apRefObject)->GetCombatController();
-                    v3->ForceStopCombat();
-                }
-            }
-            if (apRefObject->TESObjectREFR::GetExtra()) {
-                extra = apRefObject->TESObjectREFR::GetExtra();
-                extra->RemovePlayerCrimeListExtra(static_cast<Actor*>(apRefObject));
-            }
+    if ((apRefObject) && (apRefObject->IsActor())) {
+        if ((static_cast<Actor*>(apRefObject)->bInCombat) &&
+            (static_cast<Actor*>(apRefObject)->GetCombatController())) {
+            v3 = static_cast<Actor*>(apRefObject)->GetCombatController();
+            v3->ForceStopCombat();
+        }
+
+        if (apRefObject->TESObjectREFR::GetExtra()) {
+            extra = apRefObject->TESObjectREFR::GetExtra();
+            extra->RemovePlayerCrimeListExtra(static_cast<Actor*>(apRefObject));
         }
     }
+
     return true;
 }
 
@@ -16781,18 +16562,17 @@ bool Script::RemoveFlamesFunction(
 ) {
     NiNode* v7;
     NiNode* v9;
-    if (apRefObject) {
-        if (apRefObject->Get3D()) {
-            v9 = apRefObject->Get3D();
-            if (v9) {
-                v7 = v9->IsNode();
-                afReturnValue = (double)TESObjectREFR::RemoveAddonNodes(v7);
-            }
-            if (Script::GetThreadSystemOutput()) {
-                Interface::PrintLine("RemoveFlames >> %0.2f", afReturnValue);
-            }
+    if ((apRefObject) && (apRefObject->Get3D())) {
+        v9 = apRefObject->Get3D();
+        if (v9) {
+            v7 = v9->IsNode();
+            afReturnValue = (double)TESObjectREFR::RemoveAddonNodes(v7);
+        }
+        if (Script::GetThreadSystemOutput()) {
+            Interface::PrintLine("RemoveFlames >> %0.2f", afReturnValue);
         }
     }
+
     return true;
 }
 
@@ -16901,64 +16681,60 @@ bool Script::GetActorValueInfoFunction(
         )) {
         return false;
     }
-    if (GetThreadTLSData()->bSystemOutput) {
-        if (apRefObject) {
-            if (apRefObject->IsActor() && iIndex >= 0 && iIndex < ActorValue::ACTOR_VALUE_COUNT) {
-                Actor* pActor = static_cast<Actor*>(apRefObject);
-                ActorValue::Index eIndex = static_cast<ActorValue::Index>(iIndex);
-                // The results kept are rounded to float; the modifiers are passed on unrounded, as doubles.
-                float fComputedBase = pActor->GetBaseActorFloatValue(eIndex);
-                const char* pFullName = pActor->GetFullName();
-                Interface::PrintLine(
-                    "GetActorValueInfo: %s on %s", ActorValue::GetActorValueScriptName(eIndex), pFullName
-                );
-                Interface::PrintLine(
-                    "...Current Value: %.2f Computed Base: %.2f ", pActor->GetActorFloatValue(eIndex), fComputedBase
-                );
-                float fReferenceBase = pActor->GetActorBase()->GetActorFloatValue(eIndex);
-                float fDerivedValue = 0.0f;
-                bool bIsDerived =
-                    ActorValue::GetDerivedActorValue(static_cast<ActorValueOwner*>(pActor), eIndex, fDerivedValue);
-                bool bOverride = false;
-                float fOverride = pActor->GetBaseValueOverride(eIndex, bOverride);
-                Interface::PrintLine("...Base Value components:");
-                const char* pBaseNote;
-                if (pActor->IsAutoCalc()) {
-                    pBaseNote = "(auto-calculated)";
-                }
-                else if (pActor->IsCreature()) {
-                    pBaseNote = "(creature)";
-                }
-                else {
-                    pBaseNote = "";
-                }
-                Interface::PrintLine("......Reference Base Value: %.2f %s", fReferenceBase, pBaseNote);
-                if (bIsDerived) {
-                    if ((!pActor->IsPc() && !pActor->IsAutoCalc() &&
-                         ActorValue::IsFlagSet(eIndex, ActorValue::DERIVED_IF_AUTOCALC)) ||
-                        pActor->IsCreature()) {
-                        Interface::PrintLine("......Derived Value: %.2f %s", fDerivedValue, "(Ignored)");
-                    }
-                    else {
-                        Interface::PrintLine("......Derived Value: %.2f %s", fDerivedValue, "");
-                    }
-                }
-                if (bOverride) {
-                    Interface::PrintLine("......SetAV override: %.2f", fOverride);
-                }
-                // Gets the damage and permanent modifiers before the temporary one.
-                double dDamage = pActor->GetDamageModifier(eIndex);
-                double dPermanent = pActor->GetPermanentModifier(eIndex);
-                Interface::PrintLine(
-                    "...Modifiers: Temp: %.2f Perm: %.2f Damage: %.2f", pActor->GetTemporaryModifier(eIndex),
-                    dPermanent, dDamage
-                );
-                if (pActor->IsPc()) {
-                    Interface::PrintLine("...Level-up Value: %.2f", pPlayer->GetPermanentActorFloatValue(eIndex));
-                }
+    if ((GetThreadTLSData()->bSystemOutput) && (apRefObject) &&
+        (apRefObject->IsActor() && iIndex >= 0 && iIndex < ActorValue::ACTOR_VALUE_COUNT)) {
+        Actor* pActor = static_cast<Actor*>(apRefObject);
+        ActorValue::Index eIndex = static_cast<ActorValue::Index>(iIndex);
+        // The results kept are rounded to float; the modifiers are passed on unrounded, as doubles.
+        float fComputedBase = pActor->GetBaseActorFloatValue(eIndex);
+        const char* pFullName = pActor->GetFullName();
+        Interface::PrintLine("GetActorValueInfo: %s on %s", ActorValue::GetActorValueScriptName(eIndex), pFullName);
+        Interface::PrintLine(
+            "...Current Value: %.2f Computed Base: %.2f ", pActor->GetActorFloatValue(eIndex), fComputedBase
+        );
+        float fReferenceBase = pActor->GetActorBase()->GetActorFloatValue(eIndex);
+        float fDerivedValue = 0.0f;
+        bool bIsDerived =
+            ActorValue::GetDerivedActorValue(static_cast<ActorValueOwner*>(pActor), eIndex, fDerivedValue);
+        bool bOverride = false;
+        float fOverride = pActor->GetBaseValueOverride(eIndex, bOverride);
+        Interface::PrintLine("...Base Value components:");
+        const char* pBaseNote;
+        if (pActor->IsAutoCalc()) {
+            pBaseNote = "(auto-calculated)";
+        }
+        else if (pActor->IsCreature()) {
+            pBaseNote = "(creature)";
+        }
+        else {
+            pBaseNote = "";
+        }
+        Interface::PrintLine("......Reference Base Value: %.2f %s", fReferenceBase, pBaseNote);
+        if (bIsDerived) {
+            if ((!pActor->IsPc() && !pActor->IsAutoCalc() &&
+                 ActorValue::IsFlagSet(eIndex, ActorValue::DERIVED_IF_AUTOCALC)) ||
+                pActor->IsCreature()) {
+                Interface::PrintLine("......Derived Value: %.2f %s", fDerivedValue, "(Ignored)");
+            }
+            else {
+                Interface::PrintLine("......Derived Value: %.2f %s", fDerivedValue, "");
             }
         }
+        if (bOverride) {
+            Interface::PrintLine("......SetAV override: %.2f", fOverride);
+        }
+        // Gets the damage and permanent modifiers before the temporary one.
+        double dDamage = pActor->GetDamageModifier(eIndex);
+        double dPermanent = pActor->GetPermanentModifier(eIndex);
+        Interface::PrintLine(
+            "...Modifiers: Temp: %.2f Perm: %.2f Damage: %.2f", pActor->GetTemporaryModifier(eIndex), dPermanent,
+            dDamage
+        );
+        if (pActor->IsPc()) {
+            Interface::PrintLine("...Level-up Value: %.2f", pPlayer->GetPermanentActorFloatValue(eIndex));
+        }
     }
+
     return true;
 }
 
@@ -16989,22 +16765,21 @@ bool Script::SetPosFunction(
         }
         return true;
     }
-    else {
-        if (GetThreadTLSData()->bSystemOutput) {
-            Interface::PrintLine("%s cannot be moved.", apRefObject->GetFormEditorID());
-        }
-        uint32_t CastingType = apScript->iFormID;
-        if (!pDataHandler->IsFormIDCreated(CastingType)) {
-            int32_t afValue_4 = apRefObject->iFormID;
-            const char* afValue = apRefObject->GetFormEditorID();
-            int32_t v10 = apScript->iFormID;
-            Warning(
-                "SCRIPTS: Script '%s' (%08X) is attempting to move reference '%s' (%08X), but it cannot be moved",
-                apScript->GetFormEditorID(), v10, afValue, afValue_4
-            );
-        }
-        return true;
+
+    if (GetThreadTLSData()->bSystemOutput) {
+        Interface::PrintLine("%s cannot be moved.", apRefObject->GetFormEditorID());
     }
+    uint32_t CastingType = apScript->iFormID;
+    if (!pDataHandler->IsFormIDCreated(CastingType)) {
+        int32_t afValue_4 = apRefObject->iFormID;
+        const char* afValue = apRefObject->GetFormEditorID();
+        int32_t v10 = apScript->iFormID;
+        Warning(
+            "SCRIPTS: Script '%s' (%08X) is attempting to move reference '%s' (%08X), but it cannot be moved",
+            apScript->GetFormEditorID(), v10, afValue, afValue_4
+        );
+    }
+    return true;
 }
 
 void Script::SetPosBase(TESObjectREFR* apRefObject, char acAxis, float afValue) {
@@ -17029,10 +16804,8 @@ void Script::SetPosBase(TESObjectREFR* apRefObject, char acAxis, float afValue) 
         MobileObject* pmob = dynamic_cast<MobileObject*>(apRefObject);
         if (pmob) {
             bhkCharacterController* pcon = pmob->GetCharController();
-            if (pcon) {
-                if (!pcon->QIsFlying()) {
-                    pcon->SetPosition(pos);
-                }
+            if ((pcon) && (!pcon->QIsFlying())) {
+                pcon->SetPosition(pos);
             }
         }
         NiAVObject* obj3D = apRefObject->Get3D();
@@ -17097,79 +16870,72 @@ bool Script::ShowVarsFunction(
             int32_t iCount = pinventory->GetCount(true);
             for (int32_t i = 0; i < iCount; ++i) {
                 ItemChange* pitem = pinventory->GetItembyIndex(i);
-                if (pitem) {
-                    if (pitem->GetScript()) {
-                        Script* ownerScript_2 = pitem->GetScript();
-                        ScriptLocals* ownerLocals_2 = pitem->GetScriptLocals();
-                        if (ownerScript_2->GetVariableList()->IsEmpty()) {
-                            Interface::PrintLine("No variables in script %s", ownerScript_2->GetFormEditorID());
-                        }
-                        else {
-                            BSSimpleList<ScriptVariable*>* pList_2 = ownerScript_2->GetVariableList();
-                            while (ownerLocals_2 && (pList_2 && pList_2->m_item)) {
-                                ScriptVariable* pVar_2 = pList_2->m_item;
-                                pList_2 = pList_2->m_pkNext;
-                                if (ownerLocals_2->IsReferenceVariable(pVar_2->data.uiID)) {
-                                    uint32_t iid_2 = 0;
-                                    double fval_2 = ownerLocals_2->GetVariable(pVar_2->data.uiID, nullptr);
-                                    Script::GetNumericIDFromDouble(iid_2, fval_2);
-                                    uint32_t v15 = iid_2;
-                                    char* v9 = pVar_2->cName.pString;
-                                    Interface::PrintLine("%s->%s = (%08X)", ownerScript_2->GetFormEditorID(), v9, v15);
+                if ((pitem) && (pitem->GetScript())) {
+                    Script* ownerScript_2 = pitem->GetScript();
+                    ScriptLocals* ownerLocals_2 = pitem->GetScriptLocals();
+                    if (ownerScript_2->GetVariableList()->IsEmpty()) {
+                        Interface::PrintLine("No variables in script %s", ownerScript_2->GetFormEditorID());
+                    }
+                    else {
+                        BSSimpleList<ScriptVariable*>* pList_2 = ownerScript_2->GetVariableList();
+                        while (ownerLocals_2 && (pList_2 && pList_2->m_item)) {
+                            ScriptVariable* pVar_2 = pList_2->m_item;
+                            pList_2 = pList_2->m_pkNext;
+                            if (ownerLocals_2->IsReferenceVariable(pVar_2->data.uiID)) {
+                                uint32_t iid_2 = 0;
+                                double fval_2 = ownerLocals_2->GetVariable(pVar_2->data.uiID, nullptr);
+                                Script::GetNumericIDFromDouble(iid_2, fval_2);
+                                uint32_t v15 = iid_2;
+                                char* v9 = pVar_2->cName.pString;
+                                Interface::PrintLine("%s->%s = (%08X)", ownerScript_2->GetFormEditorID(), v9, v15);
+                            }
+                            else {
+                                if (pVar_2->data.bIsInteger) {
+                                    int32_t v16 =
+                                        static_cast<int32_t>(ownerLocals_2->GetVariable(pVar_2->data.uiID, nullptr));
+                                    char* v10 = pVar_2->cName.pString;
+                                    Interface::PrintLine("%s->%s = %d", ownerScript_2->GetFormEditorID(), v10, v16);
                                 }
                                 else {
-                                    if (pVar_2->data.bIsInteger) {
-                                        int32_t v16 = static_cast<int32_t>(
-                                            ownerLocals_2->GetVariable(pVar_2->data.uiID, nullptr)
-                                        );
-                                        char* v10 = pVar_2->cName.pString;
-                                        Interface::PrintLine("%s->%s = %d", ownerScript_2->GetFormEditorID(), v10, v16);
-                                    }
-                                    else {
-                                        double v11 = ownerLocals_2->GetVariable(pVar_2->data.uiID, nullptr);
-                                        char* v5 = pVar_2->cName.pString;
-                                        Interface::PrintLine(
-                                            "%s->%s = %0.4f", ownerScript_2->GetFormEditorID(), v5, v11
-                                        );
-                                    }
+                                    double v11 = ownerLocals_2->GetVariable(pVar_2->data.uiID, nullptr);
+                                    char* v5 = pVar_2->cName.pString;
+                                    Interface::PrintLine("%s->%s = %0.4f", ownerScript_2->GetFormEditorID(), v5, v11);
                                 }
                             }
                         }
-                        v39 = 0;
                     }
+                    v39 = 0;
                 }
             }
         }
     }
     if (v39) {
         BSSimpleList<TESGlobal*>* pList_3 = pDataHandler->GetGlobalList();
-        if (pList_3) {
-            if (!pList_3->IsEmpty()) {
-                Interface::PrintLine("--- Global Variables -----------------------------");
-                while (pList_3) {
-                    TESGlobal* pGlobal = pList_3->m_item;
-                    if (pGlobal) {
-                        char Type = pGlobal->GetType();
-                        switch (Type) {
-                            case 102: {
-                                double v12 = pGlobal->fValue;
-                                Interface::PrintLine("%s = %0.4f", pGlobal->GetFormEditorID(), v12);
-                                break;
-                            }
-                            case 108: {
-                                int32_t v18 = static_cast<int32_t>(pGlobal->fValue);
-                                Interface::PrintLine("%s = %d", pGlobal->GetFormEditorID(), v18);
-                                break;
-                            }
-                            case 115: {
-                                int32_t v17 = static_cast<int16_t>(static_cast<int32_t>(pGlobal->fValue));
-                                Interface::PrintLine("%s = %d", pGlobal->GetFormEditorID(), v17);
-                                break;
-                            }
+        if ((pList_3) && (!pList_3->IsEmpty())) {
+            Interface::PrintLine("--- Global Variables -----------------------------");
+            while (pList_3) {
+                TESGlobal* pGlobal = pList_3->m_item;
+                if (pGlobal) {
+                    char Type = pGlobal->GetType();
+                    switch (Type) {
+                        case 102: {
+                            double v12 = pGlobal->fValue;
+                            Interface::PrintLine("%s = %0.4f", pGlobal->GetFormEditorID(), v12);
+                            break;
+                        }
+                        case 108: {
+                            int32_t v18 = static_cast<int32_t>(pGlobal->fValue);
+                            Interface::PrintLine("%s = %d", pGlobal->GetFormEditorID(), v18);
+                            break;
+                        }
+                        case 115: {
+                            int32_t v17 = static_cast<int16_t>(static_cast<int32_t>(pGlobal->fValue));
+                            Interface::PrintLine("%s = %d", pGlobal->GetFormEditorID(), v17);
+                            break;
                         }
                     }
-                    pList_3 = pList_3->m_pkNext;
                 }
+                pList_3 = pList_3->m_pkNext;
             }
         }
     }
@@ -17204,64 +16970,57 @@ bool Script::StartConversation(
         )) {
         return false;
     }
-    if (apRefObject) {
-        if (ptarget) {
-            if (!apRefObject->GetDisabled() && !ptarget->GetDisabled()) {
-                PackageLocation* ploc1 = nullptr;
-                PackageLocation* ploc2 = nullptr;
-                PackageLocation tempFirstLoc;
-                PackageLocation tempSecondLoc;
-                if (pLocationSpeaker) {
-                    ploc1 = &tempFirstLoc;
-                    tempFirstLoc.SetLocReference(pLocationSpeaker);
-                }
-                if (pLocationTarget) {
-                    ploc2 = &tempSecondLoc;
-                    tempSecondLoc.SetLocReference(pLocationTarget);
-                }
-                MobileObject* pactor = nullptr;
-                if (apRefObject->IsActor()) {
-                    pactor = static_cast<MobileObject*>(apRefObject);
-                }
-                MobileObject* ptargetchar = nullptr;
-                if (ptarget->IsActor()) {
-                    ptargetchar = static_cast<MobileObject*>(ptarget);
-                }
-                else {
-                    ptargetchar = ptarget->AddTalkingActivatorMobileObjectREFR();
-                }
-                if (!pactor ||
-                    (!ptargetchar ||
-                     (pactor->GetDisabled() ||
-                      (ptargetchar->GetDisabled() ||
-                       (pactor->GetSitSleepState() == SIT_SLEEP_IS_SLEEPING ||
-                        (Script::IsPendingFadeDisabledReference(pactor) ||
-                         Script::IsPendingFadeDisabledReference(ptargetchar))))))) {
-                    apRefObject->Activate(ptarget, false, nullptr, 1);
-                }
-                else {
-                    if (pactor == pPlayer) {
-                        ptargetchar->Activate(pPlayer, false, nullptr, 1);
-                    }
-                    else {
-                        if (pactor->pCurrentProcess) {
-                            if (ptargetchar->pCurrentProcess) {
-                                pactor->InitiateDialogue(
-                                    ptargetchar, ploc1, ploc2, bHeadTrack == 1, bMove == 1, false, ptopic, false, false
-                                );
-                                DialoguePackage* ppack = static_cast<DialoguePackage*>(pactor->GetCurrentPackage());
-                                if (ppack) {
-                                    if (ppack->GetPackType() == PACKAGE_TYPE_IN_GAME_DIALOGUE) {
-                                        pPlayer->pAIConversationRunning = ppack;
-                                    }
-                                }
-                            }
-                        }
+    if ((apRefObject) && (ptarget) && (!apRefObject->GetDisabled() && !ptarget->GetDisabled())) {
+        PackageLocation* ploc1 = nullptr;
+        PackageLocation* ploc2 = nullptr;
+        PackageLocation tempFirstLoc;
+        PackageLocation tempSecondLoc;
+        if (pLocationSpeaker) {
+            ploc1 = &tempFirstLoc;
+            tempFirstLoc.SetLocReference(pLocationSpeaker);
+        }
+        if (pLocationTarget) {
+            ploc2 = &tempSecondLoc;
+            tempSecondLoc.SetLocReference(pLocationTarget);
+        }
+        MobileObject* pactor = nullptr;
+        if (apRefObject->IsActor()) {
+            pactor = static_cast<MobileObject*>(apRefObject);
+        }
+        MobileObject* ptargetchar = nullptr;
+        if (ptarget->IsActor()) {
+            ptargetchar = static_cast<MobileObject*>(ptarget);
+        }
+        else {
+            ptargetchar = ptarget->AddTalkingActivatorMobileObjectREFR();
+        }
+        if (!pactor ||
+            (!ptargetchar ||
+             (pactor->GetDisabled() ||
+              (ptargetchar->GetDisabled() ||
+               (pactor->GetSitSleepState() == SIT_SLEEP_IS_SLEEPING ||
+                (Script::IsPendingFadeDisabledReference(pactor) ||
+                 Script::IsPendingFadeDisabledReference(ptargetchar))))))) {
+            apRefObject->Activate(ptarget, false, nullptr, 1);
+        }
+        else {
+            if (pactor == pPlayer) {
+                ptargetchar->Activate(pPlayer, false, nullptr, 1);
+            }
+            else {
+                if ((pactor->pCurrentProcess) && (ptargetchar->pCurrentProcess)) {
+                    pactor->InitiateDialogue(
+                        ptargetchar, ploc1, ploc2, bHeadTrack == 1, bMove == 1, false, ptopic, false, false
+                    );
+                    DialoguePackage* ppack = static_cast<DialoguePackage*>(pactor->GetCurrentPackage());
+                    if ((ppack) && (ppack->GetPackType() == PACKAGE_TYPE_IN_GAME_DIALOGUE)) {
+                        pPlayer->pAIConversationRunning = ppack;
                     }
                 }
             }
         }
     }
+
     return true;
 }
 
@@ -17515,150 +17274,145 @@ bool Script::RemoveItemFunction(
         )) {
         return false;
     }
-    if (apRefObject) {
-        if (pformlist) {
-            BSSimpleList<TESForm*> removelist;
-            if (pformlist->IsBoundObject()) {
-                pobject = static_cast<TESBoundObject*>(pformlist);
-            }
-            if (pformlist->GetFormType() == LVLI_ID) {
-                TESLevItem* pleveled = static_cast<TESLevItem*>(pformlist);
-                if (pformlist) {
-                    InventoryChanges* pchanges = (&apRefObject->m_Extra)->GetContainerChanges();
-                    if (pchanges) {
-                        pobject = pchanges->GetLeveledCalculatedBaseObject(pleveled);
-                    }
-                }
-            }
-            if (pobject) {
-                TESForm* premoveform = pobject;
-                removelist.AddHead(premoveform);
-            }
-            else {
-                if (pformlist->GetFormType() == FLST_ID) {
-                    TESForm* v27 = pformlist;
-                    BSSimpleList<TESForm*>* plist = &static_cast<BGSListForm*>(pformlist)->ListOfForms;
-                    while (plist && !plist->IsEmpty()) {
-                        TESForm* premoveform_2 = plist->m_item;
-                        plist = plist->m_pkNext;
-                        if (premoveform_2->IsBoundObject()) {
-                            removelist.AddHead(premoveform_2);
-                        }
-                    }
-                }
-            }
-            while (!removelist.IsEmpty()) {
-                pobject = static_cast<TESBoundObject*>((&removelist)->m_item);
-                removelist.RemoveHead();
-                int32_t iremovecount = icount;
-                Actor* pactor = dynamic_cast<Actor*>(apRefObject);
-                if (pactor) {
-                    double iActualCount = static_cast<double>(iremovecount);
-                    Script::GetItemCountConditionFunction(apRefObject, pobject, nullptr, iActualCount);
-                    if (static_cast<double>(iremovecount) > iActualCount) {
-                        iremovecount = static_cast<int32_t>(iActualCount);
-                    }
-                    ExtraDataList* pextra = nullptr;
-                    if (pactor->WearingObject(pobject)) {
-                        InventoryChanges* pinventory = InventoryChanges::GetInventoryChanges(apRefObject);
-                        if (pinventory) {
-                            pextra = pinventory->WearingObject(pobject, false);
-                            if (pextra) {
-                                pextra->SetCanNotWear(false);
-                            }
-                        }
-                    }
-                    if (iremovecount > 0) {
-                        bool bworn = pactor->WearingObject(pobject);
-                        if (bworn) {
-                            pactor->Dispel(pobject, true);
-                        }
-                        pactor->RemoveItem(
-                            pobject, pextra, iremovecount, false, false, nullptr, nullptr, nullptr, true, false
-                        );
-                        if (pactor == pPlayer) {
-                            if (!isilent) {
-                                BSStringT<char> pstring;
-                                if (iremovecount <= 1) {
-                                    const char* v13 = sRemoveItemfromInventory.String();
-                                    const char* FullName = TESFullName::GetFullName(pobject);
-                                    pstring.SPrintF("%s %s", FullName, v13);
-                                }
-                                else {
-                                    const char* v12 = sRemoveItemfromInventory.String();
-                                    const char* time = sPlural.String();
-                                    const char* v9 = TESFullName::GetFullName(pobject);
-                                    pstring.SPrintF("%i %s%s %s", iremovecount, v9, time, v12);
-                                }
-                                switch (pobject->GetFormType()) {
-                                    case ARMO_ID: {
-                                        const char* apSoundName;
-                                        if (isilent) {
-                                            apSoundName = nullptr;
-                                        }
-                                        else {
-                                            apSoundName = pPlayer->GetPickUpSoundName(pobject, false, false);
-                                        }
-                                        Interface::ShowMessage(
-                                            pstring.pString, 0,
-                                            "Interface\\Icons\\Message Icons\\glow_message_vaultboy_neutral.dds",
-                                            apSoundName, 2.0f, false
-                                        );
-                                        break;
-                                    }
-                                    case BOOK_ID:
-                                    case LIGH_ID:
-                                    case MISC_ID:
-                                    case WEAP_ID:
-                                    case AMMO_ID:
-                                    case KEYM_ID:
-                                    case ALCH_ID:
-                                    case COBJ_ID:
-                                    case IMOD_ID:
-                                    case CHIP_ID:
-                                    case CCRD_ID:
-                                    case CMNY_ID: {
-                                        const char* soundName;
-                                        if (isilent) {
-                                            soundName = nullptr;
-                                        }
-                                        else {
-                                            soundName = pPlayer->GetPickUpSoundName(pobject, false, false);
-                                        }
-                                        Interface::ShowMessage(
-                                            pstring.pString, 0,
-                                            "Interface\\Icons\\Message Icons\\glow_message_vaultboy_neutral.dds",
-                                            soundName, 2.0f, false
-                                        );
-                                        break;
-                                    }
-                                    default: {
-                                        break;
-                                    }
-                                }
-                            }
-                            Interface::UpdateInventory();
-                        }
-                        else {
-                            if (bworn) {
-                                if (pactor->pCurrentProcess) {
-                                    if (pactor->Get3D()) {
-                                        BaseProcess* CurrentAIProcess = pactor->pCurrentProcess;
-                                        CurrentAIProcess->ProcessRemoveWorn(pactor, false);
-                                    }
-                                }
-                            }
-                        }
-                    }
-                }
-                else {
-                    apRefObject->RemoveItem(
-                        pobject, nullptr, iremovecount, false, false, nullptr, nullptr, nullptr, true, false
-                    );
+    if ((apRefObject) && (pformlist)) {
+        BSSimpleList<TESForm*> removelist;
+        if (pformlist->IsBoundObject()) {
+            pobject = static_cast<TESBoundObject*>(pformlist);
+        }
+        if (pformlist->GetFormType() == LVLI_ID) {
+            TESLevItem* pleveled = static_cast<TESLevItem*>(pformlist);
+            if (pformlist) {
+                InventoryChanges* pchanges = (&apRefObject->m_Extra)->GetContainerChanges();
+                if (pchanges) {
+                    pobject = pchanges->GetLeveledCalculatedBaseObject(pleveled);
                 }
             }
         }
+        if (pobject) {
+            TESForm* premoveform = pobject;
+            removelist.AddHead(premoveform);
+        }
+        else {
+            if (pformlist->GetFormType() == FLST_ID) {
+                TESForm* v27 = pformlist;
+                BSSimpleList<TESForm*>* plist = &static_cast<BGSListForm*>(pformlist)->ListOfForms;
+                while (plist && !plist->IsEmpty()) {
+                    TESForm* premoveform_2 = plist->m_item;
+                    plist = plist->m_pkNext;
+                    if (premoveform_2->IsBoundObject()) {
+                        removelist.AddHead(premoveform_2);
+                    }
+                }
+            }
+        }
+        while (!removelist.IsEmpty()) {
+            pobject = static_cast<TESBoundObject*>((&removelist)->m_item);
+            removelist.RemoveHead();
+            int32_t iremovecount = icount;
+            Actor* pactor = dynamic_cast<Actor*>(apRefObject);
+            if (pactor) {
+                double iActualCount = static_cast<double>(iremovecount);
+                Script::GetItemCountConditionFunction(apRefObject, pobject, nullptr, iActualCount);
+                if (static_cast<double>(iremovecount) > iActualCount) {
+                    iremovecount = static_cast<int32_t>(iActualCount);
+                }
+                ExtraDataList* pextra = nullptr;
+                if (pactor->WearingObject(pobject)) {
+                    InventoryChanges* pinventory = InventoryChanges::GetInventoryChanges(apRefObject);
+                    if (pinventory) {
+                        pextra = pinventory->WearingObject(pobject, false);
+                        if (pextra) {
+                            pextra->SetCanNotWear(false);
+                        }
+                    }
+                }
+                if (iremovecount > 0) {
+                    bool bworn = pactor->WearingObject(pobject);
+                    if (bworn) {
+                        pactor->Dispel(pobject, true);
+                    }
+                    pactor->RemoveItem(
+                        pobject, pextra, iremovecount, false, false, nullptr, nullptr, nullptr, true, false
+                    );
+                    if (pactor == pPlayer) {
+                        if (!isilent) {
+                            BSStringT<char> pstring;
+                            if (iremovecount <= 1) {
+                                const char* v13 = sRemoveItemfromInventory.String();
+                                const char* FullName = TESFullName::GetFullName(pobject);
+                                pstring.SPrintF("%s %s", FullName, v13);
+                            }
+                            else {
+                                const char* v12 = sRemoveItemfromInventory.String();
+                                const char* time = sPlural.String();
+                                const char* v9 = TESFullName::GetFullName(pobject);
+                                pstring.SPrintF("%i %s%s %s", iremovecount, v9, time, v12);
+                            }
+                            switch (pobject->GetFormType()) {
+                                case ARMO_ID: {
+                                    const char* apSoundName;
+                                    if (isilent) {
+                                        apSoundName = nullptr;
+                                    }
+                                    else {
+                                        apSoundName = pPlayer->GetPickUpSoundName(pobject, false, false);
+                                    }
+                                    Interface::ShowMessage(
+                                        pstring.pString, 0,
+                                        "Interface\\Icons\\Message Icons\\glow_message_vaultboy_neutral.dds",
+                                        apSoundName, 2.0f, false
+                                    );
+                                    break;
+                                }
+                                case BOOK_ID:
+                                case LIGH_ID:
+                                case MISC_ID:
+                                case WEAP_ID:
+                                case AMMO_ID:
+                                case KEYM_ID:
+                                case ALCH_ID:
+                                case COBJ_ID:
+                                case IMOD_ID:
+                                case CHIP_ID:
+                                case CCRD_ID:
+                                case CMNY_ID: {
+                                    const char* soundName;
+                                    if (isilent) {
+                                        soundName = nullptr;
+                                    }
+                                    else {
+                                        soundName = pPlayer->GetPickUpSoundName(pobject, false, false);
+                                    }
+                                    Interface::ShowMessage(
+                                        pstring.pString, 0,
+                                        "Interface\\Icons\\Message Icons\\glow_message_vaultboy_neutral.dds", soundName,
+                                        2.0f, false
+                                    );
+                                    break;
+                                }
+                                default: {
+                                    break;
+                                }
+                            }
+                        }
+                        Interface::UpdateInventory();
+                    }
+                    else {
+                        if ((bworn) && (pactor->pCurrentProcess) && (pactor->Get3D())) {
+                            BaseProcess* CurrentAIProcess = pactor->pCurrentProcess;
+                            CurrentAIProcess->ProcessRemoveWorn(pactor, false);
+                        }
+                    }
+                }
+            }
+            else {
+                apRefObject->RemoveItem(
+                    pobject, nullptr, iremovecount, false, false, nullptr, nullptr, nullptr, true, false
+                );
+            }
+        }
     }
+
     return true;
 }
 
@@ -18573,16 +18327,15 @@ bool Script::ShowViewerStrings(
         else {
             v11 = nullptr;
         }
-        if (v18) {
-            if (v18->IsNode()) {
-                NiNode* v17 = v18;
-                v18 = nullptr;
-                uint32_t a1 = 0;
-                for (uint32_t i = v17->GetArrayCount(); a1 < i && !v18; i = v17->GetArrayCount()) {
-                    v18 = static_cast<NiNode*>(v17->GetAt(a1++));
-                }
+        if ((v18) && (v18->IsNode())) {
+            NiNode* v17 = v18;
+            v18 = nullptr;
+            uint32_t a1 = 0;
+            for (uint32_t i = v17->GetArrayCount(); a1 < i && !v18; i = v17->GetArrayCount()) {
+                v18 = static_cast<NiNode*>(v17->GetAt(a1++));
             }
         }
+
         if (!v18) {
             Interface::PrintLine("Node with no children supplied as reference...");
             return true;
@@ -18663,42 +18416,37 @@ bool Script::ToggleLODLand(
         v23 = 1;
     }
     if (v19 || (v20 || (v21 || v23))) {
-        if (terrainManager->GetTreeNode()) {
-            if (v21) {
-                NiNode* TreeNode = terrainManager->GetTreeNode();
-                bool v16 = !TreeNode->GetAppCulled();
-                NiNode* v10 = terrainManager->GetTreeNode();
-                v10->SetAppCulled(v16);
-            }
+        if ((terrainManager->GetTreeNode()) && (v21)) {
+            NiNode* TreeNode = terrainManager->GetTreeNode();
+            bool v16 = !TreeNode->GetAppCulled();
+            NiNode* v10 = terrainManager->GetTreeNode();
+            v10->SetAppCulled(v16);
         }
-        if (terrainManager->GetLODLandRoot()) {
-            if (v20) {
-                NiNode* LODLandRoot = terrainManager->GetLODLandRoot();
-                bool v17 = !LODLandRoot->GetAppCulled();
-                NiNode* v12 = terrainManager->GetLODLandRoot();
-                v12->SetAppCulled(v17);
-            }
+
+        if ((terrainManager->GetLODLandRoot()) && (v20)) {
+            NiNode* LODLandRoot = terrainManager->GetLODLandRoot();
+            bool v17 = !LODLandRoot->GetAppCulled();
+            NiNode* v12 = terrainManager->GetLODLandRoot();
+            v12->SetAppCulled(v17);
         }
-        if (terrainManager->GetLODObjectRoot()) {
-            if (v23) {
-                NiNode* LODObjectRoot = terrainManager->GetLODObjectRoot();
-                bool v18 = !LODObjectRoot->GetAppCulled();
-                NiNode* v14 = terrainManager->GetLODObjectRoot();
-                v14->SetAppCulled(v18);
-            }
+
+        if ((terrainManager->GetLODObjectRoot()) && (v23)) {
+            NiNode* LODObjectRoot = terrainManager->GetLODObjectRoot();
+            bool v18 = !LODObjectRoot->GetAppCulled();
+            NiNode* v14 = terrainManager->GetLODObjectRoot();
+            v14->SetAppCulled(v18);
         }
-        if (terrainManager->GetWaterLODRoot()) {
-            if (v19) {
-                bool AppCulled = terrainManager->GetWaterLODRoot()->GetAppCulled();
-                terrainManager->GetWaterLODRoot()->SetAppCulled(!AppCulled);
-            }
+
+        if ((terrainManager->GetWaterLODRoot()) && (v19)) {
+            bool AppCulled = terrainManager->GetWaterLODRoot()->GetAppCulled();
+            terrainManager->GetWaterLODRoot()->SetAppCulled(!AppCulled);
         }
+
         return true;
     }
-    else {
-        Interface::PrintLine("Invalid parameter.  Please specify land, objects, trees, water, or all.");
-        return true;
-    }
+
+    Interface::PrintLine("Invalid parameter.  Please specify land, objects, trees, water, or all.");
+    return true;
 }
 
 bool Script::SetLODObjectDistanceFunction(
@@ -18763,16 +18511,15 @@ bool Script::HighlightBodyPart(
         )) {
         return false;
     }
-    if (apRefObject) {
-        if (apRefObject->Get3D()) {
-            BGSBodyPart::LIMB_ENUM v11 = static_cast<BGSBodyPart::LIMB_ENUM>(static_cast<int32_t>(a8));
-            FOVATSEffectManager* VATSEffect = Interface::GetVATSEffect();
-            VATSEffect->SetTarget(apRefObject, v11, false);
-            FOVATSEffectManager::VATS_EFFECT_MODE a2 = FOVATSEffectManager::SINGLE_TARGET;
-            FOVATSEffectManager* v10 = Interface::GetVATSEffect();
-            v10->SetEffectMode(a2);
-        }
+    if ((apRefObject) && (apRefObject->Get3D())) {
+        BGSBodyPart::LIMB_ENUM v11 = static_cast<BGSBodyPart::LIMB_ENUM>(static_cast<int32_t>(a8));
+        FOVATSEffectManager* VATSEffect = Interface::GetVATSEffect();
+        VATSEffect->SetTarget(apRefObject, v11, false);
+        FOVATSEffectManager::VATS_EFFECT_MODE a2 = FOVATSEffectManager::SINGLE_TARGET;
+        FOVATSEffectManager* v10 = Interface::GetVATSEffect();
+        v10->SetEffectMode(a2);
     }
+
     return true;
 }
 
@@ -18797,17 +18544,16 @@ bool Script::HighlightAdditionalReference(
         )) {
         return false;
     }
-    if (apRefObject) {
-        if (apRefObject->Get3D()) {
-            FOVATSEffectManager* VATSEffect = Interface::GetVATSEffect();
-            VATSEffect->SetMultiTarget(apRefObject);
-            FOVATSEffectManager* v10 = Interface::GetVATSEffect();
-            v10->SetSelectedMultiTarget(apRefObject);
-            FOVATSEffectManager::VATS_EFFECT_MODE a2 = FOVATSEffectManager::MULTIPLE_TARGETS;
-            FOVATSEffectManager* v11 = Interface::GetVATSEffect();
-            v11->SetEffectMode(a2);
-        }
+    if ((apRefObject) && (apRefObject->Get3D())) {
+        FOVATSEffectManager* VATSEffect = Interface::GetVATSEffect();
+        VATSEffect->SetMultiTarget(apRefObject);
+        FOVATSEffectManager* v10 = Interface::GetVATSEffect();
+        v10->SetSelectedMultiTarget(apRefObject);
+        FOVATSEffectManager::VATS_EFFECT_MODE a2 = FOVATSEffectManager::MULTIPLE_TARGETS;
+        FOVATSEffectManager* v11 = Interface::GetVATSEffect();
+        v11->SetEffectMode(a2);
     }
+
     return true;
 }
 
@@ -18832,17 +18578,16 @@ bool Script::DeactivateAllHighlights(
         )) {
         return false;
     }
-    if (apRefObject) {
-        if (apRefObject->Get3D()) {
-            FOVATSEffectManager* VATSEffect = Interface::GetVATSEffect();
-            VATSEffect->SetTarget(nullptr, BGSBodyPart::LIMB_TORSO, false);
-            FOVATSEffectManager* v10 = Interface::GetVATSEffect();
-            v10->ClearMultiTargets();
-            FOVATSEffectManager::VATS_EFFECT_MODE a2 = FOVATSEffectManager::SINGLE_TARGET;
-            FOVATSEffectManager* v11 = Interface::GetVATSEffect();
-            v11->SetEffectMode(a2);
-        }
+    if ((apRefObject) && (apRefObject->Get3D())) {
+        FOVATSEffectManager* VATSEffect = Interface::GetVATSEffect();
+        VATSEffect->SetTarget(nullptr, BGSBodyPart::LIMB_TORSO, false);
+        FOVATSEffectManager* v10 = Interface::GetVATSEffect();
+        v10->ClearMultiTargets();
+        FOVATSEffectManager::VATS_EFFECT_MODE a2 = FOVATSEffectManager::SINGLE_TARGET;
+        FOVATSEffectManager* v11 = Interface::GetVATSEffect();
+        v11->SetEffectMode(a2);
     }
+
     return true;
 }
 
@@ -18872,35 +18617,33 @@ bool Script::AddOcclusionPlane(
         PortalGraph->RemoveAllOccluders();
         return true;
     }
-    else {
-        BSOcclusionPlane* v15;
-        NiMatrix3 kcamerafunk;
-        if (ksize.x <= 0.0) {
-            ksize.x = 50.0f;
-        }
-        if (ksize.y <= 0.0) {
-            ksize.y = 50.0f;
-        }
-        ShadowSceneNode* v11 = BSShaderManager::GetShadowSceneNode(0);
-        ::new (&kpos) NiPoint3(v11->GetCameraPos());
-        kcamerarot = Main::GetWorldSceneGraph()->GetCamera()->GetWorldTransform().m_Rotate;
-        kcamerafunk.MakeZRotation(1.5707963f);
-        kcamerarot = *::new (&kcamerafunk_2) NiMatrix3(kcamerarot * kcamerafunk);
-        BSOcclusionPlane* apMemory =
-            static_cast<BSOcclusionPlane*>(NiMemObject::operator new(sizeof(BSOcclusionPlane)));
-        if (apMemory) {
-            v15 = ::new (apMemory) BSOcclusionPlane(&kpos, &ksize, &kcamerarot);
-        }
-        else {
-            v15 = nullptr;
-        }
-        NiPointer<BSOcclusionPlane> spoccluder(v15);
-        BSOcclusionPlane* angle = spoccluder.m_pObject;
-        ShadowSceneNode* v12 = BSShaderManager::GetShadowSceneNode(0);
-        BSPortalGraph* v13 = v12->GetPortalGraph();
-        v13->AddOccluder(angle);
-        return true;
+
+    BSOcclusionPlane* v15;
+    NiMatrix3 kcamerafunk;
+    if (ksize.x <= 0.0) {
+        ksize.x = 50.0f;
     }
+    if (ksize.y <= 0.0) {
+        ksize.y = 50.0f;
+    }
+    ShadowSceneNode* v11 = BSShaderManager::GetShadowSceneNode(0);
+    ::new (&kpos) NiPoint3(v11->GetCameraPos());
+    kcamerarot = Main::GetWorldSceneGraph()->GetCamera()->GetWorldTransform().m_Rotate;
+    kcamerafunk.MakeZRotation(1.5707963f);
+    kcamerarot = *::new (&kcamerafunk_2) NiMatrix3(kcamerarot * kcamerafunk);
+    BSOcclusionPlane* apMemory = static_cast<BSOcclusionPlane*>(NiMemObject::operator new(sizeof(BSOcclusionPlane)));
+    if (apMemory) {
+        v15 = ::new (apMemory) BSOcclusionPlane(&kpos, &ksize, &kcamerarot);
+    }
+    else {
+        v15 = nullptr;
+    }
+    NiPointer<BSOcclusionPlane> spoccluder(v15);
+    BSOcclusionPlane* angle = spoccluder.m_pObject;
+    ShadowSceneNode* v12 = BSShaderManager::GetShadowSceneNode(0);
+    BSPortalGraph* v13 = v12->GetPortalGraph();
+    v13->AddOccluder(angle);
+    return true;
 }
 
 bool Script::SetGlobalRadialBlur(
@@ -19422,21 +19165,18 @@ bool Script::SetLightingPassesFunction(
         passes = 1;
         BSShaderManager::SetDebugMode(BSShaderManager::BSSM_RENDER_NUMLIGHTS);
     LABEL_55:;
-        if (++pcurrent) {
-            if (*pcurrent == 49) {
-                passes |= 2u;
-            }
+        if ((++pcurrent) && (*pcurrent == 49)) {
+            passes |= 2u;
         }
-        if (++pcurrent) {
-            if (*pcurrent == 49) {
-                passes |= 4u;
-            }
+
+        if ((++pcurrent) && (*pcurrent == 49)) {
+            passes |= 4u;
         }
-        if (++pcurrent) {
-            if (*pcurrent == 49) {
-                passes |= 8u;
-            }
+
+        if ((++pcurrent) && (*pcurrent == 49)) {
+            passes |= 8u;
         }
+
         if (BSShaderManager::GetShaderLevel(false) >= BSShaderManager::BSSM_SV_2_0 &&
             (!++pcurrent || *pcurrent != 48)) {
             passes |= 32u;
@@ -19518,34 +19258,33 @@ bool Script::SetLightingPassesFunction(
         }
         return true;
     }
-    else {
-        if (*pcurrent == 116) {
-            BSShaderManager::iMaxLandTextures = std::atoi(pcurrent + 1);
-            goto LABEL_55;
-        }
-        if (_strnicmp("dsh", pcurrent, 3u)) {
-            if (!_strnicmp("opt", pcurrent, 3u)) {
-                BSShaderManager::bUseOptPasses = !BSShaderManager::bUseOptPasses;
-                passes = BSShaderManager::GetEnabledPasses() | 256;
-            }
-            else {
-                if (!_strnicmp("alpha", pcurrent, 5u)) {
-                    return true;
-                }
-            }
-            goto LABEL_55;
-        }
-        if (apRefObject) {
-            ShadowSceneNode* pssn = BSShaderManager::GetShadowSceneNode(0);
-            for (ShadowSceneLight* pssl = pssn->GetFirstShadowLight(); pssl; pssl = pssn->GetNextShadowLight()) {
-                NiNode* pShadowScene = static_cast<NiNode*>(pssl->GetShadowScene());
-                if (pShadowScene == apRefObject->Get3D()) {
-                    pssl->ShowDebugTexture(!pssl->bShowDebugTexture);
-                }
-            }
-        }
-        return true;
+
+    if (*pcurrent == 116) {
+        BSShaderManager::iMaxLandTextures = std::atoi(pcurrent + 1);
+        goto LABEL_55;
     }
+    if (_strnicmp("dsh", pcurrent, 3u)) {
+        if (!_strnicmp("opt", pcurrent, 3u)) {
+            BSShaderManager::bUseOptPasses = !BSShaderManager::bUseOptPasses;
+            passes = BSShaderManager::GetEnabledPasses() | 256;
+        }
+        else {
+            if (!_strnicmp("alpha", pcurrent, 5u)) {
+                return true;
+            }
+        }
+        goto LABEL_55;
+    }
+    if (apRefObject) {
+        ShadowSceneNode* pssn = BSShaderManager::GetShadowSceneNode(0);
+        for (ShadowSceneLight* pssl = pssn->GetFirstShadowLight(); pssl; pssl = pssn->GetNextShadowLight()) {
+            NiNode* pShadowScene = static_cast<NiNode*>(pssl->GetShadowScene());
+            if (pShadowScene == apRefObject->Get3D()) {
+                pssl->ShowDebugTexture(!pssl->bShowDebugTexture);
+            }
+        }
+    }
+    return true;
 }
 
 bool Script::SetFogDepthFunction(
@@ -19781,22 +19520,21 @@ bool Script::SetAngleFunction(
         }
         return true;
     }
-    else {
-        if (GetThreadTLSData()->bSystemOutput) {
-            Interface::PrintLine("%s cannot be moved.", apRefObject->GetFormEditorID());
-        }
-        uint32_t CastingType = apScript->iFormID;
-        if (!pDataHandler->IsFormIDCreated(CastingType)) {
-            int32_t afValue_4 = apRefObject->iFormID;
-            const char* afValue = apRefObject->GetFormEditorID();
-            int32_t v10 = apScript->iFormID;
-            Warning(
-                "SCRIPTS: Script '%s' (%08X) is attempting to move reference '%s' (%08X), but it cannot be moved",
-                apScript->GetFormEditorID(), v10, afValue, afValue_4
-            );
-        }
-        return true;
+
+    if (GetThreadTLSData()->bSystemOutput) {
+        Interface::PrintLine("%s cannot be moved.", apRefObject->GetFormEditorID());
     }
+    uint32_t CastingType = apScript->iFormID;
+    if (!pDataHandler->IsFormIDCreated(CastingType)) {
+        int32_t afValue_4 = apRefObject->iFormID;
+        const char* afValue = apRefObject->GetFormEditorID();
+        int32_t v10 = apScript->iFormID;
+        Warning(
+            "SCRIPTS: Script '%s' (%08X) is attempting to move reference '%s' (%08X), but it cannot be moved",
+            apScript->GetFormEditorID(), v10, afValue, afValue_4
+        );
+    }
+    return true;
 }
 
 bool Script::PlayGroupFunction(
@@ -19939,12 +19677,11 @@ bool Script::LoopGroupFunction(
         )) {
         return false;
     }
-    if (apRefObject) {
-        if (apRefObject->GetAnimation()) {
-            apRefObject->GetAnimation()->PlayGroup(static_cast<uint16_t>(eAnimGroup), eFlags, iLoops, AGS_NONE);
-            apRefObject->SetAltered(true);
-        }
+    if ((apRefObject) && (apRefObject->GetAnimation())) {
+        apRefObject->GetAnimation()->PlayGroup(static_cast<uint16_t>(eAnimGroup), eFlags, iLoops, AGS_NONE);
+        apRefObject->SetAltered(true);
     }
+
     return true;
 }
 
@@ -19994,31 +19731,25 @@ bool Script::IsAnimPlayingFunction(
             else {
                 pnode = nullptr;
             }
-            if (pnode) {
-                if (pnode->GetControllers()) {
-                    NiObject* po = (NiObject*)pnode->GetControllers();
-                    NiControllerManager* pmanager = po->IsNiControllerManager();
-                    if (pmanager) {
-                        if (uiGroup[0] == 255) {
-                            for (int32_t n_2 = 0; n_2 < pmanager->GetSequenceCount(); ++n_2) {
-                                NiControllerSequence* pseq = pmanager->GetSequenceAt(static_cast<uint32_t>(n_2));
-                                if (pseq) {
-                                    if (pseq->GetState()) {
-                                        afReturnValue = 1.0;
-                                    }
-                                }
+            if ((pnode) && (pnode->GetControllers())) {
+                NiObject* po = (NiObject*)pnode->GetControllers();
+                NiControllerManager* pmanager = po->IsNiControllerManager();
+                if (pmanager) {
+                    if (uiGroup[0] == 255) {
+                        for (int32_t n_2 = 0; n_2 < pmanager->GetSequenceCount(); ++n_2) {
+                            NiControllerSequence* pseq = pmanager->GetSequenceAt(static_cast<uint32_t>(n_2));
+                            if ((pseq) && (pseq->GetState())) {
+                                afReturnValue = 1.0;
                             }
                         }
-                        else {
-                            NiFixedString* a2 =
-                                ::new (static_cast<void*>(&apString)) NiFixedString(animGroupInfo[uiGroup[0]].pName);
-                            NiControllerSequence* pseq_2 = pmanager->GetSequenceByName(*a2);
-                            apString.~NiFixedString();
-                            if (pseq_2) {
-                                if (pseq_2->GetState()) {
-                                    afReturnValue = 1.0;
-                                }
-                            }
+                    }
+                    else {
+                        NiFixedString* a2 =
+                            ::new (static_cast<void*>(&apString)) NiFixedString(animGroupInfo[uiGroup[0]].pName);
+                        NiControllerSequence* pseq_2 = pmanager->GetSequenceByName(*a2);
+                        apString.~NiFixedString();
+                        if ((pseq_2) && (pseq_2->GetState())) {
+                            afReturnValue = 1.0;
                         }
                     }
                 }
@@ -20050,47 +19781,45 @@ bool Script::StartCombatFunction(
     }
     if (apRefObject) {
         Actor* pAttacker = dynamic_cast<Actor*>(apRefObject);
-        if (pAttacker) {
-            if (!pAttacker->IsDead(false) &&
-                (pTarget && (!pTarget->IsDead(false) && (pAttacker->pCurrentProcess && pTarget->pCurrentProcess)))) {
-                CombatController* v9;
-                Actor* v11;
-                if (pAttacker->IsinDialogue() && pTarget != pPlayer) {
-                    Warning(
-                        "COMBAT: %s is in conversation so will not go into combat. Do not put startcombat in the "
-                        "dialogue results",
-                        pAttacker->GetFullName()
-                    );
-                    return true;
-                }
-                if (pTarget == pPlayer && pPlayer->IsSleepingorResting()) {
-                    pPlayer->SetSleeping(0, true);
-                    ReferenceProcessLists.RemoveActorFromTempChangeList(pAttacker);
-                }
-                bool bagressor = !pAttacker->IsActoraGuard();
-                if (!pAttacker->IsInCombat() ||
-                    (pAttacker->GetCombatController() &&
-                     (v11 = pTarget, (v9 = pAttacker->GetCombatController(), !v9->IsActoraCombatTarget(v11))))) {
-                    if (pAttacker->pCurrentProcess) {
-                        BaseProcess* pProcess = pAttacker->pCurrentProcess;
-                        pProcess->EnterCombat(
-                            pAttacker, pTarget, true, true, nullptr, false, false, bagressor, 0, true, false, true,
-                            nullptr
-                        );
-                    }
-                }
-                if (!bagressor) {
-                    pPlayer->SetPlayerResistingArrest(true);
-                    BaseProcess* CurrentAIProcess = pAttacker->pCurrentProcess;
-                    CurrentAIProcess->GuardCallforHelp(pAttacker, pTarget);
-                }
-                if (pAttacker->GetCombatController()) {
-                    BaseProcess* v13 = pAttacker->pCurrentProcess;
-                    if (v13->GetCurrentPackageSpell()) {
-                        BaseProcess* v12 = pAttacker->pCurrentProcess;
-                        MagicItem* v10 = v12->GetCurrentPackageSpell();
-                        pAttacker->CastSpell(v10, pAttacker, false);
-                    }
+        if ((pAttacker) &&
+            (!pAttacker->IsDead(false) &&
+             (pTarget && (!pTarget->IsDead(false) && (pAttacker->pCurrentProcess && pTarget->pCurrentProcess))))) {
+            CombatController* v9;
+            Actor* v11;
+            if (pAttacker->IsinDialogue() && pTarget != pPlayer) {
+                Warning(
+                    "COMBAT: %s is in conversation so will not go into combat. Do not put startcombat in the "
+                    "dialogue results",
+                    pAttacker->GetFullName()
+                );
+                return true;
+            }
+            if (pTarget == pPlayer && pPlayer->IsSleepingorResting()) {
+                pPlayer->SetSleeping(0, true);
+                ReferenceProcessLists.RemoveActorFromTempChangeList(pAttacker);
+            }
+            bool bagressor = !pAttacker->IsActoraGuard();
+            if ((!pAttacker->IsInCombat() ||
+                 (pAttacker->GetCombatController() &&
+                  (v11 = pTarget, (v9 = pAttacker->GetCombatController(), !v9->IsActoraCombatTarget(v11))))) &&
+                (pAttacker->pCurrentProcess)) {
+                BaseProcess* pProcess = pAttacker->pCurrentProcess;
+                pProcess->EnterCombat(
+                    pAttacker, pTarget, true, true, nullptr, false, false, bagressor, 0, true, false, true, nullptr
+                );
+            }
+
+            if (!bagressor) {
+                pPlayer->SetPlayerResistingArrest(true);
+                BaseProcess* CurrentAIProcess = pAttacker->pCurrentProcess;
+                CurrentAIProcess->GuardCallforHelp(pAttacker, pTarget);
+            }
+            if (pAttacker->GetCombatController()) {
+                BaseProcess* v13 = pAttacker->pCurrentProcess;
+                if (v13->GetCurrentPackageSpell()) {
+                    BaseProcess* v12 = pAttacker->pCurrentProcess;
+                    MagicItem* v10 = v12->GetCurrentPackageSpell();
+                    pAttacker->CastSpell(v10, pAttacker, false);
                 }
             }
         }
@@ -20530,78 +20259,74 @@ bool Script::ShowAnim(
     double& afReturnValue,
     uint32_t& auiOffset
 ) {
-    if (apRefObject) {
-        if (apRefObject->GetAnimation()) {
-            if (apRefObject->IsActor()) {
-                Actor* pActor = dynamic_cast<Actor*>(apRefObject);
-                if (pActor) {
-                    const char* v20;
-                    Interface::PrintLine("--- Actor Variables -----------------------------");
-                    if (pActor->GetCurrentProcessType() != PROCESS_TYPE_NONE) {
-                        Interface::PrintLine("Process Level: %s", pProcessTypeString[pActor->GetCurrentProcessType()]);
-                    }
-                    BaseProcess* CurrentAIProcess = pActor->pCurrentProcess;
-                    BaseProcess* v23 = pActor->pCurrentProcess;
-                    int32_t v14 = CurrentAIProcess->GetWeaponDrawn();
-                    Interface::PrintLine("Wants Weapon Drawn %d, Weapon Drawn %d", v23->GetWantWeaponDrawn(), v14);
-                    if (pActor->GetAnimAction() != ANIM_ACTION_NONE) {
-                        Interface::PrintLine("Animation Action: %s", pAnimationActionStrings[pActor->GetAnimAction()]);
-                    }
-                    Interface::PrintLine("Life State: %s", LifeStateString[pActor->GetLifeState()]);
-                    BaseProcess* v22 = pActor->pCurrentProcess;
-                    Interface::PrintLine("Sit/Sleep State: %s", SleepStateString[v22->GetSitSleepState()]);
-                    BaseProcess* v21 = pActor->pCurrentProcess;
-                    Interface::PrintLine("Knock State: %s", KnockStateString[v21->GetKnockState()]);
-                    if (pActor->HasRagDoll()) {
-                        v20 = "Yes";
-                    }
-                    else {
-                        v20 = "No";
-                    }
-                    Interface::PrintLine("Has RagDoll: %s", v20);
-                    if (pActor->IsInCombat()) {
-                        if (pActor->GetCombatTarget()) {
-                            Actor* v8 = pActor->GetCombatTarget();
-                            int32_t CastingType = v8->iFormID;
-                            Actor* v9 = pActor->GetCombatTarget();
-                            Interface::PrintLine("In Combat with \"%s\" (%08x)", v9->GetFullName(), CastingType);
-                        }
-                    }
-                    if (pActor->GetCurrentPackageTarget()) {
-                        TESObjectREFR* CurrentPackageTarget = pActor->GetCurrentPackageTarget();
-                        int32_t v16 = CurrentPackageTarget->iFormID;
-                        TESObjectREFR* v11 = pActor->GetCurrentPackageTarget();
-                        Interface::PrintLine("Current package target \"%s\" (%08x)", v11->GetFullName(), v16);
-                    }
+    if ((apRefObject) && (apRefObject->GetAnimation()) && (apRefObject->IsActor())) {
+        Actor* pActor = dynamic_cast<Actor*>(apRefObject);
+        if (pActor) {
+            const char* v20;
+            Interface::PrintLine("--- Actor Variables -----------------------------");
+            if (pActor->GetCurrentProcessType() != PROCESS_TYPE_NONE) {
+                Interface::PrintLine("Process Level: %s", pProcessTypeString[pActor->GetCurrentProcessType()]);
+            }
+            BaseProcess* CurrentAIProcess = pActor->pCurrentProcess;
+            BaseProcess* v23 = pActor->pCurrentProcess;
+            int32_t v14 = CurrentAIProcess->GetWeaponDrawn();
+            Interface::PrintLine("Wants Weapon Drawn %d, Weapon Drawn %d", v23->GetWantWeaponDrawn(), v14);
+            if (pActor->GetAnimAction() != ANIM_ACTION_NONE) {
+                Interface::PrintLine("Animation Action: %s", pAnimationActionStrings[pActor->GetAnimAction()]);
+            }
+            Interface::PrintLine("Life State: %s", LifeStateString[pActor->GetLifeState()]);
+            BaseProcess* v22 = pActor->pCurrentProcess;
+            Interface::PrintLine("Sit/Sleep State: %s", SleepStateString[v22->GetSitSleepState()]);
+            BaseProcess* v21 = pActor->pCurrentProcess;
+            Interface::PrintLine("Knock State: %s", KnockStateString[v21->GetKnockState()]);
+            if (pActor->HasRagDoll()) {
+                v20 = "Yes";
+            }
+            else {
+                v20 = "No";
+            }
+            Interface::PrintLine("Has RagDoll: %s", v20);
+            if ((pActor->IsInCombat()) && (pActor->GetCombatTarget())) {
+                Actor* v8 = pActor->GetCombatTarget();
+                int32_t CastingType = v8->iFormID;
+                Actor* v9 = pActor->GetCombatTarget();
+                Interface::PrintLine("In Combat with \"%s\" (%08x)", v9->GetFullName(), CastingType);
+            }
+
+            if (pActor->GetCurrentPackageTarget()) {
+                TESObjectREFR* CurrentPackageTarget = pActor->GetCurrentPackageTarget();
+                int32_t v16 = CurrentPackageTarget->iFormID;
+                TESObjectREFR* v11 = pActor->GetCurrentPackageTarget();
+                Interface::PrintLine("Current package target \"%s\" (%08x)", v11->GetFullName(), v16);
+            }
+        }
+        Animation* pAnimation = apRefObject->GetAnimation();
+        if (pAnimation) {
+            Interface::PrintLine("--- Animation -------------------------------");
+            Interface::PrintLine("Anims Loading: %d", pAnimation->GetAnimsLoadingCount());
+            for (ANIM_GROUP_SECTION eSection = AGS_IDLE; eSection < ANIM_GROUP_SECTION_COUNT;
+                 eSection = static_cast<ANIM_GROUP_SECTION>(eSection + 1)) {
+                if (pAnimation->GetCurrentSequence(eSection)) {
+                    uint16_t eGroup = pAnimation->GetGroup(eSection);
+                    const char* pName = animGroupInfo[TESAnimGroup::GetType(eGroup)].pName;
+                    const char* v13 = animWeaponInfo[TESAnimGroup::GetWeapon(eGroup)];
+                    Interface::PrintLine(
+                        "%s -> %s/%s/%s", animGroupSectionNames[eSection], animMoveInfo[TESAnimGroup::GetMove(eGroup)],
+                        v13, pName
+                    );
                 }
-                Animation* pAnimation = apRefObject->GetAnimation();
-                if (pAnimation) {
-                    Interface::PrintLine("--- Animation -------------------------------");
-                    Interface::PrintLine("Anims Loading: %d", pAnimation->GetAnimsLoadingCount());
-                    for (ANIM_GROUP_SECTION eSection = AGS_IDLE; eSection < ANIM_GROUP_SECTION_COUNT;
-                         eSection = static_cast<ANIM_GROUP_SECTION>(eSection + 1)) {
-                        if (pAnimation->GetCurrentSequence(eSection)) {
-                            uint16_t eGroup = pAnimation->GetGroup(eSection);
-                            const char* pName = animGroupInfo[TESAnimGroup::GetType(eGroup)].pName;
-                            const char* v13 = animWeaponInfo[TESAnimGroup::GetWeapon(eGroup)];
-                            Interface::PrintLine(
-                                "%s -> %s/%s/%s", animGroupSectionNames[eSection],
-                                animMoveInfo[TESAnimGroup::GetMove(eGroup)], v13, pName
-                            );
-                        }
-                    }
-                    if (pAnimation->spAnimIdle.m_pObject) {
-                        TESIdleForm* IdleForm = pAnimation->spAnimIdle.m_pObject->pIdleForm;
-                        Interface::PrintLine("IdleAnim: %s", IdleForm->GetFormEditorID());
-                    }
-                    if (pAnimation->spAnimIdleQueued.m_pObject) {
-                        TESIdleForm* v18 = pAnimation->spAnimIdleQueued.m_pObject->pIdleForm;
-                        Interface::PrintLine("IdleAnim Queued: %s", v18->GetFormEditorID());
-                    }
-                }
+            }
+            if (pAnimation->spAnimIdle.m_pObject) {
+                TESIdleForm* IdleForm = pAnimation->spAnimIdle.m_pObject->pIdleForm;
+                Interface::PrintLine("IdleAnim: %s", IdleForm->GetFormEditorID());
+            }
+            if (pAnimation->spAnimIdleQueued.m_pObject) {
+                TESIdleForm* v18 = pAnimation->spAnimIdleQueued.m_pObject->pIdleForm;
+                Interface::PrintLine("IdleAnim Queued: %s", v18->GetFormEditorID());
             }
         }
     }
+
     return true;
 }
 
@@ -20642,11 +20367,10 @@ bool Script::EnableFunction(
         else {
             pfade = nullptr;
         }
-        if (pfade) {
-            if (pfade->GetMultType() == LOD_MULT_INVISIBLE) {
-                pfade->eMultType = TES::GetLODMult(apRefObject->GetObjectReference());
-            }
+        if ((pfade) && (pfade->GetMultType() == LOD_MULT_INVISIBLE)) {
+            pfade->eMultType = TES::GetLODMult(apRefObject->GetObjectReference());
         }
+
         if (apRefObject->GetIsInvisibleLODMultType()) {
             apRefObject->SetIsInvisibleLODMultType(false);
         }
@@ -20874,11 +20598,10 @@ bool Script::SexChange(
         return false;
     }
     Character* pactor = (Character*)pPlayer;
-    if (apRefObject) {
-        if (apRefObject->IsNpc()) {
-            pactor = static_cast<Character*>(apRefObject);
-        }
+    if ((apRefObject) && (apRefObject->IsNpc())) {
+        pactor = static_cast<Character*>(apRefObject);
     }
+
     if (pactor) {
         TESActorBase::SEX Sex = pactor->GetSex();
         if (Sex == isex) {
@@ -20902,17 +20625,16 @@ bool Script::SexChange(
             }
         }
         pnpc->SetFlagBit(1, esex == TESActorBase::SEX_FEMALE, true);
-        if (pactor->IsPc()) {
-            if (iuseDefaultPreset) {
-                using presets_t = BSSimpleArray<TESNPC*, 1024>;
-                presets_t presets;
-                TESActorBase::SEX v11 = pnpc->GetSex();
-                TESRace* Race = pnpc->GetRace();
-                TESNPC::FillCharGenPresetList(Race, v11, &presets);
-                TESNPC* v13 = presets.GetAt(0);
-                pnpc->CopyHeadData(v13);
-            }
+        if ((pactor->IsPc()) && (iuseDefaultPreset)) {
+            using presets_t = BSSimpleArray<TESNPC*, 1024>;
+            presets_t presets;
+            TESActorBase::SEX v11 = pnpc->GetSex();
+            TESRace* Race = pnpc->GetRace();
+            TESNPC::FillCharGenPresetList(Race, v11, &presets);
+            TESNPC* v13 = presets.GetAt(0);
+            pnpc->CopyHeadData(v13);
         }
+
         pactor->Reset3D();
         if (GetThreadTLSData()->bSystemOutput) {
             BSStringT<char> message;
@@ -20999,11 +20721,10 @@ bool Script::SetStage(
         )) {
         return false;
     }
-    if (a8) {
-        if (a8->SetStageDone(v9)) {
-            afReturnValue = 1.0;
-        }
+    if ((a8) && (a8->SetStageDone(v9))) {
+        afReturnValue = 1.0;
     }
+
     return true;
 }
 
@@ -21477,11 +21198,10 @@ bool Script::SetFactionRank(
         return true;
     }
     TESActorBase* pactorbase = pact->GetActorBase();
-    if (pact) {
-        if (pFaction) {
-            pact->SetFactionRank(pFaction, iRank);
-        }
+    if ((pact) && (pFaction)) {
+        pact->SetFactionRank(pFaction, iRank);
     }
+
     return true;
 }
 
@@ -21551,25 +21271,24 @@ bool Script::ShowMap(
         )) {
         return false;
     }
-    if (a8) {
-        if (a8->GetMapMarkerData()) {
-            MapMarkerData* MapMarkerData_ = a8->GetMapMarkerData();
-            if (!MapMarkerData_->GetVisible()) {
+    if ((a8) && (a8->GetMapMarkerData())) {
+        MapMarkerData* MapMarkerData_ = a8->GetMapMarkerData();
+        if (!MapMarkerData_->GetVisible()) {
+            v16 = 1;
+        }
+        MapMarkerData* v10 = a8->GetMapMarkerData();
+        v10->SetIsVisible(1);
+        a8->AddChange(CHANGE_REFR_EXTRA_GAME_ONLY);
+        if (v15) {
+            MapMarkerData* v11 = a8->GetMapMarkerData();
+            if (!v11->GetTravelLoc()) {
                 v16 = 1;
             }
-            MapMarkerData* v10 = a8->GetMapMarkerData();
-            v10->SetIsVisible(1);
-            a8->AddChange(CHANGE_REFR_EXTRA_GAME_ONLY);
-            if (v15) {
-                MapMarkerData* v11 = a8->GetMapMarkerData();
-                if (!v11->GetTravelLoc()) {
-                    v16 = 1;
-                }
-                MapMarkerData* v12 = a8->GetMapMarkerData();
-                v12->SetTravelLoc(true);
-            }
+            MapMarkerData* v12 = a8->GetMapMarkerData();
+            v12->SetTravelLoc(true);
         }
     }
+
     if (v16) {
         const char* v13 = sMapMarkerAdded.String();
         Interface::ShowMessage(
@@ -22210,45 +21929,44 @@ bool Script::StopWaitingFunction(
         return false;
     }
     Actor* pActor = dynamic_cast<Actor*>(apRefObject);
-    if (pActor) {
-        if (pPackage) {
-            TESPackage* PackageExtra;
-            TESPackage* ActiveStablePackage = pActor->GetPackageSetAsPcurrent();
-            if (ActiveStablePackage == pPackage ||
-                (PackageExtra = (&pActor->m_Extra)->GetPackageExtra(), PackageExtra == pPackage)) {
-                if (pPackage->GetPackType() == PACKAGE_TYPE_ESCORT) {
-                    pPackage->SetWaiting(false);
-                    BaseProcess* CurrentAIProcess = pActor->pCurrentProcess;
-                    CurrentAIProcess->SetProcedureIndexRunning(3);
-                }
-                else {
-                    if (pPackage->GetPackType() == PACKAGE_TYPE_ACCOMPANY ||
-                        pPackage->GetPackType() == PACKAGE_TYPE_FOLLOW) {
-                        int32_t NumberOfFollowers;
-                        BaseProcess* v15 = pActor->pCurrentProcess;
-                        TESObjectREFR* v11 = v15->GetTarget();
-                        if (dynamic_cast<Actor*>(v11) != pPlayer ||
-                            (pPlayer->IsPlayerFollower(pActor) ||
-                             (NumberOfFollowers = pPlayer->GetNumberOfFollowers(),
-                              NumberOfFollowers <= iNumberActorsAllowedToFollowPlayer.Int()))) {
-                            pPackage->SetWaiting(false);
-                        }
-                        else {
-                            const char* v13 = sNoMoreFollowers.String();
-                            Interface::ShowMessage(v13, 0, nullptr, nullptr, 2.0f, false);
-                        }
-                    }
-                    else {
-                        Warning("PACKAGES: Package %s is not a follow or an escort. ", pPackage->GetFormEditorID());
-                    }
-                }
+    if ((pActor) && (pPackage)) {
+        TESPackage* PackageExtra;
+        TESPackage* ActiveStablePackage = pActor->GetPackageSetAsPcurrent();
+        if (ActiveStablePackage == pPackage ||
+            (PackageExtra = (&pActor->m_Extra)->GetPackageExtra(), PackageExtra == pPackage)) {
+            if (pPackage->GetPackType() == PACKAGE_TYPE_ESCORT) {
+                pPackage->SetWaiting(false);
+                BaseProcess* CurrentAIProcess = pActor->pCurrentProcess;
+                CurrentAIProcess->SetProcedureIndexRunning(3);
             }
             else {
-                const char* FullName = pActor->GetFullName();
-                Warning("PACKAGES: Package %s is not  %s current package", pPackage->GetFormEditorID(), FullName);
+                if (pPackage->GetPackType() == PACKAGE_TYPE_ACCOMPANY ||
+                    pPackage->GetPackType() == PACKAGE_TYPE_FOLLOW) {
+                    int32_t NumberOfFollowers;
+                    BaseProcess* v15 = pActor->pCurrentProcess;
+                    TESObjectREFR* v11 = v15->GetTarget();
+                    if (dynamic_cast<Actor*>(v11) != pPlayer ||
+                        (pPlayer->IsPlayerFollower(pActor) ||
+                         (NumberOfFollowers = pPlayer->GetNumberOfFollowers(),
+                          NumberOfFollowers <= iNumberActorsAllowedToFollowPlayer.Int()))) {
+                        pPackage->SetWaiting(false);
+                    }
+                    else {
+                        const char* v13 = sNoMoreFollowers.String();
+                        Interface::ShowMessage(v13, 0, nullptr, nullptr, 2.0f, false);
+                    }
+                }
+                else {
+                    Warning("PACKAGES: Package %s is not a follow or an escort. ", pPackage->GetFormEditorID());
+                }
             }
         }
+        else {
+            const char* FullName = pActor->GetFullName();
+            Warning("PACKAGES: Package %s is not  %s current package", pPackage->GetFormEditorID(), FullName);
+        }
     }
+
     return true;
 }
 
@@ -22511,9 +22229,8 @@ bool Script::SwapTextureOnRef(
         }
         return true;
     }
-    else {
-        return false;
-    }
+
+    return false;
 }
 
 bool Script::SetUnconsciousFunction(
@@ -22538,14 +22255,13 @@ bool Script::SetUnconsciousFunction(
         if (pactor) {
             if (a8) {
                 pactor->StopCombat(nullptr);
-                if (!pactor->IsUnConscious()) {
-                    if (pactor->pCurrentProcess) {
-                        BaseProcess* CurrentAIProcess = pactor->pCurrentProcess;
-                        CurrentAIProcess->AddPostAnimationAction(BaseProcess::POSTANIM_FREEUP_SPECIAL_IDLE);
-                        BaseProcess* v12 = pactor->pCurrentProcess;
-                        v12->SetCurrentProcessIdle(nullptr);
-                    }
+                if ((!pactor->IsUnConscious()) && (pactor->pCurrentProcess)) {
+                    BaseProcess* CurrentAIProcess = pactor->pCurrentProcess;
+                    CurrentAIProcess->AddPostAnimationAction(BaseProcess::POSTANIM_FREEUP_SPECIAL_IDLE);
+                    BaseProcess* v12 = pactor->pCurrentProcess;
+                    v12->SetCurrentProcessIdle(nullptr);
                 }
+
                 pactor->SetUnConscious(true);
                 pactor->EndMovement();
                 if (pactor->pCurrentProcess) {
@@ -22554,14 +22270,13 @@ bool Script::SetUnconsciousFunction(
                 }
             }
             else {
-                if (pactor->IsUnConscious()) {
-                    if (pactor->pCurrentProcess) {
-                        BaseProcess* v10 = pactor->pCurrentProcess;
-                        v10->AddPostAnimationAction(BaseProcess::POSTANIM_FREEUP_SPECIAL_IDLE);
-                        BaseProcess* v9 = pactor->pCurrentProcess;
-                        v9->SetCurrentProcessIdle(nullptr);
-                    }
+                if ((pactor->IsUnConscious()) && (pactor->pCurrentProcess)) {
+                    BaseProcess* v10 = pactor->pCurrentProcess;
+                    v10->AddPostAnimationAction(BaseProcess::POSTANIM_FREEUP_SPECIAL_IDLE);
+                    BaseProcess* v9 = pactor->pCurrentProcess;
+                    v9->SetCurrentProcessIdle(nullptr);
                 }
+
                 pactor->SetUnConscious(false);
             }
         }
@@ -22876,12 +22591,11 @@ bool Script::SendCrimeAlarmFunction(
         return false;
     }
     Actor* pSender = dynamic_cast<Actor*>(apRefObject);
-    if (a8) {
-        if (pSender) {
-            TESBoundObject* ObjectReference = pSender->GetObjectReference();
-            a8->TrespassAlarm(pSender, ObjectReference, -1);
-        }
+    if ((a8) && (pSender)) {
+        TESBoundObject* ObjectReference = pSender->GetObjectReference();
+        a8->TrespassAlarm(pSender, ObjectReference, -1);
     }
+
     return true;
 }
 
@@ -22929,34 +22643,31 @@ bool Script::ForceGroupStrategy(
                 }
                 return true;
             }
-            else {
-                Interface::PrintLine("The combat group has only one member");
-                return true;
-            }
-        }
-        else {
-            const char* FullName;
-            if (apRefObject->GetFormEditorIDLength()) {
-                FullName = apRefObject->GetFormEditorID();
-            }
-            else {
-                FullName = apRefObject->GetFullName();
-            }
-            Interface::PrintLine("%s is not in combat", FullName);
+
+            Interface::PrintLine("The combat group has only one member");
             return true;
         }
-    }
-    else {
-        const char* v10;
+
+        const char* FullName;
         if (apRefObject->GetFormEditorIDLength()) {
-            v10 = apRefObject->GetFormEditorID();
+            FullName = apRefObject->GetFormEditorID();
         }
         else {
-            v10 = apRefObject->GetFullName();
+            FullName = apRefObject->GetFullName();
         }
-        Interface::PrintLine("%s is not an actor", v10);
+        Interface::PrintLine("%s is not in combat", FullName);
         return true;
     }
+
+    const char* v10;
+    if (apRefObject->GetFormEditorIDLength()) {
+        v10 = apRefObject->GetFormEditorID();
+    }
+    else {
+        v10 = apRefObject->GetFullName();
+    }
+    Interface::PrintLine("%s is not an actor", v10);
+    return true;
 }
 
 bool Script::PushActorAwayFunction(
@@ -23249,14 +22960,13 @@ bool Script::MarkForDelete(
     double& afReturnValue,
     uint32_t& auiOffset
 ) {
-    if (apRefObject) {
-        if (!apRefObject->GetDelete() && apRefObject != pPlayer) {
-            apRefObject->SetDelete(true);
-            if (!apRefObject->GetFile(0)) {
-                Script::ReferencesToDelete.AddHead(apRefObject);
-            }
+    if ((apRefObject) && (!apRefObject->GetDelete() && apRefObject != pPlayer)) {
+        apRefObject->SetDelete(true);
+        if (!apRefObject->GetFile(0)) {
+            Script::ReferencesToDelete.AddHead(apRefObject);
         }
     }
+
     return true;
 }
 
@@ -23360,67 +23070,63 @@ bool Script::PlaceLeveledActorAtMeFunction(
         )) {
         return false;
     }
-    if (a8) {
-        if (a8->IsActorBase()) {
-            if (apRefObject) {
-                TESActorBase* pbase = a8;
-                Actor* pplacedref = nullptr;
-                int32_t FormType = a8->GetFormType();
-                if (FormType == 42) {
-                    Actor* pplacedref_2;
-                    Character* apMemory = static_cast<Character*>(ourMalloc(sizeof(Character)));
-                    if (apMemory) {
-                        pplacedref_2 = ::new (apMemory) Character;
-                    }
-                    else {
-                        pplacedref_2 = nullptr;
-                    }
-                    pplacedref = pplacedref_2;
+    if ((a8) && (a8->IsActorBase()) && (apRefObject)) {
+        TESActorBase* pbase = a8;
+        Actor* pplacedref = nullptr;
+        int32_t FormType = a8->GetFormType();
+        if (FormType == 42) {
+            Actor* pplacedref_2;
+            Character* apMemory = static_cast<Character*>(ourMalloc(sizeof(Character)));
+            if (apMemory) {
+                pplacedref_2 = ::new (apMemory) Character;
+            }
+            else {
+                pplacedref_2 = nullptr;
+            }
+            pplacedref = pplacedref_2;
+        }
+        else {
+            if (FormType == 43) {
+                Actor* pplacedref_3;
+                Creature* v15 = static_cast<Creature*>(ourMalloc(sizeof(Creature)));
+                if (v15) {
+                    pplacedref_3 = ::new (v15) Creature;
                 }
                 else {
-                    if (FormType == 43) {
-                        Actor* pplacedref_3;
-                        Creature* v15 = static_cast<Creature*>(ourMalloc(sizeof(Creature)));
-                        if (v15) {
-                            pplacedref_3 = ::new (v15) Creature;
-                        }
-                        else {
-                            pplacedref_3 = nullptr;
-                        }
-                        pplacedref = pplacedref_3;
-                    }
+                    pplacedref_3 = nullptr;
                 }
-                if (pplacedref) {
-                    if (pforcezone) {
-                        pplacedref->SetEncounterZone(pforcezone);
-                    }
-                    (&pplacedref->m_Extra)->SetLevCreaModifier(aiVal);
-                    pplacedref->AddChange(CHANGE_REFR_EXTRA_CREATED_ONLY);
-                    pplacedref->SetParentCell(apRefObject->GetParentCell());
-                    pplacedref->SetObjectReference(pbase);
-                    if (pbase->GetUsesLeveledTemplate()) {
-                        pbase->CalcTemplateForRef(pplacedref);
-                    }
-                    TESObjectCELL* pint_2 = apRefObject->GetParentCell();
-                    if (pint_2) {
-                        if (!pint_2->GetInterior()) {
-                            pint_2 = nullptr;
-                        }
-                    }
-                    TESWorldSpace* pworld = apRefObject->GetWorldSpace();
-                    const NiPoint3* AngleOnReference = &apRefObject->GetAngleOnReference();
-                    const NiPoint3* v10 = &apRefObject->GetLocationOnReference();
-                    TESBoundObject* ObjectReference = pplacedref->GetObjectReference();
-                    pDataHandler->CreateReferenceAtLocation(
-                        ObjectReference, *v10, *AngleOnReference, pint_2, pworld, pplacedref, nullptr, nullptr
-                    );
-                    pplacedref->SetStillLoading(false);
-                    uint32_t iid = pplacedref->iFormID;
-                    Script::PutNumericIDInDouble(iid, afReturnValue);
-                }
+                pplacedref = pplacedref_3;
             }
         }
+        if (pplacedref) {
+            if (pforcezone) {
+                pplacedref->SetEncounterZone(pforcezone);
+            }
+            (&pplacedref->m_Extra)->SetLevCreaModifier(aiVal);
+            pplacedref->AddChange(CHANGE_REFR_EXTRA_CREATED_ONLY);
+            pplacedref->SetParentCell(apRefObject->GetParentCell());
+            pplacedref->SetObjectReference(pbase);
+            if (pbase->GetUsesLeveledTemplate()) {
+                pbase->CalcTemplateForRef(pplacedref);
+            }
+            TESObjectCELL* pint_2 = apRefObject->GetParentCell();
+            if ((pint_2) && (!pint_2->GetInterior())) {
+                pint_2 = nullptr;
+            }
+
+            TESWorldSpace* pworld = apRefObject->GetWorldSpace();
+            const NiPoint3* AngleOnReference = &apRefObject->GetAngleOnReference();
+            const NiPoint3* v10 = &apRefObject->GetLocationOnReference();
+            TESBoundObject* ObjectReference = pplacedref->GetObjectReference();
+            pDataHandler->CreateReferenceAtLocation(
+                ObjectReference, *v10, *AngleOnReference, pint_2, pworld, pplacedref, nullptr, nullptr
+            );
+            pplacedref->SetStillLoading(false);
+            uint32_t iid = pplacedref->iFormID;
+            Script::PutNumericIDInDouble(iid, afReturnValue);
+        }
     }
+
     return true;
 }
 
@@ -23681,35 +23387,30 @@ bool Script::MatchRaceFunction(
         )) {
         return false;
     }
-    if (pactor) {
-        if (pactor->IsNpc()) {
-            if (apRefObject) {
-                if (apRefObject->IsNpc()) {
-                    TESNPC* pnpc = static_cast<TESNPC*>(apRefObject->GetObjectReference());
-                    TESNPC* pnewnpc = static_cast<TESNPC*>(pactor->GetObjectReference());
-                    TESRace* prace = pnpc->pFormRace;
-                    TESRace* pnewrace = pnewnpc->pFormRace;
-                    if (pnewrace != prace) {
-                        uint32_t ilevel = 0;
-                        while (prace->GetYoungerRace()) {
-                            prace = prace->GetYoungerRace();
-                            ++ilevel;
-                        }
-                        while (pnewrace->GetYoungerRace()) {
-                            pnewrace = pnewrace->GetYoungerRace();
-                        }
-                        while (pnewrace->GetOlderRace() && ilevel) {
-                            pnewrace = pnewrace->GetOlderRace();
-                            --ilevel;
-                        }
-                        BSFaceGenManager::ClearBodyTexturesFromPalette(pnpc);
-                        pnpc->SwitchRace(pnewrace, nullptr);
-                        static_cast<Character*>(apRefObject)->Character::Reset3D();
-                    }
-                }
+    if ((pactor) && (pactor->IsNpc()) && (apRefObject) && (apRefObject->IsNpc())) {
+        TESNPC* pnpc = static_cast<TESNPC*>(apRefObject->GetObjectReference());
+        TESNPC* pnewnpc = static_cast<TESNPC*>(pactor->GetObjectReference());
+        TESRace* prace = pnpc->pFormRace;
+        TESRace* pnewrace = pnewnpc->pFormRace;
+        if (pnewrace != prace) {
+            uint32_t ilevel = 0;
+            while (prace->GetYoungerRace()) {
+                prace = prace->GetYoungerRace();
+                ++ilevel;
             }
+            while (pnewrace->GetYoungerRace()) {
+                pnewrace = pnewrace->GetYoungerRace();
+            }
+            while (pnewrace->GetOlderRace() && ilevel) {
+                pnewrace = pnewrace->GetOlderRace();
+                --ilevel;
+            }
+            BSFaceGenManager::ClearBodyTexturesFromPalette(pnpc);
+            pnpc->SwitchRace(pnewrace, nullptr);
+            static_cast<Character*>(apRefObject)->Character::Reset3D();
         }
     }
+
     return true;
 }
 
@@ -23854,15 +23555,13 @@ bool Script::CreateDetectionEventFunction(
             )) {
             return false;
         }
-        if (pref) {
-            if (pref->IsActor()) {
-                Actor* pactor = static_cast<Actor*>(pref);
-                if (pactor->GetCurrentAIProcess()) {
-                    BaseProcess* pProc = pactor->GetCurrentAIProcess();
-                    pProc->SetActorsDetectionEvent(
-                        pactor, apRefObject->GetLocationOnReference(), isound, ievent, apRefObject
-                    );
-                }
+        if ((pref) && (pref->IsActor())) {
+            Actor* pactor = static_cast<Actor*>(pref);
+            if (pactor->GetCurrentAIProcess()) {
+                BaseProcess* pProc = pactor->GetCurrentAIProcess();
+                pProc->SetActorsDetectionEvent(
+                    pactor, apRefObject->GetLocationOnReference(), isound, ievent, apRefObject
+                );
             }
         }
     }
@@ -23885,17 +23584,16 @@ bool Script::IgnoreCrimeFunction(
         )) {
         return false;
     }
-    if (apRefObject) {
-        if (apRefObject->IsActor()) {
-            Actor* pactor = static_cast<Actor*>(apRefObject);
-            if (iignorecrime <= 0) {
-                pactor->SetIgnoreCrime(false);
-            }
-            else {
-                pactor->SetIgnoreCrime(true);
-            }
+    if ((apRefObject) && (apRefObject->IsActor())) {
+        Actor* pactor = static_cast<Actor*>(apRefObject);
+        if (iignorecrime <= 0) {
+            pactor->SetIgnoreCrime(false);
+        }
+        else {
+            pactor->SetIgnoreCrime(true);
         }
     }
+
     return true;
 }
 
@@ -23943,95 +23641,93 @@ bool Script::AttachAshPileFunction(
         )) {
         return false;
     }
-    if (apRefObject) {
-        if (apRefObject->IsActor()) {
-            TESObjectACTI* v16;
-            NiPoint3 v31;
-            alignas(16) NiPoint3 v32;
-            NiNode* v39 = apRefObject->Get3D();
-            v38 = apRefObject->GetLocationOnReference();
-            NiPoint3 v37(0.0f, 0.0f, (&apRefObject->GetAngleOnReference())->z);
-            char v36 = 0;
-            // Static, water, terrain, ground and invisible wall.
-            uint32_t uimultiLayer = 0x8022802;
-            bhkCollisionFilter::SetMultiLayerCollision(L_CUSTOMPICK1, uimultiLayer);
-            bhkPickData v34;
-            fltr.iFilter = 0;
-            fltr.SetLayer(L_CUSTOMPICK1);
-            uint32_t NewSystemGroup = bhkCollisionFilter::GetNewSystemGroup();
-            fltr.SetGroup(NewSystemGroup);
-            v34.SetFilter(fltr);
-            v32.x = v38.x;
-            v32.y = v38.y;
-            v32.z = v38.z + 32.0;
-            v31.x = v38.x;
-            v31.y = v38.y;
-            v31.z = v38.z - 256.0;
-            v34.NiSetFrom(v32);
-            v34.NiSetTo(v31);
-            TES::pInstance->Pick(v34);
-            hkBool* v11 = v34.hasHit(&v30);
-            if (v11->operator bool()) {
-                NiPoint3 v19;
-                const hkpShape* Shape = v34.m_rootCollidable->m_shape;
-                bhkShape* v27 = bhkShape::Getbhk(Shape);
-                bool MaterialVarType = v27->GetMaterialVarType(MVT_STAIRS);
-                if (!MaterialVarType) {
-                    const hkpShape* v26 = Shape;
-                    const hkpShape* v25 = nullptr;
-                    uint32_t v24 = -1;
-                    v23.~hkLocalBuffer<char[512]>();
-                    ::new (&v23) hkLocalBuffer<char[512]>(8, nullptr);
-                    for (int32_t i = 0; i < 8; ++i) {
-                        if (v34.m_shapeKeys[i] == -1) {
-                            break;
-                        }
-                        if (v26->getType() == HK_SHAPE_MOPP && (++i >= 8 || v34.m_shapeKeys[i] == -1)) {
-                            break;
-                        }
-                        v24 = v34.m_shapeKeys[i];
-                        v25 = v26;
-                        const hkpShapeContainer* v21 = v26->getContainer();
-                        char (*v12)[512] = &v23.operator[](i);
-                        v26 = v21->getChildShape(v34.m_shapeKeys[i], *v12);
+    if ((apRefObject) && (apRefObject->IsActor())) {
+        TESObjectACTI* v16;
+        NiPoint3 v31;
+        alignas(16) NiPoint3 v32;
+        NiNode* v39 = apRefObject->Get3D();
+        v38 = apRefObject->GetLocationOnReference();
+        NiPoint3 v37(0.0f, 0.0f, (&apRefObject->GetAngleOnReference())->z);
+        char v36 = 0;
+        // Static, water, terrain, ground and invisible wall.
+        uint32_t uimultiLayer = 0x8022802;
+        bhkCollisionFilter::SetMultiLayerCollision(L_CUSTOMPICK1, uimultiLayer);
+        bhkPickData v34;
+        fltr.iFilter = 0;
+        fltr.SetLayer(L_CUSTOMPICK1);
+        uint32_t NewSystemGroup = bhkCollisionFilter::GetNewSystemGroup();
+        fltr.SetGroup(NewSystemGroup);
+        v34.SetFilter(fltr);
+        v32.x = v38.x;
+        v32.y = v38.y;
+        v32.z = v38.z + 32.0;
+        v31.x = v38.x;
+        v31.y = v38.y;
+        v31.z = v38.z - 256.0;
+        v34.NiSetFrom(v32);
+        v34.NiSetTo(v31);
+        TES::pInstance->Pick(v34);
+        hkBool* v11 = v34.hasHit(&v30);
+        if (v11->operator bool()) {
+            NiPoint3 v19;
+            const hkpShape* Shape = v34.m_rootCollidable->m_shape;
+            bhkShape* v27 = bhkShape::Getbhk(Shape);
+            bool MaterialVarType = v27->GetMaterialVarType(MVT_STAIRS);
+            if (!MaterialVarType) {
+                const hkpShape* v26 = Shape;
+                const hkpShape* v25 = nullptr;
+                uint32_t v24 = -1;
+                v23.~hkLocalBuffer<char[512]>();
+                ::new (&v23) hkLocalBuffer<char[512]>(8, nullptr);
+                for (int32_t i = 0; i < 8; ++i) {
+                    if (v34.m_shapeKeys[i] == -1) {
+                        break;
                     }
-                    bhkShape* v20 = bhkShape::Getbhk(v25);
-                    if (v20) {
-                        MaterialVarType = v20->GetSubMaterialVarType(v24, MVT_STAIRS);
+                    if (v26->getType() == HK_SHAPE_MOPP && (++i >= 8 || v34.m_shapeKeys[i] == -1)) {
+                        break;
                     }
+                    v24 = v34.m_shapeKeys[i];
+                    v25 = v26;
+                    const hkpShapeContainer* v21 = v26->getContainer();
+                    char (*v12)[512] = &v23.operator[](i);
+                    v26 = v21->getChildShape(v34.m_shapeKeys[i], *v12);
                 }
-                if (MaterialVarType) {
-                    PathingLocation v18(apRefObject);
-                    Pathing::GetNavmeshNormalForLocation(v18, v19);
+                bhkShape* v20 = bhkShape::Getbhk(v25);
+                if (v20) {
+                    MaterialVarType = v20->GetSubMaterialVarType(v24, MVT_STAIRS);
                 }
-                else {
-                    HK2NI(v19, v34.m_normal);
-                }
-                alignas(16) NiMatrix3 v17 = BSUtilities::GetRotationZToVectorTranspose(v19);
-                v17.ToEulerAnglesXYZ(v37.x, v37.y, v37.z);
-                v36 = 1;
-                v34.NiCalcHitPoint(v38);
             }
-            if (iparam == 2) {
-                v16 = pAshPile2;
+            if (MaterialVarType) {
+                PathingLocation v18(apRefObject);
+                Pathing::GetNavmeshNormalForLocation(v18, v19);
             }
             else {
-                v16 = pAshPile1;
+                HK2NI(v19, v34.m_normal);
             }
-            TESWorldSpace* WorldSpace = apRefObject->GetWorldSpace();
-            TESObjectCELL* ParentCell = apRefObject->GetParentCell();
-            TESObjectREFR* v15 = pDataHandler->CreateReferenceAtLocation(
-                v16, v38, v37, ParentCell, WorldSpace, nullptr, nullptr, nullptr
-            );
-            v15->SetDroppedRef(v36 == 0);
-            v15->SetDisableFade(true);
-            v15->SetRefPersists(true);
-            (&v15->m_Extra)->SetAshPileRef(apRefObject);
-            (&apRefObject->m_Extra)->SetAshPileRef(v15);
-            v15->AddChange(CHANGE_REFR_EXTRA_GAME_ONLY);
-            apRefObject->AddChange(CHANGE_REFR_EXTRA_GAME_ONLY);
+            alignas(16) NiMatrix3 v17 = BSUtilities::GetRotationZToVectorTranspose(v19);
+            v17.ToEulerAnglesXYZ(v37.x, v37.y, v37.z);
+            v36 = 1;
+            v34.NiCalcHitPoint(v38);
         }
+        if (iparam == 2) {
+            v16 = pAshPile2;
+        }
+        else {
+            v16 = pAshPile1;
+        }
+        TESWorldSpace* WorldSpace = apRefObject->GetWorldSpace();
+        TESObjectCELL* ParentCell = apRefObject->GetParentCell();
+        TESObjectREFR* v15 =
+            pDataHandler->CreateReferenceAtLocation(v16, v38, v37, ParentCell, WorldSpace, nullptr, nullptr, nullptr);
+        v15->SetDroppedRef(v36 == 0);
+        v15->SetDisableFade(true);
+        v15->SetRefPersists(true);
+        (&v15->m_Extra)->SetAshPileRef(apRefObject);
+        (&apRefObject->m_Extra)->SetAshPileRef(v15);
+        v15->AddChange(CHANGE_REFR_EXTRA_GAME_ONLY);
+        apRefObject->AddChange(CHANGE_REFR_EXTRA_GAME_ONLY);
     }
+
     return true;
 }
 
@@ -24128,12 +23824,11 @@ bool Script::SetLastExtDoorActivated(
         return false;
     }
     pPlayer->pLastExtDoorActivated = a8;
-    if (a8) {
-        if (a8->GetWorldSpace()) {
-            TESWorldSpace* WorldSpace = a8->GetWorldSpace();
-            Interface::SetRootMapSpace(WorldSpace);
-        }
+    if ((a8) && (a8->GetWorldSpace())) {
+        TESWorldSpace* WorldSpace = a8->GetWorldSpace();
+        Interface::SetRootMapSpace(WorldSpace);
     }
+
     return true;
 }
 
@@ -24187,12 +23882,10 @@ bool Script::IsImageSpaceActive(
         spInstance.SetPointer(&pNode->m_item);
         if (spInstance.m_pObject) {
             ImageSpaceModifierInstanceForm* pForm = spInstance.m_pObject->IsForm();
-            if (pForm) {
-                if (pForm->pImageSpaceMod == pImageSpace) {
-                    afReturnValue = 1.0;
-                    spInstance.~NiPointer<ImageSpaceModifierInstance>();
-                    break;
-                }
+            if ((pForm) && (pForm->pImageSpaceMod == pImageSpace)) {
+                afReturnValue = 1.0;
+                spInstance.~NiPointer<ImageSpaceModifierInstance>();
+                break;
             }
         }
         pNode = pNode->m_pkNext;
@@ -24225,10 +23918,9 @@ bool Script::ResetXP_Execute(
         pPlayer->PermanentModActorValue(ActorValue::EXPERIENCE_POINTS, (-v10), static_cast<Actor*>(nullptr));
         return true;
     }
-    else {
-        Warning("Attempting to reset xp on an invalid player!");
-        return false;
-    }
+
+    Warning("Attempting to reset xp on an invalid player!");
+    return false;
 }
 
 bool Script::PlaceAtReticle(
@@ -24600,20 +24292,18 @@ bool Script::ToggleFootIK(
 ) {
     if (apRefObject) {
         Actor* pactor = dynamic_cast<Actor*>(apRefObject);
-        if (pactor) {
-            if (pactor->pRagdollController) {
-                bool v9 = pactor->pRagdollController->QFootIKEnable();
-                pactor->pRagdollController->SetFootIKEnable(!v9);
-                if (GetThreadTLSData()->bSystemOutput) {
-                    const char* v11;
-                    if (pactor->pRagdollController->QFootIKEnable()) {
-                        v11 = "On";
-                    }
-                    else {
-                        v11 = "Off";
-                    }
-                    Interface::PrintLine("FootIK on REF %s %s", apRefObject->GetFormEditorID(), v11);
+        if ((pactor) && (pactor->pRagdollController)) {
+            bool v9 = pactor->pRagdollController->QFootIKEnable();
+            pactor->pRagdollController->SetFootIKEnable(!v9);
+            if (GetThreadTLSData()->bSystemOutput) {
+                const char* v11;
+                if (pactor->pRagdollController->QFootIKEnable()) {
+                    v11 = "On";
                 }
+                else {
+                    v11 = "Off";
+                }
+                Interface::PrintLine("FootIK on REF %s %s", apRefObject->GetFormEditorID(), v11);
             }
         }
     }
@@ -25034,13 +24724,11 @@ bool Script::ScriptEffectFinishFunction(
     uint32_t& auiOffset
 ) {
     afReturnValue = 0.0;
-    if (apScriptLocals) {
-        if (apScriptLocals->m_pScriptEffectData) {
-            if (apScriptLocals->m_pScriptEffectData->m_bScriptEffectFinish) {
-                afReturnValue = 1.0;
-            }
-        }
+    if ((apScriptLocals) && (apScriptLocals->m_pScriptEffectData) &&
+        (apScriptLocals->m_pScriptEffectData->m_bScriptEffectFinish)) {
+        afReturnValue = 1.0;
     }
+
     return true;
 }
 
@@ -25123,13 +24811,12 @@ bool Script::GetActionRefFunction(
     uint32_t apID;
     afReturnValue = 0.0;
     apID = 0;
-    if (apRefObject) {
-        if (apRefObject->GetActionRef()) {
-            TESObjectREFR* ActionRef = apRefObject->GetActionRef();
-            apID = ActionRef->GetFormID();
-            Script::PutNumericIDInDouble(apID, afReturnValue);
-        }
+    if ((apRefObject) && (apRefObject->GetActionRef())) {
+        TESObjectREFR* ActionRef = apRefObject->GetActionRef();
+        apID = ActionRef->GetFormID();
+        Script::PutNumericIDInDouble(apID, afReturnValue);
     }
+
     if (GetThreadTLSData()->bSystemOutput) {
         Interface::PrintLine("GetActionRef >> (%08x)", apID);
     }
@@ -25147,12 +24834,11 @@ bool Script::ResetFallDamageTimerFunction(
     uint32_t& auiOffset
 ) {
     Actor* pactor = dynamic_cast<Actor*>(apRefObject);
-    if (pactor) {
-        if (pactor->GetCharController()) {
-            bhkCharacterController* CharController = pactor->GetCharController();
-            CharController->QFallStartHeight();
-        }
+    if ((pactor) && (pactor->GetCharController())) {
+        bhkCharacterController* CharController = pactor->GetCharController();
+        CharController->QFallStartHeight();
     }
+
     return true;
 }
 
@@ -25739,9 +25425,8 @@ TESObjectREFR* TESQuestTarget::QTrackingRef() {
     if (m_TargetPath.Doors.iSize) {
         return (&m_TargetPath.Doors.GetAt(0))->pDoor;
     }
-    else {
-        return m_pTargetRef;
-    }
+
+    return m_pTargetRef;
 }
 
 // The female mean face coordinates for a nonzero sex, else the male ones.

@@ -385,11 +385,10 @@ void BGSCameraShot::InitCamera(TESObjectREFR* a1, int32_t a2) {
                         NiObject::DynamicCastStatic(&NiPathInterpolator::ms_RTTI, pinterp)
                     );
                 }
-                if (ppath) {
-                    if (ppath->GetFollow()) {
-                        cCameraHasRotation = 1;
-                    }
+                if ((ppath) && (ppath->GetFollow())) {
+                    cCameraHasRotation = 1;
                 }
+
                 if (cCameraHasRotation == -1) {
                     cCameraHasRotation = 0;
                 }

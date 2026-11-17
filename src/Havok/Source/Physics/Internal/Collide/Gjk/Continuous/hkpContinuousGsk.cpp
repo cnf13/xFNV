@@ -927,9 +927,8 @@ float hk4dGskCalcPointVelocityAssumingAngularVelError(
     if (!(v17 >= 0.0)) {
         return v20 - v17 / 1.2000000476837158;
     }
-    else {
-        return v20 - 1.2000000476837158 * v17;
-    }
+
+    return v20 - 1.2000000476837158 * v17;
 }
 
 // KEEP (partcopy:): the cache handed to addToi and copied whole into out->m_toi.m_gskCache shares its stack slot with

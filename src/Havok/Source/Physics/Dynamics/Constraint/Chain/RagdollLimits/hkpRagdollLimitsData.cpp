@@ -197,10 +197,9 @@ hkBool* hkpRagdollLimitsData::isValid(hkBool* arResult) const {
         arResult_1->m_bool = 1;
         return arResult_1;
     }
-    else {
-        arResult_1->m_bool = 0;
-        return arResult_1;
-    }
+
+    arResult_1->m_bool = 0;
+    return arResult_1;
 }
 
 int32_t hkpRagdollLimitsData::getType() const {

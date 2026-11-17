@@ -157,49 +157,46 @@ void BGSBodyPartData::ShowChildLimbs(
 ) {
     NiNode* pnode = apObj->IsNode();
     for (int32_t n = 0; n < 15; ++n) {
-        if (n != aeParent) {
-            if (pPartArray[n]) {
-                NiAVObject* ptestObj = BSUtilities::GetObjectByName(apRootObj, pPartArray[n]->GetNodeName());
-                if (ptestObj) {
-                    while (ptestObj != apRootObj) {
-                        if (ptestObj == apParentObj) {
-                            uint32_t i = 0;
-                            do {
-                                NiSkinInstance* pskin;
-                                NiGeometry* ptri;
-                                if (pnode) {
-                                    NiAVObject* pkObject = pnode->GetAtChecked(i++);
-                                    ptri = static_cast<NiGeometry*>(
-                                        NiObject::DynamicCastStatic(&NiGeometry::ms_RTTI, pkObject)
-                                    );
-                                }
-                                else {
-                                    ptri = static_cast<NiGeometry*>(
-                                        NiObject::DynamicCastStatic(&NiGeometry::ms_RTTI, apObj)
-                                    );
-                                }
-                                if (ptri) {
-                                    pskin = ptri->GetSkinInstance();
-                                }
-                                else {
-                                    pskin = nullptr;
-                                }
-                                BSDismemberSkinInstance* pdSkinInstance = static_cast<BSDismemberSkinInstance*>(
-                                    NiObject::DynamicCastStatic(&BSDismemberSkinInstance::ms_RTTI, pskin)
+        if ((n != aeParent) && (pPartArray[n])) {
+            NiAVObject* ptestObj = BSUtilities::GetObjectByName(apRootObj, pPartArray[n]->GetNodeName());
+            if (ptestObj) {
+                while (ptestObj != apRootObj) {
+                    if (ptestObj == apParentObj) {
+                        uint32_t i = 0;
+                        do {
+                            NiSkinInstance* pskin;
+                            NiGeometry* ptri;
+                            if (pnode) {
+                                NiAVObject* pkObject = pnode->GetAtChecked(i++);
+                                ptri = static_cast<NiGeometry*>(
+                                    NiObject::DynamicCastStatic(&NiGeometry::ms_RTTI, pkObject)
                                 );
-                                if (pdSkinInstance) {
-                                    for (int32_t j = 0; j < 15; ++j) {
-                                        if (j == n) {
-                                            pdSkinInstance->SetBodyPartEnabled(n, true);
-                                        }
+                            }
+                            else {
+                                ptri =
+                                    static_cast<NiGeometry*>(NiObject::DynamicCastStatic(&NiGeometry::ms_RTTI, apObj));
+                            }
+                            if (ptri) {
+                                pskin = ptri->GetSkinInstance();
+                            }
+                            else {
+                                pskin = nullptr;
+                            }
+                            BSDismemberSkinInstance* pdSkinInstance = static_cast<BSDismemberSkinInstance*>(
+                                NiObject::DynamicCastStatic(&BSDismemberSkinInstance::ms_RTTI, pskin)
+                            );
+                            if (pdSkinInstance) {
+                                for (int32_t j = 0; j < 15; ++j) {
+                                    if (j == n) {
+                                        pdSkinInstance->SetBodyPartEnabled(n, true);
                                     }
                                 }
                             }
-                            while (pnode && i < pnode->GetArrayCount());
-                            break;
                         }
-                        ptestObj = ptestObj->m_pkParent;
+                        while (pnode && i < pnode->GetArrayCount());
+                        break;
                     }
+                    ptestObj = ptestObj->m_pkParent;
                 }
             }
         }
@@ -223,10 +220,8 @@ void BGSBodyPartData::BuildIKPartList(BSSimpleList<BGSBodyPart*>* apOutList) {
     if (apOutList) {
         for (int32_t i = 0; i < 15; ++i) {
             BGSBodyPart* a2 = pPartArray[i];
-            if (a2) {
-                if (a2->IsIKData()) {
-                    apOutList->AddHead(a2);
-                }
+            if ((a2) && (a2->IsIKData())) {
+                apOutList->AddHead(a2);
             }
         }
     }
@@ -287,45 +282,42 @@ void BGSBodyPartData::HideChildLimbs(
 ) {
     NiNode* pnode = apObj->IsNode();
     for (int32_t n = 0; n < 15; ++n) {
-        if (n != aeParent) {
-            if (pPartArray[n]) {
-                NiAVObject* ptestObj = BSUtilities::GetObjectByName(apRootObj, pPartArray[n]->GetNodeName());
-                if (ptestObj) {
-                    while (ptestObj != apRootObj) {
-                        if (ptestObj == apParentObj) {
-                            uint32_t i = 0;
-                            do {
-                                NiSkinInstance* pskin;
-                                NiGeometry* ptri;
-                                if (pnode) {
-                                    NiAVObject* pkObject = pnode->GetAt(i++);
-                                    ptri = static_cast<NiGeometry*>(
-                                        NiObject::DynamicCastStatic(&NiGeometry::ms_RTTI, pkObject)
-                                    );
-                                }
-                                else {
-                                    ptri = static_cast<NiGeometry*>(
-                                        NiObject::DynamicCastStatic(&NiGeometry::ms_RTTI, apObj)
-                                    );
-                                }
-                                if (ptri) {
-                                    pskin = ptri->GetSkinInstance();
-                                }
-                                else {
-                                    pskin = nullptr;
-                                }
-                                BSDismemberSkinInstance* pdSkinInstance = static_cast<BSDismemberSkinInstance*>(
-                                    NiObject::DynamicCastStatic(&BSDismemberSkinInstance::ms_RTTI, pskin)
+        if ((n != aeParent) && (pPartArray[n])) {
+            NiAVObject* ptestObj = BSUtilities::GetObjectByName(apRootObj, pPartArray[n]->GetNodeName());
+            if (ptestObj) {
+                while (ptestObj != apRootObj) {
+                    if (ptestObj == apParentObj) {
+                        uint32_t i = 0;
+                        do {
+                            NiSkinInstance* pskin;
+                            NiGeometry* ptri;
+                            if (pnode) {
+                                NiAVObject* pkObject = pnode->GetAt(i++);
+                                ptri = static_cast<NiGeometry*>(
+                                    NiObject::DynamicCastStatic(&NiGeometry::ms_RTTI, pkObject)
                                 );
-                                if (pdSkinInstance) {
-                                    pdSkinInstance->SetBodyPartEnabled(n, false);
-                                }
                             }
-                            while (pnode && i < pnode->GetArrayCount());
-                            break;
+                            else {
+                                ptri =
+                                    static_cast<NiGeometry*>(NiObject::DynamicCastStatic(&NiGeometry::ms_RTTI, apObj));
+                            }
+                            if (ptri) {
+                                pskin = ptri->GetSkinInstance();
+                            }
+                            else {
+                                pskin = nullptr;
+                            }
+                            BSDismemberSkinInstance* pdSkinInstance = static_cast<BSDismemberSkinInstance*>(
+                                NiObject::DynamicCastStatic(&BSDismemberSkinInstance::ms_RTTI, pskin)
+                            );
+                            if (pdSkinInstance) {
+                                pdSkinInstance->SetBodyPartEnabled(n, false);
+                            }
                         }
-                        ptestObj = ptestObj->m_pkParent;
+                        while (pnode && i < pnode->GetArrayCount());
+                        break;
                     }
+                    ptestObj = ptestObj->m_pkParent;
                 }
             }
         }

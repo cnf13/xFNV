@@ -838,9 +838,8 @@ char* GetNextLineInString(char* Str) {
     if (Stra && *Stra) {
         return Stra;
     }
-    else {
-        return nullptr;
-    }
+
+    return nullptr;
 }
 
 void GetMoveHandAndPowerArmorTypeFromAnimName(
@@ -982,34 +981,26 @@ void TESAnimGroup::SetBlendOutFrames(uint8_t acBlendFrames) {
 }
 
 void TESAnimGroup::SetSoundTime(uint32_t aiIndex, float afValue) {
-    if (aiIndex < ((uint32_t)((int32_t)soundCount))) {
-        if (sounds) {
-            sounds[aiIndex].fTime = afValue;
-        }
+    if ((aiIndex < ((uint32_t)((int32_t)soundCount))) && (sounds)) {
+        sounds[aiIndex].fTime = afValue;
     }
 }
 
 void TESAnimGroup::SetSoundObject(uint32_t aiIndex, TESSound* apSound) {
-    if (aiIndex < ((uint32_t)((int32_t)soundCount))) {
-        if (sounds) {
-            sounds[aiIndex].pSound = apSound;
-        }
+    if ((aiIndex < ((uint32_t)((int32_t)soundCount))) && (sounds)) {
+        sounds[aiIndex].pSound = apSound;
     }
 }
 
 void TESAnimGroup::SetSoundVolume(uint32_t aiIndex, float afValue) {
-    if (aiIndex < ((uint32_t)((int32_t)soundCount))) {
-        if (sounds) {
-            sounds[aiIndex].cVolume = (uint8_t)((int32_t)(afValue * 250.0));
-        }
+    if ((aiIndex < ((uint32_t)((int32_t)soundCount))) && (sounds)) {
+        sounds[aiIndex].cVolume = (uint8_t)((int32_t)(afValue * 250.0));
     }
 }
 
 void TESAnimGroup::SetSoundPitch(uint32_t aiIndex, float afValue) {
-    if (aiIndex < ((uint32_t)((int32_t)soundCount))) {
-        if (sounds) {
-            sounds[aiIndex].fPitch = afValue;
-        }
+    if ((aiIndex < ((uint32_t)((int32_t)soundCount))) && (sounds)) {
+        sounds[aiIndex].fPitch = afValue;
     }
 }
 
@@ -1017,9 +1008,8 @@ GROUP_SOUND* TESAnimGroup::GetSound(uint32_t index) {
     if (index >= ((uint32_t)((int32_t)soundCount))) {
         return nullptr;
     }
-    else {
-        return &sounds[index];
-    }
+
+    return &sounds[index];
 }
 
 void TESAnimGroup::PlaySounds(
@@ -1062,13 +1052,12 @@ void TESAnimGroup::PlaySounds(
                 NiPoint3 loc = apRef->GetLocationOnReference();
                 if (iloopingFlags || FalloutAudio::SoundDistanceTest(pgroupSound->pSound, loc, 1.0f)) {
                     BSGameSound::SoundFlags v44;
-                    if (v87) {
-                        if (GetType() >= ANIM_GROUP_RELOAD_START && GetType() <= ANIM_GROUP_RELOAD_Z) {
-                            Animation* v7 = apRef->GetAnimation();
-                            double ReloadSpeed = v7->GetReloadSpeed();
-                            v86 = ReloadSpeed * v86;
-                        }
+                    if ((v87) && (GetType() >= ANIM_GROUP_RELOAD_START && GetType() <= ANIM_GROUP_RELOAD_Z)) {
+                        Animation* v7 = apRef->GetAnimation();
+                        double ReloadSpeed = v7->GetReloadSpeed();
+                        v86 = ReloadSpeed * v86;
                     }
+
                     if (apRef != pPlayer || pPlayer->IsActually3rdPerson()) {
                         v44 = BSGameSound::SOUND_FLAG_NONE;
                     }
@@ -1114,53 +1103,46 @@ void TESAnimGroup::PlaySounds(
                     case 28:
                     case 29:
                     case 30: {
-                        if (apRef->IsActor()) {
-                            if (apRef) {
-                                if (apRef->IsCreature()) {
-                                    TESSound* pcreatureSound;
-                                    TESCreature* pcreature = static_cast<TESCreature*>(apRef->GetObjectReference());
-                                    // The sound events from 22 on map to the creature sound types 11 on.
-                                    if (pgroupSound->eType >= 22u) {
-                                        pcreatureSound = pcreature->PickCreatureSound(
-                                            static_cast<CREATURE_SOUND_TYPE>(pgroupSound->eType - 11)
-                                        );
-                                    }
-                                    else {
-                                        pcreatureSound = pcreature->PickCreatureSound(
-                                            static_cast<CREATURE_SOUND_TYPE>(pgroupSound->eType)
-                                        );
-                                    }
-                                    TESSound* pcreatureSound_2 = pcreatureSound;
-                                    NiPoint3 loc_2 = apRef->GetLocationOnReference();
-                                    if (pcreatureSound_2) {
-                                        if (FalloutAudio::SoundDistanceTest(pcreatureSound_2, loc_2, 1.0f)) {
-                                            uint32_t a4a =
-                                                (pPlayer != apRef ? 0 : BSGameSound::SOUND_FLAG_IGNORE_TIMESCALE) |
-                                                (BSGameSound::SOUND_FLAG_IS_3D | BSGameSound::SOUND_FLAG_ONE_SHOT |
-                                                 BSGameSound::SOUND_FLAG_ANIMATION_DRIVEN);
-                                            uint32_t a3b = pcreatureSound_2->iFormID;
-                                            BSAudio* v15 = &BSAudio::QInstance();
-                                            v15->GetSoundHandleByNumericID(&soundHand_2, a3b, a4a);
-                                            if (v87) {
-                                                if (GetType() >= ANIM_GROUP_RELOAD_START &&
-                                                    GetType() <= ANIM_GROUP_RELOAD_Z) {
-                                                    Animation* v16 = apRef->GetAnimation();
-                                                    double v17 = v16->GetReloadSpeed();
-                                                    v86 = v17 * v86;
-                                                }
-                                            }
-                                            soundHand_2.SetPosition(loc_2.x, loc_2.y, loc_2.z);
-                                            NiNode* v18 = apRef->Get3D();
-                                            soundHand_2.SetObjectToFollow(v18);
-                                            soundHand_2.SetVolume(0.98f);
-                                            float v41 = v86 * 1.0;
-                                            soundHand_2.SetModFrequency(v41);
-                                            soundHand_2.Play(false);
-                                        }
-                                    }
+                        if ((apRef->IsActor()) && (apRef) && (apRef->IsCreature())) {
+                            TESSound* pcreatureSound;
+                            TESCreature* pcreature = static_cast<TESCreature*>(apRef->GetObjectReference());
+                            // The sound events from 22 on map to the creature sound types 11 on.
+                            if (pgroupSound->eType >= 22u) {
+                                pcreatureSound = pcreature->PickCreatureSound(
+                                    static_cast<CREATURE_SOUND_TYPE>(pgroupSound->eType - 11)
+                                );
+                            }
+                            else {
+                                pcreatureSound =
+                                    pcreature->PickCreatureSound(static_cast<CREATURE_SOUND_TYPE>(pgroupSound->eType));
+                            }
+                            TESSound* pcreatureSound_2 = pcreatureSound;
+                            NiPoint3 loc_2 = apRef->GetLocationOnReference();
+                            if ((pcreatureSound_2) &&
+                                (FalloutAudio::SoundDistanceTest(pcreatureSound_2, loc_2, 1.0f))) {
+                                uint32_t a4a = (pPlayer != apRef ? 0 : BSGameSound::SOUND_FLAG_IGNORE_TIMESCALE) |
+                                    (BSGameSound::SOUND_FLAG_IS_3D | BSGameSound::SOUND_FLAG_ONE_SHOT |
+                                     BSGameSound::SOUND_FLAG_ANIMATION_DRIVEN);
+                                uint32_t a3b = pcreatureSound_2->iFormID;
+                                BSAudio* v15 = &BSAudio::QInstance();
+                                v15->GetSoundHandleByNumericID(&soundHand_2, a3b, a4a);
+                                if ((v87) &&
+                                    (GetType() >= ANIM_GROUP_RELOAD_START && GetType() <= ANIM_GROUP_RELOAD_Z)) {
+                                    Animation* v16 = apRef->GetAnimation();
+                                    double v17 = v16->GetReloadSpeed();
+                                    v86 = v17 * v86;
                                 }
+
+                                soundHand_2.SetPosition(loc_2.x, loc_2.y, loc_2.z);
+                                NiNode* v18 = apRef->Get3D();
+                                soundHand_2.SetObjectToFollow(v18);
+                                soundHand_2.SetVolume(0.98f);
+                                float v41 = v86 * 1.0;
+                                soundHand_2.SetModFrequency(v41);
+                                soundHand_2.Play(false);
                             }
                         }
+
                         break;
                     }
                     case 9: {
@@ -1248,39 +1230,38 @@ void TESAnimGroup::PlaySounds(
                                 TESSound* pFoleySound =
                                     tArmor->GetFoleySound(static_cast<ENUM_FOLEY_SOUND>(pgroupSound->eType));
                                 NiPoint3 loc_3 = apRef->GetLocationOnReference();
-                                if (pFoleySound) {
-                                    if (FalloutAudio::SoundDistanceTest(pFoleySound, loc_3, 1.0f)) {
-                                        BSSoundHandle soundHand_3;
-                                        if (apRef == pPlayer) {
-                                            uint32_t a3c = pFoleySound->iFormID;
-                                            BSAudio* v19 = &BSAudio::QInstance();
-                                            BSSoundHandle* arHandle = v19->GetSoundHandleByNumericID(
-                                                &a1, a3c,
-                                                BSGameSound::SOUND_FLAG_ANIMATION_DRIVEN |
-                                                    BSGameSound::SOUND_FLAG_IGNORE_TIMESCALE |
-                                                    BSGameSound::SOUND_FLAG_ONE_SHOT | BSGameSound::SOUND_FLAG_IS_2D
-                                            );
-                                            soundHand_3.operator=(*arHandle);
-                                        }
-                                        else {
-                                            uint32_t a3d = pFoleySound->iFormID;
-                                            BSAudio* v20 = &BSAudio::QInstance();
-                                            BSSoundHandle* SoundHandleByNumericID = v20->GetSoundHandleByNumericID(
-                                                &th_s, a3d,
-                                                BSGameSound::SOUND_FLAG_ANIMATION_DRIVEN |
-                                                    BSGameSound::SOUND_FLAG_ONE_SHOT | BSGameSound::SOUND_FLAG_IS_3D
-                                            );
-                                            soundHand_3.operator=(*SoundHandleByNumericID);
-                                            soundHand_3.SetPosition(loc_3.x, loc_3.y, loc_3.z);
-                                            NiNode* v21 = apRef->Get3D();
-                                            soundHand_3.SetObjectToFollow(v21);
-                                        }
-                                        soundHand_3.SetVolume(0.98f);
-                                        float v38 = v86 * 1.0;
-                                        soundHand_3.SetModFrequency(v38);
-                                        soundHand_3.Play(false);
+                                if ((pFoleySound) && (FalloutAudio::SoundDistanceTest(pFoleySound, loc_3, 1.0f))) {
+                                    BSSoundHandle soundHand_3;
+                                    if (apRef == pPlayer) {
+                                        uint32_t a3c = pFoleySound->iFormID;
+                                        BSAudio* v19 = &BSAudio::QInstance();
+                                        BSSoundHandle* arHandle = v19->GetSoundHandleByNumericID(
+                                            &a1, a3c,
+                                            BSGameSound::SOUND_FLAG_ANIMATION_DRIVEN |
+                                                BSGameSound::SOUND_FLAG_IGNORE_TIMESCALE |
+                                                BSGameSound::SOUND_FLAG_ONE_SHOT | BSGameSound::SOUND_FLAG_IS_2D
+                                        );
+                                        soundHand_3.operator=(*arHandle);
                                     }
+                                    else {
+                                        uint32_t a3d = pFoleySound->iFormID;
+                                        BSAudio* v20 = &BSAudio::QInstance();
+                                        BSSoundHandle* SoundHandleByNumericID = v20->GetSoundHandleByNumericID(
+                                            &th_s, a3d,
+                                            BSGameSound::SOUND_FLAG_ANIMATION_DRIVEN |
+                                                BSGameSound::SOUND_FLAG_ONE_SHOT | BSGameSound::SOUND_FLAG_IS_3D
+                                        );
+                                        soundHand_3.operator=(*SoundHandleByNumericID);
+                                        soundHand_3.SetPosition(loc_3.x, loc_3.y, loc_3.z);
+                                        NiNode* v21 = apRef->Get3D();
+                                        soundHand_3.SetObjectToFollow(v21);
+                                    }
+                                    soundHand_3.SetVolume(0.98f);
+                                    float v38 = v86 * 1.0;
+                                    soundHand_3.SetModFrequency(v38);
+                                    soundHand_3.Play(false);
                                 }
+
                                 if (pItem) {
                                     delete pItem;
                                 }
@@ -1368,11 +1349,9 @@ void TESAnimGroup::SetupPriorities(BSAnimGroupSequence* apSequence) {
 }
 
 void TESAnimGroup::SetSoundEnum(uint32_t aiIndex, ANIM_ENUM aeType, uint32_t aiEnumData) {
-    if (aiIndex <= soundCount) {
-        if (sounds) {
-            sounds[aiIndex].eType = aeType;
-            sounds[aiIndex].iEnumData = aiEnumData;
-        }
+    if ((aiIndex <= soundCount) && (sounds)) {
+        sounds[aiIndex].eType = aeType;
+        sounds[aiIndex].iEnumData = aiEnumData;
     }
 }
 

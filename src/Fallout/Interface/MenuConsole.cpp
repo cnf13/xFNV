@@ -1018,16 +1018,15 @@ bool MenuConsole::Idle(int32_t aiKey) {
             int32_t a_8;
             switch (aiKey) {
                 case (-2147483647 - 1): {
-                    if (ilen) {
-                        if (ipos) {
-                            --ilen;
-                            for (int32_t itpos = ipos; itpos < ilen; ++itpos) {
-                                Source[itpos] = Source[itpos + 1];
-                            }
-                            Source[ilen] = 0;
-                            Source[ipos - 1] = 124;
+                    if ((ilen) && (ipos)) {
+                        --ilen;
+                        for (int32_t itpos = ipos; itpos < ilen; ++itpos) {
+                            Source[itpos] = Source[itpos + 1];
                         }
+                        Source[ilen] = 0;
+                        Source[ipos - 1] = 124;
                     }
+
                     break;
                 }
                 case -0x7FFFFFF9: {
@@ -1097,43 +1096,39 @@ bool MenuConsole::Idle(int32_t aiKey) {
                     break;
                 }
                 case -0x7FFFFFFF: {
-                    if (ilen) {
-                        if (ipos) {
-                            Source[ipos] = Source[ipos - 1];
-                            Source[ipos - 1] = 124;
-                        }
+                    if ((ilen) && (ipos)) {
+                        Source[ipos] = Source[ipos - 1];
+                        Source[ipos - 1] = 124;
                     }
+
                     break;
                 }
                 case -0x7FFFFFFE: {
-                    if (ilen) {
-                        if (ipos + 1 < ilen) {
-                            Source[ipos] = Source[ipos + 1];
-                            Source[ipos + 1] = 124;
-                        }
+                    if ((ilen) && (ipos + 1 < ilen)) {
+                        Source[ipos] = Source[ipos + 1];
+                        Source[ipos + 1] = 124;
                     }
+
                     break;
                 }
                 case -0x7FFFFFFB: {
-                    if (ilen) {
-                        if (ipos) {
-                            for (int32_t c = ipos; c > 0; --c) {
-                                Source[c] = Source[c - 1];
-                            }
-                            Source[0] = 124;
+                    if ((ilen) && (ipos)) {
+                        for (int32_t c = ipos; c > 0; --c) {
+                            Source[c] = Source[c - 1];
                         }
+                        Source[0] = 124;
                     }
+
                     break;
                 }
                 case -0x7FFFFFFA: {
-                    if (ilen) {
-                        if (ipos + 1 < ilen) {
-                            for (int32_t c_2 = ipos; c_2 < ilen - 1; ++c_2) {
-                                Source[c_2] = Source[c_2 + 1];
-                            }
-                            Source[ilen - 1] = 124;
+                    if ((ilen) && (ipos + 1 < ilen)) {
+                        for (int32_t c_2 = ipos; c_2 < ilen - 1; ++c_2) {
+                            Source[c_2] = Source[c_2 + 1];
                         }
+                        Source[ilen - 1] = 124;
                     }
+
                     break;
                 }
                 default: {
@@ -1273,23 +1268,21 @@ void MenuConsole::DumpTextures() {
     for (NiTexture* pTex = NiTexture::GetListHead(); pTex; pTex = pTex->m_pkNext) {
         if (NiObject::IsKindOf_0(&NiSourceTexture::ms_RTTI, pTex)) {
             NiSourceTexture* pSTex = static_cast<NiSourceTexture*>(pTex);
-            if (pTex->m_pkRendererData) {
-                if (bShowMenuTextureUse.Bool() || !IsMenuTexture(pSTex)) {
-                    int32_t idx = -1;
-                    for (int32_t i = 0; i < 200 && idx == -1; ++i) {
-                        if (pLargestTex[i]) {
-                            NiTexture::RendererData* pRendData2 = pLargestTex[i]->m_pkRendererData;
-                        }
-                        else {
-                            idx = i;
-                        }
+            if ((pTex->m_pkRendererData) && (bShowMenuTextureUse.Bool() || !IsMenuTexture(pSTex))) {
+                int32_t idx = -1;
+                for (int32_t i = 0; i < 200 && idx == -1; ++i) {
+                    if (pLargestTex[i]) {
+                        NiTexture::RendererData* pRendData2 = pLargestTex[i]->m_pkRendererData;
                     }
-                    if (idx != -1) {
-                        for (int32_t i_2 = 199; i_2 > idx; --i_2) {
-                            pLargestTex[i_2] = pLargestTex[i_2 - 1];
-                        }
-                        pLargestTex[idx] = pSTex;
+                    else {
+                        idx = i;
                     }
+                }
+                if (idx != -1) {
+                    for (int32_t i_2 = 199; i_2 > idx; --i_2) {
+                        pLargestTex[i_2] = pLargestTex[i_2 - 1];
+                    }
+                    pLargestTex[idx] = pSTex;
                 }
             }
         }
@@ -1354,21 +1347,20 @@ void MenuConsole::DumpTextures() {
 
 char MenuConsole::IsMenuTexture(NiSourceTexture* apTexture) {
     bool bretval = false;
-    if (apTexture) {
-        if (apTexture->GetFilename().GetHandleString()) {
-            const char* HandleString = apTexture->GetFilename().GetHandleString();
-            const char* Str = std::strchr(HandleString, 92);
-            while (Str) {
-                if (!_strnicmp(Str, "\\menus", 6u)) {
-                    bretval = true;
-                    Str = nullptr;
-                }
-                else {
-                    Str = std::strchr(Str + 1, 92);
-                }
+    if ((apTexture) && (apTexture->GetFilename().GetHandleString())) {
+        const char* HandleString = apTexture->GetFilename().GetHandleString();
+        const char* Str = std::strchr(HandleString, 92);
+        while (Str) {
+            if (!_strnicmp(Str, "\\menus", 6u)) {
+                bretval = true;
+                Str = nullptr;
+            }
+            else {
+                Str = std::strchr(Str + 1, 92);
             }
         }
     }
+
     return bretval;
 }
 

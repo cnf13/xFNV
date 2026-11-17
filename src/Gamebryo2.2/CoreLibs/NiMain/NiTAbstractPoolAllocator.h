@@ -42,9 +42,9 @@ public:
 template <class T>
 BSSpinLock NiTAbstractPoolAllocator<T>::ms_kSpinLock;
 template <class T>
-typename NiTAbstractPoolAllocator<T>::AllocNode* NiTAbstractPoolAllocator<T>::ms_pkBlockHeader = nullptr;
+NiTAbstractPoolAllocator<T>::AllocNode* NiTAbstractPoolAllocator<T>::ms_pkBlockHeader = nullptr;
 template <class T>
-typename NiTAbstractPoolAllocator<T>::AllocNode* NiTAbstractPoolAllocator<T>::ms_pkFreeMem = nullptr;
+NiTAbstractPoolAllocator<T>::AllocNode* NiTAbstractPoolAllocator<T>::ms_pkFreeMem = nullptr;
 // Gamebryo's block size for the timeline pool (NiAllocatorDeclareStatics(NiActorManager::TimelineData, 256)), the one
 // instance besides the shared pointer pool, which declares its own.
 template <class T>

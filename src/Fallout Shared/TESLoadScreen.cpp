@@ -173,9 +173,8 @@ const char* TESLoadScreen::GetDescription(TESForm* apForm, CHUNK_ID aeChunk) {
     if (cDescText.pString) {
         return cDescText.pString;
     }
-    else {
-        return "";
-    }
+
+    return "";
 }
 
 // Releases each location record before removing the list nodes.

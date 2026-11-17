@@ -185,10 +185,9 @@ hkBool* hkTransform::isOk(hkBool* apResult) const {
         apResult->m_bool = 1;
         return apResult;
     }
-    else {
-        apResult->m_bool = 0;
-        return apResult;
-    }
+
+    apResult->m_bool = 0;
+    return apResult;
 }
 
 __m128* hkTransform::get4x4ColumnMajorQuads(__m128* a1) {

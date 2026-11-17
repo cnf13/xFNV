@@ -104,7 +104,6 @@ ActiveEffect* LimbConditionEffect::Create(MagicCaster* apCaster, MagicItem* apSp
     if (v5) {
         return ::new (v5) LimbConditionEffect(apCaster, apSpell, apEffect);
     }
-    else {
-        return nullptr;
-    }
+
+    return nullptr;
 }

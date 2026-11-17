@@ -31,10 +31,9 @@ NiObject* NiSpotLight::CreateClone(NiCloningProcess& kCloning) {
         CopyMembers(v4, kCloning);
         return v4;
     }
-    else {
-        CopyMembers(nullptr, kCloning);
-        return nullptr;
-    }
+
+    CopyMembers(nullptr, kCloning);
+    return nullptr;
 }
 
 // Files before 20.2.0.5 carry no inner angle; it keeps its current value.
@@ -103,7 +102,6 @@ NiObject* NiSpotLight::CreateObject() {
     if (v0) {
         return ::new (v0) NiSpotLight;
     }
-    else {
-        return nullptr;
-    }
+
+    return nullptr;
 }

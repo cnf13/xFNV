@@ -320,16 +320,12 @@ void BSStream::ObjectRefRec(NiObjectNET* apObject, uint32_t aiLevels) {
                     }
                 }
                 NiNode* pNode = apObject->IsNode();
-                if (pNode) {
-                    if ((aiLevels & 1) != 0) {
-                        uint32_t i = pNode->m_kChildren.m_usSize;
-                        while (i--) {
-                            NiObjectNET* pChild = pNode->m_kChildren.m_pBase[i].m_pObject;
-                            if (pChild) {
-                                if ((aiLevels & 3) == 0 || pChild->IsNode()) {
-                                    ObjectRefRec(pChild, aiLevels);
-                                }
-                            }
+                if ((pNode) && ((aiLevels & 1) != 0)) {
+                    uint32_t i = pNode->m_kChildren.m_usSize;
+                    while (i--) {
+                        NiObjectNET* pChild = pNode->m_kChildren.m_pBase[i].m_pObject;
+                        if ((pChild) && ((aiLevels & 3) == 0 || pChild->IsNode())) {
+                            ObjectRefRec(pChild, aiLevels);
                         }
                     }
                 }
@@ -389,13 +385,10 @@ void BSStream::GetModifiedTextureFilename(char* apDstFileName, const char* apSrc
     char* pcExtension = const_cast<char*>(std::strrchr(static_cast<const char*>(pcDest), '.'));
     char* pcSlash = const_cast<char*>(std::strrchr(static_cast<const char*>(pcPath), '\\'));
     char* pcUnderscore = const_cast<char*>(std::strrchr(static_cast<const char*>(pcPath), '_'));
-    if (pcSlash) {
-        if (pcUnderscore) {
-            if (pcUnderscore < pcSlash) {
-                pcUnderscore = nullptr;
-            }
-        }
+    if ((pcSlash) && (pcUnderscore) && (pcUnderscore < pcSlash)) {
+        pcUnderscore = nullptr;
     }
+
     if (pcExtension) {
         char Dst[12];
         strcpy_s(Dst, 10, pcExtension);

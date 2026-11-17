@@ -104,10 +104,8 @@ void hkpConstraintChainInstance::entityRemovedCallback(hkpEntity* entity) {
         if (m_world->m_pendingOperationsCount) {
             m_world->internal_executePendingOperations();
         }
-        if (m_world->m_pendingOperationQueueCount == 1) {
-            if (m_world->m_pendingBodyOperationsCount) {
-                m_world->internal_executePendingBodyOperations();
-            }
+        if ((m_world->m_pendingOperationQueueCount == 1) && (m_world->m_pendingBodyOperationsCount)) {
+            m_world->internal_executePendingBodyOperations();
         }
     }
 }

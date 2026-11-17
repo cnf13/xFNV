@@ -122,113 +122,110 @@ hkCollideTriangleUtil::ClosestPointTriangleStatus hkCollideTriangleUtil::closest
         }
         return hkCollideTriangleUtil::HIT_TRIANGLE_FACE;
     }
-    else {
-        int32_t v20 = hkCollideTriangleUtil::maskToIndex[n7];
-        if (v20 >= 0) {
-            hkLineSegmentUtil::ClosestPointLineSegResult v50;
-            int32_t n8_1 = hkLineSegmentUtil::closestPointLineSeg(
-                position, tri[v20], tri[hkCollideTriangleUtil::vertexToEdgeLut[v20 + 2]], a4
-            );
-            int32_t n8 = hkLineSegmentUtil::closestPointLineSeg(
-                position, tri[hkCollideTriangleUtil::vertexToEdgeLut[v20]], tri[v20], v50
-            );
-            __m128 v34 = _mm_sub_ps(position.m_quad, v50.m_pointOnEdge.m_quad);
-            __m128 v51 = _mm_sub_ps(position.m_quad, a4.m_pointOnEdge.m_quad);
-            __m128 v35 = _mm_mul_ps(v51, v51);
-            float v36 = _mm_shuffle_ps(v35, v35, 85)[0] + v35[0];
-            float v37 = _mm_shuffle_ps(v35, v35, 170)[0];
-            __m128 v38 = _mm_mul_ps(v34, v34);
-            float v39 = v37 + v36;
-            float a3 = _mm_shuffle_ps(v38, v38, 170)[0] + (_mm_shuffle_ps(v38, v38, 85)[0] + v38[0]);
-            if (!(a3 > static_cast<double>(v39))) {
-                float v48 = std::sqrt((double)a3);
-                float v42 = 1.0 / v48;
-                if (featureOutput) {
-                    if (n8 == 4) {
-                        featureOutput->numFeatures = 1;
-                        featureOutput->featureIds[0u] = v20;
-                    }
-                    else {
-                        if (n8 == 8) {
-                            featureOutput->numFeatures = 1;
-                            featureOutput->featureIds[0u] = hkCollideTriangleUtil::vertexToEdgeLut[v20];
-                        }
-                        else {
-                            featureOutput->numFeatures = 2;
-                            featureOutput->featureIds[0u] = v20;
-                            featureOutput->featureIds[1] = hkCollideTriangleUtil::vertexToEdgeLut[v20];
-                        }
-                    }
-                }
-                result.distance.m_storage = a3 * v42;
-                result.hitDirection.m_quad = _mm_mul_ps(_mm_shuffle_ps(_mm_set_ss(v42), _mm_set_ss(v42), 0), v34);
-                return hkCollideTriangleUtil::HIT_TRIANGLE_EDGE;
-            }
-            else {
-                float a3c = std::sqrt((double)v39);
-                float a3a = 1.0 / a3c;
-                if (featureOutput) {
-                    if (n8_1 == 4) {
-                        featureOutput->numFeatures = 1;
-                        featureOutput->featureIds[0u] = v20;
-                    }
-                    else {
-                        if (n8_1 == 8) {
-                            featureOutput->numFeatures = 1;
-                            featureOutput->featureIds[0u] = hkCollideTriangleUtil::vertexToEdgeLut[v20 + 2];
-                        }
-                        else {
-                            featureOutput->numFeatures = 2;
-                            featureOutput->featureIds[0u] = v20;
-                            featureOutput->featureIds[1] = hkCollideTriangleUtil::vertexToEdgeLut[v20 + 2];
-                        }
-                    }
-                }
-                result.distance.m_storage = v39 * a3a;
-                result.hitDirection.m_quad = _mm_mul_ps(_mm_shuffle_ps(_mm_set_ss(a3a), _mm_set_ss(a3a), 0), v51);
-                return hkCollideTriangleUtil::HIT_TRIANGLE_EDGE;
-            }
-        }
-        else {
-            __m128 v28 = _mm_undefined_ps();
-            int32_t v21 = hkCollideTriangleUtil::vertexToEdgeLut[v20 + 8];
-            int32_t v22 = v20 + 8;
-            int32_t n8_2 = hkLineSegmentUtil::closestPointLineSeg(
-                position, tri[hkCollideTriangleUtil::vertexToEdgeLut[v22 + 2]], tri[v21], a4
-            );
+
+    int32_t v20 = hkCollideTriangleUtil::maskToIndex[n7];
+    if (v20 >= 0) {
+        hkLineSegmentUtil::ClosestPointLineSegResult v50;
+        int32_t n8_1 = hkLineSegmentUtil::closestPointLineSeg(
+            position, tri[v20], tri[hkCollideTriangleUtil::vertexToEdgeLut[v20 + 2]], a4
+        );
+        int32_t n8 = hkLineSegmentUtil::closestPointLineSeg(
+            position, tri[hkCollideTriangleUtil::vertexToEdgeLut[v20]], tri[v20], v50
+        );
+        __m128 v34 = _mm_sub_ps(position.m_quad, v50.m_pointOnEdge.m_quad);
+        __m128 v51 = _mm_sub_ps(position.m_quad, a4.m_pointOnEdge.m_quad);
+        __m128 v35 = _mm_mul_ps(v51, v51);
+        float v36 = _mm_shuffle_ps(v35, v35, 85)[0] + v35[0];
+        float v37 = _mm_shuffle_ps(v35, v35, 170)[0];
+        __m128 v38 = _mm_mul_ps(v34, v34);
+        float v39 = v37 + v36;
+        float a3 = _mm_shuffle_ps(v38, v38, 170)[0] + (_mm_shuffle_ps(v38, v38, 85)[0] + v38[0]);
+        if (!(a3 > static_cast<double>(v39))) {
+            float v48 = std::sqrt((double)a3);
+            float v42 = 1.0 / v48;
             if (featureOutput) {
-                if (n8_2 == 4) {
-                    featureOutput->featureIds[0u] = hkCollideTriangleUtil::vertexToEdgeLut[v22];
+                if (n8 == 4) {
                     featureOutput->numFeatures = 1;
+                    featureOutput->featureIds[0u] = v20;
                 }
                 else {
-                    if (n8_2 == 8) {
-                        featureOutput->featureIds[0u] = hkCollideTriangleUtil::vertexToEdgeLut[v22 + 2];
+                    if (n8 == 8) {
                         featureOutput->numFeatures = 1;
+                        featureOutput->featureIds[0u] = hkCollideTriangleUtil::vertexToEdgeLut[v20];
                     }
                     else {
-                        featureOutput->featureIds[0u] = hkCollideTriangleUtil::vertexToEdgeLut[v22];
-                        featureOutput->featureIds[1] = hkCollideTriangleUtil::vertexToEdgeLut[v22 + 2];
                         featureOutput->numFeatures = 2;
+                        featureOutput->featureIds[0u] = v20;
+                        featureOutput->featureIds[1] = hkCollideTriangleUtil::vertexToEdgeLut[v20];
                     }
                 }
             }
-            __m128 v24 = _mm_sub_ps(position.m_quad, a4.m_pointOnEdge.m_quad);
-            __m128 v25 = _mm_mul_ps(v24, v24);
-            __m128 v26 = _mm_shuffle_ps(v25, v25, 170);
-            v26[0] = v26[0] + (_mm_shuffle_ps(v25, v25, 85)[0] + v25[0]);
-            float v27 = _mm_cvtss_f32(_mm_rsqrt_ss(_mm_set_ss(v26[0])));
-            v28[0] = std::bit_cast<float>(static_cast<int32_t>(0.0f));
-            __m128 v29 = _mm_cmpeq_ss(v26, v28);
-            v28[0] = 3.0f - ((v26[0] * v27) * v27);
-            __m128 v30 = _mm_setzero_ps();
-            v30[0] = (0.5f * v27) * v28[0];
-            __m128 v31 = _mm_andnot_ps(v29, v30);
-            __m128 v32 = _mm_shuffle_ps(v31, v31, 0);
-            result.hitDirection.m_quad = _mm_mul_ps(v24, v32);
-            result.distance.m_storage =
-                (_mm_shuffle_ps(v25, v25, 170)[0] + (_mm_shuffle_ps(v25, v25, 85)[0] + v25[0])) * v32[0];
+            result.distance.m_storage = a3 * v42;
+            result.hitDirection.m_quad = _mm_mul_ps(_mm_shuffle_ps(_mm_set_ss(v42), _mm_set_ss(v42), 0), v34);
             return hkCollideTriangleUtil::HIT_TRIANGLE_EDGE;
         }
+
+        float a3c = std::sqrt((double)v39);
+        float a3a = 1.0 / a3c;
+        if (featureOutput) {
+            if (n8_1 == 4) {
+                featureOutput->numFeatures = 1;
+                featureOutput->featureIds[0u] = v20;
+            }
+            else {
+                if (n8_1 == 8) {
+                    featureOutput->numFeatures = 1;
+                    featureOutput->featureIds[0u] = hkCollideTriangleUtil::vertexToEdgeLut[v20 + 2];
+                }
+                else {
+                    featureOutput->numFeatures = 2;
+                    featureOutput->featureIds[0u] = v20;
+                    featureOutput->featureIds[1] = hkCollideTriangleUtil::vertexToEdgeLut[v20 + 2];
+                }
+            }
+        }
+        result.distance.m_storage = v39 * a3a;
+        result.hitDirection.m_quad = _mm_mul_ps(_mm_shuffle_ps(_mm_set_ss(a3a), _mm_set_ss(a3a), 0), v51);
+        return hkCollideTriangleUtil::HIT_TRIANGLE_EDGE;
     }
+
+    __m128 v28 = _mm_undefined_ps();
+    int32_t v21 = hkCollideTriangleUtil::vertexToEdgeLut[v20 + 8];
+    int32_t v22 = v20 + 8;
+    int32_t n8_2 = hkLineSegmentUtil::closestPointLineSeg(
+        position, tri[hkCollideTriangleUtil::vertexToEdgeLut[v22 + 2]], tri[v21], a4
+    );
+    if (featureOutput) {
+        if (n8_2 == 4) {
+            featureOutput->featureIds[0u] = hkCollideTriangleUtil::vertexToEdgeLut[v22];
+            featureOutput->numFeatures = 1;
+        }
+        else {
+            if (n8_2 == 8) {
+                featureOutput->featureIds[0u] = hkCollideTriangleUtil::vertexToEdgeLut[v22 + 2];
+                featureOutput->numFeatures = 1;
+            }
+            else {
+                featureOutput->featureIds[0u] = hkCollideTriangleUtil::vertexToEdgeLut[v22];
+                featureOutput->featureIds[1] = hkCollideTriangleUtil::vertexToEdgeLut[v22 + 2];
+                featureOutput->numFeatures = 2;
+            }
+        }
+    }
+    __m128 v24 = _mm_sub_ps(position.m_quad, a4.m_pointOnEdge.m_quad);
+    __m128 v25 = _mm_mul_ps(v24, v24);
+    __m128 v26 = _mm_shuffle_ps(v25, v25, 170);
+    v26[0] = v26[0] + (_mm_shuffle_ps(v25, v25, 85)[0] + v25[0]);
+    float v27 = _mm_cvtss_f32(_mm_rsqrt_ss(_mm_set_ss(v26[0])));
+    v28[0] = std::bit_cast<float>(static_cast<int32_t>(0.0f));
+    __m128 v29 = _mm_cmpeq_ss(v26, v28);
+    v28[0] = 3.0f - ((v26[0] * v27) * v27);
+    __m128 v30 = _mm_setzero_ps();
+    v30[0] = (0.5f * v27) * v28[0];
+    __m128 v31 = _mm_andnot_ps(v29, v30);
+    __m128 v32 = _mm_shuffle_ps(v31, v31, 0);
+    result.hitDirection.m_quad = _mm_mul_ps(v24, v32);
+    result.distance.m_storage =
+        (_mm_shuffle_ps(v25, v25, 170)[0] + (_mm_shuffle_ps(v25, v25, 85)[0] + v25[0])) * v32[0];
+    return hkCollideTriangleUtil::HIT_TRIANGLE_EDGE;
 }

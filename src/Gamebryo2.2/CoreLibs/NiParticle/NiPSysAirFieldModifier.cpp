@@ -98,10 +98,7 @@ bool NiPSysAirFieldModifier::IsEqual(NiObject* pkObject) {
     }
 
     NiPSysAirFieldModifier* pkOther = static_cast<NiPSysAirFieldModifier*>(pkObject);
-    if (pkOther->m_kDirection != m_kDirection) {
-        return false;
-    }
-    return true;
+    return pkOther->m_kDirection == m_kDirection;
 }
 
 void NiPSysAirFieldModifier::GetViewerStrings(NiTPrimitiveArray<char*>* pkStrings) {
@@ -401,7 +398,6 @@ NiObject* NiPSysAirFieldModifier::CreateObject() {
     if (v0) {
         return ::new (v0) NiPSysAirFieldModifier;
     }
-    else {
-        return nullptr;
-    }
+
+    return nullptr;
 }

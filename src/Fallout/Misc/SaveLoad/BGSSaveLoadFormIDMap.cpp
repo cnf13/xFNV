@@ -41,9 +41,8 @@ uint32_t BGSSaveLoadFormIDMap::GetFormID(uint32_t aiFormIDIndex) {
             ->NiTMapBase<DFALL<NiTMapItem<uint32_t, uint32_t>>, uint32_t, uint32_t>::GetAt(aiFormIDIndex, uiFormID)) {
         return uiFormID;
     }
-    else {
-        return (uint32_t)0;
-    }
+
+    return (uint32_t)0;
 }
 
 void BGSSaveLoadFormIDMap::Save(BGSSaveLoadFile* apFile) {
@@ -91,7 +90,6 @@ uint32_t BGSSaveLoadFormIDMap::ConvertFormID(uint32_t aiFormID) {
     if (saveMod == 255) {
         return (uint32_t)0;
     }
-    else {
-        return (saveMod << 24) | (aiFormID & 16777215);
-    }
+
+    return (saveMod << 24) | (aiFormID & 16777215);
 }

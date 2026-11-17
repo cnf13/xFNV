@@ -103,15 +103,11 @@ Menu* MenuManager::GetFrontmostMenu() {
         if (pmenutile) {
             pmenu = pmenutile->GetMenu();
         }
-        if (pmenu) {
-            if (pmenu->pMenu) {
-                if (static_cast<double>(depth) < pmenu->pMenu->GetFloat(4013) &&
-                    pmenu->pMenu->GetFloat(4007) != 6008.0 && pmenu->xFadeState != Interface::FADING_OUT &&
-                    pmenu->xFadeState != Interface::FADE_HIDDEN) {
-                    depth = pmenu->pMenu->GetFloat(4013);
-                    ptop = pmenu;
-                }
-            }
+        if ((pmenu) && (pmenu->pMenu) &&
+            (static_cast<double>(depth) < pmenu->pMenu->GetFloat(4013) && pmenu->pMenu->GetFloat(4007) != 6008.0 &&
+             pmenu->xFadeState != Interface::FADING_OUT && pmenu->xFadeState != Interface::FADE_HIDDEN)) {
+            depth = pmenu->pMenu->GetFloat(4013);
+            ptop = pmenu;
         }
     }
     return ptop;
@@ -650,35 +646,35 @@ Tile* MenuManager::ReloadMenu(int32_t aiMenuClass) {
                 if (StartMenu::GetClassStatic() == aiMenuClass && StartMenu::Create(bpausemenu, false)) {
                     return Menu::GetMenuByClass(aiMenuClass);
                 }
-                else {
-                    switch (aiMenuClass) {
-                        case 1007: {
-                            return LoadingMenu::Create(nullptr, true, false);
+
+                switch (aiMenuClass) {
+                    case 1007: {
+                        return LoadingMenu::Create(nullptr, true, false);
+                    }
+                    case 1027: {
+                        return LevelUpMenu::CreateMenu();
+                    }
+                    case 1008: {
+                        Tile* MenuByClass = Menu::GetMenuByClass(1008);
+                        ContainerMenu* pcontainer = dynamic_cast<ContainerMenu*>(MenuByClass);
+                        if (pcontainer) {
+                            return ContainerMenu::Create(pcontainer->pContainerRef, Interface::CMM_STANDARD);
                         }
-                        case 1027: {
-                            return LevelUpMenu::CreateMenu();
+                        break;
+                    }
+                    case 1026: {
+                        Tile* v13 = Menu::GetMenuByClass(1008);
+                        BookMenu* pbookmenu = dynamic_cast<BookMenu*>(v13);
+                        if (pbookmenu) {
+                            TESObjectREFR* pRef = pbookmenu->unk30;
+                            TESObjectBOOK* pbook = dynamic_cast<TESObjectBOOK*>(pRef->GetObjectReference());
+                            delete pbookmenu;
+                            return BookMenu::Create(pbook, pRef);
                         }
-                        case 1008: {
-                            Tile* MenuByClass = Menu::GetMenuByClass(1008);
-                            ContainerMenu* pcontainer = dynamic_cast<ContainerMenu*>(MenuByClass);
-                            if (pcontainer) {
-                                return ContainerMenu::Create(pcontainer->pContainerRef, Interface::CMM_STANDARD);
-                            }
-                            break;
-                        }
-                        case 1026: {
-                            Tile* v13 = Menu::GetMenuByClass(1008);
-                            BookMenu* pbookmenu = dynamic_cast<BookMenu*>(v13);
-                            if (pbookmenu) {
-                                TESObjectREFR* pRef = pbookmenu->unk30;
-                                TESObjectBOOK* pbook = dynamic_cast<TESObjectBOOK*>(pRef->GetObjectReference());
-                                delete pbookmenu;
-                                return BookMenu::Create(pbook, pRef);
-                            }
-                            break;
-                        }
+                        break;
                     }
                 }
+
                 break;
             }
         }

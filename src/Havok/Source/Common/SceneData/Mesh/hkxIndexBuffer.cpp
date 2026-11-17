@@ -94,9 +94,8 @@ int32_t hkxIndexBuffer::getNumTriangles() {
     if (m_indexType.m_storage == 1) {
         return m_size / 3;
     }
-    else {
-        return 0;
-    }
+
+    return 0;
 }
 
 char hkxIndexBuffer::getTriangleIndicesPtr(uint32_t a1, uint32_t* a2, uint32_t* a3, uint32_t* a4) {

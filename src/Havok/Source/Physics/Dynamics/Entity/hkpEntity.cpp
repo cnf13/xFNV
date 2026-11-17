@@ -513,32 +513,30 @@ void hkpEntity::removeContactListener(hkpContactListener* cl) {
 
 void hkpEntity::deactivate() {
     hkpSimulationIsland* m_simulationIsland = this->getSimulationIsland();
-    if (m_simulationIsland) {
-        if (m_simulationIsland->m_activeMark != 0) {
-            if (m_simulationIsland->m_splitCheckRequested != 0 || m_simulationIsland->m_sparseEnabled != 0) {
-                hkpWorld* m_world = this->m_world;
-                uint32_t m_minDesiredIslandSize = m_world->m_minDesiredIslandSize;
-                m_world->m_minDesiredIslandSize = 0;
-                this->getSimulationIsland()->m_sparseEnabled = 0;
-                this->getSimulationIsland()->m_splitCheckRequested = 1;
-                hkpWorldOperationUtil::splitSimulationIsland(this->m_world, this->getSimulationIsland());
-                this->m_world->m_minDesiredIslandSize = m_minDesiredIslandSize;
-            }
-            hkpSimulationIsland* v5 = this->getSimulationIsland();
-            int32_t v6 = 0;
-            if (v5->m_entities.m_size > 0) {
-                hkpEntity** m_data = v5->m_entities.begin();
-                do {
-                    hkpEntity* v8 = *m_data;
-                    v8->m_motion.m_deactivationRefPosition[0].m_quad[3] = 3.40282e+38f;
-                    ++v6;
-                    v8->m_motion.m_deactivationRefPosition[1].m_quad[3] = 3.40282e+38f;
-                    ++m_data;
-                }
-                while (v6 < v5->m_entities.m_size);
-            }
-            hkpWorldOperationUtil::markIslandInactive(this->m_world, v5);
+    if ((m_simulationIsland) && (m_simulationIsland->m_activeMark != 0)) {
+        if (m_simulationIsland->m_splitCheckRequested != 0 || m_simulationIsland->m_sparseEnabled != 0) {
+            hkpWorld* m_world = this->m_world;
+            uint32_t m_minDesiredIslandSize = m_world->m_minDesiredIslandSize;
+            m_world->m_minDesiredIslandSize = 0;
+            this->getSimulationIsland()->m_sparseEnabled = 0;
+            this->getSimulationIsland()->m_splitCheckRequested = 1;
+            hkpWorldOperationUtil::splitSimulationIsland(this->m_world, this->getSimulationIsland());
+            this->m_world->m_minDesiredIslandSize = m_minDesiredIslandSize;
         }
+        hkpSimulationIsland* v5 = this->getSimulationIsland();
+        int32_t v6 = 0;
+        if (v5->m_entities.m_size > 0) {
+            hkpEntity** m_data = v5->m_entities.begin();
+            do {
+                hkpEntity* v8 = *m_data;
+                v8->m_motion.m_deactivationRefPosition[0].m_quad[3] = 3.40282e+38f;
+                ++v6;
+                v8->m_motion.m_deactivationRefPosition[1].m_quad[3] = 3.40282e+38f;
+                ++m_data;
+            }
+            while (v6 < v5->m_entities.m_size);
+        }
+        hkpWorldOperationUtil::markIslandInactive(this->m_world, v5);
     }
 }
 
@@ -669,10 +667,9 @@ hkBool hkpEntity::isActive() const {
         a2.m_bool = m_simulationIsland->m_activeMark;
         return a2;
     }
-    else {
-        a2.m_bool = 0;
-        return a2;
-    }
+
+    a2.m_bool = 0;
+    return a2;
 }
 
 void hkpEntity::setCachedShapeData(const hkpWorld* world, const hkpShape* shape) {
@@ -710,11 +707,9 @@ void hkpEntity::updateCachedAabb() {
     hkpEntity* entities;
     entities = this;
     hkpWorld* m_world = this->m_world;
-    if (m_world) {
-        if (m_collidable.m_shape) {
-            entities = this;
-            hkpEntityAabbUtil::entityBatchRecalcAabb(m_world->m_collisionInput, &entities, 1);
-        }
+    if ((m_world) && (m_collidable.m_shape)) {
+        entities = this;
+        hkpEntityAabbUtil::entityBatchRecalcAabb(m_world->m_collisionInput, &entities, 1);
     }
 }
 

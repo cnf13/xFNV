@@ -138,11 +138,10 @@ BSSaveDataSystemUtility* BSSystemUtility::GetSaveDataUtility() {
 }
 
 void BSSystemUtility::SetLostFocus(bool abLostFocus) {
-    if (abLostFocus != bLostFocus) {
-        if (pFocusNotificationCallback) {
-            pFocusNotificationCallback(abLostFocus);
-        }
+    if ((abLostFocus != bLostFocus) && (pFocusNotificationCallback)) {
+        pFocusNotificationCallback(abLostFocus);
     }
+
     bLostFocus = abLostFocus;
 }
 

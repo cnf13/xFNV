@@ -119,15 +119,11 @@ void MagicHitEffect::FinishLoadGame(BGSLoadGameBuffer* apLoadGameBuffer) {
 void MagicHitEffect::UpdateParentCell(NiAVObject* apRoot) {
     if (pTarget) {
         pCell = pTarget->GetParentCell();
-        if (apRoot) {
-            if (pCell) {
-                if (pCell->Get3D()) {
-                    NiNode* v2;
-                    if (!apRoot->m_pkParent || (v2 = pCell->Get3D(), v2 != apRoot->m_pkParent->m_pkParent)) {
-                        NiNode* DynamicNode = static_cast<NiNode*>(pCell->GetDynamicNode());
-                        DynamicNode->AttachChild(apRoot, 1);
-                    }
-                }
+        if ((apRoot) && (pCell) && (pCell->Get3D())) {
+            NiNode* v2;
+            if (!apRoot->m_pkParent || (v2 = pCell->Get3D(), v2 != apRoot->m_pkParent->m_pkParent)) {
+                NiNode* DynamicNode = static_cast<NiNode*>(pCell->GetDynamicNode());
+                DynamicNode->AttachChild(apRoot, 1);
             }
         }
     }
@@ -140,10 +136,8 @@ BSSimpleList<MagicHitEffect*>* MagicHitEffect::InstantiateHitEffects(ActiveEffec
         TESCreature* pcreature = dynamic_cast<TESCreature*>(TargetAsActor->GetActorBase());
         Actor* v2 = apEffect->pTarget->GetTargetAsActor();
         Character* pcharacter = dynamic_cast<Character*>(v2);
-        if (!pcreature || !pcreature->IsHumanoidCreature()) {
-            if (pcharacter) {
-                pcharacter->IsNpc();
-            }
+        if ((!pcreature || !pcreature->IsHumanoidCreature()) && (pcharacter)) {
+            pcharacter->IsNpc();
         }
     }
     BSSimpleList<MagicHitEffect*>* plist_2 = nullptr;

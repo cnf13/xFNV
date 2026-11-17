@@ -65,10 +65,8 @@ void CombatProcedureBeInCover::Update() {
                     NiPoint3 targetLoc = ptarget->GetLocationOnReference();
                     NiPoint3 originalTargetLoc = pCoverLocation->CoverSearchTargetLocation;
                     NiPoint3 targetVec = targetLoc - originalTargetLoc;
-                    if (targetVec.SqrLength() > 589824.0) {
-                        if (pcombatGroup->GetTargetMemberLOSCount(ptarget)) {
-                            pCoverLocation->bDirtyFlag = true;
-                        }
+                    if ((targetVec.SqrLength() > 589824.0) && (pcombatGroup->GetTargetMemberLOSCount(ptarget))) {
+                        pCoverLocation->bDirtyFlag = true;
                     }
                 }
             }

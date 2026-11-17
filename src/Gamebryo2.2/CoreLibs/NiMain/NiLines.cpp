@@ -35,10 +35,9 @@ NiObject* NiLines::CreateClone(NiCloningProcess& kCloning) {
         NiGeometry::CopyMembers(pkClone, kCloning);
         return pkClone;
     }
-    else {
-        NiGeometry::CopyMembers(nullptr, kCloning);
-        return nullptr;
-    }
+
+    NiGeometry::CopyMembers(nullptr, kCloning);
+    return nullptr;
 }
 
 // Other geometry classes without stream data of their own use the same function.

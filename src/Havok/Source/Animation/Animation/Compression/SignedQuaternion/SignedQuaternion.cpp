@@ -314,9 +314,8 @@ const uint8_t* computePackedNurbsOffsets(
     if (HK_flyingcolors_animation) {
         return &base[(maskAndQuantizationSize & 0x7FFFFFFF) + m_blockOffsets[block]];
     }
-    else {
-        return nullptr;
-    }
+
+    return nullptr;
 }
 
 // The SDK's form: the four bytes of a POLAR32 quaternion reversed in place.

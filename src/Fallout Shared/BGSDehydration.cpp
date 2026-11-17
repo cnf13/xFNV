@@ -178,10 +178,8 @@ BGSDehydrationStage* BGSDehydrationStage::FindStageForRadLevel(float afRads) {
     BGSDehydrationStage* pstage = nullptr;
     for (uint32_t i = 0; i < BGSDehydrationStage::iNumStages && !pstage; ++i) {
         BGSDehydrationStage* pcurrentStage = BGSDehydrationStage::GetStage(i);
-        if (pcurrentStage) {
-            if (afRads >= static_cast<double>(pcurrentStage->data.iH20)) {
-                pstage = pcurrentStage;
-            }
+        if ((pcurrentStage) && (afRads >= static_cast<double>(pcurrentStage->data.iH20))) {
+            pstage = pcurrentStage;
         }
     }
     return pstage;
@@ -214,9 +212,8 @@ BGSDehydrationStage* BGSDehydrationStage::GetStage(uint32_t auiIndex) {
     if (auiIndex >= BGSDehydrationStage::iNumStages) {
         return nullptr;
     }
-    else {
-        return BGSDehydrationStage::pStagesArray[auiIndex];
-    }
+
+    return BGSDehydrationStage::pStagesArray[auiIndex];
 }
 
 // A zero-filled array of aiCount stage pointers, or null for none.

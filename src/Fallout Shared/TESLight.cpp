@@ -204,16 +204,16 @@ bool GetAttenuationSettings() {
     if (!ATTENUATION_SETTINGS::cUsageFlags) {
         ATTENUATION_SETTINGS::cUsageFlags = 4;
     }
-    if (gs_uLinearMethod_bLightAttenuation.Int()) {
-        if (gs_uLinearMethod_bLightAttenuation.Int() != 1 && gs_uLinearMethod_bLightAttenuation.Int() != 2) {
-            gs_uLinearMethod_bLightAttenuation.operator=(1);
-        }
+    if ((gs_uLinearMethod_bLightAttenuation.Int()) &&
+        (gs_uLinearMethod_bLightAttenuation.Int() != 1 && gs_uLinearMethod_bLightAttenuation.Int() != 2)) {
+        gs_uLinearMethod_bLightAttenuation.operator=(1);
     }
-    if (gs_uQuadraticMethod_bLightAttenuation.Int()) {
-        if (gs_uQuadraticMethod_bLightAttenuation.Int() != 1 && gs_uQuadraticMethod_bLightAttenuation.Int() != 2) {
-            gs_uQuadraticMethod_bLightAttenuation.operator=(2);
-        }
+
+    if ((gs_uQuadraticMethod_bLightAttenuation.Int()) &&
+        (gs_uQuadraticMethod_bLightAttenuation.Int() != 1 && gs_uQuadraticMethod_bLightAttenuation.Int() != 2)) {
+        gs_uQuadraticMethod_bLightAttenuation.operator=(2);
     }
+
     if (gs_fLinearRadiusMult_bLightAttenuation.Float() == 0.0) {
         gs_fLinearRadiusMult_bLightAttenuation.operator=(1.0f);
     }

@@ -74,11 +74,10 @@ BGSCameraPath* BGSCameraPathManager::GetCameraPathToPlay(TESObjectREFR* apAction
             }
         }
     }
-    if (pretpath) {
-        if (pretpath->GetAllowNoShots() && !(&pretpath->ShotList)->IsEmpty()) {
-            return nullptr;
-        }
+    if ((pretpath) && (pretpath->GetAllowNoShots() && !(&pretpath->ShotList)->IsEmpty())) {
+        return nullptr;
     }
+
     return pretpath;
 }
 

@@ -31,59 +31,59 @@ public:
     NiD3DShaderProgram(NiDX9Renderer* pkRenderer, NiGPUProgram::ProgramType eType);
     ~NiD3DShaderProgram() override;
 
-    virtual const NiRTTI* GetRTTI() const {
+    const NiRTTI* GetRTTI() const override {
         return &ms_RTTI;
     }
     // type queries: the object as the named class, or null
-    virtual NiNode* IsNode() {
+    NiNode* IsNode() override {
         return nullptr;
     }
-    virtual BSFadeNode* IsFadeNode() {
+    BSFadeNode* IsFadeNode() override {
         return nullptr;
     }
-    virtual BSMultiBoundNode* IsMultiBoundNode() {
+    BSMultiBoundNode* IsMultiBoundNode() override {
         return nullptr;
     }
-    virtual NiGeometry* IsGeometry() {
+    NiGeometry* IsGeometry() override {
         return nullptr;
     }
-    virtual NiTriBasedGeom* IsTriBasedGeom() {
+    NiTriBasedGeom* IsTriBasedGeom() override {
         return nullptr;
     }
-    virtual NiTriStrips* IsTriStrips() {
+    NiTriStrips* IsTriStrips() override {
         return nullptr;
     }
-    virtual NiTriShape* IsTriShape() {
+    NiTriShape* IsTriShape() override {
         return nullptr;
     }
-    virtual BSSegmentedTriShape* IsSegmentedTriShape() {
+    BSSegmentedTriShape* IsSegmentedTriShape() override {
         return nullptr;
     }
-    virtual BSResizableTriShape* IsResizableTriShape() {
+    BSResizableTriShape* IsResizableTriShape() override {
         return nullptr;
     }
-    virtual NiParticles* IsParticlesGeom() {
+    NiParticles* IsParticlesGeom() override {
         return nullptr;
     }
-    virtual NiLines* IsLinesGeom() {
+    NiLines* IsLinesGeom() override {
         return nullptr;
     }
-    virtual bhkNiCollisionObject* IsBhkNiCollisionObject() {
+    bhkNiCollisionObject* IsBhkNiCollisionObject() override {
         return nullptr;
     }
-    virtual bhkBlendCollisionObject* IsBhkBlendCollisionObject() {
+    bhkBlendCollisionObject* IsBhkBlendCollisionObject() override {
         return nullptr;
     }
-    virtual bhkRigidBody* IsBhkRigidBody() const {
+    bhkRigidBody* IsBhkRigidBody() const override {
         return nullptr;
     }
-    virtual bhkLimitedHingeConstraint* IsBhkLimitedHingeConstraint() {
+    bhkLimitedHingeConstraint* IsBhkLimitedHingeConstraint() override {
         return nullptr;
     }
-    virtual uint32_t GetVariableCount() {
+    uint32_t GetVariableCount() override {
         return 0;
     }
-    virtual const char* GetVariableName(uint32_t) {
+    const char* GetVariableName(uint32_t) override {
         return nullptr;
     }
     virtual const char* GetName() const {

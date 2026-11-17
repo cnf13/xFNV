@@ -51,11 +51,10 @@ bool BSTaskletManager::AttachTask(BSTaskletGroup& aGroup, BSTasklet& aTask, bool
 // Hands the group's data to the manager's CloseTaskGroupData through the vtable; false when the manager is not
 // available or the group was never opened.
 bool BSTaskletManager::CloseTaskGroup(BSTaskletGroup& aGroup) {
-    if (bAvailable) {
-        if (aGroup.pData) {
-            return CloseTaskGroupData(aGroup.pData);
-        }
+    if ((bAvailable) && (aGroup.pData)) {
+        return CloseTaskGroupData(aGroup.pData);
     }
+
     return false;
 }
 

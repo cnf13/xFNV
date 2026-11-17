@@ -323,7 +323,7 @@ uint32_t NiTGAReader::LoadRLERow(NiFile& kIst, uint8_t* pucDest, uint32_t uiDest
         if (m_uiRLECount == 0) {
             uint8_t ucTag = 0;
             NiStreamLoadBinary(kIst, &ucTag, 1);
-            m_bRLEncodedRun = (ucTag & 0x80) ? true : false;
+            m_bRLEncodedRun = (ucTag & 0x80) != 0;
             if (ucTag & 0x80) {
                 m_bRLEncodedRun = true;
                 m_uiRLECount = ucTag - 127;

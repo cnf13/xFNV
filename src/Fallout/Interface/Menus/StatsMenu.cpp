@@ -405,30 +405,28 @@ void StatsMenu::DoClick(int32_t aiID, Tile* apTarget) {
                     else {
                         for (StatsMenu::HealingOptionID i = StatsMenu::SM_HO_STIMPAK; i < StatsMenu::SM_HO_COUNT;
                              i = static_cast<StatsMenu::HealingOptionID>(i + 1)) {
-                            if (apTarget == pHealingOptionsA[i].pTile) {
-                                if (pHealingOptionsA[i].pInventoryItem) {
-                                    ExtraDataList* extraData;
-                                    if (pHealingOptionsA[i].pInventoryItem->pExtraObjectList) {
-                                        extraData = pHealingOptionsA[i].pInventoryItem->pExtraObjectList->m_item;
-                                    }
-                                    else {
-                                        extraData = nullptr;
-                                    }
-                                    uint32_t FormHealth_0 = pHealingOptionsA[i].pInventoryItem->iNumber;
-                                    TESBoundObject* FormFlags = pHealingOptionsA[i].pInventoryItem->pContainerObj;
-                                    pPlayer->QueueEquipObject(FormFlags, FormHealth_0, extraData, false, false, true);
-                                    for (BSSimpleList<EffectItem*>* pnode = dynamic_cast<BSSimpleList<EffectItem*>*>(
-                                             pHealingOptionsA[i].pInventoryItem->pContainerObj
-                                         );
-                                         pnode && pnode->m_item; pnode = pnode->m_pkNext) {
-                                        ActorValue::Index ActorValueIndex = pnode->m_item->GetActorValueIndex();
-                                        UpdateActorValue(ActorValueIndex);
-                                    }
-                                    UpdateHealingOptions(i);
-                                    bActiveEffectsUpdatedThisFrame = false;
-                                    UpdateActiveEffects();
-                                    i = StatsMenu::SM_HO_COUNT;
+                            if ((apTarget == pHealingOptionsA[i].pTile) && (pHealingOptionsA[i].pInventoryItem)) {
+                                ExtraDataList* extraData;
+                                if (pHealingOptionsA[i].pInventoryItem->pExtraObjectList) {
+                                    extraData = pHealingOptionsA[i].pInventoryItem->pExtraObjectList->m_item;
                                 }
+                                else {
+                                    extraData = nullptr;
+                                }
+                                uint32_t FormHealth_0 = pHealingOptionsA[i].pInventoryItem->iNumber;
+                                TESBoundObject* FormFlags = pHealingOptionsA[i].pInventoryItem->pContainerObj;
+                                pPlayer->QueueEquipObject(FormFlags, FormHealth_0, extraData, false, false, true);
+                                for (BSSimpleList<EffectItem*>* pnode = dynamic_cast<BSSimpleList<EffectItem*>*>(
+                                         pHealingOptionsA[i].pInventoryItem->pContainerObj
+                                     );
+                                     pnode && pnode->m_item; pnode = pnode->m_pkNext) {
+                                    ActorValue::Index ActorValueIndex = pnode->m_item->GetActorValueIndex();
+                                    UpdateActorValue(ActorValueIndex);
+                                }
+                                UpdateHealingOptions(i);
+                                bActiveEffectsUpdatedThisFrame = false;
+                                UpdateActiveEffects();
+                                i = StatsMenu::SM_HO_COUNT;
                             }
                         }
                         if (bLimbMode && !InterfaceManager::Has360Controller()) {
@@ -773,14 +771,12 @@ bool StatsMenu::DoGamepad(int32_t aiButton, float afValue) {
                     DoClick(11, nullptr);
                     return true;
                 }
-                else {
-                    return false;
-                }
+
+                return false;
             }
-            else {
-                DoClick(10, nullptr);
-                return true;
-            }
+
+            DoClick(10, nullptr);
+            return true;
         }
         case 11: {
             StatsMenu::StatusPage v27 = GetStatusPage();
@@ -793,13 +789,12 @@ bool StatsMenu::DoGamepad(int32_t aiButton, float afValue) {
             if (this->bLimbMode || !pTiles[9]->IsTrue(4015)) {
                 return false;
             }
-            else {
-                DoClick(9, nullptr);
-                BSAudio* v14 = &BSAudio::QInstance();
-                BSSoundHandle* v26 = v14->GetSoundHandleByName(&arHandle, "UIMenuOK", 289u);
-                v26->Play(false);
-                return true;
-            }
+
+            DoClick(9, nullptr);
+            BSAudio* v14 = &BSAudio::QInstance();
+            BSSoundHandle* v26 = v14->GetSoundHandleByName(&arHandle, "UIMenuOK", 289u);
+            v26->Play(false);
+            return true;
         }
         case 12: {
             StatsMenu::StatusPage v25;
@@ -819,9 +814,8 @@ bool StatsMenu::DoGamepad(int32_t aiButton, float afValue) {
                 v24->Play(false);
                 return true;
             }
-            else {
-                return false;
-            }
+
+            return false;
         }
         default: {
             goto LABEL_86;
@@ -1666,22 +1660,19 @@ void StatsMenu::UpdateAll() {
 }
 
 void StatsMenu::UpdateReputations() {
-    if (StatsMenu::pMe) {
-        if (StatsMenu::pMe->pTiles[46]) {
-            pTiles[47]->Set(4003, 0);
-            pTiles[51]->Set(4003, 0);
-            pTiles[48]->Set(4003, 0);
-            static_cast<ListBox<TESReputation*>*>(&StatsMenu::pMe->lbReputation)->RemoveAll();
-            for (TESReputation* pRepItem : (&pDataHandler->listReputations)->ItemsUntilNull()) {
-                if (pRepItem) {
-                    if (pRepItem->GetReputationValue(REPUTATION_POSITIVE) > 0.0 ||
-                        pRepItem->GetReputationValue(REPUTATION_NEGATIVE) > 0.0) {
-                        BSStringT<char> strtmp;
-                        strtmp.SPrintF("%s", pRepItem->GetFullName());
-                        char* v1 = strtmp.pString;
-                        StatsMenu::pMe->lbReputation.AddItem(pRepItem, v1, &StatsMenu::ReputationListSortFn, nullptr);
-                    }
-                }
+    if ((StatsMenu::pMe) && (StatsMenu::pMe->pTiles[46])) {
+        pTiles[47]->Set(4003, 0);
+        pTiles[51]->Set(4003, 0);
+        pTiles[48]->Set(4003, 0);
+        static_cast<ListBox<TESReputation*>*>(&StatsMenu::pMe->lbReputation)->RemoveAll();
+        for (TESReputation* pRepItem : (&pDataHandler->listReputations)->ItemsUntilNull()) {
+            if ((pRepItem) &&
+                (pRepItem->GetReputationValue(REPUTATION_POSITIVE) > 0.0 ||
+                 pRepItem->GetReputationValue(REPUTATION_NEGATIVE) > 0.0)) {
+                BSStringT<char> strtmp;
+                strtmp.SPrintF("%s", pRepItem->GetFullName());
+                char* v1 = strtmp.pString;
+                StatsMenu::pMe->lbReputation.AddItem(pRepItem, v1, &StatsMenu::ReputationListSortFn, nullptr);
             }
         }
     }
@@ -2031,23 +2022,21 @@ Tile* StatsMenu::Create() {
 }
 
 void StatsMenu::UpdatePerks() {
-    if (StatsMenu::pMe) {
-        if (StatsMenu::pMe->pTiles[34]) {
-            static_cast<ListBox<PerkRankData*>*>(&StatsMenu::pMe->lbPerks)->RemoveAll();
-            for (PerkRankData*& rpItem : pPlayer->GetPerkList(false)->ItemsUntilNull()) {
-                if (!rpItem->pPerk->IsPerkHidden()) {
-                    BSStringT<char> strtmp;
-                    if (rpItem->cCurrentRank <= 1u) {
-                        strtmp.SPrintF("%s", rpItem->pPerk->GetFullName());
-                    }
-                    else {
-                        int32_t cCurrentRank = rpItem->cCurrentRank;
-                        strtmp.SPrintF("%s (%d)", rpItem->pPerk->GetFullName(), cCurrentRank);
-                    }
-                    char* v1 = strtmp.pString;
-                    PerkRankData* m_item = rpItem;
-                    StatsMenu::pMe->lbPerks.AddItem(m_item, v1, &StatsMenu::PerkListSortFn, nullptr);
+    if ((StatsMenu::pMe) && (StatsMenu::pMe->pTiles[34])) {
+        static_cast<ListBox<PerkRankData*>*>(&StatsMenu::pMe->lbPerks)->RemoveAll();
+        for (PerkRankData*& rpItem : pPlayer->GetPerkList(false)->ItemsUntilNull()) {
+            if (!rpItem->pPerk->IsPerkHidden()) {
+                BSStringT<char> strtmp;
+                if (rpItem->cCurrentRank <= 1u) {
+                    strtmp.SPrintF("%s", rpItem->pPerk->GetFullName());
                 }
+                else {
+                    int32_t cCurrentRank = rpItem->cCurrentRank;
+                    strtmp.SPrintF("%s (%d)", rpItem->pPerk->GetFullName(), cCurrentRank);
+                }
+                char* v1 = strtmp.pString;
+                PerkRankData* m_item = rpItem;
+                StatsMenu::pMe->lbPerks.AddItem(m_item, v1, &StatsMenu::PerkListSortFn, nullptr);
             }
         }
     }
@@ -2182,16 +2171,13 @@ uint8_t StatsMenu::GetCurrentStatsPage() {
     if (StatsMenu::pMe) {
         return (uint8_t)StatsMenu::pMe->GetCurrentPage();
     }
-    else {
-        return (uint8_t)0;
-    }
+
+    return (uint8_t)0;
 }
 
 void StatsMenu::Close() {
-    if (StatsMenu::pMe) {
-        if (StatsMenu::pMe->bLimbMode) {
-            StatsMenu::pMe->ToggleHealingMode();
-        }
+    if ((StatsMenu::pMe) && (StatsMenu::pMe->bLimbMode)) {
+        StatsMenu::pMe->ToggleHealingMode();
     }
 }
 
@@ -2204,10 +2190,8 @@ void StatsMenu::MiscStatsUpdateFn(Tile* apTile, MiscStatManager::MiscStatID aeID
 }
 
 void StatsMenu::ClearPerks() {
-    if (StatsMenu::pMe) {
-        if (StatsMenu::pMe->pTiles[34]) {
-            static_cast<ListBox<PerkRankData*>*>(&StatsMenu::pMe->lbPerks)->RemoveAll();
-        }
+    if ((StatsMenu::pMe) && (StatsMenu::pMe->pTiles[34])) {
+        static_cast<ListBox<PerkRankData*>*>(&StatsMenu::pMe->lbPerks)->RemoveAll();
     }
 }
 

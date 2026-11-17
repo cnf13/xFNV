@@ -228,14 +228,13 @@ const char* BGSTextureSet::GetTextureFilename(BSShaderProperty::TextureTypeEnum 
 void BGSTextureSet::GetTexture(BSShaderProperty::TextureTypeEnum aiType, NiPointer<NiTexture>& aspTexture) {
     NiPointer<NiTexture> sptexture(static_cast<NiTexture*>(nullptr));
     const char* ptexfile = static_cast<BSTextureSet*>(this)->GetTextureFilename(aiType);
-    if (ptexfile) {
-        if (*ptexfile) {
-            char Src[264];
-            BSstrcpy(Src, 260, "Data\\Textures\\");
-            BSstrcat(Src, 260, ptexfile);
-            BSShaderManager::GetTexture(Src, true, sptexture, true, false);
-        }
+    if ((ptexfile) && (*ptexfile)) {
+        char Src[264];
+        BSstrcpy(Src, 260, "Data\\Textures\\");
+        BSstrcat(Src, 260, ptexfile);
+        BSShaderManager::GetTexture(Src, true, sptexture, true, false);
     }
+
     aspTexture.operator=(sptexture);
 }
 
@@ -260,9 +259,8 @@ DecalData* BGSTextureSet::GetDecalData() {
     if (pDecalData) {
         return pDecalData;
     }
-    else {
-        return DecalData::GetDefaultDecalData();
-    }
+
+    return DecalData::GetDefaultDecalData();
 }
 
 BSTextureSet* BGSTextureSet::GetAsShaderTextureSet() {
@@ -300,13 +298,11 @@ BSShaderTextureSet* BGSTextureSet::CreateShaderTextureSet() {
     for (BSShaderProperty::TextureTypeEnum i = BSShaderProperty::TEXTYPE_DIFFUSE;
          i < BSShaderProperty::TEXTYPE_SPECULAR; i = static_cast<BSShaderProperty::TextureTypeEnum>(i + 1)) {
         const char* pfilename = GetTextureFilename(i);
-        if (pfilename) {
-            if (*pfilename) {
-                char Dst[264];
-                BSstrcpy(Dst, 260, "Data\\Textures\\");
-                BSstrcat(Dst, 260, pfilename);
-                ptexset->SetTextureFilename(i, Dst);
-            }
+        if ((pfilename) && (*pfilename)) {
+            char Dst[264];
+            BSstrcpy(Dst, 260, "Data\\Textures\\");
+            BSstrcat(Dst, 260, pfilename);
+            ptexset->SetTextureFilename(i, Dst);
         }
     }
     return ptexset;

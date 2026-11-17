@@ -33,9 +33,8 @@ const char* BGSQuestObjective::GetDisplayText() {
     if ((&cDisplayText)->pString) {
         return (&cDisplayText)->pString;
     }
-    else {
-        return "";
-    }
+
+    return "";
 }
 
 bool BGSQuestObjective::GetDisplayed() {
@@ -203,17 +202,15 @@ void PlayerCharacter::AddQuestObjective(BGSQuestObjective* apObj) {
 }
 
 void HUDMainMenu::ShowQuestObjective(const char* apText, bool abCompleted, bool abFailed) {
-    if (HUDMainMenu::pme) {
-        if (apText) {
-            HUDMainMenu::HUDShowQuestObjectivsCritSect.Enter(nullptr);
-            uiMessageDelayTime = appTimer.iLastTime;
-            HUDMainMenu::QueuedQuestText* a2 =
-                static_cast<HUDMainMenu::QueuedQuestText*>(ourMalloc(sizeof(HUDMainMenu::QueuedQuestText)));
-            BSstrcpy(a2->msg, 260, apText);
-            a2->byte104 = abCompleted;
-            a2->byte105 = abFailed;
-            HUDMainMenu::pme->xQuestObjectives.AddHead(a2);
-            HUDMainMenu::HUDShowQuestObjectivsCritSect.Leave();
-        }
+    if ((HUDMainMenu::pme) && (apText)) {
+        HUDMainMenu::HUDShowQuestObjectivsCritSect.Enter(nullptr);
+        uiMessageDelayTime = appTimer.iLastTime;
+        HUDMainMenu::QueuedQuestText* a2 =
+            static_cast<HUDMainMenu::QueuedQuestText*>(ourMalloc(sizeof(HUDMainMenu::QueuedQuestText)));
+        BSstrcpy(a2->msg, 260, apText);
+        a2->byte104 = abCompleted;
+        a2->byte105 = abFailed;
+        HUDMainMenu::pme->xQuestObjectives.AddHead(a2);
+        HUDMainMenu::HUDShowQuestObjectivsCritSect.Leave();
     }
 }

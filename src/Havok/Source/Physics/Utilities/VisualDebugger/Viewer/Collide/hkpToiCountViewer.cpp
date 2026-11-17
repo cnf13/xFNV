@@ -277,9 +277,8 @@ hkProcess* hkpToiCountViewer::create(const hkArray<hkProcessContext*, hkContaine
     if (v3) {
         return &static_cast<hkProcess&>(static_cast<hkpWorldViewerBase&>(*v3));
     }
-    else {
-        return nullptr;
-    }
+
+    return nullptr;
 }
 
 void hkpToiCountViewer::registerViewer() {
@@ -353,7 +352,6 @@ hkpToiCountViewer::DisplayPosition hkpToiCountViewer::getDisplayPositionFromGrav
     if (!((*a1)[v2] > 0.0f)) {
         return static_cast<hkpToiCountViewer::DisplayPosition>(v2);
     }
-    else {
-        return static_cast<hkpToiCountViewer::DisplayPosition>(v2 + 3);
-    }
+
+    return static_cast<hkpToiCountViewer::DisplayPosition>(v2 + 3);
 }

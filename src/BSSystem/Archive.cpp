@@ -699,51 +699,49 @@ bool Archive::QLoadStrings() {
 
 void Archive::ReloadFilenamesAndIndices() {
     uint32_t v4;
-    if (this->iFiles) {
-        if (!this->pFileNameStringArray || !pFileNameStringOffsets) {
-            cArchiveFlags &= ~32;
-            if (pFileNameStringOffsets) {
-                for (uint32_t i = 0;; ++i) {
-                    uint32_t iDirectories = this->iDirectories;
-                    if (i >= iDirectories) {
-                        break;
-                    }
-                    void* Block = (void*)pFileNameStringOffsets[i];
-                    MemoryManager_Singleton.Deallocate(Block);
+    if ((this->iFiles) && (!this->pFileNameStringArray || !pFileNameStringOffsets)) {
+        cArchiveFlags &= ~32;
+        if (pFileNameStringOffsets) {
+            for (uint32_t i = 0;; ++i) {
+                uint32_t iDirectories = this->iDirectories;
+                if (i >= iDirectories) {
+                    break;
                 }
-                void* apMem = (void*)pFileNameStringOffsets;
-                MemoryManager_Singleton.Deallocate(apMem);
+                void* Block = (void*)pFileNameStringOffsets[i];
+                MemoryManager_Singleton.Deallocate(Block);
             }
-            void* pFileNameStringArray = (void*)this->pFileNameStringArray;
-            MemoryManager_Singleton.Deallocate(pFileNameStringArray);
-            size_t Size = this->iFileNamesLength;
-            char* v13 = static_cast<char*>(MemoryManager_Singleton.Allocate(Size));
-            this->pFileNameStringArray = v13;
-            uint32_t v7 = this->iDirectories;
-            size_t aSize = v7 <= SIZE_MAX / sizeof(uint32_t*) ? sizeof(uint32_t*) * v7 : SIZE_MAX;
-            uint32_t** v12 = static_cast<uint32_t**>(MemoryManager_Singleton.Allocate(aSize));
-            pFileNameStringOffsets = v12;
-            if ((oFlags.iFlag & 2) != 0) {
-                Seek(iFileNameArrayOffset, NiFile::ms_iSeekSet);
-                uint32_t iFileNamesLength = this->iFileNamesLength;
-                char* v3 = this->pFileNameStringArray;
-                v4 = 1;
-                m_uiAbsoluteCurrentPos += m_pfnRead(this, v3, iFileNamesLength, &v4, 1);
-                uint32_t v19 = 0;
-                for (uint32_t j = 0; j < this->iDirectories; ++j) {
-                    uint32_t iFiles = pDirectories[j].iFiles;
-                    uint32_t* v11 = static_cast<uint32_t*>(MemoryManager_Singleton.Allocate(
-                        iFiles <= SIZE_MAX / sizeof(uint32_t) ? sizeof(uint32_t) * iFiles : SIZE_MAX
-                    ));
-                    pFileNameStringOffsets[j] = v11;
-                    for (uint32_t k = 0; k < pDirectories[j].iFiles; ++k) {
-                        pFileNameStringOffsets[j][k] = v19;
-                        v19 += std::strlen(&this->pFileNameStringArray[v19]) + 1;
-                    }
-                }
-            }
-            cArchiveFlags |= 32;
+            void* apMem = (void*)pFileNameStringOffsets;
+            MemoryManager_Singleton.Deallocate(apMem);
         }
+        void* pFileNameStringArray = (void*)this->pFileNameStringArray;
+        MemoryManager_Singleton.Deallocate(pFileNameStringArray);
+        size_t Size = this->iFileNamesLength;
+        char* v13 = static_cast<char*>(MemoryManager_Singleton.Allocate(Size));
+        this->pFileNameStringArray = v13;
+        uint32_t v7 = this->iDirectories;
+        size_t aSize = v7 <= SIZE_MAX / sizeof(uint32_t*) ? sizeof(uint32_t*) * v7 : SIZE_MAX;
+        uint32_t** v12 = static_cast<uint32_t**>(MemoryManager_Singleton.Allocate(aSize));
+        pFileNameStringOffsets = v12;
+        if ((oFlags.iFlag & 2) != 0) {
+            Seek(iFileNameArrayOffset, NiFile::ms_iSeekSet);
+            uint32_t iFileNamesLength = this->iFileNamesLength;
+            char* v3 = this->pFileNameStringArray;
+            v4 = 1;
+            m_uiAbsoluteCurrentPos += m_pfnRead(this, v3, iFileNamesLength, &v4, 1);
+            uint32_t v19 = 0;
+            for (uint32_t j = 0; j < this->iDirectories; ++j) {
+                uint32_t iFiles = pDirectories[j].iFiles;
+                uint32_t* v11 = static_cast<uint32_t*>(MemoryManager_Singleton.Allocate(
+                    iFiles <= SIZE_MAX / sizeof(uint32_t) ? sizeof(uint32_t) * iFiles : SIZE_MAX
+                ));
+                pFileNameStringOffsets[j] = v11;
+                for (uint32_t k = 0; k < pDirectories[j].iFiles; ++k) {
+                    pFileNameStringOffsets[j][k] = v19;
+                    v19 += std::strlen(&this->pFileNameStringArray[v19]) + 1;
+                }
+            }
+        }
+        cArchiveFlags |= 32;
     }
 }
 
@@ -945,14 +943,12 @@ void Archive::DeleteFilenameStringArray(bool abPreserveOffsets) {
             MemoryManager_Singleton.Deallocate(pFileNameStringArray);
         }
         pFileNameStringArray = nullptr;
-        if (pFileNameStringOffsets) {
-            if (!abPreserveOffsets) {
-                for (uint32_t i = 0; i < iDirectories; ++i) {
-                    MemoryManager_Singleton.Deallocate(pFileNameStringOffsets[i]);
-                }
-                MemoryManager_Singleton.Deallocate(pFileNameStringOffsets);
-                pFileNameStringOffsets = nullptr;
+        if ((pFileNameStringOffsets) && (!abPreserveOffsets)) {
+            for (uint32_t i = 0; i < iDirectories; ++i) {
+                MemoryManager_Singleton.Deallocate(pFileNameStringOffsets[i]);
             }
+            MemoryManager_Singleton.Deallocate(pFileNameStringOffsets);
+            pFileNameStringOffsets = nullptr;
         }
     }
     cArchiveFlags &= ~32;
@@ -1019,11 +1015,10 @@ bool ArchiveFile::Open(bool abWaitForOpen, bool abTextMode) {
     m_uiPos = 0;
     m_uiBufferReadSize = 0;
     m_pBuffer = nullptr;
-    if (m_uiBufferAllocSize) {
-        if (!m_pBuffer) {
-            m_pBuffer = static_cast<char*>(MemoryManager_Singleton.Allocate(m_uiBufferAllocSize));
-        }
+    if ((m_uiBufferAllocSize) && (!m_pBuffer)) {
+        m_pBuffer = static_cast<char*>(MemoryManager_Singleton.Allocate(m_uiBufferAllocSize));
     }
+
     m_bGood = true;
     return m_bGood;
 }
@@ -1323,64 +1318,64 @@ uint32_t CompressedArchiveFile::ReadF(void* apReadBuffer, uint32_t aiByteCount) 
         iUncompressedBufferPos += aiByteCount;
         return aiByteCount;
     }
-    else {
-        if (uiAvail) {
-            if (apReadBuffer) {
-                rt::memcpy(apReadBuffer, &pUncompressedBuffer[iUncompressedBufferPos], uiAvail);
-                apReadBuffer = static_cast<char*>(apReadBuffer) + uiAvail;
-            }
-            uiBytesLeft = aiByteCount - uiAvail;
-            uiReadBytes = uiAvail;
+
+    if (uiAvail) {
+        if (apReadBuffer) {
+            rt::memcpy(apReadBuffer, &pUncompressedBuffer[iUncompressedBufferPos], uiAvail);
+            apReadBuffer = static_cast<char*>(apReadBuffer) + uiAvail;
         }
-        iUncompressedBufferPos = 0;
-        iUncompressedBufferReadSize = 0;
-        while (uiBytesLeft) {
-            pStream->avail_out = iUncompressedBufferSize;
-            pStream->next_out = reinterpret_cast<uint8_t*>(pUncompressedBuffer);
-            while (pStream->avail_out) {
-                uint32_t uiBytesLeftInFile = m_uiBufferReadSize - m_uiPos;
-                pStream->avail_in = uiBytesLeftInFile;
-                pStream->next_in = reinterpret_cast<uint8_t*>(&m_pBuffer[m_uiPos]);
-                if (uiBytesLeftInFile) {
-                    int32_t eInflateError = inflate(pStream, 2);
-                    if (eInflateError == -2 || (eInflateError == 2 || (eInflateError == -3 || eInflateError == -4))) {
-                        inflateEnd(pStream);
-                        uiBytesLeft = 0;
-                        break;
-                    }
-                    if (eInflateError == 1) {
-                        break;
-                    }
+        uiBytesLeft = aiByteCount - uiAvail;
+        uiReadBytes = uiAvail;
+    }
+    iUncompressedBufferPos = 0;
+    iUncompressedBufferReadSize = 0;
+    while (uiBytesLeft) {
+        pStream->avail_out = iUncompressedBufferSize;
+        pStream->next_out = reinterpret_cast<uint8_t*>(pUncompressedBuffer);
+        while (pStream->avail_out) {
+            uint32_t uiBytesLeftInFile = m_uiBufferReadSize - m_uiPos;
+            pStream->avail_in = uiBytesLeftInFile;
+            pStream->next_in = reinterpret_cast<uint8_t*>(&m_pBuffer[m_uiPos]);
+            if (uiBytesLeftInFile) {
+                int32_t eInflateError = inflate(pStream, 2);
+                if (eInflateError == -2 || (eInflateError == 2 || (eInflateError == -3 || eInflateError == -4))) {
+                    inflateEnd(pStream);
+                    uiBytesLeft = 0;
+                    break;
                 }
-                m_uiPos += uiBytesLeftInFile - pStream->avail_in;
-                iTrueFilePos += uiBytesLeftInFile - pStream->avail_in;
-                if (!pStream->avail_in) {
-                    NiFile::Flush();
-                    m_uiBufferReadSize = ReadFromArchive(m_pBuffer, m_uiBufferAllocSize, 0);
+                if (eInflateError == 1) {
+                    break;
                 }
             }
-            iUncompressedBufferReadSize = iUncompressedBufferSize - pStream->avail_out;
-            if (!iUncompressedBufferReadSize) {
-                break;
+            m_uiPos += uiBytesLeftInFile - pStream->avail_in;
+            iTrueFilePos += uiBytesLeftInFile - pStream->avail_in;
+            if (!pStream->avail_in) {
+                NiFile::Flush();
+                m_uiBufferReadSize = ReadFromArchive(m_pBuffer, m_uiBufferAllocSize, 0);
             }
-            if (uiBytesLeft <= iUncompressedBufferReadSize) {
-                if (apReadBuffer) {
-                    rt::memcpy(apReadBuffer, pUncompressedBuffer, uiBytesLeft);
-                }
-                iUncompressedBufferPos += uiBytesLeft;
-                uiReadBytes += uiBytesLeft;
-                uiBytesLeft = 0;
+        }
+        iUncompressedBufferReadSize = iUncompressedBufferSize - pStream->avail_out;
+        if (!iUncompressedBufferReadSize) {
+            break;
+        }
+        if (uiBytesLeft <= iUncompressedBufferReadSize) {
+            if (apReadBuffer) {
+                rt::memcpy(apReadBuffer, pUncompressedBuffer, uiBytesLeft);
             }
-            else {
-                uiBytesLeft -= iUncompressedBufferReadSize;
-                uiReadBytes += iUncompressedBufferReadSize;
-                if (apReadBuffer) {
-                    rt::memcpy(apReadBuffer, pUncompressedBuffer, iUncompressedBufferReadSize);
-                    apReadBuffer = static_cast<char*>(apReadBuffer) + iUncompressedBufferReadSize;
-                }
+            iUncompressedBufferPos += uiBytesLeft;
+            uiReadBytes += uiBytesLeft;
+            uiBytesLeft = 0;
+        }
+        else {
+            uiBytesLeft -= iUncompressedBufferReadSize;
+            uiReadBytes += iUncompressedBufferReadSize;
+            if (apReadBuffer) {
+                rt::memcpy(apReadBuffer, pUncompressedBuffer, iUncompressedBufferReadSize);
+                apReadBuffer = static_cast<char*>(apReadBuffer) + iUncompressedBufferReadSize;
             }
         }
     }
+
     return uiReadBytes;
 }
 
@@ -1553,10 +1548,8 @@ ArchiveManager::OpenArchive(const char* apArchiveName, uint16_t aiForceArchiveTy
                 else if (std::strstr(pName, "OldWo") && uiDLCArchive > 3) {
                     bAdded = true;
                 }
-                else if (std::strstr(pName, "Updat")) {
-                    if (uiDLCArchive > 3) {
-                        bAdded = true;
-                    }
+                else if ((std::strstr(pName, "Updat")) && (uiDLCArchive > 3)) {
+                    bAdded = true;
                 }
             }
             if (bAdded) {
@@ -1592,16 +1585,13 @@ Archive* ArchiveManager::GetArchive(const char* apArchiveName) {
         if (v4->m_item.m_pObject) {
             InterlockedIncrementInt32(reinterpret_cast<int32_t*>(&m_pObject->m_uiRefCount));
         }
-        if (m_pObject) {
-            if (!_stricmp(m_pObject->GetDevice(), apArchiveName)) {
-                break;
-            }
+        if ((m_pObject) && (!_stricmp(m_pObject->GetDevice(), apArchiveName))) {
+            break;
         }
+
         v4 = v4->GetNext();
-        if (m_pObject) {
-            if (!InterlockedDecrementInt32(reinterpret_cast<int32_t*>(&m_pObject->m_uiRefCount))) {
-                m_pObject->DeleteThis();
-            }
+        if ((m_pObject) && (!InterlockedDecrementInt32(reinterpret_cast<int32_t*>(&m_pObject->m_uiRefCount)))) {
+            m_pObject->DeleteThis();
         }
     }
     LeaveCriticalSection(&ArchiveManager::s_ArchiveListLock.CriticalSection);
@@ -1724,11 +1714,10 @@ bool ArchiveManager::InvalidateFile(const char* apFileName) {
         if (plist->m_item.m_pObject) {
             InterlockedIncrementInt32(reinterpret_cast<int32_t*>(&sparchive->m_uiRefCount));
         }
-        if (sparchive) {
-            if (sparchive->InvalidateFile(directoryHash, filenameHash, Str1)) {
-                break;
-            }
+        if ((sparchive) && (sparchive->InvalidateFile(directoryHash, filenameHash, Str1))) {
+            break;
         }
+
         plist = plist->GetNext();
         if (sparchive) {
             sparchive->DecRefCount();
@@ -2202,11 +2191,9 @@ bool ArchiveManager::CloseArchive(const char* apArchiveName) {
     }
     for (BSSimpleList<NiPointer<Archive>>* i = ArchiveManager::pArchiveList; i; i = i->GetNext()) {
         Archive* apArchive = i->m_item.m_pObject;
-        if (i->m_item.m_pObject) {
-            if (!_stricmp(apArchive->GetDevice(), acPath)) {
-                ArchiveManager::RemoveArchive(apArchive);
-                return true;
-            }
+        if ((i->m_item.m_pObject) && (!_stricmp(apArchive->GetDevice(), acPath))) {
+            ArchiveManager::RemoveArchive(apArchive);
+            return true;
         }
     }
     return false;
@@ -2297,14 +2284,13 @@ BSFileEntry* ArchiveManager::GetFileEntryForFile_1(
         if (v7->m_item.m_pObject) {
             InterlockedIncrementInt32(reinterpret_cast<int32_t*>(&m_pObject->m_uiRefCount));
         }
-        if (m_pObject) {
-            if ((aeArchiveTypeIndex & m_pObject->iArchiveType) != 0) {
-                FileEntryForFile = m_pObject->GetFileEntryForFile(*arDirectoryHash, *arFileNameHash, apFileName);
-                if (FileEntryForFile) {
-                    break;
-                }
+        if ((m_pObject) && ((aeArchiveTypeIndex & m_pObject->iArchiveType) != 0)) {
+            FileEntryForFile = m_pObject->GetFileEntryForFile(*arDirectoryHash, *arFileNameHash, apFileName);
+            if (FileEntryForFile) {
+                break;
             }
         }
+
         v7 = v7->GetNext();
         if (m_pObject) {
             m_pObject->DecRefCount();

@@ -34,19 +34,18 @@ HotKeysWheel::~HotKeysWheel() {
     InventoryChanges* InventoryChanges_ = InventoryChanges::GetInventoryChanges(pPlayer);
     for (int32_t aiKey = 0; aiKey < 8; ++aiKey) {
         ItemChange* HotKeyItem = InventoryChanges_->GetHotKeyItem(aiKey);
-        if (HotKeyItem) {
-            if (HotKeyItem->pContainerObj) {
-                TESModelTextureSwap* BipedTESModel_0 =
-                    TESBipedModelForm::GetBipedTESModel(HotKeyItem->pContainerObj, pPlayer);
-                if (!BipedTESModel_0) {
-                    BipedTESModel_0 = dynamic_cast<TESModelTextureSwap*>(HotKeyItem->pContainerObj);
-                }
-                if (BipedTESModel_0) {
-                    const char* v1 = BipedTESModel_0->GetModel();
-                    pModelLoader->ReleaseFile(v1);
-                }
+        if ((HotKeyItem) && (HotKeyItem->pContainerObj)) {
+            TESModelTextureSwap* BipedTESModel_0 =
+                TESBipedModelForm::GetBipedTESModel(HotKeyItem->pContainerObj, pPlayer);
+            if (!BipedTESModel_0) {
+                BipedTESModel_0 = dynamic_cast<TESModelTextureSwap*>(HotKeyItem->pContainerObj);
+            }
+            if (BipedTESModel_0) {
+                const char* v1 = BipedTESModel_0->GetModel();
+                pModelLoader->ReleaseFile(v1);
             }
         }
+
         if (HotKeyItem) {
             delete HotKeyItem;
         }
@@ -225,100 +224,91 @@ void HotKeysWheel::UseHotkeyItem() {
     bool v9 = pitem &&
         (pitem->pContainerObj->GetFormType() == WEAP_ID &&
          static_cast<TESObjectWEAP*>(pitem->pContainerObj)->TESObjectWEAP::IsThrownWeapon());
-    if (bSelectingHotkey) {
-        if (pinventory) {
-            if (pitem) {
-                if ((pPlayer->GetAnimAction() == ANIM_ACTION_NONE || pitem->pContainerObj->GetFormType() != ARMO_ID) &&
-                    (pPlayer->GetAnimAction() == ANIM_ACTION_NONE || pitem->pContainerObj->GetFormType() != WEAP_ID)) {
-                    int32_t v2;
-                    TESBoundObject* FormFlags = pitem->pContainerObj;
-                    if (FormFlags == BGSDefaultObjectManager::GetDefaultObject(DO_STIMPAK) &&
-                        (v2 = pPlayer->GetActorValue(ActorValue::HEALTH),
-                         v2 == pPlayer->GetPermanentActorValue(ActorValue::HEALTH))) {
-                        const char* v3 = sFullHealth.operator const char*();
-                        Interface::ShowMessage(v3, 0, nullptr, nullptr, 2.0f, false);
-                    }
-                    else {
-                        if (pitem->GetWorn(false)) {
-                            uint32_t aiCount;
-                            if (v9) {
-                                aiCount = pitem->iNumber;
-                            }
-                            else {
-                                aiCount = 1;
-                            }
-                            TESBoundObject* v5 = pitem->pContainerObj;
-                            pPlayer->QueueUnEquipObject(v5, aiCount, pextra, false, false, true);
-                        }
-                        else {
-                            uint32_t count;
-                            if (v9) {
-                                count = pitem->iNumber;
-                            }
-                            else {
-                                count = 1;
-                            }
-                            TESBoundObject* v4 = pitem->pContainerObj;
-                            pPlayer->QueueEquipObject(v4, count, pextra, false, false, true);
-                        }
-                        pPlayer->UpdatePlayer3d();
-                        BaseProcess* CurrentAIProcess = pPlayer->pCurrentProcess;
-                        CurrentAIProcess->SetShouldRefreshMagicShadersEffects(true, false, false);
-                        pPlayer->ResetArmorRating();
-                        delete pitem;
-                    }
+    if ((bSelectingHotkey) && (pinventory) && (pitem) &&
+        ((pPlayer->GetAnimAction() == ANIM_ACTION_NONE || pitem->pContainerObj->GetFormType() != ARMO_ID) &&
+         (pPlayer->GetAnimAction() == ANIM_ACTION_NONE || pitem->pContainerObj->GetFormType() != WEAP_ID))) {
+        int32_t v2;
+        TESBoundObject* FormFlags = pitem->pContainerObj;
+        if (FormFlags == BGSDefaultObjectManager::GetDefaultObject(DO_STIMPAK) &&
+            (v2 = pPlayer->GetActorValue(ActorValue::HEALTH),
+             v2 == pPlayer->GetPermanentActorValue(ActorValue::HEALTH))) {
+            const char* v3 = sFullHealth.operator const char*();
+            Interface::ShowMessage(v3, 0, nullptr, nullptr, 2.0f, false);
+        }
+        else {
+            if (pitem->GetWorn(false)) {
+                uint32_t aiCount;
+                if (v9) {
+                    aiCount = pitem->iNumber;
                 }
+                else {
+                    aiCount = 1;
+                }
+                TESBoundObject* v5 = pitem->pContainerObj;
+                pPlayer->QueueUnEquipObject(v5, aiCount, pextra, false, false, true);
             }
+            else {
+                uint32_t count;
+                if (v9) {
+                    count = pitem->iNumber;
+                }
+                else {
+                    count = 1;
+                }
+                TESBoundObject* v4 = pitem->pContainerObj;
+                pPlayer->QueueEquipObject(v4, count, pextra, false, false, true);
+            }
+            pPlayer->UpdatePlayer3d();
+            BaseProcess* CurrentAIProcess = pPlayer->pCurrentProcess;
+            CurrentAIProcess->SetShouldRefreshMagicShadersEffects(true, false, false);
+            pPlayer->ResetArmorRating();
+            delete pitem;
         }
     }
 }
 
 void HotKeysWheel::SetHotkeyItem(ItemChange* apHotkeyItem) {
     InventoryChanges* InventoryChanges_ = InventoryChanges::GetInventoryChanges(pPlayer);
-    if (apHotkeyItem) {
-        if (bSelectingHotkey) {
-            if (InventoryChanges_) {
-                ExtraDataList* v5;
-                ItemChange* HotKeyItem = InventoryChanges_->GetHotKeyItem(iLastHighlightedHotkey);
-                if (apHotkeyItem->pExtraObjectList) {
-                    v5 = apHotkeyItem->pExtraObjectList->m_item;
+    if ((apHotkeyItem) && (bSelectingHotkey) && (InventoryChanges_)) {
+        ExtraDataList* v5;
+        ItemChange* HotKeyItem = InventoryChanges_->GetHotKeyItem(iLastHighlightedHotkey);
+        if (apHotkeyItem->pExtraObjectList) {
+            v5 = apHotkeyItem->pExtraObjectList->m_item;
+        }
+        else {
+            v5 = nullptr;
+        }
+        if (HotKeyItem) {
+            InventoryChanges_->RemoveHotKeyItem(HotKeyItem, iLastHighlightedHotkey);
+            if (HotKeyItem->pContainerObj) {
+                TESModelTextureSwap* BipedTESModel_0 =
+                    TESBipedModelForm::GetBipedTESModel(HotKeyItem->pContainerObj, pPlayer);
+                if (!BipedTESModel_0) {
+                    BipedTESModel_0 = dynamic_cast<TESModelTextureSwap*>(HotKeyItem->pContainerObj);
                 }
-                else {
-                    v5 = nullptr;
-                }
-                if (HotKeyItem) {
-                    InventoryChanges_->RemoveHotKeyItem(HotKeyItem, iLastHighlightedHotkey);
-                    if (HotKeyItem->pContainerObj) {
-                        TESModelTextureSwap* BipedTESModel_0 =
-                            TESBipedModelForm::GetBipedTESModel(HotKeyItem->pContainerObj, pPlayer);
-                        if (!BipedTESModel_0) {
-                            BipedTESModel_0 = dynamic_cast<TESModelTextureSwap*>(HotKeyItem->pContainerObj);
-                        }
-                        if (BipedTESModel_0) {
-                            const char* v2 = BipedTESModel_0->GetModel();
-                            pModelLoader->ReleaseFile(v2);
-                        }
-                    }
-                }
-                InventoryChanges_->SetHotKeyItem(apHotkeyItem, v5, iLastHighlightedHotkey);
-                if (apHotkeyItem->pContainerObj) {
-                    TESModelTextureSwap* v7 = TESBipedModelForm::GetBipedTESModel(apHotkeyItem->pContainerObj, pPlayer);
-                    if (!v7) {
-                        v7 = dynamic_cast<TESModelTextureSwap*>(apHotkeyItem->pContainerObj);
-                    }
-                    if (v7) {
-                        const char* v3 = v7->GetModel();
-                        pModelLoader->LoadFile(v3, LOD_MULT_NONE, true, false, false, false);
-                    }
-                }
-                UpdateHotkeyList();
-                TESBoundObject* FormFlags = apHotkeyItem->pContainerObj;
-                pPlayer->PlayPickUpSound(FormFlags, true, false);
-                bSelectingHotkey = false;
-                if (HotKeyItem) {
-                    delete HotKeyItem;
+                if (BipedTESModel_0) {
+                    const char* v2 = BipedTESModel_0->GetModel();
+                    pModelLoader->ReleaseFile(v2);
                 }
             }
+        }
+        InventoryChanges_->SetHotKeyItem(apHotkeyItem, v5, iLastHighlightedHotkey);
+        if (apHotkeyItem->pContainerObj) {
+            TESModelTextureSwap* v7 = TESBipedModelForm::GetBipedTESModel(apHotkeyItem->pContainerObj, pPlayer);
+            if (!v7) {
+                v7 = dynamic_cast<TESModelTextureSwap*>(apHotkeyItem->pContainerObj);
+            }
+            if (v7) {
+                const char* v3 = v7->GetModel();
+                pModelLoader->LoadFile(v3, LOD_MULT_NONE, true, false, false, false);
+            }
+        }
+        UpdateHotkeyList();
+        TESBoundObject* FormFlags = apHotkeyItem->pContainerObj;
+        pPlayer->PlayPickUpSound(FormFlags, true, false);
+        bSelectingHotkey = false;
+        if (HotKeyItem) {
+            delete HotKeyItem;
         }
     }
 }

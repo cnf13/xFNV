@@ -62,7 +62,6 @@ ActiveEffect* CommandCreatureEffect::Instantiate(MagicCaster* apCaster, MagicIte
     if (apMemory) {
         return ::new (apMemory) CommandCreatureEffect(apCaster, apSpell, apEffect);
     }
-    else {
-        return nullptr;
-    }
+
+    return nullptr;
 }

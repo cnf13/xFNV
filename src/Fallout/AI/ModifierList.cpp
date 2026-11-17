@@ -61,22 +61,20 @@ void ModifierList::AddFastModifier(char acKey, Modifier* apNew) {
         if (pFastModifiers) {
             pFastModifiers->DeleteModifier(acKey);
         }
-        if (apNew) {
-            if (apNew->fValue != 0.0 || bZeroValuesAllowed) {
-                if (!pFastModifiers) {
-                    FastModifierCollection* v3;
-                    FastModifierCollection* apMemory =
-                        static_cast<FastModifierCollection*>(ourMalloc(sizeof(FastModifierCollection)));
-                    if (apMemory) {
-                        v3 = ::new (apMemory) FastModifierCollection;
-                    }
-                    else {
-                        v3 = nullptr;
-                    }
-                    pFastModifiers = v3;
+        if ((apNew) && (apNew->fValue != 0.0 || bZeroValuesAllowed)) {
+            if (!pFastModifiers) {
+                FastModifierCollection* v3;
+                FastModifierCollection* apMemory =
+                    static_cast<FastModifierCollection*>(ourMalloc(sizeof(FastModifierCollection)));
+                if (apMemory) {
+                    v3 = ::new (apMemory) FastModifierCollection;
                 }
-                pFastModifiers->pModifiers[FastModifierCollection::uiAVMapping[acKey]] = apNew;
+                else {
+                    v3 = nullptr;
+                }
+                pFastModifiers = v3;
             }
+            pFastModifiers->pModifiers[FastModifierCollection::uiAVMapping[acKey]] = apNew;
         }
     }
 }
@@ -400,15 +398,10 @@ FastModifierCollection::~FastModifierCollection() {
 }
 
 void FastModifierCollection::DeleteModifier(uint32_t auiIndex) {
-    if (auiIndex <= 76) {
-        if (pModifiers) {
-            if (FastModifierCollection::uiAVMapping[auiIndex] < 77) {
-                if (pModifiers[FastModifierCollection::uiAVMapping[auiIndex]]) {
-                    ourFree(pModifiers[FastModifierCollection::uiAVMapping[auiIndex]]);
-                    pModifiers[FastModifierCollection::uiAVMapping[auiIndex]] = nullptr;
-                }
-            }
-        }
+    if ((auiIndex <= 76) && (pModifiers) && (FastModifierCollection::uiAVMapping[auiIndex] < 77) &&
+        (pModifiers[FastModifierCollection::uiAVMapping[auiIndex]])) {
+        ourFree(pModifiers[FastModifierCollection::uiAVMapping[auiIndex]]);
+        pModifiers[FastModifierCollection::uiAVMapping[auiIndex]] = nullptr;
     }
 }
 

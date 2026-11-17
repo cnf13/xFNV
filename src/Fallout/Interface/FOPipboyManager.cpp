@@ -96,91 +96,86 @@ bool FOPipboyManager::OnIdle() {
 void FOPipboyManager::Initialize() {
     FNVD_INLINED_LOCAL(NiFixedString, v15, std::nullopt, std::nullopt);
     FNVD_INLINED_LOCAL(NiFixedString, apString, std::nullopt, std::nullopt);
-    if (bUsePipboyMode.Bool() && !GetInitialized()) {
-        if (pPlayer) {
-            if (pPlayer->Get3D(true)) {
-                NiGeometry* p3rdPersonScreenGeom = nullptr;
-                NiGeometry* pPipboyScreen = nullptr;
-                NiNode* v23 = nullptr;
-                NiAVObject* v13 = pPlayer->Get3D(true);
-                NiFixedString* v12 = ::new (static_cast<void*>(&apString)) NiFixedString("pipboyscreen");
-                NiAVObject* v1 = v13->GetObjectByName(*v12);
-                NiNode* pPipboyNode = static_cast<NiNode*>(NiObject::DynamicCastStatic(&NiNode::ms_RTTI, v1));
-                apString.~NiFixedString();
-                if (!pPipboyNode) {
-                    NiAVObject* v11 = pPlayer->Get3D(true);
-                    NiFixedString v16("pipboyscreen:0");
-                    NiFixedString* v10 = &v16;
-                    NiAVObject* v2 = v11->GetObjectByName(*v10);
-                    pPipboyNode = static_cast<NiNode*>(NiObject::DynamicCastStatic(&NiNode::ms_RTTI, v2));
-                }
-                FORenderedMenu::Initialize();
-                SetMenuRoot(InterfaceManager::Instance()->GetSceneGraph());
-                if (pPipboyNode) {
-                    pPipboyScreen = static_cast<NiGeometry*>(pPipboyNode->GetAtChecked(0));
-                    spPipboyRoot.operator=(pPipboyNode->m_pkParent);
-                }
-                else {
-                    NiAVObject* v9 = pPlayer->Get3D(true);
-                    NiFixedString* v8 = ::new (static_cast<void*>(&v15)) NiFixedString("pipboyscreen:0");
-                    NiAVObject* v3 = v9->GetObjectByName(*v8);
-                    pPipboyScreen = static_cast<NiGeometry*>(NiObject::DynamicCastStatic(&NiGeometry::ms_RTTI, v3));
-                    v15.~NiFixedString();
-                    if (pPipboyScreen) {
-                        spPipboyRoot.operator=(pPipboyScreen->m_pkParent);
-                    }
-                }
-                SetScreenParent(pPlayer->Get3D(true));
-                if (pPipboyNode) {
-                    NiGeometry* pPipboyScreen_2 = static_cast<NiGeometry*>(pPipboyNode->GetAtChecked(0));
-                    p3rdPersonScreenGeom =
-                        static_cast<NiGeometry*>(NiObject::DynamicCastStatic(&NiGeometry::ms_RTTI, pPipboyScreen_2));
-                    sp3rdPersonPipboyRoot.operator=(pPipboyNode->m_pkParent);
-                    sp3rdPersonScreen.operator=(static_cast<NiAVObject*>(p3rdPersonScreenGeom));
-                }
-                else {
-                    if (pPipboyScreen) {
-                        p3rdPersonScreenGeom = pPipboyScreen;
-                        sp3rdPersonPipboyRoot.operator=(pPipboyScreen->m_pkParent);
-                        sp3rdPersonScreen.operator=(static_cast<NiAVObject*>(p3rdPersonScreenGeom));
-                    }
-                }
-                if (pPipboyScreen) {
-                    if (p3rdPersonScreenGeom) {
-                        PrepareGeometry(pPipboyScreen);
-                        PrepareGeometry(p3rdPersonScreenGeom);
-                        SetScreenGeometry(pPipboyScreen);
-                    }
-                }
-                InitButtons();
-                InitKnobs();
-                InitLight();
-                if (spPipboyRoot.m_pObject) {
-                    NiUpdateData UpdateData(0.0f, false, false);
-                    spPipboyRoot.m_pObject->Update(UpdateData);
-                    spPipboyRoot.m_pObject->UpdateProperties();
-                }
-                if (sp3rdPersonPipboyRoot.m_pObject) {
-                    NiUpdateData UpdateData_2(0.0f, false, false);
-                    sp3rdPersonPipboyRoot.m_pObject->Update(UpdateData_2);
-                    sp3rdPersonPipboyRoot.m_pObject->UpdateProperties();
-                }
-                NiColorA newcolor(0.0f, 0.0f, 0.0f, 0.0f);
-                SystemColorManager* Instance = SystemColorManager::GetInstance();
-                if (Instance->GetColor(4, newcolor)) {
-                    SetBackgroundColor(newcolor);
-                    SetTintColor(newcolor);
-                }
-                float* v6 = &fBlurIntensityPipboy.Float();
-                SetBlurIntensity(*v6);
-                SetBlurRadius(fBlurRadiusPipboy.Float());
-                float* v7 = &gs_fScanlineFrequencyPipboy_Pipboy.Float();
-                SetDoScanlines(true, *v7);
-                bPulseAffectsLight = 1;
-                ShowPipboyLightEffect(false, false, true);
-                ShowPipboyLightEffect(true, false, true);
+    if ((bUsePipboyMode.Bool() && !GetInitialized()) && (pPlayer) && (pPlayer->Get3D(true))) {
+        NiGeometry* p3rdPersonScreenGeom = nullptr;
+        NiGeometry* pPipboyScreen = nullptr;
+        NiNode* v23 = nullptr;
+        NiAVObject* v13 = pPlayer->Get3D(true);
+        NiFixedString* v12 = ::new (static_cast<void*>(&apString)) NiFixedString("pipboyscreen");
+        NiAVObject* v1 = v13->GetObjectByName(*v12);
+        NiNode* pPipboyNode = static_cast<NiNode*>(NiObject::DynamicCastStatic(&NiNode::ms_RTTI, v1));
+        apString.~NiFixedString();
+        if (!pPipboyNode) {
+            NiAVObject* v11 = pPlayer->Get3D(true);
+            NiFixedString v16("pipboyscreen:0");
+            NiFixedString* v10 = &v16;
+            NiAVObject* v2 = v11->GetObjectByName(*v10);
+            pPipboyNode = static_cast<NiNode*>(NiObject::DynamicCastStatic(&NiNode::ms_RTTI, v2));
+        }
+        FORenderedMenu::Initialize();
+        SetMenuRoot(InterfaceManager::Instance()->GetSceneGraph());
+        if (pPipboyNode) {
+            pPipboyScreen = static_cast<NiGeometry*>(pPipboyNode->GetAtChecked(0));
+            spPipboyRoot.operator=(pPipboyNode->m_pkParent);
+        }
+        else {
+            NiAVObject* v9 = pPlayer->Get3D(true);
+            NiFixedString* v8 = ::new (static_cast<void*>(&v15)) NiFixedString("pipboyscreen:0");
+            NiAVObject* v3 = v9->GetObjectByName(*v8);
+            pPipboyScreen = static_cast<NiGeometry*>(NiObject::DynamicCastStatic(&NiGeometry::ms_RTTI, v3));
+            v15.~NiFixedString();
+            if (pPipboyScreen) {
+                spPipboyRoot.operator=(pPipboyScreen->m_pkParent);
             }
         }
+        SetScreenParent(pPlayer->Get3D(true));
+        if (pPipboyNode) {
+            NiGeometry* pPipboyScreen_2 = static_cast<NiGeometry*>(pPipboyNode->GetAtChecked(0));
+            p3rdPersonScreenGeom =
+                static_cast<NiGeometry*>(NiObject::DynamicCastStatic(&NiGeometry::ms_RTTI, pPipboyScreen_2));
+            sp3rdPersonPipboyRoot.operator=(pPipboyNode->m_pkParent);
+            sp3rdPersonScreen.operator=(static_cast<NiAVObject*>(p3rdPersonScreenGeom));
+        }
+        else {
+            if (pPipboyScreen) {
+                p3rdPersonScreenGeom = pPipboyScreen;
+                sp3rdPersonPipboyRoot.operator=(pPipboyScreen->m_pkParent);
+                sp3rdPersonScreen.operator=(static_cast<NiAVObject*>(p3rdPersonScreenGeom));
+            }
+        }
+        if ((pPipboyScreen) && (p3rdPersonScreenGeom)) {
+            PrepareGeometry(pPipboyScreen);
+            PrepareGeometry(p3rdPersonScreenGeom);
+            SetScreenGeometry(pPipboyScreen);
+        }
+
+        InitButtons();
+        InitKnobs();
+        InitLight();
+        if (spPipboyRoot.m_pObject) {
+            NiUpdateData UpdateData(0.0f, false, false);
+            spPipboyRoot.m_pObject->Update(UpdateData);
+            spPipboyRoot.m_pObject->UpdateProperties();
+        }
+        if (sp3rdPersonPipboyRoot.m_pObject) {
+            NiUpdateData UpdateData_2(0.0f, false, false);
+            sp3rdPersonPipboyRoot.m_pObject->Update(UpdateData_2);
+            sp3rdPersonPipboyRoot.m_pObject->UpdateProperties();
+        }
+        NiColorA newcolor(0.0f, 0.0f, 0.0f, 0.0f);
+        SystemColorManager* Instance = SystemColorManager::GetInstance();
+        if (Instance->GetColor(4, newcolor)) {
+            SetBackgroundColor(newcolor);
+            SetTintColor(newcolor);
+        }
+        float* v6 = &fBlurIntensityPipboy.Float();
+        SetBlurIntensity(*v6);
+        SetBlurRadius(fBlurRadiusPipboy.Float());
+        float* v7 = &gs_fScanlineFrequencyPipboy_Pipboy.Float();
+        SetDoScanlines(true, *v7);
+        bPulseAffectsLight = 1;
+        ShowPipboyLightEffect(false, false, true);
+        ShowPipboyLightEffect(true, false, true);
     }
 }
 
@@ -280,52 +275,47 @@ void FOPipboyManager::UpdateKnobs(float afTime) {
             v17[i] = true;
         }
     }
-    if (spKnobs->m_pObject) {
-        if (v17[0]) {
-            float fAngle = fKnobPositions[0];
-            NiAVObject* v2 = spKnobs->m_pObject;
-            v2->SetRotate(fAngle, static_cast<float>(1.0), static_cast<float>(0.0), static_cast<float>(0.0));
-            NiUpdateData a2(0.0, false, false);
-            NiAVObject* v3 = spKnobs->m_pObject;
-            v3->Update(a2);
-        }
+    if ((spKnobs->m_pObject) && (v17[0])) {
+        float fAngle = fKnobPositions[0];
+        NiAVObject* v2 = spKnobs->m_pObject;
+        v2->SetRotate(fAngle, static_cast<float>(1.0), static_cast<float>(0.0), static_cast<float>(0.0));
+        NiUpdateData a2(0.0, false, false);
+        NiAVObject* v3 = spKnobs->m_pObject;
+        v3->Update(a2);
     }
-    if (spKnobs[1].m_pObject) {
-        if (v17[1]) {
-            float fAnglea = fKnobPositions[1];
-            NiAVObject* v4 = spKnobs[1].m_pObject;
-            v4->SetRotate(fAnglea, static_cast<float>(0.0), static_cast<float>(0.0), static_cast<float>(1.0));
-            NiUpdateData arData(0.0, false, false);
-            NiAVObject* v5 = spKnobs[1].m_pObject;
-            v5->Update(arData);
-        }
+
+    if ((spKnobs[1].m_pObject) && (v17[1])) {
+        float fAnglea = fKnobPositions[1];
+        NiAVObject* v4 = spKnobs[1].m_pObject;
+        v4->SetRotate(fAnglea, static_cast<float>(0.0), static_cast<float>(0.0), static_cast<float>(1.0));
+        NiUpdateData arData(0.0, false, false);
+        NiAVObject* v5 = spKnobs[1].m_pObject;
+        v5->Update(arData);
     }
-    if (spKnobs[2].m_pObject) {
-        if (v17[2]) {
-            float fAngleb = fKnobPositions[2];
-            NiAVObject* v6 = spKnobs[2].m_pObject;
-            v6->SetRotate(fAngleb, static_cast<float>(0.0), static_cast<float>(0.0), static_cast<float>(1.0));
-            NiUpdateData apMemory(0.0, false, false);
-            NiAVObject* v7 = spKnobs[2].m_pObject;
-            v7->Update(apMemory);
-        }
+
+    if ((spKnobs[2].m_pObject) && (v17[2])) {
+        float fAngleb = fKnobPositions[2];
+        NiAVObject* v6 = spKnobs[2].m_pObject;
+        v6->SetRotate(fAngleb, static_cast<float>(0.0), static_cast<float>(0.0), static_cast<float>(1.0));
+        NiUpdateData apMemory(0.0, false, false);
+        NiAVObject* v7 = spKnobs[2].m_pObject;
+        v7->Update(apMemory);
     }
+
     fLastPipboyKnobUpdateTime = afTime;
 }
 
 void FOPipboyManager::SetRefractive(bool abRefractive) {
-    if (GetScreenGeometry()) {
-        if (Get3rdPersonScreen()) {
-            if (abRefractive) {
-                GetScreenGeometry()->SetAppCulled(true);
-                NiAVObject* v2 = Get3rdPersonScreen();
-                v2->SetAppCulled(true);
-            }
-            else {
-                GetScreenGeometry()->SetAppCulled(false);
-                NiAVObject* v3 = Get3rdPersonScreen();
-                v3->SetAppCulled(false);
-            }
+    if ((GetScreenGeometry()) && (Get3rdPersonScreen())) {
+        if (abRefractive) {
+            GetScreenGeometry()->SetAppCulled(true);
+            NiAVObject* v2 = Get3rdPersonScreen();
+            v2->SetAppCulled(true);
+        }
+        else {
+            GetScreenGeometry()->SetAppCulled(false);
+            NiAVObject* v3 = Get3rdPersonScreen();
+            v3->SetAppCulled(false);
         }
     }
 }
@@ -488,25 +478,24 @@ void FOPipboyManager::UpdateLightEffect(float afTime) {
         if (pLightEffect) {
             plightNode = pLightEffect->IsNode();
         }
-        if (plightNode) {
-            if (plightNode->GetChildCount()) {
-                NiAVObject* v4 = plightNode->GetAt(0);
-                NiGeometry* peffect = v4->IsGeometry();
-                if (peffect) {
-                    int32_t Type = NiMaterialProperty::GetType();
-                    NiMaterialProperty* pmp = static_cast<NiMaterialProperty*>(peffect->GetProperty(Type));
-                    if (pmp) {
-                        pmp->SetAlpha(ffade);
-                    }
-                    else {
-                        int32_t v3 = NiShadeProperty::GetType();
-                        BSShaderProperty* psp = static_cast<BSShaderProperty*>(peffect->GetProperty(v3));
-                        psp->SetAlpha(ffade);
-                    }
-                    peffect->UpdateProperties();
+        if ((plightNode) && (plightNode->GetChildCount())) {
+            NiAVObject* v4 = plightNode->GetAt(0);
+            NiGeometry* peffect = v4->IsGeometry();
+            if (peffect) {
+                int32_t Type = NiMaterialProperty::GetType();
+                NiMaterialProperty* pmp = static_cast<NiMaterialProperty*>(peffect->GetProperty(Type));
+                if (pmp) {
+                    pmp->SetAlpha(ffade);
                 }
+                else {
+                    int32_t v3 = NiShadeProperty::GetType();
+                    BSShaderProperty* psp = static_cast<BSShaderProperty*>(peffect->GetProperty(v3));
+                    psp->SetAlpha(ffade);
+                }
+                peffect->UpdateProperties();
             }
         }
+
         if (fLightEffectFadeTarget == ffade) {
             bLightEffectFading = false;
             if (fLightEffectFadeTarget == 0.0) {
@@ -532,14 +521,12 @@ void FOPipboyManager::SetTabKnobPosition(uint32_t aiNewPos, bool abPlaySounds) {
     if (fTabKnobPositions[aiNewPos] != fKnobTargets[2]) {
         fKnobTargets[2] = fTabKnobPositions[aiNewPos];
         fKnobRates[2] = fTabKnobMoveRate.Float();
-        if (FORenderedMenu::bSoundsActive) {
-            if (abPlaySounds) {
-                BSSoundHandle psoundHand;
-                BSAudio* v3 = &BSAudio::QInstance();
-                BSSoundHandle* arHandle = v3->GetSoundHandleByName(&a1, "UIPipBoyTab", 289u);
-                psoundHand.operator=(*arHandle);
-                psoundHand.Play(false);
-            }
+        if ((FORenderedMenu::bSoundsActive) && (abPlaySounds)) {
+            BSSoundHandle psoundHand;
+            BSAudio* v3 = &BSAudio::QInstance();
+            BSSoundHandle* arHandle = v3->GetSoundHandleByName(&a1, "UIPipBoyTab", 289u);
+            psoundHand.operator=(*arHandle);
+            psoundHand.Play(false);
         }
     }
 }
@@ -710,65 +697,60 @@ char FOPipboyManager::CheckOrangeButtonsClicked(char arg0, char a3, float* a4, f
     if (!GetScreenGeometry() || (!spButtons->m_pObject || (!spButtons[1].m_pObject || !spButtons[2].m_pObject))) {
         return 0;
     }
-    if (InterfaceManager::IsInPipboyMenu() && InterfaceManager::IsPipboyMenuTopmost()) {
-        if (spPipboyRoot.m_pObject) {
-            NiPoint3 a2;
-            NiPoint3 a1;
-            NiPick apMemory(0, 8u);
-            apMemory.SetObserveAppCullFlag(true);
-            apMemory.SetTarget(GetScreenGeometry());
-            apMemory.m_eSortType = NiPick::SORT;
-            apMemory.SetIsReturnTexture(true);
-            NiCamera* Camera = Main::GetWorldSceneGraph()->GetCamera();
-            int32_t ScriptProcessingDelay = static_cast<int32_t>(v27->sRealCursorPos.z);
-            double DataClipDist = v27->sRealCursorPos.x;
-            Camera->WindowPointToRay(static_cast<int32_t>(DataClipDist), ScriptProcessingDelay, a1, a2, nullptr);
-            if (apMemory.PickObjects(a1, a2, false)) {
-                NiPick::Record* v21 = (&apMemory.m_pickResults)->GetAt(0);
-                if (v21) {
-                    NiGeometry* AVObject = static_cast<NiGeometry*>(v21->GetAVObject());
-                    if (AVObject == GetScreenGeometry()) {
-                        float* Filename = &(&v21->m_texture)->x;
-                        float v17 = *Filename;
-                        float v18 = Filename[1];
-                        float RealScreenHeight = InterfaceManager::GetRealScreenHeight();
-                        float v19 = RealScreenHeight * 1.3333330154418945;
-                        *a4 = v17 * v19;
-                        *a5 = v18 * RealScreenHeight;
-                        v26 = 1;
-                    }
-                }
-            }
-            if (arg0 || a3) {
-                int32_t v16 = -1;
-                apMemory.m_eSortType = NiPick::SORT;
-                apMemory.SetIsReturnTexture(false);
-                for (int32_t i = 0; i < 3; ++i) {
-                    apMemory.SetTarget(spButtons[i].m_pObject);
-                    int32_t v13 = static_cast<int32_t>(v27->sRealCursorPos.z);
-                    int32_t v11 = static_cast<int32_t>(v27->sRealCursorPos.x);
-                    SceneGraph* WorldSceneGraph = Main::GetWorldSceneGraph();
-                    WorldSceneGraph->GetCamera()->WindowPointToRay(v11, v13, a1, a2, nullptr);
-                    if (apMemory.PickObjects(a1, a2, false)) {
-                        if ((&apMemory.m_pickResults)->GetAt(0)) {
-                            if (arg0) {
-                                iClickedOrangeButton = i;
-                            }
-                            else {
-                                v16 = i;
-                            }
-                        }
-                    }
-                }
-                if (a3) {
-                    if (v16 == iClickedOrangeButton) {
-                        *a6 = v16 + 1;
-                        iClickedOrangeButton = -1;
-                    }
+    if ((InterfaceManager::IsInPipboyMenu() && InterfaceManager::IsPipboyMenuTopmost()) && (spPipboyRoot.m_pObject)) {
+        NiPoint3 a2;
+        NiPoint3 a1;
+        NiPick apMemory(0, 8u);
+        apMemory.SetObserveAppCullFlag(true);
+        apMemory.SetTarget(GetScreenGeometry());
+        apMemory.m_eSortType = NiPick::SORT;
+        apMemory.SetIsReturnTexture(true);
+        NiCamera* Camera = Main::GetWorldSceneGraph()->GetCamera();
+        int32_t ScriptProcessingDelay = static_cast<int32_t>(v27->sRealCursorPos.z);
+        double DataClipDist = v27->sRealCursorPos.x;
+        Camera->WindowPointToRay(static_cast<int32_t>(DataClipDist), ScriptProcessingDelay, a1, a2, nullptr);
+        if (apMemory.PickObjects(a1, a2, false)) {
+            NiPick::Record* v21 = (&apMemory.m_pickResults)->GetAt(0);
+            if (v21) {
+                NiGeometry* AVObject = static_cast<NiGeometry*>(v21->GetAVObject());
+                if (AVObject == GetScreenGeometry()) {
+                    float* Filename = &(&v21->m_texture)->x;
+                    float v17 = *Filename;
+                    float v18 = Filename[1];
+                    float RealScreenHeight = InterfaceManager::GetRealScreenHeight();
+                    float v19 = RealScreenHeight * 1.3333330154418945;
+                    *a4 = v17 * v19;
+                    *a5 = v18 * RealScreenHeight;
+                    v26 = 1;
                 }
             }
         }
+        if (arg0 || a3) {
+            int32_t v16 = -1;
+            apMemory.m_eSortType = NiPick::SORT;
+            apMemory.SetIsReturnTexture(false);
+            for (int32_t i = 0; i < 3; ++i) {
+                apMemory.SetTarget(spButtons[i].m_pObject);
+                int32_t v13 = static_cast<int32_t>(v27->sRealCursorPos.z);
+                int32_t v11 = static_cast<int32_t>(v27->sRealCursorPos.x);
+                SceneGraph* WorldSceneGraph = Main::GetWorldSceneGraph();
+                WorldSceneGraph->GetCamera()->WindowPointToRay(v11, v13, a1, a2, nullptr);
+                if ((apMemory.PickObjects(a1, a2, false)) && ((&apMemory.m_pickResults)->GetAt(0))) {
+                    if (arg0) {
+                        iClickedOrangeButton = i;
+                    }
+                    else {
+                        v16 = i;
+                    }
+                }
+            }
+            if ((a3) && (v16 == iClickedOrangeButton)) {
+                *a6 = v16 + 1;
+                iClickedOrangeButton = -1;
+            }
+        }
     }
+
     return v26;
 }
 
@@ -789,12 +771,11 @@ void FOPipboyManager::InitKnobs() {
         NiFixedString* v13 = &v23;
         pGeometry = v14->GetObjectByName(*v13);
     }
-    if (pGeometry) {
-        if (pGeometry->IsNode()) {
-            NiNode* v1 = pGeometry->IsNode();
-            spKnobs->operator=(static_cast<NiGeometry*>(v1->GetAt(0)));
-        }
+    if ((pGeometry) && (pGeometry->IsNode())) {
+        NiNode* v1 = pGeometry->IsNode();
+        spKnobs->operator=(static_cast<NiGeometry*>(v1->GetAt(0)));
     }
+
     NiAVObject* v12 = pPlayer->Get3D(true);
     NiFixedString* v11 = ::new (static_cast<void*>(&v22)) NiFixedString("RadNeedle");
     spKnobs[1].operator=(static_cast<NiGeometry*>(v12->GetObjectByName(*v11)));

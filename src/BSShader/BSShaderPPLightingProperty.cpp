@@ -368,19 +368,14 @@ BSShaderProperty::RenderPassArray* BSShaderPPLightingProperty::GetRenderPasses(
                                     ->spShadowLight.m_pObject;
                         }
                     }
-                    if (!this->pConstAlphaRenderPassList->iSize) {
-                        if (static_cast<uint8_t>(abUpdateList)) {
-                            if (pkState != nullptr) {
-                                NiAlphaProperty* pAlpha =
-                                    static_cast<NiAlphaProperty*>(apGeom->GetProperty(NiProperty::ALPHA));
-                                if (!pAlpha) {
-                                    pAlpha =
-                                        static_cast<NiAlphaProperty*>(pkState->m_aspProps[NiProperty::ALPHA].m_pObject);
-                                }
-                                const bool abAddPass = pAlpha && (pAlpha->m_uFlags & NiAlphaProperty::TEST_ENABLE_MASK);
-                                AddConstAlphaPass(apGeom, apGeom->m_spSkinInstance.m_pObject != nullptr, abAddPass);
-                            }
+                    if ((!this->pConstAlphaRenderPassList->iSize) && (static_cast<uint8_t>(abUpdateList)) &&
+                        (pkState != nullptr)) {
+                        NiAlphaProperty* pAlpha = static_cast<NiAlphaProperty*>(apGeom->GetProperty(NiProperty::ALPHA));
+                        if (!pAlpha) {
+                            pAlpha = static_cast<NiAlphaProperty*>(pkState->m_aspProps[NiProperty::ALPHA].m_pObject);
                         }
+                        const bool abAddPass = pAlpha && (pAlpha->m_uFlags & NiAlphaProperty::TEST_ENABLE_MASK);
+                        AddConstAlphaPass(apGeom, apGeom->m_spSkinInstance.m_pObject != nullptr, abAddPass);
                     }
                 }
                 return this->pConstAlphaRenderPassList;
@@ -659,15 +654,13 @@ BSShaderProperty::RenderPassArray* BSShaderPPLightingProperty::GetRenderPasses(
         }
     }
     else {
-        if (static_cast<uint8_t>(abUpdateList)) {
-            if (pkState != nullptr) {
-                NiAlphaProperty* pAlpha = static_cast<NiAlphaProperty*>(apGeom->GetProperty(NiProperty::ALPHA));
-                if (!pAlpha) {
-                    pAlpha = static_cast<NiAlphaProperty*>(pkState->m_aspProps[NiProperty::ALPHA].m_pObject);
-                }
-                const bool balphatest = pAlpha && (pAlpha->m_uFlags & NiAlphaProperty::TEST_ENABLE_MASK);
-                AddDepthPass(apGeom, apGeom->m_spSkinInstance.m_pObject != nullptr, balphatest, apAccumulator);
+        if ((static_cast<uint8_t>(abUpdateList)) && (pkState != nullptr)) {
+            NiAlphaProperty* pAlpha = static_cast<NiAlphaProperty*>(apGeom->GetProperty(NiProperty::ALPHA));
+            if (!pAlpha) {
+                pAlpha = static_cast<NiAlphaProperty*>(pkState->m_aspProps[NiProperty::ALPHA].m_pObject);
             }
+            const bool balphatest = pAlpha && (pAlpha->m_uFlags & NiAlphaProperty::TEST_ENABLE_MASK);
+            AddDepthPass(apGeom, apGeom->m_spSkinInstance.m_pObject != nullptr, balphatest, apAccumulator);
         }
     }
     return this->pDepthMapRenderPassList;
@@ -1366,9 +1359,8 @@ NiObject* BSShaderPPLightingProperty::CreateObject() {
     if (v0) {
         return ::new (v0) BSShaderPPLightingProperty;
     }
-    else {
-        return nullptr;
-    }
+
+    return nullptr;
 }
 
 BSShaderPPLightingProperty::TextureEffectData::TextureEffectData()

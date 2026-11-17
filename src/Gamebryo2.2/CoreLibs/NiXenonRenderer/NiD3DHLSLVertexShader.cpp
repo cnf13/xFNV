@@ -47,9 +47,8 @@ const char* NiD3DHLSLVertexShader::GetVariableName(uint32_t uiIndex) {
          uiIndex)) {
         return kDesc.Name;
     }
-    else {
-        return nullptr;
-    }
+
+    return nullptr;
 }
 
 // Hooks the entry up to its constant table variable on first use, then sets the constant by attribute type. The warning

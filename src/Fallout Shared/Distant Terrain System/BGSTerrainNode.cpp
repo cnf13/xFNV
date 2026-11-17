@@ -116,13 +116,12 @@ BGSTerrainChunk* BGSTerrainNode::GetChunkForPoint(const NiPoint3& aPoint) {
         if (pChunk && (pChunk->bDoneLoading && !bSplitNode)) {
             return pChunk;
         }
-        else {
-            if (pChildren[0u]) {
-                for (int32_t i = 0; i < 4; ++i) {
-                    pchunk = pChildren[i]->GetChunkForPoint(aPoint);
-                    if (pchunk) {
-                        break;
-                    }
+
+        if (pChildren[0u]) {
+            for (int32_t i = 0; i < 4; ++i) {
+                pchunk = pChildren[i]->GetChunkForPoint(aPoint);
+                if (pchunk) {
+                    break;
                 }
             }
         }
@@ -137,16 +136,13 @@ BGSDistantTreeBlock* BGSTerrainNode::GetTreeBlockForPoint(const NiPoint3& aPoint
         if (FormHealth_0 == BGSTerrainManager::GetTreeLevel() && pTrees) {
             return pTrees;
         }
-        else {
-            uint32_t v3 = iLevel;
-            if (v3 > BGSTerrainManager::GetTreeLevel()) {
-                if (pChildren[0u]) {
-                    for (int32_t i = 0; i < 4; ++i) {
-                        pBlock = pChildren[i]->GetTreeBlockForPoint(aPoint);
-                        if (pBlock) {
-                            break;
-                        }
-                    }
+
+        uint32_t v3 = iLevel;
+        if ((v3 > BGSTerrainManager::GetTreeLevel()) && (pChildren[0u])) {
+            for (int32_t i = 0; i < 4; ++i) {
+                pBlock = pChildren[i]->GetTreeBlockForPoint(aPoint);
+                if (pBlock) {
+                    break;
                 }
             }
         }
@@ -274,17 +270,15 @@ float BGSTerrainNode::ComputeMorphParameter(const NiPoint3& aViewPosition) {
 void BGSTerrainNode::UpdateFadeParameters() {
     uint32_t uitime = appTimer.iLastTime;
     uint32_t uielapsed = uitime - uiFadeStartTime;
-    if (pChunk) {
-        if (pChunk->GetShadeProperty()) {
-            if (uielapsed <= uTerrainTextureFadeTime.UInt()) {
-                NiPoint2 off;
-                float ffrac = static_cast<double>(uielapsed) / static_cast<double>(uTerrainTextureFadeTime.UInt());
-                off = GetOffsetFromParent();
-                pChunk->GetShadeProperty()->SetTerrainTexParams(off.x, off.y, ffrac);
-            }
-            else {
-                EndTextureMorph();
-            }
+    if ((pChunk) && (pChunk->GetShadeProperty())) {
+        if (uielapsed <= uTerrainTextureFadeTime.UInt()) {
+            NiPoint2 off;
+            float ffrac = static_cast<double>(uielapsed) / static_cast<double>(uTerrainTextureFadeTime.UInt());
+            off = GetOffsetFromParent();
+            pChunk->GetShadeProperty()->SetTerrainTexParams(off.x, off.y, ffrac);
+        }
+        else {
+            EndTextureMorph();
         }
     }
 }
@@ -393,52 +387,49 @@ void BGSTerrainNode::UpdateBlockVisibility(bool abDebugOutput) {
     uint32_t x;
     BSSegmentedTriShape* pSegmentedTriShape;
     TESWorldSpace* pWorldspace = TES::pInstance->GetWorldSpace();
-    if (pBlock) {
-        if (pBlock->GetMesh(false)) {
-            mesh = static_cast<BSSegmentedTriShape*>(pBlock->GetMesh(false));
-            pSegmentedTriShape = mesh->IsSegmentedTriShape();
-            if (CheckIntersectsLoadedRange()) {
-                if (pSegmentedTriShape) {
-                    for (x = 0; x < this->iLevel; ++x) {
-                        for (y = 0; y < this->iLevel; ++y) {
-                            v2 = y + (x * this->iLevel);
-                            if (v2 < pSegmentedTriShape->GetNumSegments()) {
-                                uiLevel = y + (x * this->iLevel);
-                                pCell = pWorldspace->GetCellFromCellCoord(x + this->sBaseCellX, y + this->sBaseCellY);
-                                if ((!pSegmentedTriShape->GetSegmentEmpty(uiLevel)) &&
-                                    (TES::pInstance->IsCellLoaded(pCell, true) &&
-                                     pCell->All3DWithVisibleDistantFadingIn())) {
-                                    pSegmentedTriShape->DisableSegment(uiLevel);
-                                }
-                                else {
-                                    pSegmentedTriShape->EnableSegment(uiLevel);
-                                }
+    if ((pBlock) && (pBlock->GetMesh(false))) {
+        mesh = static_cast<BSSegmentedTriShape*>(pBlock->GetMesh(false));
+        pSegmentedTriShape = mesh->IsSegmentedTriShape();
+        if (CheckIntersectsLoadedRange()) {
+            if (pSegmentedTriShape) {
+                for (x = 0; x < this->iLevel; ++x) {
+                    for (y = 0; y < this->iLevel; ++y) {
+                        v2 = y + (x * this->iLevel);
+                        if (v2 < pSegmentedTriShape->GetNumSegments()) {
+                            uiLevel = y + (x * this->iLevel);
+                            pCell = pWorldspace->GetCellFromCellCoord(x + this->sBaseCellX, y + this->sBaseCellY);
+                            if ((!pSegmentedTriShape->GetSegmentEmpty(uiLevel)) &&
+                                (TES::pInstance->IsCellLoaded(pCell, true) &&
+                                 pCell->All3DWithVisibleDistantFadingIn())) {
+                                pSegmentedTriShape->DisableSegment(uiLevel);
+                            }
+                            else {
+                                pSegmentedTriShape->EnableSegment(uiLevel);
                             }
                         }
                     }
-                    pSegmentedTriShape->MergeEnabledSegments();
                 }
+                pSegmentedTriShape->MergeEnabledSegments();
             }
-            else {
-                if (pSegmentedTriShape) {
-                    pSegmentedTriShape->EnableAllSegments();
-                }
+        }
+        else {
+            if (pSegmentedTriShape) {
+                pSegmentedTriShape->EnableAllSegments();
             }
         }
     }
-    if (pBlock) {
-        if (pBlock->GetNode(true)) {
-            if (CheckIntersectsLoadedRange()) {
-                sBaseCellY = this->sBaseCellY;
-                sBaseCellX = this->sBaseCellX;
-                iLevel = this->iLevel;
-                node = pBlock->GetNode(true);
-                pBlock->UpdateStingerVisibility(node, iLevel, sBaseCellX, sBaseCellY);
-            }
-            else {
-                v7 = pBlock->GetNode(true);
-                pBlock->EnableAllStingerVisibility(v7);
-            }
+
+    if ((pBlock) && (pBlock->GetNode(true))) {
+        if (CheckIntersectsLoadedRange()) {
+            sBaseCellY = this->sBaseCellY;
+            sBaseCellX = this->sBaseCellX;
+            iLevel = this->iLevel;
+            node = pBlock->GetNode(true);
+            pBlock->UpdateStingerVisibility(node, iLevel, sBaseCellX, sBaseCellY);
+        }
+        else {
+            v7 = pBlock->GetNode(true);
+            pBlock->EnableAllStingerVisibility(v7);
         }
     }
 }
@@ -520,14 +511,13 @@ void BGSTerrainNode::UnloadData(DATA_TO_UNLOAD aeDataToUnload) {
 }
 
 void BGSTerrainNode::DestroyRecurse() {
-    if (pChunk) {
-        if (bPersistentNode) {
-            if (pChunk) {
-                delete pChunk;
-            }
-            pChunk = nullptr;
+    if ((pChunk) && (bPersistentNode)) {
+        if (pChunk) {
+            delete pChunk;
         }
+        pChunk = nullptr;
     }
+
     for (int32_t i = 0; i < 4; ++i) {
         if (pChildren[i]) {
             pChildren[i]->DestroyRecurse();
@@ -542,13 +532,10 @@ void BGSTerrainNode::UpdateTerrain(const NiPoint3& aViewPosition, bool abUpdateW
     );
     bool bforceSplit = pManager->iMaxLevel < iLevel;
     bool bshouldSplit = ShouldSplit(aViewPosition);
-    if (bshouldSplit && QPersistentNode()) {
-        if (this->pChunk) {
-            if (!this->pChunk->GetAttached()) {
-                this->pChunk->Attach();
-            }
-        }
+    if ((bshouldSplit && QPersistentNode()) && (this->pChunk) && (!this->pChunk->GetAttached())) {
+        this->pChunk->Attach();
     }
+
     if (bforceSplit || bshouldSplit) {
         bSplitNode = true;
         if (QPersistentNode() && !this->pChunk) {
@@ -567,18 +554,15 @@ void BGSTerrainNode::UpdateTerrain(const NiPoint3& aViewPosition, bool abUpdateW
                 pChildren[i]->UpdateTerrain(aViewPosition, abUpdateWaterVisibility);
             }
         }
-        if (this->pChunk) {
-            if (CheckMeshSolidUnderMe(true)) {
-                for (int32_t i_2 = 0; i_2 < 4; ++i_2) {
-                    if (pChildren[i_2]->pChunk) {
-                        if (pChildren[i_2]->pChunk->bDoneLoading) {
-                            pChildren[i_2]->StartTextureMorph();
-                        }
-                    }
+        if ((this->pChunk) && (CheckMeshSolidUnderMe(true))) {
+            for (int32_t i_2 = 0; i_2 < 4; ++i_2) {
+                if ((pChildren[i_2]->pChunk) && (pChildren[i_2]->pChunk->bDoneLoading)) {
+                    pChildren[i_2]->StartTextureMorph();
                 }
-                UnloadData(BGSTerrainNode::UNLOAD_TERRAIN_ONLY);
             }
+            UnloadData(BGSTerrainNode::UNLOAD_TERRAIN_ONLY);
         }
+
         if (CheckMeshSolidUnderMe(true)) {
             bChildrenLoaded = true;
         }
@@ -639,18 +623,16 @@ void BGSTerrainNode::UpdateTerrain(const NiPoint3& aViewPosition, bool abUpdateW
                     }
                 }
             }
-            if (abUpdateWaterVisibility) {
-                if (this->pChunk) {
-                    NiGeometry* pwater0 = this->pChunk->GetWater();
-                    NiGeometry* pwater1 = this->pChunk->GetWaterAtReflectionHeight();
-                    if (pwater0) {
-                        BSSegmentedTriShape* v4 = pwater0->IsSegmentedTriShape();
-                        UpdateWaterVisibility(v4, false);
-                    }
-                    if (pwater1) {
-                        BSSegmentedTriShape* v5 = pwater1->IsSegmentedTriShape();
-                        UpdateWaterVisibility(v5, false);
-                    }
+            if ((abUpdateWaterVisibility) && (this->pChunk)) {
+                NiGeometry* pwater0 = this->pChunk->GetWater();
+                NiGeometry* pwater1 = this->pChunk->GetWaterAtReflectionHeight();
+                if (pwater0) {
+                    BSSegmentedTriShape* v4 = pwater0->IsSegmentedTriShape();
+                    UpdateWaterVisibility(v4, false);
+                }
+                if (pwater1) {
+                    BSSegmentedTriShape* v5 = pwater1->IsSegmentedTriShape();
+                    UpdateWaterVisibility(v5, false);
                 }
             }
         }

@@ -221,7 +221,7 @@ bool TESChallenge::Compare(TESForm* apCompare) {
     if (GetFormOne() != pChallenge->GetFormOne()) {
         return true;
     }
-    return CompareAllComponents(pChallenge) ? true : false;
+    return CompareAllComponents(pChallenge);
 }
 
 CHALLENGE_TYPE TESChallenge::GetChallengeType() {
@@ -396,11 +396,10 @@ bool TESChallengeManager::UpdateChallenge(
                             case CHALLENGE_TYPE_USE_ITEM_LIST:
                             case CHALLENGE_TYPE_AQUIRE_LIST: {
                                 BGSListForm* pformlist = static_cast<BGSListForm*>(pItem->GetFormOne());
-                                if (pformlist) {
-                                    if (!(&pformlist->ListOfForms)->IsInList(pFormOne)) {
-                                        bFound = false;
-                                    }
+                                if ((pformlist) && (!(&pformlist->ListOfForms)->IsInList(pFormOne))) {
+                                    bFound = false;
                                 }
+
                                 break;
                             }
                             case CHALLENGE_TYPE_KILL_SPECIFIC:
@@ -439,10 +438,8 @@ bool TESChallengeManager::UpdateChallenge(
                     if (pFormTwo) {
                         if (cType <= CHALLENGE_TYPE_DISCOVER || cType == CHALLENGE_TYPE_DAMAGE) {
                             BGSListForm* pformlist_4 = static_cast<BGSListForm*>(pItem->GetFormTwo());
-                            if (pformlist_4) {
-                                if (!(&pformlist_4->ListOfForms)->IsInList(pFormTwo)) {
-                                    bFound = false;
-                                }
+                            if ((pformlist_4) && (!(&pformlist_4->ListOfForms)->IsInList(pFormTwo))) {
+                                bFound = false;
                             }
                         }
                     }
@@ -480,12 +477,9 @@ bool TESChallengeManager::UpdateChallenge(
                     }
                 }
                 else {
-                    if (pItem->GetChallengeType() == CHALLENGE_TYPE_HIT) {
-                        if (nSpecialDataTwo) {
-                            if (nSpecialDataTwo != 1) {
-                                bFound = false;
-                            }
-                        }
+                    if ((pItem->GetChallengeType() == CHALLENGE_TYPE_HIT) && (nSpecialDataTwo) &&
+                        (nSpecialDataTwo != 1)) {
+                        bFound = false;
                     }
                 }
                 if (pItem->GetSpecialThree()) {
@@ -513,23 +507,18 @@ bool TESChallengeManager::UpdateChallenge(
                     }
                     uint32_t uiStep = uiInterval;
                     for (int32_t i = uiProgress; i >= 0; i -= uiStep) {
-                        if (!i) {
-                            if (pItem->GetFullName()) {
-                                if (pItem->GetDescription(nullptr, DESC_ID)) {
-                                    if (bShowChallengeUpdates.Bool()) {
-                                        char apDest[512];
-                                        const char* pDescription = pItem->GetDescription(nullptr, DESC_ID);
-                                        int32_t iThreshold = pItem->data.iThreshold;
-                                        uint32_t uiCurrent = pItem->progress.iProgress;
-                                        BSsprintf(
-                                            apDest, 512, "%s   %d\\%d\n%s", pItem->GetFullName(), uiCurrent, iThreshold,
-                                            pDescription
-                                        );
-                                        const char* TextureName = TESTexture::GetTextureName(pItem, nullptr);
-                                        Interface::ShowMessage(apDest, 0, TextureName, nullptr, 2.0f, false);
-                                    }
-                                }
-                            }
+                        if ((!i) && (pItem->GetFullName()) && (pItem->GetDescription(nullptr, DESC_ID)) &&
+                            (bShowChallengeUpdates.Bool())) {
+                            char apDest[512];
+                            const char* pDescription = pItem->GetDescription(nullptr, DESC_ID);
+                            int32_t iThreshold = pItem->data.iThreshold;
+                            uint32_t uiCurrent = pItem->progress.iProgress;
+                            BSsprintf(
+                                apDest, 512, "%s   %d\\%d\n%s", pItem->GetFullName(), uiCurrent, iThreshold,
+                                pDescription
+                            );
+                            const char* TextureName = TESTexture::GetTextureName(pItem, nullptr);
+                            Interface::ShowMessage(apDest, 0, TextureName, nullptr, 2.0f, false);
                         }
                     }
                 }
@@ -540,22 +529,18 @@ bool TESChallengeManager::UpdateChallenge(
                     if (pItem->GetChallengeType() != CHALLENGE_TYPE_MISC_STAT || pItem->GetSpecialOne() != 27) {
                         MiscStatManager::Increment(MiscStatManager::MS_CHALLENGES_COMPLETED);
                     }
-                    if (pItem->GetFullName()) {
-                        if (pItem->GetDescription(nullptr, DESC_ID)) {
-                            if (bShowChallengeUpdates.Bool()) {
-                                char msg[512];
-                                const char* v22 = pItem->GetDescription(nullptr, DESC_ID);
-                                int32_t time = pItem->data.iThreshold;
-                                int32_t NumberOfItemsActivated = pItem->data.iThreshold;
-                                BSsprintf(
-                                    msg, 512, "%s   %d\\%d\n%s", pItem->GetFullName(), NumberOfItemsActivated, time, v22
-                                );
-                                const char* v16 = TESTexture::GetTextureName(pItem, nullptr);
-                                Interface::ShowMessage(msg, 0, v16, nullptr, 2.0f, false);
-                                Interface::PlayMenuSound(21);
-                            }
-                        }
+                    if ((pItem->GetFullName()) && (pItem->GetDescription(nullptr, DESC_ID)) &&
+                        (bShowChallengeUpdates.Bool())) {
+                        char msg[512];
+                        const char* v22 = pItem->GetDescription(nullptr, DESC_ID);
+                        int32_t time = pItem->data.iThreshold;
+                        int32_t NumberOfItemsActivated = pItem->data.iThreshold;
+                        BSsprintf(msg, 512, "%s   %d\\%d\n%s", pItem->GetFullName(), NumberOfItemsActivated, time, v22);
+                        const char* v16 = TESTexture::GetTextureName(pItem, nullptr);
+                        Interface::ShowMessage(msg, 0, v16, nullptr, 2.0f, false);
+                        Interface::PlayMenuSound(21);
                     }
+
                     if (!pItem->GetRecurring() || pItem->GetRemovedRecurring()) {
                         pItem->SetCompleted(true);
                         bCompletedChallenges = true;

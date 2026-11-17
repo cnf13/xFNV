@@ -120,9 +120,8 @@ float AlchemyItem::GetCost(Actor* apActor) {
     if (IsFlagSet(AlchemyItem::COST_OVERRIDE)) {
         return static_cast<float>(GetCostOverride());
     }
-    else {
-        return static_cast<EffectItemList*>(this)->EffectItemList::GetCost(nullptr);
-    }
+
+    return static_cast<EffectItemList*>(this)->EffectItemList::GetCost(nullptr);
 }
 
 void AlchemyItem::Endian() {

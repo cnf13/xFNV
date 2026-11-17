@@ -73,7 +73,7 @@ public:
     virtual uint32_t GetMajorVertexShaderVersion(const uint32_t uiVersion) = 0;
     virtual uint32_t CreateVertexShaderVersion(const uint32_t uiMajorVersion, const uint32_t uiMinorVersion) = 0;
     virtual const char* GetRendererString() const = 0;
-    virtual ~NiShaderFactory();
+    ~NiShaderFactory() override;
 
 protected:
     virtual const char* GetFirstProgramDirectory(NiTListIterator& kIter) = 0;

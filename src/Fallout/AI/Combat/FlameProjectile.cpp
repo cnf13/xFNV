@@ -122,16 +122,15 @@ void FlameProjectile::UpdateProjectile(float afDelta) {
             pfireNode = nullptr;
         }
         NiAVObject* p3d = Get3D();
-        if (pfireNode) {
-            if (p3d) {
-                p3d->SetRotate(kFollowOffset.m_Rotate * (&pfireNode->GetWorldTransform())->m_Rotate);
-                NiMatrix3* v3 = &(v14 = kFollowOffset.m_Rotate * (&pfireNode->GetWorldTransform())->m_Rotate);
-                SetRotation(v3);
-                const NiPoint3* afDelta = &pfireNode->GetWorldTranslate();
-                p3d->SetTranslate(*afDelta);
-                SetLocationOnReference(pfireNode->GetWorldTranslate());
-            }
+        if ((pfireNode) && (p3d)) {
+            p3d->SetRotate(kFollowOffset.m_Rotate * (&pfireNode->GetWorldTransform())->m_Rotate);
+            NiMatrix3* v3 = &(v14 = kFollowOffset.m_Rotate * (&pfireNode->GetWorldTransform())->m_Rotate);
+            SetRotation(v3);
+            const NiPoint3* afDelta = &pfireNode->GetWorldTranslate();
+            p3d->SetTranslate(*afDelta);
+            SetLocationOnReference(pfireNode->GetWorldTranslate());
         }
+
         if (fExpirationTimer == 0.0) {
             RunTargetPick();
             CheckExplosion(afDelta);
@@ -276,10 +275,7 @@ bool FlameProjectile::AddImpact(
         ImpactData* pImpact;
         pImpact = pIter->GetItem();
         if (apCollidee == pImpact->pCollidee) {
-            if (apCollidee && apCollidee->IsActor()) {
-                return false;
-            }
-            return true;
+            return !(apCollidee && apCollidee->IsActor());
         }
         pIter = pIter->GetNext();
     }
@@ -314,10 +310,8 @@ float FlameProjectile::FindFlameConeAngle(NiAVObject* apObject) {
              (uiIndex < ((uint32_t)((int32_t)static_cast<NiParticleSystem*>(apObject)->GetModifierCount())));
              ++uiIndex) {
             modifierAt = static_cast<NiParticleSystem*>(apObject)->GetModifierAt(uiIndex);
-            if (modifierAt) {
-                if (NiObject::IsKindOf_0(&NiPSysEmitter::ms_RTTI, modifierAt)) {
-                    fDeclinationVar = static_cast<NiPSysEmitter*>(modifierAt)->m_fDeclinationVar;
-                }
+            if ((modifierAt) && (NiObject::IsKindOf_0(&NiPSysEmitter::ms_RTTI, modifierAt))) {
+                fDeclinationVar = static_cast<NiPSysEmitter*>(modifierAt)->m_fDeclinationVar;
             }
         }
     }

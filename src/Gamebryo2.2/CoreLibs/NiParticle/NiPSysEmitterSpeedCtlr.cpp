@@ -25,10 +25,9 @@ NiObject* NiPSysEmitterSpeedCtlr::CreateClone(NiCloningProcess& kCloning) {
         NiPSysModifierCtlr::CopyMembers(v4, kCloning);
         return v4;
     }
-    else {
-        NiPSysModifierCtlr::CopyMembers(nullptr, kCloning);
-        return nullptr;
-    }
+
+    NiPSysModifierCtlr::CopyMembers(nullptr, kCloning);
+    return nullptr;
 }
 
 void NiPSysEmitterSpeedCtlr::LoadBinary(NiStream& kStream) {

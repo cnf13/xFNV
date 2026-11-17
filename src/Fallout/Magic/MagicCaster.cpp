@@ -120,16 +120,14 @@ void MagicCaster::CastSpellImmediate(
 
 // MiddleHighProcess::TransferDisease and PlayerCharacter::TransferDisease call it directly.
 void MagicCaster::TransferDisease(SpellItem* apSpell, MagicTarget* apDesiredTarget, bool abLoadCast) {
-    if (apSpell->GetSpellType() == MagicSystem::DISEASE) {
-        if (apDesiredTarget) {
-            if (apSpell) {
-                SetCurrentSpell(apSpell);
-            }
-            else {
-                SetCurrentSpell(nullptr);
-            }
-            FindTargets(0.0f, nullptr, abLoadCast, 1.0f, false);
+    if ((apSpell->GetSpellType() == MagicSystem::DISEASE) && (apDesiredTarget)) {
+        if (apSpell) {
+            SetCurrentSpell(apSpell);
         }
+        else {
+            SetCurrentSpell(nullptr);
+        }
+        FindTargets(0.0f, nullptr, abLoadCast, 1.0f, false);
     }
 }
 
@@ -192,28 +190,26 @@ MagicTarget* MagicCaster::GetTouchTarget() {
         Actor* ptargetActor = pActor;
         BSSimpleList<Actor*>* ptempfollower = nullptr;
         while (ptargetActor) {
-            if (ptargetActor != pcaster && !ptargetActor->IsDead(false)) {
-                if (ptargetActor->Get3D()) {
-                    double DistanceBetweenFacingActors =
-                        CombatUtilities::GetDistanceBetweenFacingActors(pcaster, ptargetActor, false);
-                    if (v19 >= DistanceBetweenFacingActors) {
-                        bool binStrikeAngle_2;
-                        float fdelta_2;
-                        fdelta_2 = 3.4028235e+38f;
-                        if (pactor) {
-                            binStrikeAngle_2 =
-                                CombatUtilities::IsTargetWithinStrikeAngle(pactor, ptargetActor, &fdelta_2);
-                        }
-                        else {
-                            binStrikeAngle_2 = true;
-                        }
-                        if (binStrikeAngle_2 && fclosestDelta >= static_cast<double>(fdelta_2)) {
-                            pclosestTarget = ptargetActor;
-                            fclosestDelta = fdelta_2;
-                        }
+            if ((ptargetActor != pcaster && !ptargetActor->IsDead(false)) && (ptargetActor->Get3D())) {
+                double DistanceBetweenFacingActors =
+                    CombatUtilities::GetDistanceBetweenFacingActors(pcaster, ptargetActor, false);
+                if (v19 >= DistanceBetweenFacingActors) {
+                    bool binStrikeAngle_2;
+                    float fdelta_2;
+                    fdelta_2 = 3.4028235e+38f;
+                    if (pactor) {
+                        binStrikeAngle_2 = CombatUtilities::IsTargetWithinStrikeAngle(pactor, ptargetActor, &fdelta_2);
+                    }
+                    else {
+                        binStrikeAngle_2 = true;
+                    }
+                    if (binStrikeAngle_2 && fclosestDelta >= static_cast<double>(fdelta_2)) {
+                        pclosestTarget = ptargetActor;
+                        fclosestDelta = fdelta_2;
                     }
                 }
             }
+
             if (ptempfollower && ptempfollower->m_item) {
                 ptargetActor = static_cast<Actor*>(
                     FNVD_DYNAMIC_CAST_VOID(Character)(ptempfollower->m_item, RTTI_Actor, RTTI_Character)
@@ -239,9 +235,8 @@ MagicTarget* MagicCaster::GetTouchTarget() {
     if (pclosestTarget) {
         return static_cast<MagicTarget*>(pclosestTarget);
     }
-    else {
-        return nullptr;
-    }
+
+    return nullptr;
 }
 
 void MagicCaster::StartAim() {
@@ -282,41 +277,39 @@ bool MagicCaster::CastSpell(MagicItem* apSpell, MagicTarget* apDesiredTarget, bo
         SetState(MagicCaster::ERR_SPELL_DISABLED, "CAST: Spell is disabled");
         return false;
     }
-    else {
-        MagicSystem::SpellType v8 = apSpell->GetSpellType();
-        switch (v8) {
-            case MagicSystem::DISEASE: {
-                SpellItem* v6 = dynamic_cast<SpellItem*>(apSpell);
-                TransferDisease(v6, apDesiredTarget, abLoadCast);
-                return true;
+
+    MagicSystem::SpellType v8 = apSpell->GetSpellType();
+    switch (v8) {
+        case MagicSystem::DISEASE: {
+            SpellItem* v6 = dynamic_cast<SpellItem*>(apSpell);
+            TransferDisease(v6, apDesiredTarget, abLoadCast);
+            return true;
+        }
+        case MagicSystem::ABILITY: {
+            SpellItem* v5 = dynamic_cast<SpellItem*>(apSpell);
+            CastAbility(v5, abLoadCast);
+            return true;
+        }
+        case MagicSystem::ADDICTION: {
+            SpellItem* v7 = dynamic_cast<SpellItem*>(apSpell);
+            CastAddiction(v7, abLoadCast);
+            return true;
+        }
+        default: {
+            if (GetCurrentSpell()) {
+                SetState(MagicCaster::ERR_ALREADY_CASTING, "CAST: Already Casting Spell");
+                return false;
             }
-            case MagicSystem::ABILITY: {
-                SpellItem* v5 = dynamic_cast<SpellItem*>(apSpell);
-                CastAbility(v5, abLoadCast);
-                return true;
+
+            SetCurrentSpell(apSpell);
+            SetDesiredTarget(apDesiredTarget);
+            if (apSpell->HasTargetEffect() && apDesiredTarget) {
+                StartAim();
             }
-            case MagicSystem::ADDICTION: {
-                SpellItem* v7 = dynamic_cast<SpellItem*>(apSpell);
-                CastAddiction(v7, abLoadCast);
-                return true;
+            else {
+                StartCast();
             }
-            default: {
-                if (GetCurrentSpell()) {
-                    SetState(MagicCaster::ERR_ALREADY_CASTING, "CAST: Already Casting Spell");
-                    return false;
-                }
-                else {
-                    SetCurrentSpell(apSpell);
-                    SetDesiredTarget(apDesiredTarget);
-                    if (apSpell->HasTargetEffect() && apDesiredTarget) {
-                        StartAim();
-                    }
-                    else {
-                        StartCast();
-                    }
-                    return true;
-                }
-            }
+            return true;
         }
     }
 }
@@ -329,9 +322,8 @@ Actor* MagicCaster::GetCasterAsActor() {
     if (this) {
         return static_cast<Actor*>(this);
     }
-    else {
-        return nullptr;
-    }
+
+    return nullptr;
 }
 
 // Picks the touch target (the desired target instead when there is none, dropped when it is out of reach), then
@@ -374,12 +366,12 @@ void MagicCaster::FindTargets(
             pTarget = GetDesiredTarget();
             if (pTarget && !apSource && !bNoTouchPick && pTarget->GetTargetStatsObject()) {
                 float fReach = fMagicDefaultTouchDistance.Float();
-                if (pCasterRef->IsActor()) {
-                    if (pCasterRef == pPlayer || !pTarget->GetTargetStatsObject()->IsActor() ||
-                        pTarget->GetTargetStatsObject()->GetSitSleepState() != SIT_SLEEP_IS_SLEEPING) {
-                        fReach = static_cast<Actor*>(pCasterRef)->GetReach();
-                    }
+                if ((pCasterRef->IsActor()) &&
+                    (pCasterRef == pPlayer || !pTarget->GetTargetStatsObject()->IsActor() ||
+                     pTarget->GetTargetStatsObject()->GetSitSleepState() != SIT_SLEEP_IS_SLEEPING)) {
+                    fReach = static_cast<Actor*>(pCasterRef)->GetReach();
                 }
+
                 fReach = BSMAX(1.0f, pCasterRef->GetScale()) * fReach;
                 if (fReach <
                     CombatUtilities::GetDistanceBetweenFacingActors(
@@ -599,13 +591,14 @@ void MagicCaster::FindTargets(
                 }
             }
         }
-        else if (pExplosionRef->IsActor()) {
-            if (pCostliestTouchEffect &&
-                pCostliestTouchEffect->GetEffectSetting()->IsFlagSet(EffectSetting::HAVOK_EXPLOSION)) {
-                Actor* pVictim = pExplosionRef;
-                if (CheckWillKill(pVictim, pCurrSpell)) {
-                    ExplodeActor(pVictim, kSourceLoc, pCostliestTouchEffect, pCostliestTouchEffect->GetRawCost());
-                }
+        else if (
+            (pExplosionRef->IsActor()) &&
+            (pCostliestTouchEffect &&
+             pCostliestTouchEffect->GetEffectSetting()->IsFlagSet(EffectSetting::HAVOK_EXPLOSION))
+        ) {
+            Actor* pVictim = pExplosionRef;
+            if (CheckWillKill(pVictim, pCurrSpell)) {
+                ExplodeActor(pVictim, kSourceLoc, pCostliestTouchEffect, pCostliestTouchEffect->GetRawCost());
             }
         }
     }
@@ -613,11 +606,13 @@ void MagicCaster::FindTargets(
     if (pCurrSpell->HasTargetEffect()) {
         FireProjectile();
     }
-    else if (bSkillUsed && pCaster) {
-        if (pCurrSpell->GetSpellType() == MagicSystem::SPELL || pCurrSpell->GetSpellType() == MagicSystem::POISON) {
-            pCaster->UseSkill(pCurrSpell->GetAssociatedSkill(), 1u, 0.0f);
-        }
+    else if (
+        (bSkillUsed && pCaster) &&
+        (pCurrSpell->GetSpellType() == MagicSystem::SPELL || pCurrSpell->GetSpellType() == MagicSystem::POISON)
+    ) {
+        pCaster->UseSkill(pCurrSpell->GetAssociatedSkill(), 1u, 0.0f);
     }
+
     // The model length is compared unsigned.
     if (bReleaseModel && pAVEffect && pAVEffect->TESModel::GetModelLength() > 0) {
         const char* pModelName = static_cast<TESModel*>(pAVEffect)->GetModel();
@@ -693,39 +688,30 @@ void MagicCaster::DoExplosion(
             while (pmob && pmob->m_item) {
                 MobileObject* m_item = pmob->m_item;
                 Actor* ptargetActor = m_item->IsActor() ? static_cast<Actor*>(m_item) : nullptr;
-                if (ptargetActor) {
-                    if (ptargetActor != pcasterActor) {
-                        if (ptargetActor->Get3D()) {
-                            float fdistance = ptargetActor->GetDistanceFromPoint(aSourceLoc);
-                            if (farea >= static_cast<double>(fdistance) && !ptargetActor->IsDead(false) &&
-                                !ptargetActor->GetGhost() && this->CheckWillKill(ptargetActor, apSpell)) {
-                                this->ExplodeActor(ptargetActor, aSourceLoc, apDominantEffect, fspellCost);
-                            }
-                        }
+                if ((ptargetActor) && (ptargetActor != pcasterActor) && (ptargetActor->Get3D())) {
+                    float fdistance = ptargetActor->GetDistanceFromPoint(aSourceLoc);
+                    if (farea >= static_cast<double>(fdistance) && !ptargetActor->IsDead(false) &&
+                        !ptargetActor->GetGhost() && this->CheckWillKill(ptargetActor, apSpell)) {
+                        this->ExplodeActor(ptargetActor, aSourceLoc, apDominantEffect, fspellCost);
                     }
                 }
+
                 pmob = pmob->m_pkNext;
             }
-            if (pPlayer) {
-                if (pPlayer != pcasterActor) {
-                    if (pPlayer->Get3D()) {
-                        float fdistance_2 = pPlayer->GetDistanceFromPoint(aSourceLoc);
-                        if (farea >= static_cast<double>(fdistance_2) && !pPlayer->IsDead(false) &&
-                            !pPlayer->GetGhost()) {
-                            bool v16;
-                            if (pPlayer) {
-                                v16 = this->CheckWillKill(
-                                    &static_cast<MagicTarget&>(static_cast<Actor&>(static_cast<Character&>(*pPlayer))),
-                                    apSpell
-                                );
-                            }
-                            else {
-                                v16 = this->CheckWillKill(nullptr, apSpell);
-                            }
-                            if (v16) {
-                                this->ExplodeActor(pPlayer, aSourceLoc, apDominantEffect, fspellCost);
-                            }
-                        }
+            if ((pPlayer) && (pPlayer != pcasterActor) && (pPlayer->Get3D())) {
+                float fdistance_2 = pPlayer->GetDistanceFromPoint(aSourceLoc);
+                if (farea >= static_cast<double>(fdistance_2) && !pPlayer->IsDead(false) && !pPlayer->GetGhost()) {
+                    bool v16;
+                    if (pPlayer) {
+                        v16 = this->CheckWillKill(
+                            &static_cast<MagicTarget&>(static_cast<Actor&>(static_cast<Character&>(*pPlayer))), apSpell
+                        );
+                    }
+                    else {
+                        v16 = this->CheckWillKill(nullptr, apSpell);
+                    }
+                    if (v16) {
+                        this->ExplodeActor(pPlayer, aSourceLoc, apDominantEffect, fspellCost);
                     }
                 }
             }
@@ -855,29 +841,28 @@ bool MagicCaster::CheckWillKill(MagicTarget* apTarget, MagicItem* apSpell) {
         float fdamage = 0.0f;
         while (plist && !plist->IsEmpty()) {
             ActiveEffect* peffect = plist->m_item;
-            if (peffect) {
-                if (peffect->pSpell == apSpell) {
-                    ActorValue::Index eactorValue;
-                    EffectSetting* pes = peffect->GetEffectSetting();
-                    if (pes->IsAssociatedActorValueFixed()) {
-                        eactorValue = pes->data.eAssociatedActorValue;
+            if ((peffect) && (peffect->pSpell == apSpell)) {
+                ActorValue::Index eactorValue;
+                EffectSetting* pes = peffect->GetEffectSetting();
+                if (pes->IsAssociatedActorValueFixed()) {
+                    eactorValue = pes->data.eAssociatedActorValue;
+                }
+                else {
+                    eactorValue = peffect->pEffect->GetActorValueIndex();
+                }
+                if (eactorValue == ActorValue::HEALTH && pes->IsFlagSet(EffectSetting::DETRIMENTAL) &&
+                    !pes->IsFlagSet(EffectSetting::RECOVER)) {
+                    float famount = peffect->fMagnitude;
+                    if (peffect->fDuration > 0.0) {
+                        float a2 = peffect->fDuration;
+                        float a2a = BSMAX(0.0f, a2);
+                        float fduration = BSMIN(4.0f, a2a);
+                        famount = famount * fduration;
                     }
-                    else {
-                        eactorValue = peffect->pEffect->GetActorValueIndex();
-                    }
-                    if (eactorValue == ActorValue::HEALTH && pes->IsFlagSet(EffectSetting::DETRIMENTAL) &&
-                        !pes->IsFlagSet(EffectSetting::RECOVER)) {
-                        float famount = peffect->fMagnitude;
-                        if (peffect->fDuration > 0.0) {
-                            float a2 = peffect->fDuration;
-                            float a2a = BSMAX(0.0f, a2);
-                            float fduration = BSMIN(4.0f, a2a);
-                            famount = famount * fduration;
-                        }
-                        fdamage = fdamage + famount;
-                    }
+                    fdamage = fdamage + famount;
                 }
             }
+
             plist = plist->m_pkNext;
         }
         float v19 = -pactor_3->DifficultyLevelAdjustHealthModifier(-fdamage, pcaster);
@@ -930,11 +915,10 @@ bool MagicCaster::ReleaseCast(TESBoundObject* apSource) {
     alignas(BSStringT<char>) uint8_t aCannotCastStorage[sizeof(BSStringT<char>)];
     BSStringT<char>* pCannotCast = reinterpret_cast<BSStringT<char>*>(aCannotCastStorage);
     GetCurrentSpell()->GetCannotCastString(pCannotCast, eReason);
-    if (pCaster) {
-        if (pCaster->IsPc() && (!pIngredient || static_cast<EffectItemList*>(pIngredient)->IsFood())) {
-            Interface::ShowMessage(pCannotCast->String(), 0, nullptr, nullptr, 2.0f, false);
-        }
+    if ((pCaster) && (pCaster->IsPc() && (!pIngredient || static_cast<EffectItemList*>(pIngredient)->IsFood()))) {
+        Interface::ShowMessage(pCannotCast->String(), 0, nullptr, nullptr, 2.0f, false);
     }
+
     // SetState takes the message as char* while String() returns const char*, hence the const_cast.
     SetState(ERR_CANNOT_CAST, const_cast<char*>(pCannotCast->String()));
     SpellCast(GetCurrentSpell(), false);
@@ -1023,87 +1007,77 @@ void MagicCaster::FireProjectile() {
         EffectItem* pcostliestTargetEffect = v1->GetCostliestEffect(MagicSystem::TARGET, false);
         MagicItem* v2 = GetCurrentSpell();
         EffectSetting* pavEffect = v2->GetAVEffect(MagicSystem::SELF);
-        if (pcostliestTargetEffect) {
-            if (pcasterObject) {
-                MagicCaster* v12;
-                NiPoint3 origin;
-                bool blaunch = true;
-                NiPoint3 vect = NiPoint3_ZERO;
-                NiPoint3 angle = NiPoint3_ZERO;
-                if (pcasterActor) {
-                    angle.z = pcasterActor->GetHeading(false);
-                    angle.x = pcasterActor->GetLooking();
-                    origin = pcasterObject->GetLocationOnReference();
-                    NiPoint3* v3 = &(v24 = pcasterObject->GetBoundMax());
-                    float casterHeight = v3->z - pcasterObject->GetBoundMin().z;
-                    vect.z = casterHeight * 0.699999988079071;
-                    origin.operator+=(vect);
+        if ((pcostliestTargetEffect) && (pcasterObject)) {
+            MagicCaster* v12;
+            NiPoint3 origin;
+            bool blaunch = true;
+            NiPoint3 vect = NiPoint3_ZERO;
+            NiPoint3 angle = NiPoint3_ZERO;
+            if (pcasterActor) {
+                angle.z = pcasterActor->GetHeading(false);
+                angle.x = pcasterActor->GetLooking();
+                origin = pcasterObject->GetLocationOnReference();
+                NiPoint3* v3 = &(v24 = pcasterObject->GetBoundMax());
+                float casterHeight = v3->z - pcasterObject->GetBoundMin().z;
+                vect.z = casterHeight * 0.699999988079071;
+                origin.operator+=(vect);
+            }
+            else {
+                double MaximumLeafAngle = pavEffect->data.fSpeed;
+                float fspeed = fMagicProjectileBaseSpeed.Float() * MaximumLeafAngle;
+                NiPoint3* AngleToProjectedTarget = CombatUtilities::GetAngleToProjectedTarget(
+                    &a1, pcasterObject, ptargetObject, fspeed, 0.0f, ACTOR_SEGMENT_INVIEW_TOP
+                );
+                angle = pcasterObject->GetAngleOnReference() + *AngleToProjectedTarget;
+                origin = pcasterObject->GetLocationOnReference();
+                NiPoint3* v5 = &(v20 = pcasterObject->GetBoundMax());
+                origin.z = (v5->z - pcasterObject->GetBoundMin().z) * 0.5 + origin.z;
+            }
+            NiNode* pmagicNode = GetMagicNode();
+            if (pmagicNode) {
+                origin = pmagicNode->GetWorldTranslate();
+            }
+            if (pPlayer) {
+                v12 = &static_cast<MagicCaster&>(static_cast<Actor&>(static_cast<Character&>(*pPlayer)));
+            }
+            else {
+                v12 = nullptr;
+            }
+            if ((this != v12) && (pcasterActor) && (ptargetObject)) {
+                ACTOR_SEGMENT_INVIEW segment;
+                float v11;
+                if (pavEffect) {
+                    v11 = pavEffect->data.fSpeed;
                 }
                 else {
-                    double MaximumLeafAngle = pavEffect->data.fSpeed;
-                    float fspeed = fMagicProjectileBaseSpeed.Float() * MaximumLeafAngle;
-                    NiPoint3* AngleToProjectedTarget = CombatUtilities::GetAngleToProjectedTarget(
-                        &a1, pcasterObject, ptargetObject, fspeed, 0.0f, ACTOR_SEGMENT_INVIEW_TOP
-                    );
-                    angle = pcasterObject->GetAngleOnReference() + *AngleToProjectedTarget;
-                    origin = pcasterObject->GetLocationOnReference();
-                    NiPoint3* v5 = &(v20 = pcasterObject->GetBoundMax());
-                    origin.z = (v5->z - pcasterObject->GetBoundMin().z) * 0.5 + origin.z;
+                    v11 = 1.0f;
                 }
-                NiNode* pmagicNode = GetMagicNode();
-                if (pmagicNode) {
-                    origin = pmagicNode->GetWorldTranslate();
-                }
-                if (pPlayer) {
-                    v12 = &static_cast<MagicCaster&>(static_cast<Actor&>(static_cast<Character&>(*pPlayer)));
+                float fspeed_2 = fMagicProjectileBaseSpeed.Float() * v11;
+                float fgravity = 0.0f;
+                CombatController* pcombat = pcasterActor->GetCombatController();
+                if (pcombat) {
+                    segment = pcombat->GetTargetSegmentInView();
                 }
                 else {
-                    v12 = nullptr;
+                    segment = ACTOR_SEGMENT_INVIEW_MIDDLE;
                 }
-                if (this != v12) {
-                    if (pcasterActor) {
-                        if (ptargetObject) {
-                            ACTOR_SEGMENT_INVIEW segment;
-                            float v11;
-                            if (pavEffect) {
-                                v11 = pavEffect->data.fSpeed;
-                            }
-                            else {
-                                v11 = 1.0f;
-                            }
-                            float fspeed_2 = fMagicProjectileBaseSpeed.Float() * v11;
-                            float fgravity = 0.0f;
-                            CombatController* pcombat = pcasterActor->GetCombatController();
-                            if (pcombat) {
-                                segment = pcombat->GetTargetSegmentInView();
-                            }
-                            else {
-                                segment = ACTOR_SEGMENT_INVIEW_MIDDLE;
-                            }
-                            angle = CombatUtilities::GetAngleToProjectedTarget(
-                                origin, ptargetObject, fspeed_2, fgravity, segment
-                            );
-                        }
-                    }
-                }
-                if (pcostliestTargetEffect) {
-                    if (blaunch) {
-                        NiPoint3 v41 = origin;
-                        MagicItem* v7 = GetCurrentSpell();
-                        MagicProjectile::Launch(
-                            this, nullptr, pLight, v7, pcostliestTargetEffect, pavEffect, v41, angle
-                        );
-                        pLight = nullptr;
-                    }
-                }
-                if (pLight) {
-                    MagicLight* apThis = pLight;
-                    if (apThis) {
-                        delete apThis;
-                    }
-                }
+                angle = CombatUtilities::GetAngleToProjectedTarget(origin, ptargetObject, fspeed_2, fgravity, segment);
+            }
+
+            if ((pcostliestTargetEffect) && (blaunch)) {
+                NiPoint3 v41 = origin;
+                MagicItem* v7 = GetCurrentSpell();
+                MagicProjectile::Launch(this, nullptr, pLight, v7, pcostliestTargetEffect, pavEffect, v41, angle);
                 pLight = nullptr;
             }
+
+            if (pLight) {
+                MagicLight* apThis = pLight;
+                if (apThis) {
+                    delete apThis;
+                }
+            }
+            pLight = nullptr;
         }
     }
 }
@@ -1142,29 +1116,22 @@ void MagicCaster::FindTargetsInArea(
                     if (CasterAsActor) {
                         v17 = TargetAsActor == CasterAsActor;
                     }
-                    if (v16) {
-                        if (!v17 && v16 != apTarget) {
-                            if (v18->Get3D()) {
-                                float DistanceFromPoint = v18->GetDistanceFromPoint(aLocation);
-                                if (DistanceFromPoint <= static_cast<double>(v23) &&
-                                    (!TargetAsActor || !TargetAsActor->GetGhost()) &&
-                                    (!apProjectile || apProjectile->CheckAddTarget(v16, apActiveEffect)) &&
-                                    AddTarget(v16, aLocation, apSpell, apActiveEffect, true)) {
-                                    if (apProjectile) {
-                                        apProjectile->AddAreaTarget(v16, apActiveEffect);
-                                    }
-                                    if (!apTarget && !v19) {
-                                        if (CasterAsActor) {
-                                            if (apSpell->GetSpellType() == MagicSystem::SPELL ||
-                                                apSpell->GetSpellType() == MagicSystem::POISON) {
-                                                v19 = true;
-                                                abSkillAlreadyUsed = true;
-                                                ActorValue::Index AssociatedSkill = apSpell->GetAssociatedSkill();
-                                                CasterAsActor->UseSkill(AssociatedSkill, 1u, static_cast<float>(0.0));
-                                            }
-                                        }
-                                    }
-                                }
+                    if ((v16) && (!v17 && v16 != apTarget) && (v18->Get3D())) {
+                        float DistanceFromPoint = v18->GetDistanceFromPoint(aLocation);
+                        if (DistanceFromPoint <= static_cast<double>(v23) &&
+                            (!TargetAsActor || !TargetAsActor->GetGhost()) &&
+                            (!apProjectile || apProjectile->CheckAddTarget(v16, apActiveEffect)) &&
+                            AddTarget(v16, aLocation, apSpell, apActiveEffect, true)) {
+                            if (apProjectile) {
+                                apProjectile->AddAreaTarget(v16, apActiveEffect);
+                            }
+                            if ((!apTarget && !v19) && (CasterAsActor) &&
+                                (apSpell->GetSpellType() == MagicSystem::SPELL ||
+                                 apSpell->GetSpellType() == MagicSystem::POISON)) {
+                                v19 = true;
+                                abSkillAlreadyUsed = true;
+                                ActorValue::Index AssociatedSkill = apSpell->GetAssociatedSkill();
+                                CasterAsActor->UseSkill(AssociatedSkill, 1u, static_cast<float>(0.0));
                             }
                         }
                     }
@@ -1192,11 +1159,10 @@ void MagicCaster::FindExplosionLOS(
         }
         for (EffectItemList* plist_3 = plist_2; plist_3 && !plist_3->IsEmpty(); plist_3 = plist) {
             EffectItem* peffect = plist_3->m_item;
-            if (peffect) {
-                if (peffect->data.iRange == aeRange && peffect->GetArea() > ihighestArea) {
-                    ihighestArea = peffect->GetArea();
-                }
+            if ((peffect) && (peffect->data.iRange == aeRange && peffect->GetArea() > ihighestArea)) {
+                ihighestArea = peffect->GetArea();
             }
+
             BSSimpleList<EffectItem*>* pnext = plist_3->m_pkNext;
             // Each next node is taken as the EffectItemList holding it, with null kept null.
             if (pnext) {
@@ -1226,19 +1192,15 @@ void MagicCaster::FindExplosionLOS(
                     if (pcasterActor) {
                         bitemMatchesTarget = ptargetActor == pcasterActor;
                     }
-                    if (ptarget) {
-                        if (!bitemMatchesTarget) {
-                            if (pitem->Get3D()) {
-                                float fdistance = pitem->GetDistanceFromPoint(aSpellLocation);
-                                if (farea >= static_cast<double>(fdistance) &&
-                                    (!ptargetActor || !ptargetActor->GetGhost()) &&
-                                    (v6 || RunExplosionLOSPick(aSpellLocation, ptargetActor))) {
-                                    MobileObject* a2 = (MobileObject*)ptargetActor;
-                                    apActorList->AddHead(a2);
-                                }
-                            }
+                    if ((ptarget) && (!bitemMatchesTarget) && (pitem->Get3D())) {
+                        float fdistance = pitem->GetDistanceFromPoint(aSpellLocation);
+                        if (farea >= static_cast<double>(fdistance) && (!ptargetActor || !ptargetActor->GetGhost()) &&
+                            (v6 || RunExplosionLOSPick(aSpellLocation, ptargetActor))) {
+                            MobileObject* a2 = (MobileObject*)ptargetActor;
+                            apActorList->AddHead(a2);
                         }
                     }
+
                     if (ptempfollower && ptempfollower->m_item) {
                         pitem = static_cast<MobileObject*>(
                             FNVD_DYNAMIC_CAST_VOID(Character)(ptempfollower->m_item, RTTI_Actor, RTTI_Character)
@@ -1263,14 +1225,12 @@ void MagicCaster::FindExplosionLOS(
                     }
                 }
             }
-            if (pPlayer != pcasterActor) {
-                if (pPlayer->Get3D()) {
-                    float fdistance_2 = pPlayer->GetDistanceFromPoint(aSpellLocation);
-                    if (farea >= static_cast<double>(fdistance_2) && !pPlayer->GetGhost() &&
-                        (v6 || RunExplosionLOSPick(aSpellLocation, pPlayer))) {
-                        MobileObject* item = (MobileObject*)pPlayer;
-                        apActorList->AddHead(item);
-                    }
+            if ((pPlayer != pcasterActor) && (pPlayer->Get3D())) {
+                float fdistance_2 = pPlayer->GetDistanceFromPoint(aSpellLocation);
+                if (farea >= static_cast<double>(fdistance_2) && !pPlayer->GetGhost() &&
+                    (v6 || RunExplosionLOSPick(aSpellLocation, pPlayer))) {
+                    MobileObject* item = (MobileObject*)pPlayer;
+                    apActorList->AddHead(item);
                 }
             }
         }
@@ -1355,59 +1315,51 @@ void MagicCaster::FindTargets_0(
     bskillUsed = false;
     while (plist_3) {
         EffectItem* pitem = plist_3->m_item;
-        if (pitem) {
-            if (pitem->data.iRange == MagicSystem::TARGET) {
-                MagicTarget* apTarget;
-                ActiveEffect* pactiveEffect = CreateActiveEffect(apSpell, pitem, nullptr);
-                if (pitem != pdominantTouch) {
-                    pactiveEffect->SetFlag(ActiveEffect::NO_HITEFFECT_NIF);
-                    pactiveEffect->SetFlag(ActiveEffect::NO_HITEFFECT_SHADER);
-                    pactiveEffect->SetFlag(ActiveEffect::NO_SOUND);
-                }
-                float feffectivenessModifier_2 = feffectivenessModifier * afPowerScale;
-                pactiveEffect->AdjustEffectiveness(feffectivenessModifier_2);
-                if (apCollidee) {
-                    if (apCollidee->GetMagicTarget()) {
-                        if (apCollidee != GetCasterStatsObject()) {
-                            if (!apProjectile ||
-                                apProjectile->CheckAddTarget(apCollidee->GetMagicTarget(), pactiveEffect)) {
-                                MagicTarget* v10 = apCollidee->GetMagicTarget();
-                                if (AddTarget(v10, aLocation, apSpell, pactiveEffect, false)) {
-                                    Actor* pcasterActor;
-                                    MagicCaster* pmagicCaster = apProjectile->GetCaster();
-                                    if (pmagicCaster) {
-                                        pcasterActor = pmagicCaster->GetCasterAsActor();
-                                    }
-                                    else {
-                                        pcasterActor = nullptr;
-                                    }
-                                    if ((pcasterActor &&
-                                         (!bskillUsed && apSpell->GetSpellType() == MagicSystem::SPELL)) ||
-                                        apSpell->GetSpellType() == MagicSystem::POISON) {
-                                        bskillUsed = true;
-                                        ActorValue::Index AssociatedSkill = apSpell->GetAssociatedSkill();
-                                        pcasterActor->UseSkill(AssociatedSkill, 1u, 0.0f);
-                                    }
-                                }
-                            }
-                        }
+        if ((pitem) && (pitem->data.iRange == MagicSystem::TARGET)) {
+            MagicTarget* apTarget;
+            ActiveEffect* pactiveEffect = CreateActiveEffect(apSpell, pitem, nullptr);
+            if (pitem != pdominantTouch) {
+                pactiveEffect->SetFlag(ActiveEffect::NO_HITEFFECT_NIF);
+                pactiveEffect->SetFlag(ActiveEffect::NO_HITEFFECT_SHADER);
+                pactiveEffect->SetFlag(ActiveEffect::NO_SOUND);
+            }
+            float feffectivenessModifier_2 = feffectivenessModifier * afPowerScale;
+            pactiveEffect->AdjustEffectiveness(feffectivenessModifier_2);
+            if ((apCollidee) && (apCollidee->GetMagicTarget()) && (apCollidee != GetCasterStatsObject()) &&
+                (!apProjectile || apProjectile->CheckAddTarget(apCollidee->GetMagicTarget(), pactiveEffect))) {
+                MagicTarget* v10 = apCollidee->GetMagicTarget();
+                if (AddTarget(v10, aLocation, apSpell, pactiveEffect, false)) {
+                    Actor* pcasterActor;
+                    MagicCaster* pmagicCaster = apProjectile->GetCaster();
+                    if (pmagicCaster) {
+                        pcasterActor = pmagicCaster->GetCasterAsActor();
+                    }
+                    else {
+                        pcasterActor = nullptr;
+                    }
+                    if ((pcasterActor && (!bskillUsed && apSpell->GetSpellType() == MagicSystem::SPELL)) ||
+                        apSpell->GetSpellType() == MagicSystem::POISON) {
+                        bskillUsed = true;
+                        ActorValue::Index AssociatedSkill = apSpell->GetAssociatedSkill();
+                        pcasterActor->UseSkill(AssociatedSkill, 1u, 0.0f);
                     }
                 }
-                if (apCollidee) {
-                    apTarget = apCollidee->GetMagicTarget();
-                }
-                else {
-                    apTarget = nullptr;
-                }
-                FindTargetsInArea(
-                    apSpell, pactiveEffect, apCell, aLocation, apTarget, apProjectile, &TargetList, bskillUsed,
-                    afAreaScale
-                );
-                if (pactiveEffect) {
-                    delete pactiveEffect;
-                }
+            }
+
+            if (apCollidee) {
+                apTarget = apCollidee->GetMagicTarget();
+            }
+            else {
+                apTarget = nullptr;
+            }
+            FindTargetsInArea(
+                apSpell, pactiveEffect, apCell, aLocation, apTarget, apProjectile, &TargetList, bskillUsed, afAreaScale
+            );
+            if (pactiveEffect) {
+                delete pactiveEffect;
             }
         }
+
         plist_3 = static_cast<EffectItemList*>(plist_3->m_pkNext);
     }
     bool v30 = apProjectile->pAVEffect->GetProjectileType() == MagicSystem::FOG;
@@ -1417,16 +1369,11 @@ void MagicCaster::FindTargets_0(
             DoExplosion(aLocation, apCell, apSpell, pDominantArea, &TargetList, afPowerScale, afAreaScale);
         }
         else {
-            if (apCollidee) {
-                if (apCollidee->IsActor()) {
-                    if (pdominantTouch) {
-                        if (pdominantTouch->pEffectSetting->IsFlagSet(EffectSetting::HAVOK_EXPLOSION) &&
-                            CheckWillKill(static_cast<Actor*>(apCollidee), apSpell)) {
-                            float a8 = pdominantTouch->GetRawCost();
-                            ExplodeActor(static_cast<Actor*>(apCollidee), aLocation, pdominantTouch, a8);
-                        }
-                    }
-                }
+            if ((apCollidee) && (apCollidee->IsActor()) && (pdominantTouch) &&
+                (pdominantTouch->pEffectSetting->IsFlagSet(EffectSetting::HAVOK_EXPLOSION) &&
+                 CheckWillKill(static_cast<Actor*>(apCollidee), apSpell))) {
+                float a8 = pdominantTouch->GetRawCost();
+                ExplodeActor(static_cast<Actor*>(apCollidee), aLocation, pdominantTouch, a8);
             }
         }
     }
@@ -1438,9 +1385,8 @@ MagicCaster* MagicCaster::GetMagicCasterByNumericID(uint32_t aiFormID) {
     if (formByNumericID && formByNumericID->IsReference()) {
         return static_cast<TESObjectREFR*>(formByNumericID)->GetMagicCaster();
     }
-    else {
-        return nullptr;
-    }
+
+    return nullptr;
 }
 
 // A box phantom wraps an hkpAabbPhantom; its overlap array's getter is a trivial accessor (this + 0xD0).
@@ -1449,7 +1395,6 @@ hkArray<hkpCollidable*, hkContainerHeapAllocator>* bhkAabbPhantom::GetOverlappin
     if (pphantom) {
         return &pphantom->m_overlappingCollidables;
     }
-    else {
-        return nullptr;
-    }
+
+    return nullptr;
 }

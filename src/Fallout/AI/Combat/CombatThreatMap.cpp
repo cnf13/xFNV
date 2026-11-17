@@ -199,40 +199,37 @@ NiPoint3* CombatThreat::GetThreatLinearVelocity(NiPoint3* apResult) {
             *apResult = CachedLinearVelocity;
             return apResult;
         }
-        else {
-        LABEL_9:;
-            if (pCachedThreat3D != pthreat3D) {
-                pCachedThreat3D = pthreat3D;
-                bhkCollisionObject* pcollisionObject = FindFirstCollisionObject(pCachedThreat3D);
-                if (pcollisionObject) {
-                    NiObject* pworldObject = pcollisionObject->GetRigidBody();
-                    if (pworldObject) {
-                        pCachedRigidBody = static_cast<bhkRigidBody*>(
-                            NiObject::DynamicCastStatic(&bhkRigidBody::ms_RTTI, pworldObject)
-                        );
-                    }
+
+    LABEL_9:;
+        if (pCachedThreat3D != pthreat3D) {
+            pCachedThreat3D = pthreat3D;
+            bhkCollisionObject* pcollisionObject = FindFirstCollisionObject(pCachedThreat3D);
+            if (pcollisionObject) {
+                NiObject* pworldObject = pcollisionObject->GetRigidBody();
+                if (pworldObject) {
+                    pCachedRigidBody =
+                        static_cast<bhkRigidBody*>(NiObject::DynamicCastStatic(&bhkRigidBody::ms_RTTI, pworldObject));
                 }
             }
-            if (pCachedRigidBody) {
-                pCachedRigidBody->GetLinearVelocityNi(&CachedLinearVelocity);
-            }
-            else {
-                CachedLinearVelocity = NiPoint3_ZERO;
-            }
-            float a2b = CombatTimer::GetTimer();
-            ::new (&v8.fTargetTime) CombatTimeStamp(a2b);
-            fCachedLinearVelocityTimeStamp.fTimeStamp = v8.fTargetTime;
-            *apResult = CachedLinearVelocity;
-            return apResult;
         }
-    }
-    else {
-        float a2c = CombatTimer::GetTimer();
-        v8.SetStartTime(a2c);
-        fCachedLinearVelocityTimeStamp.fTimeStamp = v8.fStartTime;
-        *apResult = NiPoint3_ZERO;
+        if (pCachedRigidBody) {
+            pCachedRigidBody->GetLinearVelocityNi(&CachedLinearVelocity);
+        }
+        else {
+            CachedLinearVelocity = NiPoint3_ZERO;
+        }
+        float a2b = CombatTimer::GetTimer();
+        ::new (&v8.fTargetTime) CombatTimeStamp(a2b);
+        fCachedLinearVelocityTimeStamp.fTimeStamp = v8.fTargetTime;
+        *apResult = CachedLinearVelocity;
         return apResult;
     }
+
+    float a2c = CombatTimer::GetTimer();
+    v8.SetStartTime(a2c);
+    fCachedLinearVelocityTimeStamp.fTimeStamp = v8.fStartTime;
+    *apResult = NiPoint3_ZERO;
+    return apResult;
 }
 
 PathingAvoidNode* CombatThreat::GetAvoidNode(PathingAvoidNode* apResult, Actor* apActor) {
@@ -306,13 +303,11 @@ void CombatThreatMap::UpdateThreats() {
             uint32_t ithreatID = 0;
             CombatThreat* pthreat = nullptr;
             GetNext(it, ithreatID, pthreat);
-            if (pthreat) {
-                if (pthreat->IsExpired(ftime)) {
-                    if (pthreat) {
-                        delete pthreat;
-                    }
-                    RemoveAt(ithreatID);
+            if ((pthreat) && (pthreat->IsExpired(ftime))) {
+                if (pthreat) {
+                    delete pthreat;
                 }
+                RemoveAt(ithreatID);
             }
         }
         Lock.UnlockWrite();
@@ -504,22 +499,21 @@ PathingAvoidNodeArray* CombatThreatMap::CreateAvoidNodeArray(const NiPoint3& arL
         }
     }
     Lock.UnlockRead();
-    if (!pavoidNodeArray) {
-        if (pbestThreat) {
-            PathingAvoidNodeArray* pavoidNodeArray_3;
-            PathingAvoidNodeArray* v12 =
-                static_cast<PathingAvoidNodeArray*>(NiMemObject::operator new(sizeof(PathingAvoidNodeArray)));
-            if (v12) {
-                pavoidNodeArray_3 = ::new (v12) PathingAvoidNodeArray;
-            }
-            else {
-                pavoidNodeArray_3 = nullptr;
-            }
-            pavoidNodeArray = pavoidNodeArray_3;
-            PathingAvoidNode* v7 = pbestThreat->GetAvoidNode(&v11, apActor);
-            pavoidNodeArray->Add(*v7);
+    if ((!pavoidNodeArray) && (pbestThreat)) {
+        PathingAvoidNodeArray* pavoidNodeArray_3;
+        PathingAvoidNodeArray* v12 =
+            static_cast<PathingAvoidNodeArray*>(NiMemObject::operator new(sizeof(PathingAvoidNodeArray)));
+        if (v12) {
+            pavoidNodeArray_3 = ::new (v12) PathingAvoidNodeArray;
         }
+        else {
+            pavoidNodeArray_3 = nullptr;
+        }
+        pavoidNodeArray = pavoidNodeArray_3;
+        PathingAvoidNode* v7 = pbestThreat->GetAvoidNode(&v11, apActor);
+        pavoidNodeArray->Add(*v7);
     }
+
     return pavoidNodeArray;
 }
 
@@ -527,31 +521,28 @@ void CombatThreatMap::AddProjectile(Projectile* apProjectile) {
     if (!apProjectile->IsFlagSet(Projectile::HITSCAN_MODE)) {
         BGSProjectile* pBaseForm = apProjectile->GetProjectileBase();
         BGSExplosion* CursorRoot = pBaseForm->GetExplosion();
-        if (pBaseForm->GetHasExplosion()) {
-            if (CursorRoot) {
-                float afExplosionRadius = CursorRoot->GetRadiusBSUnits();
-                float afBaseExplosionDamage = CursorRoot->GetDamage();
-                if (fDangerousProjectileExplosionDamage.Float() <= static_cast<double>(afBaseExplosionDamage)) {
-                    float* v2 = &fDangerousProjectileExplosionDamage.Float();
-                    float v8 =
-                        CombatFormulas::CalcExplosionDamageDistance(afExplosionRadius, afBaseExplosionDamage, *v2);
-                    if (fDangerousProjectileExplosionRadius.Float() <= static_cast<double>(v8)) {
-                        float afStartTime = 0.0;
-                        float afEndTime = 3.4028235e+38f;
-                        if (pBaseForm->GetHasExplosionAltTrigger()) {
-                            if (apProjectile->GetExplosionTimer() == 3.4028234663852886e+38) {
-                                afEndTime = fCombatThreatProximityExplosionAvoidTime.Float();
-                            }
-                            else {
-                                afEndTime = apProjectile->GetExplosionTimer() + 1.0;
-                                if (fCombatThreatTimedExplosionLength.Float() < static_cast<double>(afEndTime)) {
-                                    afStartTime = afEndTime - fCombatThreatTimedExplosionLength.Float();
-                                }
+        if ((pBaseForm->GetHasExplosion()) && (CursorRoot)) {
+            float afExplosionRadius = CursorRoot->GetRadiusBSUnits();
+            float afBaseExplosionDamage = CursorRoot->GetDamage();
+            if (fDangerousProjectileExplosionDamage.Float() <= static_cast<double>(afBaseExplosionDamage)) {
+                float* v2 = &fDangerousProjectileExplosionDamage.Float();
+                float v8 = CombatFormulas::CalcExplosionDamageDistance(afExplosionRadius, afBaseExplosionDamage, *v2);
+                if (fDangerousProjectileExplosionRadius.Float() <= static_cast<double>(v8)) {
+                    float afStartTime = 0.0;
+                    float afEndTime = 3.4028235e+38f;
+                    if (pBaseForm->GetHasExplosionAltTrigger()) {
+                        if (apProjectile->GetExplosionTimer() == 3.4028234663852886e+38) {
+                            afEndTime = fCombatThreatProximityExplosionAvoidTime.Float();
+                        }
+                        else {
+                            afEndTime = apProjectile->GetExplosionTimer() + 1.0;
+                            if (fCombatThreatTimedExplosionLength.Float() < static_cast<double>(afEndTime)) {
+                                afStartTime = afEndTime - fCombatThreatTimedExplosionLength.Float();
                             }
                         }
-                        if (afEndTime > 0.0) {
-                            AddThreat(apProjectile, v8, afStartTime, afEndTime, afBaseExplosionDamage);
-                        }
+                    }
+                    if (afEndTime > 0.0) {
+                        AddThreat(apProjectile, v8, afStartTime, afEndTime, afBaseExplosionDamage);
                     }
                 }
             }

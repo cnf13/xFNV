@@ -130,11 +130,10 @@ void PlayerMover::Update(float fdeltaT) {
         else {
             pListener = nullptr;
         }
-        if (pListener) {
-            if (pListener->StuckToSomeone()) {
-                movedelta = NiPoint3_ZERO;
-            }
+        if ((pListener) && (pListener->StuckToSomeone())) {
+            movedelta = NiPoint3_ZERO;
         }
+
         if ((this->MoveMode & 15) != 0 && !pPlayer->IsDying() && !pPlayer->GetNoCollision()) {
             pPlayer->GetAnimAction();
             float fMotionMagnitude = SideVec.Length();
@@ -184,15 +183,13 @@ void PlayerMover::Update(float fdeltaT) {
         uint32_t MoveMode = pPlayer->GetMoveMode();
         pPlayer->Move(fdeltaT, movedelta, MoveMode);
         TESObjectCELL* pcell = pPlayer->GetParentCell();
-        if (pcell) {
-            if (!pcell->GetInterior()) {
-                float fheight = 0.0f;
-                NiPoint3 refpos = pPlayer->GetLocationOnReference();
-                TESObjectLAND* Land = pcell->GetLand();
-                if (Land->GetLandHeight(refpos, fheight) && fheight - refpos.z > 32.0) {
-                    refpos.z = fheight + 32.0;
-                    pPlayer->SetPosition(refpos);
-                }
+        if ((pcell) && (!pcell->GetInterior())) {
+            float fheight = 0.0f;
+            NiPoint3 refpos = pPlayer->GetLocationOnReference();
+            TESObjectLAND* Land = pcell->GetLand();
+            if (Land->GetLandHeight(refpos, fheight) && fheight - refpos.z > 32.0) {
+                refpos.z = fheight + 32.0;
+                pPlayer->SetPosition(refpos);
             }
         }
     }

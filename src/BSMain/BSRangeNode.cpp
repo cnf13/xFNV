@@ -137,7 +137,6 @@ NiObject* BSRangeNode::CreateObject() {
     if (apMemory) {
         return ::new (apMemory) BSRangeNode;
     }
-    else {
-        return nullptr;
-    }
+
+    return nullptr;
 }

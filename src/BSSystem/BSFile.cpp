@@ -351,26 +351,24 @@ void BSFile::CheckIsGood() {
     int32_t eMemContext;
     if (m_pFile) {
         m_bGood = true;
-        if (m_uiBufferAllocSize) {
-            if (!m_pBuffer) {
-                eMemContext = GetThreadMemContext();
-                GetThreadMemContext() = 23;
-                bEmpty = (uint8_t)(m_uiBufferAllocSize == (-1));
-                if (m_uiBufferAllocSize == 0xFFFFFFFFu) {
-                    m_uiBufferAllocSize = GetFileSize();
-                }
-                m_pBuffer = static_cast<char*>(
-                    static_cast<void*>(static_cast<int8_t*>((&MemoryManager_Singleton)->Allocate(m_uiBufferAllocSize)))
-                );
-                if (bEmpty) {
-                    m_uiBufferReadSize = m_uiBufferAllocSize;
-                    m_uiPos = (uint32_t)0;
-                    if (NiFile::DiskRead(m_pBuffer, m_uiBufferAllocSize) != m_uiBufferAllocSize) {
-                        m_bGood = false;
-                    }
-                }
-                GetThreadMemContext() = eMemContext;
+        if ((m_uiBufferAllocSize) && (!m_pBuffer)) {
+            eMemContext = GetThreadMemContext();
+            GetThreadMemContext() = 23;
+            bEmpty = (uint8_t)(m_uiBufferAllocSize == (-1));
+            if (m_uiBufferAllocSize == 0xFFFFFFFFu) {
+                m_uiBufferAllocSize = GetFileSize();
             }
+            m_pBuffer = static_cast<char*>(
+                static_cast<void*>(static_cast<int8_t*>((&MemoryManager_Singleton)->Allocate(m_uiBufferAllocSize)))
+            );
+            if (bEmpty) {
+                m_uiBufferReadSize = m_uiBufferAllocSize;
+                m_uiPos = (uint32_t)0;
+                if (NiFile::DiskRead(m_pBuffer, m_uiBufferAllocSize) != m_uiBufferAllocSize) {
+                    m_bGood = false;
+                }
+            }
+            GetThreadMemContext() = eMemContext;
         }
     }
     else {
@@ -449,11 +447,10 @@ _SYSTEMTIME* BSFile::GetLastSaveTime(_SYSTEMTIME* result) {
         *result = LocalTime;
         return result;
     }
-    else {
-        std::memset(&LocalTime, 0, sizeof(LocalTime));
-        *result = LocalTime;
-        return result;
-    }
+
+    std::memset(&LocalTime, 0, sizeof(LocalTime));
+    *result = LocalTime;
+    return result;
 }
 
 void BSFile::operator delete(void* apMemory) {

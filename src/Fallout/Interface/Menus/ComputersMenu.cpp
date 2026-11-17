@@ -113,18 +113,15 @@ void ComputersMenu::AnimatingTextManager::Update() {
         }
         AnimatingText* pold = xAnimatingText.RemoveHead();
         if (ComputersMenu::pMe->eMode) {
-            if (pold) {
-                if (pold->GetParent() == ComputersMenu::pMe->pTiles[7]) {
-                    ComputersMenu::pMe->pTiles[15]->Set(4003, 1);
-                }
+            if ((pold) && (pold->GetParent() == ComputersMenu::pMe->pTiles[7])) {
+                ComputersMenu::pMe->pTiles[15]->Set(4003, 1);
             }
         }
         else {
-            if (pold) {
-                if (*pold->GetFullText() == "> "[0]) {
-                    ComputersMenu::pMe->Sounds[2].Play(false);
-                }
+            if ((pold) && (*pold->GetFullText() == "> "[0])) {
+                ComputersMenu::pMe->Sounds[2].Play(false);
             }
+
             g_computersNextMainMenuTextDisplayTime = BSGetTickCount() + 500;
         }
         AnimatingText* pold_2 = pold;
@@ -486,15 +483,12 @@ void ComputersMenu::DisplayTerminal(char a1) {
         g_iComputersDisplayRateForCurrentMenu = v10;
         const char* pdesc = pTerminal->GetDescription(pTerminal, DESC_ID);
         Tile::Value* pstringval = pTiles[7]->GetValueQ(4036);
-        if (pdesc) {
-            if (*pdesc) {
-                if (!pTiles[7]->IsVisible() || BSstrcmp(pdesc, pstringval->strValue)) {
-                    pTiles[15]->Set(4003, 0);
-                    Tile::Value* pstringval_2 = pTiles[7]->GetValue(4003);
-                    pATManager->AddItem(pdesc, pstringval, pstringval_2, -1);
-                }
-            }
+        if ((pdesc) && (*pdesc) && (!pTiles[7]->IsVisible() || BSstrcmp(pdesc, pstringval->strValue))) {
+            pTiles[15]->Set(4003, 0);
+            Tile::Value* pstringval_2 = pTiles[7]->GetValue(4003);
+            pATManager->AddItem(pdesc, pstringval, pstringval_2, -1);
         }
+
         for (TERMINAL_MENU_ITEM*& rpItem : pTerminal->GetMenuItemList()->ItemsUntilNull()) {
             if (rpItem->Conditions.IsTrue(pTerminalRef, nullptr)) {
                 Tile* pnew = lbMenuItems.AddItem(rpItem, nullptr, nullptr, nullptr);
@@ -683,26 +677,20 @@ Tile* ComputersMenu::Create(TESObjectREFR* apTerminalRef) {
                 pmenu->PrepForVisibility(false);
                 return ptile;
             }
-            else {
-                Warning("MENUS: Computers Menu Creation Failed... Missing terminal data ");
-                return nullptr;
-            }
-        }
-        else {
-            Warning("MENUS: Computers Menu Creation Failed... Missing index = #%d", imissingIndex);
+
+            Warning("MENUS: Computers Menu Creation Failed... Missing terminal data ");
             return nullptr;
         }
-    }
-    else {
-        if (pmenu) {
-            if (pmenu->pMenu) {
-                if (pmenu) {
-                    delete pmenu;
-                }
-            }
-        }
+
+        Warning("MENUS: Computers Menu Creation Failed... Missing index = #%d", imissingIndex);
         return nullptr;
     }
+
+    if ((pmenu) && (pmenu->pMenu) && (pmenu)) {
+        delete pmenu;
+    }
+
+    return nullptr;
 }
 
 int32_t ComputersMenu::GetClassStatic() {

@@ -542,12 +542,7 @@ void LowProcess::UpdateMissedPackages(MobileObject* apRef, bool abActionflag) {
                             pActor->SetLocationOnReference(kCoord);
                             pCell = pPack->GetLocationCell(pActor);
                             pWorld = pPack->GetLocationWorld(pActor);
-                            if (pPack->GetLocation() && pPack->GetLocation()->GetLocType() == PLT_CELL) {
-                                bClearAngle = true;
-                            }
-                            else {
-                                bClearAngle = false;
-                            }
+                            bClearAngle = pPack->GetLocation() && pPack->GetLocation()->GetLocType() == PLT_CELL;
                             break;
                         }
                         case PACKAGE_TYPE_EXPLORE:
@@ -584,12 +579,7 @@ void LowProcess::UpdateMissedPackages(MobileObject* apRef, bool abActionflag) {
                             pActor->SetLocationOnReference(kCoord);
                             pCell = pPack->GetLocationCell(pActor);
                             pWorld = pPack->GetLocationWorld(pActor);
-                            if (pPack->GetLocation() && pPack->GetLocation()->GetLocReference()) {
-                                bClearAngle = true;
-                            }
-                            else {
-                                bClearAngle = false;
-                            }
+                            bClearAngle = pPack->GetLocation() && pPack->GetLocation()->GetLocReference();
                             break;
                         }
                         case PACKAGE_TYPE_FOLLOW:
@@ -692,64 +682,61 @@ bool LowProcess::CheckforNewPackage(Actor* apActor, bool abFlag) {
         SetTargetActivated(false);
     LABEL_79:;
         if (bflag) {
-            if (ppack) {
-                if (GetCurrentPackage() != ppack) {
-                    if (ppack->GetLockDoorsAtEnd()) {
-                        const NiPoint3* v30 = &apActor->GetLocationOnReference();
-                        const NiPoint3* v26 = &apActor->GetLocationOnReference();
-                        TESObjectCELL* ParentCell = apActor->GetParentCell();
+            if ((ppack) && (GetCurrentPackage() != ppack)) {
+                if (ppack->GetLockDoorsAtEnd()) {
+                    const NiPoint3* v30 = &apActor->GetLocationOnReference();
+                    const NiPoint3* v26 = &apActor->GetLocationOnReference();
+                    TESObjectCELL* ParentCell = apActor->GetParentCell();
+                    pDataHandler->EnumReferencesCloseToPoint(
+                        ParentCell, *v26, 5000.0f, *v30, 5000.0f, &LowProcess::LockDoorsatLocation, apActor
+                    );
+                }
+                else {
+                    if (ppack->GetUnlockDoorsAtEnd()) {
+                        const NiPoint3* v31 = &apActor->GetLocationOnReference();
+                        const NiPoint3* v27 = &apActor->GetLocationOnReference();
+                        TESObjectCELL* v23 = apActor->GetParentCell();
                         pDataHandler->EnumReferencesCloseToPoint(
-                            ParentCell, *v26, 5000.0f, *v30, 5000.0f, &LowProcess::LockDoorsatLocation, apActor
+                            v23, *v27, 5000.0f, *v31, 5000.0f, &LowProcess::UnLockDoorsatLocation, apActor
                         );
                     }
-                    else {
-                        if (ppack->GetUnlockDoorsAtEnd()) {
-                            const NiPoint3* v31 = &apActor->GetLocationOnReference();
-                            const NiPoint3* v27 = &apActor->GetLocationOnReference();
-                            TESObjectCELL* v23 = apActor->GetParentCell();
-                            pDataHandler->EnumReferencesCloseToPoint(
-                                v23, *v27, 5000.0f, *v31, 5000.0f, &LowProcess::UnLockDoorsatLocation, apActor
-                            );
-                        }
-                    }
                 }
             }
-            if (GetCurrentPackage()) {
-                if (GetCurrentPackage() != ppack) {
-                    if (GetCurrentPackage()->GetLockDoorsAtStart()) {
-                        const NiPoint3* v32 = &apActor->GetLocationOnReference();
-                        const NiPoint3* v28 = &apActor->GetLocationOnReference();
-                        TESObjectCELL* v24 = apActor->GetParentCell();
+
+            if ((GetCurrentPackage()) && (GetCurrentPackage() != ppack)) {
+                if (GetCurrentPackage()->GetLockDoorsAtStart()) {
+                    const NiPoint3* v32 = &apActor->GetLocationOnReference();
+                    const NiPoint3* v28 = &apActor->GetLocationOnReference();
+                    TESObjectCELL* v24 = apActor->GetParentCell();
+                    pDataHandler->EnumReferencesCloseToPoint(
+                        v24, *v28, 5000.0f, *v32, 5000.0f, &LowProcess::LockDoorsatLocation, apActor
+                    );
+                }
+                else {
+                    TESPackage* v15 = GetCurrentPackage();
+                    if (v15->GetUnlockDoorsAtStart()) {
+                        const NiPoint3* v33 = &apActor->GetLocationOnReference();
+                        const NiPoint3* v29 = &apActor->GetLocationOnReference();
+                        TESObjectCELL* v25 = apActor->GetParentCell();
                         pDataHandler->EnumReferencesCloseToPoint(
-                            v24, *v28, 5000.0f, *v32, 5000.0f, &LowProcess::LockDoorsatLocation, apActor
+                            v25, *v29, 5000.0f, *v33, 5000.0f, &LowProcess::UnLockDoorsatLocation, apActor
                         );
                     }
-                    else {
-                        TESPackage* v15 = GetCurrentPackage();
-                        if (v15->GetUnlockDoorsAtStart()) {
-                            const NiPoint3* v33 = &apActor->GetLocationOnReference();
-                            const NiPoint3* v29 = &apActor->GetLocationOnReference();
-                            TESObjectCELL* v25 = apActor->GetParentCell();
-                            pDataHandler->EnumReferencesCloseToPoint(
-                                v25, *v29, 5000.0f, *v33, 5000.0f, &LowProcess::UnLockDoorsatLocation, apActor
-                            );
-                        }
+                }
+            }
+
+            if ((GetCurrentPackage()) && (ppack != GetCurrentPackage() || !apActor->GetCurrentTarget())) {
+                TESPackage* v16 = GetCurrentPackage();
+                if (v16->IsTargetAnActor(apActor)) {
+                    TESPackage* v17 = GetCurrentPackage();
+                    if (v17->GetPackType()) {
+                        TESPackage* v18 = GetCurrentPackage();
+                        TESObjectREFR* EscortTargetForPackage = v18->GetEscortTargetForPackage(apActor, false);
+                        SetTarget(EscortTargetForPackage);
                     }
                 }
             }
-            if (GetCurrentPackage()) {
-                if (ppack != GetCurrentPackage() || !apActor->GetCurrentTarget()) {
-                    TESPackage* v16 = GetCurrentPackage();
-                    if (v16->IsTargetAnActor(apActor)) {
-                        TESPackage* v17 = GetCurrentPackage();
-                        if (v17->GetPackType()) {
-                            TESPackage* v18 = GetCurrentPackage();
-                            TESObjectREFR* EscortTargetForPackage = v18->GetEscortTargetForPackage(apActor, false);
-                            SetTarget(EscortTargetForPackage);
-                        }
-                    }
-                }
-            }
+
             apActor->UnlockLockDoorsProcedure();
             SetLockedLocation(false);
             float z = apActor->GetAngleOnReference().z;
@@ -760,11 +747,10 @@ bool LowProcess::CheckforNewPackage(Actor* apActor, bool abFlag) {
             SetContinuingPackage(false);
             SetTarget(nullptr);
             TESPackage* ppack_2 = GetRunOncePackage();
-            if (ppack_2) {
-                if (ppack_2->GetPackType() != PACKAGE_TYPE_GET_UP) {
-                    ClearRunOncePackage();
-                }
+            if ((ppack_2) && (ppack_2->GetPackType() != PACKAGE_TYPE_GET_UP)) {
+                ClearRunOncePackage();
             }
+
             SetCurrentActionComplete(false);
             SetPackageIdleDone(false);
             SetTargetActivated(false);
@@ -879,12 +865,11 @@ bool LowProcess::CheckforNewPackage(Actor* apActor, bool abFlag) {
     }
     if (ppack->GetIsCreated()) {
         apActor->EndInterruptPackage(false);
-        if (GetCurrentPackage()) {
-            if (ppack == GetCurrentPackage()) {
-                ClearCurrentDataforProcess(apActor);
-                ClearCurrentPackage();
-            }
+        if ((GetCurrentPackage()) && (ppack == GetCurrentPackage())) {
+            ClearCurrentDataforProcess(apActor);
+            ClearCurrentPackage();
         }
+
         ppack = nullptr;
     }
     if (!SetCurrentPackageFromSchedule(apActor)) {
@@ -1031,14 +1016,13 @@ TESObjectREFR* LowProcess::GetCurrentDestinationReference(Actor* apActor, bool a
             break;
         }
         case PROCEDURE_ACCOMPANY: {
-            if (pTarget) {
-                if (pTarget->IsActor()) {
-                    TESPackage* CurrentPackage = pTarget->GetCurrentPackage();
-                    if (CurrentPackage) {
-                        pTarget = static_cast<Actor*>(CurrentPackage->GetLocationReference(pTarget));
-                    }
+            if ((pTarget) && (pTarget->IsActor())) {
+                TESPackage* CurrentPackage = pTarget->GetCurrentPackage();
+                if (CurrentPackage) {
+                    pTarget = static_cast<Actor*>(CurrentPackage->GetLocationReference(pTarget));
                 }
             }
+
             break;
         }
         case PROCEDURE_GUARD: {
@@ -1094,135 +1078,129 @@ NiPoint3 LowProcess::GetCurrentDestinationCoordinate(Actor* apActor, bool abInte
     TESPackage* pPack = GetCurrentPackage();
     Actor* ptargAct = static_cast<Actor*>(pTarget);
     int32_t iIndex = GetProcedureIndexRunning();
-    if (!abInterrupt) {
-        if (pPack) {
-            if (pPack->IsInterruptPackage()) {
-                pPack = (&apActor->m_Extra)->GetPackageExtra();
-                iIndex = (&apActor->m_Extra)->GetPackageExtraIndex();
-                ptargAct = static_cast<Actor*>((&apActor->m_Extra)->GetPackageExtraTarget());
-            }
-        }
+    if ((!abInterrupt) && (pPack) && (pPack->IsInterruptPackage())) {
+        pPack = (&apActor->m_Extra)->GetPackageExtra();
+        iIndex = (&apActor->m_Extra)->GetPackageExtraIndex();
+        ptargAct = static_cast<Actor*>((&apActor->m_Extra)->GetPackageExtraTarget());
     }
+
     if (pPack) {
         if (pPack->ePROCEDURE_TYPE == PACKAGE_PROCEDURE_NONE) {
             result = ppoint;
             return result;
         }
-        else {
-            switch (Procedure_Action[pPack->ePROCEDURE_TYPE][iIndex]) {
-                case PROCEDURE_TRAVEL:
-                case PROCEDURE_SLEEP:
-                case PROCEDURE_EAT:
-                case PROCEDURE_ESCORT:
-                case PROCEDURE_USE_WEAPON: {
-                    const NiPoint3* LocationCoord;
-                    if (pPack->pPackLoc) {
-                        LocationCoord = &(v14 = pPack->GetLocationCoord(apActor));
-                    }
-                    else {
-                        LocationCoord = &apActor->GetLocationOnReference();
-                    }
-                    ppoint = *LocationCoord;
-                    break;
+
+        switch (Procedure_Action[pPack->ePROCEDURE_TYPE][iIndex]) {
+            case PROCEDURE_TRAVEL:
+            case PROCEDURE_SLEEP:
+            case PROCEDURE_EAT:
+            case PROCEDURE_ESCORT:
+            case PROCEDURE_USE_WEAPON: {
+                const NiPoint3* LocationCoord;
+                if (pPack->pPackLoc) {
+                    LocationCoord = &(v14 = pPack->GetLocationCoord(apActor));
                 }
-                case PROCEDURE_WANDER:
-                case PROCEDURE_ACTIVATE:
-                case PROCEDURE_ACQUIRE:
-                case PROCEDURE_FOLLOW:
-                case PROCEDURE_ALARM:
-                case PROCEDURE_COMBAT:
-                case PROCEDURE_WAIT:
-                case PROCEDURE_TRAVEL_TARGET:
-                case PROCEDURE_PURSUE:
-                case PROCEDURE_USE_ITEM_AT:
-                case PROCEDURE_AMBUSH_WAIT:
-                case PROCEDURE_SUMMON_CREATURE_DEFEND:
-                case PROCEDURE_SANDBOX:
-                case PROCEDURE_PATROL: {
-                    const NiPoint3* v5;
-                    if (ptargAct) {
-                        v5 = &ptargAct->GetLocationOnReference();
-                    }
-                    else {
-                        v5 = &apActor->GetLocationOnReference();
-                    }
-                    ppoint = *v5;
-                    break;
+                else {
+                    LocationCoord = &apActor->GetLocationOnReference();
                 }
-                case PROCEDURE_ACCOMPANY: {
-                    ppoint = apActor->GetLocationOnReference();
-                    if (ptargAct) {
-                        if (ptargAct->IsActor()) {
-                            TESPackage* ptargpack = ptargAct->GetCurrentPackage();
-                            if (ptargpack) {
-                                ppoint = ptargpack->GetLocationCoord(ptargAct);
-                            }
-                        }
-                    }
-                    break;
-                }
-                case PROCEDURE_GUARD: {
-                    if (pPack->SandboxGetAllowConversation() && pPack->pPackLoc) {
-                        ppoint = pPack->GetLocationCoord(apActor);
-                    }
-                    else {
-                        if (pPack->GetPackageTarget() && pPack->GetPackageTarget()->GetTargReference()) {
-                            Actor* TargReference = static_cast<Actor*>(pPack->GetPackageTarget()->GetTargReference());
-                            ppoint = TargReference->GetLocationOnReference();
-                        }
-                        else {
-                            ppoint = apActor->GetLocationOnReference();
-                        }
-                    }
-                    break;
-                }
-                case PROCEDURE_DONE: {
-                    if (abInterrupt) {
-                        const NiPoint3* v9;
-                        if (ptargAct) {
-                            v9 = &ptargAct->GetLocationOnReference();
-                        }
-                        else {
-                            v9 = &apActor->GetLocationOnReference();
-                        }
-                        ppoint = *v9;
-                    }
-                    else {
-                        if (pPack->GetPackType() == PACKAGE_TYPE_TRAVEL) {
-                            const NiPoint3* PackageStartLocationCoord;
-                            if (pPack->pPackLoc) {
-                                PackageStartLocationCoord = &(v12 = pPack->GetLocationCoord(apActor));
-                            }
-                            else {
-                                PackageStartLocationCoord = &apActor->GetPackageStartLocationCoord();
-                            }
-                            ppoint = *PackageStartLocationCoord;
-                        }
-                        else {
-                            const NiPoint3* v8;
-                            if (ptargAct) {
-                                v8 = &ptargAct->GetLocationOnReference();
-                            }
-                            else {
-                                v8 = &apActor->GetLocationOnReference();
-                            }
-                            ppoint = *v8;
-                        }
-                    }
-                    break;
-                }
-                default: {
-                    break;
-                }
+                ppoint = *LocationCoord;
+                break;
             }
-            result = ppoint;
-            return result;
+            case PROCEDURE_WANDER:
+            case PROCEDURE_ACTIVATE:
+            case PROCEDURE_ACQUIRE:
+            case PROCEDURE_FOLLOW:
+            case PROCEDURE_ALARM:
+            case PROCEDURE_COMBAT:
+            case PROCEDURE_WAIT:
+            case PROCEDURE_TRAVEL_TARGET:
+            case PROCEDURE_PURSUE:
+            case PROCEDURE_USE_ITEM_AT:
+            case PROCEDURE_AMBUSH_WAIT:
+            case PROCEDURE_SUMMON_CREATURE_DEFEND:
+            case PROCEDURE_SANDBOX:
+            case PROCEDURE_PATROL: {
+                const NiPoint3* v5;
+                if (ptargAct) {
+                    v5 = &ptargAct->GetLocationOnReference();
+                }
+                else {
+                    v5 = &apActor->GetLocationOnReference();
+                }
+                ppoint = *v5;
+                break;
+            }
+            case PROCEDURE_ACCOMPANY: {
+                ppoint = apActor->GetLocationOnReference();
+                if ((ptargAct) && (ptargAct->IsActor())) {
+                    TESPackage* ptargpack = ptargAct->GetCurrentPackage();
+                    if (ptargpack) {
+                        ppoint = ptargpack->GetLocationCoord(ptargAct);
+                    }
+                }
+
+                break;
+            }
+            case PROCEDURE_GUARD: {
+                if (pPack->SandboxGetAllowConversation() && pPack->pPackLoc) {
+                    ppoint = pPack->GetLocationCoord(apActor);
+                }
+                else {
+                    if (pPack->GetPackageTarget() && pPack->GetPackageTarget()->GetTargReference()) {
+                        Actor* TargReference = static_cast<Actor*>(pPack->GetPackageTarget()->GetTargReference());
+                        ppoint = TargReference->GetLocationOnReference();
+                    }
+                    else {
+                        ppoint = apActor->GetLocationOnReference();
+                    }
+                }
+                break;
+            }
+            case PROCEDURE_DONE: {
+                if (abInterrupt) {
+                    const NiPoint3* v9;
+                    if (ptargAct) {
+                        v9 = &ptargAct->GetLocationOnReference();
+                    }
+                    else {
+                        v9 = &apActor->GetLocationOnReference();
+                    }
+                    ppoint = *v9;
+                }
+                else {
+                    if (pPack->GetPackType() == PACKAGE_TYPE_TRAVEL) {
+                        const NiPoint3* PackageStartLocationCoord;
+                        if (pPack->pPackLoc) {
+                            PackageStartLocationCoord = &(v12 = pPack->GetLocationCoord(apActor));
+                        }
+                        else {
+                            PackageStartLocationCoord = &apActor->GetPackageStartLocationCoord();
+                        }
+                        ppoint = *PackageStartLocationCoord;
+                    }
+                    else {
+                        const NiPoint3* v8;
+                        if (ptargAct) {
+                            v8 = &ptargAct->GetLocationOnReference();
+                        }
+                        else {
+                            v8 = &apActor->GetLocationOnReference();
+                        }
+                        ppoint = *v8;
+                    }
+                }
+                break;
+            }
+            default: {
+                break;
+            }
         }
-    }
-    else {
         result = ppoint;
         return result;
     }
+
+    result = ppoint;
+    return result;
 }
 
 TESObjectCELL* LowProcess::GetCurrentDestinationCell(Actor* apActor) {
@@ -1268,9 +1246,8 @@ TESObjectCELL* LowProcess::GetCurrentDestinationCell(Actor* apActor) {
             if (pTarget) {
                 return pTarget->GetParentCell();
             }
-            else {
-                return apActor->GetParentCell();
-            }
+
+            return apActor->GetParentCell();
         }
         case PROCEDURE_ESCORT: {
             if (GetCurrentPackage()->pPackLoc) {
@@ -1464,9 +1441,8 @@ float LowProcess::GetCurrentDestinationRadius(Actor* apActor) {
         }
         return fradius;
     }
-    else {
-        return fradius;
-    }
+
+    return fradius;
 }
 
 bool LowProcess::CheckAndStartCombatControllerForPackage(
@@ -1576,43 +1552,39 @@ void LowProcess::ProcessRemoveWorn(Actor* apActor, bool abInterateIndex) {
 
 void LowProcess::CreateFollowforEscort(Actor* apActor, TESPackage* apEscort, bool abCheck) {
     Actor* pTarget = dynamic_cast<Actor*>(this->pTarget);
-    if (pTarget != apActor) {
-        if (pTarget) {
-            if (pTarget != pPlayer) {
-                if (apActor->GetSitSleepState()) {
-                    apActor->InitiateGetUpPackage();
-                }
-                TESPackage* Package = TESPackage::CreatePackage(PACKAGE_TYPE_FOLLOW);
-                Package->SetPackType(PACKAGE_TYPE_FOLLOW);
-                Package->SetMustReachLocation(true);
-                Package->SetMustComplete(true);
-                TESPackage* v4 = GetCurrentPackage();
-                PackageLocation* Location_ = v4->GetLocation();
-                Package->SetPackageLocation(Location_);
-                uint32_t EscortFollowDistance = apEscort->GetEscortFollowDistance();
-                PackageLocation* v6 = Package->GetLocation();
-                v6->SetRadius(EscortFollowDistance);
-                TESPackage* v7 = GetCurrentPackage();
-                PackageTarget* PackageTarget_ = v7->GetPackageTarget();
-                Package->SetPackageTarget(PackageTarget_);
-                Package->SetProcedureType(PACKAGE_PROCEDURE_FOLLOW_WITH_ESCORT);
-                PackageTarget* v9 = Package->GetPackageTarget();
-                v9->SetTargType(PTT_REFERENCE);
-                PackageTarget* v10 = Package->GetPackageTarget();
-                v10->SetTargReference(apActor);
-                PackageTarget* v11 = apEscort->GetPackageTarget();
-                uint32_t FormFlags = v11->iValue;
-                PackageTarget* v12 = Package->GetPackageTarget();
-                v12->iValue = FormFlags;
-                Package->CopyAllFlags(apEscort);
-                BaseProcess* CurrentAIProcess = pTarget->GetCurrentAIProcess();
-                CurrentAIProcess->ComputeLastTimeProcessed();
-                CurrentAIProcess->SavePackageToExtraData(pTarget);
-                apActor->AddFollower(pTarget);
-                pTarget->PutCreatedPackage(Package, false, true);
-                CurrentAIProcess->SetTarget(apActor);
-            }
+    if ((pTarget != apActor) && (pTarget) && (pTarget != pPlayer)) {
+        if (apActor->GetSitSleepState()) {
+            apActor->InitiateGetUpPackage();
         }
+        TESPackage* Package = TESPackage::CreatePackage(PACKAGE_TYPE_FOLLOW);
+        Package->SetPackType(PACKAGE_TYPE_FOLLOW);
+        Package->SetMustReachLocation(true);
+        Package->SetMustComplete(true);
+        TESPackage* v4 = GetCurrentPackage();
+        PackageLocation* Location_ = v4->GetLocation();
+        Package->SetPackageLocation(Location_);
+        uint32_t EscortFollowDistance = apEscort->GetEscortFollowDistance();
+        PackageLocation* v6 = Package->GetLocation();
+        v6->SetRadius(EscortFollowDistance);
+        TESPackage* v7 = GetCurrentPackage();
+        PackageTarget* PackageTarget_ = v7->GetPackageTarget();
+        Package->SetPackageTarget(PackageTarget_);
+        Package->SetProcedureType(PACKAGE_PROCEDURE_FOLLOW_WITH_ESCORT);
+        PackageTarget* v9 = Package->GetPackageTarget();
+        v9->SetTargType(PTT_REFERENCE);
+        PackageTarget* v10 = Package->GetPackageTarget();
+        v10->SetTargReference(apActor);
+        PackageTarget* v11 = apEscort->GetPackageTarget();
+        uint32_t FormFlags = v11->iValue;
+        PackageTarget* v12 = Package->GetPackageTarget();
+        v12->iValue = FormFlags;
+        Package->CopyAllFlags(apEscort);
+        BaseProcess* CurrentAIProcess = pTarget->GetCurrentAIProcess();
+        CurrentAIProcess->ComputeLastTimeProcessed();
+        CurrentAIProcess->SavePackageToExtraData(pTarget);
+        apActor->AddFollower(pTarget);
+        pTarget->PutCreatedPackage(Package, false, true);
+        CurrentAIProcess->SetTarget(apActor);
     }
 }
 
@@ -1728,16 +1700,13 @@ void LowProcess::ProcessFollow(Actor* apActor, bool abflag, int32_t emovemode, b
                 float distance = v10->GetPackageRadiusActorToRefTarget(apActor, false);
                 TESWorldSpace* pws1 = apActor->GetWorldSpace();
                 TESWorldSpace* pws2 = pTarget->GetWorldSpace();
-                if (apActor->IsPathingComplete()) {
-                    if (pTarget) {
-                        if (pws1 != pws2 ||
-                            static_cast<double>(distance) < apActor->GetDistanceFromReference(pTarget, false, false)) {
-                            TESWorldSpace* WorldSpace = pTarget->GetWorldSpace();
-                            TESObjectCELL* ParentCell = pTarget->GetParentCell();
-                            const NiPoint3* v11 = &pTarget->GetLocationOnReference();
-                            apActor->SetPathfindingGoal(*v11, ParentCell, WorldSpace, distance, nullptr);
-                        }
-                    }
+                if ((apActor->IsPathingComplete()) && (pTarget) &&
+                    (pws1 != pws2 ||
+                     static_cast<double>(distance) < apActor->GetDistanceFromReference(pTarget, false, false))) {
+                    TESWorldSpace* WorldSpace = pTarget->GetWorldSpace();
+                    TESObjectCELL* ParentCell = pTarget->GetParentCell();
+                    const NiPoint3* v11 = &pTarget->GetLocationOnReference();
+                    apActor->SetPathfindingGoal(*v11, ParentCell, WorldSpace, distance, nullptr);
                 }
             }
         }
@@ -1847,16 +1816,14 @@ void LowProcess::UpdateFollowers(Actor* apActor, float afDelta) {
                 bool bremove = false;
                 TESPackage* pactpack = apActor->GetPackageSetAsPcurrent();
                 TESPackage* pactEdit = (&apActor->m_Extra)->GetPackageExtra();
-                if (!pactpack || pactpack->IsInterruptPackage()) {
-                    if (pactEdit) {
-                        pactpack = pactEdit;
-                    }
+                if ((!pactpack || pactpack->IsInterruptPackage()) && (pactEdit)) {
+                    pactpack = pactEdit;
                 }
-                if (pactpack) {
-                    if (pactpack->GetPackType() == PACKAGE_TYPE_ESCORT) {
-                        bremove = true;
-                    }
+
+                if ((pactpack) && (pactpack->GetPackType() == PACKAGE_TYPE_ESCORT)) {
+                    bremove = true;
                 }
+
                 TESPackage* ptargpack = ptarget->GetPackageSetAsPcurrent();
                 TESPackage* pEditorpack = (&ptarget->m_Extra)->GetPackageExtra();
                 if (!ptargpack || (ptargpack->IsInterruptPackage() && pEditorpack)) {
@@ -1979,22 +1946,20 @@ void LowProcess::DamageModActorValue(Actor* apActor, ActorValue::Index aiWhich, 
 }
 
 void LowProcess::ClearObjectFromAcquireList(TESObjectREFR* apRef) {
-    if (pAcquireObject) {
-        if (pAcquireObject->pRef == apRef) {
-            if (pAcquireObject) {
-                pAcquireObject->Delete(1u);
-            }
-            pAcquireObject = nullptr;
+    if ((pAcquireObject) && (pAcquireObject->pRef == apRef)) {
+        if (pAcquireObject) {
+            pAcquireObject->Delete(1u);
         }
+        pAcquireObject = nullptr;
     }
-    if (pSavedAcquireObject) {
-        if (pSavedAcquireObject->pRef == apRef) {
-            if (pSavedAcquireObject) {
-                pSavedAcquireObject->Delete(1u);
-            }
-            pSavedAcquireObject = nullptr;
+
+    if ((pSavedAcquireObject) && (pSavedAcquireObject->pRef == apRef)) {
+        if (pSavedAcquireObject) {
+            pSavedAcquireObject->Delete(1u);
         }
+        pSavedAcquireObject = nullptr;
     }
+
     BSSimpleList<ObjectstoAcquire*>* plist = &ObjectList;
     while (plist && plist->m_item) {
         ObjectstoAcquire* pobj = plist->m_item;
@@ -2033,22 +1998,20 @@ void LowProcess::ClearObjectFromAcquireList(TESObjectREFR* apRef) {
 }
 
 void LowProcess::ClearObjectFromAcquireList(uint32_t aID) {
-    if (pAcquireObject) {
-        if (pAcquireObject->pRef->iFormID == aID) {
-            if (pAcquireObject) {
-                pAcquireObject->Delete(1u);
-            }
-            pAcquireObject = nullptr;
+    if ((pAcquireObject) && (pAcquireObject->pRef->iFormID == aID)) {
+        if (pAcquireObject) {
+            pAcquireObject->Delete(1u);
         }
+        pAcquireObject = nullptr;
     }
-    if (pSavedAcquireObject) {
-        if (pSavedAcquireObject->pRef->iFormID == aID) {
-            if (pSavedAcquireObject) {
-                pSavedAcquireObject->Delete(1u);
-            }
-            pSavedAcquireObject = nullptr;
+
+    if ((pSavedAcquireObject) && (pSavedAcquireObject->pRef->iFormID == aID)) {
+        if (pSavedAcquireObject) {
+            pSavedAcquireObject->Delete(1u);
         }
+        pSavedAcquireObject = nullptr;
     }
+
     BSSimpleList<ObjectstoAcquire*>* plist = &ObjectList;
     while (plist && plist->m_item) {
         ObjectstoAcquire* pobj = plist->m_item;
@@ -2063,11 +2026,10 @@ void LowProcess::ClearObjectFromAcquireList(uint32_t aID) {
             plist = plist->m_pkNext;
         }
     }
-    if (pGenericLocation) {
-        if (pGenericLocation->iFormID == aID) {
-            pGenericLocation = nullptr;
-        }
+    if ((pGenericLocation) && (pGenericLocation->iFormID == aID)) {
+        pGenericLocation = nullptr;
     }
+
     BSSimpleList<TESObjectREFR*>* preflist = &GenericLocationsList;
     BSSimpleList<TESObjectREFR*>* plastlist = nullptr;
     while (preflist && preflist->m_item) {
@@ -2247,11 +2209,10 @@ void LowProcess::SaveGame(uint32_t aiFlags, MobileObject* pmob) {
         pSaveLoadGameOLD->SaveGameDataOLD(&iNumberItemsActivate, 4u);
     }
     itargetID = 0;
-    if (pTarget) {
-        if (!pAcquireObject) {
-            itargetID = pTarget->iFormID;
-        }
+    if ((pTarget) && (!pAcquireObject)) {
+        itargetID = pTarget->iFormID;
     }
+
     pSaveLoadGameOLD->SaveNumericID(&itargetID, 4u);
     ilocationID = 0;
     if (pGenericLocation) {
@@ -2636,13 +2597,12 @@ void LowProcess::ChangePackage(Actor* apActor, TESPackage* apPack) {
     Script* v7;
     if (apPack) {
         v7 = apPack->GetOnChangeScript();
-        if (v7) {
-            if (v7->GetCompiledData() || v7->GetText()) {
-                extra = apActor->TESObjectREFR::GetExtra();
-                scriptLocals = extra->GetScriptLocals();
-                v7->Run(apActor, scriptLocals, nullptr, true);
-            }
+        if ((v7) && (v7->GetCompiledData() || v7->GetText())) {
+            extra = apActor->TESObjectREFR::GetExtra();
+            scriptLocals = extra->GetScriptLocals();
+            v7->Run(apActor, scriptLocals, nullptr, true);
         }
+
         v6 = apPack->GetOnChangeTopicInfo();
         if (v6) {
             ProcessGreet(apActor, v6, false, false, true, false);
@@ -2753,10 +2713,8 @@ void LowProcess::LoadPackageFromExtraData(MobileObject* apMob) {
 }
 
 void LowProcess::ModTrackedDamage(Actor* apAggressor, float afAmount) {
-    if (apAggressor) {
-        if (apAggressor->IsPc() || apAggressor->Actor::IsPlayerTeammate()) {
-            fTrackedDamage = (fTrackedDamage + afAmount);
-        }
+    if ((apAggressor) && (apAggressor->IsPc() || apAggressor->Actor::IsPlayerTeammate())) {
+        fTrackedDamage = (fTrackedDamage + afAmount);
     }
 }
 
@@ -2779,14 +2737,11 @@ void LowProcess::ProcessEscort(Actor* apActor) {
          ((SetTargetForPackage(apActor), pTarget) &&
           (pTarget->IsActor() || (v3 = pTarget->iFormID, apActor->HasObjectId(v3)))))) {
         uint32_t CastingType;
-        if (!pitem) {
-            if (pAcquireObject) {
-                if (pAcquireObject->pRef == apActor) {
-                    pitem = apActor->GetInventoryItem(pAcquireObject->pObject, 0);
-                    bManyflag = true;
-                }
-            }
+        if ((!pitem) && (pAcquireObject) && (pAcquireObject->pRef == apActor)) {
+            pitem = apActor->GetInventoryItem(pAcquireObject->pObject, 0);
+            bManyflag = true;
         }
+
         if (GetCurrentPackage()->GetPackageTarget()) {
             TESPackage* v4 = GetCurrentPackage();
             ainumb = v4->GetInitialTargetCount();
@@ -2809,12 +2764,11 @@ void LowProcess::ProcessEscort(Actor* apActor) {
                             plist = pitem->pExtraObjectList->m_item;
                         }
                         uint32_t id = 0;
-                        if (plist) {
-                            if (plist->GetReferencePointer()) {
-                                TESObjectREFR* ReferencePointer = plist->GetReferencePointer();
-                                id = ReferencePointer->iFormID;
-                            }
+                        if ((plist) && (plist->GetReferencePointer())) {
+                            TESObjectREFR* ReferencePointer = plist->GetReferencePointer();
+                            id = ReferencePointer->iFormID;
                         }
+
                         TESObjectREFR* pcont = pPack->pPackLoc->GetLocReference();
                         if (!pcont) {
                             pcont = pGenericLocation;
@@ -2860,33 +2814,31 @@ void LowProcess::ProcessEscort(Actor* apActor) {
                 int32_t distance = static_cast<int32_t>(v10->GetPackageRadiusActorToRefTarget(apActor, false));
                 fMydistance = 0.0f;
                 ftargdistance = 0.0f;
-                if (pTarget) {
-                    if (pTarget->IsActor()) {
-                        destcoord = pPack->GetLocationCoord(apActor);
-                        TESObjectCELL* pdestcell = pPack->GetLocationCell(apActor);
-                        TESWorldSpace* pdestworld = pPack->GetLocationWorld(apActor);
-                        PathingLocation pl1(static_cast<TESObjectREFR*>(apActor));
-                        PathingLocation pl2(&destcoord, pdestcell, pdestworld);
-                        Pathing::ComputeLowPathDistance(pl1, pl2, &fMydistance);
-                        Actor* ptargactor = static_cast<Actor*>(pTarget);
-                        PathingLocation pl3(static_cast<TESObjectREFR*>(ptargactor));
-                        Pathing::ComputeLowPathDistance(pl3, pl2, &ftargdistance);
-                    }
+                if ((pTarget) && (pTarget->IsActor())) {
+                    destcoord = pPack->GetLocationCoord(apActor);
+                    TESObjectCELL* pdestcell = pPack->GetLocationCell(apActor);
+                    TESWorldSpace* pdestworld = pPack->GetLocationWorld(apActor);
+                    PathingLocation pl1(static_cast<TESObjectREFR*>(apActor));
+                    PathingLocation pl2(&destcoord, pdestcell, pdestworld);
+                    Pathing::ComputeLowPathDistance(pl1, pl2, &fMydistance);
+                    Actor* ptargactor = static_cast<Actor*>(pTarget);
+                    PathingLocation pl3(static_cast<TESObjectREFR*>(ptargactor));
+                    Pathing::ComputeLowPathDistance(pl3, pl2, &ftargdistance);
                 }
-                if (!pTarget ||
-                    (!pTarget->IsActor() ||
-                     ((DistanceFromReference = apActor->GetDistanceFromReference(pTarget, false, false),
-                       static_cast<double>(distance) > DistanceFromReference) ||
-                      ftargdistance < static_cast<double>(fMydistance)))) {
-                    if (apActor->IsPathingComplete()) {
-                        TESPackage* pPack_2 = GetCurrentPackage();
-                        TESWorldSpace* LocationWorld = pPack_2->GetLocationWorld(apActor);
-                        TESPackage* pPack_3 = GetCurrentPackage();
-                        TESObjectCELL* LocationCell = pPack_3->GetLocationCell(apActor);
-                        TESPackage* pPack_4 = GetCurrentPackage();
-                        NiPoint3* LocationCoord = &(v21 = pPack_4->GetLocationCoord(apActor));
-                        apActor->SetPathfindingGoal(*LocationCoord, LocationCell, LocationWorld, -1.0f, nullptr);
-                    }
+
+                if ((!pTarget ||
+                     (!pTarget->IsActor() ||
+                      ((DistanceFromReference = apActor->GetDistanceFromReference(pTarget, false, false),
+                        static_cast<double>(distance) > DistanceFromReference) ||
+                       ftargdistance < static_cast<double>(fMydistance)))) &&
+                    (apActor->IsPathingComplete())) {
+                    TESPackage* pPack_2 = GetCurrentPackage();
+                    TESWorldSpace* LocationWorld = pPack_2->GetLocationWorld(apActor);
+                    TESPackage* pPack_3 = GetCurrentPackage();
+                    TESObjectCELL* LocationCell = pPack_3->GetLocationCell(apActor);
+                    TESPackage* pPack_4 = GetCurrentPackage();
+                    NiPoint3* LocationCoord = &(v21 = pPack_4->GetLocationCoord(apActor));
+                    apActor->SetPathfindingGoal(*LocationCoord, LocationCell, LocationWorld, -1.0f, nullptr);
                 }
             }
             if (pitem) {
@@ -2963,12 +2915,10 @@ void LowProcess::ProcessAlarm(Actor* apActor) {
         if (Class->IsGuard()) {
             AddToProcedureIndexRunning(apActor, 1);
             ProcessPursue(apActor, false, true, 257);
-            if (apActor->GetDistanceFromReference(pPlayer, false, false) > 3500.0) {
-                if (pPlayer->GetWorldSpace()) {
-                    TESWorldSpace* WorldSpace = pPlayer->GetWorldSpace();
-                    if (WorldSpace == apActor->GetWorldSpace()) {
-                        apActor->EndInterruptPackage(false);
-                    }
+            if ((apActor->GetDistanceFromReference(pPlayer, false, false) > 3500.0) && (pPlayer->GetWorldSpace())) {
+                TESWorldSpace* WorldSpace = pPlayer->GetWorldSpace();
+                if (WorldSpace == apActor->GetWorldSpace()) {
+                    apActor->EndInterruptPackage(false);
                 }
             }
         }
@@ -2989,10 +2939,8 @@ void LowProcess::ProcessAlarm(Actor* apActor) {
                         }
                     }
                     else {
-                        if (pcrimeAct) {
-                            if (apActor->GetShouldAttackActor(pactor_2, false, ereaction, false)) {
-                                bcombatflag = true;
-                            }
+                        if ((pcrimeAct) && (apActor->GetShouldAttackActor(pactor_2, false, ereaction, false))) {
+                            bcombatflag = true;
                         }
                     }
                 }
@@ -3165,11 +3113,10 @@ void LowProcess::ProcessAcquire(Actor* apActor) {
             }
             case LIGH_ID: {
                 TESObjectLIGH* plight = dynamic_cast<TESObjectLIGH*>(pTarget->GetObjectReference());
-                if (plight) {
-                    if (!plight->GetCanCarry()) {
-                        AddToProcedureIndexRunning(apActor, 1);
-                    }
+                if ((plight) && (!plight->GetCanCarry())) {
+                    AddToProcedureIndexRunning(apActor, 1);
                 }
+
                 break;
             }
             default: {
@@ -3336,29 +3283,27 @@ void LowProcess::ProcessSandBox(Actor* apActor) {
                     TESObjectREFR* Thread = pPackData->pLocation;
                     if (pPackData->MoveToNextLocation()) {
                         TESObjectREFR* apPathingRequest = pPackData->pLocation;
-                        if (apPathingRequest) {
-                            if (apPathingRequest != Thread) {
-                                TESObjectCELL* cell = Thread->GetParentCell();
-                                TESObjectCELL* apCell = apPathingRequest->GetParentCell();
-                                bool v9 = (!cell || !TES::pInstance->IsCellLoaded(cell, false)) &&
-                                    (!apCell || !TES::pInstance->IsCellLoaded(apCell, false));
-                                bool v8 = cell && cell == apCell;
-                                if (v9) {
-                                    const NiPoint3* v5 = &apPathingRequest->GetLocationOnReference();
-                                    apActor->SetPosition(*v5);
-                                    if (!v8) {
-                                        TESWorldSpace* WorldSpace = apPathingRequest->GetWorldSpace();
-                                        TESObjectREFR::MoveRefToNewSpace(apActor, apCell, WorldSpace);
-                                    }
+                        if ((apPathingRequest) && (apPathingRequest != Thread)) {
+                            TESObjectCELL* cell = Thread->GetParentCell();
+                            TESObjectCELL* apCell = apPathingRequest->GetParentCell();
+                            bool v9 = (!cell || !TES::pInstance->IsCellLoaded(cell, false)) &&
+                                (!apCell || !TES::pInstance->IsCellLoaded(apCell, false));
+                            bool v8 = cell && cell == apCell;
+                            if (v9) {
+                                const NiPoint3* v5 = &apPathingRequest->GetLocationOnReference();
+                                apActor->SetPosition(*v5);
+                                if (!v8) {
+                                    TESWorldSpace* WorldSpace = apPathingRequest->GetWorldSpace();
+                                    TESObjectREFR::MoveRefToNewSpace(apActor, apCell, WorldSpace);
                                 }
-                                else {
-                                    TESPackage* v7 = GetPackageThatIsRunning();
-                                    float LocationRadius = static_cast<float>(v7->GetLocationRadius(apActor));
-                                    float v12 = BSMAX(LocationRadius, 10.0f);
-                                    apActor->SetPathfindingGoal(
-                                        apPathingRequest, v12, static_cast<PathingAvoidNodeArray*>(nullptr)
-                                    );
-                                }
+                            }
+                            else {
+                                TESPackage* v7 = GetPackageThatIsRunning();
+                                float LocationRadius = static_cast<float>(v7->GetLocationRadius(apActor));
+                                float v12 = BSMAX(LocationRadius, 10.0f);
+                                apActor->SetPathfindingGoal(
+                                    apPathingRequest, v12, static_cast<PathingAvoidNodeArray*>(nullptr)
+                                );
                             }
                         }
                     }
@@ -3742,11 +3687,10 @@ TESObjectREFR* LowProcess::GetTargetForPackage(Actor* apActor, TESPackage* apPac
                                 pObjecttoAcquire = nullptr;
                                 EvaluateOrderAcquireList(apActor);
                                 PackageTarget* ptarg_2 = apPackage->GetPackageTarget();
-                                if (ptarg_2) {
-                                    if (ptarg_2->GetTargType()) {
-                                        iNumberItemsActivate = apPackage->GetInitialTargetCount();
-                                    }
+                                if ((ptarg_2) && (ptarg_2->GetTargType())) {
+                                    iNumberItemsActivate = apPackage->GetInitialTargetCount();
                                 }
+
                                 break;
                             }
                         }
@@ -3811,21 +3755,16 @@ TESObjectREFR* LowProcess::GetTargetForPackage(Actor* apActor, TESPackage* apPac
                     break;
                 }
             }
-            if (preturntarget) {
-                if (preturntarget->GetDelete() && !preturntarget->IsActor()) {
-                    // Tests this address (&preturntarget->m_Extra), which is never null, as the game does.
-                    preturntarget = (&preturntarget->m_Extra)->GetReferencePointer();
-                }
+            if ((preturntarget) && (preturntarget->GetDelete() && !preturntarget->IsActor())) {
+                // Tests this address (&preturntarget->m_Extra), which is never null, as the game does.
+                preturntarget = (&preturntarget->m_Extra)->GetReferencePointer();
             }
         }
     }
-    if (preturntarget) {
-        if (preturntarget->GetDelete()) {
-            if ((&preturntarget->m_Extra)->GetReferencePointer()) {
-                return (&preturntarget->m_Extra)->GetReferencePointer();
-            }
-        }
+    if ((preturntarget) && (preturntarget->GetDelete()) && ((&preturntarget->m_Extra)->GetReferencePointer())) {
+        return (&preturntarget->m_Extra)->GetReferencePointer();
     }
+
     return preturntarget;
 }
 
@@ -3845,41 +3784,40 @@ TESObjectREFR* LowProcess::GetLocationForPackage(Actor* apActor, TESPackage* apP
         if (pLoc->GetLocType() == PLT_LINKEDREF) {
             return apActor->GetLinkedRef();
         }
-        else {
-            if (pLoc->IsLocationGeneric() && apPackage->GetMustComplete()) {
-                if (GenericLocationsList.IsEmpty()) {
-                    TESObjectCELL* pCell = apActor->GetParentCell();
-                    NiPoint3 pointB = apActor->GetLocationOnReference();
-                    PACK_LOC_TYPE etype = pLoc->GetLocType();
-                    if (etype == PLT_OBJECT) {
-                        pObjectForLocation = static_cast<TESBoundObject*>(pLoc->GetLocObject());
-                        eFormType = POTYPE_NONE;
-                    }
-                    else {
-                        if (etype == PLT_TYPE) {
-                            pObjectForLocation = nullptr;
-                            eFormType = pLoc->GetLocObjectType();
-                        }
-                    }
-                    float facquireDist = 0.0f;
-                    if (!apPackage || !apPackage->GetAcquireRadius(apActor, facquireDist)) {
-                        facquireDist = fAIAcquireObjectDistance.Float();
-                    }
-                    float afRadius2 = facquireDist;
-                    const NiPoint3* v4 = &apActor->GetLocationOnReference();
-                    pDataHandler->EnumReferencesCloseToPoint(
-                        pCell, pointB, facquireDist, *v4, afRadius2, &EvaluateGenericLocation, apActor
-                    );
+
+        if (pLoc->IsLocationGeneric() && apPackage->GetMustComplete()) {
+            if (GenericLocationsList.IsEmpty()) {
+                TESObjectCELL* pCell = apActor->GetParentCell();
+                NiPoint3 pointB = apActor->GetLocationOnReference();
+                PACK_LOC_TYPE etype = pLoc->GetLocType();
+                if (etype == PLT_OBJECT) {
+                    pObjectForLocation = static_cast<TESBoundObject*>(pLoc->GetLocObject());
                     eFormType = POTYPE_NONE;
-                    pObjectForLocation = nullptr;
-                    for (BSSimpleList<TESObjectREFR*>* plist = &TempLocList; plist->m_item; plist->RemoveHead()) {
-                        GenericLocationsList.AddHead(plist->m_item);
+                }
+                else {
+                    if (etype == PLT_TYPE) {
+                        pObjectForLocation = nullptr;
+                        eFormType = pLoc->GetLocObjectType();
                     }
                 }
-                if (!GenericLocationsList.IsEmpty()) {
-                    preturnloc = GenericLocationsList.m_item;
-                    GenericLocationsList.RemoveHead();
+                float facquireDist = 0.0f;
+                if (!apPackage || !apPackage->GetAcquireRadius(apActor, facquireDist)) {
+                    facquireDist = fAIAcquireObjectDistance.Float();
                 }
+                float afRadius2 = facquireDist;
+                const NiPoint3* v4 = &apActor->GetLocationOnReference();
+                pDataHandler->EnumReferencesCloseToPoint(
+                    pCell, pointB, facquireDist, *v4, afRadius2, &EvaluateGenericLocation, apActor
+                );
+                eFormType = POTYPE_NONE;
+                pObjectForLocation = nullptr;
+                for (BSSimpleList<TESObjectREFR*>* plist = &TempLocList; plist->m_item; plist->RemoveHead()) {
+                    GenericLocationsList.AddHead(plist->m_item);
+                }
+            }
+            if (!GenericLocationsList.IsEmpty()) {
+                preturnloc = GenericLocationsList.m_item;
+                GenericLocationsList.RemoveHead();
             }
         }
     }
@@ -3943,18 +3881,16 @@ void LowProcess::EvaluateOrderAcquireList(Actor* apActor) {
                             pbuyactor = ReferenceProcessLists.GetActorRefInHigh(pnpc, false);
                         }
                     }
-                    if (pbuyactor) {
-                        if (ballowBuying && pbuyactor->GetActorBase()->SellBuysItem(pObj)) {
-                            if (apActor->IsInCombat()) {
-                                badd = false;
-                            }
-                            else {
-                                pObject->eType = ACQUIRE_TYPE_BUY_NPC;
-                                uint32_t DistanceFromReference =
-                                    static_cast<int32_t>(apActor->GetDistanceFromReference(pRef, false, false));
-                                pObject->iWantValue = DistanceFromReference;
-                                v26 = 1;
-                            }
+                    if ((pbuyactor) && (ballowBuying && pbuyactor->GetActorBase()->SellBuysItem(pObj))) {
+                        if (apActor->IsInCombat()) {
+                            badd = false;
+                        }
+                        else {
+                            pObject->eType = ACQUIRE_TYPE_BUY_NPC;
+                            uint32_t DistanceFromReference =
+                                static_cast<int32_t>(apActor->GetDistanceFromReference(pRef, false, false));
+                            pObject->iWantValue = DistanceFromReference;
+                            v26 = 1;
                         }
                     }
                 }
@@ -3995,11 +3931,9 @@ void LowProcess::EvaluateOrderAcquireList(Actor* apActor) {
                             badd = false;
                         }
                         else {
-                            if (bbuyit) {
-                                if (!bbuyit->IsPlayerTeammate()) {
-                                    pObject->eType = ACQUIRE_TYPE_KILL;
-                                    badd = true;
-                                }
+                            if ((bbuyit) && (!bbuyit->IsPlayerTeammate())) {
+                                pObject->eType = ACQUIRE_TYPE_KILL;
+                                badd = true;
                             }
                         }
                     }
@@ -4031,10 +3965,8 @@ void LowProcess::EvaluateOrderAcquireList(Actor* apActor) {
                         if (pObject->eType == ACQUIRE_TYPE_NOOWNED_CONTAINER) {
                             PACKAGE_OBJECT_TYPE eUseItem = POTYPE_NONE;
                             pObject->eType = ACQUIRE_TYPE_PICKPOCKET;
-                            if (!apActor->HasObjects(pLockpick, POTYPE_NONE, 1, 0, eUseItem)) {
-                                if (pRef->GetLock()) {
-                                    badd = false;
-                                }
+                            if ((!apActor->HasObjects(pLockpick, POTYPE_NONE, 1, 0, eUseItem)) && (pRef->GetLock())) {
+                                badd = false;
                             }
                         }
                         else {
@@ -4222,10 +4154,9 @@ char LowProcess::Patrol_StartLow(Actor* apActor, PatrolActorPackageData* apData)
         Patrol_StartTravelToRefLow(apActor, apData);
         return 1;
     }
-    else {
-        SetProcedureIndexRunning(0xFFFFFFFFu);
-        return 0;
-    }
+
+    SetProcedureIndexRunning(0xFFFFFFFFu);
+    return 0;
 }
 
 void LowProcess::UpdateTarget() {
@@ -4483,28 +4414,26 @@ void LowProcess::BuildMulitTargetObjectList(Actor* apActor, TESObjectREFR* pref,
                     pitem_7 = pchange->GetItembyIndex(i_4);
                     if (pitem_7) {
                         TESObjectWEAP* pweap_3 = dynamic_cast<TESObjectWEAP*>(pitem_7->pContainerObj);
-                        if (pweap_3) {
-                            if (pweap_3->IsMeleeWeapon()) {
-                                ObjectstoAcquire* pacquire_7;
-                                ObjectstoAcquire* v33 =
-                                    static_cast<ObjectstoAcquire*>(ourMalloc(sizeof(ObjectstoAcquire)));
-                                if (v33) {
-                                    pacquire_7 = ::new (v33) ObjectstoAcquire;
-                                }
-                                else {
-                                    pacquire_7 = nullptr;
-                                }
-                                ObjectstoAcquire* v34 = pacquire_7;
-                                ObjectstoAcquire* pacquire_8 = pacquire_7;
-                                TESBoundObject* v10 = pitem_7->pContainerObj;
-                                pacquire_8->pObject = v10;
-                                uint32_t v11 = pitem_7->iNumber;
-                                pacquire_8->iamount = v11;
-                                pacquire_8->pRef = pref;
-                                pacquire_8->eType = ACQUIRE_TYPE_NOOWNED_CONTAINER;
-                                ObjectList.AddHead(pacquire_8);
+                        if ((pweap_3) && (pweap_3->IsMeleeWeapon())) {
+                            ObjectstoAcquire* pacquire_7;
+                            ObjectstoAcquire* v33 = static_cast<ObjectstoAcquire*>(ourMalloc(sizeof(ObjectstoAcquire)));
+                            if (v33) {
+                                pacquire_7 = ::new (v33) ObjectstoAcquire;
                             }
+                            else {
+                                pacquire_7 = nullptr;
+                            }
+                            ObjectstoAcquire* v34 = pacquire_7;
+                            ObjectstoAcquire* pacquire_8 = pacquire_7;
+                            TESBoundObject* v10 = pitem_7->pContainerObj;
+                            pacquire_8->pObject = v10;
+                            uint32_t v11 = pitem_7->iNumber;
+                            pacquire_8->iamount = v11;
+                            pacquire_8->pRef = pref;
+                            pacquire_8->eType = ACQUIRE_TYPE_NOOWNED_CONTAINER;
+                            ObjectList.AddHead(pacquire_8);
                         }
+
                         ItemChange* v31 = pitem_7;
                         ItemChange* pitem_8 = pitem_7;
                         if (pitem_7) {
@@ -4522,28 +4451,26 @@ void LowProcess::BuildMulitTargetObjectList(Actor* apActor, TESObjectREFR* pref,
                     pitem_9 = pchange->GetItembyIndex(i_5);
                     if (pitem_9) {
                         TESObjectWEAP* pweap_4 = dynamic_cast<TESObjectWEAP*>(pitem_9->pContainerObj);
-                        if (pweap_4) {
-                            if (pweap_4->IsRangedWeapon()) {
-                                ObjectstoAcquire* pacquire_9;
-                                ObjectstoAcquire* v29 =
-                                    static_cast<ObjectstoAcquire*>(ourMalloc(sizeof(ObjectstoAcquire)));
-                                if (v29) {
-                                    pacquire_9 = ::new (v29) ObjectstoAcquire;
-                                }
-                                else {
-                                    pacquire_9 = nullptr;
-                                }
-                                ObjectstoAcquire* v30 = pacquire_9;
-                                ObjectstoAcquire* pacquire_10 = pacquire_9;
-                                TESBoundObject* v12 = pitem_9->pContainerObj;
-                                pacquire_10->pObject = v12;
-                                uint32_t v13 = pitem_9->iNumber;
-                                pacquire_10->iamount = v13;
-                                pacquire_10->pRef = pref;
-                                pacquire_10->eType = ACQUIRE_TYPE_NOOWNED_CONTAINER;
-                                ObjectList.AddHead(pacquire_10);
+                        if ((pweap_4) && (pweap_4->IsRangedWeapon())) {
+                            ObjectstoAcquire* pacquire_9;
+                            ObjectstoAcquire* v29 = static_cast<ObjectstoAcquire*>(ourMalloc(sizeof(ObjectstoAcquire)));
+                            if (v29) {
+                                pacquire_9 = ::new (v29) ObjectstoAcquire;
                             }
+                            else {
+                                pacquire_9 = nullptr;
+                            }
+                            ObjectstoAcquire* v30 = pacquire_9;
+                            ObjectstoAcquire* pacquire_10 = pacquire_9;
+                            TESBoundObject* v12 = pitem_9->pContainerObj;
+                            pacquire_10->pObject = v12;
+                            uint32_t v13 = pitem_9->iNumber;
+                            pacquire_10->iamount = v13;
+                            pacquire_10->pRef = pref;
+                            pacquire_10->eType = ACQUIRE_TYPE_NOOWNED_CONTAINER;
+                            ObjectList.AddHead(pacquire_10);
                         }
+
                         ItemChange* v27 = pitem_9;
                         ItemChange* pitem_10 = pitem_9;
                         if (pitem_9) {
@@ -4677,15 +4604,13 @@ double LowProcess::Patrol_TravelingToNextRefLow(Actor* apActor, PatrolActorPacka
             }
             return v25;
         }
-        else {
-            Patrol_StartTravelToRefLow(apActor, apData);
-            return v25;
-        }
+
+        Patrol_StartTravelToRefLow(apActor, apData);
+        return v25;
     }
-    else {
-        SetProcedureIndexRunning(-1);
-        return 0.0;
-    }
+
+    SetProcedureIndexRunning(-1);
+    return 0.0;
 }
 
 double LowProcess::Patrol_AtRefLow(Actor* apActor, PatrolActorPackageData* apData, float afTimeRemaining) {
@@ -4860,12 +4785,8 @@ bool LowProcess_EvaluateReferenceforAcquire(TESObjectREFR* a1, void* a2) {
         if (pAcquirer->IsInCombat()) {
             v30 = 1;
         }
-        if (pHealthForm) {
-            if (a1->GetHealth() <= 0.0) {
-                if (v30) {
-                    v34 = false;
-                }
-            }
+        if ((pHealthForm) && (a1->GetHealth() <= 0.0) && (v30)) {
+            v34 = false;
         }
     }
     if (v34) {

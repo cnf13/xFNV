@@ -72,10 +72,9 @@ bool NavMeshInfoMap::ProcessBeforeSave() {
         CheckMap();
         return true;
     }
-    else {
-        SetAltered(false);
-        return true;
-    }
+
+    SetAltered(false);
+    return true;
 }
 
 // Loads the NAVI record: an info per NVMI chunk (merged into an existing info of the same navmesh, else added) and the
@@ -323,10 +322,8 @@ void NavMeshInfoMap::DeleteNavMeshInfo(uint32_t auiNavMeshID) {
         if (a2->GetNavMeshEvenDisabled(*static_cast<NavMeshPtr*>(&apMemory))) {
             TESForm* v2 = apMemory.m_pObject;
             TESFile* File = v2->GetFile(0);
-            if (File) {
-                if (File->GetMaster()) {
-                    bMaster = true;
-                }
+            if ((File) && (File->GetMaster())) {
+                bMaster = true;
             }
         }
         if (a2) {
@@ -347,9 +344,8 @@ NavMeshInfo* NavMeshInfoMap::GetNavMeshInfo(uint32_t auiNavMeshID) {
     if (vCondition1) {
         return a2;
     }
-    else {
-        return nullptr;
-    }
+
+    return nullptr;
 }
 
 void NavMeshInfoMap::RemoveNavMeshInfo(uint32_t auiNavMeshID) {
@@ -428,10 +424,8 @@ void NavMeshInfoMap::AddInfoToCellKeyMap(NavMeshInfo* apNavMeshInfo) {
         uint32_t imapSize = 103;
         if (worldspaceId) {
             TESWorldSpace* pworld = static_cast<TESWorldSpace*>(TESForm::GetFormByNumericID(worldspaceId));
-            if (pworld) {
-                if (!pworld->GetSmallWorld()) {
-                    imapSize = 1009;
-                }
+            if ((pworld) && (!pworld->GetSmallWorld())) {
+                imapSize = 1009;
             }
         }
         else {

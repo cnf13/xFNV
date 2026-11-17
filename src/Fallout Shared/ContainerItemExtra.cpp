@@ -31,13 +31,11 @@ void ContainerItemExtra::AddToExtraDataList(ExtraDataList* apExtra, TESHealthFor
                 }
             }
         }
-        if (apHealthForm) {
-            if (!FloatEQ(fHealthMult, 1.0f, 0.0001f)) {
-                uint32_t ibasehealth = apHealthForm->GetFormHealth();
-                if (ibasehealth) {
-                    float fhealth = static_cast<double>(ibasehealth) * fHealthMult;
-                    apExtra->SetHealth(fhealth);
-                }
+        if ((apHealthForm) && (!FloatEQ(fHealthMult, 1.0f, 0.0001f))) {
+            uint32_t ibasehealth = apHealthForm->GetFormHealth();
+            if (ibasehealth) {
+                float fhealth = static_cast<double>(ibasehealth) * fHealthMult;
+                apExtra->SetHealth(fhealth);
             }
         }
     }
@@ -114,19 +112,18 @@ void ContainerItemExtra::InitItem(TESForm* apOwner) {
 bool ContainerItemExtra::Load(TESFile* apFile) {
     CONTAINER_ITEM_EXTRA loaddata;
     bool bsuccess = false;
-    if (apFile) {
-        if (apFile->GetTESChunk() == COED_ID) {
-            apFile->GetChunkData(&loaddata, 12u);
-            if (apFile->QEndian()) {
-                loaddata.Endian();
-            }
-            // The owner's form ID goes into pOwnerForm, which InitItem resolves.
-            pOwnerForm = reinterpret_cast<TESForm*>(static_cast<uintptr_t>(loaddata.iOwnerID));
-            iUnion = loaddata.iUnion;
-            fHealthMult = loaddata.fHealthMult;
-            return true;
+    if ((apFile) && (apFile->GetTESChunk() == COED_ID)) {
+        apFile->GetChunkData(&loaddata, 12u);
+        if (apFile->QEndian()) {
+            loaddata.Endian();
         }
+        // The owner's form ID goes into pOwnerForm, which InitItem resolves.
+        pOwnerForm = reinterpret_cast<TESForm*>(static_cast<uintptr_t>(loaddata.iOwnerID));
+        iUnion = loaddata.iUnion;
+        fHealthMult = loaddata.fHealthMult;
+        return true;
     }
+
     return bsuccess;
 }
 

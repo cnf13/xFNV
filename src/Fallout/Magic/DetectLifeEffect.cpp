@@ -73,9 +73,8 @@ ActiveEffect* DetectLifeEffect::Create(MagicCaster* a1, MagicItem* a2, EffectIte
     if (v5) {
         return ::new (v5) DetectLifeEffect(a1, a2, a3);
     }
-    else {
-        return nullptr;
-    }
+
+    return nullptr;
 }
 
 bool DetectLifeEffect::CheckActorDetected(Actor* apTarget, bool abCurrentlyDetected) {

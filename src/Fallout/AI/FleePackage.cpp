@@ -451,22 +451,19 @@ void FleePackage::UpdateAvoidedRefList(BaseProcess* apProcess) {
         Actor* pact = pref->IsActor() ? static_cast<Actor*>(pref) : nullptr;
         bool v4 = pref->IsDead(false) || pref->GetDelete();
         bool bdelete = v4;
-        if (!v4) {
-            if (pact) {
-                if (bCombatMode) {
-                    bool v2 = true;
-                    if (pact->IsInCombat() || pact == pPlayer) {
-                        double Timer;
-                        if (!apProcess ||
-                            (Timer = CombatTimer::GetTimer(),
-                             !(fforgetTime < Timer - apProcess->GetLastTimeDetected(pact, 0)))) {
-                            v2 = false;
-                        }
-                    }
-                    bdelete = v2;
+        if ((!v4) && (pact) && (bCombatMode)) {
+            bool v2 = true;
+            if (pact->IsInCombat() || pact == pPlayer) {
+                double Timer;
+                if (!apProcess ||
+                    (Timer = CombatTimer::GetTimer(),
+                     !(fforgetTime < Timer - apProcess->GetLastTimeDetected(pact, 0)))) {
+                    v2 = false;
                 }
             }
+            bdelete = v2;
         }
+
         if (bdelete) {
             plist->RemoveHead();
             plist = &kAvoidRefs;
@@ -545,17 +542,15 @@ PathingAvoidNodeArray* FleePackage::CreateAvoidNodeArray() {
     }
     float favoidNodeRadius_2 = BSMAX(favoidNodeRadius, 256.0f);
     for (TESObjectREFR* pref : kAvoidRefs) {
-        if (pref) {
-            if (!pref->GetDisabled() && !pref->IsDead(false)) {
-                int32_t nodeArrayIndex = pavoidNodeArray->iSize;
-                pavoidNodeArray->SetSize(nodeArrayIndex + 1, true);
-                float v6 = favoidNodeRadius_2 * favoidNodeRadius_2;
-                float favoidNodeCost = BSMAX(v6, 100.0f);
-                float a2 = favoidNodeCost;
-                const NiPoint3* v1 = &pref->GetLocationOnReference();
-                PathingAvoidNode* v2 = FNVD_RECONSTRUCT(PathingAvoidNode)(&v10, *v1, favoidNodeRadius_2, a2);
-                pavoidNodeArray->GetAt(nodeArrayIndex) = *v2;
-            }
+        if ((pref) && (!pref->GetDisabled() && !pref->IsDead(false))) {
+            int32_t nodeArrayIndex = pavoidNodeArray->iSize;
+            pavoidNodeArray->SetSize(nodeArrayIndex + 1, true);
+            float v6 = favoidNodeRadius_2 * favoidNodeRadius_2;
+            float favoidNodeCost = BSMAX(v6, 100.0f);
+            float a2 = favoidNodeCost;
+            const NiPoint3* v1 = &pref->GetLocationOnReference();
+            PathingAvoidNode* v2 = FNVD_RECONSTRUCT(PathingAvoidNode)(&v10, *v1, favoidNodeRadius_2, a2);
+            pavoidNodeArray->GetAt(nodeArrayIndex) = *v2;
         }
     }
     return pavoidNodeArray;
@@ -583,26 +578,25 @@ void FleePackage::RemoveAvoidedRef(TESObjectREFR* apRef) {
         packageTarget = TESPackage::GetPackageTarget();
         targReference = static_cast<Actor*>(packageTarget->GetTargReference());
     }
-    if (targReference) {
-        if (static_cast<const void*>(targReference) == static_cast<const void*>(apRef)) {
-            bool vCondition1;
-            vCondition1 = (&kAvoidRefs)->IsEmpty();
-            if (vCondition1) {
-                v5 = TESPackage::GetPackageTarget();
-                v5->SetTargReference(nullptr);
-                location = TESPackage::GetLocation();
-                location->SetLocReference(nullptr);
-            }
-            else {
-                v7 = (&kAvoidRefs)->m_item;
-                v3 = TESPackage::GetPackageTarget();
-                v3->SetTargReference(v7);
-                v8 = (&kAvoidRefs)->m_item;
-                v4 = TESPackage::GetLocation();
-                v4->SetLocReference(v8);
-            }
+    if ((targReference) && (static_cast<const void*>(targReference) == static_cast<const void*>(apRef))) {
+        bool vCondition1;
+        vCondition1 = (&kAvoidRefs)->IsEmpty();
+        if (vCondition1) {
+            v5 = TESPackage::GetPackageTarget();
+            v5->SetTargReference(nullptr);
+            location = TESPackage::GetLocation();
+            location->SetLocReference(nullptr);
+        }
+        else {
+            v7 = (&kAvoidRefs)->m_item;
+            v3 = TESPackage::GetPackageTarget();
+            v3->SetTargReference(v7);
+            v8 = (&kAvoidRefs)->m_item;
+            v4 = TESPackage::GetLocation();
+            v4->SetLocReference(v8);
         }
     }
+
     if (static_cast<const void*>(apRef) == static_cast<const void*>(pRefFleeTo)) {
         pRefFleeTo = nullptr;
     }

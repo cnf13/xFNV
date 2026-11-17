@@ -203,21 +203,20 @@ float hkgpConvexHull::getVolume() const {
         hkgpConvexHullImpl* v6 = this->m_data;
         return m_data->m_volume;
     }
-    else {
-        char buf[512];
-        ::new (&apThis) hkErrStream(buf, 512);
-        uint32_t m_uid = m_data->m_uid;
-        hkOstream* v3 = &apThis.operator<<("No mass properties available (");
-        hkOstream* v4 = &v3->operator<<(m_uid);
-        v4->operator<<(")");
-        if (hkError::s_instance->message(
-                hkError::MESSAGE_ERROR, 0x79F9D887, buf, ".\\GeometryProcessing\\ConvexHull\\hkgpConvexHull.cpp", 334
-            )) {
-            __builtin_debugtrap();
-        }
-        FNVD_DESTRUCT(hkOstream)(&apThis);
-        return this->m_data->m_volume;
+
+    char buf[512];
+    ::new (&apThis) hkErrStream(buf, 512);
+    uint32_t m_uid = m_data->m_uid;
+    hkOstream* v3 = &apThis.operator<<("No mass properties available (");
+    hkOstream* v4 = &v3->operator<<(m_uid);
+    v4->operator<<(")");
+    if (hkError::s_instance->message(
+            hkError::MESSAGE_ERROR, 0x79F9D887, buf, ".\\GeometryProcessing\\ConvexHull\\hkgpConvexHull.cpp", 334
+        )) {
+        __builtin_debugtrap();
     }
+    FNVD_DESTRUCT(hkOstream)(&apThis);
+    return this->m_data->m_volume;
 }
 
 float hkgpConvexHull::getSurfaceArea() const {
@@ -227,21 +226,20 @@ float hkgpConvexHull::getSurfaceArea() const {
         hkgpConvexHullImpl* v6 = this->m_data;
         return m_data->m_surface;
     }
-    else {
-        char buf[512];
-        ::new (&apThis) hkErrStream(buf, 512);
-        uint32_t m_uid = m_data->m_uid;
-        hkOstream* v3 = &apThis.operator<<("No mass properties available (");
-        hkOstream* v4 = &v3->operator<<(m_uid);
-        v4->operator<<(")");
-        if (hkError::s_instance->message(
-                hkError::MESSAGE_ERROR, 0x79F9D887, buf, ".\\GeometryProcessing\\ConvexHull\\hkgpConvexHull.cpp", 334
-            )) {
-            __builtin_debugtrap();
-        }
-        FNVD_DESTRUCT(hkOstream)(&apThis);
-        return this->m_data->m_surface;
+
+    char buf[512];
+    ::new (&apThis) hkErrStream(buf, 512);
+    uint32_t m_uid = m_data->m_uid;
+    hkOstream* v3 = &apThis.operator<<("No mass properties available (");
+    hkOstream* v4 = &v3->operator<<(m_uid);
+    v4->operator<<(")");
+    if (hkError::s_instance->message(
+            hkError::MESSAGE_ERROR, 0x79F9D887, buf, ".\\GeometryProcessing\\ConvexHull\\hkgpConvexHull.cpp", 334
+        )) {
+        __builtin_debugtrap();
     }
+    FNVD_DESTRUCT(hkOstream)(&apThis);
+    return this->m_data->m_surface;
 }
 
 // The volume is raised to 2/3 and rounded to float; the product with the constant pi^(1/3) 6^(2/3) is kept as a double
@@ -260,21 +258,20 @@ int32_t hkgpConvexHull::getNumPlanes() const {
         hkgpConvexHullImpl* v6 = this->m_data;
         return m_data->m_planes.m_size;
     }
-    else {
-        char buf[512];
-        ::new (&apThis) hkErrStream(buf, 512);
-        uint32_t m_uid = m_data->m_uid;
-        hkOstream* v3 = &apThis.operator<<("No index available (");
-        hkOstream* v4 = &v3->operator<<(m_uid);
-        v4->operator<<(")");
-        if (hkError::s_instance->message(
-                hkError::MESSAGE_ERROR, 0x79F9D886, buf, ".\\GeometryProcessing\\ConvexHull\\hkgpConvexHull.cpp", 328
-            )) {
-            __builtin_debugtrap();
-        }
-        FNVD_DESTRUCT(hkOstream)(&apThis);
-        return this->m_data->m_planes.m_size;
+
+    char buf[512];
+    ::new (&apThis) hkErrStream(buf, 512);
+    uint32_t m_uid = m_data->m_uid;
+    hkOstream* v3 = &apThis.operator<<("No index available (");
+    hkOstream* v4 = &v3->operator<<(m_uid);
+    v4->operator<<(")");
+    if (hkError::s_instance->message(
+            hkError::MESSAGE_ERROR, 0x79F9D886, buf, ".\\GeometryProcessing\\ConvexHull\\hkgpConvexHull.cpp", 328
+        )) {
+        __builtin_debugtrap();
     }
+    FNVD_DESTRUCT(hkOstream)(&apThis);
+    return this->m_data->m_planes.m_size;
 }
 
 const hkVector4& hkgpConvexHull::getPlane(int32_t index) const {
@@ -2291,30 +2288,30 @@ float hkgpConvexHull::findBestUnion(
         hkVector4 plane = a->getPlane(i);
         hkgpConvexHull* pPos;
         hkgpConvexHull* pNeg;
-        if (b->splitByPlane(plane, &pPos, &pNeg, 1e-07f) == CROSSING) {
-            if (pPos && pNeg && pPos->getDimensions() == 3 && pNeg->getDimensions() == 3 &&
-                pNeg->buildMassProperties() == 0 && fBest < pNeg->getVolume() && pPos->buildMassProperties() == 0) {
-                hkgpConvexHull* pCompound = createCompound(SOURCE_VERTICES, a, pNeg);
-                if (pCompound) {
-                    hkBool bAccepted;
-                    const hkgpConvexHull* hulls[2];
-                    hulls[0] = pCompound;
-                    hulls[1] = pPos;
-                    if (pCompound->getDimensions() == 3 && pCompound->buildMassProperties() == 0 &&
-                        f(&bAccepted, hulls, 2)->m_bool) {
-                        delete aUnb;
-                        delete pb;
-                        fBest = pNeg->getVolume();
-                        aUnb = pCompound;
-                        pb = pPos;
-                        pPos = nullptr;
-                    }
-                    else {
-                        delete pCompound;
-                    }
+        if ((b->splitByPlane(plane, &pPos, &pNeg, 1e-07f) == CROSSING) &&
+            (pPos && pNeg && pPos->getDimensions() == 3 && pNeg->getDimensions() == 3 &&
+             pNeg->buildMassProperties() == 0 && fBest < pNeg->getVolume() && pPos->buildMassProperties() == 0)) {
+            hkgpConvexHull* pCompound = createCompound(SOURCE_VERTICES, a, pNeg);
+            if (pCompound) {
+                hkBool bAccepted;
+                const hkgpConvexHull* hulls[2];
+                hulls[0] = pCompound;
+                hulls[1] = pPos;
+                if (pCompound->getDimensions() == 3 && pCompound->buildMassProperties() == 0 &&
+                    f(&bAccepted, hulls, 2)->m_bool) {
+                    delete aUnb;
+                    delete pb;
+                    fBest = pNeg->getVolume();
+                    aUnb = pCompound;
+                    pb = pPos;
+                    pPos = nullptr;
+                }
+                else {
+                    delete pCompound;
                 }
             }
         }
+
         if (pPos) {
             delete pPos;
         }
@@ -2988,11 +2985,10 @@ int32_t hkgpConvexHullImpl::build(
                 m_pendings[i].m_source.setInt24W(i);
             }
         }
-        if (!static_cast<uint8_t>(forcePlanar) && m_config.m_sortInputs.m_bool) {
-            if (m_pendings.m_size > 1) {
-                hkAlgorithm::quickSortRecursive(m_pendings.m_data, 0, m_pendings.m_size - 1, uint8_t(0));
-            }
+        if ((!static_cast<uint8_t>(forcePlanar) && m_config.m_sortInputs.m_bool) && (m_pendings.m_size > 1)) {
+            hkAlgorithm::quickSortRecursive(m_pendings.m_data, 0, m_pendings.m_size - 1, uint8_t(0));
         }
+
         for (;;) {
             bool bAgain = false;
             switch (m_dimensions) {
@@ -4558,86 +4554,82 @@ hkResult hkgpConvexHullImpl::buildMassProperties() {
         m_inertia.m_quad = v34.m_quad;
         return static_cast<hkResult>(v35);
     }
-    else {
-        hkVector4 v30;
-        hkMatrix3 arB;
-        hkMatrix3 arA_;
-        hkMatrix3 arA;
-        hkMatrix3 v82;
-        v7[0] = v13[0];
-        *reinterpret_cast<float*>(&v54) = 1.0f / (v26 * 10.0);
-        m_quad_1 = _mm_mul_ps(
-            _mm_shuffle_ps(_mm_set_ss(std::bit_cast<float>(v54)), _mm_set_ss(std::bit_cast<float>(v54)), 0), m_quad_1
-        );
-        *reinterpret_cast<float*>(&v55) = 1.0f / (v26 * 20.0);
-        __m128 i_1 = i;
-        i = _mm_mul_ps(
-            _mm_shuffle_ps(_mm_set_ss(std::bit_cast<float>(v55)), _mm_set_ss(std::bit_cast<float>(v55)), 0), i
-        );
-        const __m128 negZ = _mm_sub_ss(_mm_set_ss(-0.0f), _mm_set_ss(i[2]));
-        const __m128 negY = _mm_sub_ss(_mm_set_ss(-0.0f), _mm_set_ss(i[1]));
-        const __m128 negX = _mm_sub_ss(_mm_set_ss(-0.0f), _mm_set_ss(i[0]));
-        i_1[0] = negZ[0];
-        *reinterpret_cast<float*>(&v56) = m_quad_1[2] + m_quad_1[1];
-        m_quad_2[0] = negZ[0];
-        v6[0] = negY[0];
-        r.m_quad = _mm_sub_ps(m_quad_4, a1.m_quad);
-        *reinterpret_cast<float*>(&v58) = m_quad_1[2] + m_quad_1[0];
-        v67 = m_quad_1[0] + m_quad_1[1];
-        m_inertiaMatrix.m_col0.m_quad =
-            _mm_unpacklo_ps(_mm_unpacklo_ps(_mm_set_ss(std::bit_cast<float>(v56)), v6), _mm_unpacklo_ps(m_quad_2, v7));
-        __m128 v29 = negX;
-        v6[0] = negX[0];
-        v30.m_quad =
-            _mm_unpacklo_ps(_mm_unpacklo_ps(i_1, v6), _mm_unpacklo_ps(_mm_set_ss(std::bit_cast<float>(v58)), v7));
-        m_inertiaMatrix.m_col1.m_quad = v30.m_quad;
-        v30.m_quad[0] = negY[0];
-        m_inertiaMatrix.m_col2.m_quad = _mm_unpacklo_ps(
-            _mm_unpacklo_ps(v30.m_quad, _mm_set_ss(std::bit_cast<float>(std::bit_cast<uint32_t>(v67)))),
-            _mm_unpacklo_ps(v29, v13)
-        );
-        arA.setCrossSkewSymmetric(r);
-        arB.setCrossSkewSymmetric(hkVector4Zero);
-        v82.setMul(arA, arA);
-        arA_.setMul(arB, arB);
-        arA_.transpose();
-        v82.sub(arA_);
-        a1.m_quad = _mm_set_ss(1.0f);
-        m_inertiaMatrix.addMul(&a1.m_quad, &v82.m_col0.m_quad);
-        if (m_inertiaMatrix.diagonalizeSymmetric(eigenVec, eigenVal, 128, 0.0001f) == HK_FAILURE) {
-            alignas(16) char buf[512];
-            hkErrStream apThis_(buf, 512);
-            uint32_t m_uid = this->m_uid;
-            hkOstream* v31 = &apThis_.operator<<("Failed to diagonalize inertia matrix (");
-            hkOstream* v32 = &v31->operator<<(m_uid);
-            v32->operator<<(")");
-            if (hkError::s_instance->message(
-                    hkError::MESSAGE_ERROR, 0x45465, buf, ".\\GeometryProcessing\\ConvexHull\\hkgpConvexHull.cpp", 1753
-                )) {
-                __builtin_debugtrap();
-            }
+
+    hkVector4 v30;
+    hkMatrix3 arB;
+    hkMatrix3 arA_;
+    hkMatrix3 arA;
+    hkMatrix3 v82;
+    v7[0] = v13[0];
+    *reinterpret_cast<float*>(&v54) = 1.0f / (v26 * 10.0);
+    m_quad_1 = _mm_mul_ps(
+        _mm_shuffle_ps(_mm_set_ss(std::bit_cast<float>(v54)), _mm_set_ss(std::bit_cast<float>(v54)), 0), m_quad_1
+    );
+    *reinterpret_cast<float*>(&v55) = 1.0f / (v26 * 20.0);
+    __m128 i_1 = i;
+    i = _mm_mul_ps(_mm_shuffle_ps(_mm_set_ss(std::bit_cast<float>(v55)), _mm_set_ss(std::bit_cast<float>(v55)), 0), i);
+    const __m128 negZ = _mm_sub_ss(_mm_set_ss(-0.0f), _mm_set_ss(i[2]));
+    const __m128 negY = _mm_sub_ss(_mm_set_ss(-0.0f), _mm_set_ss(i[1]));
+    const __m128 negX = _mm_sub_ss(_mm_set_ss(-0.0f), _mm_set_ss(i[0]));
+    i_1[0] = negZ[0];
+    *reinterpret_cast<float*>(&v56) = m_quad_1[2] + m_quad_1[1];
+    m_quad_2[0] = negZ[0];
+    v6[0] = negY[0];
+    r.m_quad = _mm_sub_ps(m_quad_4, a1.m_quad);
+    *reinterpret_cast<float*>(&v58) = m_quad_1[2] + m_quad_1[0];
+    v67 = m_quad_1[0] + m_quad_1[1];
+    m_inertiaMatrix.m_col0.m_quad =
+        _mm_unpacklo_ps(_mm_unpacklo_ps(_mm_set_ss(std::bit_cast<float>(v56)), v6), _mm_unpacklo_ps(m_quad_2, v7));
+    __m128 v29 = negX;
+    v6[0] = negX[0];
+    v30.m_quad = _mm_unpacklo_ps(_mm_unpacklo_ps(i_1, v6), _mm_unpacklo_ps(_mm_set_ss(std::bit_cast<float>(v58)), v7));
+    m_inertiaMatrix.m_col1.m_quad = v30.m_quad;
+    v30.m_quad[0] = negY[0];
+    m_inertiaMatrix.m_col2.m_quad = _mm_unpacklo_ps(
+        _mm_unpacklo_ps(v30.m_quad, _mm_set_ss(std::bit_cast<float>(std::bit_cast<uint32_t>(v67)))),
+        _mm_unpacklo_ps(v29, v13)
+    );
+    arA.setCrossSkewSymmetric(r);
+    arB.setCrossSkewSymmetric(hkVector4Zero);
+    v82.setMul(arA, arA);
+    arA_.setMul(arB, arB);
+    arA_.transpose();
+    v82.sub(arA_);
+    a1.m_quad = _mm_set_ss(1.0f);
+    m_inertiaMatrix.addMul(&a1.m_quad, &v82.m_col0.m_quad);
+    if (m_inertiaMatrix.diagonalizeSymmetric(eigenVec, eigenVal, 128, 0.0001f) == HK_FAILURE) {
+        alignas(16) char buf[512];
+        hkErrStream apThis_(buf, 512);
+        uint32_t m_uid = this->m_uid;
+        hkOstream* v31 = &apThis_.operator<<("Failed to diagonalize inertia matrix (");
+        hkOstream* v32 = &v31->operator<<(m_uid);
+        v32->operator<<(")");
+        if (hkError::s_instance->message(
+                hkError::MESSAGE_ERROR, 0x45465, buf, ".\\GeometryProcessing\\ConvexHull\\hkgpConvexHull.cpp", 1753
+            )) {
+            __builtin_debugtrap();
         }
-        eigenVec.transpose();
-        eigenVec.renormalize();
-        this->m_inertiaMatrix = m_inertiaMatrix;
-        m_inertiaMatrix.changeBasis(eigenVec);
-        m_inertia.m_quad = _mm_unpacklo_ps(
-            _mm_unpacklo_ps(
-                _mm_set_ss(std::bit_cast<float>(std::bit_cast<uint32_t>(m_inertiaMatrix.m_col0.m_quad[0]))),
-                _mm_set_ss(std::bit_cast<float>(std::bit_cast<uint32_t>(m_inertiaMatrix.m_col2.m_quad[2])))
-            ),
-            _mm_unpacklo_ps(
-                _mm_set_ss(std::bit_cast<float>(std::bit_cast<uint32_t>(m_inertiaMatrix.m_col1.m_quad[1]))),
-                _mm_set_ss(std::bit_cast<float>(std::bit_cast<uint32_t>(zero)))
-            )
-        );
-        eigenVec.transpose();
-        m_localTransform.m_rotation.m_col0 = eigenVec.m_col0;
-        m_localTransform.m_rotation.m_col1 = eigenVec.m_col1;
-        m_localTransform.m_rotation.m_col2 = eigenVec.m_col2;
-        m_hasMassProperties.m_bool = 1;
-        return static_cast<hkResult>(m_hasMassProperties.m_bool == 0);
     }
+    eigenVec.transpose();
+    eigenVec.renormalize();
+    this->m_inertiaMatrix = m_inertiaMatrix;
+    m_inertiaMatrix.changeBasis(eigenVec);
+    m_inertia.m_quad = _mm_unpacklo_ps(
+        _mm_unpacklo_ps(
+            _mm_set_ss(std::bit_cast<float>(std::bit_cast<uint32_t>(m_inertiaMatrix.m_col0.m_quad[0]))),
+            _mm_set_ss(std::bit_cast<float>(std::bit_cast<uint32_t>(m_inertiaMatrix.m_col2.m_quad[2])))
+        ),
+        _mm_unpacklo_ps(
+            _mm_set_ss(std::bit_cast<float>(std::bit_cast<uint32_t>(m_inertiaMatrix.m_col1.m_quad[1]))),
+            _mm_set_ss(std::bit_cast<float>(std::bit_cast<uint32_t>(zero)))
+        )
+    );
+    eigenVec.transpose();
+    m_localTransform.m_rotation.m_col0 = eigenVec.m_col0;
+    m_localTransform.m_rotation.m_col1 = eigenVec.m_col1;
+    m_localTransform.m_rotation.m_col2 = eigenVec.m_col2;
+    m_hasMassProperties.m_bool = 1;
+    return static_cast<hkResult>(m_hasMassProperties.m_bool == 0);
 }
 
 // Builds the hull's face planes once (m_hasIndexing): numbers the triangles and the vertices and fills m_planes by

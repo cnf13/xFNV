@@ -59,214 +59,203 @@ NiSourceTexture* BSFaceGenImage::GetCompressedImage(
 ) {
     BSFaceGenRGBAVector::iterator v65;
     BSFaceGenRGBAVector::iterator v66;
-    if (!spCompressedImage.m_pObject && !UncompressedImage.empty()) {
-        if (this->iWidth) {
-            if (this->iHeight) {
-                if (afUncompressedMax > static_cast<double>(afUncompressedMin)) {
-                    float v58;
-                    NiDevImageConverter imageConverter;
-                    NiPointer<NiSourceTexture> sptex(static_cast<NiSourceTexture*>(nullptr));
-                    NiPixelData* ppixeldata = nullptr;
-                    NiPixelData* ppixeldataDest = nullptr;
-                    BSFaceGenRGBAVector::iterator* v6 =
-                        ::new (&v66) BSFaceGenRGBAVector::iterator(this->UncompressedImage.begin());
-                    v65 = *v6;
-                    uint32_t v64 = this->iHeight * this->iWidth;
-                    uint8_t* pbuffer = nullptr;
-                    if (aFormat.m_eFormat) {
-                        NiPixelData* ppixeldata_3;
-                        NiPixelData* v41 = static_cast<NiPixelData*>(NiMemObject::operator new(sizeof(NiPixelData)));
-                        if (v41) {
-                            ppixeldata_3 =
-                                ::new (v41) NiPixelData(this->iWidth, this->iHeight, NiPixelFormat_RGBA32, 1u, 1u);
-                        }
-                        else {
-                            ppixeldata_3 = nullptr;
-                        }
-                        ppixeldata = ppixeldata_3;
-                        pbuffer = ppixeldata_3->GetPixels(0u, 0u);
-                        for (uint32_t i = 0; i < v64; ++i) {
-                            float v21;
-                            float v26;
-                            float v31;
-                            float v36;
-                            v58 = VectorIteratorDeref(&v65).pColor[0];
-                            if (!(afUncompressedMin <= static_cast<double>(v58))) {
-                                v36 = afUncompressedMin;
-                            }
-                            else {
-                                float v37;
-                                if (!(afUncompressedMax >= static_cast<double>(v58))) {
-                                    v37 = afUncompressedMax;
-                                }
-                                else {
-                                    v37 = v58;
-                                }
-                                v36 = v37;
-                            }
-                            double v11 = FloatFloor(v36);
-                            int32_t v33 = static_cast<int32_t>((v11 - afUncompressedMin) * afScale);
-                            *pbuffer = v33;
-                            v58 = VectorIteratorDeref(&v65).pColor[1];
-                            if (!(afUncompressedMin <= static_cast<double>(v58))) {
-                                v31 = afUncompressedMin;
-                            }
-                            else {
-                                float v32;
-                                if (!(afUncompressedMax >= static_cast<double>(v58))) {
-                                    v32 = afUncompressedMax;
-                                }
-                                else {
-                                    v32 = v58;
-                                }
-                                v31 = v32;
-                            }
-                            double v12 = FloatFloor(v31);
-                            int32_t v28 = static_cast<int32_t>((v12 - afUncompressedMin) * afScale);
-                            pbuffer[1] = v28;
-                            v58 = VectorIteratorDeref(&v65).pColor[2];
-                            if (!(afUncompressedMin <= static_cast<double>(v58))) {
-                                v26 = afUncompressedMin;
-                            }
-                            else {
-                                float v27;
-                                if (!(afUncompressedMax >= static_cast<double>(v58))) {
-                                    v27 = afUncompressedMax;
-                                }
-                                else {
-                                    v27 = v58;
-                                }
-                                v26 = v27;
-                            }
-                            double v13 = FloatFloor(v26);
-                            int32_t v23 = static_cast<int32_t>((v13 - afUncompressedMin) * afScale);
-                            pbuffer[2] = v23;
-                            v58 = VectorIteratorDeref(&v65).pColor[3];
-                            if (!(afUncompressedMin <= static_cast<double>(v58))) {
-                                v21 = afUncompressedMin;
-                            }
-                            else {
-                                float v22;
-                                if (!(afUncompressedMax >= static_cast<double>(v58))) {
-                                    v22 = afUncompressedMax;
-                                }
-                                else {
-                                    v22 = v58;
-                                }
-                                v21 = v22;
-                            }
-                            double v14 = FloatFloor(v21);
-                            int32_t v18 = static_cast<int32_t>((v14 - afUncompressedMin) * afScale);
-                            pbuffer[3] = v18;
-                            pbuffer += 4;
-                            v65.operator++(0);
-                        }
-                    }
-                    else {
-                        NiPixelData* ppixeldata_2;
-                        NiPixelData* v62 = static_cast<NiPixelData*>(NiMemObject::operator new(sizeof(NiPixelData)));
-                        if (v62) {
-                            ppixeldata_2 =
-                                ::new (v62) NiPixelData(this->iWidth, this->iHeight, NiPixelFormat_RGB24, 1u, 1u);
-                        }
-                        else {
-                            ppixeldata_2 = nullptr;
-                        }
-                        ppixeldata = ppixeldata_2;
-                        pbuffer = ppixeldata_2->GetPixels(0u, 0u);
-                        for (uint32_t j = 0; j < v64; ++j) {
-                            float v46;
-                            float v51;
-                            float v56;
-                            v58 = VectorIteratorDeref(&v65).pColor[0];
-                            if (!(afUncompressedMin <= static_cast<double>(v58))) {
-                                v56 = afUncompressedMin;
-                            }
-                            else {
-                                float v57;
-                                if (!(afUncompressedMax >= static_cast<double>(v58))) {
-                                    v57 = afUncompressedMax;
-                                }
-                                else {
-                                    v57 = v58;
-                                }
-                                v56 = v57;
-                            }
-                            double v8 = FloatFloor(v56);
-                            int32_t v53 = static_cast<int32_t>((v8 - afUncompressedMin) * afScale);
-                            *pbuffer = v53;
-                            v58 = VectorIteratorDeref(&v65).pColor[1];
-                            if (!(afUncompressedMin <= static_cast<double>(v58))) {
-                                v51 = afUncompressedMin;
-                            }
-                            else {
-                                float v52;
-                                if (!(afUncompressedMax >= static_cast<double>(v58))) {
-                                    v52 = afUncompressedMax;
-                                }
-                                else {
-                                    v52 = v58;
-                                }
-                                v51 = v52;
-                            }
-                            double v9 = FloatFloor(v51);
-                            int32_t v48 = static_cast<int32_t>((v9 - afUncompressedMin) * afScale);
-                            pbuffer[1] = v48;
-                            v58 = VectorIteratorDeref(&v65).pColor[2];
-                            if (!(afUncompressedMin <= static_cast<double>(v58))) {
-                                v46 = afUncompressedMin;
-                            }
-                            else {
-                                float v47;
-                                if (!(afUncompressedMax >= static_cast<double>(v58))) {
-                                    v47 = afUncompressedMax;
-                                }
-                                else {
-                                    v47 = v58;
-                                }
-                                v46 = v47;
-                            }
-                            double v10 = FloatFloor(v46);
-                            int32_t v43 = static_cast<int32_t>((v10 - afUncompressedMin) * afScale);
-                            pbuffer[2] = v43;
-                            pbuffer += 3;
-                            v65.operator++(0);
-                        }
-                    }
-                    if (gs_bFaceMipMaps_General.operator bool()) {
-                        ppixeldataDest = imageConverter.NiDevImageConverter::GenerateMipmapLevels(ppixeldata, nullptr);
-                        if (ppixeldata) {
-                            delete ppixeldata;
-                        }
-                        if (BSShaderManager::GetTintMipMaps()) {
-                            BSShaderUtil::TintUncompressedPixelDataByMipMap(ppixeldataDest);
-                        }
-                        sptex.operator=(
-                            NiSourceTexture::Create(ppixeldataDest, nullptr, NiSourceTexture::ms_kDefaultPrefs)
-                        );
-                    }
-                    else {
-                        if (BSShaderManager::GetTintMipMaps()) {
-                            BSShaderUtil::TintUncompressedPixelDataByMipMap(ppixeldata);
-                        }
-                        sptex.operator=(
-                            NiSourceTexture::Create(ppixeldata, nullptr, NiSourceTexture::ms_kDefaultPrefs)
-                        );
-                    }
-                    if (aFormat.m_eFormat != NiPixelFormat::FORMAT_RGBA && aFormat.m_eFormat) {
-                        NiSourceTexture* x = BSShaderUtil::ConvertTexture(sptex.m_pObject, aFormat);
-                        this->spCompressedImage.operator=(x);
-                    }
-                    else {
-                        this->spCompressedImage.operator=(sptex);
-                    }
-                    if (!this->spCompressedImage.m_pObject) {
-                        this->spCompressedImage.operator=(sptex);
-                    }
+    if ((!spCompressedImage.m_pObject && !UncompressedImage.empty()) && (this->iWidth) && (this->iHeight) &&
+        (afUncompressedMax > static_cast<double>(afUncompressedMin))) {
+        float v58;
+        NiDevImageConverter imageConverter;
+        NiPointer<NiSourceTexture> sptex(static_cast<NiSourceTexture*>(nullptr));
+        NiPixelData* ppixeldata = nullptr;
+        NiPixelData* ppixeldataDest = nullptr;
+        BSFaceGenRGBAVector::iterator* v6 = ::new (&v66) BSFaceGenRGBAVector::iterator(this->UncompressedImage.begin());
+        v65 = *v6;
+        uint32_t v64 = this->iHeight * this->iWidth;
+        uint8_t* pbuffer = nullptr;
+        if (aFormat.m_eFormat) {
+            NiPixelData* ppixeldata_3;
+            NiPixelData* v41 = static_cast<NiPixelData*>(NiMemObject::operator new(sizeof(NiPixelData)));
+            if (v41) {
+                ppixeldata_3 = ::new (v41) NiPixelData(this->iWidth, this->iHeight, NiPixelFormat_RGBA32, 1u, 1u);
+            }
+            else {
+                ppixeldata_3 = nullptr;
+            }
+            ppixeldata = ppixeldata_3;
+            pbuffer = ppixeldata_3->GetPixels(0u, 0u);
+            for (uint32_t i = 0; i < v64; ++i) {
+                float v21;
+                float v26;
+                float v31;
+                float v36;
+                v58 = VectorIteratorDeref(&v65).pColor[0];
+                if (!(afUncompressedMin <= static_cast<double>(v58))) {
+                    v36 = afUncompressedMin;
                 }
+                else {
+                    float v37;
+                    if (!(afUncompressedMax >= static_cast<double>(v58))) {
+                        v37 = afUncompressedMax;
+                    }
+                    else {
+                        v37 = v58;
+                    }
+                    v36 = v37;
+                }
+                double v11 = FloatFloor(v36);
+                int32_t v33 = static_cast<int32_t>((v11 - afUncompressedMin) * afScale);
+                *pbuffer = v33;
+                v58 = VectorIteratorDeref(&v65).pColor[1];
+                if (!(afUncompressedMin <= static_cast<double>(v58))) {
+                    v31 = afUncompressedMin;
+                }
+                else {
+                    float v32;
+                    if (!(afUncompressedMax >= static_cast<double>(v58))) {
+                        v32 = afUncompressedMax;
+                    }
+                    else {
+                        v32 = v58;
+                    }
+                    v31 = v32;
+                }
+                double v12 = FloatFloor(v31);
+                int32_t v28 = static_cast<int32_t>((v12 - afUncompressedMin) * afScale);
+                pbuffer[1] = v28;
+                v58 = VectorIteratorDeref(&v65).pColor[2];
+                if (!(afUncompressedMin <= static_cast<double>(v58))) {
+                    v26 = afUncompressedMin;
+                }
+                else {
+                    float v27;
+                    if (!(afUncompressedMax >= static_cast<double>(v58))) {
+                        v27 = afUncompressedMax;
+                    }
+                    else {
+                        v27 = v58;
+                    }
+                    v26 = v27;
+                }
+                double v13 = FloatFloor(v26);
+                int32_t v23 = static_cast<int32_t>((v13 - afUncompressedMin) * afScale);
+                pbuffer[2] = v23;
+                v58 = VectorIteratorDeref(&v65).pColor[3];
+                if (!(afUncompressedMin <= static_cast<double>(v58))) {
+                    v21 = afUncompressedMin;
+                }
+                else {
+                    float v22;
+                    if (!(afUncompressedMax >= static_cast<double>(v58))) {
+                        v22 = afUncompressedMax;
+                    }
+                    else {
+                        v22 = v58;
+                    }
+                    v21 = v22;
+                }
+                double v14 = FloatFloor(v21);
+                int32_t v18 = static_cast<int32_t>((v14 - afUncompressedMin) * afScale);
+                pbuffer[3] = v18;
+                pbuffer += 4;
+                v65.operator++(0);
             }
         }
+        else {
+            NiPixelData* ppixeldata_2;
+            NiPixelData* v62 = static_cast<NiPixelData*>(NiMemObject::operator new(sizeof(NiPixelData)));
+            if (v62) {
+                ppixeldata_2 = ::new (v62) NiPixelData(this->iWidth, this->iHeight, NiPixelFormat_RGB24, 1u, 1u);
+            }
+            else {
+                ppixeldata_2 = nullptr;
+            }
+            ppixeldata = ppixeldata_2;
+            pbuffer = ppixeldata_2->GetPixels(0u, 0u);
+            for (uint32_t j = 0; j < v64; ++j) {
+                float v46;
+                float v51;
+                float v56;
+                v58 = VectorIteratorDeref(&v65).pColor[0];
+                if (!(afUncompressedMin <= static_cast<double>(v58))) {
+                    v56 = afUncompressedMin;
+                }
+                else {
+                    float v57;
+                    if (!(afUncompressedMax >= static_cast<double>(v58))) {
+                        v57 = afUncompressedMax;
+                    }
+                    else {
+                        v57 = v58;
+                    }
+                    v56 = v57;
+                }
+                double v8 = FloatFloor(v56);
+                int32_t v53 = static_cast<int32_t>((v8 - afUncompressedMin) * afScale);
+                *pbuffer = v53;
+                v58 = VectorIteratorDeref(&v65).pColor[1];
+                if (!(afUncompressedMin <= static_cast<double>(v58))) {
+                    v51 = afUncompressedMin;
+                }
+                else {
+                    float v52;
+                    if (!(afUncompressedMax >= static_cast<double>(v58))) {
+                        v52 = afUncompressedMax;
+                    }
+                    else {
+                        v52 = v58;
+                    }
+                    v51 = v52;
+                }
+                double v9 = FloatFloor(v51);
+                int32_t v48 = static_cast<int32_t>((v9 - afUncompressedMin) * afScale);
+                pbuffer[1] = v48;
+                v58 = VectorIteratorDeref(&v65).pColor[2];
+                if (!(afUncompressedMin <= static_cast<double>(v58))) {
+                    v46 = afUncompressedMin;
+                }
+                else {
+                    float v47;
+                    if (!(afUncompressedMax >= static_cast<double>(v58))) {
+                        v47 = afUncompressedMax;
+                    }
+                    else {
+                        v47 = v58;
+                    }
+                    v46 = v47;
+                }
+                double v10 = FloatFloor(v46);
+                int32_t v43 = static_cast<int32_t>((v10 - afUncompressedMin) * afScale);
+                pbuffer[2] = v43;
+                pbuffer += 3;
+                v65.operator++(0);
+            }
+        }
+        if (gs_bFaceMipMaps_General.operator bool()) {
+            ppixeldataDest = imageConverter.NiDevImageConverter::GenerateMipmapLevels(ppixeldata, nullptr);
+            if (ppixeldata) {
+                delete ppixeldata;
+            }
+            if (BSShaderManager::GetTintMipMaps()) {
+                BSShaderUtil::TintUncompressedPixelDataByMipMap(ppixeldataDest);
+            }
+            sptex.operator=(NiSourceTexture::Create(ppixeldataDest, nullptr, NiSourceTexture::ms_kDefaultPrefs));
+        }
+        else {
+            if (BSShaderManager::GetTintMipMaps()) {
+                BSShaderUtil::TintUncompressedPixelDataByMipMap(ppixeldata);
+            }
+            sptex.operator=(NiSourceTexture::Create(ppixeldata, nullptr, NiSourceTexture::ms_kDefaultPrefs));
+        }
+        if (aFormat.m_eFormat != NiPixelFormat::FORMAT_RGBA && aFormat.m_eFormat) {
+            NiSourceTexture* x = BSShaderUtil::ConvertTexture(sptex.m_pObject, aFormat);
+            this->spCompressedImage.operator=(x);
+        }
+        else {
+            this->spCompressedImage.operator=(sptex);
+        }
+        if (!this->spCompressedImage.m_pObject) {
+            this->spCompressedImage.operator=(sptex);
+        }
     }
+
     return this->spCompressedImage.m_pObject;
 }
 

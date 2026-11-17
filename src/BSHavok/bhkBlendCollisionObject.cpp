@@ -358,10 +358,8 @@ void bhkBlendCollisionObject::hktoNiTransform() {
     }
     if (bAddToWorld) {
         bhkWorld* pStoredWorld = this->pStoredWorld;
-        if (pStoredWorld) {
-            if (!pStoredWorld->iBatchAdd) {
-                UpdateAddedToWorld();
-            }
+        if ((pStoredWorld) && (!pStoredWorld->iBatchAdd)) {
+            UpdateAddedToWorld();
         }
     }
 }
@@ -456,10 +454,8 @@ void bhkBlendCollisionObject::SetMotionType(
             v19 = 0;
         }
         int32_t v20 = v19 & 127;
-        if (v20 == 8 || v20 == 29) {
-            if (pStoredWorld) {
-                spWorldObject->Add(pStoredWorld);
-            }
+        if ((v20 == 8 || v20 == 29) && (pStoredWorld)) {
+            spWorldObject->Add(pStoredWorld);
         }
     }
 }

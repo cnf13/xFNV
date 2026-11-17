@@ -168,31 +168,30 @@ uint8_t* calcEigenVectors(uint8_t* a1, __m128* a2, __m128* a3, __m128* a4, __m12
         }
         return a1;
     }
-    else {
-        __m128 v5 = _mm_undefined_ps();
-        __m128 v6 = _mm_undefined_ps();
-        __m128 v7 = _mm_undefined_ps();
-        __m128 v8 = _mm_undefined_ps();
-        v7[0] = 0.0f;
-        v8[0] = 0.0f;
-        v5[0] = 1.0f;
-        v6[0] = 0.0f;
-        __m128 v9 = _mm_unpacklo_ps(v6, v8);
-        __m128 v10 = _mm_unpacklo_ps(_mm_unpacklo_ps(v5, v7), v9);
-        *a3 = v10;
-        v10[0] = 0.0f;
-        v9[0] = 1.0f;
-        __m128 v12 = _mm_unpacklo_ps(v9, v8);
-        __m128 v13 = _mm_unpacklo_ps(_mm_unpacklo_ps(v10, v7), v12);
-        *a4 = v13;
-        v13[0] = 0.0f;
-        v12[0] = 0.0f;
-        *a5 = _mm_unpacklo_ps(
-            _mm_unpacklo_ps(v13, _mm_set_ss(std::bit_cast<float>(0x3F800000u))),
-            _mm_unpacklo_ps(v12, _mm_set_ss(std::bit_cast<float>(std::bit_cast<uint32_t>(zero))))
-        );
-        return a1;
-    }
+
+    __m128 v5 = _mm_undefined_ps();
+    __m128 v6 = _mm_undefined_ps();
+    __m128 v7 = _mm_undefined_ps();
+    __m128 v8 = _mm_undefined_ps();
+    v7[0] = 0.0f;
+    v8[0] = 0.0f;
+    v5[0] = 1.0f;
+    v6[0] = 0.0f;
+    __m128 v9 = _mm_unpacklo_ps(v6, v8);
+    __m128 v10 = _mm_unpacklo_ps(_mm_unpacklo_ps(v5, v7), v9);
+    *a3 = v10;
+    v10[0] = 0.0f;
+    v9[0] = 1.0f;
+    __m128 v12 = _mm_unpacklo_ps(v9, v8);
+    __m128 v13 = _mm_unpacklo_ps(_mm_unpacklo_ps(v10, v7), v12);
+    *a4 = v13;
+    v13[0] = 0.0f;
+    v12[0] = 0.0f;
+    *a5 = _mm_unpacklo_ps(
+        _mm_unpacklo_ps(v13, _mm_set_ss(std::bit_cast<float>(0x3F800000u))),
+        _mm_unpacklo_ps(v12, _mm_set_ss(std::bit_cast<float>(std::bit_cast<uint32_t>(zero))))
+    );
+    return a1;
 }
 
 // Whether the largest of |x|, |y| and |z| of apColumn is within afTolerance of 1. Returns 1 or 0.

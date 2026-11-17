@@ -95,43 +95,41 @@ bool BGSOpenCloseForm::SetOpenState(TESObjectREFR* apRef, bool abOpen, bool abSn
             NiControllerSequence* popenseq = pmanager->GetSequenceByName(*v5);
             NiFixedString* v6 = &FixedStrings::QCloseString();
             NiControllerSequence* pcloseseq = pmanager->GetSequenceByName(*v6);
-            if (popenseq) {
-                if (pcloseseq) {
-                    if (abOpen) {
-                        pseqtoplay = popenseq;
-                        pseqtostop = pcloseseq;
-                    }
-                    else {
-                        pseqtoplay = pcloseseq;
-                        pseqtostop = popenseq;
-                    }
-                    pmanager->SetActive(true);
-                    if (abSnap) {
-                        (&apRef->m_Extra)->SetRagDollData(nullptr);
-                        pmanager->DeactivateSequence(pseqtoplay, 0.0f);
-                        pmanager->ActivateSequence(pseqtostop, 0, false, 1.0f, 0.0f, nullptr);
-                        pseqtostop->SetOffset(-3.4028235e+38f);
-                        float a4 = pseqtostop->GetBeginKeyTime();
-                        NiUpdateData UpdateData(a4, true, false);
-                        NiNode* v7 = apRef->Get3D();
-                        v7->Update(UpdateData);
-                        pmanager->DeactivateSequence(pseqtostop, 0.0f);
-                        const char* HandleString = (&pseqtoplay->m_kName)->GetHandleString();
-                        apRef->SetLastFinishedSequence(HandleString);
-                        NiNode* v9 = apRef->Get3D();
-                        bhkNiCollisionObject::ResetSim(v9, true);
-                    }
-                    else {
-                        pmanager->DeactivateSequence(pseqtostop, 0.0f);
-                        pmanager->ActivateSequence(pseqtoplay, 0, false, 1.0f, 0.0f, nullptr);
-                        pseqtoplay->SetOffset(-3.4028235e+38f);
-                        float a4a = pseqtoplay->GetBeginKeyTime();
-                        NiUpdateData UpdateData_2(a4a, true, false);
-                        NiNode* v10 = apRef->Get3D();
-                        v10->Update(UpdateData_2);
-                    }
-                    bplayedanims = true;
+            if ((popenseq) && (pcloseseq)) {
+                if (abOpen) {
+                    pseqtoplay = popenseq;
+                    pseqtostop = pcloseseq;
                 }
+                else {
+                    pseqtoplay = pcloseseq;
+                    pseqtostop = popenseq;
+                }
+                pmanager->SetActive(true);
+                if (abSnap) {
+                    (&apRef->m_Extra)->SetRagDollData(nullptr);
+                    pmanager->DeactivateSequence(pseqtoplay, 0.0f);
+                    pmanager->ActivateSequence(pseqtostop, 0, false, 1.0f, 0.0f, nullptr);
+                    pseqtostop->SetOffset(-3.4028235e+38f);
+                    float a4 = pseqtostop->GetBeginKeyTime();
+                    NiUpdateData UpdateData(a4, true, false);
+                    NiNode* v7 = apRef->Get3D();
+                    v7->Update(UpdateData);
+                    pmanager->DeactivateSequence(pseqtostop, 0.0f);
+                    const char* HandleString = (&pseqtoplay->m_kName)->GetHandleString();
+                    apRef->SetLastFinishedSequence(HandleString);
+                    NiNode* v9 = apRef->Get3D();
+                    bhkNiCollisionObject::ResetSim(v9, true);
+                }
+                else {
+                    pmanager->DeactivateSequence(pseqtostop, 0.0f);
+                    pmanager->ActivateSequence(pseqtoplay, 0, false, 1.0f, 0.0f, nullptr);
+                    pseqtoplay->SetOffset(-3.4028235e+38f);
+                    float a4a = pseqtoplay->GetBeginKeyTime();
+                    NiUpdateData UpdateData_2(a4a, true, false);
+                    NiNode* v10 = apRef->Get3D();
+                    v10->Update(UpdateData_2);
+                }
+                bplayedanims = true;
             }
         }
         else {
@@ -142,17 +140,14 @@ bool BGSOpenCloseForm::SetOpenState(TESObjectREFR* apRef, bool abOpen, bool abSn
                 apRef->SetLastFinishedSequence("Close");
             }
         }
-        if (abSnap && bCutDoors.Bool() && apRef->GetObjectReference()->GetFormType() == DOOR_ID) {
-            if (apRef->Get3D()) {
-                if (!apRef->GetTeleport()) {
-                    NavMeshObstacleManager* v11 = NavMeshObstacleManager::GetInstance();
-                    if (abOpen) {
-                        v11->OnDoorOpen(apRef);
-                    }
-                    else {
-                        v11->OnDoorClose(apRef);
-                    }
-                }
+        if ((abSnap && bCutDoors.Bool() && apRef->GetObjectReference()->GetFormType() == DOOR_ID) && (apRef->Get3D()) &&
+            (!apRef->GetTeleport())) {
+            NavMeshObstacleManager* v11 = NavMeshObstacleManager::GetInstance();
+            if (abOpen) {
+                v11->OnDoorOpen(apRef);
+            }
+            else {
+                v11->OnDoorClose(apRef);
             }
         }
     }
@@ -160,60 +155,53 @@ bool BGSOpenCloseForm::SetOpenState(TESObjectREFR* apRef, bool abOpen, bool abSn
 }
 
 void BGSOpenCloseForm::HandleAnimEnd(TESObjectREFR* apAnimRef, NiControllerSequence* apEndSeq) {
-    if (apAnimRef) {
-        if (apEndSeq) {
-            BGSOpenCloseForm::HandleAnimEndHavok(apAnimRef, apEndSeq);
-            const char* HandleString = (&apEndSeq->m_kName)->GetHandleString();
-            if (!std::strcmp(HandleString, "Open")) {
-                Script::SetActionFlag(apAnimRef, &apAnimRef->m_Extra, SCRIPT_ACTION_ONOPEN);
-                TESObjectREFR* pactionref = (&apAnimRef->m_Extra)->GetOpenCloseActivateRef();
-                if (pactionref) {
-                    BGSOpenCloseForm* pocform = BGSOpenCloseForm::GetAsOpenCloseForm(apAnimRef->GetObjectReference());
-                    if (pocform) {
-                        pocform->HandleOpenFinish(apAnimRef, pactionref);
+    if ((apAnimRef) && (apEndSeq)) {
+        BGSOpenCloseForm::HandleAnimEndHavok(apAnimRef, apEndSeq);
+        const char* HandleString = (&apEndSeq->m_kName)->GetHandleString();
+        if (!std::strcmp(HandleString, "Open")) {
+            Script::SetActionFlag(apAnimRef, &apAnimRef->m_Extra, SCRIPT_ACTION_ONOPEN);
+            TESObjectREFR* pactionref = (&apAnimRef->m_Extra)->GetOpenCloseActivateRef();
+            if (pactionref) {
+                BGSOpenCloseForm* pocform = BGSOpenCloseForm::GetAsOpenCloseForm(apAnimRef->GetObjectReference());
+                if (pocform) {
+                    pocform->HandleOpenFinish(apAnimRef, pactionref);
+                }
+                (&apAnimRef->m_Extra)->SetOpenCloseActivateRef(nullptr);
+                if ((pactionref == pPlayer) && (pocform) && (pocform->GetBlockActivatesWhileOpening())) {
+                    pPlayer->SetBlockActivate(false);
+                }
+            }
+            if (bCutDoors.Bool() && apAnimRef->GetObjectReference()->GetFormType() == DOOR_ID) {
+                if (AILinearTaskThreadManager::ShouldQueue3DTask()) {
+                    TaskQueueInterface* Instance = TaskQueueInterface::GetInstance();
+                    Instance->QueueObstacleDoorOpen(apAnimRef);
+                }
+                else {
+                    NavMeshObstacleManager* v4 = NavMeshObstacleManager::GetInstance();
+                    v4->OnDoorOpen(apAnimRef);
+                }
+            }
+        }
+        else {
+            const char* v5 = (&apEndSeq->m_kName)->GetHandleString();
+            if (!std::strcmp(v5, "Close")) {
+                Script::SetActionFlag(apAnimRef, &apAnimRef->m_Extra, SCRIPT_ACTION_ONCLOSE);
+                TESObjectREFR* pactionref_2 = (&apAnimRef->m_Extra)->GetOpenCloseActivateRef();
+                if (pactionref_2) {
+                    BGSOpenCloseForm* pocform_2 = BGSOpenCloseForm::GetAsOpenCloseForm(apAnimRef->GetObjectReference());
+                    if (pocform_2) {
+                        pocform_2->HandleCloseFinish(apAnimRef, pactionref_2);
                     }
                     (&apAnimRef->m_Extra)->SetOpenCloseActivateRef(nullptr);
-                    if (pactionref == pPlayer) {
-                        if (pocform) {
-                            if (pocform->GetBlockActivatesWhileOpening()) {
-                                pPlayer->SetBlockActivate(false);
-                            }
-                        }
-                    }
                 }
                 if (bCutDoors.Bool() && apAnimRef->GetObjectReference()->GetFormType() == DOOR_ID) {
                     if (AILinearTaskThreadManager::ShouldQueue3DTask()) {
-                        TaskQueueInterface* Instance = TaskQueueInterface::GetInstance();
-                        Instance->QueueObstacleDoorOpen(apAnimRef);
+                        TaskQueueInterface* v6 = TaskQueueInterface::GetInstance();
+                        v6->QueueObstacleDoorClose(apAnimRef);
                     }
                     else {
-                        NavMeshObstacleManager* v4 = NavMeshObstacleManager::GetInstance();
-                        v4->OnDoorOpen(apAnimRef);
-                    }
-                }
-            }
-            else {
-                const char* v5 = (&apEndSeq->m_kName)->GetHandleString();
-                if (!std::strcmp(v5, "Close")) {
-                    Script::SetActionFlag(apAnimRef, &apAnimRef->m_Extra, SCRIPT_ACTION_ONCLOSE);
-                    TESObjectREFR* pactionref_2 = (&apAnimRef->m_Extra)->GetOpenCloseActivateRef();
-                    if (pactionref_2) {
-                        BGSOpenCloseForm* pocform_2 =
-                            BGSOpenCloseForm::GetAsOpenCloseForm(apAnimRef->GetObjectReference());
-                        if (pocform_2) {
-                            pocform_2->HandleCloseFinish(apAnimRef, pactionref_2);
-                        }
-                        (&apAnimRef->m_Extra)->SetOpenCloseActivateRef(nullptr);
-                    }
-                    if (bCutDoors.Bool() && apAnimRef->GetObjectReference()->GetFormType() == DOOR_ID) {
-                        if (AILinearTaskThreadManager::ShouldQueue3DTask()) {
-                            TaskQueueInterface* v6 = TaskQueueInterface::GetInstance();
-                            v6->QueueObstacleDoorClose(apAnimRef);
-                        }
-                        else {
-                            NavMeshObstacleManager* v7 = NavMeshObstacleManager::GetInstance();
-                            v7->OnDoorClose(apAnimRef);
-                        }
+                        NavMeshObstacleManager* v7 = NavMeshObstacleManager::GetInstance();
+                        v7->OnDoorClose(apAnimRef);
                     }
                 }
             }
@@ -225,33 +213,28 @@ void BGSOpenCloseForm::HandleAnimEnd(TESObjectREFR* apAnimRef, NiControllerSeque
 // returns whether the sequence was Open or Close.
 bool BGSOpenCloseForm::HandleAnimEndHavok(TESObjectREFR* apAnimRef, NiControllerSequence* apEndSeq) {
     bool bIsOpenOrClose = false;
-    if (apAnimRef) {
-        if (apEndSeq) {
-            if (!std::strcmp(apEndSeq->GetName().GetHandleString(), "Open") ||
-                !std::strcmp(apEndSeq->GetName().GetHandleString(), "Close")) {
-                bIsOpenOrClose = true;
-            }
-            if (!(&bAnimateDoorPhysics)->Bool()) {
-                if (bIsOpenOrClose) {
-                    if (!(&bAnimateDoorPhysics)->Bool()) {
-                        NiNode* pNode = apAnimRef->Get3D();
-                        if (pNode) {
-                            if (AILinearTaskThreadManager::ShouldQueue3DTask()) {
-                                TaskQueueInterface::GetInstance()->QueueHavokAdd(pNode);
-                            }
-                            else {
-                                TESObjectCELL* pParentCell = apAnimRef->GetParentCell();
-                                bhkWorld* pWorld = pParentCell ? pParentCell->GetbhkWorld() : nullptr;
-                                if (pWorld) {
-                                    pWorld->AddObjects(pNode, true, true, 0, false);
-                                }
-                            }
-                        }
+    if ((apAnimRef) && (apEndSeq)) {
+        if (!std::strcmp(apEndSeq->GetName().GetHandleString(), "Open") ||
+            !std::strcmp(apEndSeq->GetName().GetHandleString(), "Close")) {
+            bIsOpenOrClose = true;
+        }
+        if ((!(&bAnimateDoorPhysics)->Bool()) && (bIsOpenOrClose) && (!(&bAnimateDoorPhysics)->Bool())) {
+            NiNode* pNode = apAnimRef->Get3D();
+            if (pNode) {
+                if (AILinearTaskThreadManager::ShouldQueue3DTask()) {
+                    TaskQueueInterface::GetInstance()->QueueHavokAdd(pNode);
+                }
+                else {
+                    TESObjectCELL* pParentCell = apAnimRef->GetParentCell();
+                    bhkWorld* pWorld = pParentCell ? pParentCell->GetbhkWorld() : nullptr;
+                    if (pWorld) {
+                        pWorld->AddObjects(pNode, true, true, 0, false);
                     }
                 }
             }
         }
     }
+
     return bIsOpenOrClose;
 }
 
@@ -311,16 +294,13 @@ BGSOpenCloseForm::OPEN_STATE BGSOpenCloseForm::GetOpenState(TESObjectREFR* apRef
                 pOpenSequence = static_cast<BSAnimGroupSequence*>(v9->GetSequenceByName(*g_Open));
                 g_Close = &FixedStrings::QCloseString();
                 pCloseSequence = static_cast<BSAnimGroupSequence*>(v9->GetSequenceByName(*g_Close));
-                if (pOpenSequence) {
-                    if (pCloseSequence) {
-                        if (((int32_t)pOpenSequence->NiControllerSequence::GetState()) == 1) {
-                            return BGSOpenCloseForm::OBJECT_OPENING;
-                        }
-                        else {
-                            if (((int32_t)pCloseSequence->NiControllerSequence::GetState()) == 1) {
-                                return BGSOpenCloseForm::OBJECT_CLOSING;
-                            }
-                        }
+                if ((pOpenSequence) && (pCloseSequence)) {
+                    if (((int32_t)pOpenSequence->NiControllerSequence::GetState()) == 1) {
+                        return BGSOpenCloseForm::OBJECT_OPENING;
+                    }
+
+                    if (((int32_t)pCloseSequence->NiControllerSequence::GetState()) == 1) {
+                        return BGSOpenCloseForm::OBJECT_CLOSING;
                     }
                 }
             }
@@ -338,108 +318,96 @@ void BGSOpenCloseForm::HandleActivate(
     FNVD_INLINED_LOCAL(BSSoundHandle, apHandle, std::nullopt, std::nullopt);
     if (apItemActivated) {
         bool bhasanims = false;
-        if (apItemActivated->Get3D()) {
-            if (apItemActivated->Get3D()->GetControllers()) {
-                NiTimeController* po = apItemActivated->Get3D()->GetControllers();
-                NiControllerManager* pmanager =
-                    static_cast<NiControllerManager*>(NiObject::DynamicCastStatic(&NiControllerManager::ms_RTTI, po));
-                if (pmanager) {
-                    NiFixedString* v3 = &FixedStrings::QOpenString();
-                    NiControllerSequence* popenSeq = pmanager->GetSequenceByName(*v3);
-                    NiFixedString* v4 = &FixedStrings::QCloseString();
-                    NiControllerSequence* pcloseSeq = pmanager->GetSequenceByName(*v4);
-                    if (popenSeq) {
-                        if (pcloseSeq) {
-                            bhasanims = true;
-                            if (popenSeq->GetState() != NiControllerSequence::kAnimating &&
-                                pcloseSeq->GetState() != NiControllerSequence::kAnimating) {
-                                NiControllerSequence* pplayThisSeq;
-                                TESSound* soundThisSeq = nullptr;
-                                TESObjectDOOR* pDoor = dynamic_cast<TESObjectDOOR*>(apOpenCloseForm);
-                                if (apItemActivated->GetAction(OBJECT_ACTION_OPEN)) {
-                                    if (pDoor) {
-                                        soundThisSeq = pDoor->pCloseSound;
-                                    }
-                                    pplayThisSeq = pcloseSeq;
-                                    apItemActivated->ClearAction(OBJECT_ACTION_OPEN);
+        if ((apItemActivated->Get3D()) && (apItemActivated->Get3D()->GetControllers())) {
+            NiTimeController* po = apItemActivated->Get3D()->GetControllers();
+            NiControllerManager* pmanager =
+                static_cast<NiControllerManager*>(NiObject::DynamicCastStatic(&NiControllerManager::ms_RTTI, po));
+            if (pmanager) {
+                NiFixedString* v3 = &FixedStrings::QOpenString();
+                NiControllerSequence* popenSeq = pmanager->GetSequenceByName(*v3);
+                NiFixedString* v4 = &FixedStrings::QCloseString();
+                NiControllerSequence* pcloseSeq = pmanager->GetSequenceByName(*v4);
+                if ((popenSeq) && (pcloseSeq)) {
+                    bhasanims = true;
+                    if (popenSeq->GetState() != NiControllerSequence::kAnimating &&
+                        pcloseSeq->GetState() != NiControllerSequence::kAnimating) {
+                        NiControllerSequence* pplayThisSeq;
+                        TESSound* soundThisSeq = nullptr;
+                        TESObjectDOOR* pDoor = dynamic_cast<TESObjectDOOR*>(apOpenCloseForm);
+                        if (apItemActivated->GetAction(OBJECT_ACTION_OPEN)) {
+                            if (pDoor) {
+                                soundThisSeq = pDoor->pCloseSound;
+                            }
+                            pplayThisSeq = pcloseSeq;
+                            apItemActivated->ClearAction(OBJECT_ACTION_OPEN);
+                        }
+                        else {
+                            if (pDoor) {
+                                soundThisSeq = pDoor->pOpenSound;
+                            }
+                            pplayThisSeq = popenSeq;
+                            apItemActivated->SetAction(OBJECT_ACTION_OPEN);
+                        }
+                        if ((!bAnimateDoorPhysics.Bool()) && (apActionRef) &&
+                            (apActionRef->IsActor() && apActionRef != pPlayer) && (apItemActivated->Get3D())) {
+                            bool bremovehavok = true;
+                            if (apItemActivated->GetObjectReference()->GetFormType() == DOOR_ID) {
+                                TESObjectDOOR* pdoor =
+                                    static_cast<TESObjectDOOR*>(apItemActivated->GetObjectReference());
+                                bremovehavok = !pdoor->IsSlidingDoor();
+                            }
+                            if (bremovehavok) {
+                                NiAVObject* pav = apItemActivated->Get3D();
+                                if (AILinearTaskThreadManager::ShouldQueue3DTask()) {
+                                    TaskQueueInterface* Instance = TaskQueueInterface::GetInstance();
+                                    Instance->QueueHavokRemove(pav);
                                 }
                                 else {
-                                    if (pDoor) {
-                                        soundThisSeq = pDoor->pOpenSound;
-                                    }
-                                    pplayThisSeq = popenSeq;
-                                    apItemActivated->SetAction(OBJECT_ACTION_OPEN);
+                                    bhkWorld::Activate(pav, true, true, false);
+                                    bhkWorld::RemoveObjects(pav, true, true);
                                 }
-                                if (!bAnimateDoorPhysics.Bool()) {
-                                    if (apActionRef) {
-                                        if (apActionRef->IsActor() && apActionRef != pPlayer) {
-                                            if (apItemActivated->Get3D()) {
-                                                bool bremovehavok = true;
-                                                if (apItemActivated->GetObjectReference()->GetFormType() == DOOR_ID) {
-                                                    TESObjectDOOR* pdoor = static_cast<TESObjectDOOR*>(
-                                                        apItemActivated->GetObjectReference()
-                                                    );
-                                                    bremovehavok = !pdoor->IsSlidingDoor();
-                                                }
-                                                if (bremovehavok) {
-                                                    NiAVObject* pav = apItemActivated->Get3D();
-                                                    if (AILinearTaskThreadManager::ShouldQueue3DTask()) {
-                                                        TaskQueueInterface* Instance =
-                                                            TaskQueueInterface::GetInstance();
-                                                        Instance->QueueHavokRemove(pav);
-                                                    }
-                                                    else {
-                                                        bhkWorld::Activate(pav, true, true, false);
-                                                        bhkWorld::RemoveObjects(pav, true, true);
-                                                    }
-                                                }
-                                            }
-                                        }
-                                    }
-                                }
-                                pmanager->SetActive(true);
-                                pmanager->ActivateSequence(pplayThisSeq, 0, false, 1.0f, 0.0f, nullptr);
-                                pplayThisSeq->SetOffset(-3.4028235e+38f);
-                                if (soundThisSeq) {
-                                    BSSoundHandle SoundHandle;
-                                    if (apActionRef == pPlayer) {
-                                        uint32_t a3 = soundThisSeq->iFormID;
-                                        BSAudio* v6 = &BSAudio::QInstance();
-                                        BSSoundHandle* arHandle = v6->GetSoundHandleByNumericID(
-                                            &apHandle, a3,
-                                            BSGameSound::SOUND_FLAG_IS_2D | BSGameSound::SOUND_FLAG_SYSTEM_SOUND |
-                                                BSGameSound::SOUND_FLAG_ONE_SHOT | BSGameSound::SOUND_FLAG_UNKBIT31
-                                        );
-                                        SoundHandle.operator=(*arHandle);
-                                    }
-                                    else {
-                                        uint32_t a3a = soundThisSeq->iFormID;
-                                        BSAudio* v7 = &BSAudio::QInstance();
-                                        BSSoundHandle* SoundHandleByNumericID =
-                                            v7->GetSoundHandleByNumericID(&th_s, a3a, 258u);
-                                        SoundHandle.operator=(*SoundHandleByNumericID);
-                                        NiPoint3 v19 = apItemActivated->GetLocationOnReference();
-                                        SoundHandle.SetPosition(v19.x, v19.y, v19.z);
-                                    }
-                                    SoundHandle.Play(false);
-                                }
-                                (&apItemActivated->m_Extra)->SetOpenCloseActivateRef(apActionRef);
-                                apItemActivated->AddChange(CHANGE_REFR_EXTRA_GAME_ONLY);
-                                if (pplayThisSeq == popenSeq && apActionRef == pPlayer) {
-                                    BGSOpenCloseForm* pocform =
-                                        BGSOpenCloseForm::GetAsOpenCloseForm(apItemActivated->GetObjectReference());
-                                    if (pocform) {
-                                        if (pocform->GetBlockActivatesWhileOpening()) {
-                                            pPlayer->SetBlockActivate(true);
-                                        }
-                                    }
-                                }
+                            }
+                        }
+
+                        pmanager->SetActive(true);
+                        pmanager->ActivateSequence(pplayThisSeq, 0, false, 1.0f, 0.0f, nullptr);
+                        pplayThisSeq->SetOffset(-3.4028235e+38f);
+                        if (soundThisSeq) {
+                            BSSoundHandle SoundHandle;
+                            if (apActionRef == pPlayer) {
+                                uint32_t a3 = soundThisSeq->iFormID;
+                                BSAudio* v6 = &BSAudio::QInstance();
+                                BSSoundHandle* arHandle = v6->GetSoundHandleByNumericID(
+                                    &apHandle, a3,
+                                    BSGameSound::SOUND_FLAG_IS_2D | BSGameSound::SOUND_FLAG_SYSTEM_SOUND |
+                                        BSGameSound::SOUND_FLAG_ONE_SHOT | BSGameSound::SOUND_FLAG_UNKBIT31
+                                );
+                                SoundHandle.operator=(*arHandle);
+                            }
+                            else {
+                                uint32_t a3a = soundThisSeq->iFormID;
+                                BSAudio* v7 = &BSAudio::QInstance();
+                                BSSoundHandle* SoundHandleByNumericID = v7->GetSoundHandleByNumericID(&th_s, a3a, 258u);
+                                SoundHandle.operator=(*SoundHandleByNumericID);
+                                NiPoint3 v19 = apItemActivated->GetLocationOnReference();
+                                SoundHandle.SetPosition(v19.x, v19.y, v19.z);
+                            }
+                            SoundHandle.Play(false);
+                        }
+                        (&apItemActivated->m_Extra)->SetOpenCloseActivateRef(apActionRef);
+                        apItemActivated->AddChange(CHANGE_REFR_EXTRA_GAME_ONLY);
+                        if (pplayThisSeq == popenSeq && apActionRef == pPlayer) {
+                            BGSOpenCloseForm* pocform =
+                                BGSOpenCloseForm::GetAsOpenCloseForm(apItemActivated->GetObjectReference());
+                            if ((pocform) && (pocform->GetBlockActivatesWhileOpening())) {
+                                pPlayer->SetBlockActivate(true);
                             }
                         }
                     }
                 }
             }
         }
+
         if (!bhasanims) {
             bool bopen = false;
             BGSOpenCloseForm::OPEN_STATE OpenState = BGSOpenCloseForm::GetOpenState(apItemActivated);
@@ -465,17 +433,16 @@ void BGSOpenCloseForm::HandleActivate(
 
 BGSOpenCloseForm* BGSOpenCloseForm::GetAsOpenCloseForm(TESForm* apForm) {
     BGSOpenCloseForm* pretval = nullptr;
-    if (apForm) {
-        if (BGSOpenCloseForm::IsOpenCloseForm(apForm)) {
-            switch (apForm->GetFormType()) {
-                case ACTI_ID:
-                case TERM_ID: pretval = static_cast<TESObjectACTI*>(apForm); break;
-                case CONT_ID: pretval = static_cast<TESObjectCONT*>(apForm); break;
-                case DOOR_ID: pretval = static_cast<TESObjectDOOR*>(apForm); break;
-                default: break;
-            }
+    if ((apForm) && (BGSOpenCloseForm::IsOpenCloseForm(apForm))) {
+        switch (apForm->GetFormType()) {
+            case ACTI_ID:
+            case TERM_ID: pretval = static_cast<TESObjectACTI*>(apForm); break;
+            case CONT_ID: pretval = static_cast<TESObjectCONT*>(apForm); break;
+            case DOOR_ID: pretval = static_cast<TESObjectDOOR*>(apForm); break;
+            default: break;
         }
     }
+
     return pretval;
 }
 

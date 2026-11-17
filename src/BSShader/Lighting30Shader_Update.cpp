@@ -39,26 +39,23 @@ void Lighting30Shader::UpdateDiffuseNormalStages(uint32_t a1, Lighting30ShaderPr
             pstage->m_spTexture = v7;
             SetTextureMode(pstage, a2);
         }
-        if (BSShaderManager::eCurrentPass >= BSShaderManager::BSSM_3XLIGHTING_SIMPLESHADOW &&
-            BSShaderManager::eCurrentPass <= BSShaderManager::BSSM_3XLIGHTING_SIMPLESHADOW_VcS) {
-            if (a2->GetUnk68()) {
-                ShadowSceneLight* v8 = *BSShaderManager::pCurrentRenderPass->ppSceneLights;
-                if (v8->bCastShadow) {
-                    BSRenderedTexture* v9 = v8->spDynamicShadowMap.m_pObject;
-                    if (v9) {
-                        if (BSShaderManager::pCurrentRenderPass->ucNumLights) {
-                            NiD3DTextureStage* pstage_2 = v3->m_kStages.m_pBase[2].m_pObject;
-                            pstage_2->m_spTexture = (NiTexture*)v9->GetTexture(0);
-                            pstage_2->SetFilterMode(
-                                static_cast<NiTexturingProperty::FilterMode>(
-                                    BSShaderManager::eShadowMode == BSShaderManager::BSSM_SHADOW_LOOPFILTER
-                                )
-                            );
-                            pstage_2->SetClampMode(NiTexturingProperty::CLAMP_S_CLAMP_T);
-                            v4 = a1;
-                            Lighting30Shader::kPSConstants[20].w = static_cast<float>(a2->GetFlag(8u));
-                        }
-                    }
+        if ((BSShaderManager::eCurrentPass >= BSShaderManager::BSSM_3XLIGHTING_SIMPLESHADOW &&
+             BSShaderManager::eCurrentPass <= BSShaderManager::BSSM_3XLIGHTING_SIMPLESHADOW_VcS) &&
+            (a2->GetUnk68())) {
+            ShadowSceneLight* v8 = *BSShaderManager::pCurrentRenderPass->ppSceneLights;
+            if (v8->bCastShadow) {
+                BSRenderedTexture* v9 = v8->spDynamicShadowMap.m_pObject;
+                if ((v9) && (BSShaderManager::pCurrentRenderPass->ucNumLights)) {
+                    NiD3DTextureStage* pstage_2 = v3->m_kStages.m_pBase[2].m_pObject;
+                    pstage_2->m_spTexture = (NiTexture*)v9->GetTexture(0);
+                    pstage_2->SetFilterMode(
+                        static_cast<NiTexturingProperty::FilterMode>(
+                            BSShaderManager::eShadowMode == BSShaderManager::BSSM_SHADOW_LOOPFILTER
+                        )
+                    );
+                    pstage_2->SetClampMode(NiTexturingProperty::CLAMP_S_CLAMP_T);
+                    v4 = a1;
+                    Lighting30Shader::kPSConstants[20].w = static_cast<float>(a2->GetFlag(8u));
                 }
             }
         }
@@ -796,39 +793,38 @@ Lighting30Shader::UpdatePass(BSShaderManager::eBSSMPassEnum aePassEnum, Lighting
         if (aePassEnum == BSShaderManager::BSSM_3XOCCLUSION) {
             return Lighting30Shader::spPass[0].m_pObject;
         }
-        else {
-            switch (aePassEnum) {
-                case BSShaderManager::BSSM_3XZONLY: {
-                    result = Lighting30Shader::spPass[1].m_pObject;
-                    break;
-                }
-                case BSShaderManager::BSSM_3XZONLY_S: {
-                    result = Lighting30Shader::spPass[2].m_pObject;
-                    break;
-                }
-                case BSShaderManager::BSSM_3XZONLY_Vc: {
-                    result = Lighting30Shader::spPass[3].m_pObject;
-                    break;
-                }
-                case BSShaderManager::BSSM_3XZONLY_SVc: {
-                    result = Lighting30Shader::spPass[4].m_pObject;
-                    break;
-                }
-                case BSShaderManager::BSSM_3XZONLY_TEXEFFECT: {
-                    NiD3DPass* v6 = Lighting30Shader::spPass[5].m_pObject;
-                    UpdatePipelineZOnlyTexEffect(apL30Prop, Lighting30Shader::spPass[5].m_pObject);
-                    result = v6;
-                    break;
-                }
-                case BSShaderManager::BSSM_3XZONLY_TEXEFFECT_S: {
-                    NiD3DPass* v7 = Lighting30Shader::spPass[6].m_pObject;
-                    UpdatePipelineZOnlyTexEffect(apL30Prop, Lighting30Shader::spPass[6].m_pObject);
-                    result = v7;
-                    break;
-                }
-                default: {
-                    goto LABEL_130;
-                }
+
+        switch (aePassEnum) {
+            case BSShaderManager::BSSM_3XZONLY: {
+                result = Lighting30Shader::spPass[1].m_pObject;
+                break;
+            }
+            case BSShaderManager::BSSM_3XZONLY_S: {
+                result = Lighting30Shader::spPass[2].m_pObject;
+                break;
+            }
+            case BSShaderManager::BSSM_3XZONLY_Vc: {
+                result = Lighting30Shader::spPass[3].m_pObject;
+                break;
+            }
+            case BSShaderManager::BSSM_3XZONLY_SVc: {
+                result = Lighting30Shader::spPass[4].m_pObject;
+                break;
+            }
+            case BSShaderManager::BSSM_3XZONLY_TEXEFFECT: {
+                NiD3DPass* v6 = Lighting30Shader::spPass[5].m_pObject;
+                UpdatePipelineZOnlyTexEffect(apL30Prop, Lighting30Shader::spPass[5].m_pObject);
+                result = v6;
+                break;
+            }
+            case BSShaderManager::BSSM_3XZONLY_TEXEFFECT_S: {
+                NiD3DPass* v7 = Lighting30Shader::spPass[6].m_pObject;
+                UpdatePipelineZOnlyTexEffect(apL30Prop, Lighting30Shader::spPass[6].m_pObject);
+                result = v7;
+                break;
+            }
+            default: {
+                goto LABEL_130;
             }
         }
     }

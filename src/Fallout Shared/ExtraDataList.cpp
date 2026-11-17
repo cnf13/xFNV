@@ -1336,24 +1336,22 @@ void ExtraDataList::InitLoadGame(BGSLoadFormBuffer* apLoadGameBuffer, TESForm* a
     }
     if (apLoadGameBuffer->GetChangeFlags().CheckFlags(xDataTypeToChangeFlag[13])) {
         ExtraScript* pscriptExtra = static_cast<ExtraScript*>(GetExtraData(13));
-        if (pscriptExtra) {
-            if (apBaseObject) {
-                Script* FormScript;
-                TESScriptableForm* pscriptableForm = nullptr;
-                if (pactor) {
-                    TESActorBase* pactorBase = pactor->GetActorBase();
-                    if (pactorBase) {
-                        pscriptableForm = static_cast<TESScriptableForm*>(pactorBase);
-                    }
+        if ((pscriptExtra) && (apBaseObject)) {
+            Script* FormScript;
+            TESScriptableForm* pscriptableForm = nullptr;
+            if (pactor) {
+                TESActorBase* pactorBase = pactor->GetActorBase();
+                if (pactorBase) {
+                    pscriptableForm = static_cast<TESScriptableForm*>(pactorBase);
                 }
-                else {
-                    pscriptableForm = dynamic_cast<TESScriptableForm*>(apBaseObject);
-                }
-                if (!pscriptableForm ||
-                    (!pscriptExtra->pScript ||
-                     (FormScript = pscriptableForm->pFormScript, FormScript != pscriptExtra->pScript))) {
-                    RemoveExtra(13);
-                }
+            }
+            else {
+                pscriptableForm = dynamic_cast<TESScriptableForm*>(apBaseObject);
+            }
+            if (!pscriptableForm ||
+                (!pscriptExtra->pScript ||
+                 (FormScript = pscriptableForm->pFormScript, FormScript != pscriptExtra->pScript))) {
+                RemoveExtra(13);
             }
         }
     }
@@ -1548,11 +1546,9 @@ void ExtraDataList::InitLoadGame(BGSLoadFormBuffer* apLoadGameBuffer, TESForm* a
             }
             if (apLoadGameBuffer->GetChangeFlags().CheckFlags(xDataTypeToChangeFlag[112])) {
                 ExtraPackageData* pextraPackageData = static_cast<ExtraPackageData*>(GetExtraData(112));
-                if (pextraPackageData) {
-                    if (pextraPackageData->pActorPackageData) {
-                        TESPackage* ppackage = GetPackageExtra();
-                        pextraPackageData->pActorPackageData->InitLoadGame(apLoadGameBuffer);
-                    }
+                if ((pextraPackageData) && (pextraPackageData->pActorPackageData)) {
+                    TESPackage* ppackage = GetPackageExtra();
+                    pextraPackageData->pActorPackageData->InitLoadGame(apLoadGameBuffer);
                 }
             }
             if (apLoadGameBuffer->GetChangeFlags().CheckFlags(xDataTypeToChangeFlag[60])) {
@@ -1574,10 +1570,8 @@ void ExtraDataList::InitLoadGame(BGSLoadFormBuffer* apLoadGameBuffer, TESForm* a
             }
             if (apLoadGameBuffer->GetChangeFlags().CheckFlags(xDataTypeToChangeFlag[26])) {
                 ExtraTresPassPackage* pextraTresPassPackage = static_cast<ExtraTresPassPackage*>(GetExtraData(26));
-                if (pextraTresPassPackage) {
-                    if (pextraTresPassPackage->pPack) {
-                        pextraTresPassPackage->pPack->InitLoadGame(apLoadGameBuffer);
-                    }
+                if ((pextraTresPassPackage) && (pextraTresPassPackage->pPack)) {
+                    pextraTresPassPackage->pPack->InitLoadGame(apLoadGameBuffer);
                 }
             }
             if (apLoadGameBuffer->GetChangeFlags().CheckFlags(xDataTypeToChangeFlag[70])) {
@@ -1669,11 +1663,11 @@ void ExtraDataList::SaveGame(BGSSaveFormBuffer* apSaveGameBuffer) {
     while (pExtra) {
         uint8_t cextraType = pExtra->GetExtraType();
         bool bsaveExtra = false;
-        if (xDataTypeToChangeFlag[cextraType]) {
-            if (apSaveGameBuffer->GetChangeFlags().CheckFlags(xDataTypeToChangeFlag[cextraType])) {
-                bsaveExtra = true;
-            }
+        if ((xDataTypeToChangeFlag[cextraType]) &&
+            (apSaveGameBuffer->GetChangeFlags().CheckFlags(xDataTypeToChangeFlag[cextraType]))) {
+            bsaveExtra = true;
         }
+
         // Extras whose change flag has bit 30 are saved only for created forms.
         if (!bcreated && bsaveExtra && (xDataTypeToChangeFlag[cextraType] & 0x40000000) != 0) {
             bsaveExtra = false;
@@ -2761,18 +2755,17 @@ void ExtraDataList::SaveGame(uint32_t aiFlags, TESObjectREFR* apRef) {
         void* ptempBuffer = pSaveLoadGameOLD->m_pBuffer;
         switch (work->cEtype) {
             case EXTRA_PERSISTENT_CELL: {
-                if (apRef) {
-                    if (apRef->IsActor()) {
-                        pSaveLoadGameOLD->SaveGameDataOLD(&cextratype, 1u);
-                        ExtraPersistentCell* ppersistentCell = dynamic_cast<ExtraPersistentCell*>(work);
-                        CastingType = 0;
-                        if (ppersistentCell->pPersistentCell) {
-                            TESWorldSpace* WorldSpace = ppersistentCell->pPersistentCell->GetWorldSpace();
-                            CastingType = WorldSpace->iFormID;
-                        }
-                        pSaveLoadGameOLD->SaveNumericID(&CastingType, 4u);
+                if ((apRef) && (apRef->IsActor())) {
+                    pSaveLoadGameOLD->SaveGameDataOLD(&cextratype, 1u);
+                    ExtraPersistentCell* ppersistentCell = dynamic_cast<ExtraPersistentCell*>(work);
+                    CastingType = 0;
+                    if (ppersistentCell->pPersistentCell) {
+                        TESWorldSpace* WorldSpace = ppersistentCell->pPersistentCell->GetWorldSpace();
+                        CastingType = WorldSpace->iFormID;
                     }
+                    pSaveLoadGameOLD->SaveNumericID(&CastingType, 4u);
                 }
+
                 break;
             }
             case EXTRA_PACKAGESTARTLOC: {
@@ -3508,11 +3501,10 @@ void ExtraDataList::Revert(uint32_t aiFlags, TESObjectREFR* apRef) {
     if (apRef) {
         bActor = (uint8_t)apRef->IsActor();
     }
-    if (((aiFlags & 131072) != 0) && (!bActor)) {
-        if (GetTeleport()) {
-            RemoveTeleportPtr();
-        }
+    if ((((aiFlags & 131072) != 0) && (!bActor)) && (GetTeleport())) {
+        RemoveTeleportPtr();
     }
+
     if ((aiFlags & 268435456) != 0) {
         RemoveLastFinishedSequence();
     }
@@ -3758,19 +3750,18 @@ ExtraLight* ExtraDataList::SetSpellEffectLightPtr(LightRefData* apLight) {
         ExtraData->pLight = apLight;
         return ExtraData;
     }
-    else {
-        ExtraLight* v3;
-        ExtraLight* apMemory = static_cast<ExtraLight*>(ourMalloc(sizeof(ExtraLight)));
-        if (apMemory) {
-            v3 = ::new (apMemory) ExtraLight(apLight);
-        }
-        else {
-            v3 = nullptr;
-        }
-        v3->cEtype = 64;
-        AddExtra(v3);
-        return v3;
+
+    ExtraLight* v3;
+    ExtraLight* apMemory = static_cast<ExtraLight*>(ourMalloc(sizeof(ExtraLight)));
+    if (apMemory) {
+        v3 = ::new (apMemory) ExtraLight(apLight);
     }
+    else {
+        v3 = nullptr;
+    }
+    v3->cEtype = 64;
+    AddExtra(v3);
+    return v3;
 }
 
 NiPoint3 ExtraDataList::GetStartingAngle(TESObjectREFR* apObject) {
@@ -3797,9 +3788,8 @@ int32_t ExtraDataList::GetFriendHitCount() {
     if (extraData) {
         return static_cast<ExtraFriendHits*>(extraData)->GetHitCount();
     }
-    else {
-        return 0;
-    }
+
+    return 0;
 }
 
 void ExtraDataList::SetSeenData(SeenData* apData) {
@@ -4163,18 +4153,17 @@ ExtraAnim* ExtraDataList::SetAnimPtr(Animation* apAnim) {
         apExtra->pAnimation = apAnim;
         return apExtra;
     }
-    else {
-        ExtraAnim* v3;
-        ExtraAnim* apMemory = static_cast<ExtraAnim*>(ourMalloc(sizeof(ExtraAnim)));
-        if (apMemory) {
-            v3 = ::new (apMemory) ExtraAnim(apAnim);
-        }
-        else {
-            v3 = nullptr;
-        }
-        AddExtra(v3);
-        return v3;
+
+    ExtraAnim* v3;
+    ExtraAnim* apMemory = static_cast<ExtraAnim*>(ourMalloc(sizeof(ExtraAnim)));
+    if (apMemory) {
+        v3 = ::new (apMemory) ExtraAnim(apAnim);
     }
+    else {
+        v3 = nullptr;
+    }
+    AddExtra(v3);
+    return v3;
 }
 
 LightRefData* ExtraDataList::GetLight() {
@@ -4352,9 +4341,8 @@ TESObjectREFR* ExtraDataList::GetPortalLinkedRoomRef(int32_t aiWhich) {
     if (pExtraData->pData) {
         return pExtraData->pData->pLinkedRefs[aiWhich];
     }
-    else {
-        return nullptr;
-    }
+
+    return nullptr;
 }
 
 MultiBoundMarkerData* ExtraDataList::GetMultiBoundData() {
@@ -4400,11 +4388,10 @@ uint16_t ExtraDataList::GetSaveSize(uint32_t aiFlags, TESObjectREFR* apRef) {
         uint16_t itempsize = isize;
         switch (work->cEtype) {
             case EXTRA_PERSISTENT_CELL: {
-                if (apRef) {
-                    if (apRef->IsActor()) {
-                        isize += 4;
-                    }
+                if ((apRef) && (apRef->IsActor())) {
+                    isize += 4;
                 }
+
                 break;
             }
             case EXTRA_PACKAGESTARTLOC: {
@@ -4417,12 +4404,12 @@ uint16_t ExtraDataList::GetSaveSize(uint32_t aiFlags, TESObjectREFR* apRef) {
             case EXTRA_PACKAGE: {
                 ExtraPackage* pPackage = dynamic_cast<ExtraPackage*>(work);
                 isize += 14;
-                if (pSaveLoadGameOLD->GetCurrentVersion() >= 64) {
-                    if (pDataHandler->IsFormIDCreated(pPackage->pPack->iFormID)) {
-                        isize += 1;
-                        isize += pPackage->pPack->GetSaveSize();
-                    }
+                if ((pSaveLoadGameOLD->GetCurrentVersion() >= 64) &&
+                    (pDataHandler->IsFormIDCreated(pPackage->pPack->iFormID))) {
+                    isize += 1;
+                    isize += pPackage->pPack->GetSaveSize();
                 }
+
                 break;
             }
             case EXTRA_RUN_ONCE_PACKAGES: {
@@ -4972,9 +4959,8 @@ SeenData* ExtraDataList::GetSeenData() {
     if (extraData) {
         return extraData->pSeenData;
     }
-    else {
-        return nullptr;
-    }
+
+    return nullptr;
 }
 
 TESActorBase* ExtraDataList::GetLevCreaTemplate() {
@@ -5089,9 +5075,8 @@ BSSimpleList<REF_REFLECTOR_DATA*>* ExtraDataList::GetReflectorRefs() {
     if (pextra) {
         return &pextra->RefList;
     }
-    else {
-        return nullptr;
-    }
+
+    return nullptr;
 }
 
 // The package is deleted from the save only when GetLoading (a stub that returns false) says a save is loading.
@@ -5153,9 +5138,8 @@ TESObjectREFR* ExtraDataList::GetActionRef() {
     if (extraData) {
         return extraData->pActionRef;
     }
-    else {
-        return nullptr;
-    }
+
+    return nullptr;
 }
 
 ExtraTalkingActor* ExtraDataList::GetTalkingActorExtra() {
@@ -5181,14 +5165,12 @@ TESObjectREFR* ExtraDataList::SetInWaterZone(WaterZone* apZone, bool abValue) {
         if (pextra->pHighestWaterZone) {
             return pextra->pHighestWaterZone->pRef;
         }
-        else {
-            return nullptr;
-        }
-    }
-    else {
-        RemoveExtra(pextra, true);
+
         return nullptr;
     }
+
+    RemoveExtra(pextra, true);
+    return nullptr;
 }
 
 bool ExtraDataList::GetIgnoredBySandbox() {
@@ -5931,9 +5913,8 @@ TESRegionList* ExtraDataList::GetRegionList() {
     if (extraData) {
         return extraData->pList;
     }
-    else {
-        return nullptr;
-    }
+
+    return nullptr;
 }
 
 // A different old list is destroyed through its virtual deleting destructor.
@@ -6889,12 +6870,11 @@ void ExtraDataList::SetCell3D(NiNode* apObjectRoot) {
     if (apObjectRoot) {
         goto LABEL_6;
     }
-    if (pExtra) {
-        if (pExtra->spCellNode.operator==(nullptr)) {
-            RemoveExtra(pExtra, true);
-            pExtra = nullptr;
-        }
+    if ((pExtra) && (pExtra->spCellNode.operator==(nullptr))) {
+        RemoveExtra(pExtra, true);
+        pExtra = nullptr;
     }
+
     if (pExtra) {
     LABEL_6:;
         if (!pExtra) {
@@ -6965,19 +6945,18 @@ void ExtraDataList::SetTrespassPackageExtra(TrespassPackage* apPack) {
 }
 
 void ExtraDataList::AddRoomLinkedRoomRef(TESObjectREFR* apRef) {
-    if (!GetRoomLinkedRefData()) {
-        if (apRef) {
-            RoomRefData* v2;
-            RoomRefData* apMemory = static_cast<RoomRefData*>(ourMalloc(sizeof(RoomRefData)));
-            if (apMemory) {
-                v2 = ::new (apMemory) RoomRefData;
-            }
-            else {
-                v2 = nullptr;
-            }
-            SetRoomLinkedRefData(v2);
+    if ((!GetRoomLinkedRefData()) && (apRef)) {
+        RoomRefData* v2;
+        RoomRefData* apMemory = static_cast<RoomRefData*>(ourMalloc(sizeof(RoomRefData)));
+        if (apMemory) {
+            v2 = ::new (apMemory) RoomRefData;
         }
+        else {
+            v2 = nullptr;
+        }
+        SetRoomLinkedRefData(v2);
     }
+
     RoomRefData* RoomLinkedRefData = GetRoomLinkedRefData();
     if (!RoomLinkedRefData->kRoomList.IsInList(apRef)) {
         RoomLinkedRefData->kRoomList.AddHead(apRef);
@@ -8332,9 +8311,8 @@ OcclusionPlaneLinkedRefData* ExtraDataList::GetOcclusionPlaneLinkedRefData() {
     if (extraData) {
         return extraData->pData;
     }
-    else {
-        return nullptr;
-    }
+
+    return nullptr;
 }
 
 // The sub-buffer is a stack copy of the extra's buffer pointer; the extra forgets the buffer before it is removed.
@@ -8393,19 +8371,18 @@ void ExtraDataList::SetStartingWorldOrCellForRef(TESObjectREFR* apRef) {
 }
 
 void ExtraDataList::AddRoomLinkedPortalRef(TESObjectREFR* apRef) {
-    if (!GetRoomLinkedRefData()) {
-        if (apRef) {
-            RoomRefData* pNewData;
-            void* pMemory = ourMalloc(sizeof(RoomRefData));
-            if (pMemory) {
-                pNewData = ::new (pMemory) RoomRefData;
-            }
-            else {
-                pNewData = nullptr;
-            }
-            SetRoomLinkedRefData(pNewData);
+    if ((!GetRoomLinkedRefData()) && (apRef)) {
+        RoomRefData* pNewData;
+        void* pMemory = ourMalloc(sizeof(RoomRefData));
+        if (pMemory) {
+            pNewData = ::new (pMemory) RoomRefData;
         }
+        else {
+            pNewData = nullptr;
+        }
+        SetRoomLinkedRefData(pNewData);
     }
+
     RoomRefData* pData = GetRoomLinkedRefData();
     if (!pData->kPortalList.IsInList(apRef)) {
         pData->kPortalList.AddHead(apRef);
@@ -8475,9 +8452,8 @@ BSPortal* ExtraDataList::GetPortal() {
     if (extraData) {
         return static_cast<ExtraPortal*>(extraData)->spPortal.m_pObject;
     }
-    else {
-        return nullptr;
-    }
+
+    return nullptr;
 }
 
 PortalLinkedRefData* ExtraDataList::GetPortalLinkedRefData() {
@@ -8643,9 +8619,8 @@ TESObjectREFR* ExtraDataList::GetLinkedPlaneRef(int32_t aiEdge) {
     if (occlusionPlaneLinkedRefData) {
         return occlusionPlaneLinkedRefData->pLinkedRefs[aiEdge];
     }
-    else {
-        return nullptr;
-    }
+
+    return nullptr;
 }
 
 void ExtraDataList::RemoveAllSaveableData(uint32_t aiFlags, TESObjectREFR* apRef) {
@@ -8656,11 +8631,9 @@ void ExtraDataList::RemoveAllSaveableData(uint32_t aiFlags, TESObjectREFR* apRef
     }
     if (v5) {
         persistentCell = GetPersistentCell();
-        if (persistentCell) {
-            if (apRef->TESObjectREFR::GetParentCell()) {
-                SetPersistentCell(nullptr);
-                persistentCell->RemoveReference(apRef);
-            }
+        if ((persistentCell) && (apRef->TESObjectREFR::GetParentCell())) {
+            SetPersistentCell(nullptr);
+            persistentCell->RemoveReference(apRef);
         }
     }
 }
@@ -8693,9 +8666,8 @@ REF_ACTIVATE_DATA* ExtraDataList::GetActivateData(TESObjectREFR* apRef) {
     if (extraData) {
         return static_cast<ExtraActivateRef*>(extraData)->GetData(apRef);
     }
-    else {
-        return nullptr;
-    }
+
+    return nullptr;
 }
 
 float ExtraDataList::GetActivateDelay(TESObjectREFR* apRef) {
@@ -8704,9 +8676,8 @@ float ExtraDataList::GetActivateDelay(TESObjectREFR* apRef) {
     if (extraData && ((data = static_cast<ExtraActivateRef*>(extraData)->GetData(apRef)) != nullptr)) {
         return data->fActivateDelay;
     }
-    else {
-        return 0.0;
-    }
+
+    return 0.0;
 }
 
 void ExtraDataList::RemoveFollowerExtra() {
@@ -8731,9 +8702,8 @@ AlchemyItem* ExtraDataList::GetPoison() {
     if (extraData) {
         return extraData->pPoison;
     }
-    else {
-        return nullptr;
-    }
+
+    return nullptr;
 }
 
 bool ExtraDataList::HasOnlyOwnershipNonDefault() {
@@ -8810,9 +8780,8 @@ int32_t ExtraDataList::GetPackageExtraIndex() {
     if (extraData) {
         return extraData->iindex;
     }
-    else {
-        return 0;
-    }
+
+    return 0;
 }
 
 TESObjectREFR* ExtraDataList::GetPackageExtraTarget() {
@@ -8820,9 +8789,8 @@ TESObjectREFR* ExtraDataList::GetPackageExtraTarget() {
     if (extraData) {
         return extraData->pTarg;
     }
-    else {
-        return nullptr;
-    }
+
+    return nullptr;
 }
 
 void ExtraDataList::SetPackageExtraActionComplete(bool abFlag) {
@@ -8837,9 +8805,8 @@ ActorPackageData* ExtraDataList::GetActorPackageData() {
     if (extraData) {
         return extraData->pActorPackageData;
     }
-    else {
-        return nullptr;
-    }
+
+    return nullptr;
 }
 
 void ExtraDataList::SetExtraSayToResponseIDOnExtra(uint32_t anResponseID) {
@@ -9017,18 +8984,17 @@ void ExtraDataList::SetDistantDataNormal(const NiPoint3& aNormal) {
 void ExtraDataList::SetLinkedPlaneRef(TESObjectREFR* apRef, int32_t aiEdge) {
     OcclusionPlaneLinkedRefData* v3;
     void* v5;
-    if (!GetOcclusionPlaneLinkedRefData()) {
-        if (apRef) {
-            v5 = ourMalloc(sizeof(OcclusionPlaneLinkedRefData));
-            if (v5) {
-                v3 = ::new (v5) OcclusionPlaneLinkedRefData;
-            }
-            else {
-                v3 = nullptr;
-            }
-            SetOcclusionPlaneLinkedRefData(v3);
+    if ((!GetOcclusionPlaneLinkedRefData()) && (apRef)) {
+        v5 = ourMalloc(sizeof(OcclusionPlaneLinkedRefData));
+        if (v5) {
+            v3 = ::new (v5) OcclusionPlaneLinkedRefData;
         }
+        else {
+            v3 = nullptr;
+        }
+        SetOcclusionPlaneLinkedRefData(v3);
     }
+
     OcclusionPlaneLinkedRefData* occlusionPlaneLinkedRefData = GetOcclusionPlaneLinkedRefData();
     if (occlusionPlaneLinkedRefData) {
         occlusionPlaneLinkedRefData->pLinkedRefs[aiEdge] = apRef;
@@ -9042,18 +9008,17 @@ void ExtraDataList::SetPortalLinkedRoomRef(int32_t aiWhich, TESObjectREFR* apRef
     TESObjectREFR* masterRoom;
     PortalLinkedRefData* v7;
     void* v9;
-    if (!GetPortalLinkedRefData()) {
-        if (apRef) {
-            v9 = ourMalloc(sizeof(PortalLinkedRefData));
-            if (v9) {
-                v7 = ::new (v9) PortalLinkedRefData;
-            }
-            else {
-                v7 = nullptr;
-            }
-            SetPortalLinkedRefData(v7);
+    if ((!GetPortalLinkedRefData()) && (apRef)) {
+        v9 = ourMalloc(sizeof(PortalLinkedRefData));
+        if (v9) {
+            v7 = ::new (v9) PortalLinkedRefData;
         }
+        else {
+            v7 = nullptr;
+        }
+        SetPortalLinkedRefData(v7);
     }
+
     PortalLinkedRefData* portalLinkedRefData = GetPortalLinkedRefData();
     if (portalLinkedRefData) {
         portalLinkedRefData->pLinkedRefs[aiWhich] = apRef;
@@ -9140,35 +9105,25 @@ void ExtraDataList::FinishLoadGame(BGSLoadFormBuffer* apLoadGameBuffer) {
     TESObjectREFR* pref = apLoadGameBuffer->GetReference();
     if (apLoadGameBuffer->GetChangeFlags().CheckFlags(xDataTypeToChangeFlag[117])) {
         ExtraSayToTopicInfo* pextraSayToTopicInfo = static_cast<ExtraSayToTopicInfo*>(GetExtraData(117));
-        if (pextraSayToTopicInfo) {
-            if (pref) {
-                if (pref->IsMobileObject()) {
-                    if (pextraSayToTopicInfo->pTopic && pextraSayToTopicInfo->pInfo) {
-                        // The callback's context is the reference's form ID.
-                        MobileObject::SayToCallBack(
-                            reinterpret_cast<void*>(static_cast<uintptr_t>(pref->iFormID)), true
-                        );
-                    }
-                    else {
-                        MobileObject::SayToCallBack(
-                            reinterpret_cast<void*>(static_cast<uintptr_t>(pref->iFormID)), false
-                        );
-                    }
+        if ((pextraSayToTopicInfo) && (pref)) {
+            if (pref->IsMobileObject()) {
+                if (pextraSayToTopicInfo->pTopic && pextraSayToTopicInfo->pInfo) {
+                    // The callback's context is the reference's form ID.
+                    MobileObject::SayToCallBack(reinterpret_cast<void*>(static_cast<uintptr_t>(pref->iFormID)), true);
                 }
                 else {
-                    pextraSayToTopicInfo->bVoiceDone = true;
+                    MobileObject::SayToCallBack(reinterpret_cast<void*>(static_cast<uintptr_t>(pref->iFormID)), false);
                 }
+            }
+            else {
+                pextraSayToTopicInfo->bVoiceDone = true;
             }
         }
     }
-    if (pref) {
-        if (apLoadGameBuffer->GetChangeFlags().CheckFlags(xDataTypeToChangeFlag[51])) {
-            NonActorMagicTarget* pextraNonActorMagicTarget = static_cast<NonActorMagicTarget*>(GetExtraData(51));
-            if (pextraNonActorMagicTarget) {
-                ActiveEffect::FinishLoadActiveEffectList(
-                    apLoadGameBuffer, &pextraNonActorMagicTarget->lActiveEffectList
-                );
-            }
+    if ((pref) && (apLoadGameBuffer->GetChangeFlags().CheckFlags(xDataTypeToChangeFlag[51]))) {
+        NonActorMagicTarget* pextraNonActorMagicTarget = static_cast<NonActorMagicTarget*>(GetExtraData(51));
+        if (pextraNonActorMagicTarget) {
+            ActiveEffect::FinishLoadActiveEffectList(apLoadGameBuffer, &pextraNonActorMagicTarget->lActiveEffectList);
         }
     }
 }
@@ -9337,10 +9292,8 @@ void ExtraDataList::CopyListForContainer(ExtraDataList* apCopy, bool abDontRemov
                 break;
             }
         }
-        if (pHead) {
-            if (v4) {
-                pHead = pHead->pNext;
-            }
+        if ((pHead) && (v4)) {
+            pHead = pHead->pNext;
         }
     }
     (&BaseExtraList::ExtraCritSection)->Unlock();
@@ -9349,10 +9302,8 @@ void ExtraDataList::CopyListForContainer(ExtraDataList* apCopy, bool abDontRemov
 void ExtraDataList::ClearTrespassPackage(TESPackage* apPackage) {
     ExtraTresPassPackage* result =
         static_cast<ExtraTresPassPackage*>(BaseExtraList::GetExtraData(EXTRA_TRESPASS_PACKAGE));
-    if (result) {
-        if (result->pPack == apPackage) {
-            result->pPack = nullptr;
-        }
+    if ((result) && (result->pPack == apPackage)) {
+        result->pPack = nullptr;
     }
 }
 
@@ -9433,10 +9384,9 @@ void ExtraDataList::LoadGameBGS(BGSLoadFormBuffer* a1) {
     ourMemset(apDest, 0, 147u);
     for (BSExtraData* pextra = this->pHead; pextra; pextra = pextra->pNext) {
         uint8_t cextraType = pextra->cEtype;
-        if (xDataTypeToChangeFlag[cextraType]) {
-            if (a1->GetChangeFlags().CheckFlags(xDataTypeToChangeFlag[cextraType])) {
-                apDest[cextraType] = true;
-            }
+        if ((xDataTypeToChangeFlag[cextraType]) &&
+            (a1->GetChangeFlags().CheckFlags(xDataTypeToChangeFlag[cextraType]))) {
+            apDest[cextraType] = true;
         }
     }
     uint32_t iextraCount = a1->LoadVariableSizedValue();
@@ -9931,11 +9881,10 @@ void ExtraDataList::LoadGameBGS(BGSLoadFormBuffer* a1) {
                     ExtraData = nullptr;
                 }
                 ExtraMapMarker* pextraMapMarker = static_cast<ExtraMapMarker*>(ExtraData);
-                if (ExtraData) {
-                    if (pextraMapMarker->pMapData) {
-                        pextraMapMarker->pMapData->SetFlags(cflags);
-                    }
+                if ((ExtraData) && (pextraMapMarker->pMapData)) {
+                    pextraMapMarker->pMapData->SetFlags(cflags);
                 }
+
                 break;
             }
             case 46: {
@@ -9977,11 +9926,11 @@ void ExtraDataList::LoadGameBGS(BGSLoadFormBuffer* a1) {
                 TESActorBase* pnewActorBase_2 = nullptr;
                 bool bcreatedTempActorBase = false;
                 bool bresetInventory = false;
-                if (pcurrentTemplate != pleveledCreature_2->pTemplate) {
-                    if (!a1->GetChangeFlags().CheckFlags(CHANGE_REFR_LEVELED_INVENTORY | CHANGE_REFR_INVENTORY)) {
-                        bresetInventory = true;
-                    }
+                if ((pcurrentTemplate != pleveledCreature_2->pTemplate) &&
+                    (!a1->GetChangeFlags().CheckFlags(CHANGE_REFR_LEVELED_INVENTORY | CHANGE_REFR_INVENTORY))) {
+                    bresetInventory = true;
                 }
+
                 if (bresetInventory) {
                     (&pactor->m_Extra)->RemoveContainerChanges();
                     pactor->ClearProcessItems();
@@ -10667,10 +10616,9 @@ void ExtraDataList::LoadGameBGS(BGSLoadFormBuffer* a1) {
                     this->RemoveExtra(pcurrentDismemberedLimbs_2, false);
                 }
                 else {
-                    if (a1->GetOldChangeFlags().CheckFlags(CHANGE_ACTOR_EXTRA_DISMEMBERED_LIMBS)) {
-                        if (pactor->Get3D()) {
-                            pactor->ClearDismemberedLimbs();
-                        }
+                    if ((a1->GetOldChangeFlags().CheckFlags(CHANGE_ACTOR_EXTRA_DISMEMBERED_LIMBS)) &&
+                        (pactor->Get3D())) {
+                        pactor->ClearDismemberedLimbs();
                     }
                 }
                 ExtraDismemberedLimbs* v225 =
@@ -11393,13 +11341,10 @@ void ExtraDataList::Revert_0042DAE0(BGSLoadFormBuffer* apLoadGameBuffer) {
                 v11 = 1;
             }
         }
-        if (!IsFormIDCreated) {
-            if (v11) {
-                if ((xDataTypeToChangeFlag[i] & CHANGE_REFR_EXTRA_CREATED_ONLY) != 0) {
-                    v11 = 0;
-                }
-            }
+        if ((!IsFormIDCreated) && (v11) && ((xDataTypeToChangeFlag[i] & CHANGE_REFR_EXTRA_CREATED_ONLY) != 0)) {
+            v11 = 0;
         }
+
         if (v11) {
             switch (i) {
                 case 13u:
@@ -11429,10 +11374,8 @@ MenuTopic* ExtraDataList::GetInfoGeneralTopic(TESObjectREFR* apSpeaker) {
     ExtraInfoGeneralTopic* pextra = static_cast<ExtraInfoGeneralTopic*>(GetExtraData(77));
     if (pextra) {
         pItem = pextra->pInfoGen;
-        if (pItem) {
-            if (pItem->GetResponseListEmpty()) {
-                pItem->FillResponseList(apSpeaker);
-            }
+        if ((pItem) && (pItem->GetResponseListEmpty())) {
+            pItem->FillResponseList(apSpeaker);
         }
     }
     return pItem;

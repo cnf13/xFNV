@@ -30,32 +30,25 @@ hkpConstraintCollisionFilter::hkpConstraintCollisionFilter(const hkpCollisionFil
 hkpConstraintCollisionFilter::~hkpConstraintCollisionFilter() {}
 
 void hkpConstraintCollisionFilter::constraintAddedCallback(hkpConstraintInstance* constraint) {
-    if (constraint) {
-        if (constraint->getDataRw()->getType() != 11) {
-            hkpEntity* v3 = constraint->m_entities[0];
-            if (v3->m_collidable.m_shape) {
-                if (constraint->m_entities[1]->m_collidable.m_shape) {
-                    if (disableCollisionsBetween(v3, constraint->m_entities[1]) == 1) {
-                        hkpAgentNnEntry* Agent = hkAgentNnMachine_FindAgent(
-                            &constraint->m_entities[0]->m_collidable, &constraint->m_entities[1]->m_collidable
-                        );
-                        if (Agent) {
-                            hkpWorld* m_world = v3->m_world;
-                            if (m_world) {
-                                ++m_world->m_criticalOperationsLockCount;
-                                hkpWorldAgentUtil::removeAgentAndItsToiEvents(Agent);
-                                if (m_world->m_criticalOperationsLockCount-- == 1 &&
-                                    !m_world->m_blockExecutingPendingOperations.m_bool) {
-                                    if (m_world->m_pendingOperationsCount) {
-                                        m_world->internal_executePendingOperations();
-                                    }
-                                    if (m_world->m_pendingOperationQueueCount == 1) {
-                                        if (m_world->m_pendingBodyOperationsCount) {
-                                            m_world->internal_executePendingBodyOperations();
-                                        }
-                                    }
-                                }
-                            }
+    if ((constraint) && (constraint->getDataRw()->getType() != 11)) {
+        hkpEntity* v3 = constraint->m_entities[0];
+        if ((v3->m_collidable.m_shape) && (constraint->m_entities[1]->m_collidable.m_shape) &&
+            (disableCollisionsBetween(v3, constraint->m_entities[1]) == 1)) {
+            hkpAgentNnEntry* Agent = hkAgentNnMachine_FindAgent(
+                &constraint->m_entities[0]->m_collidable, &constraint->m_entities[1]->m_collidable
+            );
+            if (Agent) {
+                hkpWorld* m_world = v3->m_world;
+                if (m_world) {
+                    ++m_world->m_criticalOperationsLockCount;
+                    hkpWorldAgentUtil::removeAgentAndItsToiEvents(Agent);
+                    if (m_world->m_criticalOperationsLockCount-- == 1 &&
+                        !m_world->m_blockExecutingPendingOperations.m_bool) {
+                        if (m_world->m_pendingOperationsCount) {
+                            m_world->internal_executePendingOperations();
+                        }
+                        if ((m_world->m_pendingOperationQueueCount == 1) && (m_world->m_pendingBodyOperationsCount)) {
+                            m_world->internal_executePendingBodyOperations();
                         }
                     }
                 }
@@ -65,30 +58,24 @@ void hkpConstraintCollisionFilter::constraintAddedCallback(hkpConstraintInstance
 }
 
 void hkpConstraintCollisionFilter::constraintRemovedCallback(hkpConstraintInstance* constraint) {
-    if (constraint) {
-        if (constraint->getDataRw()->getType() != 11) {
-            hkpEntity* v4 = constraint->m_entities[0];
-            if (v4->m_collidable.m_shape) {
-                hkpEntity* v5 = constraint->m_entities[1];
-                if (v5->m_collidable.m_shape) {
-                    if (enableCollisionsBetween(v4, v5) <= 0 &&
-                        (!m_childFilter ||
-                         m_childFilter->isCollisionEnabled(v4->m_collidable, v5->m_collidable).m_bool)) {
-                        hkpWorld* m_world = v4->m_world;
-                        if (m_world) {
-                            ++m_world->m_criticalOperationsLockCount;
-                            m_world->reenableCollisionBetweenEntityPair(v4, v5);
-                            if (m_world->m_criticalOperationsLockCount-- == 1 &&
-                                !m_world->m_blockExecutingPendingOperations.m_bool) {
-                                if (m_world->m_pendingOperationsCount) {
-                                    m_world->internal_executePendingOperations();
-                                }
-                                if (m_world->m_pendingOperationQueueCount == 1) {
-                                    if (m_world->m_pendingBodyOperationsCount) {
-                                        m_world->internal_executePendingBodyOperations();
-                                    }
-                                }
-                            }
+    if ((constraint) && (constraint->getDataRw()->getType() != 11)) {
+        hkpEntity* v4 = constraint->m_entities[0];
+        if (v4->m_collidable.m_shape) {
+            hkpEntity* v5 = constraint->m_entities[1];
+            if ((v5->m_collidable.m_shape) &&
+                (enableCollisionsBetween(v4, v5) <= 0 &&
+                 (!m_childFilter || m_childFilter->isCollisionEnabled(v4->m_collidable, v5->m_collidable).m_bool))) {
+                hkpWorld* m_world = v4->m_world;
+                if (m_world) {
+                    ++m_world->m_criticalOperationsLockCount;
+                    m_world->reenableCollisionBetweenEntityPair(v4, v5);
+                    if (m_world->m_criticalOperationsLockCount-- == 1 &&
+                        !m_world->m_blockExecutingPendingOperations.m_bool) {
+                        if (m_world->m_pendingOperationsCount) {
+                            m_world->internal_executePendingOperations();
+                        }
+                        if ((m_world->m_pendingOperationQueueCount == 1) && (m_world->m_pendingBodyOperationsCount)) {
+                            m_world->internal_executePendingBodyOperations();
                         }
                     }
                 }

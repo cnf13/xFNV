@@ -63,11 +63,10 @@ NiD3DVertexShader* NiD3DShaderProgramCreatorAsm::CreateVertexShaderFromFile(
         pkVertexShader->SetSoftwareVertexProcessing(bSoftwareVP);
         return pkVertexShader;
     }
-    else {
-        NiShaderFactory::ReportError(1u, bRecoverable, "Failed CreateVertexShader call on %s\n", pcShaderName);
-        delete pkVertexShader;
-        return nullptr;
-    }
+
+    NiShaderFactory::ReportError(1u, bRecoverable, "Failed CreateVertexShader call on %s\n", pcShaderName);
+    delete pkVertexShader;
+    return nullptr;
 }
 
 NiD3DVertexShader* NiD3DShaderProgramCreatorAsm::CreateVertexShaderFromBuffer(
@@ -111,11 +110,10 @@ NiD3DVertexShader* NiD3DShaderProgramCreatorAsm::CreateVertexShaderFromBuffer(
         pkVertexShader->SetSoftwareVertexProcessing(static_cast<uint8_t>(bSoftwareVP));
         return pkVertexShader;
     }
-    else {
-        NiShaderFactory::ReportError(1u, bRecoverable, "Failed CreateVertexShader call on %s\n", pcShaderName);
-        delete pkVertexShader;
-        return nullptr;
-    }
+
+    NiShaderFactory::ReportError(1u, bRecoverable, "Failed CreateVertexShader call on %s\n", pcShaderName);
+    delete pkVertexShader;
+    return nullptr;
 }
 
 NiD3DPixelShader* NiD3DShaderProgramCreatorAsm::CreatePixelShaderFromFile(
@@ -148,11 +146,10 @@ NiD3DPixelShader* NiD3DShaderProgramCreatorAsm::CreatePixelShaderFromFile(
         pkPixelShader->SetShaderHandle(hShader);
         return pkPixelShader;
     }
-    else {
-        NiShaderFactory::ReportError(1u, bRecoverable, "Failed CreatePixelShader call on %s\n", pcShaderName);
-        delete pkPixelShader;
-        return nullptr;
-    }
+
+    NiShaderFactory::ReportError(1u, bRecoverable, "Failed CreatePixelShader call on %s\n", pcShaderName);
+    delete pkPixelShader;
+    return nullptr;
 }
 
 NiD3DPixelShader* NiD3DShaderProgramCreatorAsm::CreatePixelShaderFromBuffer(
@@ -188,11 +185,10 @@ NiD3DPixelShader* NiD3DShaderProgramCreatorAsm::CreatePixelShaderFromBuffer(
         pkPixelShader->SetShaderHandle(hShader);
         return pkPixelShader;
     }
-    else {
-        NiShaderFactory::ReportError(1u, bRecoverable, "Failed CreatePixelShader call on %s\n", pcShaderName);
-        delete pkPixelShader;
-        return nullptr;
-    }
+
+    NiShaderFactory::ReportError(1u, bRecoverable, "Failed CreatePixelShader call on %s\n", pcShaderName);
+    delete pkPixelShader;
+    return nullptr;
 }
 
 bool NiD3DShaderProgramCreatorAsm::RecreateVertexShader(NiD3DVertexShader* a1) {

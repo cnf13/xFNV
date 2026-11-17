@@ -33,7 +33,7 @@ template <class T>
 void NiTPointerAllocator<T>::Deallocate(void* pkDel) {
     using Pool = NiTAbstractPoolAllocator<T>;
     Pool::ms_kSpinLock.Lock(nullptr);
-    typename Pool::AllocNode* pkAllocNode = static_cast<typename Pool::AllocNode*>(pkDel);
+    typename Pool::AllocNode* pkAllocNode = static_cast<Pool::AllocNode*>(pkDel);
     pkAllocNode->m_pkData = nullptr;
     pkAllocNode->m_pkNext = Pool::ms_pkFreeMem;
     Pool::ms_pkFreeMem = pkAllocNode;

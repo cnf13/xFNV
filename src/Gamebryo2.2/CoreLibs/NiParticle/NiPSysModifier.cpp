@@ -76,10 +76,7 @@ bool NiPSysModifier::IsEqual(NiObject* pkObject) {
     }
 
     NiPSysModifier* pkOther = static_cast<NiPSysModifier*>(pkObject);
-    if (!(m_kName == pkOther->m_kName) || m_uiOrder != pkOther->m_uiOrder || m_bActive != pkOther->m_bActive) {
-        return false;
-    }
-    return true;
+    return !(!(m_kName == pkOther->m_kName) || m_uiOrder != pkOther->m_uiOrder || m_bActive != pkOther->m_bActive);
 }
 
 void NiPSysModifier::GetViewerStrings(NiTPrimitiveArray<char*>* pkStrings) {

@@ -198,7 +198,6 @@ NiObject* NiBSplineTransformInterpolator::CreateObject() {
     if (v0) {
         return ::new (v0) NiBSplineTransformInterpolator(nullptr, 0xFFFFu, 0xFFFFu, 0xFFFFu, nullptr);
     }
-    else {
-        return nullptr;
-    }
+
+    return nullptr;
 }

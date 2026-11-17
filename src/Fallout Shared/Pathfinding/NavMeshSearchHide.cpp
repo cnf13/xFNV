@@ -155,10 +155,8 @@ bool NavMeshSearchHide::IsGoalNode(const AStarNode<NavMeshSearchNode, NavMeshSea
         bproperSide = true;
     }
     else {
-        if (barycentricCoords.z < 0.0) {
-            if (ptriangle->GetEdgeCover(0)) {
-                bproperSide = true;
-            }
+        if ((barycentricCoords.z < 0.0) && (ptriangle->GetEdgeCover(0))) {
+            bproperSide = true;
         }
     }
     if (!bproperSide) {

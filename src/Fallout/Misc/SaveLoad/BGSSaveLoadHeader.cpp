@@ -309,7 +309,6 @@ int32_t BGSSaveLoadFileEntry::Compare(BGSSaveLoadFileEntry* a1, BGSSaveLoadFileE
     if (arFileTime.dwLowDateTime <= result.dwLowDateTime) {
         return (int32_t)((uint8_t)(arFileTime.dwLowDateTime < result.dwLowDateTime));
     }
-    else {
-        return (-1);
-    }
+
+    return (-1);
 }

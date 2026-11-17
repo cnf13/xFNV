@@ -41,10 +41,9 @@ NiObject* NiFogProperty::CreateClone(NiCloningProcess& kCloning) {
         v4->m_kColor.b = m_kColor.b;
         return v4;
     }
-    else {
-        NiObject::CopyMembers(this, kCloning);
-        return this;
-    }
+
+    NiObject::CopyMembers(this, kCloning);
+    return this;
 }
 
 void NiFogProperty::LoadBinary(NiStream& kStream) {

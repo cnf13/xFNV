@@ -161,17 +161,16 @@ uint32_t DebugShader::UpdatePipeline(
         NiD3DShader::m_spCurrentPass = spPass.m_pObject;
         return 0;
     }
-    else {
-        if (v11) {
-            NiDecRefCount(v11);
-        }
-        p_m_spPixelShader->m_pObject = v10;
-        if (v10) {
-            NiIncRefCount(v10);
-        }
-        NiD3DShader::m_spCurrentPass = spPass.m_pObject;
-        return 0;
+
+    if (v11) {
+        NiDecRefCount(v11);
     }
+    p_m_spPixelShader->m_pObject = v10;
+    if (v10) {
+        NiIncRefCount(v10);
+    }
+    NiD3DShader::m_spCurrentPass = spPass.m_pObject;
+    return 0;
 }
 
 void DebugShader::ReloadShaders() {

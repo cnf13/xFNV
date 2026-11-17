@@ -505,7 +505,6 @@ NiObject* NiBoneLODController::CreateObject() {
     if (v0) {
         return ::new (v0) NiBoneLODController;
     }
-    else {
-        return nullptr;
-    }
+
+    return nullptr;
 }

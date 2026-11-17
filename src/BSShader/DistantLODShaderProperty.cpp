@@ -95,20 +95,19 @@ void ClearDistantLODMap() {
     }
     pos = pos_1;
     DistantLODShaderProperty::CachedDistantLOD* val_ = nullptr;
-    if (DistantLODShaderProperty::GetDistantLODMap()->m_kAllocator.m_uiCount) {
-        if (pos_1) {
-            do {
-                uint32_t key;
-                DistantLODShaderProperty::GetDistantLODMap()->GetNext(pos, key, val_);
-                DistantLODShaderProperty::CachedDistantLOD* val__1 = val_;
-                if (val_) {
-                    val_->~CachedDistantLOD();
-                    MemoryManager_Singleton.Deallocate(val__1);
-                }
+    if ((DistantLODShaderProperty::GetDistantLODMap()->m_kAllocator.m_uiCount) && (pos_1)) {
+        do {
+            uint32_t key;
+            DistantLODShaderProperty::GetDistantLODMap()->GetNext(pos, key, val_);
+            DistantLODShaderProperty::CachedDistantLOD* val__1 = val_;
+            if (val_) {
+                val_->~CachedDistantLOD();
+                MemoryManager_Singleton.Deallocate(val__1);
             }
-            while (pos);
         }
+        while (pos);
     }
+
     DistantLODShaderProperty::GetDistantLODMap()->RemoveAll();
     DistantLODShaderProperty::uiLODGeometryCount = 0;
     DistantLODShaderProperty::uiLODCount = 0;
@@ -179,15 +178,16 @@ DistantLODShaderProperty::GetCachedGeometry(DistantLODParam* apDistantLODParam) 
     }
     NiPointer<CachedGeometry> spCachedGeom;
     if (!GetCachedGeometryMap()->GetAt(uiBaseObjectID, spCachedGeom)) {
-        if (!apDistantLODParam->p3DData && apDistantLODParam->pcGeomFilename) {
-            // BSStream's Load is called directly because the stream is a local object.
-            if (pStream->BSStream::Load(apDistantLODParam->pcGeomFilename, nullptr)) {
-                NiObject* pobj = pStream->m_kTopObjects.m_pBase[0].m_pObject;
-                if (pobj) {
-                    apDistantLODParam->p3DData = pobj->IsNode();
-                }
+        if ((!apDistantLODParam->p3DData && apDistantLODParam->pcGeomFilename) &&
+            (pStream->BSStream::Load(apDistantLODParam->pcGeomFilename, nullptr)))
+        // BSStream's Load is called directly because the stream is a local object.
+        {
+            NiObject* pobj = pStream->m_kTopObjects.m_pBase[0].m_pObject;
+            if (pobj) {
+                apDistantLODParam->p3DData = pobj->IsNode();
             }
         }
+
         NiNode* parent = apDistantLODParam->p3DData;
         if (parent) {
             while (!plodgeom) {

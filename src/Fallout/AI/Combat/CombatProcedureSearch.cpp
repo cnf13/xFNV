@@ -159,12 +159,12 @@ void CombatProcedureSearch::Update() {
                 losRequest.SetLOSGridMap(v47);
                 v47.~NiPointer<PathingLOSGridMap>();
                 CombatLocationTarget* plocationTarget = pcombatState->pLocationTarget;
-                if (plocationTarget) {
-                    if (plocationTarget->cType == 1 || (plocationTarget->cType == 2 || plocationTarget->cType == 3)) {
-                        float a2a = pcombatState->GetLocationTargetDistance();
-                        losRequest.SetSearchCenter(plocationTarget->WorldLoc.Point, a2a);
-                    }
+                if ((plocationTarget) &&
+                    (plocationTarget->cType == 1 || (plocationTarget->cType == 2 || plocationTarget->cType == 3))) {
+                    float a2a = pcombatState->GetLocationTargetDistance();
+                    losRequest.SetSearchCenter(plocationTarget->WorldLoc.Point, a2a);
                 }
+
                 if (psearchLocation) {
                     TESForm* v4 = psearchLocation->WorldLoc.pSpace;
                     if (v4 == pattacker->GetSpace()) {
@@ -235,13 +235,12 @@ void CombatProcedureSearch::Update() {
         }
         case CombatProcedureSearch::SEARCH_STATE_SEARCHING_DOOR: {
             if (pattacker->DidPathingFail()) {
-                if (!pattacker->IsPathValid()) {
-                    if (pSearchDoor) {
-                        BGSWorldLocation* WorldLocation = pSearchDoor->GetWorldLocation(&v45);
-                        pcombatState->AddUnreachableLocation(*WorldLocation);
-                        pcombatGroup->FailedToInvestigateSearchDoor(pSearchDoor);
-                    }
+                if ((!pattacker->IsPathValid()) && (pSearchDoor)) {
+                    BGSWorldLocation* WorldLocation = pSearchDoor->GetWorldLocation(&v45);
+                    pcombatState->AddUnreachableLocation(*WorldLocation);
+                    pcombatGroup->FailedToInvestigateSearchDoor(pSearchDoor);
                 }
+
                 if (pattacker->IsPathValid()) {
                     SetFailed("Pathing failed while moving to search door");
                 }
@@ -287,12 +286,10 @@ void CombatProcedureSearch::Update() {
             if (pattacker->DidPathingFail()) {
                 if (!pattacker->IsPathValid()) {
                     PathingLocation* pfailedPathDestination = pattacker->GetFailedPathDestination();
-                    if (pfailedPathDestination) {
-                        if (psearchLOSGridMap) {
-                            pfailedPathDestination->ResolveNavMeshInfo(nullptr);
-                            psearchLOSGridMap->SetLocationSeen(*pfailedPathDestination, true);
-                            pcombatGroup->bUpdateSearchDebugGeometry = true;
-                        }
+                    if ((pfailedPathDestination) && (psearchLOSGridMap)) {
+                        pfailedPathDestination->ResolveNavMeshInfo(nullptr);
+                        psearchLOSGridMap->SetLocationSeen(*pfailedPathDestination, true);
+                        pcombatGroup->bUpdateSearchDebugGeometry = true;
                     }
                 }
                 if (pattacker->IsPathValid()) {
@@ -322,50 +319,49 @@ void CombatProcedureSearch::Update() {
                     }
                 }
                 bool bforceComplete_2 = false;
-                if (psearchLOSGridMap) {
-                    if (CheckDestinationTimer.Check()) {
-                        PathingLocation searchDestination;
-                        if (pattacker->GetCurrentPathfindingGoal(&searchDestination)) {
-                            NiPoint3* a2b = ::new (&result) NiPoint3(searchDestination.GetLocation());
-                            const NiPoint3* v13 = &pattacker->GetLocationOnReference();
-                            NiPoint3 vec = *v13 - *a2b;
-                            float fsquaredDistance = vec.SqrLength();
-                            float* v14 = &fCombatSearchCheckDestinationMaxDistance.Float();
-                            float* v15 = &fCombatSearchCheckDestinationMaxDistance.Float();
-                            if (fsquaredDistance < *v14 * *v15) {
-                                searchDestination.ResolveNavMeshInfo(nullptr);
-                                if (searchDestination.HasNavMeshData() &&
-                                    psearchLOSGridMap->IsLocationSeen(searchDestination)) {
-                                    bforceComplete_2 = true;
-                                    NavMeshPtr spmesh;
-                                    if (searchDestination.GetNavMesh(spmesh)) {
-                                        float* v17;
-                                        float* v18;
-                                        float* v19;
-                                        float* v20;
-                                        uint16_t Triangle = searchDestination.GetTriangle();
-                                        char cneighbors = spmesh.m_pObject->GetNeighborCount(Triangle);
-                                        if ((cneighbors == 1 &&
-                                             (v17 = &fCombatSearchCheckDestinationMinDistance.Float(),
-                                              (v18 = &fCombatSearchCheckDestinationMinDistance.Float(),
-                                               fsquaredDistance > *v17 * *v18))) ||
-                                            (cneighbors == 2 &&
-                                             (v19 = &fCombatSearchCheckDestinationMidDistance.Float(),
-                                              (v20 = &fCombatSearchCheckDestinationMidDistance.Float(),
-                                               fsquaredDistance > *v19 * *v20)))) {
-                                            bforceComplete_2 = false;
-                                        }
+                if ((psearchLOSGridMap) && (CheckDestinationTimer.Check())) {
+                    PathingLocation searchDestination;
+                    if (pattacker->GetCurrentPathfindingGoal(&searchDestination)) {
+                        NiPoint3* a2b = ::new (&result) NiPoint3(searchDestination.GetLocation());
+                        const NiPoint3* v13 = &pattacker->GetLocationOnReference();
+                        NiPoint3 vec = *v13 - *a2b;
+                        float fsquaredDistance = vec.SqrLength();
+                        float* v14 = &fCombatSearchCheckDestinationMaxDistance.Float();
+                        float* v15 = &fCombatSearchCheckDestinationMaxDistance.Float();
+                        if (fsquaredDistance < *v14 * *v15) {
+                            searchDestination.ResolveNavMeshInfo(nullptr);
+                            if (searchDestination.HasNavMeshData() &&
+                                psearchLOSGridMap->IsLocationSeen(searchDestination)) {
+                                bforceComplete_2 = true;
+                                NavMeshPtr spmesh;
+                                if (searchDestination.GetNavMesh(spmesh)) {
+                                    float* v17;
+                                    float* v18;
+                                    float* v19;
+                                    float* v20;
+                                    uint16_t Triangle = searchDestination.GetTriangle();
+                                    char cneighbors = spmesh.m_pObject->GetNeighborCount(Triangle);
+                                    if ((cneighbors == 1 &&
+                                         (v17 = &fCombatSearchCheckDestinationMinDistance.Float(),
+                                          (v18 = &fCombatSearchCheckDestinationMinDistance.Float(),
+                                           fsquaredDistance > *v17 * *v18))) ||
+                                        (cneighbors == 2 &&
+                                         (v19 = &fCombatSearchCheckDestinationMidDistance.Float(),
+                                          (v20 = &fCombatSearchCheckDestinationMidDistance.Float(),
+                                           fsquaredDistance > *v19 * *v20)))) {
+                                        bforceComplete_2 = false;
                                     }
-                                    if (bforceComplete_2) {
-                                        pattacker->StopMoving();
-                                    }
+                                }
+                                if (bforceComplete_2) {
+                                    pattacker->StopMoving();
                                 }
                             }
                         }
-                        float* v21 = &fCombatSearchCheckDestinationTime.Float();
-                        CheckDestinationTimer.Reset(*v21);
                     }
+                    float* v21 = &fCombatSearchCheckDestinationTime.Float();
+                    CheckDestinationTimer.Reset(*v21);
                 }
+
                 if (bforceComplete_2 || pattacker->IsPathingComplete()) {
                     eState = CombatProcedureSearch::SEARCH_STATE_LOOKING;
                     LookingTimer.Reset(1.0f);
@@ -405,13 +401,13 @@ void CombatProcedureSearch::Update() {
             TESForm* v23;
             BGSWorldLocation v43;
             double DecalMinWidth = (&pcombatGroup->SearchAreaUpdateTimer)->fStartTime;
-            if (!(LookingTimer.fStartTime > DecalMinWidth) ||
-                (v23 = (::new (&v43) BGSWorldLocation(pcombatGroup->GetSearchCenter()))->pSpace,
-                 v23 == pattacker->GetSpace())) {
-                if (LookingTimer.Check()) {
-                    eState = CombatProcedureSearch::SEARCH_STATE_INITIALIZING;
-                }
+            if ((!(LookingTimer.fStartTime > DecalMinWidth) ||
+                 (v23 = (::new (&v43) BGSWorldLocation(pcombatGroup->GetSearchCenter()))->pSpace,
+                  v23 == pattacker->GetSpace())) &&
+                (LookingTimer.Check())) {
+                eState = CombatProcedureSearch::SEARCH_STATE_INITIALIZING;
             }
+
             return;
         }
         default: {

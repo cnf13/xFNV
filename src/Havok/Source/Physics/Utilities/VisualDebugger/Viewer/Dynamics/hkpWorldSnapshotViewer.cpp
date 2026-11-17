@@ -97,9 +97,8 @@ hkProcess* hkpWorldSnapshotViewer::createNative(const hkArray<hkProcessContext*,
     if (v3) {
         return &static_cast<hkProcess&>(static_cast<hkpWorldViewerBase&>(*v3));
     }
-    else {
-        return nullptr;
-    }
+
+    return nullptr;
 }
 
 hkProcess* hkpWorldSnapshotViewer::createPC(const hkArray<hkProcessContext*, hkContainerHeapAllocator>& contexts) {
@@ -111,9 +110,8 @@ hkProcess* hkpWorldSnapshotViewer::createPC(const hkArray<hkProcessContext*, hkC
     if (v3) {
         return &static_cast<hkProcess&>(static_cast<hkpWorldViewerBase&>(*v3));
     }
-    else {
-        return nullptr;
-    }
+
+    return nullptr;
 }
 
 void hkpWorldSnapshotViewer::registerViewer() {

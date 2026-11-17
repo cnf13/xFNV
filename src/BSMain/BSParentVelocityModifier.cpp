@@ -150,7 +150,6 @@ NiObject* BSParentVelocityModifier::CreateObject() {
     if (apMemory) {
         return ::new (apMemory) BSParentVelocityModifier;
     }
-    else {
-        return nullptr;
-    }
+
+    return nullptr;
 }

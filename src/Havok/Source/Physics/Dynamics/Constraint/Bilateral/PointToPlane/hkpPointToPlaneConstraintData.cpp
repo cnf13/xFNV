@@ -171,10 +171,9 @@ hkBool* hkpPointToPlaneConstraintData::isValid(hkBool* arResult) const {
         arResult->m_bool = 1;
         return arResult;
     }
-    else {
-        arResult->m_bool = 0;
-        return arResult;
-    }
+
+    arResult->m_bool = 0;
+    return arResult;
 }
 
 int32_t hkpPointToPlaneConstraintData::getType() const {

@@ -293,33 +293,34 @@ void hkAgent1nMachine_Process(hkpAgent1nTrack& agentTrack, const hkpAgent3Proces
 				case hkAgent3::STREAM_CALL_WITH_TIM: {
 					hkpAgent1nMachineTimEntry* timEntry = static_cast<hkpAgent1nMachineTimEntry*>(entry);
 					float distAtT1;
-					if (in3.m_input->m_stepInfo.m_startTime != timEntry->m_timeOfSeparatingNormal) {
-						if (!(in3.m_input->m_stepInfo.m_endTime <= timEntry->m_timeOfSeparatingNormal)) {
-							const hkpCollisionQualityInfo* quality = in3.m_input->m_collisionQualityInfo;
-							if (!quality->m_useContinuousPhysics.m_storage) {
-								// No continuous physics: no separating normal, and the agent runs.
-								timEntry->m_timeOfSeparatingNormal = in3.m_input->m_stepInfo.m_endTime;
-								timEntry->m_separatingNormal.setZero4();
-								distAtT1 = static_cast<float>(quality->m_minSeparation * 0.10000000149011612);
-								timEntry->m_separatingNormal.m_quad[3] = distAtT1;
-								goto processTim;
-							}
-							// The separating normal at the step's start: both bodies at their start transforms.
-							if (!sepInputValid) {
-								sepInputValid = !transformed;
-								initSeparatingInput(&sepInput, &bodyTemp, &in3);
-							}
-							childBody.m_shape = shapeContainerB->getChildShape(key, shapeBuffer);
-							childBody.m_shapeKey = key;
-							bodyTemp.m_bodyB.m_shape = in3.m_bodyB->m_shape;
-							bodyTemp.m_bodyB.m_shapeKey = in3.m_bodyB->m_shapeKey;
-							dispatcher->m_agent3Func[entry->m_agentType].m_sepNormalFunc(sepInput, entry, timEntry + 1,
-								timEntry->m_separatingNormal);
-						}
-						// Otherwise the normal is from the step's end or later. Its distance is extrapolated over that
+                    if ((in3.m_input->m_stepInfo.m_startTime != timEntry->m_timeOfSeparatingNormal) &&
+                        (!(in3.m_input->m_stepInfo.m_endTime <= timEntry->m_timeOfSeparatingNormal))) {
+                        const hkpCollisionQualityInfo* quality = in3.m_input->m_collisionQualityInfo;
+                        if (!quality->m_useContinuousPhysics.m_storage) {
+                            // No continuous physics: no separating normal, and the agent runs.
+                            timEntry->m_timeOfSeparatingNormal = in3.m_input->m_stepInfo.m_endTime;
+                            timEntry->m_separatingNormal.setZero4();
+                            distAtT1 = static_cast<float>(quality->m_minSeparation * 0.10000000149011612);
+                            timEntry->m_separatingNormal.m_quad[3] = distAtT1;
+                            goto processTim;
+                        }
+                        // The separating normal at the step's start: both bodies at their start transforms.
+                        if (!sepInputValid) {
+                            sepInputValid = !transformed;
+                            initSeparatingInput(&sepInput, &bodyTemp, &in3);
+                        }
+                        childBody.m_shape = shapeContainerB->getChildShape(key, shapeBuffer);
+                        childBody.m_shapeKey = key;
+                        bodyTemp.m_bodyB.m_shape = in3.m_bodyB->m_shape;
+                        bodyTemp.m_bodyB.m_shapeKey = in3.m_bodyB->m_shapeKey;
+                        dispatcher->m_agent3Func[entry->m_agentType].m_sepNormalFunc(
+                            sepInput, entry, timEntry + 1, timEntry->m_separatingNormal
+                        );
+                    }
+                        // Otherwise the normal is from the step's end or later. Its distance is extrapolated over that
 						// time, but the result is never used.
-					}
-					timEntry->m_timeOfSeparatingNormal = in3.m_input->m_stepInfo.m_endTime;
+
+                    timEntry->m_timeOfSeparatingNormal = in3.m_input->m_stepInfo.m_endTime;
 					{
 						const float fProjected = in3.m_linearTimInfo.dot4xyz1(timEntry->m_separatingNormal);
 						distAtT1 = timEntry->m_separatingNormal.m_quad[3] - fProjected;
@@ -667,7 +668,7 @@ void hkAgentNmMachine_Process(hkpAgent1nTrack& agentTrack, const hkpAgent3Proces
 	uint32_t keyA;
 	uint32_t keyB;
 	// The child shapes of the current keys, fetched again only when a key changes.
-	auto extractShapes = [&]() __attribute__((always_inline)) {
+    auto extractShapes = [&] __attribute__((always_inline)) {
 		if (lastKeyB != keyB) {
 			lastKeyB = keyB;
 			bodyB.m_shape = shapeContainerB->getChildShape(keyB, shapeBufferB);
@@ -678,9 +679,9 @@ void hkAgentNmMachine_Process(hkpAgent1nTrack& agentTrack, const hkpAgent3Proces
 			bodyA.m_shape = shapeContainerA->getChildShape(keyA, shapeBufferA);
 			bodyA.m_shapeKey = keyA;
 		}
-	};
+    };
 
-	for (;;) {
+    for (;;) {
 		in3.m_bodyB = &bodyB;
 		in3.m_aTb = inputIn.m_aTb;
 		in3.m_bodyA = &bodyA;
@@ -820,35 +821,37 @@ void hkAgentNmMachine_Process(hkpAgent1nTrack& agentTrack, const hkpAgent3Proces
 					hkpAgent1nMachineTimEntry* timEntry = static_cast<hkpAgent1nMachineTimEntry*>(entry);
 					const hkpProcessCollisionInput* pInput = in3.m_input;
 					float distAtT1;
-					if (pInput->m_stepInfo.m_startTime != timEntry->m_timeOfSeparatingNormal) {
-						// A normal from at or after this step's end is kept as it is.
-						if (!(timEntry->m_timeOfSeparatingNormal >= pInput->m_stepInfo.m_endTime)) {
-							const hkpCollisionQualityInfo* quality = pInput->m_collisionQualityInfo;
-							if (!quality->m_useContinuousPhysics.m_storage) {
-								// No continuous physics: no separating normal, and the agent always runs.
-								timEntry->m_timeOfSeparatingNormal = pInput->m_stepInfo.m_endTime;
-								timEntry->m_separatingNormal.setZero4();
-								distAtT1 = static_cast<float>(quality->m_minSeparation * 0.10000000149011612);
-								timEntry->m_separatingNormal.m_quad[3] = distAtT1;
-								goto processTim;
-							}
-							// The separating normal at the step's start: both bodies at their start transforms. The
-							// input over them stays valid until the bodies are transformed.
-							if (!sepInputInitialized) {
-								sepInputInitialized = !bodiesTransformed;
-								initSeparatingInput(&sepInput, &bodyTemp, &in3);
-							}
-							extractShapes();
-							bodyTemp.m_bodyB.m_shape = in3.m_bodyB->m_shape;
-							bodyTemp.m_bodyB.m_shapeKey = in3.m_bodyB->m_shapeKey;
-							bodyTemp.m_bodyA.m_shape = in3.m_bodyA->m_shape;
-							bodyTemp.m_bodyA.m_shapeKey = in3.m_bodyA->m_shapeKey;
-							dispatcher->m_agent3Func[entry->m_agentType].m_sepNormalFunc(sepInput, entry, timEntry + 1,
-								timEntry->m_separatingNormal);
-							pInput = in3.m_input;
-						}
-					}
-					{
+                    if ((pInput->m_stepInfo.m_startTime != timEntry->m_timeOfSeparatingNormal) &&
+                        (!(timEntry->m_timeOfSeparatingNormal >= pInput->m_stepInfo.m_endTime)))
+                    // A normal from at or after this step's end is kept as it is.
+                    {
+                        const hkpCollisionQualityInfo* quality = pInput->m_collisionQualityInfo;
+                        if (!quality->m_useContinuousPhysics.m_storage) {
+                            // No continuous physics: no separating normal, and the agent always runs.
+                            timEntry->m_timeOfSeparatingNormal = pInput->m_stepInfo.m_endTime;
+                            timEntry->m_separatingNormal.setZero4();
+                            distAtT1 = static_cast<float>(quality->m_minSeparation * 0.10000000149011612);
+                            timEntry->m_separatingNormal.m_quad[3] = distAtT1;
+                            goto processTim;
+                        }
+                        // The separating normal at the step's start: both bodies at their start transforms. The
+                        // input over them stays valid until the bodies are transformed.
+                        if (!sepInputInitialized) {
+                            sepInputInitialized = !bodiesTransformed;
+                            initSeparatingInput(&sepInput, &bodyTemp, &in3);
+                        }
+                        extractShapes();
+                        bodyTemp.m_bodyB.m_shape = in3.m_bodyB->m_shape;
+                        bodyTemp.m_bodyB.m_shapeKey = in3.m_bodyB->m_shapeKey;
+                        bodyTemp.m_bodyA.m_shape = in3.m_bodyA->m_shape;
+                        bodyTemp.m_bodyA.m_shapeKey = in3.m_bodyA->m_shapeKey;
+                        dispatcher->m_agent3Func[entry->m_agentType].m_sepNormalFunc(
+                            sepInput, entry, timEntry + 1, timEntry->m_separatingNormal
+                        );
+                        pInput = in3.m_input;
+                    }
+
+                    {
 						timEntry->m_timeOfSeparatingNormal = pInput->m_stepInfo.m_endTime;
 						const float fProjected = in3.m_linearTimInfo.dot4xyz1(timEntry->m_separatingNormal);
 						distAtT1 = timEntry->m_separatingNormal.m_quad[3] - fProjected;

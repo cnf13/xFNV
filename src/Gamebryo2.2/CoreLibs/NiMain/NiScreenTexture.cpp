@@ -36,10 +36,9 @@ NiObject* NiScreenTexture::CreateClone(NiCloningProcess& kCloning) {
         CopyMembers(pkObject, kCloning);
         return pkObject;
     }
-    else {
-        CopyMembers(nullptr, kCloning);
-        return nullptr;
-    }
+
+    CopyMembers(nullptr, kCloning);
+    return nullptr;
 }
 
 // Each rectangle is six 2-byte transfers and its color; the texturing property link is queued for LinkObject.
@@ -121,7 +120,7 @@ bool NiScreenTexture::IsEqual(NiObject* pkObject) {
         }
     }
 
-    return m_spTexProp->IsEqual(pkOther->m_spTexProp) != false;
+    return m_spTexProp->IsEqual(pkOther->m_spTexProp);
 }
 
 void NiScreenTexture::GetViewerStrings(NiTPrimitiveArray<char*>* pStrings) {

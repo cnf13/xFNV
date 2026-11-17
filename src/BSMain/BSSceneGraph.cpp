@@ -90,20 +90,19 @@ float BSSceneGraph::GetFarDistance() {
     if (bMenuSceneGraph) {
         return 20480.0f;
     }
-    else {
-        Setting::Info* fNoLODFarDistanceMin;
-        Setting::Info* fNoLODFarDistancePct;
-        Setting::Info* fNoLODFarDistanceMax;
-        // The setting's address is never null.
-        fNoLODFarDistanceMax = &BSSceneGraph::fNoLODFarDistanceMax.uValue;
-        float fNoLODFarDistanceMax_ = fNoLODFarDistanceMax->f;
-        // The setting's address is never null.
-        fNoLODFarDistancePct = &BSSceneGraph::fNoLODFarDistancePct.uValue;
-        // The setting's address is never null.
-        fNoLODFarDistanceMin = &BSSceneGraph::fNoLODFarDistanceMin.uValue;
-        return fNoLODFarDistanceMin->f +
-            (fNoLODFarDistanceMax_ - fNoLODFarDistanceMin->f) * ((fNoLODFarDistancePct->f - 0.0) / (1.0 - 0.0));
-    }
+
+    Setting::Info* fNoLODFarDistanceMin;
+    Setting::Info* fNoLODFarDistancePct;
+    Setting::Info* fNoLODFarDistanceMax;
+    // The setting's address is never null.
+    fNoLODFarDistanceMax = &BSSceneGraph::fNoLODFarDistanceMax.uValue;
+    float fNoLODFarDistanceMax_ = fNoLODFarDistanceMax->f;
+    // The setting's address is never null.
+    fNoLODFarDistancePct = &BSSceneGraph::fNoLODFarDistancePct.uValue;
+    // The setting's address is never null.
+    fNoLODFarDistanceMin = &BSSceneGraph::fNoLODFarDistanceMin.uValue;
+    return fNoLODFarDistanceMin->f +
+        (fNoLODFarDistanceMax_ - fNoLODFarDistanceMin->f) * ((fNoLODFarDistancePct->f - 0.0) / (1.0 - 0.0));
 }
 
 void BSSceneGraph::SetViewDistanceBasedOnFrameRate(float afTime) {

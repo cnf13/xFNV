@@ -263,10 +263,9 @@ hkVector4& bhkRigidBodyT::GetPosition(hkVector4& arPos) {
         arPos.m_quad = _mm_sub_ps(arPos.m_quad, _mm_add_ps(v8, v8));
         return arPos;
     }
-    else {
-        arPos.m_quad = hkVector4Zero.m_quad;
-        return arPos;
-    }
+
+    arPos.m_quad = hkVector4Zero.m_quad;
+    return arPos;
 }
 
 hkQuaternion& bhkRigidBodyT::GetRotation(hkQuaternion& arRot) {
@@ -277,37 +276,35 @@ hkQuaternion& bhkRigidBodyT::GetRotation(hkQuaternion& arRot) {
 }
 
 void bhkRigidBodyT::SetPosition(const hkVector4& arPos) {
-    if (this) {
-        if (phkObject) {
-            hkQuaternion hkq;
-            hkVector4 hkp;
-            GetRotation(hkq);
-            __m128 v3 = _mm_mul_ps(kLocalPos.m_quad, hkq.m_vec.m_quad);
-            __m128 v4 = _mm_shuffle_ps(v3, v3, 170);
-            v4[0] = v4[0] + (_mm_shuffle_ps(v3, v3, 85)[0] + v3[0]);
-            __m128 v5 = _mm_shuffle_ps(hkq.m_vec.m_quad, hkq.m_vec.m_quad, 255);
-            __m128 v6 = _mm_add_ps(
-                _mm_mul_ps(
-                    _mm_sub_ps(
-                        _mm_mul_ps(
-                            _mm_shuffle_ps(kLocalPos.m_quad, kLocalPos.m_quad, 210),
-                            _mm_shuffle_ps(hkq.m_vec.m_quad, hkq.m_vec.m_quad, 201)
-                        ),
-                        _mm_mul_ps(
-                            _mm_shuffle_ps(kLocalPos.m_quad, kLocalPos.m_quad, 201),
-                            _mm_shuffle_ps(hkq.m_vec.m_quad, hkq.m_vec.m_quad, 210)
-                        )
+    if ((this) && (phkObject)) {
+        hkQuaternion hkq;
+        hkVector4 hkp;
+        GetRotation(hkq);
+        __m128 v3 = _mm_mul_ps(kLocalPos.m_quad, hkq.m_vec.m_quad);
+        __m128 v4 = _mm_shuffle_ps(v3, v3, 170);
+        v4[0] = v4[0] + (_mm_shuffle_ps(v3, v3, 85)[0] + v3[0]);
+        __m128 v5 = _mm_shuffle_ps(hkq.m_vec.m_quad, hkq.m_vec.m_quad, 255);
+        __m128 v6 = _mm_add_ps(
+            _mm_mul_ps(
+                _mm_sub_ps(
+                    _mm_mul_ps(
+                        _mm_shuffle_ps(kLocalPos.m_quad, kLocalPos.m_quad, 210),
+                        _mm_shuffle_ps(hkq.m_vec.m_quad, hkq.m_vec.m_quad, 201)
                     ),
-                    v5
+                    _mm_mul_ps(
+                        _mm_shuffle_ps(kLocalPos.m_quad, kLocalPos.m_quad, 201),
+                        _mm_shuffle_ps(hkq.m_vec.m_quad, hkq.m_vec.m_quad, 210)
+                    )
                 ),
-                _mm_add_ps(
-                    _mm_mul_ps(_mm_add_ps(_mm_mul_ps(v5, v5), hkQuadRealMinusHalf), kLocalPos.m_quad),
-                    _mm_mul_ps(_mm_shuffle_ps(v4, v4, 0), hkq.m_vec.m_quad)
-                )
-            );
-            hkp.m_quad = _mm_add_ps(_mm_add_ps(v6, v6), arPos.m_quad);
-            bhkRigidBody::SetPosition(hkp);
-        }
+                v5
+            ),
+            _mm_add_ps(
+                _mm_mul_ps(_mm_add_ps(_mm_mul_ps(v5, v5), hkQuadRealMinusHalf), kLocalPos.m_quad),
+                _mm_mul_ps(_mm_shuffle_ps(v4, v4, 0), hkq.m_vec.m_quad)
+            )
+        );
+        hkp.m_quad = _mm_add_ps(_mm_add_ps(v6, v6), arPos.m_quad);
+        bhkRigidBody::SetPosition(hkp);
     }
 }
 

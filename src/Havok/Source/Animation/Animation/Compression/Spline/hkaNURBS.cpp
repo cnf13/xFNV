@@ -337,31 +337,30 @@ hkBool* hkaNURBS::WithinTolerance(
         apResult->m_bool = 1;
         return apResult;
     }
-    else {
-        int32_t v13 = 0;
-        while (true) {
-            hkaNURBS::Point v16;
-            hkaNURBS::Point* apPoint = &Q.m_data[v13];
-            float v9 = apPoint->point[1];
-            v16.point[0] = apPoint->point[0];
-            float v10 = apPoint->point[2];
-            v16.point[1] = v9;
-            float v11 = apPoint->point[3];
-            v16.point[2] = v10;
-            v16.point[3] = v11;
-            float u = projectPointToCurve(n, p, &U, &P, apPoint, 100, 10, 0.0001f, 0.0001f);
-            hkaNURBS::CurvePoint(&apResult_, n, p, U, P, u);
-            if (static_cast<double>(E) < hkaNURBS::Point::Dist(v16, apResult_)) {
-                break;
-            }
-            ++v13;
-            if (++v14 > m) {
-                goto LABEL_5;
-            }
+
+    int32_t v13 = 0;
+    while (true) {
+        hkaNURBS::Point v16;
+        hkaNURBS::Point* apPoint = &Q.m_data[v13];
+        float v9 = apPoint->point[1];
+        v16.point[0] = apPoint->point[0];
+        float v10 = apPoint->point[2];
+        v16.point[1] = v9;
+        float v11 = apPoint->point[3];
+        v16.point[2] = v10;
+        v16.point[3] = v11;
+        float u = projectPointToCurve(n, p, &U, &P, apPoint, 100, 10, 0.0001f, 0.0001f);
+        hkaNURBS::CurvePoint(&apResult_, n, p, U, P, u);
+        if (static_cast<double>(E) < hkaNURBS::Point::Dist(v16, apResult_)) {
+            break;
         }
-        apResult->m_bool = 0;
-        return apResult;
+        ++v13;
+        if (++v14 > m) {
+            goto LABEL_5;
+        }
     }
+    apResult->m_bool = 0;
+    return apResult;
 }
 
 // True when every point Q[i] lies within E[i] (plus 0.001) of the curve at its parameter ub[i].
@@ -1972,10 +1971,9 @@ uint8_t* isKnotDistinct(uint8_t* a1, int32_t a2, const hkArray<float, hkContaine
         *a1 = 1;
         return a1;
     }
-    else {
-        *a1 = 0;
-        return a1;
-    }
+
+    *a1 = 0;
+    return a1;
 }
 
 // Point inversion: the parameter of the curve (n, p, U, P) nearest apPoint. iSamples + 1 evenly spaced samples pick the

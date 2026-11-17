@@ -500,14 +500,14 @@ void BSBatchRenderer::RegisterPass(BSShaderProperty::RenderPass* apRenderPass, u
             }
             NiAlphaProperty* v6 = static_cast<NiAlphaProperty*>(pGeometry->m_PropertyState.m_aspProps[0].m_pObject);
             char v7 = 0;
-            if (v6) {
-                if ((v6->m_uFlags & 512) == 0 ||
-                    (!apRenderPass->bFirstPass ||
-                     (((v7 = 1, m_pObject->fAlpha < 1.0f) || m_pObject->fFadeAlpha < 1.0f) &&
-                      ((v6->m_uFlags & 1) == 0 && auiPassEnum != 2)))) {
-                    v7 = 0;
-                }
+            if ((v6) &&
+                ((v6->m_uFlags & 512) == 0 ||
+                 (!apRenderPass->bFirstPass ||
+                  (((v7 = 1, m_pObject->fAlpha < 1.0f) || m_pObject->fFadeAlpha < 1.0f) &&
+                   ((v6->m_uFlags & 1) == 0 && auiPassEnum != 2))))) {
+                v7 = 0;
             }
+
             if (auiPassEnum == 14 ||
                 (auiPassEnum == 15 || (auiPassEnum == 4 || (auiPassEnum == 5 || auiPassEnum == 570)))) {
                 v7 = 1;
@@ -1416,19 +1416,17 @@ void BSBatchRenderer::RenderPassImmediately(
                 }
             }
         }
-        if (v6) {
-            if (BSBatchRenderer::pLastShader) {
-                int32_t iShaderType = BSBatchRenderer::pLastShader->iShaderType;
-                if (iShaderType < 1 || iShaderType > 5) {
-                    if (iShaderType == 17) {
-                        static_cast<Lighting30Shader*>(BSBatchRenderer::pLastShader)
-                            ->Lighting30Shader::DisableNonVolatileConstantsForPass(uicurrentPass);
-                    }
+        if ((v6) && (BSBatchRenderer::pLastShader)) {
+            int32_t iShaderType = BSBatchRenderer::pLastShader->iShaderType;
+            if (iShaderType < 1 || iShaderType > 5) {
+                if (iShaderType == 17) {
+                    static_cast<Lighting30Shader*>(BSBatchRenderer::pLastShader)
+                        ->Lighting30Shader::DisableNonVolatileConstantsForPass(uicurrentPass);
                 }
-                else {
-                    static_cast<ShadowLightShader*>(BSBatchRenderer::pLastShader)
-                        ->ShadowLightShader::DisableNonVolatileConstantsForPass(uicurrentPass);
-                }
+            }
+            else {
+                static_cast<ShadowLightShader*>(BSBatchRenderer::pLastShader)
+                    ->ShadowLightShader::DisableNonVolatileConstantsForPass(uicurrentPass);
             }
         }
     }

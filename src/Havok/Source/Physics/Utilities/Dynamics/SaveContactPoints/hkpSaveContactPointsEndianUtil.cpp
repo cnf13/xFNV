@@ -309,19 +309,19 @@ void hkpSaveContactPointsEndianUtil::swapEndianTypeIn1nTrack(
             int32_t iNext = iSubTrack + 1;
             do {
                 int32_t iSizeOfEntry = 0;
-                if (pSubTrack) {
-                    if (pSubTrack->m_sectorIndex != iSector ||
-                        pSubTrack->m_offsetInSector < static_cast<int32_t>(pEntry - pSector->m_data)) {
-                        if (iNext >= serializedTrack.m_subTracks.m_size) {
-                            pSubTrack = nullptr;
-                        }
-                        else {
-                            pSubTrack = serializedTrack.m_subTracks.m_data[iSubTrack + 1];
-                            ++iSubTrack;
-                            ++iNext;
-                        }
+                if ((pSubTrack) &&
+                    (pSubTrack->m_sectorIndex != iSector ||
+                     pSubTrack->m_offsetInSector < static_cast<int32_t>(pEntry - pSector->m_data))) {
+                    if (iNext >= serializedTrack.m_subTracks.m_size) {
+                        pSubTrack = nullptr;
+                    }
+                    else {
+                        pSubTrack = serializedTrack.m_subTracks.m_data[iSubTrack + 1];
+                        ++iSubTrack;
+                        ++iNext;
                     }
                 }
+
                 bool bTrackUsed;
                 // Passes the current sub track, null when none is left (the callee then reads none of it).
                 hkpSaveContactPointsEndianUtil::swapEndianTypeInEntry(

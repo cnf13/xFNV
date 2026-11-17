@@ -430,9 +430,8 @@ HavokMaterialType bhkPackedNiTriStripsShape::QSubMaterial(uint32_t aiKey) {
     if (v3 >= ((int32_t)m_pObject->usPartCount)) {
         return (HavokMaterialType)(((int32_t)eMaterial) & 31);
     }
-    else {
-        return (HavokMaterialType)((int32_t)m_pObject->paSubPartData[v3].uiMaterial);
-    }
+
+    return (HavokMaterialType)((int32_t)m_pObject->paSubPartData[v3].uiMaterial);
 }
 
 // The base's data, then the wrapped shape's mesh, radius and scale; without a wrapped shape, a zero radius and a unit
@@ -455,9 +454,8 @@ float bhkPackedNiTriStripsShape::GetScale() {
     if (this && (phkObject = this->phkObject) != nullptr) {
         return static_cast<hkPackedNiTriStripsShape*>(phkObject)->vScale(0);
     }
-    else {
-        return 1.0f;
-    }
+
+    return 1.0f;
 }
 
 NiObject* bhkPackedNiTriStripsShape::CreateObject() {

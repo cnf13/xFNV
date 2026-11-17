@@ -450,24 +450,22 @@ void TESFurniture::VerifyMarkers() {
 NiPoint3 TESFurniture::GetMarkerTargetOffset(uint32_t aiIndex, float afScale) {
     NiPoint3 result;
     NiPoint3 v5 = NiPoint3_ZERO;
-    if (aiIndex) {
-        if (aiIndex <= 40u) {
-            v5.x = pFurnitureMarkerDelta[aiIndex - 1][0]->Float();
-            v5.y = pFurnitureMarkerDelta[aiIndex - 1][1]->Float();
-            v5.z = (afScale - 1.0) * pFurnitureMarkerDelta[aiIndex - 1][2]->Float();
-        }
+    if ((aiIndex) && (aiIndex <= 40u)) {
+        v5.x = pFurnitureMarkerDelta[aiIndex - 1][0]->Float();
+        v5.y = pFurnitureMarkerDelta[aiIndex - 1][1]->Float();
+        v5.z = (afScale - 1.0) * pFurnitureMarkerDelta[aiIndex - 1][2]->Float();
     }
+
     result = v5;
     return result;
 }
 
 float TESFurniture::GetMarkerHeadingOffset(uint32_t aiIndex) {
     float v4 = 0.0;
-    if (aiIndex) {
-        if (aiIndex <= 40) {
-            return pFurnitureMarkerDelta[aiIndex - 1][3]->Float();
-        }
+    if ((aiIndex) && (aiIndex <= 40)) {
+        return pFurnitureMarkerDelta[aiIndex - 1][3]->Float();
     }
+
     return v4;
 }
 

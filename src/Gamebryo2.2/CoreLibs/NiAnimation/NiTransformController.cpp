@@ -41,10 +41,9 @@ NiObject* NiTransformController::CreateClone(NiCloningProcess& kCloning) {
         NiSingleInterpController::CopyMembers(v4, kCloning);
         return v4;
     }
-    else {
-        NiSingleInterpController::CopyMembers(nullptr, kCloning);
-        return nullptr;
-    }
+
+    NiSingleInterpController::CopyMembers(nullptr, kCloning);
+    return nullptr;
 }
 
 // Files before 10.1.0.104 also store the link to an old-style keyframe data, which LinkObject resolves.

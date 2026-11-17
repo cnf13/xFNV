@@ -272,9 +272,8 @@ uint32_t hkPackedNiTriStripsShape::getCollisionFilterInfo(uint32_t aKey) const {
     if (static_cast<int32_t>(static_cast<uint8_t>(aKey >> 24)) < m_pObject->usPartCount) {
         return m_pObject->paSubPartData[static_cast<uint8_t>(aKey >> 24)].uiFilter;
     }
-    else {
-        return 0;
-    }
+
+    return 0;
 }
 
 // The triangle is built in the caller's buffer (the SDK's placement new, with its null test).

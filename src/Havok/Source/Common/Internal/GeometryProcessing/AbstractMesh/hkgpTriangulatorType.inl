@@ -840,11 +840,11 @@ auto FNVD_TRIANGULATOR_TYP::insertEdge(
         t->m_root = 1;
     };
     // Insertion(eType, const Edge&).
-    const auto result = [apResult](typename Insertion::eType eType, const Edge& e) {
+    const auto result = [apResult](Insertion::eType eType, const Edge& e) {
         return ::new (apResult) Insertion(eType, e);
     };
     // Insertion(eType, Edge::null()).
-    const auto nullResult = [&](typename Insertion::eType eType) { return result(eType, makeEdge(nullptr, 0)); };
+    const auto nullResult = [&](Insertion::eType eType) { return result(eType, makeEdge(nullptr, 0)); };
 
     if (x0 == x1 && y0 == y1) {
         return nullResult(Insertion::EDGE_IS_VERTEX);
@@ -891,7 +891,7 @@ auto FNVD_TRIANGULATOR_TYP::insertEdge(
         if (x1 == 0 && y1 < y0) {
             return nullResult(Insertion::INVALID_ORIENTATION);
         }
-        else if (x1 == iBoundary && y1 > y0) {
+        if (x1 == iBoundary && y1 > y0) {
             return nullResult(Insertion::INVALID_ORIENTATION);
         }
     }
@@ -899,7 +899,7 @@ auto FNVD_TRIANGULATOR_TYP::insertEdge(
         if (y1 == 0 && x1 > x0) {
             return nullResult(Insertion::INVALID_ORIENTATION);
         }
-        else if (y1 == iBoundary && x1 < x0) {
+        if (y1 == iBoundary && x1 < x0) {
             return nullResult(Insertion::INVALID_ORIENTATION);
         }
     }
@@ -909,14 +909,13 @@ auto FNVD_TRIANGULATOR_TYP::insertEdge(
             if (orientation(startOf(focal)->m_x, startOf(focal)->m_y, x0, y0, x1, y1) == 0) {
                 return result(Insertion::CROSSING_CONSTRAINED_VERTEX, focal);
             }
-            else if (orientation(endOf(focal)->m_x, endOf(focal)->m_y, x0, y0, x1, y1) == 0) {
+            if (orientation(endOf(focal)->m_x, endOf(focal)->m_y, x0, y0, x1, y1) == 0) {
                 return result(
                     Insertion::CROSSING_CONSTRAINED_VERTEX, makeEdge(focal.m_triangle, nextIndex(focal.m_index))
                 );
             }
-            else {
-                return result(Insertion::CROSSING_CONSTRAINED_EDGE, focal);
-            }
+
+            return result(Insertion::CROSSING_CONSTRAINED_EDGE, focal);
         }
         focal = linkOf(focal);
         const Vertex* pApex = apexOf(focal);
@@ -1132,7 +1131,7 @@ auto FNVD_TRIANGULATOR_TYP::insertVertex(
     const Vertex vertexItem = Vertex();
     const Triangle triangleItem = Triangle();
     // newVertex: constrained, its data all ones.
-    const auto newVertex = [&]() {
+    const auto newVertex = [&] {
         Vertex* k = m_mesh.m_vertices.allocate(vertexItem);
         k->m_x = x;
         k->m_y = y;
@@ -1157,7 +1156,7 @@ auto FNVD_TRIANGULATOR_TYP::insertVertex(
         to->m_sets = from->m_sets;
     };
     // Insertion(eType, const Edge&).
-    const auto result = [apResult](typename Insertion::eType eType, const Edge& e) {
+    const auto result = [apResult](Insertion::eType eType, const Edge& e) {
         return ::new (apResult) Insertion(eType, e);
     };
 

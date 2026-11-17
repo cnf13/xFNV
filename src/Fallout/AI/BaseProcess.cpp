@@ -48,42 +48,34 @@ void BaseProcess::Copy(BaseProcess* apProcess) {
         v7 = dynamic_cast<MiddleHighProcess*>(this);
         v9 = dynamic_cast<MiddleLowProcess*>(this);
         v10 = dynamic_cast<LowProcess*>(this);
-        if (a2) {
-            if (a2->GetAwarePlayerTimer() > 0.0) {
-                a2->ClearRunOncePackage();
-                a2->SetTarget(nullptr);
-            }
+        if ((a2) && (a2->GetAwarePlayerTimer() > 0.0)) {
+            a2->ClearRunOncePackage();
+            a2->SetTarget(nullptr);
         }
-        if (v5) {
-            if (v5->GetAwarePlayerTimer() > 0.0) {
-                v5->ClearRunOncePackage();
-                v5->SetTarget(nullptr);
-            }
+
+        if ((v5) && (v5->GetAwarePlayerTimer() > 0.0)) {
+            v5->ClearRunOncePackage();
+            v5->SetTarget(nullptr);
         }
-        if (v5) {
-            if (a2) {
-                v5->HighCopy(a2);
-            }
+
+        if ((v5) && (a2)) {
+            v5->HighCopy(a2);
         }
-        if (v7) {
-            if (apProcess_2) {
-                v7->MiddleHighCopy(apProcess_2);
-            }
+
+        if ((v7) && (apProcess_2)) {
+            v7->MiddleHighCopy(apProcess_2);
         }
-        if (v9) {
-            if (v4) {
-                static_cast<MiddleLowProcess*>(v9)->MiddleLowCopy(static_cast<MiddleLowProcess*>(v4));
-            }
+
+        if ((v9) && (v4)) {
+            static_cast<MiddleLowProcess*>(v9)->MiddleLowCopy(static_cast<MiddleLowProcess*>(v4));
         }
-        if (v10) {
-            if (arg0) {
-                static_cast<LowProcess*>(v10)->LowCopy(static_cast<LowProcess*>(arg0));
-            }
+
+        if ((v10) && (arg0)) {
+            static_cast<LowProcess*>(v10)->LowCopy(static_cast<LowProcess*>(arg0));
         }
-        if (pCachedValues) {
-            if (apProcess->pCachedValues) {
-                pCachedValues->Copy(apProcess->pCachedValues);
-            }
+
+        if ((pCachedValues) && (apProcess->pCachedValues)) {
+            pCachedValues->Copy(apProcess->pCachedValues);
         }
     }
 }
@@ -404,11 +396,9 @@ void BaseProcess::InitLoadGame(BGSLoadFormBuffer* apLoadGameBuffer) {
 
 void BaseProcess::FinishInitLoadGame(uint32_t aiFlags, uint32_t aiOldFlags, MobileObject* pmob) {
     PlayerCharacter* v5 = static_cast<PlayerCharacter*>(dynamic_cast<Actor*>(pmob));
-    if (v5) {
-        if (((v5 != pPlayer) && (!GetCurrentPackage())) && (((uint32_t)GetProcedureIndexRunning()) == (-1))) {
-            SetProcedureIndexRunning(0);
-            v5->EvaluatePackage(true, true);
-        }
+    if ((v5) && (((v5 != pPlayer) && (!GetCurrentPackage())) && (((uint32_t)GetProcedureIndexRunning()) == (-1)))) {
+        SetProcedureIndexRunning(0);
+        v5->EvaluatePackage(true, true);
     }
 }
 
@@ -576,9 +566,8 @@ int32_t BaseProcess::GetCachedActorAggression(CachedValuesOwner* apOwner) {
     if (pCachedValues->IsDirty(CachedValues::CVF_ACTOR_AGGRESSION)) {
         return apOwner->CalculateCachedActorAggression();
     }
-    else {
-        return pCachedValues->eCachedActorAggression;
-    }
+
+    return pCachedValues->eCachedActorAggression;
 }
 
 void BaseProcess::SetCachedActorAggression(int32_t aeActorAggression) {
@@ -642,13 +631,11 @@ double BaseProcess::GetWalkSpeed(CachedValuesOwner* a1) {
         if (pCachedValues->IsDirty(CachedValues::CVF_WALK_SPEED)) {
             return a1->CalculateCachedWalkSpeed();
         }
-        else {
-            return pCachedValues->fCachedWalkSpeed;
-        }
+
+        return pCachedValues->fCachedWalkSpeed;
     }
-    else {
-        return 0.0f;
-    }
+
+    return 0.0f;
 }
 
 double BaseProcess::GetCachedRunSpeed(CachedValuesOwner* a1) {
@@ -656,13 +643,11 @@ double BaseProcess::GetCachedRunSpeed(CachedValuesOwner* a1) {
         if (pCachedValues->IsDirty(CachedValues::CVF_RUN_SPEED)) {
             return a1->CalculateCachedRunSpeed();
         }
-        else {
-            return pCachedValues->fCachedRunSpeed;
-        }
+
+        return pCachedValues->fCachedRunSpeed;
     }
-    else {
-        return 0.0f;
-    }
+
+    return 0.0f;
 }
 
 void BaseProcess::sub_83B7D0() {
@@ -674,13 +659,11 @@ double BaseProcess::GetDamagePerSecond(CachedValuesOwner* apOwner) {
         if (pCachedValues->IsDirty(CachedValues::CVF_WEAPON_DPS)) {
             return apOwner->CalculateCachedWeaponDPS();
         }
-        else {
-            return pCachedValues->fCachedWeaponDPS;
-        }
+
+        return pCachedValues->fCachedWeaponDPS;
     }
-    else {
-        return 0.0f;
-    }
+
+    return 0.0f;
 }
 
 double BaseProcess::GetHealRate(CachedValuesOwner* apOwner) {
@@ -688,13 +671,11 @@ double BaseProcess::GetHealRate(CachedValuesOwner* apOwner) {
         if (pCachedValues->IsDirty(CachedValues::CVF_HEALING_RATE)) {
             return apOwner->CalculateCachedHealingRate();
         }
-        else {
-            return pCachedValues->fCachedHealingRate;
-        }
+
+        return pCachedValues->fCachedHealingRate;
     }
-    else {
-        return 0.0f;
-    }
+
+    return 0.0f;
 }
 
 int32_t BaseProcess::GetAssistance(CachedValuesOwner* apOwner) {
@@ -704,9 +685,8 @@ int32_t BaseProcess::GetAssistance(CachedValuesOwner* apOwner) {
     if (pCachedValues->IsDirty(CachedValues::CVF_ACTOR_ASSISTANCE)) {
         return apOwner->CalculateCachedActorAssistance();
     }
-    else {
-        return pCachedValues->eCachedActorAssistance;
-    }
+
+    return pCachedValues->eCachedActorAssistance;
 }
 
 double BaseProcess::GetMedicineSkillMult(CachedValuesOwner* a2) {
@@ -714,13 +694,11 @@ double BaseProcess::GetMedicineSkillMult(CachedValuesOwner* a2) {
         if (pCachedValues->IsDirty(CachedValues::CVF_MEDICINE_EFFECTIVENESS_MULT)) {
             return a2->CalculateCachedMedicineEffectivenessMult();
         }
-        else {
-            return pCachedValues->fCachedMedicineEffectivenessMult;
-        }
+
+        return pCachedValues->fCachedMedicineEffectivenessMult;
     }
-    else {
-        return 0.0f;
-    }
+
+    return 0.0f;
 }
 
 double BaseProcess::GetSurvivalSkillMult(CachedValuesOwner* a2) {
@@ -728,13 +706,11 @@ double BaseProcess::GetSurvivalSkillMult(CachedValuesOwner* a2) {
         if (pCachedValues->IsDirty(CachedValues::kCached_SurvivalSkillMult)) {
             return a2->CalculateCachedSurvivalEffectivenessMult();
         }
-        else {
-            return pCachedValues->fCachedSurvivalEffectivenessMult;
-        }
+
+        return pCachedValues->fCachedSurvivalEffectivenessMult;
     }
-    else {
-        return 0.0f;
-    }
+
+    return 0.0f;
 }
 
 void ActorPackage::AddToCurrentProcedureIndex(int32_t aiOffset) {

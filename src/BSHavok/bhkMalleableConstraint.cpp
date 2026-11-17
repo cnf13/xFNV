@@ -164,19 +164,17 @@ void hkMalleableConstraintCinfo::SetStrength(float afStrength) {
 void hkMalleableConstraintCinfo::ApplyScale(float afScale, hkpConstraintData* apInfo) {
     ahkpMalleableConstraintData* pd = static_cast<ahkpMalleableConstraintData*>(apInfo);
     // EXE-INLINED none: ahkpMalleableConstraintData::GetChild
-    if (pd && pd->m_constraintData) {
-        if (1.0f != afScale) {
-            switch (pd->m_constraintData->getType()) {
-                case hkpConstraintData::CONSTRAINT_TYPE_BALLANDSOCKET:
-                    hkBallAndSocketConstraintCinfo::ApplyScale(afScale, pd->m_constraintData);
-                    break;
-                case hkpConstraintData::CONSTRAINT_TYPE_HINGE:
-                case hkpConstraintData::CONSTRAINT_TYPE_LIMITEDHINGE:
-                case hkpConstraintData::CONSTRAINT_TYPE_RAGDOLL:
-                    hkHingeConstraintCinfo::ApplyScale(afScale, pd->m_constraintData);
-                    break;
-                default: break;
-            }
+    if ((pd && pd->m_constraintData) && (1.0f != afScale)) {
+        switch (pd->m_constraintData->getType()) {
+            case hkpConstraintData::CONSTRAINT_TYPE_BALLANDSOCKET:
+                hkBallAndSocketConstraintCinfo::ApplyScale(afScale, pd->m_constraintData);
+                break;
+            case hkpConstraintData::CONSTRAINT_TYPE_HINGE:
+            case hkpConstraintData::CONSTRAINT_TYPE_LIMITEDHINGE:
+            case hkpConstraintData::CONSTRAINT_TYPE_RAGDOLL:
+                hkHingeConstraintCinfo::ApplyScale(afScale, pd->m_constraintData);
+                break;
+            default: break;
         }
     }
 }

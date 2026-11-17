@@ -94,22 +94,19 @@ uint32_t LoadGameSizeFromBuffer(const char* apBuffer, uint32_t& ariSize, SIZE_TY
             ariSize = v4[0];
             return 2;
         }
-        else {
-            if (aeSizeType == SIZE_INT) {
-                ourMemcpy(&ariSize, apBuffer, sizeof(ariSize));
-                return 4;
-            }
-            else {
-                return 0;
-            }
+
+        if (aeSizeType == SIZE_INT) {
+            ourMemcpy(&ariSize, apBuffer, sizeof(ariSize));
+            return 4;
         }
+
+        return 0;
     }
-    else {
-        apDest = 0;
-        ourMemcpy(&apDest, apBuffer, 1u);
-        ariSize = apDest;
-        return 1;
-    }
+
+    apDest = 0;
+    ourMemcpy(&apDest, apBuffer, 1u);
+    ariSize = apDest;
+    return 1;
 }
 
 uint32_t LoadVariableSizedValueFromBuffer(const char* apBuffer, uint32_t& ariVariableValue) {
@@ -208,22 +205,19 @@ uint32_t LoadGameSizeFromFile(BGSSaveLoadFile* apFile, uint32_t& ariSize, SIZE_T
             ariSize = (uint32_t)v4[0];
             return (uint32_t)2;
         }
-        else {
-            if (((int32_t)aeSizeType) == 2) {
-                apFile->Read(&ariSize, 4u);
-                return (uint32_t)4;
-            }
-            else {
-                return (uint32_t)0;
-            }
+
+        if (((int32_t)aeSizeType) == 2) {
+            apFile->Read(&ariSize, 4u);
+            return (uint32_t)4;
         }
+
+        return (uint32_t)0;
     }
-    else {
-        apBuffer = 0;
-        apFile->Read(&apBuffer, 1u);
-        ariSize = (uint32_t)apBuffer;
-        return (uint32_t)1;
-    }
+
+    apBuffer = 0;
+    apFile->Read(&apBuffer, 1u);
+    ariSize = (uint32_t)apBuffer;
+    return (uint32_t)1;
 }
 
 bool GetLocationCellOrWorld(TESForm* apLocation, TESObjectCELL*& arpCell, TESWorldSpace*& arpWorld) {
@@ -234,15 +228,13 @@ bool GetLocationCellOrWorld(TESForm* apLocation, TESObjectCELL*& arpCell, TESWor
         arpWorld = static_cast<TESWorldSpace*>(apLocation);
         return true;
     }
-    else {
-        if (apLocation->GetFormType() == 57) {
-            arpCell = static_cast<TESObjectCELL*>(apLocation);
-            return true;
-        }
-        else {
-            return false;
-        }
+
+    if (apLocation->GetFormType() == 57) {
+        arpCell = static_cast<TESObjectCELL*>(apLocation);
+        return true;
     }
+
+    return false;
 }
 
 void NiEndian::Swap32(char* pcValue, uint32_t uiCount) {

@@ -89,9 +89,8 @@ uint16_t XRumbleControl::PatternPeriodicSquare(_RUMBLE_EFFECT* apMotorEffect, ui
     if (static_cast<int32_t>(aiRumbleCounter % 360) >= 180) {
         return 0;
     }
-    else {
-        return apMotorEffect->uiSpeed;
-    }
+
+    return apMotorEffect->uiSpeed;
 }
 
 uint16_t XRumbleControl::RampUp(_RUMBLE_EFFECT* MotorEffect, uint32_t iRumbleCounter) {
@@ -100,9 +99,8 @@ uint16_t XRumbleControl::RampUp(_RUMBLE_EFFECT* MotorEffect, uint32_t iRumbleCou
             ((MotorEffect->RampUp.wEndSpeed - MotorEffect->RampUp.wStartSpeed) /
              static_cast<uint16_t>(MotorEffect->RampUp.uiDuration));
     }
-    else {
-        return 0;
-    }
+
+    return 0;
 }
 
 uint16_t XRumbleControl::RampDown(_RUMBLE_EFFECT* MotorEffect, uint32_t iRumbleCounter) {
@@ -111,9 +109,8 @@ uint16_t XRumbleControl::RampDown(_RUMBLE_EFFECT* MotorEffect, uint32_t iRumbleC
             ((MotorEffect->RampDown.wEndSpeed - MotorEffect->RampDown.wStartSpeed) /
              static_cast<uint16_t>(MotorEffect->RampDown.uiDuration));
     }
-    else {
-        return 0;
-    }
+
+    return 0;
 }
 
 void XRumbleControl::Rumble(RUMBLE_SIDE aeLeftOrRight, _XINPUT_VIBRATION* XInput, uint32_t iTime) {
@@ -312,10 +309,10 @@ uint32_t Controls::HasInputInterfaces(int32_t aiDevice) {
     if (aiDevice == 0) {
         return HasKeyboard();
     }
-    else if (aiDevice == 1) {
+    if (aiDevice == 1) {
         return HasMouse();
     }
-    else if (aiDevice == 2) {
+    if (aiDevice == 2) {
         return HasJoySticks();
     }
     return 0;
@@ -903,38 +900,36 @@ int32_t Controls::GetUserAction(USERACTIONS eAction, int32_t toggleFlags) {
         }
         return 0;
     }
+
+    buttonState = 0;
+    if (Controls::bUseController) {
+        buttonState =
+            GetButtonState(3, ucKeyBinds[3][(int32_t)eAction], static_cast<CONTROL_TOGGLE_FLAGS>(toggleFlags));
+    }
     else {
-        buttonState = 0;
-        if (Controls::bUseController) {
-            buttonState =
-                GetButtonState(3, ucKeyBinds[3][(int32_t)eAction], static_cast<CONTROL_TOGGLE_FLAGS>(toggleFlags));
+        for (i = 0; i < 2; ++i) {
+            if (ucKeyBinds[i][(int32_t)eAction] != 255) {
+                buttonState +=
+                    GetButtonState(i, ucKeyBinds[i][(int32_t)eAction], static_cast<CONTROL_TOGGLE_FLAGS>(toggleFlags));
+            }
+        }
+    }
+    if ((((int32_t)eAction) == 14) && (buttonState > 0)) {
+        if ((usOverrideFlags & 8) != 0) {
+            usOverrideFlags ^= 8;
+            v5 = 1;
         }
         else {
-            for (i = 0; i < 2; ++i) {
-                if (ucKeyBinds[i][(int32_t)eAction] != 255) {
-                    buttonState += GetButtonState(
-                        i, ucKeyBinds[i][(int32_t)eAction], static_cast<CONTROL_TOGGLE_FLAGS>(toggleFlags)
-                    );
-                }
+            v5 = 0;
+        }
+        if (v5) {
+            buttonState = 0;
+            if (((uint32_t)toggleFlags) <= 1) {
+                usOverrideFlags |= 8;
             }
         }
-        if ((((int32_t)eAction) == 14) && (buttonState > 0)) {
-            if ((usOverrideFlags & 8) != 0) {
-                usOverrideFlags ^= 8;
-                v5 = 1;
-            }
-            else {
-                v5 = 0;
-            }
-            if (v5) {
-                buttonState = 0;
-                if (((uint32_t)toggleFlags) <= 1) {
-                    usOverrideFlags |= 8;
-                }
-            }
-        }
-        return buttonState;
     }
+    return buttonState;
 }
 
 bool Controls::SetControl(uint32_t auiAction, uint32_t auiDevice, uint8_t aucKey) {
@@ -1028,9 +1023,8 @@ int32_t Controls::GetJoystickHat(int32_t aiJoystick, int32_t aiHat) {
     if (((uint16_t)v4) == 65535) {
         return (-1);
     }
-    else {
-        return (v4 / 4500) + 32;
-    }
+
+    return (v4 / 4500) + 32;
 }
 
 void Controls::UpdateValues() {
@@ -1140,9 +1134,8 @@ int32_t Controls::A23650(int32_t a2) {
     if (((uint8_t)(kJoyStickInstances[a2].dwDevType >> 8)) == 2) {
         return 2;
     }
-    else {
-        return (-1);
-    }
+
+    return (-1);
 }
 
 int32_t Controls::A232D0(int32_t a2, int32_t a3) {

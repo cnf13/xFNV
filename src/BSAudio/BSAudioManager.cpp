@@ -71,9 +71,8 @@ int32_t Compare_AE5FB0(AudioDebugString* apA, AudioDebugString* apB) {
     if (apA->iSoundID >= apB->iSoundID) {
         return (int32_t)((uint8_t)(apB->iSoundID < apA->iSoundID));
     }
-    else {
-        return (-1);
-    }
+
+    return (-1);
 }
 
 void au_re_ExitThread(uint32_t dwExitCode, int32_t x0) {
@@ -270,12 +269,11 @@ BSAudioManager::GetSoundHandleByNumericID(BSSoundHandle* apHandle, uint32_t auiF
         apHandle->eState = returnHandle.eState;
         return apHandle;
     }
-    else {
-        apHandle->iSoundID = -1;
-        apHandle->bAssumeSuccess = false;
-        apHandle->eState = BSSoundHandle::ASSUMED_STATE_INITIALIZED;
-        return apHandle;
-    }
+
+    apHandle->iSoundID = -1;
+    apHandle->bAssumeSuccess = false;
+    apHandle->eState = BSSoundHandle::ASSUMED_STATE_INITIALIZED;
+    return apHandle;
 }
 
 BSSoundHandle* BSAudioManager::GetSoundHandleByFilePath(
@@ -403,13 +401,11 @@ void BSAudioManager::PrecacheSoundFromID(uint32_t auiFormID, int32_t aiFlags) {
     v6 = aiFlags;
     bool (*pfnIDCallback)(uint32_t, char*, uint32_t*, void**) = BSAudio::pAudioInstance->pfnIDCallback;
     pSettings = nullptr;
-    if (BSAudio::pAudioInstance->bAudioEnabled) {
-        if (pfnIDCallback) {
-            char a1[264];
-            if (pfnIDCallback(auiFormID, a1, &v6, &pSettings)) {
-                // The callback's flag bits and the caller's, combined into the sound flags.
-                PrecacheSound(a1, v6 | aiFlags, static_cast<TESSound*>(pSettings));
-            }
+    if ((BSAudio::pAudioInstance->bAudioEnabled) && (pfnIDCallback)) {
+        char a1[264];
+        if (pfnIDCallback(auiFormID, a1, &v6, &pSettings)) {
+            // The callback's flag bits and the caller's, combined into the sound flags.
+            PrecacheSound(a1, v6 | aiFlags, static_cast<TESSound*>(pSettings));
         }
     }
 }
@@ -545,12 +541,11 @@ BSAudioManager::GetSoundHandleByName(BSSoundHandle* apHandle, const char* apEdit
         }
         return apHandle;
     }
-    else {
-        apHandle->iSoundID = -1;
-        apHandle->bAssumeSuccess = false;
-        apHandle->eState = BSSoundHandle::ASSUMED_STATE_INITIALIZED;
-        return apHandle;
-    }
+
+    apHandle->iSoundID = -1;
+    apHandle->bAssumeSuccess = false;
+    apHandle->eState = BSSoundHandle::ASSUMED_STATE_INITIALIZED;
+    return apHandle;
 }
 
 void BSAudioManager::Precache(const char* apToCache, uint32_t aiFlags) {
@@ -559,12 +554,10 @@ void BSAudioManager::Precache(const char* apToCache, uint32_t aiFlags) {
     isoundTypeFlags = aiFlags;
     bool (*pfncallback)(const char*, char*, uint32_t*, void**) = BSAudio::pAudioInstance->pfnNameCallback;
     pSettingsContext = nullptr;
-    if (BSAudio::pAudioInstance->bAudioEnabled) {
-        if (pfncallback) {
-            char a1[264];
-            if (pfncallback(apToCache, a1, &isoundTypeFlags, &pSettingsContext)) {
-                PrecacheSound(a1, aiFlags, static_cast<TESSound*>(pSettingsContext));
-            }
+    if ((BSAudio::pAudioInstance->bAudioEnabled) && (pfncallback)) {
+        char a1[264];
+        if (pfncallback(apToCache, a1, &isoundTypeFlags, &pSettingsContext)) {
+            PrecacheSound(a1, aiFlags, static_cast<TESSound*>(pSettingsContext));
         }
     }
 }
@@ -731,9 +724,8 @@ int32_t BSAudioManager::GetDuration(uint32_t aiSoundID) {
     if (val[0]) {
         return val[0]->uiDuration;
     }
-    else {
-        return 0;
-    }
+
+    return 0;
 }
 
 void BSAudioManager::FadeInPlay(uint32_t aiID, uint32_t aiMilliseconds) {
@@ -1045,44 +1037,41 @@ void BSAudioManager::PrecacheSound(char* a1, uint32_t a2, TESSound* a3) {
     uint32_t imodFlags;
     uint32_t iend;
     FNVD_INLINED_LOCAL(BSSoundHandle, v16, std::nullopt, std::nullopt);
-    if (a1) {
-        if (BSAudio::pAudioInstance->bAudioEnabled) {
-            char pcDest[268];
-            uint32_t ithisSoundID = uiSoundCacheIndex++;
-            // MAYBE-INLINED 0xADD784: a write opening BSSoundHandle's uses: may be its inlined constructor
-            v16.iSoundID = ithisSoundID;
-            // MAYBE-INLINED 0xADD787: a write opening BSSoundHandle's uses: may be its inlined constructor
-            v16.bAssumeSuccess = false;
-            // MAYBE-INLINED 0xADD78B: a write opening BSSoundHandle's uses: may be its inlined constructor
-            v16.eState = BSSoundHandle::ASSUMED_STATE_INITIALIZED;
-            strcpy_s(pcDest, 260, a1);
-            BSAudio::pAudioInstance->FixSoundPath(pcDest);
-            uint32_t itestHash = BSGameSound::GetNameHash(pcDest);
-            if (IsInCache(itestHash, true)) {}
-            else {
-                BSGameSound* pNewSound__pfnLoopPointsCallback = BSAudio::pAudioInstance->CreateNewGameSound(a1);
-                pNewSound__pfnLoopPointsCallback->iSoundID = ithisSoundID;
-                pNewSound__pfnLoopPointsCallback->iSoundTypeFlags = static_cast<BSGameSound::SoundFlags>(a2);
-                pNewSound__pfnLoopPointsCallback->SetupPath(false);
-                uint32_t (*pfnSettingsCallback)(BSSoundHandle*, void*, uint32_t*) =
-                    BSAudio::pAudioInstance->pfnSettingsCallback;
-                imodFlags = 0;
-                if (pfnSettingsCallback) {
-                    pfnSettingsCallback(&v16, a3, &imodFlags);
-                }
-                BSAudioLoopPointCallback v15 = BSAudio::pAudioInstance->GetLoopPointCallback();
-                ibegin = 0;
-                iend = 0;
-                if (v15) {
-                    if (v15(a3, &ibegin, &iend)) {
-                        uint32_t v5 = iend;
-                        pNewSound__pfnLoopPointsCallback->iLoopStart = ibegin;
-                        pNewSound__pfnLoopPointsCallback->iLoopEnd = v5;
-                    }
-                }
-                pNewSound__pfnLoopPointsCallback->iModifierFlags = imodFlags;
-                Precache(pNewSound__pfnLoopPointsCallback);
+    if ((a1) && (BSAudio::pAudioInstance->bAudioEnabled)) {
+        char pcDest[268];
+        uint32_t ithisSoundID = uiSoundCacheIndex++;
+        // MAYBE-INLINED 0xADD784: a write opening BSSoundHandle's uses: may be its inlined constructor
+        v16.iSoundID = ithisSoundID;
+        // MAYBE-INLINED 0xADD787: a write opening BSSoundHandle's uses: may be its inlined constructor
+        v16.bAssumeSuccess = false;
+        // MAYBE-INLINED 0xADD78B: a write opening BSSoundHandle's uses: may be its inlined constructor
+        v16.eState = BSSoundHandle::ASSUMED_STATE_INITIALIZED;
+        strcpy_s(pcDest, 260, a1);
+        BSAudio::pAudioInstance->FixSoundPath(pcDest);
+        uint32_t itestHash = BSGameSound::GetNameHash(pcDest);
+        if (IsInCache(itestHash, true)) {}
+        else {
+            BSGameSound* pNewSound__pfnLoopPointsCallback = BSAudio::pAudioInstance->CreateNewGameSound(a1);
+            pNewSound__pfnLoopPointsCallback->iSoundID = ithisSoundID;
+            pNewSound__pfnLoopPointsCallback->iSoundTypeFlags = static_cast<BSGameSound::SoundFlags>(a2);
+            pNewSound__pfnLoopPointsCallback->SetupPath(false);
+            uint32_t (*pfnSettingsCallback)(BSSoundHandle*, void*, uint32_t*) =
+                BSAudio::pAudioInstance->pfnSettingsCallback;
+            imodFlags = 0;
+            if (pfnSettingsCallback) {
+                pfnSettingsCallback(&v16, a3, &imodFlags);
             }
+            BSAudioLoopPointCallback v15 = BSAudio::pAudioInstance->GetLoopPointCallback();
+            ibegin = 0;
+            iend = 0;
+            if ((v15) && (v15(a3, &ibegin, &iend))) {
+                uint32_t v5 = iend;
+                pNewSound__pfnLoopPointsCallback->iLoopStart = ibegin;
+                pNewSound__pfnLoopPointsCallback->iLoopEnd = v5;
+            }
+
+            pNewSound__pfnLoopPointsCallback->iModifierFlags = imodFlags;
+            Precache(pNewSound__pfnLoopPointsCallback);
         }
     }
 }
@@ -1123,11 +1112,10 @@ bool BSAudioManager::IsValid(uint32_t aiSoundID) {
     uint8_t v4 = 0;
     BSSoundInfo* v3 = nullptr;
     (&SoundStateMap)->GetAt(aiSoundID, v3);
-    if (v3) {
-        if (v3->iID == aiSoundID) {
-            return true;
-        }
+    if ((v3) && (v3->iID == aiSoundID)) {
+        return true;
     }
+
     return (bool)v4;
 }
 
@@ -1146,29 +1134,24 @@ float BSAudioManager::GetCorrectedVolume(float afBaseVolume, uint32_t aiTypeFlag
     if ((((int32_t)aiTypeFlags) & 0x800000u) != 0) {
         return ((v8 * fVolumes[4]) * fVolumes[10]);
     }
-    else {
-        if ((((int32_t)aiTypeFlags) & 8u) != 0) {
-            return ((fVolumes[1] * fVolumes[7]) * v8);
-        }
-        else {
-            if ((((int32_t)aiTypeFlags) & 4u) != 0) {
-                return ((fVolumes[2] * fVolumes[8]) * v8);
-            }
-            else {
-                if ((((int32_t)aiTypeFlags) & 0x800u) != 0) {
-                    return ((fVolumes[4] * fVolumes[10]) * v8);
-                }
-                else {
-                    if ((((int32_t)aiTypeFlags) & 0x100000u) != 0) {
-                        return ((fVolumes[5] * fVolumes[11]) * v8);
-                    }
-                    else {
-                        return ((fVolumes[3] * fVolumes[9]) * v8);
-                    }
-                }
-            }
-        }
+
+    if ((((int32_t)aiTypeFlags) & 8u) != 0) {
+        return ((fVolumes[1] * fVolumes[7]) * v8);
     }
+
+    if ((((int32_t)aiTypeFlags) & 4u) != 0) {
+        return ((fVolumes[2] * fVolumes[8]) * v8);
+    }
+
+    if ((((int32_t)aiTypeFlags) & 0x800u) != 0) {
+        return ((fVolumes[4] * fVolumes[10]) * v8);
+    }
+
+    if ((((int32_t)aiTypeFlags) & 0x100000u) != 0) {
+        return ((fVolumes[5] * fVolumes[11]) * v8);
+    }
+
+    return ((fVolumes[3] * fVolumes[9]) * v8);
 }
 
 bool BSAudioManager::IsPlaying(uint32_t aiSoundID) {
@@ -1644,27 +1627,21 @@ BSGameSound* BSAudioManager::GetFromCache(uint32_t aiSoundHash, uint32_t aiDirec
             return pretValue;
         }
         if (aiDirectoryHash == pSoundCopy->iDirectoryHash && pSoundCopy->iDirectoryHash) {
-            if (pcloseMatch) {
-                if (brandomize && !(rt::rand() % 3)) {
-                    pcloseMatchAlternate = pcloseMatch;
-                    altMatch = lastMatch;
-                }
+            if ((pcloseMatch) && (brandomize && !(rt::rand() % 3))) {
+                pcloseMatchAlternate = pcloseMatch;
+                altMatch = lastMatch;
             }
+
             pcloseMatch = pSoundCopy;
             lastMatch = iter;
         }
         iter = iter->m_pkNext;
     }
-    if (brandomize) {
-        if (pcloseMatchAlternate) {
-            if (pcloseMatch) {
-                if (!(rt::rand() % 2)) {
-                    pcloseMatch = pcloseMatchAlternate;
-                    lastMatch = altMatch;
-                }
-            }
-        }
+    if ((brandomize) && (pcloseMatchAlternate) && (pcloseMatch) && (!(rt::rand() % 2))) {
+        pcloseMatch = pcloseMatchAlternate;
+        lastMatch = altMatch;
     }
+
     if (pcloseMatch) {
         CachedSoundList.RemovePos(lastMatch);
         CachedSoundList.AddHead(pcloseMatch);
@@ -1741,11 +1718,10 @@ void BSAudioManager::ProcessMessages() {
             }
             GarbageMessages.Push(pMsg);
         }
-        if (pcurrentMessages->uiCount) {
-            if (!pcurrentMessages->pHead || !pcurrentMessages->pTail) {
-                pcurrentMessages->RemoveAll();
-            }
+        if ((pcurrentMessages->uiCount) && (!pcurrentMessages->pHead || !pcurrentMessages->pTail)) {
+            pcurrentMessages->RemoveAll();
         }
+
         EnterCriticalSection(&MessageCritSection);
         iMessageListIndex = (iMessageListIndex + 1) % 2;
         iMessageProcessingListIndex = (iMessageListIndex + 1) % 2;
@@ -1792,37 +1768,34 @@ void BSAudioManager::ProcessSoundUpdates() {
                 (psound->iStateFlags & BSGameSound::STATE_VALID) != 0) {
                 psound->Prepare();
                 AddToCache(psound);
-                if ((psound->iStateFlags & BSGameSound::STATE_READY) != 0 &&
-                    (psound->iStateFlags & BSGameSound::STATE_VALID) != 0) {
-                    if (psound->QueuedMessages.m_uiCount) {
-                        NiTPointerList<BSSoundMessage*>* pmsgQueue = &psound->QueuedMessages;
-                        NiTPointerList<BSSoundMessage*> tmpQueue;
-                        NiTListItem<BSSoundMessage*>* it = nullptr;
-                        while (pmsgQueue->m_uiCount) {
-                            BSSoundMessage* ptmpMessage = pmsgQueue->RemoveHead();
-                            // EXE-INLINED 0xAE8BF0
-                            NiTListItem<BSSoundMessage*>* pNode = tmpQueue.NewItem();
-                            pNode->m_element = ptmpMessage;
-                            tmpQueue.AddNodeTail(pNode);
-                        }
-                        it = tmpQueue.m_pkHead;
-                        while (it) {
-                            BSSoundMessage** p_m_element = &it->m_element;
-                            it = it->m_pkNext;
-                            BSSoundMessage* ptmpMessage_2 = *p_m_element;
-                            if (*p_m_element) {
-                                if (ptmpMessage_2->msg == MSET_POS) {
-                                    ProcessMessage(ptmpMessage_2);
-                                }
-                            }
-                        }
-                        while (tmpQueue.m_uiCount) {
-                            BSSoundMessage* ptmpMessage_3 = tmpQueue.RemoveHead();
-                            bprocessResult = ProcessMessage(ptmpMessage_3);
-                            FreeQueueMessage(ptmpMessage_3);
-                        }
-                        tmpQueue.RemoveAll();
+                if (((psound->iStateFlags & BSGameSound::STATE_READY) != 0 &&
+                     (psound->iStateFlags & BSGameSound::STATE_VALID) != 0) &&
+                    (psound->QueuedMessages.m_uiCount)) {
+                    NiTPointerList<BSSoundMessage*>* pmsgQueue = &psound->QueuedMessages;
+                    NiTPointerList<BSSoundMessage*> tmpQueue;
+                    NiTListItem<BSSoundMessage*>* it = nullptr;
+                    while (pmsgQueue->m_uiCount) {
+                        BSSoundMessage* ptmpMessage = pmsgQueue->RemoveHead();
+                        // EXE-INLINED 0xAE8BF0
+                        NiTListItem<BSSoundMessage*>* pNode = tmpQueue.NewItem();
+                        pNode->m_element = ptmpMessage;
+                        tmpQueue.AddNodeTail(pNode);
                     }
+                    it = tmpQueue.m_pkHead;
+                    while (it) {
+                        BSSoundMessage** p_m_element = &it->m_element;
+                        it = it->m_pkNext;
+                        BSSoundMessage* ptmpMessage_2 = *p_m_element;
+                        if ((*p_m_element) && (ptmpMessage_2->msg == MSET_POS)) {
+                            ProcessMessage(ptmpMessage_2);
+                        }
+                    }
+                    while (tmpQueue.m_uiCount) {
+                        BSSoundMessage* ptmpMessage_3 = tmpQueue.RemoveHead();
+                        bprocessResult = ProcessMessage(ptmpMessage_3);
+                        FreeQueueMessage(ptmpMessage_3);
+                    }
+                    tmpQueue.RemoveAll();
                 }
             }
             if ((psound->iStateFlags & BSGameSound::STATE_OPENED) != 0 &&
@@ -1845,20 +1818,20 @@ void BSAudioManager::ProcessSoundUpdates() {
                 (psound->iStateFlags & BSGameSound::STATE_READY) != 0) {
                 psound->iStateFlags |= BSGameSound::STATE_STOPPED;
             }
-            if ((psound->iStateFlags & BSGameSound::STATE_STOPPED) != 0 &&
-                (psound->iStateFlags & BSGameSound::STATE_FADING) == 0 &&
-                (psound->iStateFlags & BSGameSound::STATE_OPENING) == 0) {
-                if (psound->iCleanupDelayInMS) {
-                    uint32_t v4;
-                    if (psound->iCleanupDelayInMS <= iDelayTimerDelta) {
-                        v4 = 0;
-                    }
-                    else {
-                        v4 = psound->iCleanupDelayInMS - iDelayTimerDelta;
-                    }
-                    psound->iCleanupDelayInMS = v4;
+            if (((psound->iStateFlags & BSGameSound::STATE_STOPPED) != 0 &&
+                 (psound->iStateFlags & BSGameSound::STATE_FADING) == 0 &&
+                 (psound->iStateFlags & BSGameSound::STATE_OPENING) == 0) &&
+                (psound->iCleanupDelayInMS)) {
+                uint32_t v4;
+                if (psound->iCleanupDelayInMS <= iDelayTimerDelta) {
+                    v4 = 0;
                 }
+                else {
+                    v4 = psound->iCleanupDelayInMS - iDelayTimerDelta;
+                }
+                psound->iCleanupDelayInMS = v4;
             }
+
             if ((psound->iStateFlags & BSGameSound::STATE_STOPPED) == 0 ||
                 ((psound->iStateFlags & BSGameSound::STATE_FADING) != 0 ||
                  ((psound->iStateFlags & BSGameSound::STATE_OPENING) != 0 || psound->iCleanupDelayInMS))) {

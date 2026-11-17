@@ -295,10 +295,8 @@ void BGSSaveLoadQueuedSubBufferMap::LoadQueuedSubBuffers(QUEUED_SUB_BUFFER_TYPE 
                     subBuffer.DeleteBuffer();
                 }
                 else {
-                    if (aeType == QUEUED_SUB_BUFFER_HAVOK_DATA) {
-                        if (pref) {
-                            (&pref->m_Extra)->SetSavedHavokData(subBuffer.pBuffer);
-                        }
+                    if ((aeType == QUEUED_SUB_BUFFER_HAVOK_DATA) && (pref)) {
+                        (&pref->m_Extra)->SetSavedHavokData(subBuffer.pBuffer);
                     }
                 }
             }

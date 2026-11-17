@@ -404,29 +404,23 @@ TileMenu* RepairServicesMenu::Create(Actor* apVendor) {
                 RepairServicesMenu::pMe->PrepForVisibility(false);
                 return static_cast<TileMenu*>(ptile);
             }
-            else {
-                Warning("MENUS: Repair Services Menu Creation Failed... Are your menu and art resources up to date?");
-                return nullptr;
-            }
-        }
-        else {
-            if (RepairServicesMenu::pMe) {
-                if (RepairServicesMenu::pMe->pMenu) {
-                    if (RepairServicesMenu::pMe) {
-                        delete RepairServicesMenu::pMe;
-                    }
-                }
-            }
+
+            Warning("MENUS: Repair Services Menu Creation Failed... Are your menu and art resources up to date?");
             return nullptr;
         }
-    }
-    else {
-        InitializationFlow(
-            "Create() -- Missing vendor parameter.  4 bytes large, responds to the name 'Vendy'.  "
-            "Please call if you see him!"
-        );
+
+        if ((RepairServicesMenu::pMe) && (RepairServicesMenu::pMe->pMenu) && (RepairServicesMenu::pMe)) {
+            delete RepairServicesMenu::pMe;
+        }
+
         return nullptr;
     }
+
+    InitializationFlow(
+        "Create() -- Missing vendor parameter.  4 bytes large, responds to the name 'Vendy'.  "
+        "Please call if you see him!"
+    );
+    return nullptr;
 }
 
 int32_t RepairServicesMenu::GetClassStatic() {
@@ -446,36 +440,34 @@ void RepairServicesMenu::RepairAllFunc(Tile* a1, ItemChange* a2) {
 }
 
 void RepairServicesMenu::SetCanRepair(Tile* a1, ItemChange* a2) {
-    if (a1) {
-        if (a2) {
-            float v8;
-            float afValue = static_cast<float>(TESValueForm::GetFormValue(a2->pContainerObj));
-            float ItemHealth = a2->GetItemHealth(true);
-            int32_t aiValue =
-                GamePlayFormulas::GetRepairCost(RepairServicesMenu::pMe->iVendorRepairSkill, ItemHealth, afValue);
-            if (aiValue <= 0 || aiValue > pPlayer->GetGoldAmount()) {
-                v8 = 128.0f;
-            }
-            else {
-                v8 = 255.0f;
-            }
-            a1->Set(4010, 17);
-            a1->Set(g_repairServicesMenu_trait_RepairCost, aiValue);
-            RepairServicesMenu::pMe->iRepairAllCost += aiValue;
-            a1->xChildren.Get(a1->xChildren.m_pkTail)->Set(4009, v8, true);
-            Tile* ChildByID = a1->GetChildByID(18);
-            ChildByID->Set(4009, v8, true);
-            a1->xChildren.Get(a1->xChildren.m_pkHead)->Set(4009, v8, true);
-            int32_t v7 = a1->GetFloat(4012) >= 0.0;
-            a1->Set(4003, v7);
-            float v6 = a2->GetItemHealth(true) * 0.6000000238418579;
-            Tile* v3 = a1->GetChildByID(18);
-            v3->Set(4017, v6, true);
-            int32_t iCanRepair = v8 == 255.0;
-            a1->Set(g_repairServicesMenu_trait_CanRepair, iCanRepair);
-            if (a2->GetWorn(false)) {
-                a1->xChildren.Get(a1->xChildren.m_pkHead)->Set(4003, 1);
-            }
+    if ((a1) && (a2)) {
+        float v8;
+        float afValue = static_cast<float>(TESValueForm::GetFormValue(a2->pContainerObj));
+        float ItemHealth = a2->GetItemHealth(true);
+        int32_t aiValue =
+            GamePlayFormulas::GetRepairCost(RepairServicesMenu::pMe->iVendorRepairSkill, ItemHealth, afValue);
+        if (aiValue <= 0 || aiValue > pPlayer->GetGoldAmount()) {
+            v8 = 128.0f;
+        }
+        else {
+            v8 = 255.0f;
+        }
+        a1->Set(4010, 17);
+        a1->Set(g_repairServicesMenu_trait_RepairCost, aiValue);
+        RepairServicesMenu::pMe->iRepairAllCost += aiValue;
+        a1->xChildren.Get(a1->xChildren.m_pkTail)->Set(4009, v8, true);
+        Tile* ChildByID = a1->GetChildByID(18);
+        ChildByID->Set(4009, v8, true);
+        a1->xChildren.Get(a1->xChildren.m_pkHead)->Set(4009, v8, true);
+        int32_t v7 = a1->GetFloat(4012) >= 0.0;
+        a1->Set(4003, v7);
+        float v6 = a2->GetItemHealth(true) * 0.6000000238418579;
+        Tile* v3 = a1->GetChildByID(18);
+        v3->Set(4017, v6, true);
+        int32_t iCanRepair = v8 == 255.0;
+        a1->Set(g_repairServicesMenu_trait_CanRepair, iCanRepair);
+        if (a2->GetWorn(false)) {
+            a1->xChildren.Get(a1->xChildren.m_pkHead)->Set(4003, 1);
         }
     }
 }
@@ -534,10 +526,9 @@ int32_t RepairServicesMenu::Compare(ListBoxItem<ItemChange*>* a1, ListBoxItem<It
     else {
         iResult = 1;
     }
-    if (bCannotRepair1) {
-        if (bCannotRepair2) {
-            iResult = -iResult;
-        }
+    if ((bCannotRepair1) && (bCannotRepair2)) {
+        iResult = -iResult;
     }
+
     return iResult;
 }

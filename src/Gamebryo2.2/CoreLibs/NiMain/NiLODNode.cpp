@@ -36,10 +36,9 @@ NiObject* NiLODNode::CreateClone(NiCloningProcess& kCloning) {
         CopyMembers(pkObject, kCloning);
         return pkObject;
     }
-    else {
-        CopyMembers(nullptr, kCloning);
-        return nullptr;
-    }
+
+    CopyMembers(nullptr, kCloning);
+    return nullptr;
 }
 
 // Up to 10.1.0.11 the ranges were stored inline in the node; they now live in a linked NiLODData.

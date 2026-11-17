@@ -64,10 +64,7 @@ void BSPSysMultiTargetEmitterCtlr::LinkObject(NiStream& kStream) {
 }
 
 bool BSPSysMultiTargetEmitterCtlr::RegisterStreamables(NiStream& kStream) {
-    if (!NiPSysEmitterCtlr::RegisterStreamables(kStream)) {
-        return false;
-    }
-    return true;
+    return NiPSysEmitterCtlr::RegisterStreamables(kStream);
 }
 
 void BSPSysMultiTargetEmitterCtlr::SaveBinary(NiStream& kStream) {
@@ -299,7 +296,6 @@ NiObject* BSPSysMultiTargetEmitterCtlr::CreateObject() {
     if (apMemory) {
         return ::new (apMemory) BSPSysMultiTargetEmitterCtlr;
     }
-    else {
-        return nullptr;
-    }
+
+    return nullptr;
 }

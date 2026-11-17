@@ -339,9 +339,8 @@ hkProcess* hkpConvexRadiusViewer::create(const hkArray<hkProcessContext*, hkCont
     if (v3) {
         return &static_cast<hkProcess&>(static_cast<hkpWorldViewerBase&>(*v3));
     }
-    else {
-        return nullptr;
-    }
+
+    return nullptr;
 }
 
 void hkpConvexRadiusViewer::registerViewer() {

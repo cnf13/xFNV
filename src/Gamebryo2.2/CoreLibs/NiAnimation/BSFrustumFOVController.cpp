@@ -35,10 +35,9 @@ NiObject* BSFrustumFOVController::CreateClone(NiCloningProcess& kCloning) {
         CopyMembers(v3, kCloning);
         return v3;
     }
-    else {
-        CopyMembers(nullptr, kCloning);
-        return nullptr;
-    }
+
+    CopyMembers(nullptr, kCloning);
+    return nullptr;
 }
 
 void BSFrustumFOVController::LoadBinary(NiStream& kStream) {

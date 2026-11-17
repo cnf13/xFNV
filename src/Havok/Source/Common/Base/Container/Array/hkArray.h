@@ -170,7 +170,7 @@ public:
     const U& operator[](int32_t index) const;
     // The element at index, without a bounds check. The return type is spelled through hkArrayElementReference so that
     // the void instance stays declarable.
-    typename hkArrayElementReference<T>::Type operator[](int32_t index) {
+    hkArrayElementReference<T>::Type operator[](int32_t index) {
         return m_data[index];
     }
     // Replaces numdel elements at index with numtoinsert copied from p, growing the storage through alloc. The body is

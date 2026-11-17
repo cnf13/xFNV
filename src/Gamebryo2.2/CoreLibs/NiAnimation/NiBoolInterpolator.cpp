@@ -38,10 +38,9 @@ NiObject* NiBoolInterpolator::CreateClone(NiCloningProcess& kCloning) {
         CopyMembers(pkObject, kCloning);
         return pkObject;
     }
-    else {
-        CopyMembers(nullptr, kCloning);
-        return nullptr;
-    }
+
+    CopyMembers(nullptr, kCloning);
+    return nullptr;
 }
 
 void NiBoolInterpolator::LoadBinary(NiStream& kStream) {
@@ -255,12 +254,11 @@ NiBoolKey* NiBoolInterpolator::GetKeys(uint32_t& uiNumKeys, NiAnimationKey::KeyT
         ucSize = m_pObject->m_ucKeySize;
         return m_pObject->m_pkKeys;
     }
-    else {
-        uiNumKeys = 0;
-        eType = NiAnimationKey::NOINTERP;
-        ucSize = 0;
-        return nullptr;
-    }
+
+    uiNumKeys = 0;
+    eType = NiAnimationKey::NOINTERP;
+    ucSize = 0;
+    return nullptr;
 }
 
 void NiBoolInterpolator::CopyMembers(NiBoolInterpolator* pkDest, NiCloningProcess& kCloning) {

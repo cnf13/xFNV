@@ -262,50 +262,48 @@ void BGSBodyPart::QueueFiles(IO_TASK_PRIORITY aePriority, QueuedFile* apParent) 
 
 // Resolves the form IDs the loader stored in the pointer fields to their forms.
 void BGSBodyPart::InitItem(TESForm* apParentForm) {
-    if (apParentForm) {
-        if (!apParentForm->GetInitialized()) {
-            uint32_t itempInt = static_cast<uint32_t>(reinterpret_cast<uintptr_t>(Data.pExplosion));
-            if (itempInt) {
-                TESFile* File = apParentForm->GetFile(-1);
-                TESForm::AddCompileIndex(itempInt, File);
-                TESForm* FormByNumericID = TESForm::GetFormByNumericID(itempInt);
-                Data.pExplosion = dynamic_cast<BGSExplosion*>(FormByNumericID);
-            }
-            itempInt = static_cast<uint32_t>(reinterpret_cast<uintptr_t>(Data.pExplosionGenericDebris));
-            if (itempInt) {
-                TESFile* v4 = apParentForm->GetFile(-1);
-                TESForm::AddCompileIndex(itempInt, v4);
-                TESForm* v5 = TESForm::GetFormByNumericID(itempInt);
-                Data.pExplosionGenericDebris = dynamic_cast<BGSDebris*>(v5);
-            }
-            itempInt = static_cast<uint32_t>(reinterpret_cast<uintptr_t>(Data.pDismemberExplosion));
-            if (itempInt) {
-                TESFile* v6 = apParentForm->GetFile(-1);
-                TESForm::AddCompileIndex(itempInt, v6);
-                TESForm* v7 = TESForm::GetFormByNumericID(itempInt);
-                Data.pDismemberExplosion = dynamic_cast<BGSExplosion*>(v7);
-            }
-            itempInt = static_cast<uint32_t>(reinterpret_cast<uintptr_t>(Data.pDismemberGenericDebris));
-            if (itempInt) {
-                TESFile* v8 = apParentForm->GetFile(-1);
-                TESForm::AddCompileIndex(itempInt, v8);
-                TESForm* v9 = TESForm::GetFormByNumericID(itempInt);
-                Data.pDismemberGenericDebris = dynamic_cast<BGSDebris*>(v9);
-            }
-            itempInt = static_cast<uint32_t>(reinterpret_cast<uintptr_t>(GetDismemberImpactDataSet()));
-            if (itempInt) {
-                TESFile* v10 = apParentForm->GetFile(-1);
-                TESForm::AddCompileIndex(itempInt, v10);
-                TESForm* v11 = TESForm::GetFormByNumericID(itempInt);
-                Data.pDismemberImpactDataSet = dynamic_cast<BGSImpactDataSet*>(v11);
-            }
-            itempInt = static_cast<uint32_t>(reinterpret_cast<uintptr_t>(Data.pExplosionImpactDataSet));
-            if (itempInt) {
-                TESFile* v12 = apParentForm->GetFile(-1);
-                TESForm::AddCompileIndex(itempInt, v12);
-                TESForm* v13 = TESForm::GetFormByNumericID(itempInt);
-                Data.pExplosionImpactDataSet = dynamic_cast<BGSImpactDataSet*>(v13);
-            }
+    if ((apParentForm) && (!apParentForm->GetInitialized())) {
+        uint32_t itempInt = static_cast<uint32_t>(reinterpret_cast<uintptr_t>(Data.pExplosion));
+        if (itempInt) {
+            TESFile* File = apParentForm->GetFile(-1);
+            TESForm::AddCompileIndex(itempInt, File);
+            TESForm* FormByNumericID = TESForm::GetFormByNumericID(itempInt);
+            Data.pExplosion = dynamic_cast<BGSExplosion*>(FormByNumericID);
+        }
+        itempInt = static_cast<uint32_t>(reinterpret_cast<uintptr_t>(Data.pExplosionGenericDebris));
+        if (itempInt) {
+            TESFile* v4 = apParentForm->GetFile(-1);
+            TESForm::AddCompileIndex(itempInt, v4);
+            TESForm* v5 = TESForm::GetFormByNumericID(itempInt);
+            Data.pExplosionGenericDebris = dynamic_cast<BGSDebris*>(v5);
+        }
+        itempInt = static_cast<uint32_t>(reinterpret_cast<uintptr_t>(Data.pDismemberExplosion));
+        if (itempInt) {
+            TESFile* v6 = apParentForm->GetFile(-1);
+            TESForm::AddCompileIndex(itempInt, v6);
+            TESForm* v7 = TESForm::GetFormByNumericID(itempInt);
+            Data.pDismemberExplosion = dynamic_cast<BGSExplosion*>(v7);
+        }
+        itempInt = static_cast<uint32_t>(reinterpret_cast<uintptr_t>(Data.pDismemberGenericDebris));
+        if (itempInt) {
+            TESFile* v8 = apParentForm->GetFile(-1);
+            TESForm::AddCompileIndex(itempInt, v8);
+            TESForm* v9 = TESForm::GetFormByNumericID(itempInt);
+            Data.pDismemberGenericDebris = dynamic_cast<BGSDebris*>(v9);
+        }
+        itempInt = static_cast<uint32_t>(reinterpret_cast<uintptr_t>(GetDismemberImpactDataSet()));
+        if (itempInt) {
+            TESFile* v10 = apParentForm->GetFile(-1);
+            TESForm::AddCompileIndex(itempInt, v10);
+            TESForm* v11 = TESForm::GetFormByNumericID(itempInt);
+            Data.pDismemberImpactDataSet = dynamic_cast<BGSImpactDataSet*>(v11);
+        }
+        itempInt = static_cast<uint32_t>(reinterpret_cast<uintptr_t>(Data.pExplosionImpactDataSet));
+        if (itempInt) {
+            TESFile* v12 = apParentForm->GetFile(-1);
+            TESForm::AddCompileIndex(itempInt, v12);
+            TESForm* v13 = TESForm::GetFormByNumericID(itempInt);
+            Data.pExplosionImpactDataSet = dynamic_cast<BGSImpactDataSet*>(v13);
         }
     }
 }

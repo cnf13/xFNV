@@ -85,11 +85,10 @@ MagicProjectile::~MagicProjectile() {
     if (pCurrentProcess) {
         ReferenceProcessLists.RemoveReference(this, pCurrentProcess->eLevel);
     }
-    if (pAVEffect) {
-        if (pAVEffect->GetModelLength()) {
-            pModelLoader->ReleaseModel(pAVEffect->GetModel(), false, 1u);
-        }
+    if ((pAVEffect) && (pAVEffect->GetModelLength())) {
+        pModelLoader->ReleaseModel(pAVEffect->GetModel(), false, 1u);
     }
+
     if (!pDataHandler->GetClearingData()) {
         CleanUpOtherMobileObjects(false);
     }
@@ -180,11 +179,10 @@ NiAVObject* MagicProjectile::Load3D(bool abBackgroundLoading) {
             bhkNiCollisionObject::ResetSim(apObject, true);
             const NiFixedString* v7 = &BSXFlags::Tag();
             BSXFlags* ExtraData = static_cast<BSXFlags*>(apObject->GetExtraData(*v7));
-            if (ExtraData) {
-                if (ExtraData->QAddon() && !GetFireOff()) {
-                    TESObjectREFR::AddAddonNodes(apObject);
-                }
+            if ((ExtraData) && (ExtraData->QAddon() && !GetFireOff())) {
+                TESObjectREFR::AddAddonNodes(apObject);
             }
+
             static_cast<BSFadeNode*>(apObject)->BSFadeNode::SetUserData(this);
             InitAnimation();
             float X = GetScale();
@@ -392,11 +390,9 @@ void MagicProjectile::KillAreaEffectGeometry() {
     NiNode* v8 = v2;
     v9 = (-1);
     if ((v6 & 1) != 0) {}
-    if (v8) {
-        if (v8->NiAVObject::GetParent()) {
-            parent = v8->NiAVObject::GetParent();
-            parent->DetachChild(v8);
-        }
+    if ((v8) && (v8->NiAVObject::GetParent())) {
+        parent = v8->NiAVObject::GetParent();
+        parent->DetachChild(v8);
     }
 }
 
@@ -404,11 +400,10 @@ NiAVObject* MagicProjectile::Clone3D(const char* apModelPath) {
     BSCloningProcess a2;
     NiNode* v5 = nullptr;
     NiNode* file = nullptr;
-    if (apModelPath) {
-        if (*apModelPath) {
-            file = pModelLoader->LoadFile(apModelPath, LOD_MULT_NONE, true, false, false, false);
-        }
+    if ((apModelPath) && (*apModelPath)) {
+        file = pModelLoader->LoadFile(apModelPath, LOD_MULT_NONE, true, false, false, false);
     }
+
     if (!file) {
         return v5;
     }

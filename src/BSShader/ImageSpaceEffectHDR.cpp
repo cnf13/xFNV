@@ -418,13 +418,13 @@ bool ImageSpaceEffectHDR::UpdateParams(ImageSpaceEffectParam* apParam) {
     if (!pfData) {
         return false;
     }
-    if (bResetAdaptedLight) {
-        // EXE-INLINED 0xBAD4A0
-        if (kAdaptedLight.GetTexture()) {
-            kAdaptedLight.ReturnRenderedTexture();
-            kAdaptedLight.ClearTexture();
-        }
+    if ((bResetAdaptedLight) && (kAdaptedLight.GetTexture()))
+    // EXE-INLINED 0xBAD4A0
+    {
+        kAdaptedLight.ReturnRenderedTexture();
+        kAdaptedLight.ClearTexture();
     }
+
     ImageSpaceShaderParam* pParam = pEffectParamList.m_pBase[2].m_pObject;
     ImageSpaceEffect* pCinematic =
         BSShaderManager::pImageSpaceManager->pEffectList.m_pBase[ImageSpaceManager::EFFECT_CINEMATIC];

@@ -367,11 +367,10 @@ bool TESObjectACTI::Activate(
     FNVD_INLINED_LOCAL(BSSoundHandle, sndHandle, std::nullopt, std::nullopt);
     Actor* pActionActor = nullptr;
     bool bstoreSoundLoopOnPlayer = false;
-    if (apActionRef) {
-        if (apActionRef->IsActor()) {
-            pActionActor = static_cast<Actor*>(apActionRef);
-        }
+    if ((apActionRef) && (apActionRef->IsActor())) {
+        pActionActor = static_cast<Actor*>(apActionRef);
     }
+
     if (pActionActor) {
         TESIdleManager::SetUsedItem(this);
         TESIdleManager::SetUsedItemActivate(true);
@@ -409,13 +408,12 @@ bool TESObjectACTI::Activate(
     if (pSoundActivate) {
         const NiPoint3* WorldTranslate;
         NiAVObject* psoundNode = nullptr;
-        if (apItemActivated) {
-            if (apItemActivated->Get3D()) {
-                NiNode* v20 = apItemActivated->Get3D();
-                NiFixedString* v9 = &FixedStrings::QAttachSound();
-                psoundNode = v20->GetObjectByName(*v9);
-            }
+        if ((apItemActivated) && (apItemActivated->Get3D())) {
+            NiNode* v20 = apItemActivated->Get3D();
+            NiFixedString* v9 = &FixedStrings::QAttachSound();
+            psoundNode = v20->GetObjectByName(*v9);
         }
+
         if (psoundNode) {
             WorldTranslate = &psoundNode->GetWorldTranslate();
         }

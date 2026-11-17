@@ -145,18 +145,17 @@ hkBool* hkpAabbPhantom::isOverlappingCollidableAdded(hkBool* arResult, const hkp
         arResult->m_bool = 0;
         return arResult;
     }
-    else {
-        hkpCollidable** pCollidables = m_overlappingCollidables.m_data;
-        while (*pCollidables != apCollidable) {
-            ++v4;
-            ++pCollidables;
-            if (v4 >= iSize) {
-                goto LABEL_5;
-            }
+
+    hkpCollidable** pCollidables = m_overlappingCollidables.m_data;
+    while (*pCollidables != apCollidable) {
+        ++v4;
+        ++pCollidables;
+        if (v4 >= iSize) {
+            goto LABEL_5;
         }
-        arResult->m_bool = 1;
-        return arResult;
     }
+    arResult->m_bool = 1;
+    return arResult;
 }
 
 void hkpAabbPhantom::removeOverlappingCollidable(hkpCollidable* collidable) {

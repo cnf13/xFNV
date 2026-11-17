@@ -80,24 +80,21 @@ void MessageMenu::DoClick(int32_t aiID, Tile* apTarget) {
     if (!apTarget && aiID >= 0 && aiID < 6) {
         apTarget = pTiles[aiID];
     }
-    if (aiID == 7) {
-        if (apTarget) {
-            char DataFor = buttonList.GetDataFor(apTarget);
-            InterfaceManager::Instance()->cLastMessageButtonClicked = DataFor;
-            MessageMenu::bCheckForDeletion = true;
-            if (MessageMenu::GetQueueHead()) {
-                if (MessageMenu::GetQueueHead()->fpResultCallback) {
-                    MessageMenu::MessageMenuEntry* QueueHead = MessageMenu::GetQueueHead();
-                    QueueHead->fpResultCallback();
-                }
-            }
-            MessageMenu::bCheckForDeletion = false;
-            if (MessageMenu::bDeletedDuringCheck) {
-                MessageMenu::bDeletedDuringCheck = false;
-            }
-            else {
-                MessageMenu::ClearMessageQueueHead();
-            }
+    if ((aiID == 7) && (apTarget)) {
+        char DataFor = buttonList.GetDataFor(apTarget);
+        InterfaceManager::Instance()->cLastMessageButtonClicked = DataFor;
+        MessageMenu::bCheckForDeletion = true;
+        if ((MessageMenu::GetQueueHead()) && (MessageMenu::GetQueueHead()->fpResultCallback)) {
+            MessageMenu::MessageMenuEntry* QueueHead = MessageMenu::GetQueueHead();
+            QueueHead->fpResultCallback();
+        }
+
+        MessageMenu::bCheckForDeletion = false;
+        if (MessageMenu::bDeletedDuringCheck) {
+            MessageMenu::bDeletedDuringCheck = false;
+        }
+        else {
+            MessageMenu::ClearMessageQueueHead();
         }
     }
 }
@@ -665,21 +662,16 @@ bool MessageMenu::Create() {
             Interface::SetGunScopeVisible(false);
             return true;
         }
-        else {
-            InitializationFlow("Message Menu Creation Failed... Are your menu and art resources up to date?");
-            return false;
-        }
-    }
-    else {
-        if (MessageMenu::pMe) {
-            if (MessageMenu::pMe->pMenu) {
-                if (MessageMenu::pMe) {
-                    delete MessageMenu::pMe;
-                }
-            }
-        }
+
+        InitializationFlow("Message Menu Creation Failed... Are your menu and art resources up to date?");
         return false;
     }
+
+    if ((MessageMenu::pMe) && (MessageMenu::pMe->pMenu) && (MessageMenu::pMe)) {
+        delete MessageMenu::pMe;
+    }
+
+    return false;
 }
 
 void MessageMenu::ClearMessageQueueHead() {
@@ -737,40 +729,39 @@ bool MessageMenu::AddMessageToQueue(
     while (apChoiceList && !apChoiceList->IsEmpty()) {
         BSstrcpy(Dst, 260, apChoiceList->m_item->pActivateChoiceLabel);
         BGSEntryPointFunctionDataActivateChoice* m_item = apChoiceList->m_item;
-        if (m_item->GetType() == 4) {
-            if (apChoiceList->m_item->pActivateChoiceLabel) {
-                // Tests the address of the item's ActivateChoiceScript, which is never null, as the game does.
-                {
-                    MessageMenu::PerkActivation* pperk =
-                        static_cast<MessageMenu::PerkActivation*>(ourMalloc(sizeof(MessageMenu::PerkActivation)));
-                    MessageMenu::PerkActivation* pperk_2 = pperk;
-                    char* FormHealth_0 = apChoiceList->m_item->pActivateChoiceLabel;
-                    pperk_2->DisplayText = FormHealth_0;
-                    Script* Script_ = &apChoiceList->m_item->ActivateChoiceScript;
-                    pperk_2->pScript = Script_;
-                    pperk_2->pActivatedObject = apActivationTarget;
-                    MessageMenu::xPerkActivations.Add(pperk_2);
-                    if (BSstrlen(Dst)) {
-                        using strtemp_t = std::basic_string<char, std::char_traits<char>, std::allocator<char>>;
-                        strtemp_t strtemp(static_cast<const char*>(Dst));
-                        uint32_t hotkeyIndex = strtemp.find(38, 0);
-                        if (hotkeyIndex != -1) {
-                            _Result = strtemp.substr(hotkeyIndex + 1, 1u);
-                            std::string* v20 = &_Result;
-                            const char* v5 = v20->c_str();
-                            pnewMessage_2->strHotkeys.operator+=(v5);
-                            strtemp.replace(hotkeyIndex, 1u, "");
-                        }
-                        const char* v6 = strtemp.c_str();
-                        if (BSstrcmp(v6, " ")) {
-                            const char* v7 = strtemp.c_str();
-                            pnewMessage_2->strButtonsText.operator+=(v7);
-                            pnewMessage_2->strButtonsText.operator+=(";");
-                        }
+        if ((m_item->GetType() == 4) && (apChoiceList->m_item->pActivateChoiceLabel)) {
+            // Tests the address of the item's ActivateChoiceScript, which is never null, as the game does.
+            {
+                MessageMenu::PerkActivation* pperk =
+                    static_cast<MessageMenu::PerkActivation*>(ourMalloc(sizeof(MessageMenu::PerkActivation)));
+                MessageMenu::PerkActivation* pperk_2 = pperk;
+                char* FormHealth_0 = apChoiceList->m_item->pActivateChoiceLabel;
+                pperk_2->DisplayText = FormHealth_0;
+                Script* Script_ = &apChoiceList->m_item->ActivateChoiceScript;
+                pperk_2->pScript = Script_;
+                pperk_2->pActivatedObject = apActivationTarget;
+                MessageMenu::xPerkActivations.Add(pperk_2);
+                if (BSstrlen(Dst)) {
+                    using strtemp_t = std::basic_string<char, std::char_traits<char>, std::allocator<char>>;
+                    strtemp_t strtemp(static_cast<const char*>(Dst));
+                    uint32_t hotkeyIndex = strtemp.find(38, 0);
+                    if (hotkeyIndex != -1) {
+                        _Result = strtemp.substr(hotkeyIndex + 1, 1u);
+                        std::string* v20 = &_Result;
+                        const char* v5 = v20->c_str();
+                        pnewMessage_2->strHotkeys.operator+=(v5);
+                        strtemp.replace(hotkeyIndex, 1u, "");
+                    }
+                    const char* v6 = strtemp.c_str();
+                    if (BSstrcmp(v6, " ")) {
+                        const char* v7 = strtemp.c_str();
+                        pnewMessage_2->strButtonsText.operator+=(v7);
+                        pnewMessage_2->strButtonsText.operator+=(";");
                     }
                 }
             }
         }
+
         apChoiceList = apChoiceList->m_pkNext;
     }
     int32_t itype = apActivationTarget->GetRefPromptType();

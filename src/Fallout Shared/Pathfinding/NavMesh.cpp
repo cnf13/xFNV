@@ -84,55 +84,48 @@ bool NavMesh::GetMatchingEdge(
                         if (potherTri->EdgeHasExtraInfo(otherEdgeIndex)) {
                             EdgeExtraInfo* potherInfo =
                                 potherMesh->GetEdgeExtraInfo(otherTriangleIndex, otherEdgeIndex);
-                            if (potherInfo) {
-                                if (potherInfo->Portal.pOtherMesh == GetNavMeshInfo() &&
-                                    potherInfo->Portal.sTriangle == ausTriangleIndex) {
-                                    break;
-                                }
+                            if ((potherInfo) &&
+                                (potherInfo->Portal.pOtherMesh == GetNavMeshInfo() &&
+                                 potherInfo->Portal.sTriangle == ausTriangleIndex)) {
+                                break;
                             }
                         }
                     }
                     if (otherEdgeIndex == 3) {
                         return false;
                     }
-                    else {
-                        *arpReturnNavMesh = potherMesh;
-                        *arOtherTriangleIndex = otherTriangleIndex;
-                        *arOtherEdgeIndex = otherEdgeIndex;
-                        return true;
-                    }
+
+                    *arpReturnNavMesh = potherMesh;
+                    *arOtherTriangleIndex = otherTriangleIndex;
+                    *arOtherEdgeIndex = otherEdgeIndex;
+                    return true;
                 }
-                else {
-                    return false;
-                }
-            }
-            else {
+
                 return false;
             }
-        }
-        else {
+
             return false;
         }
+
+        return false;
     }
-    else {
-        int32_t otherEdgeIndex_2;
-        *arpReturnNavMesh = this;
-        *arOtherTriangleIndex = pthisTri->GetTriOrExtraInfo(aiEdgeIndex);
-        NavMeshTriangle* potherTri_2 = GetTriangle(*arOtherTriangleIndex);
-        for (otherEdgeIndex_2 = 0; otherEdgeIndex_2 < 3 &&
-             (potherTri_2->EdgeHasExtraInfo(otherEdgeIndex_2) ||
-              potherTri_2->GetTriOrExtraInfo(otherEdgeIndex_2) != ausTriangleIndex);
-             ++otherEdgeIndex_2) {
-            ;
-        }
-        if (otherEdgeIndex_2 < 3) {
-            *arOtherEdgeIndex = otherEdgeIndex_2;
-            return true;
-        }
-        else {
-            return false;
-        }
+
+    int32_t otherEdgeIndex_2;
+    *arpReturnNavMesh = this;
+    *arOtherTriangleIndex = pthisTri->GetTriOrExtraInfo(aiEdgeIndex);
+    NavMeshTriangle* potherTri_2 = GetTriangle(*arOtherTriangleIndex);
+    for (otherEdgeIndex_2 = 0; otherEdgeIndex_2 < 3 &&
+         (potherTri_2->EdgeHasExtraInfo(otherEdgeIndex_2) ||
+          potherTri_2->GetTriOrExtraInfo(otherEdgeIndex_2) != ausTriangleIndex);
+         ++otherEdgeIndex_2) {
+        ;
     }
+    if (otherEdgeIndex_2 < 3) {
+        *arOtherEdgeIndex = otherEdgeIndex_2;
+        return true;
+    }
+
+    return false;
 }
 
 TESObjectCELL* NavMesh::GetParentCell() {
@@ -564,11 +557,9 @@ void NavMesh::CreateCoverArray() {
     CoverArray.Clear(false);
     uint32_t uiCount = Triangles.GetSize();
     for (uint32_t i = 0; i < uiCount; ++i) {
-        if (!GetTriangle(i)->GetFlag(NavMeshTriangle::NAV_TRI_DISABLED)) {
-            if (GetTriangle(i)->HasCover()) {
-                uint16_t usTriangle = i;
-                CoverArray.Add(usTriangle);
-            }
+        if ((!GetTriangle(i)->GetFlag(NavMeshTriangle::NAV_TRI_DISABLED)) && (GetTriangle(i)->HasCover())) {
+            uint16_t usTriangle = i;
+            CoverArray.Add(usTriangle);
         }
     }
 }
@@ -877,20 +868,14 @@ bool NavMesh::SetDisableNavMesh(uint32_t aiID, bool abDisable) {
             apMemory.~NiPointer<NavMesh>();
             return true;
         }
-        else {
-            Warning(
-                "DisableNavMesh Script Function: Did not find matching NavMesh for NavMesh ID parameter %08X", aiID
-            );
-            apMemory.~NiPointer<NavMesh>();
-            return false;
-        }
-    }
-    else {
-        Warning(
-            "DisableNavMesh Script Function: Did not find matching NavMeshInfo for NavMesh ID parameter %08X", aiID
-        );
+
+        Warning("DisableNavMesh Script Function: Did not find matching NavMesh for NavMesh ID parameter %08X", aiID);
+        apMemory.~NiPointer<NavMesh>();
         return false;
     }
+
+    Warning("DisableNavMesh Script Function: Did not find matching NavMeshInfo for NavMesh ID parameter %08X", aiID);
+    return false;
 }
 
 // Rounds deltas and ratios to float, then clamps the column before the row.

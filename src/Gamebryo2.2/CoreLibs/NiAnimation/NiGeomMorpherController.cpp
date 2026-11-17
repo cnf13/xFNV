@@ -55,10 +55,9 @@ NiObject* NiGeomMorpherController::CreateClone(NiCloningProcess& kCloning) {
         CopyMembers(v4, kCloning);
         return v4;
     }
-    else {
-        CopyMembers(nullptr, kCloning);
-        return nullptr;
-    }
+
+    CopyMembers(nullptr, kCloning);
+    return nullptr;
 }
 
 // Before 10.0.1.2 the flags come from the stream's time controller flags. Before 20.1.0.3 the interpolators are
@@ -399,9 +398,8 @@ NiInterpolator* NiGeomMorpherController::CreatePoseInterpolator(uint16_t usIndex
     if (v3) {
         return ::new (v3) NiFloatInterpolator(m_fWeight);
     }
-    else {
-        return nullptr;
-    }
+
+    return nullptr;
 }
 
 // Sets a float interpolator's pose value to the target's current weight. Any other interpolator (or null) is passed

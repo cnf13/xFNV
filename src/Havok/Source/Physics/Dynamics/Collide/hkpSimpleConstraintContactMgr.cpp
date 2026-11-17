@@ -403,11 +403,9 @@ hkpContactPointProperties* hkpSimpleConstraintContactMgr::getContactPointPropert
     if (m_contactConstraintData.m_idMgrA.m_values.m_data[id] == 255) {
         return nullptr;
     }
-    else {
-        hkpSimpleContactConstraintAtom* pAtom = m_contactConstraintData.m_atom;
-        return pAtom->getContactPointPropertiesStream(m_contactConstraintData.m_idMgrA.m_values.m_data[id])
-            ->asProperties();
-    }
+
+    hkpSimpleContactConstraintAtom* pAtom = m_contactConstraintData.m_atom;
+    return pAtom->getContactPointPropertiesStream(m_contactConstraintData.m_idMgrA.m_values.m_data[id])->asProperties();
 }
 
 hkContactPoint* hkpSimpleConstraintContactMgr::getContactPoint(uint16_t id) {

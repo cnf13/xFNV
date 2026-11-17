@@ -232,72 +232,69 @@ bool PathingSolution::FindPointOnPath(
             }
             return true;
         }
-        else {
-            if (apNewParameter) {
-                *apNewParameter = static_cast<float>(isize);
-            }
-            if (apNewPoint) {
-                PathingNode* v7 = GetLastNode();
-                *apNewPoint = (&v7->Location)->GetLocation();
-            }
-            return false;
-        }
-    }
-    else {
-        int32_t isize_2 = GetNodeCount() - 1;
-        if (!(afCurrentParameter <= 0.0)) {
-            int32_t icurrentSpline_2 = static_cast<int32_t>(afCurrentParameter);
-            if (icurrentSpline_2 < 0) {
-                icurrentSpline_2 = 0;
-            }
-            // The spline index is compared with the node count less one as signed integers.
-            if (icurrentSpline_2 >= static_cast<int32_t>(CurrentPathingNodes.GetSize() - 1)) {
-                --icurrentSpline_2;
-            }
-            float fcurrentParameter_2 = afCurrentParameter;
-            float fdist_2 = afDist;
-            PathingSpline spline_2;
-            PathingNode* v17 = &CurrentPathingNodes.GetAt(icurrentSpline_2 + 1);
-            PathingSplineKey kNextKeyB = v17->GetSplineKey();
-            PathingNode* v18 = &CurrentPathingNodes.GetAt(icurrentSpline_2);
-            spline_2.SetKeys(v18->GetSplineKey(), kNextKeyB);
-            float v30 = fcurrentParameter_2 - static_cast<double>(icurrentSpline_2);
-            for (bool bfound_2 = spline_2.FindPointOnSpline(v30, fdist_2, false, apNewParameter, apNewPoint, 1.0f);
-                 !bfound_2;
-                 bfound_2 = spline_2.FindPointOnSpline(1.0f, fdist_2, false, apNewParameter, apNewPoint, 1.0f)) {
-                float afEndParam = fcurrentParameter_2 - static_cast<double>(icurrentSpline_2);
-                double v20 = spline_2.ApproxLength(0.0f, afEndParam, 2u);
-                fdist_2 = fdist_2 - v20;
-                fcurrentParameter_2 = static_cast<float>(icurrentSpline_2--);
-                if (icurrentSpline_2 < 0) {
-                    if (apNewParameter) {
-                        *apNewParameter = 0.0f;
-                    }
-                    if (apNewPoint) {
-                        PathingNode* FirstNode = GetFirstNode();
-                        *apNewPoint = (&FirstNode->Location)->GetLocation();
-                    }
-                    return false;
-                }
-                PathingNode* v22 = &CurrentPathingNodes.GetAt(icurrentSpline_2 + 1);
-                PathingSplineKey kNextKeyC = v22->GetSplineKey();
-                PathingNode* v23 = &CurrentPathingNodes.GetAt(icurrentSpline_2);
-                spline_2.SetKeys(v23->GetSplineKey(), kNextKeyC);
-            }
-            if (apNewParameter) {
-                *apNewParameter = static_cast<double>(icurrentSpline_2) + *apNewParameter;
-            }
-            return true;
-        }
+
         if (apNewParameter) {
-            *apNewParameter = 0.0f;
+            *apNewParameter = static_cast<float>(isize);
         }
         if (apNewPoint) {
-            PathingNode* v16 = GetFirstNode();
-            *apNewPoint = (&v16->Location)->GetLocation();
+            PathingNode* v7 = GetLastNode();
+            *apNewPoint = (&v7->Location)->GetLocation();
         }
         return false;
     }
+
+    int32_t isize_2 = GetNodeCount() - 1;
+    if (!(afCurrentParameter <= 0.0)) {
+        int32_t icurrentSpline_2 = static_cast<int32_t>(afCurrentParameter);
+        if (icurrentSpline_2 < 0) {
+            icurrentSpline_2 = 0;
+        }
+        // The spline index is compared with the node count less one as signed integers.
+        if (icurrentSpline_2 >= static_cast<int32_t>(CurrentPathingNodes.GetSize() - 1)) {
+            --icurrentSpline_2;
+        }
+        float fcurrentParameter_2 = afCurrentParameter;
+        float fdist_2 = afDist;
+        PathingSpline spline_2;
+        PathingNode* v17 = &CurrentPathingNodes.GetAt(icurrentSpline_2 + 1);
+        PathingSplineKey kNextKeyB = v17->GetSplineKey();
+        PathingNode* v18 = &CurrentPathingNodes.GetAt(icurrentSpline_2);
+        spline_2.SetKeys(v18->GetSplineKey(), kNextKeyB);
+        float v30 = fcurrentParameter_2 - static_cast<double>(icurrentSpline_2);
+        for (bool bfound_2 = spline_2.FindPointOnSpline(v30, fdist_2, false, apNewParameter, apNewPoint, 1.0f);
+             !bfound_2; bfound_2 = spline_2.FindPointOnSpline(1.0f, fdist_2, false, apNewParameter, apNewPoint, 1.0f)) {
+            float afEndParam = fcurrentParameter_2 - static_cast<double>(icurrentSpline_2);
+            double v20 = spline_2.ApproxLength(0.0f, afEndParam, 2u);
+            fdist_2 = fdist_2 - v20;
+            fcurrentParameter_2 = static_cast<float>(icurrentSpline_2--);
+            if (icurrentSpline_2 < 0) {
+                if (apNewParameter) {
+                    *apNewParameter = 0.0f;
+                }
+                if (apNewPoint) {
+                    PathingNode* FirstNode = GetFirstNode();
+                    *apNewPoint = (&FirstNode->Location)->GetLocation();
+                }
+                return false;
+            }
+            PathingNode* v22 = &CurrentPathingNodes.GetAt(icurrentSpline_2 + 1);
+            PathingSplineKey kNextKeyC = v22->GetSplineKey();
+            PathingNode* v23 = &CurrentPathingNodes.GetAt(icurrentSpline_2);
+            spline_2.SetKeys(v23->GetSplineKey(), kNextKeyC);
+        }
+        if (apNewParameter) {
+            *apNewParameter = static_cast<double>(icurrentSpline_2) + *apNewParameter;
+        }
+        return true;
+    }
+    if (apNewParameter) {
+        *apNewParameter = 0.0f;
+    }
+    if (apNewPoint) {
+        PathingNode* v16 = GetFirstNode();
+        *apNewPoint = (&v16->Location)->GetLocation();
+    }
+    return false;
 }
 
 // Each segment's XY length is added to the float total at x87 precision.

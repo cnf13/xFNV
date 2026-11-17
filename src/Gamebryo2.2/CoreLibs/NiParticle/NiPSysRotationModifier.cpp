@@ -41,10 +41,9 @@ NiObject* NiPSysRotationModifier::CreateClone(NiCloningProcess& kCloning) {
         CopyMembers(pkObject, kCloning);
         return pkObject;
     }
-    else {
-        CopyMembers(nullptr, kCloning);
-        return nullptr;
-    }
+
+    CopyMembers(nullptr, kCloning);
+    return nullptr;
 }
 
 // Files before 20.0.0.2 store only the initial speed and the random-axis flag.
@@ -98,14 +97,12 @@ bool NiPSysRotationModifier::IsEqual(NiObject* pkObject) {
     }
 
     NiPSysRotationModifier* pkOther = static_cast<NiPSysRotationModifier*>(pkObject);
-    if (pkOther->m_fInitialRotSpeed != m_fInitialRotSpeed || pkOther->m_fInitialRotSpeedVar != m_fInitialRotSpeedVar ||
+    return !(
+        pkOther->m_fInitialRotSpeed != m_fInitialRotSpeed || pkOther->m_fInitialRotSpeedVar != m_fInitialRotSpeedVar ||
         pkOther->m_bRandomRotSpeedSign != m_bRandomRotSpeedSign || pkOther->m_fInitialRotAngle != m_fInitialRotAngle ||
         pkOther->m_fInitialRotAngleVar != m_fInitialRotAngleVar ||
-        pkOther->m_bRandomInitialAxis != m_bRandomInitialAxis || pkOther->m_kInitialAxis != m_kInitialAxis) {
-        return false;
-    }
-
-    return true;
+        pkOther->m_bRandomInitialAxis != m_bRandomInitialAxis || pkOther->m_kInitialAxis != m_kInitialAxis
+    );
 }
 
 void NiPSysRotationModifier::GetViewerStrings(NiTPrimitiveArray<char*>* pkStrings) {

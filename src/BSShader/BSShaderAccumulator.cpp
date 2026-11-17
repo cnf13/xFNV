@@ -173,9 +173,8 @@ bool BSShaderAccumulator::RegisterObject(NiGeometry* apGeometry) {
     if (v5) {
         return v5(this, apGeometry, p_m_PropertyState, pshp, m_spShader);
     }
-    else {
-        return BSShaderAccumulator::pRegisterObjectFunc[0](this, apGeometry, p_m_PropertyState, pshp, m_spShader);
-    }
+
+    return BSShaderAccumulator::pRegisterObjectFunc[0](this, apGeometry, p_m_PropertyState, pshp, m_spShader);
 }
 
 bool BSShaderAccumulator::AddShared(NiAVObject* apObject) {
@@ -735,11 +734,10 @@ void BSShaderAccumulator::RemoveBoundVolume(uint32_t auiReferenceID) {
             pvolume = m_pkHead->m_element;
             m_pkHead = m_pkHead->m_pkNext;
             v7 = pvolume;
-            if (pvolume) {
-                if (pvolume->uiReferenceID == auiReferenceID) {
-                    break;
-                }
+            if ((pvolume) && (pvolume->uiReferenceID == auiReferenceID)) {
+                break;
             }
+
             if (!m_pkHead) {
                 return;
             }
@@ -770,11 +768,10 @@ bool BSShaderAccumulator::IsBoundVolumeOccluded(uint32_t auiReferenceID, bool ab
     while (true) {
         pvolume = m_pkHead->m_element;
         m_pkHead = m_pkHead->m_pkNext;
-        if (pvolume) {
-            if (pvolume->uiReferenceID == auiReferenceID) {
-                break;
-            }
+        if ((pvolume) && (pvolume->uiReferenceID == auiReferenceID)) {
+            break;
         }
+
         if (!m_pkHead) {
             return false;
         }
@@ -1173,11 +1170,10 @@ void BSShaderAccumulator::SetShadowLight(ShadowSceneLight* apLight) {
     ShadowSceneLight* m_pObject;
     m_pObject = spShadowLight.m_pObject;
     if (m_pObject != apLight) {
-        if (m_pObject) {
-            if (!InterlockedDecrementUInt32(&m_pObject->m_uiRefCount)) {
-                m_pObject->DeleteThis();
-            }
+        if ((m_pObject) && (!InterlockedDecrementUInt32(&m_pObject->m_uiRefCount))) {
+            m_pObject->DeleteThis();
         }
+
         spShadowLight.m_pObject = apLight;
         if (apLight) {
             InterlockedIncrementUInt32(&apLight->m_uiRefCount);
@@ -1284,11 +1280,10 @@ void BSShaderAccumulator::AddAndUpdateBoundVolume(uint32_t auiReferenceID, const
         while (true) {
             pvolume = m_pkHead->m_element;
             m_pkHead = m_pkHead->m_pkNext;
-            if (pvolume) {
-                if (pvolume->uiReferenceID == auiReferenceID) {
-                    break;
-                }
+            if ((pvolume) && (pvolume->uiReferenceID == auiReferenceID)) {
+                break;
             }
+
             if (!m_pkHead) {
                 goto LABEL_5;
             }
@@ -1381,7 +1376,7 @@ void BSShaderAccumulator::EvaluateSunOcclusionResults(uint32_t aiTestNumber) {
                 // The pixel count is read into aiTestNumber, overwriting it, as the game does; kTest keeps the index.
                 uint32_t& uiPixelCount = aiTestNumber;
                 bool bResult = pQuery->GetResultNoWait(&uiPixelCount, true);
-                if (bResult == true) {
+                if (bResult) {
                     if (uiPixelCount) {
                         uint32_t uiClamped = 1500;
                         if (uiPixelCount <= 1500) {
@@ -1967,12 +1962,10 @@ void BSBatchRenderer::ClearAlphaLists(int32_t aiSide) {
 }
 
 void ImageSpaceShaderVolumetricFog::ReturnVolumetricFogTexture() {
-    if (pTextures.m_pBase[2]) {
-        if (pTextures.m_pBase[2]->GetRenderedTexture()) {
-            BSTextureManager* pTextureManager = BSShaderManager::pTextureManager;
-            BSRenderedTexture* pRenderedTexture = pTextures.m_pBase[2]->GetRenderedTexture();
-            pTextureManager->ReturnRenderedTexture(pRenderedTexture);
-            pTextures.m_pBase[2]->SetTexture(static_cast<BSRenderedTexture*>(nullptr));
-        }
+    if ((pTextures.m_pBase[2]) && (pTextures.m_pBase[2]->GetRenderedTexture())) {
+        BSTextureManager* pTextureManager = BSShaderManager::pTextureManager;
+        BSRenderedTexture* pRenderedTexture = pTextures.m_pBase[2]->GetRenderedTexture();
+        pTextureManager->ReturnRenderedTexture(pRenderedTexture);
+        pTextures.m_pBase[2]->SetTexture(static_cast<BSRenderedTexture*>(nullptr));
     }
 }

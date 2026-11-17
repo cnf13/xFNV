@@ -71,9 +71,8 @@ void* hkObjectResource::getContentsPointer(const char* typeName, const hkTypeInf
     if (v8->isSuperClass(&isSuper, *v7)->m_bool) {
         return m_topLevelObject.m_object;
     }
-    else {
-        return nullptr;
-    }
+
+    return nullptr;
 }
 
 const char* hkObjectResource::getContentsTypeName() const {

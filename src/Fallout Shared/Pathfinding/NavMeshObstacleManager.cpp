@@ -227,10 +227,8 @@ void NavMeshObstacleManager::Update() {
                 }
             }
             else {
-                if (iBackgroundTaskCount) {
-                    if (iBackgroundTaskCount == iProcessedTaskCount) {
-                        bneedsToQueueNewTasks = fTimeToNextSwap <= 0.0;
-                    }
+                if ((iBackgroundTaskCount) && (iBackgroundTaskCount == iProcessedTaskCount)) {
+                    bneedsToQueueNewTasks = fTimeToNextSwap <= 0.0;
                 }
             }
             if (bneedsToQueueNewTasks) {
@@ -1338,12 +1336,10 @@ void NavMeshObstacleManager::CreateBoundingBox3DNode(
 }
 
 void NavMeshObstacleManager::RemoveBoundingBox3DNode(const NiPointer<ObstacleData>& aBox) {
-    if (spObstacleRootNode.m_pObject) {
-        if (aBox.m_pObject->sp3DNode.m_pObject) {
-            NiNode* v2 = spObstacleRootNode.m_pObject;
-            v2->DetachChild(aBox.m_pObject->sp3DNode.m_pObject);
-            aBox.m_pObject->sp3DNode.operator=(static_cast<NiTriShape*>(nullptr));
-        }
+    if ((spObstacleRootNode.m_pObject) && (aBox.m_pObject->sp3DNode.m_pObject)) {
+        NiNode* v2 = spObstacleRootNode.m_pObject;
+        v2->DetachChild(aBox.m_pObject->sp3DNode.m_pObject);
+        aBox.m_pObject->sp3DNode.operator=(static_cast<NiTriShape*>(nullptr));
     }
 }
 
@@ -1424,24 +1420,23 @@ bool NavMeshObstacleManager::FindFirstObstacleFor3D(NiAVObject* ap3D, ObstacleDa
         NavMeshObstacleManager::UpdateObstacleData(apRetObstacle);
         return true;
     }
-    else {
-        NiNode* pnode = ap3D->IsNode();
-        if (pnode) {
-            for (uint32_t i = 0;; ++i) {
-                uint32_t ChildCount = pnode->GetChildCount();
-                if (i >= ChildCount) {
-                    break;
-                }
-                if (pnode->GetAt(i)) {
-                    NiAVObject* v5 = pnode->GetAt(i);
-                    if (NavMeshObstacleManager::FindFirstObstacleFor3D(v5, apRetObstacle)) {
-                        return true;
-                    }
+
+    NiNode* pnode = ap3D->IsNode();
+    if (pnode) {
+        for (uint32_t i = 0;; ++i) {
+            uint32_t ChildCount = pnode->GetChildCount();
+            if (i >= ChildCount) {
+                break;
+            }
+            if (pnode->GetAt(i)) {
+                NiAVObject* v5 = pnode->GetAt(i);
+                if (NavMeshObstacleManager::FindFirstObstacleFor3D(v5, apRetObstacle)) {
+                    return true;
                 }
             }
         }
-        return false;
     }
+    return false;
 }
 
 // Adds an obstacle for every rigid body of a static, clutter, prop, large debris or small transparent animated layer in
@@ -1651,19 +1646,15 @@ bool NavMeshObstacleManager::GetCellListForObstacle(
                 int32_t y = x_2;
                 TESWorldSpace* WorldSpace = pcell->GetWorldSpace();
                 TESObjectCELL* pgridCell = WorldSpace->GetCellFromCellCoord(y, z);
-                if (pgridCell) {
-                    if (pgridCell->GetAttached()) {
-                        NiPoint3 gridcellMin(
-                            static_cast<float>(x_2 << 12), static_cast<float>(y_2 << 12), -3.4028235e+38f
-                        );
-                        float v9 = gridcellMin.y + 4096.0;
-                        float v8 = gridcellMin.x + 4096.0;
-                        NiPoint3 gridcellMax(v8, v9, 3.4028235e+38f);
-                        if (Pathing::DoAABBsOverlap(
-                                gridcellMin, gridcellMax, apData.m_pObject->aabbMin, apData.m_pObject->aabbMax
-                            )) {
-                            apReturnCellArray->Add(pgridCell);
-                        }
+                if ((pgridCell) && (pgridCell->GetAttached())) {
+                    NiPoint3 gridcellMin(static_cast<float>(x_2 << 12), static_cast<float>(y_2 << 12), -3.4028235e+38f);
+                    float v9 = gridcellMin.y + 4096.0;
+                    float v8 = gridcellMin.x + 4096.0;
+                    NiPoint3 gridcellMax(v8, v9, 3.4028235e+38f);
+                    if (Pathing::DoAABBsOverlap(
+                            gridcellMin, gridcellMax, apData.m_pObject->aabbMin, apData.m_pObject->aabbMax
+                        )) {
+                        apReturnCellArray->Add(pgridCell);
                     }
                 }
             }

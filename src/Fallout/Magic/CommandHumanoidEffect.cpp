@@ -54,7 +54,6 @@ ActiveEffect* CommandHumanoidEffect::Instantiate(MagicCaster* apCaster, MagicIte
     if (apMemory) {
         return ::new (apMemory) CommandHumanoidEffect(apCaster, apSpell, apEffect);
     }
-    else {
-        return nullptr;
-    }
+
+    return nullptr;
 }

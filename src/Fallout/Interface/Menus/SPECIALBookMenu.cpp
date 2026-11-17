@@ -1294,10 +1294,8 @@ void SPECIALBookMenu::Create(int32_t aiTotalPoints) {
         }
     }
     else {
-        if (pmenu) {
-            if (pmenu->pMenu) {
-                delete pmenu;
-            }
+        if ((pmenu) && (pmenu->pMenu)) {
+            delete pmenu;
         }
     }
 }
@@ -1307,26 +1305,24 @@ int32_t SPECIALBookMenu::GetClassStatic() {
 }
 
 void SPECIALBookMenu::Draw3DElements() {
-    if (SPECIALBookMenu::pSPECIALBookMenu) {
-        if (SPECIALBookMenu::sp3DCamera.m_pObject) {
-            NiRenderer* Renderer_ = NiRenderer::GetRenderer();
-            Renderer_->ClearBuffer(nullptr, 4u);
-            SceneGraph* apSceneGraph = Main::GetWorldSceneGraph();
-            BSCullingProcess* apCuller = apSceneGraph->pCuller;
-            apCuller->PushCullMode(BSCullingProcess::BSCP_CULL_ALLPASS);
-            NiCamera* pcam = SPECIALBookMenu::sp3DCamera.m_pObject;
-            NiCamera::HandleEyeFinityFOVScale(pcam, 0.15f);
-            InterfaceManager* v1 = InterfaceManager::Instance();
-            NiPointer<BSShaderAccumulator> spaccum(v1->Get3dAccumulator());
-            BSShaderAccumulator* afScale = spaccum.m_pObject;
-            apCuller->SetAccumulator(afScale);
-            ShadowSceneNode* ShadowSceneNode_ = BSShaderManager::GetShadowSceneNode(1);
-            BSShaderUtil::AccumulateScene(pcam, ShadowSceneNode_, *apCuller);
-            BSShaderAccumulator* v3 = spaccum.m_pObject;
-            BSShaderUtil::RenderScene(pcam, v3, false);
-            apCuller->SetAccumulator(nullptr);
-            apCuller->PopCullMode();
-        }
+    if ((SPECIALBookMenu::pSPECIALBookMenu) && (SPECIALBookMenu::sp3DCamera.m_pObject)) {
+        NiRenderer* Renderer_ = NiRenderer::GetRenderer();
+        Renderer_->ClearBuffer(nullptr, 4u);
+        SceneGraph* apSceneGraph = Main::GetWorldSceneGraph();
+        BSCullingProcess* apCuller = apSceneGraph->pCuller;
+        apCuller->PushCullMode(BSCullingProcess::BSCP_CULL_ALLPASS);
+        NiCamera* pcam = SPECIALBookMenu::sp3DCamera.m_pObject;
+        NiCamera::HandleEyeFinityFOVScale(pcam, 0.15f);
+        InterfaceManager* v1 = InterfaceManager::Instance();
+        NiPointer<BSShaderAccumulator> spaccum(v1->Get3dAccumulator());
+        BSShaderAccumulator* afScale = spaccum.m_pObject;
+        apCuller->SetAccumulator(afScale);
+        ShadowSceneNode* ShadowSceneNode_ = BSShaderManager::GetShadowSceneNode(1);
+        BSShaderUtil::AccumulateScene(pcam, ShadowSceneNode_, *apCuller);
+        BSShaderAccumulator* v3 = spaccum.m_pObject;
+        BSShaderUtil::RenderScene(pcam, v3, false);
+        apCuller->SetAccumulator(nullptr);
+        apCuller->PopCullMode();
     }
 }
 
@@ -1380,30 +1376,27 @@ void SPECIALBookMenu::RefreshTotalPointsText(SPECIALBookMenu::SpecialBookTextIte
 }
 
 void SPECIALBookMenu::RefreshTotalPointsValue(SPECIALBookMenu::SpecialBookTextItem* apTextItem) {
-    if (apTextItem->pText[0u]) {
-        if (apTextItem->pText[1]) {
-            int32_t v1 = SPECIALBookMenu::pSPECIALBookMenu->iAvailablePoints - PlayerCharacter::GetSumOfSPECIALStats();
-            if (v1) {
-                if (v1 / 10 <= 0) {
-                    apTextItem->pTextObj[0u]->SetAppCulled(true);
-                }
-                else {
-                    apTextItem->pTextObj[0u]->SetAppCulled(false);
-                    apTextItem->pText[0u]->SetTexture(
-                        BSShaderProperty::TEXTYPE_DIFFUSE, 0,
-                        SPECIALBookMenu::pSPECIALBookMenu->spAVValues[v1 / 10].m_pObject
-                    );
-                }
-                apTextItem->pTextObj[1]->SetAppCulled(false);
-                apTextItem->pText[1]->SetTexture(
-                    BSShaderProperty::TEXTYPE_DIFFUSE, 0,
-                    SPECIALBookMenu::pSPECIALBookMenu->spAVValues[v1 % 10].m_pObject
-                );
+    if ((apTextItem->pText[0u]) && (apTextItem->pText[1])) {
+        int32_t v1 = SPECIALBookMenu::pSPECIALBookMenu->iAvailablePoints - PlayerCharacter::GetSumOfSPECIALStats();
+        if (v1) {
+            if (v1 / 10 <= 0) {
+                apTextItem->pTextObj[0u]->SetAppCulled(true);
             }
             else {
-                apTextItem->pTextObj[0u]->SetAppCulled(true);
-                apTextItem->pTextObj[1]->SetAppCulled(true);
+                apTextItem->pTextObj[0u]->SetAppCulled(false);
+                apTextItem->pText[0u]->SetTexture(
+                    BSShaderProperty::TEXTYPE_DIFFUSE, 0,
+                    SPECIALBookMenu::pSPECIALBookMenu->spAVValues[v1 / 10].m_pObject
+                );
             }
+            apTextItem->pTextObj[1]->SetAppCulled(false);
+            apTextItem->pText[1]->SetTexture(
+                BSShaderProperty::TEXTYPE_DIFFUSE, 0, SPECIALBookMenu::pSPECIALBookMenu->spAVValues[v1 % 10].m_pObject
+            );
+        }
+        else {
+            apTextItem->pTextObj[0u]->SetAppCulled(true);
+            apTextItem->pTextObj[1]->SetAppCulled(true);
         }
     }
 }

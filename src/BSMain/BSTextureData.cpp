@@ -128,9 +128,8 @@ NiObject* BSTextureData::CreateObject() {
     if (v2) {
         return ::new (v2) BSTextureData;
     }
-    else {
-        return nullptr;
-    }
+
+    return nullptr;
 }
 
 void BSTextureData::KillSDM() {

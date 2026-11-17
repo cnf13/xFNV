@@ -246,29 +246,28 @@ void ArrowProjectile::SaveGame(uint32_t aiFlags) {
             SaveNumericID(&icollideeID, 4);
             icollisionObjectCount = 0;
             icollisionObjectIndex = 0xFFFF;
-            if (psCollisionData->pCollidee) {
-                if (psCollisionData->pClosestObject) {
-                    if (bNeedsFinishInitLoadGame) {
-                        uint32_t iclosestObject =
-                            static_cast<uint32_t>(reinterpret_cast<uintptr_t>(psCollisionData->pClosestObject));
-                        icollisionObjectCount = static_cast<uint16_t>(iclosestObject >> 16);
-                        icollisionObjectIndex = static_cast<uint16_t>(iclosestObject);
-                    }
-                    else {
-                        bool bignoreWeaponBoneAndFadeNodes = psCollisionData->eCollisionType == 0;
-                        NiNode* v2 = psCollisionData->pCollidee->TESObjectREFR::Get3D();
-                        icollisionObjectCount = GetCollisionObjectCountInSceneGraph(
-                            v2, bignoreWeaponBoneAndFadeNodes, bignoreWeaponBoneAndFadeNodes, true
-                        );
-                        bhkNiCollisionObject* pcol =
-                            bhkNiCollisionObject::GetbhkNiCollisionObject(psCollisionData->pClosestObject);
-                        NiNode* v3 = psCollisionData->pCollidee->TESObjectREFR::Get3D();
-                        icollisionObjectIndex = GetCollisionObjectIndexInSceneGraph(
-                            v3, pcol, bignoreWeaponBoneAndFadeNodes, bignoreWeaponBoneAndFadeNodes, true
-                        );
-                    }
+            if ((psCollisionData->pCollidee) && (psCollisionData->pClosestObject)) {
+                if (bNeedsFinishInitLoadGame) {
+                    uint32_t iclosestObject =
+                        static_cast<uint32_t>(reinterpret_cast<uintptr_t>(psCollisionData->pClosestObject));
+                    icollisionObjectCount = static_cast<uint16_t>(iclosestObject >> 16);
+                    icollisionObjectIndex = static_cast<uint16_t>(iclosestObject);
+                }
+                else {
+                    bool bignoreWeaponBoneAndFadeNodes = psCollisionData->eCollisionType == 0;
+                    NiNode* v2 = psCollisionData->pCollidee->TESObjectREFR::Get3D();
+                    icollisionObjectCount = GetCollisionObjectCountInSceneGraph(
+                        v2, bignoreWeaponBoneAndFadeNodes, bignoreWeaponBoneAndFadeNodes, true
+                    );
+                    bhkNiCollisionObject* pcol =
+                        bhkNiCollisionObject::GetbhkNiCollisionObject(psCollisionData->pClosestObject);
+                    NiNode* v3 = psCollisionData->pCollidee->TESObjectREFR::Get3D();
+                    icollisionObjectIndex = GetCollisionObjectIndexInSceneGraph(
+                        v3, pcol, bignoreWeaponBoneAndFadeNodes, bignoreWeaponBoneAndFadeNodes, true
+                    );
                 }
             }
+
             SaveGameDataOLD(&icollisionObjectCount, 2);
             SaveGameDataOLD(&icollisionObjectIndex, 2);
         }
@@ -501,15 +500,14 @@ void ArrowProjectile::InitLoadGame(uint32_t aiFlags, uint32_t aiOldFlags) {
         TESForm* v5 = TESForm::GetFormByNumericID(ipoisonID);
         pPoison = dynamic_cast<AlchemyItem*>(v5);
     }
-    if (psCollisionData) {
-        if (psCollisionData->eCollisionType <= 1) {
-            uint32_t icollideeID = static_cast<uint32_t>(reinterpret_cast<uintptr_t>(psCollisionData->pCollidee));
-            if (icollideeID) {
-                TESForm* v6 = TESForm::GetFormByNumericID(icollideeID);
-                psCollisionData->pCollidee = dynamic_cast<TESObjectREFR*>(v6);
-            }
+    if ((psCollisionData) && (psCollisionData->eCollisionType <= 1)) {
+        uint32_t icollideeID = static_cast<uint32_t>(reinterpret_cast<uintptr_t>(psCollisionData->pCollidee));
+        if (icollideeID) {
+            TESForm* v6 = TESForm::GetFormByNumericID(icollideeID);
+            psCollisionData->pCollidee = dynamic_cast<TESObjectREFR*>(v6);
         }
     }
+
     PROCESS_TYPE CurrentProcessType = GetCurrentProcessType();
     ReferenceProcessLists.RemoveReference(this, CurrentProcessType);
     PROCESS_TYPE v8 = GetCurrentProcessType();
@@ -524,56 +522,55 @@ void ArrowProjectile::FinishInitLoadGame(uint32_t aiFlags, uint32_t aiOldFlags) 
     if (TESObjectREFR::Get3D()) {
         InitHavok(pShooter, 1.0f);
         MobileObject::FinishInitLoadGame(aiFlags, aiOldFlags);
-        if (psCollisionData) {
-            if (psCollisionData->eCollisionType <= 1) {
-                if (pSaveLoadGameOLD->GetCurrentVersion() >= 32u) {
-                    bool bignoreWeaponBoneAndFadeNodes = psCollisionData->eCollisionType == 0;
-                    int32_t icollisionObjectIndex =
-                        static_cast<int32_t>(reinterpret_cast<uintptr_t>(psCollisionData->pClosestObject));
-                    psCollisionData->pClosestObject = nullptr;
-                    if (psCollisionData->pCollidee) {
-                        NiNode* v3 = psCollisionData->pCollidee->TESObjectREFR::Get3D();
-                        if (static_cast<uint16_t>(icollisionObjectIndex >> 16) ==
-                            static_cast<uint16_t>(GetCollisionObjectCountInSceneGraph(
-                                v3, bignoreWeaponBoneAndFadeNodes, bignoreWeaponBoneAndFadeNodes, true
-                            ))) {
-                            if (icollisionObjectIndex != -1) {
-                                NiNode* v4 = psCollisionData->pCollidee->TESObjectREFR::Get3D();
-                                bhkNiCollisionObject* pcol = GetCollisionObjectByIndexInSceneGraph(
-                                    v4, icollisionObjectIndex, bignoreWeaponBoneAndFadeNodes,
-                                    bignoreWeaponBoneAndFadeNodes, true
-                                );
-                                if (pcol) {
-                                    psCollisionData->pClosestObject = pcol->m_pkSceneObject;
-                                }
+        if ((psCollisionData) && (psCollisionData->eCollisionType <= 1)) {
+            if (pSaveLoadGameOLD->GetCurrentVersion() >= 32u) {
+                bool bignoreWeaponBoneAndFadeNodes = psCollisionData->eCollisionType == 0;
+                int32_t icollisionObjectIndex =
+                    static_cast<int32_t>(reinterpret_cast<uintptr_t>(psCollisionData->pClosestObject));
+                psCollisionData->pClosestObject = nullptr;
+                if (psCollisionData->pCollidee) {
+                    NiNode* v3 = psCollisionData->pCollidee->TESObjectREFR::Get3D();
+                    if (static_cast<uint16_t>(icollisionObjectIndex >> 16) ==
+                        static_cast<uint16_t>(GetCollisionObjectCountInSceneGraph(
+                            v3, bignoreWeaponBoneAndFadeNodes, bignoreWeaponBoneAndFadeNodes, true
+                        ))) {
+                        if (icollisionObjectIndex != -1) {
+                            NiNode* v4 = psCollisionData->pCollidee->TESObjectREFR::Get3D();
+                            bhkNiCollisionObject* pcol = GetCollisionObjectByIndexInSceneGraph(
+                                v4, icollisionObjectIndex, bignoreWeaponBoneAndFadeNodes, bignoreWeaponBoneAndFadeNodes,
+                                true
+                            );
+                            if (pcol) {
+                                psCollisionData->pClosestObject = pcol->m_pkSceneObject;
                             }
                         }
-                        else {
-                            int32_t a4 = psCollisionData->pCollidee->iFormID;
-                            Warning(
-                                "AI: Collision object count has changed on object %s %08",
-                                psCollisionData->pCollidee->GetFormEditorID(), a4
-                            );
-                        }
-                    }
-                }
-                if (pSaveLoadGameOLD->GetCurrentVersion() < 32u) {
-                    char* pstring = reinterpret_cast<char*>(psCollisionData->pClosestObject);
-                    if (psCollisionData->pCollidee) {
-                        NiNode* v5 = psCollisionData->pCollidee->TESObjectREFR::Get3D();
-                        psCollisionData->pClosestObject =
-                            BSUtilities::GetObjectByName(static_cast<NiAVObject*>(v5), pstring);
                     }
                     else {
-                        psCollisionData->pClosestObject = nullptr;
+                        int32_t a4 = psCollisionData->pCollidee->iFormID;
+                        Warning(
+                            "AI: Collision object count has changed on object %s %08",
+                            psCollisionData->pCollidee->GetFormEditorID(), a4
+                        );
                     }
-                    ourFree(pstring);
-                }
-                if (!psCollisionData->pClosestObject) {
-                    psCollisionData->eCollisionType = 3;
                 }
             }
+            if (pSaveLoadGameOLD->GetCurrentVersion() < 32u) {
+                char* pstring = reinterpret_cast<char*>(psCollisionData->pClosestObject);
+                if (psCollisionData->pCollidee) {
+                    NiNode* v5 = psCollisionData->pCollidee->TESObjectREFR::Get3D();
+                    psCollisionData->pClosestObject =
+                        BSUtilities::GetObjectByName(static_cast<NiAVObject*>(v5), pstring);
+                }
+                else {
+                    psCollisionData->pClosestObject = nullptr;
+                }
+                ourFree(pstring);
+            }
+            if (!psCollisionData->pClosestObject) {
+                psCollisionData->eCollisionType = 3;
+            }
         }
+
         pSaveLoadGameOLD->QueueFormForFinalization(this);
     }
     else {
@@ -687,9 +684,8 @@ bool ArrowProjectile::ChangeProcessLevel() {
             }
             return false;
         }
-        else {
-            MovetoMiddleHigh();
-        }
+
+        MovetoMiddleHigh();
     }
     else {
         MovetoHigh();
@@ -705,13 +701,10 @@ void ArrowProjectile::Update(float afDelta) {
     NiMatrix3 rot;
     if (bNeedsFinishInitLoadGame) {
         bool bready = true;
-        if (psCollisionData) {
-            if (psCollisionData->eCollisionType <= 1) {
-                if (psCollisionData->pCollidee) {
-                    bready = psCollisionData->pCollidee->TESObjectREFR::Get3D() != nullptr;
-                }
-            }
+        if ((psCollisionData) && (psCollisionData->eCollisionType <= 1) && (psCollisionData->pCollidee)) {
+            bready = psCollisionData->pCollidee->TESObjectREFR::Get3D() != nullptr;
         }
+
         if (bready) {
             bNeedsFinishInitLoadGame = false;
             FinishInitLoadGame(iLoadGameFlags, 0);
@@ -735,29 +728,27 @@ void ArrowProjectile::Update(float afDelta) {
         if (eState || !GetCharController()) {
             if (eState == ArrowProjectile::STATE_POST_COLLISION && psCollisionData) {
                 uint32_t ecolType = psCollisionData->eCollisionType;
-                if (p3d) {
-                    if (!ecolType) {
-                        SetLocationOnReference(p3d->GetWorldTranslate());
-                        TESObjectCELL* pcell = nullptr;
-                        if (psCollisionData->pCollidee) {
-                            pcell = psCollisionData->pCollidee->GetParentCell();
+                if ((p3d) && (!ecolType)) {
+                    SetLocationOnReference(p3d->GetWorldTranslate());
+                    TESObjectCELL* pcell = nullptr;
+                    if (psCollisionData->pCollidee) {
+                        pcell = psCollisionData->pCollidee->GetParentCell();
+                    }
+                    if (pcell != GetParentCell()) {
+                        if (pcell) {
+                            ReferenceProcessLists.AddActorToTempChangeList(this);
                         }
-                        if (pcell != GetParentCell()) {
-                            if (pcell) {
-                                ReferenceProcessLists.AddActorToTempChangeList(this);
-                            }
-                            else {
-                                SetDelete(true);
-                            }
+                        else {
+                            SetDelete(true);
                         }
                     }
                 }
-                if (p3d) {
-                    if (ecolType == 1 &&
-                        (!psCollisionData ||
-                         (!psCollisionData->pCollidee || !psCollisionData->pCollidee->TESObjectREFR::Get3D()))) {
-                        SetDelete(true);
-                    }
+
+                if ((p3d) &&
+                    (ecolType == 1 &&
+                     (!psCollisionData ||
+                      (!psCollisionData->pCollidee || !psCollisionData->pCollidee->TESObjectREFR::Get3D())))) {
+                    SetDelete(true);
                 }
             }
             else {
@@ -966,9 +957,8 @@ TESObjectREFR* ArrowProjectile::GetAttachedRef() {
     if (psCollisionData) {
         return psCollisionData->pCollidee;
     }
-    else {
-        return nullptr;
-    }
+
+    return nullptr;
 }
 
 float ArrowProjectile::GetSpeed() {
@@ -1062,22 +1052,19 @@ bool ArrowProjectile::ProcessCollisionActor(bhkRigidBody* apArrowRB) {
             pClosestObject->AttachChild(apNode, true);
             shadowSceneNode->AddObject(apNode);
             pCollidee = static_cast<Actor*>(psCollisionData->pCollidee);
-            if (pCollidee) {
-                if (pCollidee->MobileObject::GetCurrentAIProcess()) {
-                    currentAIProcess = pCollidee->MobileObject::GetCurrentAIProcess();
-                    currentAIProcess->AddAttachedArrow(this);
-                }
+            if ((pCollidee) && (pCollidee->MobileObject::GetCurrentAIProcess())) {
+                currentAIProcess = pCollidee->MobileObject::GetCurrentAIProcess();
+                currentAIProcess->AddAttachedArrow(this);
             }
+
             return true;
         }
-        else {
-            return false;
-        }
-    }
-    else {
-        Warning("AI: An arrow thinks it is colliding with an Actor, but there is no Actor in the collision data!");
+
         return false;
     }
+
+    Warning("AI: An arrow thinks it is colliding with an Actor, but there is no Actor in the collision data!");
+    return false;
 }
 
 bool ArrowProjectile::ProcessSimulate(bhkRigidBody* apArrowRB) {
@@ -1165,41 +1152,39 @@ void ArrowProjectile::CollideActor(const NiPoint3& aContactPoint, const NiPoint3
         NiPoint3 dir;
         NiNode* proot;
         NiNode* v77 = this->Get3D();
-        if (this->pShooter) {
-            if (this->pShooter->GetCombatController()) {
-                // Gets the collidee's position before the second GetCombatController call.
-                const NiPoint3& rCollideePos = apCollidee->GetLocationOnReference();
-                this->pShooter->GetCombatController()->ProjectileHitObstruction(rCollideePos, true);
-            }
+        if ((this->pShooter) && (this->pShooter->GetCombatController())) {
+            // Gets the collidee's position before the second GetCombatController call.
+            const NiPoint3& rCollideePos = apCollidee->GetLocationOnReference();
+            this->pShooter->GetCombatController()->ProjectileHitObstruction(rCollideePos, true);
         }
+
         this->psCollisionData->pCollidee = apCollidee;
         apCollidee->ClearLastHitData();
         ExtraDataList* fAnglea = &this->psCollisionData->pCollidee->m_Extra;
         Script::SetActionFlag(this->GetObjectReference(), fAnglea, SCRIPT_ACTION_ONHITWITH);
-        if (this->pShooter) {
-            if (this->pShooter == pPlayer || this->pShooter->IsInCombat()) {
-                bool v76 = apCollidee->IsDead(false);
-                if (!v76 && apCollidee->IsDead(false) && (!apCollidee->IsCreature() || apCollidee->HasRagDoll())) {
-                    NiAVObject* p3d = (NiAVObject*)apCollidee->TESObjectREFR::Get3D();
-                    if (p3d) {
-                        hkVector4 loc;
-                        float* v10 = &fDeathForceRangedDamageMax.Float();
-                        float fmagnitude = CombatFormulas::GetDeathForce(*v10, true);
-                        bhkForceController::RemoveForce(p3d);
-                        bhkWorld::SetMotion(p3d, hkpMotion::MOTION_DYNAMIC, true, false, true);
-                        NiUpdateData UpdateData(0.0f, false, false);
-                        p3d->Update(UpdateData);
-                        alignas(16) NiPoint3 moveBack = (&v77->GetWorldTransform())->m_Rotate * NiPoint3_UNIT_Y;
-                        moveBack.Unitize();
-                        NiPoint3* v31 = ::new (&v71) NiPoint3(moveBack * -1024.0f);
-                        const NiPoint3* v11 = &this->GetLocationOnReference();
-                        moveBack = *v11 + *v31;
-                        NI2HK(loc, moveBack);
-                        TESHavokUtilities::AddExplosionImpulse(p3d, loc, fmagnitude, nullptr);
-                    }
+        if ((this->pShooter) && (this->pShooter == pPlayer || this->pShooter->IsInCombat())) {
+            bool v76 = apCollidee->IsDead(false);
+            if (!v76 && apCollidee->IsDead(false) && (!apCollidee->IsCreature() || apCollidee->HasRagDoll())) {
+                NiAVObject* p3d = (NiAVObject*)apCollidee->TESObjectREFR::Get3D();
+                if (p3d) {
+                    hkVector4 loc;
+                    float* v10 = &fDeathForceRangedDamageMax.Float();
+                    float fmagnitude = CombatFormulas::GetDeathForce(*v10, true);
+                    bhkForceController::RemoveForce(p3d);
+                    bhkWorld::SetMotion(p3d, hkpMotion::MOTION_DYNAMIC, true, false, true);
+                    NiUpdateData UpdateData(0.0f, false, false);
+                    p3d->Update(UpdateData);
+                    alignas(16) NiPoint3 moveBack = (&v77->GetWorldTransform())->m_Rotate * NiPoint3_UNIT_Y;
+                    moveBack.Unitize();
+                    NiPoint3* v31 = ::new (&v71) NiPoint3(moveBack * -1024.0f);
+                    const NiPoint3* v11 = &this->GetLocationOnReference();
+                    moveBack = *v11 + *v31;
+                    NI2HK(loc, moveBack);
+                    TESHavokUtilities::AddExplosionImpulse(p3d, loc, fmagnitude, nullptr);
                 }
             }
         }
+
         bhkRigidBody* RigidBody = nullptr;
         if (apCollidee == pPlayer) {
             proot = static_cast<NiNode*>(pPlayer->Get3D(false));
@@ -1242,15 +1227,13 @@ void ArrowProjectile::CollideActor(const NiPoint3& aContactPoint, const NiPoint3
             v58 = 1;
         }
         bool v48 = false;
-        if (apCollidee->GetBlocked()) {
-            if (apCollidee->pCurrentProcess) {
-                if (CombatUtilities::IsTargetWithinStrikeAngle(apCollidee, this, nullptr)) {
-                    NiPoint3 v47 = *apCollidee->QLocationOnReference();
-                    float v46 = apCollidee->GetHeight() / 2.0 + v47.z;
-                    v48 = aContactPoint.z >= static_cast<double>(v46);
-                }
-            }
+        if ((apCollidee->GetBlocked()) && (apCollidee->pCurrentProcess) &&
+            (CombatUtilities::IsTargetWithinStrikeAngle(apCollidee, this, nullptr))) {
+            NiPoint3 v47 = *apCollidee->QLocationOnReference();
+            float v46 = apCollidee->GetHeight() / 2.0 + v47.z;
+            v48 = aContactPoint.z >= static_cast<double>(v46);
         }
+
         if (v58 && !v48) {
             goto LABEL_44;
         }
@@ -1392,11 +1375,10 @@ void ArrowProjectile::CollideTerrain(const NiPoint3& aContactPoint, const NiPoin
     NiPoint3 v34 = aContactPoint;
     float afVelocity = this->psCollisionData->kVelocity.Length();
     this->PlayArrowCollisionSound(afVelocity, v34, nullptr, emat);
-    if (this->pShooter) {
-        if (this->pShooter->GetCombatController()) {
-            this->pShooter->GetCombatController()->ProjectileHitObstruction(aContactPoint, false);
-        }
+    if ((this->pShooter) && (this->pShooter->GetCombatController())) {
+        this->pShooter->GetCombatController()->ProjectileHitObstruction(aContactPoint, false);
     }
+
     if (this->pShooter) {
         if (this->pEnchantment) {
             EnchantmentItem* LoopingSound = this->pEnchantment;
@@ -1589,12 +1571,11 @@ bool ArrowProjectile::ProcessCollision() {
         }
         return v6;
     }
-    else {
-        Warning("AI: No collision data was found on this arrow");
-        ourFree(psCollisionData);
-        psCollisionData = nullptr;
-        return false;
-    }
+
+    Warning("AI: No collision data was found on this arrow");
+    ourFree(psCollisionData);
+    psCollisionData = nullptr;
+    return false;
 }
 
 bool ArrowProjectile::ProcessCollisionReference(bhkRigidBody* apArrowRB) {
@@ -1620,25 +1601,22 @@ bool ArrowProjectile::ProcessCollisionReference(bhkRigidBody* apArrowRB) {
             if (pList) {
                 pList->AddHead(static_cast<MobileObject*>(this));
             }
-            if (apArrowRB) {
-                if (ptargetRB->GetDynamicMass() > 0.0) {
-                    apArrowRB->GetCenterOfMassInWorld(centerOfMass);
-                    TESArrowTargetListener::AddArrowTarget(centerOfMass, this->psCollisionData->pClosestObject);
-                }
+            if ((apArrowRB) && (ptargetRB->GetDynamicMass() > 0.0)) {
+                apArrowRB->GetCenterOfMassInWorld(centerOfMass);
+                TESArrowTargetListener::AddArrowTarget(centerOfMass, this->psCollisionData->pClosestObject);
             }
+
             return true;
         }
-        else {
-            return false;
-        }
-    }
-    else {
-        Warning(
-            "AI: An arrow thinks it is colliding with an Reference, but there is no Reference in the collision "
-            "data!"
-        );
+
         return false;
     }
+
+    Warning(
+        "AI: An arrow thinks it is colliding with an Reference, but there is no Reference in the collision "
+        "data!"
+    );
+    return false;
 }
 
 // The filter is passed by value.
@@ -1699,33 +1677,28 @@ bool ArrowProjectile::ProcessBounce(bhkRigidBody* apArrowRB) {
 void ArrowProjectile::PlayArrowCollisionSound(float afVelocity, NiPoint3 a3, bhkRigidBody* a4, char a5) {
     ImpactMixer::COLLISION_SOUND apMemory;
     NiNode* arg0 = Get3D();
-    if (arg0) {
-        if (psCollisionData) {
-            if (psCollisionData->eCollisionType == 1) {
-                bhkRigidBody* Base;
-                bhkCollisionObject* FirstCollisionObject = FindFirstCollisionObject(arg0);
-                if (FirstCollisionObject) {
-                    Base = FirstCollisionObject->GetRigidBody();
-                }
-                else {
-                    Base = nullptr;
-                }
-                if (Base) {
-                    ::new (&apMemory) NiBound;
-                    apMemory.fFriction = 0.5f;
-                    apMemory.pBody1 = Base;
-                    apMemory.pBody2 = a4;
-                    bhkShape* Shape = Base->GetShape();
-                    apMemory.cMaterialType1 = Shape->GetMaterial();
-                    apMemory.cMaterialType2 = a5;
-                    apMemory.Location = a3;
-                    apMemory.fVelocity = afVelocity;
-                    // The sound's ID is the sum of the two addresses, truncated to 32 bits.
-                    apMemory.iID =
-                        static_cast<int32_t>(reinterpret_cast<uintptr_t>(this) + reinterpret_cast<uintptr_t>(a4));
-                    ImpactMixer::PlayCollisionSound(apMemory);
-                }
-            }
+    if ((arg0) && (psCollisionData) && (psCollisionData->eCollisionType == 1)) {
+        bhkRigidBody* Base;
+        bhkCollisionObject* FirstCollisionObject = FindFirstCollisionObject(arg0);
+        if (FirstCollisionObject) {
+            Base = FirstCollisionObject->GetRigidBody();
+        }
+        else {
+            Base = nullptr;
+        }
+        if (Base) {
+            ::new (&apMemory) NiBound;
+            apMemory.fFriction = 0.5f;
+            apMemory.pBody1 = Base;
+            apMemory.pBody2 = a4;
+            bhkShape* Shape = Base->GetShape();
+            apMemory.cMaterialType1 = Shape->GetMaterial();
+            apMemory.cMaterialType2 = a5;
+            apMemory.Location = a3;
+            apMemory.fVelocity = afVelocity;
+            // The sound's ID is the sum of the two addresses, truncated to 32 bits.
+            apMemory.iID = static_cast<int32_t>(reinterpret_cast<uintptr_t>(this) + reinterpret_cast<uintptr_t>(a4));
+            ImpactMixer::PlayCollisionSound(apMemory);
         }
     }
 }
@@ -1742,91 +1715,87 @@ int32_t ArrowProjectile::GetArrowCount() {
 }
 
 void ArrowProjectile::DeleteAttachedArrows(TESObjectREFR* apRef, bool abInstant) {
-    if (apRef) {
-        if (!apRef->IsProjectile()) {
-            bool v12 = true;
-            bool v11 = true;
-            if (apRef->IsActor()) {
-                BaseProcess* pprocess = static_cast<Actor*>(apRef)->GetCurrentAIProcess();
-                if (pprocess) {
-                    if (pprocess->GetAttachedArrowList()) {
-                        for (BSSimpleList<ArrowProjectile*>* plist = pprocess->GetAttachedArrowList();
-                             plist && !plist->IsEmpty(); plist = plist->m_pkNext) {
-                            ArrowProjectile* parrow = plist->m_item;
-                            if (parrow) {
-                                if (parrow->GetAttachedRef() == apRef) {
-                                    parrow->ClearAttachedRef();
-                                    if (!parrow->GetDelete()) {
-                                        if (abInstant) {
-                                            parrow->SetDelete(true);
-                                        }
-                                        else {
-                                            parrow->SetState(ArrowProjectile::STATE_DELETING);
-                                        }
-                                    }
-                                }
-                                if (parrow->GetDelete()) {
-                                    parrow->Set3D(nullptr, true);
-                                }
-                            }
-                        }
-                        pprocess->GetAttachedArrowList()->RemoveAll();
-                    }
-                    if (pprocess->eLevel) {
-                        if (pprocess->eLevel == PROCESS_TYPE_MIDDLE_HIGH) {
-                            v12 = false;
-                            v11 = true;
-                        }
-                    }
-                    else {
-                        v12 = true;
-                        v11 = false;
-                    }
-                }
-            }
-            if (v12) {
-                for (uint32_t i = 0;
-                     i < (&ReferenceProcessLists.MobProcessArray)->GetProcessLevelTail(PROCESS_TYPE_HIGH); ++i) {
-                    MobileObject* pmob = (&ReferenceProcessLists.MobProcessArray)->GetItem(i);
-                    if (pmob->IsProjectile()) {
-                        ArrowProjectile* parrow_2 = dynamic_cast<ArrowProjectile*>(pmob);
-                        if (parrow_2) {
-                            if (parrow_2->GetAttachedRef() == apRef) {
-                                parrow_2->ClearAttachedRef();
-                                if (!pmob->GetDelete()) {
+    if ((apRef) && (!apRef->IsProjectile())) {
+        bool v12 = true;
+        bool v11 = true;
+        if (apRef->IsActor()) {
+            BaseProcess* pprocess = static_cast<Actor*>(apRef)->GetCurrentAIProcess();
+            if (pprocess) {
+                if (pprocess->GetAttachedArrowList()) {
+                    for (BSSimpleList<ArrowProjectile*>* plist = pprocess->GetAttachedArrowList();
+                         plist && !plist->IsEmpty(); plist = plist->m_pkNext) {
+                        ArrowProjectile* parrow = plist->m_item;
+                        if (parrow) {
+                            if (parrow->GetAttachedRef() == apRef) {
+                                parrow->ClearAttachedRef();
+                                if (!parrow->GetDelete()) {
                                     if (abInstant) {
-                                        parrow_2->SetDelete(true);
+                                        parrow->SetDelete(true);
                                     }
                                     else {
-                                        parrow_2->SetState(ArrowProjectile::STATE_DELETING);
+                                        parrow->SetState(ArrowProjectile::STATE_DELETING);
                                     }
                                 }
                             }
-                            if (parrow_2->GetDelete()) {
-                                parrow_2->Set3D(nullptr, true);
+                            if (parrow->GetDelete()) {
+                                parrow->Set3D(nullptr, true);
                             }
+                        }
+                    }
+                    pprocess->GetAttachedArrowList()->RemoveAll();
+                }
+                if (pprocess->eLevel) {
+                    if (pprocess->eLevel == PROCESS_TYPE_MIDDLE_HIGH) {
+                        v12 = false;
+                        v11 = true;
+                    }
+                }
+                else {
+                    v12 = true;
+                    v11 = false;
+                }
+            }
+        }
+        if (v12) {
+            for (uint32_t i = 0; i < (&ReferenceProcessLists.MobProcessArray)->GetProcessLevelTail(PROCESS_TYPE_HIGH);
+                 ++i) {
+                MobileObject* pmob = (&ReferenceProcessLists.MobProcessArray)->GetItem(i);
+                if (pmob->IsProjectile()) {
+                    ArrowProjectile* parrow_2 = dynamic_cast<ArrowProjectile*>(pmob);
+                    if (parrow_2) {
+                        if (parrow_2->GetAttachedRef() == apRef) {
+                            parrow_2->ClearAttachedRef();
+                            if (!pmob->GetDelete()) {
+                                if (abInstant) {
+                                    parrow_2->SetDelete(true);
+                                }
+                                else {
+                                    parrow_2->SetState(ArrowProjectile::STATE_DELETING);
+                                }
+                            }
+                        }
+                        if (parrow_2->GetDelete()) {
+                            parrow_2->Set3D(nullptr, true);
                         }
                     }
                 }
             }
-            if (v11) {
-                for (uint32_t i_2 =
-                         (&ReferenceProcessLists.MobProcessArray)->GetProcessLevelHead(PROCESS_TYPE_MIDDLE_HIGH);
-                     i_2 < (&ReferenceProcessLists.MobProcessArray)->GetProcessLevelTail(PROCESS_TYPE_MIDDLE_HIGH);
-                     ++i_2) {
-                    MobileObject* pmob_2 = (&ReferenceProcessLists.MobProcessArray)->GetItem(i_2);
-                    if (pmob_2->IsProjectile()) {
-                        ArrowProjectile* parrow_3 = dynamic_cast<ArrowProjectile*>(pmob_2);
-                        if (parrow_3) {
-                            if (parrow_3->GetAttachedRef() == apRef) {
-                                parrow_3->ClearAttachedRef();
-                                if (!pmob_2->GetDelete()) {
-                                    parrow_3->SetDelete(true);
-                                }
+        }
+        if (v11) {
+            for (uint32_t i_2 = (&ReferenceProcessLists.MobProcessArray)->GetProcessLevelHead(PROCESS_TYPE_MIDDLE_HIGH);
+                 i_2 < (&ReferenceProcessLists.MobProcessArray)->GetProcessLevelTail(PROCESS_TYPE_MIDDLE_HIGH); ++i_2) {
+                MobileObject* pmob_2 = (&ReferenceProcessLists.MobProcessArray)->GetItem(i_2);
+                if (pmob_2->IsProjectile()) {
+                    ArrowProjectile* parrow_3 = dynamic_cast<ArrowProjectile*>(pmob_2);
+                    if (parrow_3) {
+                        if (parrow_3->GetAttachedRef() == apRef) {
+                            parrow_3->ClearAttachedRef();
+                            if (!pmob_2->GetDelete()) {
+                                parrow_3->SetDelete(true);
                             }
-                            if (parrow_3->GetDelete()) {
-                                parrow_3->Set3D(nullptr, true);
-                            }
+                        }
+                        if (parrow_3->GetDelete()) {
+                            parrow_3->Set3D(nullptr, true);
                         }
                     }
                 }

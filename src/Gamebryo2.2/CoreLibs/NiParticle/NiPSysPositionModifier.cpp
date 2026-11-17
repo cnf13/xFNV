@@ -23,10 +23,9 @@ NiObject* NiPSysPositionModifier::CreateClone(NiCloningProcess& kCloning) {
         NiPSysModifier::CopyMembers(v4, kCloning);
         return v4;
     }
-    else {
-        NiPSysModifier::CopyMembers(nullptr, kCloning);
-        return nullptr;
-    }
+
+    NiPSysModifier::CopyMembers(nullptr, kCloning);
+    return nullptr;
 }
 
 void NiPSysPositionModifier::LoadBinary(NiStream& kStream) {

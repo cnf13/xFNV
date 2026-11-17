@@ -283,9 +283,8 @@ bool GetIsFullHelp() {
     if (InterfaceManager::Instance() && ((singleton = InterfaceManager::Instance()), singleton->IsDoneFirstInit())) {
         return (bool)((uint8_t)InterfaceManager::Instance()->bFullHelp);
     }
-    else {
-        return false;
-    }
+
+    return false;
 }
 
 bool GetMapMenuFogOfWar() {
@@ -325,9 +324,8 @@ uint32_t GetContainerMenuMode() {
     if (ContainerMenu::pMe) {
         return ContainerMenu::pMe->eContainerMode;
     }
-    else {
-        return (uint32_t)0;
-    }
+
+    return (uint32_t)0;
 }
 
 // Returns null on both failed tests: the null singleton, then IsDoneFirstInit.
@@ -650,12 +648,10 @@ void InterfaceManager::HandleControllerStateChange(int32_t aiState) {
     NiTListItem<Tile*>* pos = HeadPos;
     while (pos) {
         Tile* v10 = pMenusRoot->xChildren.GetNext(pos);
-        if (v10) {
-            if (v10->GetMenu()) {
-                Menu* Menu_ = v10->GetMenu();
-                bool v5 = InterfaceManager::Has360Controller();
-                Menu_->DoControllerSwitch(v5);
-            }
+        if ((v10) && (v10->GetMenu())) {
+            Menu* Menu_ = v10->GetMenu();
+            bool v5 = InterfaceManager::Has360Controller();
+            Menu_->DoControllerSwitch(v5);
         }
     }
     StartMenu::GoBackIfInActionMapping();
@@ -670,11 +666,10 @@ void InterfaceManager::DumpMenuPackingInfo() {
 }
 
 void InterfaceManager::ToggleSafeZone(int32_t abForceSetTo) {
-    if (pSafeZone) {
-        if (abForceSetTo == 2) {
-            bool v3 = !pSafeZone->IsTrue(4003);
-        }
+    if ((pSafeZone) && (abForceSetTo == 2)) {
+        bool v3 = !pSafeZone->IsTrue(4003);
     }
+
     if (abForceSetTo == 3) {
         if (pSafeZone) {
             delete pSafeZone;
@@ -772,11 +767,9 @@ void InterfaceManager::EmergencyCloseAllMenusAndBreakStuff() {
                 }
             }
             else {
-                if (iEnterStack[i] == 3) {
-                    if (MenuConsole::Instance(false)) {
-                        MenuConsole* v1 = MenuConsole::Instance(true);
-                        v1->ToggleVisible();
-                    }
+                if ((iEnterStack[i] == 3) && (MenuConsole::Instance(false))) {
+                    MenuConsole* v1 = MenuConsole::Instance(true);
+                    v1->ToggleVisible();
                 }
             }
             iEnterStack[i] = 0;
@@ -2112,11 +2105,10 @@ void InterfaceManager::Idle() {
             this->pCursor->Set(Tile::kTileValue_Visible, 1);
         }
         this->UpdateCursor();
-        if (!this->bMouseInMotion) {
-            if (!this->GetCurrentFocusTarget() || !this->GetCurrentFocusTarget()->IsVisible() ||
-                !this->GetCurrentFocusTarget()->IsTrue(Tile::kTileValue_Target)) {
-                this->GetDefaultFocus();
-            }
+        if ((!this->bMouseInMotion) &&
+            (!this->GetCurrentFocusTarget() || !this->GetCurrentFocusTarget()->IsVisible() ||
+             !this->GetCurrentFocusTarget()->IsTrue(Tile::kTileValue_Target))) {
+            this->GetDefaultFocus();
         }
 
         // The left button (or the 360 A button for the console): pressed, released and held this frame.
@@ -3026,11 +3018,10 @@ void InterfaceManager::DoGamepadEvent(Interface::enumGamepadButtons aiButton) {
         if (aiButton == Interface::eButtonNone) {
             aiButton = GetTopGamepadButton(brepeats_v, brepeats_h, bisUpEvent);
         }
-        if (aiButton) {
-            if (aiButton != Interface::eButtonDPadLeft && aiButton != Interface::eButtonDPadRight &&
-                aiButton != Interface::eButtonDPadUp && aiButton != Interface::eButtonDPadDown) {
-                iDragDroppingState = 0;
-            }
+        if ((aiButton) &&
+            (aiButton != Interface::eButtonDPadLeft && aiButton != Interface::eButtonDPadRight &&
+             aiButton != Interface::eButtonDPadUp && aiButton != Interface::eButtonDPadDown)) {
+            iDragDroppingState = 0;
         }
     }
     Menu* pmenu_2 = MenuManager::Instance(true)->GetFrontmostMenu();
@@ -3083,11 +3074,10 @@ void InterfaceManager::DoGamepadEvent(Interface::enumGamepadButtons aiButton) {
                             xlast.AddHead(pnext);
                             pnext = pnext->GetFirstRefCopy(iid, itype);
                         }
-                        if (pnext) {
-                            if (xlast.IsInList(pnext) && (!pnext->IsTrue(4003) || !pnext->IsTrue(4015))) {
-                                pnext = nullptr;
-                            }
+                        if ((pnext) && (xlast.IsInList(pnext) && (!pnext->IsTrue(4003) || !pnext->IsTrue(4015)))) {
+                            pnext = nullptr;
                         }
+
                         xlast.RemoveAll();
                         if (pnext) {
                             if (pnext != ptarget_2 && itype == 4035) {
@@ -3100,10 +3090,8 @@ void InterfaceManager::DoGamepadEvent(Interface::enumGamepadButtons aiButton) {
                         }
                         else {
                             if (DoGamepad(pmenu_2, aiButton, 1.0f) || ptarget_2 == pMouseOverTarget) {
-                                if (ptarget_2) {
-                                    if (itype == 4039) {
-                                        ptarget_2->PlayTileSound(4043);
-                                    }
+                                if ((ptarget_2) && (itype == 4039)) {
+                                    ptarget_2->PlayTileSound(4043);
                                 }
                             }
                             else {
@@ -3144,13 +3132,11 @@ void InterfaceManager::DoGamepadEvent(Interface::enumGamepadButtons aiButton) {
                         if (pmenutile_4) {
                             pmenu_3 = pmenutile_4->GetMenu();
                         }
-                        if (pmenu_3) {
-                            if (pmenutile_4->IsVisible()) {
-                                float afValueb = static_cast<float>(InterfaceManager::CheckMenuButton(aiButton, true));
-                                if (DoGamepad(pmenu_3, aiButton, afValueb)) {
-                                    InterfaceManager::ClearMenuButton(aiButton);
-                                    return;
-                                }
+                        if ((pmenu_3) && (pmenutile_4->IsVisible())) {
+                            float afValueb = static_cast<float>(InterfaceManager::CheckMenuButton(aiButton, true));
+                            if (DoGamepad(pmenu_3, aiButton, afValueb)) {
+                                InterfaceManager::ClearMenuButton(aiButton);
+                                return;
                             }
                         }
                     }
@@ -4386,28 +4372,24 @@ int32_t InterfaceManager::GetShouldKeyBeRepeated(float afRepeatScale) {
         iRepeatingKey = 0;
         return 0;
     }
-    else {
-        if (uKeyRepeatStartTime) {
-            double v7 = static_cast<double>(Time - uKeyRepeatStartTime);
-            if (!(fKeyRepeatInterval.Float() / afRepeatScale > v7)) {
-                uKeyRepeatStartTime = Time;
-                return iRepeatingKey;
-            }
-            else {
-                return 0;
-            }
+
+    if (uKeyRepeatStartTime) {
+        double v7 = static_cast<double>(Time - uKeyRepeatStartTime);
+        if (!(fKeyRepeatInterval.Float() / afRepeatScale > v7)) {
+            uKeyRepeatStartTime = Time;
+            return iRepeatingKey;
         }
-        else {
-            double v8 = static_cast<double>(Time - uKeyDownTime);
-            if (!(fKeyRepeatTime.Float() > v8)) {
-                uKeyRepeatStartTime = Time;
-                return iRepeatingKey;
-            }
-            else {
-                return 0;
-            }
-        }
+
+        return 0;
     }
+
+    double v8 = static_cast<double>(Time - uKeyDownTime);
+    if (!(fKeyRepeatTime.Float() > v8)) {
+        uKeyRepeatStartTime = Time;
+        return iRepeatingKey;
+    }
+
+    return 0;
 }
 
 void InterfaceManager::HandleMenuAndListboxScroll(Menu* apMenu, float aiID, Tile* apTarget) {
@@ -4485,13 +4467,11 @@ bool InterfaceManager::IsMenuInStack(uint32_t aiMenuID) {
 
 void InterfaceManager::PreLoadMenus() {
     int32_t uiMenuMode;
-    if (pPlayer) {
-        if (bFirstChanceLoad && (!pDataHandler->GetSaveLoad())) {
-            uiMenuMode = cMenuMode;
-            PreLoadMainMenus();
-            cMenuMode = static_cast<eMenuModeType>(uiMenuMode);
-            bFirstChanceLoad = false;
-        }
+    if ((pPlayer) && (bFirstChanceLoad && (!pDataHandler->GetSaveLoad()))) {
+        uiMenuMode = cMenuMode;
+        PreLoadMainMenus();
+        cMenuMode = static_cast<eMenuModeType>(uiMenuMode);
+        bFirstChanceLoad = false;
     }
 }
 
@@ -5205,9 +5185,8 @@ uint32_t SystemColorManager::GetColor_007190A0(int32_t aiID) {
     if (v4) {
         return v4->GetColor();
     }
-    else {
-        return 0;
-    }
+
+    return 0;
 }
 
 void SystemColorManager::RemoveAll() {
@@ -5449,11 +5428,10 @@ void EditableTextField::SetText(const char* sDefaultText) {
 }
 
 void EditableTextField::SetEditing(bool bEditingText) {
-    if (!bEditing) {
-        if (static_cast<uint8_t>(bEditingText)) {
-            iCurPos = sText.GetLength();
-        }
+    if ((!bEditing) && (static_cast<uint8_t>(bEditingText))) {
+        iCurPos = sText.GetLength();
     }
+
     *reinterpret_cast<uint8_t*>(&bEditing) = static_cast<uint8_t>(bEditingText);
 }
 
@@ -5544,7 +5522,6 @@ int32_t NiSemaphore::Wait(uint32_t aiTime) {
     if (m_hSemaphore->Wait(aiTime) == BSSystemWait::TIMED_OUT) {
         return 1;
     }
-    else {
-        return NiAtomicDecrement(m_iCount);
-    }
+
+    return NiAtomicDecrement(m_iCount);
 }

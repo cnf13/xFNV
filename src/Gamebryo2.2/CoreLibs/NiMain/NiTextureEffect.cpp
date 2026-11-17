@@ -61,10 +61,9 @@ NiObject* NiTextureEffect::CreateClone(NiCloningProcess& kCloning) {
         CopyMembers(v4, kCloning);
         return v4;
     }
-    else {
-        CopyMembers(nullptr, kCloning);
-        return nullptr;
-    }
+
+    CopyMembers(nullptr, kCloning);
+    return nullptr;
 }
 
 // Files before 10.3.0.4 carry two more 16-bit values and files before 4.1.0.16 a third; all are skipped.
@@ -364,7 +363,6 @@ NiObject* NiTextureEffect::CreateObject() {
     if (v0) {
         return ::new (v0) NiTextureEffect;
     }
-    else {
-        return nullptr;
-    }
+
+    return nullptr;
 }

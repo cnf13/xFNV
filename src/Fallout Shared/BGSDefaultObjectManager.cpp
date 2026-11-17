@@ -119,9 +119,8 @@ TESForm* BGSDefaultObjectManager::GetDefaultObject(DEFAULT_OBJECT aeObject) {
     if (singleton->TESForm::GetInitialized()) {
         return BGSDefaultObjectManager::Instance()->pObjectArray[(uint32_t)aeObject];
     }
-    else {
-        return nullptr;
-    }
+
+    return nullptr;
 }
 
 void BGSDefaultObjectManager::ReleaseInstance() {

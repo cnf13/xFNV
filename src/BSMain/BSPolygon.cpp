@@ -301,17 +301,16 @@ void BSPolygon2D::Triangulate() {
             vert = pVertexSimpleArray->pBuffer[indexlist.pBuffer[++i % indexlist.iSize]];
         }
     }
-    if (pIndexSimpleArray) {
-        if (indexlist.iSize == 3) {
-            uint16_t v11 = indexlist.pBuffer[2];
-            pIndexSimpleArray->Add(v11);
-            uint16_t v10 = indexlist.pBuffer[1];
-            pIndexSimpleArray->Add(v10);
-            uint16_t v9 = indexlist.pBuffer[0];
-            pIndexSimpleArray->Add(v9);
-            ++iTriangleCount;
-        }
+    if ((pIndexSimpleArray) && (indexlist.iSize == 3)) {
+        uint16_t v11 = indexlist.pBuffer[2];
+        pIndexSimpleArray->Add(v11);
+        uint16_t v10 = indexlist.pBuffer[1];
+        pIndexSimpleArray->Add(v10);
+        uint16_t v9 = indexlist.pBuffer[0];
+        pIndexSimpleArray->Add(v9);
+        ++iTriangleCount;
     }
+
     if (iTriangleCount > 0) {
         NiNode* v1;
         NiTriShapeData* data = CreateTriData();
@@ -362,9 +361,8 @@ NiTriShape* BSPolygon2D::CreateTriShape(NiTriShapeData* data) {
     if (apMemory) {
         return ::new (apMemory) NiTriShape(data);
     }
-    else {
-        return nullptr;
-    }
+
+    return nullptr;
 }
 
 // The four arrays are vector news, each followed by a constructor loop (empty for NiPoint3 and NiPoint2, NiColorA's
@@ -456,9 +454,8 @@ NiTriShapeData* BSPolygon2D::CreateTriData() {
             NiGeometryData::NBT_METHOD_NONE, iTriangleCount, pIndexArray
         );
     }
-    else {
-        return nullptr;
-    }
+
+    return nullptr;
 }
 
 int32_t BSPolygon2D::InternalAngle(NiPoint3 arCurr, NiPoint3 arPrev, NiPoint3 arNext) {

@@ -86,9 +86,8 @@ BGSDistantTreeBlock* BGSTerrainManager::GetTreeBlockForPoint(const NiPoint3& aPo
     if (pRootNode) {
         return pRootNode->GetTreeBlockForPoint(aPoint);
     }
-    else {
-        return nullptr;
-    }
+
+    return nullptr;
 }
 
 // The size is read once; each removal shrinks the local count and keeps the index.
@@ -119,9 +118,8 @@ BGSTerrainChunk* BGSTerrainManager::GetChunkForPoint(const NiPoint3& aPoint) {
     if (pRootNode) {
         return pRootNode->GetChunkForPoint(aPoint);
     }
-    else {
-        return nullptr;
-    }
+
+    return nullptr;
 }
 
 void BGSTerrainManager::Update(const NiPoint3& aViewPosition, BGSTerrainManager::LOD_UPDATE_TYPE aWhatToUpdate) {
@@ -132,16 +130,15 @@ void BGSTerrainManager::Update(const NiPoint3& aViewPosition, BGSTerrainManager:
         char aeUpdateType = aWhatToUpdate | BGSTerrainManager::UPDATE_LAND_AND_BLOCKS;
         TES::pInstance->GetLoadedAreaRect(kloadedrect, 0.0f);
         BSShaderManager::SetLoadedRange(&kloadedrect);
-        if (BGSTerrainManager::pActiveManager) {
-            if (BGSTerrainManager::pActiveManager != this) {
-                BGSTerrainManager* poldManager = BGSTerrainManager::pActiveManager;
-                BGSTerrainManager::pActiveManager = this;
-                poldManager->UnloadAll();
-                if (BGSTerrainManager::spTreeNode.m_pObject) {
-                    BGSTerrainManager::spTreeNode.m_pObject->DetachAllChildren();
-                }
+        if ((BGSTerrainManager::pActiveManager) && (BGSTerrainManager::pActiveManager != this)) {
+            BGSTerrainManager* poldManager = BGSTerrainManager::pActiveManager;
+            BGSTerrainManager::pActiveManager = this;
+            poldManager->UnloadAll();
+            if (BGSTerrainManager::spTreeNode.m_pObject) {
+                BGSTerrainManager::spTreeNode.m_pObject->DetachAllChildren();
             }
         }
+
         BGSTerrainManager::pActiveManager = this;
         if (pRootNode) {
             bool bupdateLandAndBlocks = (aeUpdateType & 1) != 0;
@@ -157,29 +154,27 @@ void BGSTerrainManager::Update(const NiPoint3& aViewPosition, BGSTerrainManager:
             }
             if (bupdateTrees && bUseDistantTrees.Bool()) {
                 pRootNode->UpdateTrees(viewPos);
-                if (BGSDistantTreeBlock::GetBlockCount()) {
-                    if (TreesQueuedToHide.iSize) {
-                        tempTreeList_t tempTreeList;
-                        uint32_t uisize = TreesQueuedToHide.iSize;
-                        for (uint32_t i = 0; i < uisize; ++i) {
-                            uint32_t id = TreesQueuedToHide.GetAt(static_cast<int32_t>(i))->GetLODFormID();
-                            TESObjectREFR* pRef = TreesQueuedToHide.GetAt(static_cast<int32_t>(i));
-                            const NiPoint3* v3 = &pRef->GetLocationOnReference();
-                            BGSDistantTreeBlock* ptrees = GetTreeBlockForPoint(*v3);
-                            if (ptrees) {
-                                ptrees->HideTree(id, true);
-                            }
-                            else {
-                                tempTreeList.Add(TreesQueuedToHide.GetAt(static_cast<int32_t>(i)));
-                            }
+                if ((BGSDistantTreeBlock::GetBlockCount()) && (TreesQueuedToHide.iSize)) {
+                    tempTreeList_t tempTreeList;
+                    uint32_t uisize = TreesQueuedToHide.iSize;
+                    for (uint32_t i = 0; i < uisize; ++i) {
+                        uint32_t id = TreesQueuedToHide.GetAt(static_cast<int32_t>(i))->GetLODFormID();
+                        TESObjectREFR* pRef = TreesQueuedToHide.GetAt(static_cast<int32_t>(i));
+                        const NiPoint3* v3 = &pRef->GetLocationOnReference();
+                        BGSDistantTreeBlock* ptrees = GetTreeBlockForPoint(*v3);
+                        if (ptrees) {
+                            ptrees->HideTree(id, true);
                         }
-                        TreesQueuedToHide.Clear(true);
-                        if (tempTreeList.iSize) {
-                            uint32_t uisize_2 = tempTreeList.iSize;
-                            TreesQueuedToHide.SetSize(uisize_2, true);
-                            for (uint32_t i_2 = 0; i_2 < uisize_2; ++i_2) {
-                                TreesQueuedToHide.SetAt(i_2, tempTreeList.operator[](i_2));
-                            }
+                        else {
+                            tempTreeList.Add(TreesQueuedToHide.GetAt(static_cast<int32_t>(i)));
+                        }
+                    }
+                    TreesQueuedToHide.Clear(true);
+                    if (tempTreeList.iSize) {
+                        uint32_t uisize_2 = tempTreeList.iSize;
+                        TreesQueuedToHide.SetSize(uisize_2, true);
+                        for (uint32_t i_2 = 0; i_2 < uisize_2; ++i_2) {
+                            TreesQueuedToHide.SetAt(i_2, tempTreeList.operator[](i_2));
                         }
                     }
                 }
@@ -190,10 +185,8 @@ void BGSTerrainManager::Update(const NiPoint3& aViewPosition, BGSTerrainManager:
 }
 
 void BGSTerrainManager::UpdateMorphParameters(const NiPoint3& aViewPosition) {
-    if (BGSTerrainManager::bEnabled && bUseNewTerrainSystem.Bool()) {
-        if (pRootNode) {
-            pRootNode->UpdateMorphParameters(aViewPosition);
-        }
+    if ((BGSTerrainManager::bEnabled && bUseNewTerrainSystem.Bool()) && (pRootNode)) {
+        pRootNode->UpdateMorphParameters(aViewPosition);
     }
 }
 

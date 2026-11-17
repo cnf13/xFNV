@@ -102,7 +102,6 @@ NiObject* BSWindModifier::CreateObject() {
     if (apMemory) {
         return ::new (apMemory) BSWindModifier;
     }
-    else {
-        return nullptr;
-    }
+
+    return nullptr;
 }

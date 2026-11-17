@@ -240,27 +240,27 @@ void bhkCollisionObject::ClearVelocities() {
         __m128 v4 = _mm_shuffle_ps(
             _mm_set_ss(std::bit_cast<float>(0x3A83126Fu)), _mm_set_ss(std::bit_cast<float>(0x3A83126Fu)), 0
         );
-        if ((_mm_movemask_ps(_mm_cmple_ps(
-                 _mm_and_ps(_mm_sub_ps(p_m_linearVelocity->m_quad, hkVector4Zero.m_quad), hkVector4_setAbs4_absMask), v4
-             )) &
-             7) != 7) {
-            if (phkObject) {
-                phkObject->setLinearVelocity(hkVector4Zero);
-            }
+        if (((_mm_movemask_ps(_mm_cmple_ps(
+                  _mm_and_ps(_mm_sub_ps(p_m_linearVelocity->m_quad, hkVector4Zero.m_quad), hkVector4_setAbs4_absMask),
+                  v4
+              )) &
+              7) != 7) &&
+            (phkObject)) {
+            phkObject->setLinearVelocity(hkVector4Zero);
         }
+
         hkpRigidBody* v5 = static_cast<hkpRigidBody*>(spWorldObject->phkObject);
         hkVector4* p_m_angularVelocity = &v5->m_motion.m_angularVelocity;
         if (!v5) {
             p_m_angularVelocity = &hkVector4Zero;
         }
-        if ((_mm_movemask_ps(_mm_cmple_ps(
-                 _mm_and_ps(_mm_sub_ps(p_m_angularVelocity->m_quad, hkVector4Zero.m_quad), hkVector4_setAbs4_absMask),
-                 v4
-             )) &
-             7) != 7) {
-            if (v5) {
-                v5->setAngularVelocity(hkVector4Zero);
-            }
+        if (((_mm_movemask_ps(_mm_cmple_ps(
+                  _mm_and_ps(_mm_sub_ps(p_m_angularVelocity->m_quad, hkVector4Zero.m_quad), hkVector4_setAbs4_absMask),
+                  v4
+              )) &
+              7) != 7) &&
+            (v5)) {
+            v5->setAngularVelocity(hkVector4Zero);
         }
     }
 }

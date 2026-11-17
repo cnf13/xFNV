@@ -426,11 +426,10 @@ void Lighting30Shader::PostGeometry(const NiPropertyState* apState) {
         BSRenderState::SetZFunc(NiZBufferProperty::TEST_LESSEQUAL, BSRS_NOLOCK);
     }
     NiStencilProperty* pStencil = static_cast<NiStencilProperty*>(apState->m_aspProps[4].m_pObject);
-    if (pStencil) {
-        if ((pStencil->m_uFlags & NiStencilProperty::ENABLE_MASK) != 0) {
-            BSRenderState::SetStencilEnable(false, BSRS_NOLOCK);
-        }
+    if ((pStencil) && ((pStencil->m_uFlags & NiStencilProperty::ENABLE_MASK) != 0)) {
+        BSRenderState::SetStencilEnable(false, BSRS_NOLOCK);
     }
+
     // The alpha property is read without a null test, as the game does.
     NiAlphaProperty* pAlpha = static_cast<NiAlphaProperty*>(apState->m_aspProps[0].m_pObject);
     if (ePass - BSShaderManager::BSSM_3XCONSTALPHA <= 3 &&
@@ -706,18 +705,15 @@ NiD3DShaderDeclaration* Lighting30Shader::GetShaderDecl(NiGeometry* apGeometry, 
         if (v3) {
             return spSkinnedShaderDeclVC.m_pObject;
         }
-        else {
-            return spSkinnedShaderDecl.m_pObject;
-        }
+
+        return spSkinnedShaderDecl.m_pObject;
     }
-    else {
-        if (v3) {
-            return spShaderDeclVC.m_pObject;
-        }
-        else {
-            return spShaderDecl.m_pObject;
-        }
+
+    if (v3) {
+        return spShaderDeclVC.m_pObject;
     }
+
+    return spShaderDecl.m_pObject;
 }
 
 // Builds the vertex map's entries once (keeping a reference on each in pVertexConstantMapEntry), then gives the shader
@@ -2690,26 +2686,24 @@ void Lighting30Shader::SetupGeometryConstants_ObjToCubemap(
             rt::memcpy(&Lighting30Shader::kVSConstants[8], &kobjtoshadow, sizeof(kobjtoshadow));
         }
     }
-    if (Lighting30Shader::pVertexConstantMapEntry[14]->m_bEnabled) {
-        if (apSkin) {
-            kobjtoshadow._43 = 0.0f;
-            kobjtoshadow._42 = 0.0f;
-            kobjtoshadow._41 = 0.0f;
-            kobjtoshadow._34 = 0.0f;
-            kobjtoshadow._32 = 0.0f;
-            kobjtoshadow._31 = 0.0f;
-            kobjtoshadow._24 = 0.0f;
-            kobjtoshadow._23 = 0.0f;
-            kobjtoshadow._21 = 0.0f;
-            kobjtoshadow._14 = 0.0f;
-            kobjtoshadow._13 = 0.0f;
-            kobjtoshadow._12 = 0.0f;
-            kobjtoshadow._44 = 1.0f;
-            kobjtoshadow._33 = 1.0f;
-            kobjtoshadow._22 = 1.0f;
-            kobjtoshadow._11 = 1.0f;
-            rt::memcpy(&Lighting30Shader::kVSConstants[28], &kobjtoshadow, sizeof(kobjtoshadow));
-        }
+    if ((Lighting30Shader::pVertexConstantMapEntry[14]->m_bEnabled) && (apSkin)) {
+        kobjtoshadow._43 = 0.0f;
+        kobjtoshadow._42 = 0.0f;
+        kobjtoshadow._41 = 0.0f;
+        kobjtoshadow._34 = 0.0f;
+        kobjtoshadow._32 = 0.0f;
+        kobjtoshadow._31 = 0.0f;
+        kobjtoshadow._24 = 0.0f;
+        kobjtoshadow._23 = 0.0f;
+        kobjtoshadow._21 = 0.0f;
+        kobjtoshadow._14 = 0.0f;
+        kobjtoshadow._13 = 0.0f;
+        kobjtoshadow._12 = 0.0f;
+        kobjtoshadow._44 = 1.0f;
+        kobjtoshadow._33 = 1.0f;
+        kobjtoshadow._22 = 1.0f;
+        kobjtoshadow._11 = 1.0f;
+        rt::memcpy(&Lighting30Shader::kVSConstants[28], &kobjtoshadow, sizeof(kobjtoshadow));
     }
 }
 
@@ -2758,28 +2752,27 @@ void Lighting30Shader::SetupGeometryConstants_MaterialAlpha(
             else {
                 Lighting30Shader::kPSConstants[3].x = fAlpha;
             }
-            if ((apProp->ulFlags[1] & BSS2_Envmap_Light_Fade) != 0) {
-                if (!apProp->GetFlag(BSShaderProperty::BSSP_FLAG_EYEREFLECT)) {
-                    float fLightLuminance = 0.0f;
-                    void* pIterator = nullptr;
-                    ShadowSceneLight* psslight = apProp->GetFirstActiveNonShadowLight(pIterator);
-                    NiColor kSunColor = BSShaderManager::pShadowSceneNode[0]->pSunLight->spLight.m_pObject->m_kDiff;
-                    float fSunLuminance = kSunColor.Luminance();
-                    if (psslight) {
-                        NiLight* pLight = psslight->spLight.m_pObject;
-                        NiPoint3 kToLight = pLight->m_kWorld.m_Translate - aWorldBound.m_kCenter;
-                        NiColor kLightColor = pLight->m_kDiff * pLight->m_fDimmer;
-                        float fDistance = kToLight.Length() / pLight->m_kSpec.r;
-                        float fClamped = fMin_(1.0, BSMAX_0(0.0, fDistance));
-                        fLightLuminance = 1.0 - fClamped;
-                        fLightLuminance = kLightColor.Luminance() * fLightLuminance;
-                    }
-                    float fMax = fSunLuminance;
-                    if (fSunLuminance < fLightLuminance) {
-                        fMax = fLightLuminance;
-                    }
-                    Lighting30Shader::kPSConstants[3].x = fMax * Lighting30Shader::kPSConstants[3].x;
+            if (((apProp->ulFlags[1] & BSS2_Envmap_Light_Fade) != 0) &&
+                (!apProp->GetFlag(BSShaderProperty::BSSP_FLAG_EYEREFLECT))) {
+                float fLightLuminance = 0.0f;
+                void* pIterator = nullptr;
+                ShadowSceneLight* psslight = apProp->GetFirstActiveNonShadowLight(pIterator);
+                NiColor kSunColor = BSShaderManager::pShadowSceneNode[0]->pSunLight->spLight.m_pObject->m_kDiff;
+                float fSunLuminance = kSunColor.Luminance();
+                if (psslight) {
+                    NiLight* pLight = psslight->spLight.m_pObject;
+                    NiPoint3 kToLight = pLight->m_kWorld.m_Translate - aWorldBound.m_kCenter;
+                    NiColor kLightColor = pLight->m_kDiff * pLight->m_fDimmer;
+                    float fDistance = kToLight.Length() / pLight->m_kSpec.r;
+                    float fClamped = fMin_(1.0, BSMAX_0(0.0, fDistance));
+                    fLightLuminance = 1.0 - fClamped;
+                    fLightLuminance = kLightColor.Luminance() * fLightLuminance;
                 }
+                float fMax = fSunLuminance;
+                if (fSunLuminance < fLightLuminance) {
+                    fMax = fLightLuminance;
+                }
+                Lighting30Shader::kPSConstants[3].x = fMax * Lighting30Shader::kPSConstants[3].x;
             }
         }
         // The alpha property is read without a null test, as the game does.
@@ -3708,47 +3701,46 @@ NiD3DPass* Lighting30Shader::SelectPass(BSShaderManager::eBSSMPassEnum a1) {
             m_spShaderDecl.SetNew(spShaderDecl.m_pObject);
             return v10;
         }
-        else {
-            switch (a1) {
-                case BSShaderManager::BSSM_3XZONLY: {
-                    NiD3DPass* v3 = Lighting30Shader::spPass[1].m_pObject;
-                    m_spShaderDecl.SetNew(spShaderDecl.m_pObject);
-                    result = v3;
-                    break;
-                }
-                case BSShaderManager::BSSM_3XZONLY_S: {
-                    NiD3DPass* v5 = Lighting30Shader::spPass[2].m_pObject;
-                    m_spShaderDecl.SetNew(spSkinnedShaderDecl.m_pObject);
-                    result = v5;
-                    break;
-                }
-                case BSShaderManager::BSSM_3XZONLY_Vc: {
-                    NiD3DPass* v6 = Lighting30Shader::spPass[3].m_pObject;
-                    m_spShaderDecl.SetNew(spShaderDeclVC.m_pObject);
-                    result = v6;
-                    break;
-                }
-                case BSShaderManager::BSSM_3XZONLY_SVc: {
-                    NiD3DPass* v7 = Lighting30Shader::spPass[4].m_pObject;
-                    m_spShaderDecl.SetNew(spSkinnedShaderDeclVC.m_pObject);
-                    result = v7;
-                    break;
-                }
-                case BSShaderManager::BSSM_3XZONLY_TEXEFFECT: {
-                    NiD3DPass* v8 = Lighting30Shader::spPass[5].m_pObject;
-                    m_spShaderDecl.SetNew(spShaderDecl.m_pObject);
-                    result = v8;
-                    break;
-                }
-                case BSShaderManager::BSSM_3XZONLY_TEXEFFECT_S: {
-                    NiD3DPass* v9 = Lighting30Shader::spPass[6].m_pObject;
-                    m_spShaderDecl.SetNew(spSkinnedShaderDecl.m_pObject);
-                    result = v9;
-                    break;
-                }
-                default: {
-                    goto LABEL_118;
-                }
+
+        switch (a1) {
+            case BSShaderManager::BSSM_3XZONLY: {
+                NiD3DPass* v3 = Lighting30Shader::spPass[1].m_pObject;
+                m_spShaderDecl.SetNew(spShaderDecl.m_pObject);
+                result = v3;
+                break;
+            }
+            case BSShaderManager::BSSM_3XZONLY_S: {
+                NiD3DPass* v5 = Lighting30Shader::spPass[2].m_pObject;
+                m_spShaderDecl.SetNew(spSkinnedShaderDecl.m_pObject);
+                result = v5;
+                break;
+            }
+            case BSShaderManager::BSSM_3XZONLY_Vc: {
+                NiD3DPass* v6 = Lighting30Shader::spPass[3].m_pObject;
+                m_spShaderDecl.SetNew(spShaderDeclVC.m_pObject);
+                result = v6;
+                break;
+            }
+            case BSShaderManager::BSSM_3XZONLY_SVc: {
+                NiD3DPass* v7 = Lighting30Shader::spPass[4].m_pObject;
+                m_spShaderDecl.SetNew(spSkinnedShaderDeclVC.m_pObject);
+                result = v7;
+                break;
+            }
+            case BSShaderManager::BSSM_3XZONLY_TEXEFFECT: {
+                NiD3DPass* v8 = Lighting30Shader::spPass[5].m_pObject;
+                m_spShaderDecl.SetNew(spShaderDecl.m_pObject);
+                result = v8;
+                break;
+            }
+            case BSShaderManager::BSSM_3XZONLY_TEXEFFECT_S: {
+                NiD3DPass* v9 = Lighting30Shader::spPass[6].m_pObject;
+                m_spShaderDecl.SetNew(spSkinnedShaderDecl.m_pObject);
+                result = v9;
+                break;
+            }
+            default: {
+                goto LABEL_118;
             }
         }
     }

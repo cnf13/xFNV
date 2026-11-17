@@ -10,10 +10,8 @@ CBaseObject::CBaseObject([[maybe_unused]] const char* apName) {
 
 // The last object frees the library the SDK loaded.
 CBaseObject::~CBaseObject() {
-    if (!InterlockedDecrementInt32(&iObjectCount)) {
-        if (hLibModule) {
-            platform::LibraryFree(hLibModule);
-            hLibModule = nullptr;
-        }
+    if ((!InterlockedDecrementInt32(&iObjectCount)) && (hLibModule)) {
+        platform::LibraryFree(hLibModule);
+        hLibModule = nullptr;
     }
 }

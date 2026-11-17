@@ -245,10 +245,9 @@ hkpCollisionAgent* hkpPredGskfAgent::createPredGskfAgent(
         agent->m_memSizeAndFlags = sizeof(hkpPredGskfAgent);
         return ::new (agent) hkpPredGskfAgent(bodyA, bodyB, mgr);
     }
-    else {
-        hkpGskBaseAgent* agent =
-            static_cast<hkpGskBaseAgent*>(hkMemoryRouter::getInstance().m_heap->blockAlloc(sizeof(hkpGskBaseAgent)));
-        agent->m_memSizeAndFlags = sizeof(hkpGskBaseAgent);
-        return ::new (agent) hkpGskBaseAgent(bodyA, bodyB, nullptr);
-    }
+
+    hkpGskBaseAgent* agent =
+        static_cast<hkpGskBaseAgent*>(hkMemoryRouter::getInstance().m_heap->blockAlloc(sizeof(hkpGskBaseAgent)));
+    agent->m_memSizeAndFlags = sizeof(hkpGskBaseAgent);
+    return ::new (agent) hkpGskBaseAgent(bodyA, bodyB, nullptr);
 }

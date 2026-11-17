@@ -114,15 +114,14 @@ uint32_t ShaderConstantMapEntryArray_AddFirstEmpty(
         ++apArray->m_usESize;
         return v7;
     }
-    else {
-    LABEL_7:;
-        if (m_usSize >= static_cast<uint32_t>(apArray->m_usMaxSize)) {
-            apArray->SetSize(m_usSize + apArray->m_usGrowBy);
-        }
-        // NiTArray::SetAt takes an unsigned int index; the size is passed zero-extended.
-        ShaderConstantMapEntryArray_SetAt(apArray, m_usSize, akElement);
-        return m_usSize;
+
+LABEL_7:;
+    if (m_usSize >= static_cast<uint32_t>(apArray->m_usMaxSize)) {
+        apArray->SetSize(m_usSize + apArray->m_usGrowBy);
     }
+    // NiTArray::SetAt takes an unsigned int index; the size is passed zero-extended.
+    ShaderConstantMapEntryArray_SetAt(apArray, m_usSize, akElement);
+    return m_usSize;
 }
 
 // Copies the matrix's sixteen floats, in memory order, into the constant data.

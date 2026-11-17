@@ -98,17 +98,14 @@ void MemoryLevelManager::RunNonDestructiveFree() {
     MemoryLevelManager::MEM_FREE_DATA freedata;
     MemoryLevelManager::BeginMemoryFree(&freedata, true, true, true);
     MemoryLevelManager::FreeReleasedObjects(freedata.bLockedFaceGen);
-    if (pPlayer->GetAllowEGMCacheClear()) {
-        if (BSFaceGenManager::GetModelCache()) {
-            BSFaceGenModelMap* ModelCache = BSFaceGenManager::GetModelCache();
-            if (ModelCache->bHasFaceGenData) {
-                if (!Menu::GetMenuByClass(1036)) {
-                    BSFaceGenModelMap* v1 = BSFaceGenManager::GetModelCache();
-                    v1->UnloadAllEGMAndEGTData(false);
-                }
-            }
+    if ((pPlayer->GetAllowEGMCacheClear()) && (BSFaceGenManager::GetModelCache())) {
+        BSFaceGenModelMap* ModelCache = BSFaceGenManager::GetModelCache();
+        if ((ModelCache->bHasFaceGenData) && (!Menu::GetMenuByClass(1036))) {
+            BSFaceGenModelMap* v1 = BSFaceGenManager::GetModelCache();
+            v1->UnloadAllEGMAndEGTData(false);
         }
     }
+
     MemoryLevelManager::EndMemoryFree(freedata);
 }
 

@@ -254,36 +254,31 @@ void BGSDecalManager::AddDecal(
     );
     bClearQueryTexture = true;
     if (aeDecalType == BGSDecalManager::DECAL_TYPE_SIMPLE) {
-        if (gs_bDecals_Decals.Bool()) {
-            if (arDecalData.pAVObj) {
-                if (!arDecalData.pAVObj->GetNoDecals()) {
-                    NiPoint3 keyepos = pPlayer->GetLocationOnReference();
-                    float fdist = (arDecalData.pOrigin - keyepos).Length();
-                    double fTicksPerMicrosecond = 1000.0;
-                    int32_t finaltricount = 0;
-                    Start.u.LowPart = 0;
-                    if (gs_bProfileDecals_Decals.Bool()) {
-                        QueryPerformanceFrequency(&TicksPerSecond);
-                        fTicksPerMicrosecond = static_cast<double>(TicksPerSecond.QuadPart) * 1e-06;
-                        QueryPerformanceCounter(&Start);
-                    }
-                    if (static_cast<double>(fdist) <= Renderer::GetDecalLODStart() ||
-                        (arDecalData.bModelSpace || abForceAdd)) {
-                        if (BGSDecalManager::bDebugDecals.Bool()) {
-                            Warning("DECAL: Simple Decal Instantiated");
-                        }
-                        AddGeometryDecalRecurse(arDecalData);
-                    }
-                    if (gs_bProfileDecals_Decals.Bool()) {
-                        QueryPerformanceCounter(&End);
-                        int64_t iTicks = End.QuadPart - Start.QuadPart;
-                        BSsprintf(
-                            acBuffer, 255, "AddGeometryDecalRecurse: Ticks: %lld, Microseconds: %f", iTicks,
-                            static_cast<double>(iTicks) / fTicksPerMicrosecond
-                        );
-                        InitializationFlow(acBuffer, 0);
-                    }
+        if ((gs_bDecals_Decals.Bool()) && (arDecalData.pAVObj) && (!arDecalData.pAVObj->GetNoDecals())) {
+            NiPoint3 keyepos = pPlayer->GetLocationOnReference();
+            float fdist = (arDecalData.pOrigin - keyepos).Length();
+            double fTicksPerMicrosecond = 1000.0;
+            int32_t finaltricount = 0;
+            Start.u.LowPart = 0;
+            if (gs_bProfileDecals_Decals.Bool()) {
+                QueryPerformanceFrequency(&TicksPerSecond);
+                fTicksPerMicrosecond = static_cast<double>(TicksPerSecond.QuadPart) * 1e-06;
+                QueryPerformanceCounter(&Start);
+            }
+            if (static_cast<double>(fdist) <= Renderer::GetDecalLODStart() || (arDecalData.bModelSpace || abForceAdd)) {
+                if (BGSDecalManager::bDebugDecals.Bool()) {
+                    Warning("DECAL: Simple Decal Instantiated");
                 }
+                AddGeometryDecalRecurse(arDecalData);
+            }
+            if (gs_bProfileDecals_Decals.Bool()) {
+                QueryPerformanceCounter(&End);
+                int64_t iTicks = End.QuadPart - Start.QuadPart;
+                BSsprintf(
+                    acBuffer, 255, "AddGeometryDecalRecurse: Ticks: %lld, Microseconds: %f", iTicks,
+                    static_cast<double>(iTicks) / fTicksPerMicrosecond
+                );
+                InitializationFlow(acBuffer, 0);
             }
         }
     }
@@ -321,21 +316,17 @@ void BGSDecalManager::AddDecal(
                     else {
                         pnode = nullptr;
                     }
-                    if (pnode) {
-                        if (!pavobject->GetNoDecals()) {
-                            arDecalData.pAVObj = (NiAVObject*)pnode;
-                            if ((static_cast<double>(fdist_2) <= Renderer::GetSkinnedDecalLODStart() &&
-                                 BGSDecalManager::iSkinnedDecalCount < gs_uMaxSkinDecals_Decals.UInt()) ||
-                                abForceAdd) {
-                                AddProjectedDecalRecurse(arDecalData);
-                            }
-                            else {
-                                if (BGSDecalManager::iSkinnedDecalCount >= gs_uMaxSkinDecals_Decals.UInt() &&
-                                    BGSDecalManager::bDebugDecals.Bool()) {
-                                    Warning(
-                                        "DECAL: Reached Max Skin Decal Limit! : %d", gs_uMaxSkinDecals_Decals.Int()
-                                    );
-                                }
+                    if ((pnode) && (!pavobject->GetNoDecals())) {
+                        arDecalData.pAVObj = (NiAVObject*)pnode;
+                        if ((static_cast<double>(fdist_2) <= Renderer::GetSkinnedDecalLODStart() &&
+                             BGSDecalManager::iSkinnedDecalCount < gs_uMaxSkinDecals_Decals.UInt()) ||
+                            abForceAdd) {
+                            AddProjectedDecalRecurse(arDecalData);
+                        }
+                        else {
+                            if (BGSDecalManager::iSkinnedDecalCount >= gs_uMaxSkinDecals_Decals.UInt() &&
+                                BGSDecalManager::bDebugDecals.Bool()) {
+                                Warning("DECAL: Reached Max Skin Decal Limit! : %d", gs_uMaxSkinDecals_Decals.Int());
                             }
                         }
                     }
@@ -373,19 +364,14 @@ void BGSDecalManager::AddDecal(
                                 );
                                 havoknormal.Unitize();
                                 TESObjectREFR* pref = TESObjectREFR::FindReferenceFor3D(pavobj);
-                                if (!pavobj->GetNoDecals()) {
-                                    if (pref) {
-                                        if (BGSDecalManager::IsValidDecalImpact(
-                                                pref, BGSDecalManager::DECAL_TYPE_SIMPLE
-                                            ) &&
-                                            !listavobj.FindPos(pavobj, nullptr)) {
-                                            arDecalData.pOrigin = havokpos;
-                                            arDecalData.pDirection = havoknormal;
-                                            arDecalData.pAVObj = pavobj;
-                                            AddGeometryDecalRecurse(arDecalData);
-                                            NiAVObjectList_AddHead(&listavobj, pavobj);
-                                        }
-                                    }
+                                if ((!pavobj->GetNoDecals()) && (pref) &&
+                                    (BGSDecalManager::IsValidDecalImpact(pref, BGSDecalManager::DECAL_TYPE_SIMPLE) &&
+                                     !listavobj.FindPos(pavobj, nullptr))) {
+                                    arDecalData.pOrigin = havokpos;
+                                    arDecalData.pDirection = havoknormal;
+                                    arDecalData.pAVObj = pavobj;
+                                    AddGeometryDecalRecurse(arDecalData);
+                                    NiAVObjectList_AddHead(&listavobj, pavobj);
                                 }
                             }
                         }
@@ -395,13 +381,10 @@ void BGSDecalManager::AddDecal(
             }
         }
         else {
-            if (aeDecalType == BGSDecalManager::DECAL_TYPE_PERMENANT_SIMPLE && gs_bDecals_Decals.Bool()) {
-                if (arDecalData.pAVObj) {
-                    if (!arDecalData.pAVObj->GetNoDecals()) {
-                        arDecalData.bPermanent = true;
-                        AddGeometryDecalRecurse(arDecalData);
-                    }
-                }
+            if ((aeDecalType == BGSDecalManager::DECAL_TYPE_PERMENANT_SIMPLE && gs_bDecals_Decals.Bool()) &&
+                (arDecalData.pAVObj) && (!arDecalData.pAVObj->GetNoDecals())) {
+                arDecalData.bPermanent = true;
+                AddGeometryDecalRecurse(arDecalData);
             }
         }
     }
@@ -443,10 +426,8 @@ bool BGSDecalManager::AddGeometryDecalRecurse(DECAL_CREATION_DATA& arDecalData) 
                 if (pgeom) {
                     BSShaderPPLightingProperty* pshade =
                         static_cast<BSShaderPPLightingProperty*>(pgeom->m_PropertyState.GetShade());
-                    if (pshade) {
-                        if (pshade->GetFlag(26u)) {
-                            return true;
-                        }
+                    if ((pshade) && (pshade->GetFlag(26u))) {
+                        return true;
                     }
                 }
                 NiNode* pnode = arDecalData.pAVObj->m_pkParent;
@@ -516,12 +497,11 @@ bool BGSDecalManager::AddGeometryDecalRecurse(DECAL_CREATION_DATA& arDecalData) 
         }
         return true;
     }
-    else {
-        if (BGSDecalManager::bDebugDecals.Bool()) {
-            Warning("DECAL: Reached max non-skinned decals per frame. Ignoring decal.");
-        }
-        return false;
+
+    if (BGSDecalManager::bDebugDecals.Bool()) {
+        Warning("DECAL: Reached max non-skinned decals per frame. Ignoring decal.");
     }
+    return false;
 }
 
 bool BGSDecalManager::AddProjectedDecalRecurse(DECAL_CREATION_DATA& arDecalData) {
@@ -844,15 +824,13 @@ void BGSDecalManager::ClearPendingQueries() {
         iter = PendingSimpleDecalList.m_pkHead;
         while (iter) {
             BSTempEffectSimpleDecal* pdecal = (&PendingSimpleDecalList.GetNext(iter))->m_pObject;
-            if (pdecal) {
+            if ((pdecal) && (pdecal->pOcclusionQuery)) {
+                iresult = 0;
+                pdecal->pOcclusionQuery->GetResult(&iresult, true);
                 if (pdecal->pOcclusionQuery) {
-                    iresult = 0;
-                    pdecal->pOcclusionQuery->GetResult(&iresult, true);
-                    if (pdecal->pOcclusionQuery) {
-                        delete pdecal->pOcclusionQuery;
-                    }
-                    pdecal->pOcclusionQuery = nullptr;
+                    delete pdecal->pOcclusionQuery;
                 }
+                pdecal->pOcclusionQuery = nullptr;
             }
         }
         NiDX9Renderer* v2 = static_cast<NiDX9Renderer*>(NiRenderer::GetRenderer());

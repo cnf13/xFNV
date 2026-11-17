@@ -47,11 +47,9 @@ void AILinearTaskThreadManager::SetThreadStage(
     AILinearTaskThreadManager::AI_THREAD_INDEX aiThreadIndex,
     uint32_t aiStage
 ) {
-    if (aiThreadIndex < 2) {
-        if (AITaskThreadArray[aiThreadIndex]) {
-            pEvents[aiThreadIndex][aiStage]->Set();
-            AITaskThreadStage[aiThreadIndex] = aiStage;
-        }
+    if ((aiThreadIndex < 2) && (AITaskThreadArray[aiThreadIndex])) {
+        pEvents[aiThreadIndex][aiStage]->Set();
+        AITaskThreadStage[aiThreadIndex] = aiStage;
     }
 }
 

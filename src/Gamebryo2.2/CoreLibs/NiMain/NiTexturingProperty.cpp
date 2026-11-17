@@ -291,15 +291,13 @@ NiObject* NiTexturingProperty::CreateClone(NiCloningProcess& kCloning) {
             CopyMembers(v4, kCloning);
             return v4;
         }
-        else {
-            CopyMembers(nullptr, kCloning);
-            return nullptr;
-        }
+
+        CopyMembers(nullptr, kCloning);
+        return nullptr;
     }
-    else {
-        NiObject::CopyMembers(this, kCloning);
-        return this;
-    }
+
+    NiObject::CopyMembers(this, kCloning);
+    return this;
 }
 
 // Reads the flags (before 20.1.0.2 only the apply mode), the map list (the bump and parallax maps as their
@@ -977,9 +975,8 @@ NiObject* NiTexturingProperty::CreateObject() {
     if (v0) {
         return ::new (v0) NiTexturingProperty;
     }
-    else {
-        return nullptr;
-    }
+
+    return nullptr;
 }
 
 void NiTexturingProperty::_SDMInit() {

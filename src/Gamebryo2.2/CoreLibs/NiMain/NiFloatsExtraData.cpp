@@ -30,10 +30,9 @@ NiObject* NiFloatsExtraData::CreateClone(NiCloningProcess& kCloning) {
         CopyMembers(pkObject_2, kCloning);
         return pkObject_2;
     }
-    else {
-        CopyMembers(nullptr, kCloning);
-        return nullptr;
-    }
+
+    CopyMembers(nullptr, kCloning);
+    return nullptr;
 }
 
 // The old array is not freed, as the game does.

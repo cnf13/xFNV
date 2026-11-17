@@ -265,38 +265,37 @@ NiVBChip* NiDynamicGeometryGroup::CreateChip(NiGeometryBufferData* pkBuffData, u
         pkBuffData->m_uiBaseVertexIndex = uiOffset / uiVertexStride;
         return pkChip;
     }
-    else {
-        if (m_kMultiStreamSets.m_usMaxSize < uiNumStreams) {
-            m_kMultiStreamSets.SetSize(uiNumStreams);
-            m_kMultiStreamChips.SetSize(uiNumStreams);
-        }
-        if (m_uiNextIndex >= m_kMultiStreamSets.m_usMaxSize) {
-            m_uiNextIndex = 0;
-        }
-        NiVBDynamicSet* pkSet = m_kMultiStreamSets.m_pBase[m_uiNextIndex];
-        if (!pkSet) {
-            pkSet = NiVBDynamicSet::Create(2048u, m_pkD3DDevice, 0, 0);
-            m_kMultiStreamSets.SetAt(m_uiNextIndex, pkSet);
-        }
-        IDirect3DVertexBuffer9* pkVB =
-            pkSet->AllocateBufferSpace(uiSize, uiOffset, uiFlags, true, pkBuffData->m_bSoftwareVP);
-        NiVBChip* pkMultiChip = m_kMultiStreamChips.m_pBase[m_uiNextIndex];
-        if (pkMultiChip) {
-            pkMultiChip->m_pkVB = pkVB;
-            pkMultiChip->m_uiOffset = uiOffset;
-            pkMultiChip->m_uiSize = uiSize;
-        }
-        else {
-            pkMultiChip = NiVBChip::Create(nullptr, pkVB, uiOffset, uiSize, 0);
-            pkChip = pkMultiChip;
-            m_kMultiStreamChips.SetAt(m_uiNextIndex, pkChip);
-        }
-        pkMultiChip->m_pkDynamicSet = pkSet;
-        pkMultiChip->m_uiLockFlags = uiFlags;
-        pkBuffData->m_uiBaseVertexIndex = 0;
-        ++m_uiNextIndex;
-        return pkMultiChip;
+
+    if (m_kMultiStreamSets.m_usMaxSize < uiNumStreams) {
+        m_kMultiStreamSets.SetSize(uiNumStreams);
+        m_kMultiStreamChips.SetSize(uiNumStreams);
     }
+    if (m_uiNextIndex >= m_kMultiStreamSets.m_usMaxSize) {
+        m_uiNextIndex = 0;
+    }
+    NiVBDynamicSet* pkSet = m_kMultiStreamSets.m_pBase[m_uiNextIndex];
+    if (!pkSet) {
+        pkSet = NiVBDynamicSet::Create(2048u, m_pkD3DDevice, 0, 0);
+        m_kMultiStreamSets.SetAt(m_uiNextIndex, pkSet);
+    }
+    IDirect3DVertexBuffer9* pkVB =
+        pkSet->AllocateBufferSpace(uiSize, uiOffset, uiFlags, true, pkBuffData->m_bSoftwareVP);
+    NiVBChip* pkMultiChip = m_kMultiStreamChips.m_pBase[m_uiNextIndex];
+    if (pkMultiChip) {
+        pkMultiChip->m_pkVB = pkVB;
+        pkMultiChip->m_uiOffset = uiOffset;
+        pkMultiChip->m_uiSize = uiSize;
+    }
+    else {
+        pkMultiChip = NiVBChip::Create(nullptr, pkVB, uiOffset, uiSize, 0);
+        pkChip = pkMultiChip;
+        m_kMultiStreamChips.SetAt(m_uiNextIndex, pkChip);
+    }
+    pkMultiChip->m_pkDynamicSet = pkSet;
+    pkMultiChip->m_uiLockFlags = uiFlags;
+    pkBuffData->m_uiBaseVertexIndex = 0;
+    ++m_uiNextIndex;
+    return pkMultiChip;
 }
 
 void NiDynamicGeometryGroup::ReleaseChip(NiGeometryBufferData* pkBuffData, uint32_t uiStream) {

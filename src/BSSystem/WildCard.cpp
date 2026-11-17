@@ -27,9 +27,8 @@ int32_t WildCard::RecMatch(const char* apString, const char* apPattern) {
             if (apString) {
                 return WildCard::RecMatch(apString + 1, apPatterna);
             }
-            else {
-                return 0;
-            }
+
+            return 0;
         }
         case 42: {
             if (*apPatterna) {
@@ -42,9 +41,8 @@ int32_t WildCard::RecMatch(const char* apString, const char* apPattern) {
                 }
                 return 2;
             }
-            else {
-                return 1;
-            }
+
+            return 1;
         }
         case 91: {
             if (*apString) {
@@ -100,9 +98,8 @@ int32_t WildCard::RecMatch(const char* apString, const char* apPattern) {
                                             if (v12) {
                                                 return 0;
                                             }
-                                            else {
-                                                return WildCard::RecMatch(apString + 1, cpend + 1);
-                                            }
+
+                                            return WildCard::RecMatch(apString + 1, cpend + 1);
                                         }
                                         ++v18;
                                     }
@@ -122,17 +119,14 @@ int32_t WildCard::RecMatch(const char* apString, const char* apPattern) {
                     if (v12) {
                         return WildCard::RecMatch(apString + 1, cpend + 1);
                     }
-                    else {
-                        return 0;
-                    }
-                }
-                else {
+
                     return 0;
                 }
-            }
-            else {
+
                 return 0;
             }
+
+            return 0;
         }
         default: {
             if (c != 92 || (c = *apPatterna, (++apPatterna, c))) {
@@ -153,13 +147,11 @@ int32_t WildCard::RecMatch(const char* apString, const char* apPattern) {
                 if (v6 == v5) {
                     return WildCard::RecMatch(apString + 1, apPatterna);
                 }
-                else {
-                    return 0;
-                }
-            }
-            else {
+
                 return 0;
             }
+
+            return 0;
         }
     }
 }

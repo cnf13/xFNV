@@ -65,11 +65,9 @@ DialogueResponse* DialogueItem::GetCurrentResponse() {
 }
 
 void DialogueItem::RunResult(TOPIC_INFO_RESULT_SCRIPT aeScript) {
-    if (pInfo) {
-        if (!pInfo->IsRunImmediately()) {
-            pInfo->AddTopicList();
-            pInfo->RunResult(aeScript, pSpeaker);
-        }
+    if ((pInfo) && (!pInfo->IsRunImmediately())) {
+        pInfo->AddTopicList();
+        pInfo->RunResult(aeScript, pSpeaker);
     }
 }
 
@@ -303,13 +301,12 @@ void DialogueItem::PrecacheSounds() {
     // Walks the responses' list nodes; the first node is the item itself.
     BSSimpleList<DialogueResponse*>* pNode = &lResponses;
     while (pNode && !pNode->IsEmpty()) {
-        if ((&pNode->m_item->cText)->pString) {
-            if (BSstrlen((&pNode->m_item->cText)->pString) > 1) {
-                char* v2 = pNode->m_item->GetVoice()->pString;
-                BSAudio* v1 = &BSAudio::QInstance();
-                v1->PrecacheSound(v2, 0x20100001u, nullptr);
-            }
+        if (((&pNode->m_item->cText)->pString) && (BSstrlen((&pNode->m_item->cText)->pString) > 1)) {
+            char* v2 = pNode->m_item->GetVoice()->pString;
+            BSAudio* v1 = &BSAudio::QInstance();
+            v1->PrecacheSound(v2, 0x20100001u, nullptr);
         }
+
         pNode = pNode->m_pkNext;
     }
 }

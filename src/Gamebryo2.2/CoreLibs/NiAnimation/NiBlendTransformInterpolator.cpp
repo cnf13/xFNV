@@ -36,10 +36,9 @@ NiObject* NiBlendTransformInterpolator::CreateClone(NiCloningProcess& kCloning) 
         NiBlendInterpolator::CopyMembers(v4, kCloning);
         return v4;
     }
-    else {
-        NiBlendInterpolator::CopyMembers(nullptr, kCloning);
-        return nullptr;
-    }
+
+    NiBlendInterpolator::CopyMembers(nullptr, kCloning);
+    return nullptr;
 }
 
 // Files before 10.1.0.110 store a transform here that is no longer used; it is read and dropped.

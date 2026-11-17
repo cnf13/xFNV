@@ -537,12 +537,11 @@ bool PathingLocation::ResolveNavMeshInfoOnly() {
         SetAllMeshesReachable(1);
         return true;
     }
-    else {
-        bool v3 = AreAllMeshesReachable();
-        SetAllMeshesReachable(v3);
-        bool v5 = QAllMeshesReachable();
-        return v5;
-    }
+
+    bool v3 = AreAllMeshesReachable();
+    SetAllMeshesReachable(v3);
+    bool v5 = QAllMeshesReachable();
+    return v5;
 }
 
 bool PathingLocation::AreAllMeshesReachable() {
@@ -612,10 +611,7 @@ bool PathingLocation::AreAllMeshesReachable() {
     while (bAdded);
 
     uiReachableCount = kReachable.GetSize();
-    if (uiReachableCount == pNavMeshes->GetSize()) {
-        return true;
-    }
-    return false;
+    return uiReachableCount == pNavMeshes->GetSize();
 }
 
 bool PathingLocation::ResolveToClosestNavmeshAndTriangle() {
@@ -647,94 +643,87 @@ bool PathingLocation::ResolveToClosestNavmeshAndTriangle() {
                 }
                 return true;
             }
-            else {
-                return false;
-            }
-        }
-        else {
+
             return false;
         }
+
+        return false;
     }
-    else {
-        float fminDistToPointSqr = 3.4028235e+38f;
-        uint32_t ibestNavMesh = -1;
-        uint16_t usbestTri = -1;
-        bool bbestTriWithinZRange = false;
-        uint32_t isize = pNavMeshes->iSize;
-        bool bunderWater = Location.z < TES::pInstance->GetWaterHeight(Location, pCell) + 25.0;
-        for (uint32_t i = 0; i < isize; ++i) {
-            uint16_t a3[3];
-            a3[0] = -1;
-            bpointInside_2 = false;
-            NavMeshPtr spmesh_2;
-            const NavMeshInfo* pinfo = pNavMeshes->operator[](i);
-            if (pinfo->GetDisabled() ||
-                (!pinfo->GetNavMesh(spmesh_2) ||
-                 spmesh_2.m_pObject->FindClosestTriangleForLocation(Location, a3, &bpointInside_2))) {
-                if (bpointInside_2) {
-                    pNavMesh = pNavMeshes->operator[](i);
-                    pNavMeshes = nullptr;
-                    usTriangle = a3[0];
-                    bool v13 = true;
-                    return v13;
+
+    float fminDistToPointSqr = 3.4028235e+38f;
+    uint32_t ibestNavMesh = -1;
+    uint16_t usbestTri = -1;
+    bool bbestTriWithinZRange = false;
+    uint32_t isize = pNavMeshes->iSize;
+    bool bunderWater = Location.z < TES::pInstance->GetWaterHeight(Location, pCell) + 25.0;
+    for (uint32_t i = 0; i < isize; ++i) {
+        uint16_t a3[3];
+        a3[0] = -1;
+        bpointInside_2 = false;
+        NavMeshPtr spmesh_2;
+        const NavMeshInfo* pinfo = pNavMeshes->operator[](i);
+        if (pinfo->GetDisabled() ||
+            (!pinfo->GetNavMesh(spmesh_2) ||
+             spmesh_2.m_pObject->FindClosestTriangleForLocation(Location, a3, &bpointInside_2))) {
+            if (bpointInside_2) {
+                pNavMesh = pNavMeshes->operator[](i);
+                pNavMeshes = nullptr;
+                usTriangle = a3[0];
+                bool v13 = true;
+                return v13;
+            }
+            if (spmesh_2.operator NavMesh*()) {
+                NiPoint3 delta = Location - spmesh_2.m_pObject->GetCenter(a3[0]);
+                float fdistToPointSqr = delta.SqrXYLength();
+                float fzdist = delta.z;
+                bool bthisTriInZRange = false;
+                if ((bunderWater || fzdist < 180.0) && fzdist > -64.0) {
+                    bthisTriInZRange = true;
                 }
-                if (spmesh_2.operator NavMesh*()) {
-                    NiPoint3 delta = Location - spmesh_2.m_pObject->GetCenter(a3[0]);
-                    float fdistToPointSqr = delta.SqrXYLength();
-                    float fzdist = delta.z;
-                    bool bthisTriInZRange = false;
-                    if ((bunderWater || fzdist < 180.0) && fzdist > -64.0) {
-                        bthisTriInZRange = true;
+                if (bbestTriWithinZRange) {
+                    if ((bthisTriInZRange) && (fminDistToPointSqr > fdistToPointSqr)) {
+                        fminDistToPointSqr = fdistToPointSqr;
+                        usbestTri = a3[0];
+                        ibestNavMesh = i;
                     }
-                    if (bbestTriWithinZRange) {
-                        if (bthisTriInZRange) {
-                            if (fminDistToPointSqr > fdistToPointSqr) {
-                                fminDistToPointSqr = fdistToPointSqr;
-                                usbestTri = a3[0];
-                                ibestNavMesh = i;
-                            }
-                        }
+                }
+                else {
+                    if (bthisTriInZRange) {
+                        fminDistToPointSqr = fdistToPointSqr;
+                        usbestTri = a3[0];
+                        ibestNavMesh = i;
+                        bbestTriWithinZRange = true;
                     }
                     else {
-                        if (bthisTriInZRange) {
+                        if (fminDistToPointSqr > fdistToPointSqr) {
                             fminDistToPointSqr = fdistToPointSqr;
                             usbestTri = a3[0];
                             ibestNavMesh = i;
-                            bbestTriWithinZRange = true;
-                        }
-                        else {
-                            if (fminDistToPointSqr > fdistToPointSqr) {
-                                fminDistToPointSqr = fdistToPointSqr;
-                                usbestTri = a3[0];
-                                ibestNavMesh = i;
-                            }
                         }
                     }
                 }
             }
         }
-        if (ibestNavMesh == -1) {
-            return false;
-        }
-        else {
-            pNavMesh = pNavMeshes->operator[](ibestNavMesh);
-            pNavMeshes = nullptr;
-            usTriangle = usbestTri;
-            NavMeshPtr spmesh_3;
-            if (pNavMesh->GetNavMesh(spmesh_3)) {
-                NiPoint3 center_2 = spmesh_3.m_pObject->GetCenter(usbestTri);
-                spmesh_3.m_pObject->FindInterectingEdge2(&res_2, usbestTri, -1, center_2, Location);
-                if (res_2.eType) {
-                    NiPoint3* fScalara = ::new (&v10) NiPoint3(res_2.Intersection * 0.9f);
-                    Location = center_2 * 0.1f + *fScalara;
-                }
-                return true;
-            }
-            else {
-                return false;
-            }
-        }
     }
+    if (ibestNavMesh == -1) {
+        return false;
+    }
+
+    pNavMesh = pNavMeshes->operator[](ibestNavMesh);
+    pNavMeshes = nullptr;
+    usTriangle = usbestTri;
+    NavMeshPtr spmesh_3;
+    if (pNavMesh->GetNavMesh(spmesh_3)) {
+        NiPoint3 center_2 = spmesh_3.m_pObject->GetCenter(usbestTri);
+        spmesh_3.m_pObject->FindInterectingEdge2(&res_2, usbestTri, -1, center_2, Location);
+        if (res_2.eType) {
+            NiPoint3* fScalara = ::new (&v10) NiPoint3(res_2.Intersection * 0.9f);
+            Location = center_2 * 0.1f + *fScalara;
+        }
+        return true;
+    }
+
+    return false;
 }
 
 void PathingLocation::SetupData(const NiPoint3& aLocation, TESObjectCELL* apCell, TESWorldSpace* apWorldSpace) {
@@ -798,17 +787,15 @@ bool PathingLocation::GetNavMeshInfos(BSSimpleArray<const NavMeshInfo*, 1024>& a
         apRetInfos.Add(pNavMesh);
         return true;
     }
-    else {
-        if (pNavMeshes) {
-            // CopyTo<1024> takes its own array type, while the caller's array holds const NavMeshInfo pointers, hence
-            // the cast.
-            pNavMeshes->CopyTo(reinterpret_cast<BSSimpleArray<NavMeshInfo*, 1024>*>(&apRetInfos));
-            return true;
-        }
-        else {
-            return false;
-        }
+
+    if (pNavMeshes) {
+        // CopyTo<1024> takes its own array type, while the caller's array holds const NavMeshInfo pointers, hence
+        // the cast.
+        pNavMeshes->CopyTo(reinterpret_cast<BSSimpleArray<NavMeshInfo*, 1024>*>(&apRetInfos));
+        return true;
     }
+
+    return false;
 }
 
 void PathingLocation::PrintDebugText(char* apBuffer, int32_t aiMaxSize) {

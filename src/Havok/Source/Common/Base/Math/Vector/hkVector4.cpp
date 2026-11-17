@@ -105,7 +105,9 @@ hkVector4::hkVector4(float afX, float afY, float afZ, float afW) {
 // goes through a float local; the four components are stored once, after all inputs are read.
 void hkVector4::setTransformedPos(const hkTransform& t, const hkVector4& v) {
     const hkRotation& r = t.m_rotation;
-    float fX = v.m_quad[0], fY = v.m_quad[1], fZ = v.m_quad[2];
+    float fX = v.m_quad[0];
+    float fY = v.m_quad[1];
+    float fZ = v.m_quad[2];
     hkQuadReal kResult;
     for (int32_t i = 0; i < 4; ++i) {
         float fYCol1 = fY * (&reinterpret_cast<const float*>(&r.m_col1.m_quad)[0])[i];
@@ -160,7 +162,9 @@ void hkVector4::setAll3(float a) {
 // Computes (a.y * col1 + a.x * col0) + a.z * col2 in that order, with each step rounded to float as in
 // setTransformedPos.
 void hkVector4::setMul3(const hkMatrix3& r, const hkVector4& b) {
-    float fX = b.m_quad[0], fY = b.m_quad[1], fZ = b.m_quad[2];
+    float fX = b.m_quad[0];
+    float fY = b.m_quad[1];
+    float fZ = b.m_quad[2];
     hkQuadReal kResult;
     for (int32_t i = 0; i < 4; ++i) {
         float fYCol1 = fY * (&reinterpret_cast<const float*>(&r.m_col1.m_quad)[0])[i];
@@ -175,7 +179,9 @@ void hkVector4::setMul3(const hkMatrix3& r, const hkVector4& b) {
 // The rotation's turn on a direction vector: (a.y * col1 + a.x * col0) + a.z * col2, in this order, each step rounded
 // to float as in setMul3.
 void hkVector4::setRotatedDir(const hkRotation& a, const hkVector4& b) {
-    float fX = b.m_quad[0], fY = b.m_quad[1], fZ = b.m_quad[2];
+    float fX = b.m_quad[0];
+    float fY = b.m_quad[1];
+    float fZ = b.m_quad[2];
     hkQuadReal kResult;
     for (int32_t i = 0; i < 4; ++i) {
         float fYCol1 = fY * (&reinterpret_cast<const float*>(&a.m_col1.m_quad)[0])[i];

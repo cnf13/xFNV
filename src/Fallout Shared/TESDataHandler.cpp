@@ -521,40 +521,38 @@ void TESDataHandler::UnloadCell(TESObjectCELL* apCell) {
     TESObjectLAND* land;
     TESWorldSpace* worldSpace;
     uint8_t v5;
-    if (apCell) {
-        if (!apCell->GetDelete()) {
-            BSTaskThread::SetPauseSleepEnabled(true);
-            v5 = 0;
-            if (pSaveLoadGame->GetSaveGameLoading()) {
-                v5 = (uint8_t)pSaveLoadGame->SetThreadAllowChanges(false);
-            }
-            apCell->Detach(true);
-            (&ReferenceProcessLists)->RemoveTempEffectsForCell(apCell);
-            apCell->SetState(TESObjectCELL::CS_UNLOADING);
-            apCell->UnLoadAllTempData();
-            apCell->ClearReference3D();
-            while (apCell->GetLowestProcessMiddleLow()) {
-                apCell->SetLowestProcessToMiddleLow(false);
-            }
-            if (!pDataHandler->GetClearingData()) {
-                isSleepingorResting = (uint8_t)pPlayer->IsSleepingorResting();
-                apCell->ChangeProcessLevel((uint8_t)(!isSleepingorResting));
-            }
-            if (!apCell->GetInterior()) {
-                land = apCell->GetLand();
-                land->UnLoadVertices();
-            }
-            apCell->Clear3D();
-            apCell->SetAutoWaterLoaded(false);
-            if (!apCell->GetInterior()) {
-                worldSpace = apCell->GetWorldSpace();
-                worldSpace->UnLoadCell(apCell);
-            }
-            if (pSaveLoadGame->GetSaveGameLoading()) {
-                pSaveLoadGame->SetThreadAllowChanges(v5);
-            }
-            BSTaskThread::SetPauseSleepEnabled(false);
+    if ((apCell) && (!apCell->GetDelete())) {
+        BSTaskThread::SetPauseSleepEnabled(true);
+        v5 = 0;
+        if (pSaveLoadGame->GetSaveGameLoading()) {
+            v5 = (uint8_t)pSaveLoadGame->SetThreadAllowChanges(false);
         }
+        apCell->Detach(true);
+        (&ReferenceProcessLists)->RemoveTempEffectsForCell(apCell);
+        apCell->SetState(TESObjectCELL::CS_UNLOADING);
+        apCell->UnLoadAllTempData();
+        apCell->ClearReference3D();
+        while (apCell->GetLowestProcessMiddleLow()) {
+            apCell->SetLowestProcessToMiddleLow(false);
+        }
+        if (!pDataHandler->GetClearingData()) {
+            isSleepingorResting = (uint8_t)pPlayer->IsSleepingorResting();
+            apCell->ChangeProcessLevel((uint8_t)(!isSleepingorResting));
+        }
+        if (!apCell->GetInterior()) {
+            land = apCell->GetLand();
+            land->UnLoadVertices();
+        }
+        apCell->Clear3D();
+        apCell->SetAutoWaterLoaded(false);
+        if (!apCell->GetInterior()) {
+            worldSpace = apCell->GetWorldSpace();
+            worldSpace->UnLoadCell(apCell);
+        }
+        if (pSaveLoadGame->GetSaveGameLoading()) {
+            pSaveLoadGame->SetThreadAllowChanges(v5);
+        }
+        BSTaskThread::SetPauseSleepEnabled(false);
     }
 }
 
@@ -1885,10 +1883,8 @@ TESDataHandler::GetExtCellDataFromFileByEditorID(const char* apCellID, int32_t& 
 bool TESDataHandler::FormGroupLoadsInGame(TESFile* apFile, FORM* apFormGroup) {
     bool result = true;
 
-    if (apFile && !apFile->GetMaster()) {
-        if (!pSaveLoadGameOLD || !pSaveLoadGameOLD->GetLoading()) {
-            return true;
-        }
+    if ((apFile && !apFile->GetMaster()) && (!pSaveLoadGameOLD || !pSaveLoadGameOLD->GetLoading())) {
+        return true;
     }
 
     if (!apFormGroup) {
@@ -2038,22 +2034,19 @@ TESDataHandler::GetCellFromCellCoord(int32_t aiX, int32_t aiY, TESWorldSpace* ap
         if (pCell) {
             return pCell;
         }
-        else {
-            if (GetSaveLoad() || !abCreateCell) {
-                return nullptr;
-            }
-            else {
-                return NewCell("", aiX, aiY, apWorldSpace);
-            }
+
+        if (GetSaveLoad() || !abCreateCell) {
+            return nullptr;
         }
+
+        return NewCell("", aiX, aiY, apWorldSpace);
     }
-    else {
-        Warning(
-            "CELLS: Trying to get exterior cell for invalid cell coordinate. Values must be between %i and %i.",
-            -0x8000, 0x7FFF
-        );
-        return nullptr;
-    }
+
+    Warning(
+        "CELLS: Trying to get exterior cell for invalid cell coordinate. Values must be between %i and %i.", -0x8000,
+        0x7FFF
+    );
+    return nullptr;
 }
 
 TESObjectCELL*
@@ -2188,13 +2181,11 @@ void TESDataHandler::SortAllList() {
             if (pList->m_pkNext) {
                 TESClass* class1 = pList->m_item;
                 TESClass* class2 = pList->m_pkNext->m_item;
-                if (class1) {
-                    if (class2) {
-                        const char* FullName = class2->GetFullName();
-                        if (_tcsicmp(class1->GetFullName(), FullName) > 0) {
-                            pList->SetItem(class2);
-                            pList->m_pkNext->SetItem(class1);
-                        }
+                if ((class1) && (class2)) {
+                    const char* FullName = class2->GetFullName();
+                    if (_tcsicmp(class1->GetFullName(), FullName) > 0) {
+                        pList->SetItem(class2);
+                        pList->m_pkNext->SetItem(class1);
                     }
                 }
             }
@@ -2207,13 +2198,11 @@ void TESDataHandler::SortAllList() {
             if (pList_2->m_pkNext) {
                 TESRace* race1 = pList_2->m_item;
                 TESRace* race2 = pList_2->m_pkNext->m_item;
-                if (race1) {
-                    if (race2) {
-                        const char* v2 = race2->GetFullName();
-                        if (_tcsicmp(race1->GetFullName(), v2) > 0) {
-                            pList_2->SetItem(race2);
-                            pList_2->m_pkNext->SetItem(race1);
-                        }
+                if ((race1) && (race2)) {
+                    const char* v2 = race2->GetFullName();
+                    if (_tcsicmp(race1->GetFullName(), v2) > 0) {
+                        pList_2->SetItem(race2);
+                        pList_2->m_pkNext->SetItem(race1);
                     }
                 }
             }
@@ -3538,9 +3527,8 @@ TESFile* TESDataHandler::GetCompiledFile(int32_t index) {
     if (((uint32_t)index) <= 254) {
         return pFileIndex[(uint32_t)index];
     }
-    else {
-        return nullptr;
-    }
+
+    return nullptr;
 }
 
 bool TESDataHandler::GetMasterSave() {
@@ -3575,199 +3563,191 @@ TESObjectREFR* TESDataHandler::CreateReferenceAtLocation(
     void* apAdditionalData
 ) {
     TESObjectREFR* pnewactor = nullptr;
-    if (apInterior) {
-        if (!apInterior->GetInterior()) {
-            apInterior = nullptr;
-        }
+    if ((apInterior) && (!apInterior->GetInterior())) {
+        apInterior = nullptr;
     }
+
     if (apInterior) {
         apWorld = nullptr;
     }
-    if (apObject) {
-        if (apInterior || apWorld) {
-            bool bpersistent = false;
-            if (apReference) {
-                bpersistent = apReference->GetRefPersists();
-                apReference->SetRefPersists(false);
-                TESObjectCELL* poldparent = apReference->GetParentCell();
-                if (poldparent) {
-                    poldparent->RemoveReference(apReference);
+    if ((apObject) && (apInterior || apWorld)) {
+        bool bpersistent = false;
+        if (apReference) {
+            bpersistent = apReference->GetRefPersists();
+            apReference->SetRefPersists(false);
+            TESObjectCELL* poldparent = apReference->GetParentCell();
+            if (poldparent) {
+                poldparent->RemoveReference(apReference);
+            }
+            pnewactor = apReference;
+            if (!apReference->GetObjectReference()) {
+                pnewactor->SetObjectReference(apObject);
+            }
+            if (pnewactor->MustRefPersist()) {
+                bpersistent = true;
+            }
+        }
+        else {
+            switch (apObject->GetFormType()) {
+                case NPC__ID: {
+                    TESObjectREFR* pretref;
+                    Character* v31 = static_cast<Character*>(ourMalloc(sizeof(Character)));
+                    if (v31) {
+                        pretref = (TESObjectREFR*)::new (v31) Character;
+                    }
+                    else {
+                        pretref = nullptr;
+                    }
+                    pnewactor = pretref;
+                    goto LABEL_32;
                 }
-                pnewactor = apReference;
-                if (!apReference->GetObjectReference()) {
+                case CREA_ID: {
+                    TESObjectREFR* pretref_2;
+                    Creature* v29 = static_cast<Creature*>(ourMalloc(sizeof(Creature)));
+                    if (v29) {
+                        pretref_2 = (TESObjectREFR*)::new (v29) Creature;
+                    }
+                    else {
+                        pretref_2 = nullptr;
+                    }
+                    pnewactor = pretref_2;
+                    goto LABEL_32;
+                }
+                case PROJ_ID: {
+                    return CreateProjectileAtLocation(apObject, aLocation, aDirection, apInterior, apWorld);
+                }
+                case EXPL_ID: {
+                    return CreateExplosionAtLocation(apObject, aLocation, aDirection, apInterior, apWorld);
+                }
+                default: {
+                    TESObjectREFR* pretref_3;
+                    void* apMemory;
+                    apMemory = ourMalloc(sizeof(TESObjectREFR));
+                    if (apMemory) {
+                        pretref_3 = ::new (apMemory) TESObjectREFR;
+                    }
+                    else {
+                        pretref_3 = nullptr;
+                    }
+                    pnewactor = pretref_3;
+                LABEL_32:;
+                    if ((apObject == pPortalMarker) && (apAdditionalData)) {
+                        (&pnewactor->m_Extra)->SetPortalLinkedRoomRef(0, static_cast<TESObjectREFR*>(apAdditionalData));
+                    }
+
                     pnewactor->SetObjectReference(apObject);
-                }
-                if (pnewactor->MustRefPersist()) {
-                    bpersistent = true;
-                }
-            }
-            else {
-                switch (apObject->GetFormType()) {
-                    case NPC__ID: {
-                        TESObjectREFR* pretref;
-                        Character* v31 = static_cast<Character*>(ourMalloc(sizeof(Character)));
-                        if (v31) {
-                            pretref = (TESObjectREFR*)::new (v31) Character;
+                    if (apAddPrimitive) {
+                        ExtraPrimitive* v17;
+                        ExtraPrimitive* v25 = static_cast<ExtraPrimitive*>(ourMalloc(sizeof(ExtraPrimitive)));
+                        if (v25) {
+                            v17 = ::new (v25) ExtraPrimitive(apAddPrimitive);
                         }
                         else {
-                            pretref = nullptr;
+                            v17 = nullptr;
                         }
-                        pnewactor = pretref;
-                        goto LABEL_32;
+                        BSExtraData* apExtra = (BSExtraData*)v17;
+                        (&pnewactor->m_Extra)->AddExtra(v17);
                     }
-                    case CREA_ID: {
-                        TESObjectREFR* pretref_2;
-                        Creature* v29 = static_cast<Creature*>(ourMalloc(sizeof(Creature)));
-                        if (v29) {
-                            pretref_2 = (TESObjectREFR*)::new (v29) Creature;
-                        }
-                        else {
-                            pretref_2 = nullptr;
-                        }
-                        pnewactor = pretref_2;
-                        goto LABEL_32;
+                    if (pnewactor->MustBeVisibleDistant()) {
+                        pnewactor->SetVisibleDistant(true);
                     }
-                    case PROJ_ID: {
-                        return CreateProjectileAtLocation(apObject, aLocation, aDirection, apInterior, apWorld);
+                    bpersistent = pnewactor->MustRefPersist();
+                    TESObjectLIGH* plight = dynamic_cast<TESObjectLIGH*>(apObject);
+                    if (plight) {
+                        bool OffByDefault = plight->GetOffByDefault();
+                        pnewactor->SetFireOff(OffByDefault);
                     }
-                    case EXPL_ID: {
-                        return CreateExplosionAtLocation(apObject, aLocation, aDirection, apInterior, apWorld);
-                    }
-                    default: {
-                        TESObjectREFR* pretref_3;
-                        void* apMemory;
-                        apMemory = ourMalloc(sizeof(TESObjectREFR));
-                        if (apMemory) {
-                            pretref_3 = ::new (apMemory) TESObjectREFR;
-                        }
-                        else {
-                            pretref_3 = nullptr;
-                        }
-                        pnewactor = pretref_3;
-                    LABEL_32:;
-                        if (apObject == pPortalMarker) {
-                            if (apAdditionalData) {
-                                (&pnewactor->m_Extra)
-                                    ->SetPortalLinkedRoomRef(0, static_cast<TESObjectREFR*>(apAdditionalData));
-                            }
-                        }
-                        pnewactor->SetObjectReference(apObject);
-                        if (apAddPrimitive) {
-                            ExtraPrimitive* v17;
-                            ExtraPrimitive* v25 = static_cast<ExtraPrimitive*>(ourMalloc(sizeof(ExtraPrimitive)));
-                            if (v25) {
-                                v17 = ::new (v25) ExtraPrimitive(apAddPrimitive);
-                            }
-                            else {
-                                v17 = nullptr;
-                            }
-                            BSExtraData* apExtra = (BSExtraData*)v17;
-                            (&pnewactor->m_Extra)->AddExtra(v17);
-                        }
-                        if (pnewactor->MustBeVisibleDistant()) {
-                            pnewactor->SetVisibleDistant(true);
-                        }
-                        bpersistent = pnewactor->MustRefPersist();
-                        TESObjectLIGH* plight = dynamic_cast<TESObjectLIGH*>(apObject);
-                        if (plight) {
-                            bool OffByDefault = plight->GetOffByDefault();
-                            pnewactor->SetFireOff(OffByDefault);
-                        }
-                        break;
-                    }
+                    break;
                 }
-            }
-            if (pnewactor->IsActor()) {
-                if (static_cast<Actor*>(pnewactor)->GetActorBase()->GetUsesLeveledTemplate()) {
-                    static_cast<Actor*>(pnewactor)->GetActorBase()->CalcTemplateForRef(pnewactor);
-                }
-            }
-            uint32_t CastingType = pnewactor->iFormID;
-            if (IsFormIDCreated(CastingType)) {
-                pnewactor->AddChange(0);
-            }
-            if (BGSDestructibleObjectForm::IsDestructible(pnewactor->GetObjectReference())) {
-                pnewactor->SetDestructible(true);
-            }
-            pnewactor->SetLocationOnReference(aLocation);
-            pnewactor->SetAngleOnReference(aDirection);
-            TESObjectCELL* pnewparent = nullptr;
-            if (apWorld) {
-                int32_t icellx = FloatToInt(aLocation.x) >> 12;
-                int32_t icelly = FloatToInt(aLocation.y) >> 12;
-                pnewparent = apWorld->GetCellFromCellCoord(icellx, icelly);
-            }
-            else {
-                pnewparent = apInterior;
-            }
-            if (pnewparent) {
-                NiAVObject* a1 = nullptr;
-                if (TES::pInstance->IsCellLoaded(pnewparent, false)) {
-                    if (apObject == pBoundMarker ||
-                        (apObject == pPlaneMarker ||
-                         (apObject == pDoorMarker ||
-                          (apObject == pTravelMarker ||
-                           (apObject == pXMarker ||
-                            (apObject == pXMarkerHeading ||
-                             (apObject == pMapMarker ||
-                              (apObject == pAudioMarker || apObject == pAudioBuoyMarker)))))))) {
-                        NiAVObject* pmodel;
-                        NiNode* v23 = static_cast<NiNode*>(NiMemObject::operator new(sizeof(NiNode)));
-                        if (v23) {
-                            pmodel = (NiAVObject*)::new (v23) NiNode(0);
-                        }
-                        else {
-                            pmodel = nullptr;
-                        }
-                        a1 = pmodel;
-                        pnewactor->Set3D(pmodel, true);
-                    }
-                    pnewactor->SetParentCell(pnewparent);
-                    if (pnewactor->HasContainer()) {
-                        InventoryChanges* pinventory = InventoryChanges::GetInventoryChanges(pnewactor);
-                        pinventory->InitLeveledItems();
-                        pinventory->InitFromContainerExtra();
-                        pinventory->InitScripts();
-                        if (pinventory->IsEmpty()) {
-                            (&pnewactor->m_Extra)->RemoveContainerChanges();
-                        }
-                    }
-                    pnewactor->SetParentCell(nullptr);
-                }
-                pnewactor->SetDroppedRef(true);
-                pnewparent->AddReference(pnewactor, false);
-                pnewactor->SetRefPersists(bpersistent);
-                NiAVObject* pmodel_2 = (NiAVObject*)pnewactor->Get3D();
-                if (pmodel_2) {
-                    const NiPoint3* v12 = &pnewactor->GetLocationOnReference();
-                    pmodel_2->SetTranslate(*v12);
-                    pmodel_2->SetRotate(pnewactor->GetOrientation());
-                    bhkNiCollisionObject::ResetSim(pmodel_2, true);
-                    ShadowSceneNode* ShadowSceneNode_ = BSShaderManager::GetShadowSceneNode(0);
-                    ShadowSceneNode_->AddObject(pmodel_2);
-                    pmodel_2->UpdateProperties();
-                    NiUpdateData UpdateData(0.0f, false, false);
-                    pmodel_2->Update(UpdateData);
-                }
-            }
-            else {
-                pnewactor->Set3D(nullptr, false);
-                pnewactor->SetRefPersists(true);
-                apWorld->AddPersistentRef(pnewactor);
             }
         }
+        if ((pnewactor->IsActor()) && (static_cast<Actor*>(pnewactor)->GetActorBase()->GetUsesLeveledTemplate())) {
+            static_cast<Actor*>(pnewactor)->GetActorBase()->CalcTemplateForRef(pnewactor);
+        }
+
+        uint32_t CastingType = pnewactor->iFormID;
+        if (IsFormIDCreated(CastingType)) {
+            pnewactor->AddChange(0);
+        }
+        if (BGSDestructibleObjectForm::IsDestructible(pnewactor->GetObjectReference())) {
+            pnewactor->SetDestructible(true);
+        }
+        pnewactor->SetLocationOnReference(aLocation);
+        pnewactor->SetAngleOnReference(aDirection);
+        TESObjectCELL* pnewparent = nullptr;
+        if (apWorld) {
+            int32_t icellx = FloatToInt(aLocation.x) >> 12;
+            int32_t icelly = FloatToInt(aLocation.y) >> 12;
+            pnewparent = apWorld->GetCellFromCellCoord(icellx, icelly);
+        }
+        else {
+            pnewparent = apInterior;
+        }
+        if (pnewparent) {
+            NiAVObject* a1 = nullptr;
+            if (TES::pInstance->IsCellLoaded(pnewparent, false)) {
+                if (apObject == pBoundMarker ||
+                    (apObject == pPlaneMarker ||
+                     (apObject == pDoorMarker ||
+                      (apObject == pTravelMarker ||
+                       (apObject == pXMarker ||
+                        (apObject == pXMarkerHeading ||
+                         (apObject == pMapMarker || (apObject == pAudioMarker || apObject == pAudioBuoyMarker)))))))) {
+                    NiAVObject* pmodel;
+                    NiNode* v23 = static_cast<NiNode*>(NiMemObject::operator new(sizeof(NiNode)));
+                    if (v23) {
+                        pmodel = (NiAVObject*)::new (v23) NiNode(0);
+                    }
+                    else {
+                        pmodel = nullptr;
+                    }
+                    a1 = pmodel;
+                    pnewactor->Set3D(pmodel, true);
+                }
+                pnewactor->SetParentCell(pnewparent);
+                if (pnewactor->HasContainer()) {
+                    InventoryChanges* pinventory = InventoryChanges::GetInventoryChanges(pnewactor);
+                    pinventory->InitLeveledItems();
+                    pinventory->InitFromContainerExtra();
+                    pinventory->InitScripts();
+                    if (pinventory->IsEmpty()) {
+                        (&pnewactor->m_Extra)->RemoveContainerChanges();
+                    }
+                }
+                pnewactor->SetParentCell(nullptr);
+            }
+            pnewactor->SetDroppedRef(true);
+            pnewparent->AddReference(pnewactor, false);
+            pnewactor->SetRefPersists(bpersistent);
+            NiAVObject* pmodel_2 = (NiAVObject*)pnewactor->Get3D();
+            if (pmodel_2) {
+                const NiPoint3* v12 = &pnewactor->GetLocationOnReference();
+                pmodel_2->SetTranslate(*v12);
+                pmodel_2->SetRotate(pnewactor->GetOrientation());
+                bhkNiCollisionObject::ResetSim(pmodel_2, true);
+                ShadowSceneNode* ShadowSceneNode_ = BSShaderManager::GetShadowSceneNode(0);
+                ShadowSceneNode_->AddObject(pmodel_2);
+                pmodel_2->UpdateProperties();
+                NiUpdateData UpdateData(0.0f, false, false);
+                pmodel_2->Update(UpdateData);
+            }
+        }
+        else {
+            pnewactor->Set3D(nullptr, false);
+            pnewactor->SetRefPersists(true);
+            apWorld->AddPersistentRef(pnewactor);
+        }
     }
+
     Actor* pactor = dynamic_cast<Actor*>(pnewactor);
-    if (pactor) {
-        if (!pactor->HasEditorLocation()) {
-            pactor->SetStartingPosition();
-        }
+    if ((pactor) && (!pactor->HasEditorLocation())) {
+        pactor->SetStartingPosition();
     }
-    if (pactor) {
-        if (!apReference) {
-            pactor->SetStillLoading(false);
-        }
+
+    if ((pactor) && (!apReference)) {
+        pactor->SetStillLoading(false);
     }
+
     return pnewactor;
 }
 
@@ -4182,30 +4162,28 @@ void TESDataHandler::CreateBarterContainer(TESObjectREFR* apVendor) {
             NiPointer<BSShaderAccumulator>* v15 = nullptr;
             for (ItemChange* pitemChange : pBarterContainer->pListofChanges->ItemsUntilNull()) {
                 TESBoundObject* pboundObject = pitemChange->pContainerObj;
-                if (pboundObject->GetFormType() == AMMO_ID) {
-                    if (pact->GetCurrentWeapon()) {
-                        TESObjectWEAP* CurrentWeapon = pact->GetCurrentWeapon();
-                        if (CurrentWeapon->GetCurrentAmmo(pact) == pboundObject) {
-                            BSSimpleList<ExtraDataList*>* pextralist = pitemChange->pExtraObjectList;
-                            int32_t icount = 0;
-                            while (pextralist && pextralist->m_item) {
-                                ExtraDataList* pextra = pextralist->m_item;
-                                if (pextra->GetOriginalReference() && pextra->GetOriginalReference() == pact) {
-                                    icount = pextra->GetCount();
-                                    pitemChange->pExtraObjectList->Remove(pextra);
-                                    break;
-                                }
-                                pextralist = pextralist->m_pkNext;
+                if ((pboundObject->GetFormType() == AMMO_ID) && (pact->GetCurrentWeapon())) {
+                    TESObjectWEAP* CurrentWeapon = pact->GetCurrentWeapon();
+                    if (CurrentWeapon->GetCurrentAmmo(pact) == pboundObject) {
+                        BSSimpleList<ExtraDataList*>* pextralist = pitemChange->pExtraObjectList;
+                        int32_t icount = 0;
+                        while (pextralist && pextralist->m_item) {
+                            ExtraDataList* pextra = pextralist->m_item;
+                            if (pextra->GetOriginalReference() && pextra->GetOriginalReference() == pact) {
+                                icount = pextra->GetCount();
+                                pitemChange->pExtraObjectList->Remove(pextra);
+                                break;
                             }
-                            uint32_t FormHealth_0 = pitemChange->iNumber;
-                            pitemChange->iNumber = FormHealth_0 - icount;
-                            if (pitemChange->iNumber <= 0 ||
-                                (!pitemChange->pExtraObjectList ||
-                                 (pitemChange->pExtraObjectList->IsEmpty() || pitemChange->GetWorn(false)))) {
-                                pBarterContainer->pListofChanges->Remove(pitemChange);
-                            }
-                            return;
+                            pextralist = pextralist->m_pkNext;
                         }
+                        uint32_t FormHealth_0 = pitemChange->iNumber;
+                        pitemChange->iNumber = FormHealth_0 - icount;
+                        if (pitemChange->iNumber <= 0 ||
+                            (!pitemChange->pExtraObjectList ||
+                             (pitemChange->pExtraObjectList->IsEmpty() || pitemChange->GetWorn(false)))) {
+                            pBarterContainer->pListofChanges->Remove(pitemChange);
+                        }
+                        return;
                     }
                 }
             }
@@ -4270,11 +4248,10 @@ void TESDataHandler::RemoveItemBarterContainer(ItemChange* apitem, int32_t aiNum
             if (pref) {
                 if (pref->HasContainer()) {
                     ExtraDataList* ppassedExtra = nullptr;
-                    if (pextra->ItemsInList()) {
-                        if (pextra->ItemsInList() != 1 || !pextra->GetExtraData(36)) {
-                            ppassedExtra = pextra;
-                        }
+                    if ((pextra->ItemsInList()) && (pextra->ItemsInList() != 1 || !pextra->GetExtraData(36))) {
+                        ppassedExtra = pextra;
                     }
+
                     pref->RemoveItem(
                         pitem->pContainerObj, ppassedExtra, iremove, false, false, pPlayer, nullptr, nullptr, true,
                         false
@@ -4283,17 +4260,15 @@ void TESDataHandler::RemoveItemBarterContainer(ItemChange* apitem, int32_t aiNum
                     bool bdelete = true;
                     if (pchangeref) {
                         ItemChange* ptempitem = pchangeref->GetObjectInList(pitem->pContainerObj, true, 0);
-                        if (ptempitem) {
-                            if (ptempitem->pExtraObjectList) {
-                                BSSimpleList<ExtraDataList*>* ptempObj = ptempitem->pExtraObjectList;
-                                while (ptempObj && (ptempObj->m_item && bdelete)) {
-                                    BSSimpleList<ExtraDataList*>* v5 = ptempObj;
-                                    if (v5->m_item == pextra) {
-                                        bdelete = false;
-                                    }
-                                    else {
-                                        ptempObj = ptempObj->m_pkNext;
-                                    }
+                        if ((ptempitem) && (ptempitem->pExtraObjectList)) {
+                            BSSimpleList<ExtraDataList*>* ptempObj = ptempitem->pExtraObjectList;
+                            while (ptempObj && (ptempObj->m_item && bdelete)) {
+                                BSSimpleList<ExtraDataList*>* v5 = ptempObj;
+                                if (v5->m_item == pextra) {
+                                    bdelete = false;
+                                }
+                                else {
+                                    ptempObj = ptempObj->m_pkNext;
                                 }
                             }
                         }
@@ -4301,37 +4276,31 @@ void TESDataHandler::RemoveItemBarterContainer(ItemChange* apitem, int32_t aiNum
                     InventoryChanges* pchangeref_2 = (&pPlayer->m_Extra)->GetContainerChanges();
                     if (pchangeref_2) {
                         ItemChange* ptempitem_2 = pchangeref_2->GetObjectInList(pitem->pContainerObj, true, 0);
-                        if (ptempitem_2) {
-                            if (ptempitem_2->pExtraObjectList) {
-                                BSSimpleList<ExtraDataList*>* ptempObj_2 = ptempitem_2->pExtraObjectList;
-                                while (ptempObj_2 && (ptempObj_2->m_item && bdelete)) {
-                                    BSSimpleList<ExtraDataList*>* v6 = ptempObj_2;
-                                    if (v6->m_item == pextra) {
-                                        bdelete = false;
-                                    }
-                                    else {
-                                        ptempObj_2 = ptempObj_2->m_pkNext;
-                                    }
+                        if ((ptempitem_2) && (ptempitem_2->pExtraObjectList)) {
+                            BSSimpleList<ExtraDataList*>* ptempObj_2 = ptempitem_2->pExtraObjectList;
+                            while (ptempObj_2 && (ptempObj_2->m_item && bdelete)) {
+                                BSSimpleList<ExtraDataList*>* v6 = ptempObj_2;
+                                if (v6->m_item == pextra) {
+                                    bdelete = false;
+                                }
+                                else {
+                                    ptempObj_2 = ptempObj_2->m_pkNext;
                                 }
                             }
                         }
                     }
-                    if (bdelete) {
+                    if ((bdelete) && (pextra) &&
+                        (pextra->ItemsInList() < 2 && pextra->GetCount() <= 1 && !pextra->GetScript())) {
+                        pitem->pExtraObjectList->Remove(pextra);
+                        plist = pitem->pExtraObjectList;
                         if (pextra) {
-                            if (pextra->ItemsInList() < 2 && pextra->GetCount() <= 1 && !pextra->GetScript()) {
-                                pitem->pExtraObjectList->Remove(pextra);
-                                plist = pitem->pExtraObjectList;
-                                if (pextra) {
-                                    delete pextra;
-                                }
-                                pextra = nullptr;
-                            }
+                            delete pextra;
                         }
+                        pextra = nullptr;
                     }
-                    if (pextra) {
-                        if ((pextra->GetCount() > 1 && pextra->ItemsInList() < 2) || !pextra->ItemsInList()) {
-                            pextra = nullptr;
-                        }
+
+                    if ((pextra) && ((pextra->GetCount() > 1 && pextra->ItemsInList() < 2) || !pextra->ItemsInList())) {
+                        pextra = nullptr;
                     }
                 }
                 else {
@@ -4340,11 +4309,10 @@ void TESDataHandler::RemoveItemBarterContainer(ItemChange* apitem, int32_t aiNum
                     pPlayer->PickUpObject(pref, iremove, false);
                     pitem->pExtraObjectList->Remove(pextra);
                     plist = pitem->pExtraObjectList;
-                    if (pextra->ItemsInList() < 2 && pextra->GetCount() <= 1 && !pextra->GetScript()) {
-                        if (pextra) {
-                            delete pextra;
-                        }
+                    if ((pextra->ItemsInList() < 2 && pextra->GetCount() <= 1 && !pextra->GetScript()) && (pextra)) {
+                        delete pextra;
                     }
+
                     pextra = nullptr;
                 }
                 aiNumber -= iremove;
@@ -4921,21 +4889,20 @@ bool TESDataHandler::ClearData() {
         pFileIndex[index] = nullptr;
     }
     iNumCompile = 0;
-    if (!bSaveLoadGame) {
-        if (this->pActiveFile) {
-            if (!GetMasterSave()) {
-                this->pActiveFile->SetActive(false);
-            }
-            if (this->pActiveFile) {
-                TESFile* pActiveFile = this->pActiveFile;
-                if (pActiveFile) {
-                    delete pActiveFile;
-                }
-            }
-            this->pActiveFile = nullptr;
-            iNextID = 2048;
+    if ((!bSaveLoadGame) && (this->pActiveFile)) {
+        if (!GetMasterSave()) {
+            this->pActiveFile->SetActive(false);
         }
+        if (this->pActiveFile) {
+            TESFile* pActiveFile = this->pActiveFile;
+            if (pActiveFile) {
+                delete pActiveFile;
+            }
+        }
+        this->pActiveFile = nullptr;
+        iNextID = 2048;
     }
+
     BGSImpactDataSet::ClearDefaultImpactDataSet();
     pDoorMarker = nullptr;
     pMapMarker = nullptr;
@@ -4986,11 +4953,9 @@ void TESDataHandler::SortInteriorCells() {
                 }
             }
         }
-        if (pcurrentCell) {
-            if (pcurrentCell != poutterCell) {
-                arrayInteriorCells.SetAt(iouter, pcurrentCell);
-                arrayInteriorCells.SetAt(icurrent, poutterCell);
-            }
+        if ((pcurrentCell) && (pcurrentCell != poutterCell)) {
+            arrayInteriorCells.SetAt(iouter, pcurrentCell);
+            arrayInteriorCells.SetAt(icurrent, poutterCell);
         }
     }
 }
@@ -5026,38 +4991,35 @@ TESObjectREFR* TESDataHandler::CreateExplosionAtLocation(
     TESWorldSpace* apWorld
 ) {
     TESObjectREFR* pref = nullptr;
-    if (apObject) {
-        if (apObject->GetFormType() == EXPL_ID) {
-            BGSExplosion* pexplosionForm = static_cast<BGSExplosion*>(apObject);
-            TESObjectCELL* pnewparent = nullptr;
-            if (apWorld) {
-                int32_t icellx = FloatToInt(aLocation.x) >> 12;
-                int32_t icelly = FloatToInt(aLocation.y) >> 12;
-                pnewparent = apWorld->GetCellFromCellCoord(icellx, icelly);
-                if (!pnewparent && apWorld != pPlayer->GetWorldSpace()) {
-                    Warning("CELLS: Trying to create an explosion in an unloaded cell: %i, %i.", icellx, icelly);
-                }
-            }
-            else {
-                pnewparent = apInterior;
-            }
-            NiMatrix3 rot;
-            rot.FromEulerAnglesZYX(aDirection.z, aDirection.y, aDirection.x);
-            TESObjectREFR* pOwner = nullptr;
-            uint32_t uiFormID = apObject->iFormID;
-            // The player owns the explosions of these three explosion forms.
-            if (uiFormID == 0xCDEF0 || uiFormID == 0x16AF00 || uiFormID == 0x172FBD) {
-                pOwner = pPlayer;
-            }
-            pref = Explosion::SpawnExplosion(pexplosionForm, pOwner, nullptr, pnewparent, aLocation, rot);
-            if (!pnewparent) {
-                if (apWorld) {
-                    pref->SetRefPersists(true);
-                    pref->m_Extra.SetPersistentCell(apWorld->pPersistentCell);
-                }
+    if ((apObject) && (apObject->GetFormType() == EXPL_ID)) {
+        BGSExplosion* pexplosionForm = static_cast<BGSExplosion*>(apObject);
+        TESObjectCELL* pnewparent = nullptr;
+        if (apWorld) {
+            int32_t icellx = FloatToInt(aLocation.x) >> 12;
+            int32_t icelly = FloatToInt(aLocation.y) >> 12;
+            pnewparent = apWorld->GetCellFromCellCoord(icellx, icelly);
+            if (!pnewparent && apWorld != pPlayer->GetWorldSpace()) {
+                Warning("CELLS: Trying to create an explosion in an unloaded cell: %i, %i.", icellx, icelly);
             }
         }
+        else {
+            pnewparent = apInterior;
+        }
+        NiMatrix3 rot;
+        rot.FromEulerAnglesZYX(aDirection.z, aDirection.y, aDirection.x);
+        TESObjectREFR* pOwner = nullptr;
+        uint32_t uiFormID = apObject->iFormID;
+        // The player owns the explosions of these three explosion forms.
+        if (uiFormID == 0xCDEF0 || uiFormID == 0x16AF00 || uiFormID == 0x172FBD) {
+            pOwner = pPlayer;
+        }
+        pref = Explosion::SpawnExplosion(pexplosionForm, pOwner, nullptr, pnewparent, aLocation, rot);
+        if ((!pnewparent) && (apWorld)) {
+            pref->SetRefPersists(true);
+            pref->m_Extra.SetPersistentCell(apWorld->pPersistentCell);
+        }
     }
+
     return pref;
 }
 
@@ -6484,35 +6446,31 @@ void TESDataHandler::EnsureFactionFriendshipsAreTwoWay() {
             for (BSSimpleList<GROUP_REACTION*>* pNode = static_cast<TESReactionForm*>(apFaction)->QReactionList();
                  pNode; pNode = pNode->m_pkNext) {
                 GROUP_REACTION* pReaction = pNode->m_item;
-                if (pReaction) {
-                    if (pReaction->pForm) {
-                        if (pReaction->pForm->GetFormType() == FACT_ID &&
-                            (pReaction->iFightReaction == 3 || pReaction->iFightReaction == 2)) {
-                            TESFaction* v11 = static_cast<TESFaction*>(pReaction->pForm);
-                            int32_t Reaction_0048C1B0 =
-                                static_cast<TESReactionForm*>(v11)->GetReaction_0048C1B0(apFaction);
-                            if (Reaction_0048C1B0 != 2 && Reaction_0048C1B0 != 3) {
-                                int32_t CastingType = apFaction->iFormID;
-                                const char* v9 = apFaction->GetFormEditorID();
-                                const char* v8 = apFaction->GetFormEditorID();
-                                const char* v7 = v11->GetFormEditorID();
-                                int32_t v6 = apFaction->iFormID;
-                                const char* v5 = apFaction->GetFormEditorID();
-                                int32_t v4 = v11->iFormID;
-                                const char* v3 = v11->GetFormEditorID();
-                                int32_t v2 = v11->iFormID;
-                                const char* v1 = v11->GetFormEditorID();
-                                int32_t v0 = apFaction->iFormID;
-                                Warning(
-                                    "DEFAULT: (Faction Reaction Error) Faction '%s' (%08X) is a Friend or Ally of "
-                                    "Faction '%s' (%08X), but Faction '%s' (%08X) is not a Friend or Ally of "
-                                    "Faction '%s' (%08X). Faction '%s'(%08X) will be forced to be a Friend of "
-                                    "Faction '%s' (%08X) ",
-                                    apFaction->GetFormEditorID(), v0, v1, v2, v3, v4, v5, v6, v7, v8, v9, CastingType
-                                );
-                                v11->SetFactionReaction(apFaction, 3);
-                            }
-                        }
+                if ((pReaction) && (pReaction->pForm) &&
+                    (pReaction->pForm->GetFormType() == FACT_ID &&
+                     (pReaction->iFightReaction == 3 || pReaction->iFightReaction == 2))) {
+                    TESFaction* v11 = static_cast<TESFaction*>(pReaction->pForm);
+                    int32_t Reaction_0048C1B0 = static_cast<TESReactionForm*>(v11)->GetReaction_0048C1B0(apFaction);
+                    if (Reaction_0048C1B0 != 2 && Reaction_0048C1B0 != 3) {
+                        int32_t CastingType = apFaction->iFormID;
+                        const char* v9 = apFaction->GetFormEditorID();
+                        const char* v8 = apFaction->GetFormEditorID();
+                        const char* v7 = v11->GetFormEditorID();
+                        int32_t v6 = apFaction->iFormID;
+                        const char* v5 = apFaction->GetFormEditorID();
+                        int32_t v4 = v11->iFormID;
+                        const char* v3 = v11->GetFormEditorID();
+                        int32_t v2 = v11->iFormID;
+                        const char* v1 = v11->GetFormEditorID();
+                        int32_t v0 = apFaction->iFormID;
+                        Warning(
+                            "DEFAULT: (Faction Reaction Error) Faction '%s' (%08X) is a Friend or Ally of "
+                            "Faction '%s' (%08X), but Faction '%s' (%08X) is not a Friend or Ally of "
+                            "Faction '%s' (%08X). Faction '%s'(%08X) will be forced to be a Friend of "
+                            "Faction '%s' (%08X) ",
+                            apFaction->GetFormEditorID(), v0, v1, v2, v3, v4, v5, v6, v7, v8, v9, CastingType
+                        );
+                        v11->SetFactionReaction(apFaction, 3);
                     }
                 }
             }

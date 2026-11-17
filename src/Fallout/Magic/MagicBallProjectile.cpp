@@ -174,21 +174,19 @@ void MagicBallProjectile::InitLoadGame(uint32_t aiFlags, uint32_t aiOldFlags) {
     MagicProjectile::InitLoadGame(aiFlags, aiOldFlags);
     Init3D();
     GetParentCell()->AddReference(this, false);
-    if (eState != MagicBallProjectile::BALL_STATE_EXPLODING) {
-        if (pAVEffect->GetBoltSound()) {
-            uint32_t isoundFileID = pAVEffect->GetBoltSound()->iFormID;
-            if (Sound.IsValid()) {
-                Sound.Release();
-            }
-            BSSoundHandle* arHandle = PlaySound(
-                &arHandleOut, isoundFileID, true,
-                BSGameSound::SOUND_FLAG_IS_3D | BSGameSound::SOUND_FLAG_ONE_SHOT |
-                    BSGameSound::SOUND_FLAG_ANIMATION_DRIVEN,
-                true
-            );
-            Sound.operator=(*arHandle);
+    if ((eState != MagicBallProjectile::BALL_STATE_EXPLODING) && (pAVEffect->GetBoltSound())) {
+        uint32_t isoundFileID = pAVEffect->GetBoltSound()->iFormID;
+        if (Sound.IsValid()) {
+            Sound.Release();
         }
+        BSSoundHandle* arHandle = PlaySound(
+            &arHandleOut, isoundFileID, true,
+            BSGameSound::SOUND_FLAG_IS_3D | BSGameSound::SOUND_FLAG_ONE_SHOT | BSGameSound::SOUND_FLAG_ANIMATION_DRIVEN,
+            true
+        );
+        Sound.operator=(*arHandle);
     }
+
     if (Get3D()) {
         float a3 = fScale;
         NiNode* v3 = Get3D();
@@ -196,44 +194,38 @@ void MagicBallProjectile::InitLoadGame(uint32_t aiFlags, uint32_t aiOldFlags) {
     }
     ourMemcpy(&ffadeTimer, &pLight, sizeof(ffadeTimer));
     pLight = nullptr;
-    if (Get3D()) {
-        if (pAVEffect->data.pLight) {
-            MagicLight* v10;
-            MagicLight* v14 = static_cast<MagicLight*>(ourMalloc(sizeof(MagicLight)));
-            if (v14) {
-                NiNode* a3a = Get3D();
-                uint32_t CastingType = pAVEffect->data.pLight->iFormID;
-                v10 = ::new (v14) MagicLight(CastingType, a3a);
+    if ((Get3D()) && (pAVEffect->data.pLight)) {
+        MagicLight* v10;
+        MagicLight* v14 = static_cast<MagicLight*>(ourMalloc(sizeof(MagicLight)));
+        if (v14) {
+            NiNode* a3a = Get3D();
+            uint32_t CastingType = pAVEffect->data.pLight->iFormID;
+            v10 = ::new (v14) MagicLight(CastingType, a3a);
+        }
+        else {
+            v10 = nullptr;
+        }
+        pLight = v10;
+        if ((eState == MagicBallProjectile::BALL_STATE_EXPLODING) && (pLight)) {
+            NiTimeController* po;
+            NiAVObject* ptopav = (NiAVObject*)Get3D();
+            if (ptopav) {
+                po = ptopav->GetControllers();
             }
             else {
-                v10 = nullptr;
+                po = nullptr;
             }
-            pLight = v10;
-            if (eState == MagicBallProjectile::BALL_STATE_EXPLODING) {
-                if (pLight) {
-                    NiTimeController* po;
-                    NiAVObject* ptopav = (NiAVObject*)Get3D();
-                    if (ptopav) {
-                        po = ptopav->GetControllers();
-                    }
-                    else {
-                        po = nullptr;
-                    }
-                    NiObject* pkObject = (NiObject*)po;
-                    NiControllerManager* pmanager = static_cast<NiControllerManager*>(
-                        NiObject::DynamicCastStatic(&NiControllerManager::ms_RTTI, po)
-                    );
-                    if (pmanager) {
-                        NiFixedString* a2 =
-                            ::new (static_cast<void*>(&apString)) NiFixedString("SpecialIdle_AreaEffect");
-                        NiControllerSequence* pseqArea = pmanager->GetSequenceByName(*a2);
-                        apString.~NiFixedString();
-                        if (pseqArea) {
-                            float v7 = pseqArea->m_fEndKeyTime * 0.75;
-                            pLight->Fade(false, v7);
-                            pLight->SetFadeTimer(ffadeTimer);
-                        }
-                    }
+            NiObject* pkObject = (NiObject*)po;
+            NiControllerManager* pmanager =
+                static_cast<NiControllerManager*>(NiObject::DynamicCastStatic(&NiControllerManager::ms_RTTI, po));
+            if (pmanager) {
+                NiFixedString* a2 = ::new (static_cast<void*>(&apString)) NiFixedString("SpecialIdle_AreaEffect");
+                NiControllerSequence* pseqArea = pmanager->GetSequenceByName(*a2);
+                apString.~NiFixedString();
+                if (pseqArea) {
+                    float v7 = pseqArea->m_fEndKeyTime * 0.75;
+                    pLight->Fade(false, v7);
+                    pLight->SetFadeTimer(ffadeTimer);
                 }
             }
         }
@@ -588,35 +580,33 @@ void MagicBallProjectile::Collide(
             NiPoint3 v38 = (&pav->GetWorldTransform())->m_Rotate * NiPoint3_UNIT_Y;
             ApplyCollisionForce(aContactPoint, v38, apTargetBody);
         }
-        if (pav) {
-            if (!abFizzle) {
-                pav->SetTranslate(aContactPoint);
-                NiFixedString* v18 = ::new (static_cast<void*>(&apString)) NiFixedString("AreaEffect");
-                NiAVObject* pareaParticles = pav->GetObjectByName(*v18);
-                apString.~NiFixedString();
-                if (pareaParticles) {
-                    pareaParticles->SetScale(fScale);
-                }
+        if ((pav) && (!abFizzle)) {
+            pav->SetTranslate(aContactPoint);
+            NiFixedString* v18 = ::new (static_cast<void*>(&apString)) NiFixedString("AreaEffect");
+            NiAVObject* pareaParticles = pav->GetObjectByName(*v18);
+            apString.~NiFixedString();
+            if (pareaParticles) {
+                pareaParticles->SetScale(fScale);
             }
         }
+
         if (Sound.IsValid()) {
             Sound.Stop();
         }
-        if (GetCharController()) {
-            if (!abFizzle) {
-                CFilter filter_2;
-                bhkCharacterController* CharController = GetCharController();
-                if (CharController->GetFlag(bhkCharacterController::DEBUGDISP)) {
-                    BuildAreaEffectGeometry();
-                }
-                bhkCharacterController* v6 = GetCharController();
-                v6->GetCollisionFilter(&filter);
-                filter.SetDisabled(1);
-                filter_2.iFilter = filter.iFilter;
-                bhkCharacterController* v7 = GetCharController();
-                v7->SetCollisionFilter(filter_2);
+        if ((GetCharController()) && (!abFizzle)) {
+            CFilter filter_2;
+            bhkCharacterController* CharController = GetCharController();
+            if (CharController->GetFlag(bhkCharacterController::DEBUGDISP)) {
+                BuildAreaEffectGeometry();
             }
+            bhkCharacterController* v6 = GetCharController();
+            v6->GetCollisionFilter(&filter);
+            filter.SetDisabled(1);
+            filter_2.iFilter = filter.iFilter;
+            bhkCharacterController* v7 = GetCharController();
+            v7->SetCollisionFilter(filter_2);
         }
+
         eState = MagicBallProjectile::BALL_STATE_EXPLODING;
         if (!abFizzle) {
             NiPoint3 v37 = GetLocationOnReference();
@@ -647,17 +637,15 @@ void MagicBallProjectile::Collide(
                 }
             }
         }
-        if (pAVEffect->data.pAreaSound) {
-            if (!abFizzle) {
-                TESSound* OpenSound = pAVEffect->data.pAreaSound;
-                int32_t auiFormID = OpenSound->iFormID;
-                uint32_t arPos_4 = auiFormID;
-                BSAudio* v9 = &BSAudio::QInstance();
-                v9->GetSoundHandleByNumericID(&soundHand, arPos_4, 258u);
-                NiPoint3 v27 = GetLocationOnReference();
-                soundHand.SetPosition(v27.x, v27.y, v27.z);
-                soundHand.Play(false);
-            }
+        if ((pAVEffect->data.pAreaSound) && (!abFizzle)) {
+            TESSound* OpenSound = pAVEffect->data.pAreaSound;
+            int32_t auiFormID = OpenSound->iFormID;
+            uint32_t arPos_4 = auiFormID;
+            BSAudio* v9 = &BSAudio::QInstance();
+            v9->GetSoundHandleByNumericID(&soundHand, arPos_4, 258u);
+            NiPoint3 v27 = GetLocationOnReference();
+            soundHand.SetPosition(v27.x, v27.y, v27.z);
+            soundHand.Play(false);
         }
     }
 }

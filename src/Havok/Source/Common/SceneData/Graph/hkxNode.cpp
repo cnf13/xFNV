@@ -223,35 +223,33 @@ hkRefVariant hkxNode::findVariantByObject(const hkReferencedObject* object) cons
         result.m_pntr = m_object.m_pntr;
         return result;
     }
-    else {
-        int32_t v7 = 0;
-        if (m_children.m_size <= 0) {
-        LABEL_8:;
-            result.m_pntr = nullptr;
-            return result;
+
+    int32_t v7 = 0;
+    if (m_children.m_size <= 0) {
+    LABEL_8:;
+        result.m_pntr = nullptr;
+        return result;
+    }
+
+    hkRefVariant v10;
+    while (true) {
+        v10 = m_children.m_data[v7].val()->findVariantByObject(object);
+        if (v10.m_pntr) {
+            break;
         }
-        else {
-            hkRefVariant v10;
-            while (true) {
-                v10 = m_children.m_data[v7].val()->findVariantByObject(object);
-                if (v10.m_pntr) {
-                    break;
-                }
-                bool v8 = ++v7 < m_children.m_size;
-                v10.m_pntr = nullptr;
-                if (!v8) {
-                    goto LABEL_8;
-                }
-            }
-            v10.m_pntr->addReference();
-            hkReferencedObject* v9 = v10.m_pntr;
-            result.m_pntr = v10.m_pntr;
-            if (v9) {
-                v9->removeReference();
-            }
-            return result;
+        bool v8 = ++v7 < m_children.m_size;
+        v10.m_pntr = nullptr;
+        if (!v8) {
+            goto LABEL_8;
         }
     }
+    v10.m_pntr->addReference();
+    hkReferencedObject* v9 = v10.m_pntr;
+    result.m_pntr = v10.m_pntr;
+    if (v9) {
+        v9->removeReference();
+    }
+    return result;
 }
 
 hkResult hkxNode::getPathToNode(const hkxNode* theNode, hkArray<const hkxNode*, hkContainerHeapAllocator>& pathOut) {

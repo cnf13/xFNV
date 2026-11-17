@@ -202,19 +202,14 @@ TileMenu* QuantityMenu::Create(int32_t aiMaxAmount, QuantityMenu::ResultCallback
             QuantityMenu::pMe->PrepForVisibility(false);
             return static_cast<TileMenu*>(ptile);
         }
-        else {
-            Warning("MENUS: Quantity Menu Creation Failed... Are your menu and art resources up to date?");
-            return nullptr;
-        }
-    }
-    else {
-        if (QuantityMenu::pMe) {
-            if (QuantityMenu::pMe->pMenu) {
-                if (QuantityMenu::pMe) {
-                    delete QuantityMenu::pMe;
-                }
-            }
-        }
+
+        Warning("MENUS: Quantity Menu Creation Failed... Are your menu and art resources up to date?");
         return nullptr;
     }
+
+    if ((QuantityMenu::pMe) && (QuantityMenu::pMe->pMenu) && (QuantityMenu::pMe)) {
+        delete QuantityMenu::pMe;
+    }
+
+    return nullptr;
 }

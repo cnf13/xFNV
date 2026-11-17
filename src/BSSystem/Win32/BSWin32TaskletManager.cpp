@@ -181,25 +181,21 @@ void BSWin32TaskletManager::ProcessQueue() {
                 ++pQueueHead;
             }
             LeaveCriticalSection(&kQueueLock);
-            if (pTaskletData) {
-                if (pGroupData) {
-                    if (!pGroupData->padding2E && (!pTaskletData->bRunOnStartup || pTaskletData->OnStartup())) {
-                        pTaskletData->bRunOnStartup = false;
-                        pTaskletData->Process();
-                    }
-                }
+            if ((pTaskletData) && (pGroupData) &&
+                (!pGroupData->padding2E && (!pTaskletData->bRunOnStartup || pTaskletData->OnStartup()))) {
+                pTaskletData->bRunOnStartup = false;
+                pTaskletData->Process();
             }
-            if (pTaskletData) {
-                if (pGroupData) {
-                    if (!pTaskletData->bYielding || pGroupData->padding2E) {
-                        pTaskletData->OnComplete();
-                        pTaskletData->pGroupData = nullptr;
-                        pTaskletData->TaskDataLock = 0;
-                        pGroupData->CompleteTask();
-                    }
-                    else {
-                        QueueTaskData(pTaskletData);
-                    }
+
+            if ((pTaskletData) && (pGroupData)) {
+                if (!pTaskletData->bYielding || pGroupData->padding2E) {
+                    pTaskletData->OnComplete();
+                    pTaskletData->pGroupData = nullptr;
+                    pTaskletData->TaskDataLock = 0;
+                    pGroupData->CompleteTask();
+                }
+                else {
+                    QueueTaskData(pTaskletData);
                 }
             }
         }

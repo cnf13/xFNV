@@ -103,10 +103,8 @@ void RaceSexMenu::Entry::SetEnabled(bool abEnabled) {
 }
 
 void RaceSexMenu::Entry::SetDisplay(const char* Src) {
-    if (tile) {
-        if (Src) {
-            tile->Set(Tile::kTileValue_User5, Src, true);
-        }
+    if ((tile) && (Src)) {
+        tile->Set(Tile::kTileValue_User5, Src, true);
     }
 }
 
@@ -195,9 +193,8 @@ uint32_t RaceSexMenu::Entry::GetIncrement() {
     if (!(Float <= 1.0)) {
         return static_cast<int64_t>(Float);
     }
-    else {
-        return 1;
-    }
+
+    return 1;
 }
 
 RaceSexMenu::List::List(int32_t aiID, const char* apName)
@@ -228,13 +225,11 @@ char RaceSexMenu::List::Focus(char a2) {
     Tile* v5;
     int8_t v7 = 0;
     if (a2) {
-        if (selectedEntry) {
-            if (selectedEntry->tile) {
-                v5 = selectedEntry->tile;
-                singleton = InterfaceManager::Instance();
-                singleton->SetCurrentFocusTarget(v5, 4035, true);
-                return 1;
-            }
+        if ((selectedEntry) && (selectedEntry->tile)) {
+            v5 = selectedEntry->tile;
+            singleton = InterfaceManager::Instance();
+            singleton->SetCurrentFocusTarget(v5, 4035, true);
+            return 1;
         }
     }
     else {
@@ -501,19 +496,18 @@ bool RaceSexMenu::List::HandleKey(int32_t a1) {
         case 16: {
             selectedEntry = items.GetTail();
         LABEL_21:;
-            if (selectedEntry) {
-                if (selectedEntry->tile) {
-                    int32_t v8 = 100;
-                    while (true) {
-                        int32_t v4 = v8--;
-                        if (!v4 || selectedEntry->tile->IsVisible()) {
-                            break;
-                        }
-                        RaceSexMenu::pMe->DoClick(3 - v6, nullptr);
+            if ((selectedEntry) && (selectedEntry->tile)) {
+                int32_t v8 = 100;
+                while (true) {
+                    int32_t v4 = v8--;
+                    if (!v4 || selectedEntry->tile->IsVisible()) {
+                        break;
                     }
-                    Interface::SetCurrentFocusTarget(selectedEntry->tile);
+                    RaceSexMenu::pMe->DoClick(3 - v6, nullptr);
                 }
+                Interface::SetCurrentFocusTarget(selectedEntry->tile);
             }
+
             result = v9;
             break;
         }
@@ -859,43 +853,40 @@ void RaceSexMenu::DoIdle() {
             else {
                 Sounds[2].Play(false);
             }
-            if (pSliderOpt) {
-                if (IsFlagged(RSM_FLAG_STICK_RELEASED)) {
-                    SliderRelease();
-                    pSliderOpt = nullptr;
-                    pSliderElem = nullptr;
-                }
+            if ((pSliderOpt) && (IsFlagged(RSM_FLAG_STICK_RELEASED))) {
+                SliderRelease();
+                pSliderOpt = nullptr;
+                pSliderElem = nullptr;
             }
         }
         else {
             SetFlag(RSM_FLAG_ZOOMING, false);
             InterfaceManager* v7 = InterfaceManager::Instance();
-            if (v7->GetMouseWheel()) {
-                if (InterfaceManager::Instance()->pOverTileTarget) {
-                    InterfaceManager* v8 = InterfaceManager::Instance();
-                    bool v21 = static_cast<double>(v8->GetMouseWheel()) > 0.0;
-                    if (InterfaceManager::Instance()->pOverTileTarget == rsmFaceGrab) {
-                        float v13;
-                        if (v21) {
-                            v13 = -0.125f;
-                        }
-                        else {
-                            v13 = 0.125f;
-                        }
-                        unkC8 = unkC8 + v13;
-                        float a1 = BSMIN(unkC8, 1.0f);
-                        unkC8 = BSMAX(a1, 0.0f);
+            if ((v7->GetMouseWheel()) && (InterfaceManager::Instance()->pOverTileTarget)) {
+                InterfaceManager* v8 = InterfaceManager::Instance();
+                bool v21 = static_cast<double>(v8->GetMouseWheel()) > 0.0;
+                if (InterfaceManager::Instance()->pOverTileTarget == rsmFaceGrab) {
+                    float v13;
+                    if (v21) {
+                        v13 = -0.125f;
                     }
                     else {
-                        if (v21) {
-                            DoClick(2, nullptr);
-                        }
-                        else {
-                            DoClick(3, nullptr);
-                        }
+                        v13 = 0.125f;
+                    }
+                    unkC8 = unkC8 + v13;
+                    float a1 = BSMIN(unkC8, 1.0f);
+                    unkC8 = BSMAX(a1, 0.0f);
+                }
+                else {
+                    if (v21) {
+                        DoClick(2, nullptr);
+                    }
+                    else {
+                        DoClick(3, nullptr);
                     }
                 }
             }
+
             if (!(unkC8 > static_cast<double>(fZoomPct))) {
                 if (!(unkC8 < static_cast<double>(fZoomPct))) {
                     fZoomVelocity = 0.0f;
@@ -937,12 +928,10 @@ void RaceSexMenu::DoIdle() {
                 Sounds[3].Play(false);
             }
             SetFlag(RSM_FLAG_ROTATING, false);
-            if (pSliderOpt) {
-                if (appMain->GetControls()) {
-                    Controls* v11 = appMain->GetControls();
-                    if (v11->GetMouseButton(0, 2)) {
-                        SliderUpdate();
-                    }
+            if ((pSliderOpt) && (appMain->GetControls())) {
+                Controls* v11 = appMain->GetControls();
+                if (v11->GetMouseButton(0, 2)) {
+                    SliderUpdate();
                 }
             }
         }
@@ -1315,14 +1304,12 @@ bool RaceSexMenu::SetActiveList(RaceSexMenu::ListID aeList) {
     }
     UpdateScrollArrows();
     InterfaceManager* v2 = InterfaceManager::Instance();
-    if (v2->GetCurrentRenderedMenu()) {
-        if (aeList < RaceSexMenu::RSM_CUSTOM) {
-            InterfaceManager* v3 = InterfaceManager::Instance();
-            FORenderedMenuRaceSex* CurrentRenderedMenu =
-                static_cast<FORenderedMenuRaceSex*>(v3->GetCurrentRenderedMenu());
-            CurrentRenderedMenu->LightButton(aeList);
-        }
+    if ((v2->GetCurrentRenderedMenu()) && (aeList < RaceSexMenu::RSM_CUSTOM)) {
+        InterfaceManager* v3 = InterfaceManager::Instance();
+        FORenderedMenuRaceSex* CurrentRenderedMenu = static_cast<FORenderedMenuRaceSex*>(v3->GetCurrentRenderedMenu());
+        CurrentRenderedMenu->LightButton(aeList);
     }
+
     // The parent and child list IDs are compared signed.
     int32_t CastingType = pOptionListsA[aeList]->parentID;
     rsmBackButton->Set(Tile::kTileValue_Visible, static_cast<int32_t>(CastingType < 20));
@@ -1676,158 +1663,150 @@ void RaceSexMenu::SynchronizeFaceSliders(RaceSexMenu::OptionID aeSliderType) {
 
 void RaceSexMenu::UpdatePlayerHead(bool abChangeRace, bool abShape, bool abTone) {
     FaceGenDatas diffcoord;
-    if (pPlayer->GetFaceNodeBiped(nullptr)) {
-        if (pPlayer->GetFaceNodeSkinned(nullptr)) {
-            pPlayerBase->AddChange(CHANGE_NPC_FACE);
-            if (abChangeRace) {
-                NiNode* proot;
-                BSFaceGenNiNode* pbiped;
-                NiAVObject* pobj = pPlayer->Get3D(false);
-                if (pobj) {
-                    proot = pobj->IsNode();
-                }
-                else {
-                    proot = nullptr;
-                }
-                if (proot) {
-                    NiAVObjectPalette* ptmpPal = nullptr;
-                    if (pPlayer->GetAnimation(false)) {
-                        Animation* Animation_0 = pPlayer->GetAnimation(false);
-                        if (Animation_0->GetControllerManager()) {
-                            Animation* v5 = pPlayer->GetAnimation(false);
-                            NiControllerManager* ControllerManager = v5->GetControllerManager();
-                            ptmpPal = ControllerManager->GetObjectPalette();
-                        }
-                    }
-                    NiDefaultAVObjectPalette* ppal = static_cast<NiDefaultAVObjectPalette*>(ptmpPal);
-                    NiAVObject* premove = (NiAVObject*)pPlayer->GetFaceNodeSkinned(nullptr);
-                    if (premove) {
-                        if (premove->m_pkParent) {
-                            RecurseAndRemoveObjectsFromPalette(premove, ppal);
-                            BaseProcess* CurrentAIProcess = pPlayer->pCurrentProcess;
-                            CurrentAIProcess->SetFaceSkinnedNode(nullptr);
-                            NiNode* Parent = premove->m_pkParent;
-                            Parent->DetachChild(premove);
-                        }
-                    }
-                    premove = (NiAVObject*)pPlayer->GetFaceNodeBiped(nullptr);
-                    if (premove) {
-                        if (premove->m_pkParent) {
-                            RecurseAndRemoveObjectsFromPalette(premove, ppal);
-                            BaseProcess* v21 = pPlayer->pCurrentProcess;
-                            v21->SetFaceNode(nullptr);
-                            BaseProcess* v20 = pPlayer->pCurrentProcess;
-                            v20->SetHeadAnims(nullptr);
-                            NiNode* v19 = premove->m_pkParent;
-                            v19->DetachChild(premove);
-                        }
-                    }
-                }
-                if (pPlayer->pCurrentProcess) {
-                    BaseProcess* v18 = pPlayer->pCurrentProcess;
-                    v18->ClearFaceAnimationData();
-                }
-                pPlayerBase->ClearHead();
-                BSFaceGenNiNode* pskin = nullptr;
-                pbiped = nullptr;
-                pPlayerBase->InitHead(pbiped, pskin);
-                BSFaceGenNiNode* v11 = pskin;
-                BSFaceGenNiNode* v10 = pbiped;
-                BipedAnim* Biped_0 = pPlayer->GetBiped(false);
-                pPlayerBase->AttachHead(pPlayer, Biped_0, v10, v11);
+    if ((pPlayer->GetFaceNodeBiped(nullptr)) && (pPlayer->GetFaceNodeSkinned(nullptr))) {
+        pPlayerBase->AddChange(CHANGE_NPC_FACE);
+        if (abChangeRace) {
+            NiNode* proot;
+            BSFaceGenNiNode* pbiped;
+            NiAVObject* pobj = pPlayer->Get3D(false);
+            if (pobj) {
+                proot = pobj->IsNode();
             }
             else {
-                FNVD_INLINED_LOCAL(
-                    std::type_identity_t<FR2MatrixVTC<float>[2][2]>, currcord, std::nullopt, std::nullopt
-                );
-                rt::eh_vector_constructor_iterator(
-                    currcord, sizeof(FR2MatrixVTC<float>), 4, &fnvd::constructElement<FR2MatrixVTC<float>>,
-                    &fnvd::destructElement<FR2MatrixVTC<float>>
-                );
-                rt::eh_vector_constructor_iterator(
-                    diffcoord.kFaceGens, sizeof(FR2MatrixVTC<float>), 4, &fnvd::constructElement<FR2MatrixVTC<float>>,
-                    &fnvd::destructElement<FR2MatrixVTC<float>>
-                );
-                pPlayerBase->GetFaceCoord(currcord);
-                if (abShape) {
-                    BSFaceGenManager::OffsetFaceGenCoord(&LastFaceCoord, &currcord, &diffcoord.kFaceGens, false);
-                }
-                BSFaceGenNiNode* pfacenode = pPlayer->GetFaceNodeBiped(nullptr);
-                for (int32_t a = 0; a < 2; ++a) {
-                    if (abShape) {
-                        pfacenode->SetForceMorphUpdates(true);
+                proot = nullptr;
+            }
+            if (proot) {
+                NiAVObjectPalette* ptmpPal = nullptr;
+                if (pPlayer->GetAnimation(false)) {
+                    Animation* Animation_0 = pPlayer->GetAnimation(false);
+                    if (Animation_0->GetControllerManager()) {
+                        Animation* v5 = pPlayer->GetAnimation(false);
+                        NiControllerManager* ControllerManager = v5->GetControllerManager();
+                        ptmpPal = ControllerManager->GetObjectPalette();
                     }
-                    uint32_t isizeArray = pfacenode->GetArrayCount();
-                    for (uint32_t ichild = 0; ichild < isizeArray; ++ichild) {
-                        NiTriBasedGeom* ptri;
-                        NiAVObject* pobj_2 = pfacenode->GetAt(ichild);
-                        if (pobj_2) {
-                            ptri = pobj_2->IsTriBasedGeom();
+                }
+                NiDefaultAVObjectPalette* ppal = static_cast<NiDefaultAVObjectPalette*>(ptmpPal);
+                NiAVObject* premove = (NiAVObject*)pPlayer->GetFaceNodeSkinned(nullptr);
+                if ((premove) && (premove->m_pkParent)) {
+                    RecurseAndRemoveObjectsFromPalette(premove, ppal);
+                    BaseProcess* CurrentAIProcess = pPlayer->pCurrentProcess;
+                    CurrentAIProcess->SetFaceSkinnedNode(nullptr);
+                    NiNode* Parent = premove->m_pkParent;
+                    Parent->DetachChild(premove);
+                }
+
+                premove = (NiAVObject*)pPlayer->GetFaceNodeBiped(nullptr);
+                if ((premove) && (premove->m_pkParent)) {
+                    RecurseAndRemoveObjectsFromPalette(premove, ppal);
+                    BaseProcess* v21 = pPlayer->pCurrentProcess;
+                    v21->SetFaceNode(nullptr);
+                    BaseProcess* v20 = pPlayer->pCurrentProcess;
+                    v20->SetHeadAnims(nullptr);
+                    NiNode* v19 = premove->m_pkParent;
+                    v19->DetachChild(premove);
+                }
+            }
+            if (pPlayer->pCurrentProcess) {
+                BaseProcess* v18 = pPlayer->pCurrentProcess;
+                v18->ClearFaceAnimationData();
+            }
+            pPlayerBase->ClearHead();
+            BSFaceGenNiNode* pskin = nullptr;
+            pbiped = nullptr;
+            pPlayerBase->InitHead(pbiped, pskin);
+            BSFaceGenNiNode* v11 = pskin;
+            BSFaceGenNiNode* v10 = pbiped;
+            BipedAnim* Biped_0 = pPlayer->GetBiped(false);
+            pPlayerBase->AttachHead(pPlayer, Biped_0, v10, v11);
+        }
+        else {
+            FNVD_INLINED_LOCAL(std::type_identity_t<FR2MatrixVTC<float>[2][2]>, currcord, std::nullopt, std::nullopt);
+            rt::eh_vector_constructor_iterator(
+                currcord, sizeof(FR2MatrixVTC<float>), 4, &fnvd::constructElement<FR2MatrixVTC<float>>,
+                &fnvd::destructElement<FR2MatrixVTC<float>>
+            );
+            rt::eh_vector_constructor_iterator(
+                diffcoord.kFaceGens, sizeof(FR2MatrixVTC<float>), 4, &fnvd::constructElement<FR2MatrixVTC<float>>,
+                &fnvd::destructElement<FR2MatrixVTC<float>>
+            );
+            pPlayerBase->GetFaceCoord(currcord);
+            if (abShape) {
+                BSFaceGenManager::OffsetFaceGenCoord(&LastFaceCoord, &currcord, &diffcoord.kFaceGens, false);
+            }
+            BSFaceGenNiNode* pfacenode = pPlayer->GetFaceNodeBiped(nullptr);
+            for (int32_t a = 0; a < 2; ++a) {
+                if (abShape) {
+                    pfacenode->SetForceMorphUpdates(true);
+                }
+                uint32_t isizeArray = pfacenode->GetArrayCount();
+                for (uint32_t ichild = 0; ichild < isizeArray; ++ichild) {
+                    NiTriBasedGeom* ptri;
+                    NiAVObject* pobj_2 = pfacenode->GetAt(ichild);
+                    if (pobj_2) {
+                        ptri = pobj_2->IsTriBasedGeom();
+                    }
+                    else {
+                        ptri = nullptr;
+                    }
+                    NiTriBasedGeom* ptri_2 = ptri;
+                    if (ptri) {
+                        BSFaceGenModel* pfgmodel;
+                        BSFaceGenModelExtraData* pmodelExtraData = BSFaceGenManager::GetFaceGenModelExtraData(ptri_2);
+                        if (pmodelExtraData) {
+                            pfgmodel = pmodelExtraData->GetModel();
                         }
                         else {
-                            ptri = nullptr;
+                            pfgmodel = nullptr;
                         }
-                        NiTriBasedGeom* ptri_2 = ptri;
-                        if (ptri) {
-                            BSFaceGenModel* pfgmodel;
-                            BSFaceGenModelExtraData* pmodelExtraData =
-                                BSFaceGenManager::GetFaceGenModelExtraData(ptri_2);
-                            if (pmodelExtraData) {
-                                pfgmodel = pmodelExtraData->GetModel();
+                        BSFaceGenModel* pfgmodel_2 = pfgmodel;
+                        if (pfgmodel) {
+                            if (abShape) {
+                                pfgmodel_2->ApplyCoordinateToExistingMesh(&(&diffcoord)->kFaceGens, ptri_2, false);
                             }
-                            else {
-                                pfgmodel = nullptr;
-                            }
-                            BSFaceGenModel* pfgmodel_2 = pfgmodel;
-                            if (pfgmodel) {
-                                if (abShape) {
-                                    pfgmodel_2->ApplyCoordinateToExistingMesh(&(&diffcoord)->kFaceGens, ptri_2, false);
-                                }
-                                if (abTone) {
-                                    uint32_t v12 = std::strlen("FaceGenFace");
-                                    const char* HandleString = (&ptri_2->m_kName)->GetHandleString();
-                                    if (!BSstrnicmp(HandleString, "FaceGenFace", v12)) {
-                                        int32_t v15;
-                                        NiShadeProperty* pshaderprop =
-                                            static_cast<NiShadeProperty*>(pobj_2->GetProperty(NiProperty::SHADE));
-                                        if (pshaderprop) {
-                                            int32_t v14 = pshaderprop->iShaderPropertyType >= 8 &&
-                                                pshaderprop->iShaderPropertyType <= 12;
-                                            v15 = v14;
+                            if (abTone) {
+                                uint32_t v12 = std::strlen("FaceGenFace");
+                                const char* HandleString = (&ptri_2->m_kName)->GetHandleString();
+                                if (!BSstrnicmp(HandleString, "FaceGenFace", v12)) {
+                                    int32_t v15;
+                                    NiShadeProperty* pshaderprop =
+                                        static_cast<NiShadeProperty*>(pobj_2->GetProperty(NiProperty::SHADE));
+                                    if (pshaderprop) {
+                                        int32_t v14 = pshaderprop->iShaderPropertyType >= 8 &&
+                                            pshaderprop->iShaderPropertyType <= 12;
+                                        v15 = v14;
+                                    }
+                                    else {
+                                        v15 = 0;
+                                    }
+                                    BSShaderPPLightingProperty* pshaderpropLighting =
+                                        v15 ? static_cast<BSShaderPPLightingProperty*>(pshaderprop) : nullptr;
+                                    if (pshaderpropLighting) {
+                                        NiPointer<NiTexture> sptexBaseMod(static_cast<NiTexture*>(nullptr));
+                                        if (!pfgmodel_2->HasEGTData()) {
+                                            pfgmodel_2->ForceLoadModelTexture();
                                         }
-                                        else {
-                                            v15 = 0;
-                                        }
-                                        BSShaderPPLightingProperty* pshaderpropLighting =
-                                            v15 ? static_cast<BSShaderPPLightingProperty*>(pshaderprop) : nullptr;
-                                        if (pshaderpropLighting) {
-                                            NiPointer<NiTexture> sptexBaseMod(static_cast<NiTexture*>(nullptr));
-                                            if (!pfgmodel_2->HasEGTData()) {
-                                                pfgmodel_2->ForceLoadModelTexture();
-                                            }
-                                            uint32_t EGTClampSize = BSFaceGenManager::GetEGTClampSize();
-                                            pfgmodel_2->ApplyCoordinateTexturingToMesh(
-                                                &currcord, sptexBaseMod, EGTClampSize
-                                            );
-                                            NiTexture* v13 = sptexBaseMod.m_pObject;
-                                            pshaderpropLighting->SetDiffuseTexture(1u, v13);
-                                        }
+                                        uint32_t EGTClampSize = BSFaceGenManager::GetEGTClampSize();
+                                        pfgmodel_2->ApplyCoordinateTexturingToMesh(
+                                            &currcord, sptexBaseMod, EGTClampSize
+                                        );
+                                        NiTexture* v13 = sptexBaseMod.m_pObject;
+                                        pshaderpropLighting->SetDiffuseTexture(1u, v13);
                                     }
                                 }
                             }
                         }
                     }
-                    pfacenode = pPlayer->GetFaceNodeSkinned(nullptr);
                 }
-                rt::eh_vector_destructor_iterator(
-                    diffcoord.kFaceGens, sizeof(FR2MatrixVTC<float>), 4, &fnvd::destructElement<FR2MatrixVTC<float>>
-                );
-                rt::eh_vector_destructor_iterator(
-                    currcord, sizeof(FR2MatrixVTC<float>), 4, &fnvd::destructElement<FR2MatrixVTC<float>>
-                );
+                pfacenode = pPlayer->GetFaceNodeSkinned(nullptr);
             }
-            NiUpdatePlayer3D();
+            rt::eh_vector_destructor_iterator(
+                diffcoord.kFaceGens, sizeof(FR2MatrixVTC<float>), 4, &fnvd::destructElement<FR2MatrixVTC<float>>
+            );
+            rt::eh_vector_destructor_iterator(
+                currcord, sizeof(FR2MatrixVTC<float>), 4, &fnvd::destructElement<FR2MatrixVTC<float>>
+            );
         }
+        NiUpdatePlayer3D();
     }
 }
 
@@ -2278,44 +2257,42 @@ char RaceSexMenu::UpdateEntriesBetween(int32_t aiStart, int32_t aiEnd, FanTypeE 
         NiTListItem<RaceSexMenu::Entry*>* piter = pOptionListsA[i]->items.m_pkHead;
         while (piter) {
             RaceSexMenu::Entry* popt = pOptionListsA[i]->items.GetNext(piter);
-            if (popt) {
-                if (popt->id == 34 || popt->id == 35) {
-                    int32_t aiLow;
-                    int32_t aiHigh;
-                    FNVD_INLINED_LOCAL(std::type_identity_t<FR2MatrixVTC<float>[2][2]>, a1, std::nullopt, std::nullopt);
-                    rt::eh_vector_constructor_iterator(
-                        a1, sizeof(FR2MatrixVTC<float>), 4, &fnvd::constructElement<FR2MatrixVTC<float>>,
-                        &fnvd::destructElement<FR2MatrixVTC<float>>
-                    );
-                    FR2MatrixVTC<float>(*OffsetFaceCoord)[2][2] = pPlayerBase->GetOffsetFaceCoord();
-                    TESActorBase::SEX Sex = pPlayerBase->GetSex();
-                    FR2MatrixVTC<float>(*MeanFaceCoord)[2][2] = pPlayerBase->pFormRace->GetMeanFaceCoord(Sex);
-                    BSFaceGenManager::MergeFaceGenCoord(MeanFaceCoord, OffsetFaceCoord, &a1, false, 0.0f);
-                    // The entry's data is the FaceGen control index.
-                    int32_t aiVal = static_cast<int32_t>(
-                        BSFaceGenManager::GetFaceCoordValue(&a1, a3, FANSYMM_SYMM, static_cast<uint32_t>(popt->iData)) *
-                        10.0
-                    );
-                    popt->GetRange(aiLow, aiHigh);
-                    if (aiVal >= aiLow) {
-                        if (aiVal <= aiHigh) {
-                            if (popt != pSliderOpt) {
-                                popt->SetValue(aiVal);
-                            }
-                        }
-                        else {
-                            popt->SetValue(aiHigh);
-                            bChanged = 1;
+            if ((popt) && (popt->id == 34 || popt->id == 35)) {
+                int32_t aiLow;
+                int32_t aiHigh;
+                FNVD_INLINED_LOCAL(std::type_identity_t<FR2MatrixVTC<float>[2][2]>, a1, std::nullopt, std::nullopt);
+                rt::eh_vector_constructor_iterator(
+                    a1, sizeof(FR2MatrixVTC<float>), 4, &fnvd::constructElement<FR2MatrixVTC<float>>,
+                    &fnvd::destructElement<FR2MatrixVTC<float>>
+                );
+                FR2MatrixVTC<float>(*OffsetFaceCoord)[2][2] = pPlayerBase->GetOffsetFaceCoord();
+                TESActorBase::SEX Sex = pPlayerBase->GetSex();
+                FR2MatrixVTC<float>(*MeanFaceCoord)[2][2] = pPlayerBase->pFormRace->GetMeanFaceCoord(Sex);
+                BSFaceGenManager::MergeFaceGenCoord(MeanFaceCoord, OffsetFaceCoord, &a1, false, 0.0f);
+                // The entry's data is the FaceGen control index.
+                int32_t aiVal = static_cast<int32_t>(
+                    BSFaceGenManager::GetFaceCoordValue(&a1, a3, FANSYMM_SYMM, static_cast<uint32_t>(popt->iData)) *
+                    10.0
+                );
+                popt->GetRange(aiLow, aiHigh);
+                if (aiVal >= aiLow) {
+                    if (aiVal <= aiHigh) {
+                        if (popt != pSliderOpt) {
+                            popt->SetValue(aiVal);
                         }
                     }
                     else {
-                        popt->SetValue(aiLow);
+                        popt->SetValue(aiHigh);
                         bChanged = 1;
                     }
-                    rt::eh_vector_destructor_iterator(
-                        a1, sizeof(FR2MatrixVTC<float>), 4, &fnvd::destructElement<FR2MatrixVTC<float>>
-                    );
                 }
+                else {
+                    popt->SetValue(aiLow);
+                    bChanged = 1;
+                }
+                rt::eh_vector_destructor_iterator(
+                    a1, sizeof(FR2MatrixVTC<float>), 4, &fnvd::destructElement<FR2MatrixVTC<float>>
+                );
             }
         }
     }
@@ -2375,58 +2352,55 @@ bool RaceSexMenu::UpdatePlayerEyes() {
                 spRightEye.operator=(pobj->IsTriBasedGeom());
             }
         }
-        if (spLeftEye.m_pObject) {
-            if (spRightEye.m_pObject) {
-                BSStringT<char> filename;
-                if (pPlayerBase->GetEyeColor()) {
-                    filename.SPrintF("Textures\\%s", pPlayerBase->GetEyeColor()->GetTextureName());
+        if ((spLeftEye.m_pObject) && (spRightEye.m_pObject)) {
+            BSStringT<char> filename;
+            if (pPlayerBase->GetEyeColor()) {
+                filename.SPrintF("Textures\\%s", pPlayerBase->GetEyeColor()->GetTextureName());
+            }
+            else {
+                filename.SPrintF("Textures\\Characters\\Eyes\\EyeDefault.dds");
+            }
+            NiPointer<NiSourceTexture> sptexBase(static_cast<NiSourceTexture*>(nullptr));
+            char* v6 = filename.pString;
+            TES::pInstance->CreateTextureImage(v6, sptexBase, false, false);
+            if (sptexBase.m_pObject) {
+                int32_t v8;
+                int32_t v10;
+                NiShadeProperty* pprop =
+                    static_cast<NiShadeProperty*>(spLeftEye.m_pObject->GetProperty(NiProperty::SHADE));
+                if (pprop) {
+                    int32_t v9 = pprop->iShaderPropertyType >= 8 && pprop->iShaderPropertyType <= 12;
+                    v10 = v9;
                 }
                 else {
-                    filename.SPrintF("Textures\\Characters\\Eyes\\EyeDefault.dds");
+                    v10 = 0;
                 }
-                NiPointer<NiSourceTexture> sptexBase(static_cast<NiSourceTexture*>(nullptr));
-                char* v6 = filename.pString;
-                TES::pInstance->CreateTextureImage(v6, sptexBase, false, false);
-                if (sptexBase.m_pObject) {
-                    int32_t v8;
-                    int32_t v10;
-                    NiShadeProperty* pprop =
-                        static_cast<NiShadeProperty*>(spLeftEye.m_pObject->GetProperty(NiProperty::SHADE));
-                    if (pprop) {
-                        int32_t v9 = pprop->iShaderPropertyType >= 8 && pprop->iShaderPropertyType <= 12;
-                        v10 = v9;
-                    }
-                    else {
-                        v10 = 0;
-                    }
-                    BSShaderPPLightingProperty* pLighting =
-                        v10 ? static_cast<BSShaderPPLightingProperty*>(pprop) : nullptr;
-                    if (pLighting) {
-                        pLighting->SetTexture(BSShaderProperty::TEXTYPE_DIFFUSE, 0, sptexBase.m_pObject);
-                    }
-                    NiShadeProperty* pprop_2 =
-                        static_cast<NiShadeProperty*>(spRightEye.m_pObject->GetProperty(NiProperty::SHADE));
-                    if (pprop_2) {
-                        int32_t v7 = pprop_2->iShaderPropertyType >= 8 && pprop_2->iShaderPropertyType <= 12;
-                        v8 = v7;
-                    }
-                    else {
-                        v8 = 0;
-                    }
-                    BSShaderPPLightingProperty* pLighting_2 =
-                        v8 ? static_cast<BSShaderPPLightingProperty*>(pprop_2) : nullptr;
-                    if (pLighting_2) {
-                        pLighting_2->SetTexture(BSShaderProperty::TEXTYPE_DIFFUSE, 0, sptexBase.m_pObject);
-                    }
+                BSShaderPPLightingProperty* pLighting = v10 ? static_cast<BSShaderPPLightingProperty*>(pprop) : nullptr;
+                if (pLighting) {
+                    pLighting->SetTexture(BSShaderProperty::TEXTYPE_DIFFUSE, 0, sptexBase.m_pObject);
+                }
+                NiShadeProperty* pprop_2 =
+                    static_cast<NiShadeProperty*>(spRightEye.m_pObject->GetProperty(NiProperty::SHADE));
+                if (pprop_2) {
+                    int32_t v7 = pprop_2->iShaderPropertyType >= 8 && pprop_2->iShaderPropertyType <= 12;
+                    v8 = v7;
+                }
+                else {
+                    v8 = 0;
+                }
+                BSShaderPPLightingProperty* pLighting_2 =
+                    v8 ? static_cast<BSShaderPPLightingProperty*>(pprop_2) : nullptr;
+                if (pLighting_2) {
+                    pLighting_2->SetTexture(BSShaderProperty::TEXTYPE_DIFFUSE, 0, sptexBase.m_pObject);
                 }
             }
         }
+
         NiUpdatePlayer3D();
         return true;
     }
-    else {
-        return false;
-    }
+
+    return false;
 }
 
 void RaceSexMenu::ChangeHairColor() {
@@ -2461,58 +2435,56 @@ void RaceSexMenu::ChangeHairColor() {
 }
 
 void RaceSexMenu::SliderUpdate() {
-    if (pSliderElem) {
-        if (pSliderOpt) {
-            const char* String;
-            const char* v10;
-            int32_t iid = static_cast<int32_t>(pSliderElem->GetFloat(4010));
-            bool bvalueChanged = false;
-            if (pSliderOpt->id == 29 &&
-                ((iid == 100 || iid == 104) &&
-                 (v10 = sRSMCustom.String(),
-                  (String = pSliderElem->pParent->GetString(Tile::kTileValue_User5), !_tcscmp(String, v10))))) {
-                bvalueChanged = true;
-            }
-            else {
-                switch (iid) {
-                    case 100: {
-                        int32_t Value_007B3740 = pSliderOpt->GetValue_007B3740();
-                        uint32_t Increment = pSliderOpt->GetIncrement();
-                        bvalueChanged = pSliderOpt->SetValue(Value_007B3740 - Increment);
-                        break;
-                    }
-                    case 104: {
-                        int32_t v4 = pSliderOpt->GetValue_007B3740();
-                        uint32_t v5 = pSliderOpt->GetIncrement();
-                        bvalueChanged = pSliderOpt->SetValue(v5 + v4);
-                        break;
-                    }
-                    case 102: {
-                        int32_t v6 = pSliderOpt->GetValue_007B3740();
-                        int32_t Float = static_cast<int32_t>(pSliderElem->pParent->GetFloat(Tile::kTileValue_User4));
-                        bvalueChanged = pSliderOpt->SetValue(v6 - Float);
-                        break;
-                    }
-                    case 103: {
-                        int32_t v8 = pSliderOpt->GetValue_007B3740();
-                        int32_t v9 = static_cast<int32_t>(pSliderElem->pParent->GetFloat(Tile::kTileValue_User4));
-                        bvalueChanged = pSliderOpt->SetValue(v9 + v8);
-                        break;
-                    }
-                    case 105: {
-                        bvalueChanged = IsFlagged(RaceSexMenu::RSM_FLAG_SLIDER_UPDATE);
-                        break;
-                    }
+    if ((pSliderElem) && (pSliderOpt)) {
+        const char* String;
+        const char* v10;
+        int32_t iid = static_cast<int32_t>(pSliderElem->GetFloat(4010));
+        bool bvalueChanged = false;
+        if (pSliderOpt->id == 29 &&
+            ((iid == 100 || iid == 104) &&
+             (v10 = sRSMCustom.String(),
+              (String = pSliderElem->pParent->GetString(Tile::kTileValue_User5), !_tcscmp(String, v10))))) {
+            bvalueChanged = true;
+        }
+        else {
+            switch (iid) {
+                case 100: {
+                    int32_t Value_007B3740 = pSliderOpt->GetValue_007B3740();
+                    uint32_t Increment = pSliderOpt->GetIncrement();
+                    bvalueChanged = pSliderOpt->SetValue(Value_007B3740 - Increment);
+                    break;
+                }
+                case 104: {
+                    int32_t v4 = pSliderOpt->GetValue_007B3740();
+                    uint32_t v5 = pSliderOpt->GetIncrement();
+                    bvalueChanged = pSliderOpt->SetValue(v5 + v4);
+                    break;
+                }
+                case 102: {
+                    int32_t v6 = pSliderOpt->GetValue_007B3740();
+                    int32_t Float = static_cast<int32_t>(pSliderElem->pParent->GetFloat(Tile::kTileValue_User4));
+                    bvalueChanged = pSliderOpt->SetValue(v6 - Float);
+                    break;
+                }
+                case 103: {
+                    int32_t v8 = pSliderOpt->GetValue_007B3740();
+                    int32_t v9 = static_cast<int32_t>(pSliderElem->pParent->GetFloat(Tile::kTileValue_User4));
+                    bvalueChanged = pSliderOpt->SetValue(v9 + v8);
+                    break;
+                }
+                case 105: {
+                    bvalueChanged = IsFlagged(RaceSexMenu::RSM_FLAG_SLIDER_UPDATE);
+                    break;
                 }
             }
-            if (bvalueChanged) {
-                SliderRelease();
-                pSliderElem->PlayTileSound(4043);
-            }
-            SetFlag(RaceSexMenu::RSM_FLAG_SLIDER_UPDATE, false);
-            pSliderElem = nullptr;
-            pSliderOpt = nullptr;
         }
+        if (bvalueChanged) {
+            SliderRelease();
+            pSliderElem->PlayTileSound(4043);
+        }
+        SetFlag(RaceSexMenu::RSM_FLAG_SLIDER_UPDATE, false);
+        pSliderElem = nullptr;
+        pSliderOpt = nullptr;
     }
 }
 
@@ -2762,33 +2734,27 @@ bool RaceSexMenu::IsPlayerHair(Entry* apOpt) {
 
 bool RaceSexMenu::IsPlayerEyes(RaceSexMenu::Entry* apOpt) {
     bool v3 = false;
-    if (apOpt) {
-        if (apOpt->data) {
-            if (RaceSexMenu::pMe) {
-                if (RaceSexMenu::pMe->pPlayerBase) {
-                    TESEyes* EyeColor = RaceSexMenu::pMe->pPlayerBase->GetEyeColor();
-                    if (EyeColor == apOpt->data) {
-                        return true;
-                    }
-                }
-            }
+    if ((apOpt) && (apOpt->data) && (RaceSexMenu::pMe) && (RaceSexMenu::pMe->pPlayerBase)) {
+        TESEyes* EyeColor = RaceSexMenu::pMe->pPlayerBase->GetEyeColor();
+        if (EyeColor == apOpt->data) {
+            return true;
         }
     }
+
     return v3;
 }
 
 void RaceSexMenu::RandomizeCallback() {
-    if (RaceSexMenu::pMe) {
-        if ((Interface::GetMessageMenuResult() == 1) || RaceSexMenu::pMe->IsFlagged(RSM_FLAG_RANDOM_HEAD)) {
-            RaceSexMenu::pMe->pPlayerBase->RandomizeHead(true, false, true);
-            RaceSexMenu::pMe->SetFlag(RSM_FLAG_RANDOM_HEAD, true);
-            RaceSexMenu::pMe->SynchronizeFaceSliders(RSM_SHAPE_SLIDER);
-            RaceSexMenu::pMe->SynchronizeFaceSliders(RSM_TONE_SLIDER);
-            RaceSexMenu::pMe->UpdatePlayerHead(true, true, false);
-            RaceSexMenu::pMe->UpdatePlayerBody();
-            RaceSexMenu::pMe->SetFlag(RSM_FLAG_UPDATE_HEAD, false);
-            RaceSexMenu::pMe->SetFlag(RSM_FLAG_UPDATE_BODY, false);
-        }
+    if ((RaceSexMenu::pMe) &&
+        ((Interface::GetMessageMenuResult() == 1) || RaceSexMenu::pMe->IsFlagged(RSM_FLAG_RANDOM_HEAD))) {
+        RaceSexMenu::pMe->pPlayerBase->RandomizeHead(true, false, true);
+        RaceSexMenu::pMe->SetFlag(RSM_FLAG_RANDOM_HEAD, true);
+        RaceSexMenu::pMe->SynchronizeFaceSliders(RSM_SHAPE_SLIDER);
+        RaceSexMenu::pMe->SynchronizeFaceSliders(RSM_TONE_SLIDER);
+        RaceSexMenu::pMe->UpdatePlayerHead(true, true, false);
+        RaceSexMenu::pMe->UpdatePlayerBody();
+        RaceSexMenu::pMe->SetFlag(RSM_FLAG_UPDATE_HEAD, false);
+        RaceSexMenu::pMe->SetFlag(RSM_FLAG_UPDATE_BODY, false);
     }
 }
 
@@ -2851,18 +2817,14 @@ bool RaceSexMenu_IsPlayerSex(RaceSexMenu::Entry* a1) {
 
 bool RaceSexMenu_IsPlayerHeadPart(RaceSexMenu::Entry* a1) {
     bool v3 = false;
-    if (a1) {
-        if (RaceSexMenu::pMe) {
-            if (RaceSexMenu::pMe->pPlayerBase) {
-                if (!RaceSexMenu::pMe->pPlayerBase->GetHeadParts()->IsEmpty()) {
-                    void** v1 = &RaceSexMenu::pMe->pPlayerBase->GetHeadParts()->m_item;
-                    if (*v1 == a1->data) {
-                        return true;
-                    }
-                }
-            }
+    if ((a1) && (RaceSexMenu::pMe) && (RaceSexMenu::pMe->pPlayerBase) &&
+        (!RaceSexMenu::pMe->pPlayerBase->GetHeadParts()->IsEmpty())) {
+        void** v1 = &RaceSexMenu::pMe->pPlayerBase->GetHeadParts()->m_item;
+        if (*v1 == a1->data) {
+            return true;
         }
     }
+
     return v3;
 }
 

@@ -39,15 +39,13 @@ NiObject* NiMaterialProperty::CreateClone(NiCloningProcess& kCloning) {
             CopyMembers(v4, kCloning);
             return v4;
         }
-        else {
-            CopyMembers(nullptr, kCloning);
-            return nullptr;
-        }
+
+        CopyMembers(nullptr, kCloning);
+        return nullptr;
     }
-    else {
-        NiObject::CopyMembers(this, kCloning);
-        return this;
-    }
+
+    NiObject::CopyMembers(this, kCloning);
+    return this;
 }
 
 // Old files (Bethesda stream version below 0x1A) also store ambient and diffuse colors; both are read into one
@@ -183,7 +181,6 @@ NiObject* NiMaterialProperty::CreateObject() {
     if (v0) {
         return ::new (v0) NiMaterialProperty;
     }
-    else {
-        return nullptr;
-    }
+
+    return nullptr;
 }

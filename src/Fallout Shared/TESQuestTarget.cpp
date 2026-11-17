@@ -23,15 +23,14 @@ TESObjectREFR* TESQuestTarget::GetReference(bool abAllowPickUpActor) {
     ExtraDataList* extra;
     TESObjectREFR* referencePointer;
     TESObjectREFR* pTarget = m_pTargetRef;
-    if (pTarget) {
-        if (pTarget->TESForm::GetDelete() && abAllowPickUpActor) {
-            extra = pTarget->TESObjectREFR::GetExtra();
-            referencePointer = extra->GetReferencePointer();
-            if (referencePointer) {
-                return referencePointer;
-            }
+    if ((pTarget) && (pTarget->TESForm::GetDelete() && abAllowPickUpActor)) {
+        extra = pTarget->TESObjectREFR::GetExtra();
+        referencePointer = extra->GetReferencePointer();
+        if (referencePointer) {
+            return referencePointer;
         }
     }
+
     return pTarget;
 }
 
@@ -41,19 +40,17 @@ bool TESQuestTarget::GetIgnoreLocks() {
 
 // A QSTA chunk: the target reference and the flag byte, byte-swapped on a big-endian file.
 void TESQuestTarget::Load(TESFile* apFile) {
-    if (apFile) {
-        if (apFile->GetTESChunk() == QSTA_ID) {
-            QSTA_DATA kData;
-            ourMemset(&kData, 0, sizeof(kData));
-            apFile->GetChunkData(&kData, 0);
-            if (apFile->QEndian()) {
-                kData.Endian();
-            }
-            // Copies the chunk's raw 4-byte reference slot straight into the pointer field: the value is raw file data,
-            // not a typed object.
-            m_pTargetRef = reinterpret_cast<TESObjectREFR*>(kData.uiTargetRef);
-            cFlags = kData.cFlags;
+    if ((apFile) && (apFile->GetTESChunk() == QSTA_ID)) {
+        QSTA_DATA kData;
+        ourMemset(&kData, 0, sizeof(kData));
+        apFile->GetChunkData(&kData, 0);
+        if (apFile->QEndian()) {
+            kData.Endian();
         }
+        // Copies the chunk's raw 4-byte reference slot straight into the pointer field: the value is raw file data,
+        // not a typed object.
+        m_pTargetRef = reinterpret_cast<TESObjectREFR*>(kData.uiTargetRef);
+        cFlags = kData.cFlags;
     }
 }
 

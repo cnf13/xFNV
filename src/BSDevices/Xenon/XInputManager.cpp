@@ -6,18 +6,16 @@ uint32_t BSMAX(uint32_t iA, uint16_t iB) {
     if (iA <= iB) {
         return iB;
     }
-    else {
-        return iA;
-    }
+
+    return iA;
 }
 
 char BSMIN(char iA, char iB) {
     if (iA >= iB) {
         return iB;
     }
-    else {
-        return iA;
-    }
+
+    return iA;
 }
 
 // The larger of two floats: afB unless it is below afA, so afB is returned for a tie and for a NaN.

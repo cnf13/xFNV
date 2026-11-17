@@ -62,48 +62,44 @@ void TESTextureList::LoadFromBuffer(
     const char* apModelName
 ) {
     Archive* pmasterTextureArchive = ArchiveManager::GetMasterArchive(ARCHIVE_TYPE_INDEX_TEXTURES);
-    if (pmasterTextureArchive) {
-        if (static_cast<uint8_t>(pmasterTextureArchive->HasEmbeddedFileNames())) {
-            if (bUseOptimizedTextureLoading.Bool()) {
-                cTextureCount = aiCount;
-                // The allocation size is 0xFFFFFFFF when 4 * aiCount would overflow 32 bits, as the game does.
-                pTextureOffsetArray = static_cast<BSFileEntry**>(ourMalloc(
-                    (aiCount >> 30) != 0 ? 0xFFFFFFFFu : static_cast<uint32_t>(sizeof(BSFileEntry*) * aiCount)
-                ));
-                for (uint32_t i = 0; i < aiCount; ++i) {
-                    BSHash filehash2(
-                        apBuffer[i].cLast, apBuffer[i].cLast2, apBuffer[i].cLength, apBuffer[i].cFirst, apBuffer[i].iCRC
+    if ((pmasterTextureArchive) && (static_cast<uint8_t>(pmasterTextureArchive->HasEmbeddedFileNames())) &&
+        (bUseOptimizedTextureLoading.Bool())) {
+        cTextureCount = aiCount;
+        // The allocation size is 0xFFFFFFFF when 4 * aiCount would overflow 32 bits, as the game does.
+        pTextureOffsetArray = static_cast<BSFileEntry**>(
+            ourMalloc((aiCount >> 30) != 0 ? 0xFFFFFFFFu : static_cast<uint32_t>(sizeof(BSFileEntry*) * aiCount))
+        );
+        for (uint32_t i = 0; i < aiCount; ++i) {
+            BSHash filehash2(
+                apBuffer[i].cLast, apBuffer[i].cLast2, apBuffer[i].cLength, apBuffer[i].cFirst, apBuffer[i].iCRC
+            );
+            BSHash dirhash(
+                apBuffer[i].cDirLast, apBuffer[i].cDirLast2, apBuffer[i].cDirLength, apBuffer[i].cDirFirst,
+                apBuffer[i].iDirCRC
+            );
+            BSFileEntry* FileEntryForFileFromAllArchives = ArchiveManager::GetFileEntryForFileFromAllArchives(
+                ARCHIVE_TYPE_INDEX_TEXTURES, dirhash, filehash2, nullptr
+            );
+            pTextureOffsetArray[i] = FileEntryForFileFromAllArchives;
+            if (bWarnOnMissingFileEntry.Bool() && ArchiveManager::ArchivesEnabled() && !pTextureOffsetArray[i]) {
+                if (apParentForm && apModelName) {
+                    int32_t CastingType = apParentForm->iFormID;
+                    Warning(
+                        "MASTERFILE: Failed to find archive file entry for texture on model '%s' for form "
+                        "%s (%08X).",
+                        apModelName, apParentForm->GetFormEditorID(), CastingType
                     );
-                    BSHash dirhash(
-                        apBuffer[i].cDirLast, apBuffer[i].cDirLast2, apBuffer[i].cDirLength, apBuffer[i].cDirFirst,
-                        apBuffer[i].iDirCRC
-                    );
-                    BSFileEntry* FileEntryForFileFromAllArchives = ArchiveManager::GetFileEntryForFileFromAllArchives(
-                        ARCHIVE_TYPE_INDEX_TEXTURES, dirhash, filehash2, nullptr
-                    );
-                    pTextureOffsetArray[i] = FileEntryForFileFromAllArchives;
-                    if (bWarnOnMissingFileEntry.Bool() && ArchiveManager::ArchivesEnabled() &&
-                        !pTextureOffsetArray[i]) {
-                        if (apParentForm && apModelName) {
-                            int32_t CastingType = apParentForm->iFormID;
-                            Warning(
-                                "MASTERFILE: Failed to find archive file entry for texture on model '%s' for form "
-                                "%s (%08X).",
-                                apModelName, apParentForm->GetFormEditorID(), CastingType
-                            );
-                        }
-                        else {
-                            if (apModelName) {
-                                Warning(
-                                    "MASTERFILE: Failed to find archive file entry for texture on model '%s' on "
-                                    "UNKNOWN form.",
-                                    apModelName
-                                );
-                            }
-                            else {
-                                Warning("MASTERFILE: Failed to find archive file entry for texture on UNKNOWN Model");
-                            }
-                        }
+                }
+                else {
+                    if (apModelName) {
+                        Warning(
+                            "MASTERFILE: Failed to find archive file entry for texture on model '%s' on "
+                            "UNKNOWN form.",
+                            apModelName
+                        );
+                    }
+                    else {
+                        Warning("MASTERFILE: Failed to find archive file entry for texture on UNKNOWN Model");
                     }
                 }
             }
@@ -177,9 +173,8 @@ const char* TESModel::GetModel() {
     if (cModel.pString) {
         return cModel.pString;
     }
-    else {
-        return "";
-    }
+
+    return "";
 }
 
 void TESModel::SetModel(const char* apModel) {
@@ -303,9 +298,8 @@ uint32_t TESModel::GetModelLength_00489540(TESForm* apObj) {
     if (pmodel) {
         return pmodel->GetModelLength();
     }
-    else {
-        return 0;
-    }
+
+    return 0;
 }
 
 // The group's master archive from the first set, else from the second.

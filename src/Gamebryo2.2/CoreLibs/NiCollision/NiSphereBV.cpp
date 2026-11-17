@@ -122,7 +122,9 @@ bool NiSphereBV::SphereTriTestIntersect(
 ) {
     const NiSphereBV& kSphABV = static_cast<const NiSphereBV&>(kABV0);
 
-    float fT0, fT1, fSqrDist;
+    float fT0;
+    float fT1;
+    float fSqrDist;
     NiTrigon kTri;
     kTri.m_kOrigin = kVert0;
     // EXE-INLINED 0x439EF0
@@ -488,35 +490,33 @@ bool NiSphereBV::SphereSphereFindIntersect(
                 }
                 return true;
             }
-            else {
-                NiPoint3 v70;
-                fIntrTime = 0.0f;
-                float v38 = kSphABV0.m_kSphere.m_kCenter.x + kSphABV1.m_kSphere.m_kCenter.x;
-                float v41 = kSphABV0.m_kSphere.m_kCenter.y + kSphABV1.m_kSphere.m_kCenter.y;
-                float v43 = kSphABV0.m_kSphere.m_kCenter.z + kSphABV1.m_kSphere.m_kCenter.z;
-                v70.x = v38 * 0.5;
-                v70.y = v41 * 0.5;
-                v70.z = 0.5 * v43;
-                kIntrPt = v70;
-                if (bCalcNormals) {
-                    NiPoint3 v71;
-                    if (!(v23 > 1.1920929e-07f)) {
-                        kNormal0 = NiPoint3_UNIT_X;
-                    }
-                    else {
-                        kNormal0 = v33;
-                        kNormal0.Unitize();
-                    }
-                    v71.x = -kNormal0.x;
-                    v71.y = -kNormal0.y;
-                    v71.z = -kNormal0.z;
-                    kNormal1 = v71;
-                    return true;
+
+            NiPoint3 v70;
+            fIntrTime = 0.0f;
+            float v38 = kSphABV0.m_kSphere.m_kCenter.x + kSphABV1.m_kSphere.m_kCenter.x;
+            float v41 = kSphABV0.m_kSphere.m_kCenter.y + kSphABV1.m_kSphere.m_kCenter.y;
+            float v43 = kSphABV0.m_kSphere.m_kCenter.z + kSphABV1.m_kSphere.m_kCenter.z;
+            v70.x = v38 * 0.5;
+            v70.y = v41 * 0.5;
+            v70.z = 0.5 * v43;
+            kIntrPt = v70;
+            if (bCalcNormals) {
+                NiPoint3 v71;
+                if (!(v23 > 1.1920929e-07f)) {
+                    kNormal0 = NiPoint3_UNIT_X;
                 }
                 else {
-                    return true;
+                    kNormal0 = v33;
+                    kNormal0.Unitize();
                 }
+                v71.x = -kNormal0.x;
+                v71.y = -kNormal0.y;
+                v71.z = -kNormal0.z;
+                kNormal1 = v71;
+                return true;
             }
+
+            return true;
         }
     }
     if (!(v32 >= static_cast<double>(kABV1a))) {

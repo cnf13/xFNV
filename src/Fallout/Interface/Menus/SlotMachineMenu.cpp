@@ -337,46 +337,45 @@ void SlotMachineMenu::DoIdle() {
             break;
         }
         case SlotMachineMenu::SL_SPIN_REELS_ANIM: {
-            if (pSlotLeverAnim) {
-                if (pSlotReelAnim[0]) {
-                    if (pSlotCoinAnim) {
-                        pSlotAnimManager->DeactivateSequence(pSlotCoinAnim, 0.0f);
-                    }
-                    if (SlotMachineMenu::fTimeDelta > 1.0) {
-                        pTiles[9]->Set(4003, 0);
-                    }
-                    NiUpdateData UpdateData1(SlotMachineMenu::fTimeDelta, true, false);
-                    NiUpdateData UpdateData2(SlotMachineMenu::fTimeDelta, true, false);
-                    NiUpdateData UpdateData3(SlotMachineMenu::fTimeDelta, true, false);
-                    NiUpdateData UpdateData4(SlotMachineMenu::fTimeDelta, true, false);
-                    NiAVObject* v15 = SlotMachineMenu::spSlotModel.m_pObject->GetAt(0);
-                    v15->Update(UpdateData1);
-                    if (SlotMachineMenu::fTimeDelta == 0.0 && pTiles[1]->GetFloat(SlotMachineMenu::iUT_X) > 0.0) {
-                        BSAudio* v16 = &BSAudio::QInstance();
-                        BSSoundHandle* SoundHandleByName = v16->GetSoundHandleByName(&a1, "GameSlotsPullLever", 289u);
-                        SoundHandleByName->Play(false);
-                        bSwapTextures = true;
-                    }
-                    if (SlotMachineMenu::fTimeDelta == 0.0 || pTiles[1]->GetFloat(SlotMachineMenu::iUT_X) > 0.0) {
-                        NiAVObject* v17 = SlotMachineMenu::spSlotModel.m_pObject->GetAt(1u);
-                        v17->Update(UpdateData2);
-                        NiAVObject* v18 = SlotMachineMenu::spSlotModel.m_pObject->GetAt(2u);
-                        v18->Update(UpdateData3);
-                        NiAVObject* v19 = SlotMachineMenu::spSlotModel.m_pObject->GetAt(3u);
-                        v19->Update(UpdateData4);
-                    }
-                    if (static_cast<double>(SlotMachineMenu::fTimeDelta) >= pSlotLeverAnim->m_fEndKeyTime &&
-                        bSwapTextures) {
-                        bSwapTextures = false;
-                        SwapFrontfacingTextures();
-                    }
-                    if (static_cast<double>(SlotMachineMenu::fTimeDelta) >= pSlotLeverAnim->m_fEndKeyTime &&
-                        static_cast<double>(SlotMachineMenu::fTimeDelta) >= pSlotReelAnim[0]->m_fEndKeyTime) {
-                        eSlotState = SlotMachineMenu::SL_CALC_RESULTS;
-                        SwapBackfacingTextures();
-                    }
+            if ((pSlotLeverAnim) && (pSlotReelAnim[0])) {
+                if (pSlotCoinAnim) {
+                    pSlotAnimManager->DeactivateSequence(pSlotCoinAnim, 0.0f);
+                }
+                if (SlotMachineMenu::fTimeDelta > 1.0) {
+                    pTiles[9]->Set(4003, 0);
+                }
+                NiUpdateData UpdateData1(SlotMachineMenu::fTimeDelta, true, false);
+                NiUpdateData UpdateData2(SlotMachineMenu::fTimeDelta, true, false);
+                NiUpdateData UpdateData3(SlotMachineMenu::fTimeDelta, true, false);
+                NiUpdateData UpdateData4(SlotMachineMenu::fTimeDelta, true, false);
+                NiAVObject* v15 = SlotMachineMenu::spSlotModel.m_pObject->GetAt(0);
+                v15->Update(UpdateData1);
+                if (SlotMachineMenu::fTimeDelta == 0.0 && pTiles[1]->GetFloat(SlotMachineMenu::iUT_X) > 0.0) {
+                    BSAudio* v16 = &BSAudio::QInstance();
+                    BSSoundHandle* SoundHandleByName = v16->GetSoundHandleByName(&a1, "GameSlotsPullLever", 289u);
+                    SoundHandleByName->Play(false);
+                    bSwapTextures = true;
+                }
+                if (SlotMachineMenu::fTimeDelta == 0.0 || pTiles[1]->GetFloat(SlotMachineMenu::iUT_X) > 0.0) {
+                    NiAVObject* v17 = SlotMachineMenu::spSlotModel.m_pObject->GetAt(1u);
+                    v17->Update(UpdateData2);
+                    NiAVObject* v18 = SlotMachineMenu::spSlotModel.m_pObject->GetAt(2u);
+                    v18->Update(UpdateData3);
+                    NiAVObject* v19 = SlotMachineMenu::spSlotModel.m_pObject->GetAt(3u);
+                    v19->Update(UpdateData4);
+                }
+                if (static_cast<double>(SlotMachineMenu::fTimeDelta) >= pSlotLeverAnim->m_fEndKeyTime &&
+                    bSwapTextures) {
+                    bSwapTextures = false;
+                    SwapFrontfacingTextures();
+                }
+                if (static_cast<double>(SlotMachineMenu::fTimeDelta) >= pSlotLeverAnim->m_fEndKeyTime &&
+                    static_cast<double>(SlotMachineMenu::fTimeDelta) >= pSlotReelAnim[0]->m_fEndKeyTime) {
+                    eSlotState = SlotMachineMenu::SL_CALC_RESULTS;
+                    SwapBackfacingTextures();
                 }
             }
+
             break;
         }
         case SlotMachineMenu::SL_CALC_RESULTS: {
@@ -1532,26 +1531,24 @@ void SlotMachineMenu::SwapFrontfacingTextures() {
                 eReelResults[2] = eReelResults[0];
                 return true;
             }
-            else {
-                if (eReelResults[0] == eReelResults[2]) {
-                    int32_t v13 = iLuckSkill - 5;
-                    int32_t v5 = std::abs(eReelResults[0] - eReelResults[1]);
-                    if (v5 * v5 > iLuckSkill) {
-                        return false;
-                    }
-                    eReelResults[1] = eReelResults[0];
-                    return true;
+
+            if (eReelResults[0] == eReelResults[2]) {
+                int32_t v13 = iLuckSkill - 5;
+                int32_t v5 = std::abs(eReelResults[0] - eReelResults[1]);
+                if (v5 * v5 > iLuckSkill) {
+                    return false;
                 }
-                else {
-                    int32_t v12 = iLuckSkill - 5;
-                    int32_t v6 = std::abs(eReelResults[1] - eReelResults[0]);
-                    if (v6 * v6 > iLuckSkill) {
-                        return false;
-                    }
-                    eReelResults[0] = eReelResults[1];
-                    return true;
-                }
+                eReelResults[1] = eReelResults[0];
+                return true;
             }
+
+            int32_t v12 = iLuckSkill - 5;
+            int32_t v6 = std::abs(eReelResults[1] - eReelResults[0]);
+            if (v6 * v6 > iLuckSkill) {
+                return false;
+            }
+            eReelResults[0] = eReelResults[1];
+            return true;
         }
         case 2: {
             if (eReelResults[0] == SlotMachineMenu::SL_WILD) {
@@ -1745,136 +1742,124 @@ Tile* SlotMachineMenu::Create(
         SoundHandleByName->Play(false);
         return nullptr;
     }
-    else {
-        CASINO_DATA* Data = &SlotMachineMenu::pCasino->data;
-        if (g_slotMachineCasinoStats->iTotalWinnings < Data->iMaxWinnings) {
-            TESCasinoChips* ChipType = SlotMachineMenu::pCasino->GetChipType();
-            if (pPlayer->GetInventoryObjectCount(ChipType) >= g_slotMachineMinBet) {
-                if (g_slotMachineCasinoStats->iTotalWinnings < aiMinWinnings && aiMinWinnings) {
-                    char apString[264];
-                    BSsprintf(apString, 260, sGamblingMinWinText.String());
-                    Interface::ShowMessage(
-                        apString, 0, "Interface\\Icons\\Message Icons\\glow_message_vaultboy_surprised.dds", nullptr,
-                        2.0f, false
-                    );
-                    BSAudio* v12 = &BSAudio::QInstance();
-                    BSSoundHandle* v31 = v12->GetSoundHandleByName(&apResult, "UIPopUpMessageGeneral", 289u);
-                    v31->Play(false);
-                    return nullptr;
-                }
-                else {
-                    int32_t v13;
-                    if (pold_menu_tile) {
-                        delete pold_menu_tile;
-                    }
-                    Tile* ptile = pin->GetMenusRoot()->ReadFile("Data\\Menus\\slot_machine_menu.xml");
-                    SlotMachineMenu::pMe = static_cast<SlotMachineMenu*>(ptile->GetMenu());
-                    if (SlotMachineMenu::pMe &&
-                        ((v13 = SlotMachineMenu::pMe->GetClass(), v13 == SlotMachineMenu::GetClassStatic()) &&
-                         SlotMachineMenu::pCasino)) {
-                        SlotMachineMenu::pMe->SetMenuTile(static_cast<TileMenu*>(ptile), false);
-                        if (SlotMachineMenu::pMe->IsWellFormedMenu()) {
-                            char Src[64];
-                            if (ptile->GetFloat(4007) == 6006.0 || ptile->GetFloat(4007) == 102.0) {
-                                float time = Tile::GetMaximumDepth();
-                                ptile->Set(4013, time, true);
-                            }
-                            BSAudio* v14 = &BSAudio::QInstance();
-                            BSSoundHandle* v30 = v14->GetSoundHandleByName(&v36, "GAMESlotsActivate", 289u);
-                            v30->Play(false);
-                            SlotMachineMenu::pMe->iLuckSkill = pPlayer->GetClampedActorValue(ActorValue::LUCK);
-                            SlotMachineMenu::pMe->iCurrentBet = g_slotMachineMinBet;
-                            const char* v15 = sCurrentBetText.String();
-                            SlotMachineMenu::pMe->pTiles[0]->Set(g_slotMachineMenuTrait_Value, v15, true);
-                            SlotMachineMenu::pMe->pTiles[0]->Poke(SlotMachineMenu::iUT_X, 1.0f);
-                            SlotMachineMenu::pMe->pTiles[0]->Set(SlotMachineMenu::iUT_X, g_slotMachineMinBet);
-                            const char* v16 = sChipCountText.String();
-                            SlotMachineMenu::pMe->pTiles[1]->Set(g_slotMachineMenuTrait_Value, v16, true);
-                            SlotMachineMenu::pMe->pTiles[1]->Poke(SlotMachineMenu::iUT_X, 1.0f);
-                            TESCasinoChips* v17 = SlotMachineMenu::pCasino->GetChipType();
-                            int32_t ItemCountinContainer = pPlayer->GetInventoryObjectCount(v17);
-                            SlotMachineMenu::pMe->pTiles[1]->Set(SlotMachineMenu::iUT_X, ItemCountinContainer);
-                            if (BSstrlen(SlotMachineMenu::pCasino->GetFullName())) {
-                                const char* v19 = sCasinoEarningsText.String();
-                                BSsprintf(Src, 64, "%s %s", SlotMachineMenu::pCasino->GetFullName(), v19);
-                            }
-                            else {
-                                BSsprintf(Src, 64, "%s Earnings: ", SlotMachineMenu::pCasino->GetFormEditorID());
-                            }
-                            SlotMachineMenu::pMe->pTiles[2]->Set(g_slotMachineMenuTrait_Value, Src, true);
-                            Tile* TileByName =
-                                Tile::GetTileByName(SlotMachineMenu::pMe->pTiles[2], "SMM_TotalEarningsValue");
-                            TileByName->Set(4003, 0);
-                            SlotMachineMenu::pMe->UpdateEarningsString();
-                            const char* v21 = sSpinText.String();
-                            SlotMachineMenu::pMe->pTiles[3]->Set(4036, v21, true);
-                            const char* v22 = sIncreaseBetText.String();
-                            SlotMachineMenu::pMe->pTiles[4]->Set(4036, v22, true);
-                            const char* v23 = sDecreaseBetText.String();
-                            SlotMachineMenu::pMe->pTiles[5]->Set(4036, v23, true);
-                            const char* v24 = sPayoutListText.String();
-                            SlotMachineMenu::pMe->pTiles[6]->Set(4036, v24, true);
-                            const char* v25 = gs_sBetMax.String();
-                            SlotMachineMenu::pMe->pTiles[7]->Set(4036, v25, true);
-                            const char* v26 = sSlotPressAnyButtonText.String();
-                            SlotMachineMenu::pMe->pTiles[9]->Set(4036, v26, true);
-                            if (SlotMachineMenu::pMe->pTiles[8]) {
-                                const char* v27 = sExit.String();
-                                SlotMachineMenu::pMe->pTiles[8]->Set(4036, v27, true);
-                            }
-                            if (SlotMachineMenu::pMe->InitializeCasinoData()) {
-                                SlotMachineMenu::pMe->Prepare3DElements();
-                                SlotMachineMenu::pMe->PrepForVisibility(false);
-                                return ptile;
-                            }
-                            else {
-                                SlotMachineMenu::Close();
-                                return nullptr;
-                            }
-                        }
-                        else {
-                            Warning(
-                                "MENUS: SlotMachine Menu Creation Failed... Are your menu and art resources up to "
-                                "date?"
-                            );
-                            return nullptr;
-                        }
-                    }
-                    else {
-                        if (SlotMachineMenu::pMe) {
-                            if (SlotMachineMenu::pMe->pMenu) {
-                                if (SlotMachineMenu::pMe) {
-                                    delete SlotMachineMenu::pMe;
-                                }
-                            }
-                        }
-                        return nullptr;
-                    }
-                }
-            }
-            else {
-                char apText[264];
-                BSsprintf(apText, 260, sGamblingBrokeText.String());
+
+    CASINO_DATA* Data = &SlotMachineMenu::pCasino->data;
+    if (g_slotMachineCasinoStats->iTotalWinnings < Data->iMaxWinnings) {
+        TESCasinoChips* ChipType = SlotMachineMenu::pCasino->GetChipType();
+        if (pPlayer->GetInventoryObjectCount(ChipType) >= g_slotMachineMinBet) {
+            if (g_slotMachineCasinoStats->iTotalWinnings < aiMinWinnings && aiMinWinnings) {
+                char apString[264];
+                BSsprintf(apString, 260, sGamblingMinWinText.String());
                 Interface::ShowMessage(
-                    apText, 0, "Interface\\Icons\\Message Icons\\glow_message_vaultboy_surprised.dds", nullptr, 2.0f,
+                    apString, 0, "Interface\\Icons\\Message Icons\\glow_message_vaultboy_surprised.dds", nullptr, 2.0f,
                     false
                 );
-                BSAudio* v11 = &BSAudio::QInstance();
-                BSSoundHandle* v32 = v11->GetSoundHandleByName(&th_s, "UIPopUpMessageGeneral", 289u);
-                v32->Play(false);
+                BSAudio* v12 = &BSAudio::QInstance();
+                BSSoundHandle* v31 = v12->GetSoundHandleByName(&apResult, "UIPopUpMessageGeneral", 289u);
+                v31->Play(false);
                 return nullptr;
             }
-        }
-        else {
-            char apDest[264];
-            BSsprintf(apDest, 260, sGamblingBannedText.String());
-            Interface::ShowMessage(
-                apDest, 0, "Interface\\Icons\\Message Icons\\glow_message_vaultboy_surprised.dds", nullptr, 2.0f, false
-            );
-            BSAudio* v9 = &BSAudio::QInstance();
-            BSSoundHandle* v33 = v9->GetSoundHandleByName(&arHandle, "UIPopUpMessageGeneral", 289u);
-            v33->Play(false);
+
+            int32_t v13;
+            if (pold_menu_tile) {
+                delete pold_menu_tile;
+            }
+            Tile* ptile = pin->GetMenusRoot()->ReadFile("Data\\Menus\\slot_machine_menu.xml");
+            SlotMachineMenu::pMe = static_cast<SlotMachineMenu*>(ptile->GetMenu());
+            if (SlotMachineMenu::pMe &&
+                ((v13 = SlotMachineMenu::pMe->GetClass(), v13 == SlotMachineMenu::GetClassStatic()) &&
+                 SlotMachineMenu::pCasino)) {
+                SlotMachineMenu::pMe->SetMenuTile(static_cast<TileMenu*>(ptile), false);
+                if (SlotMachineMenu::pMe->IsWellFormedMenu()) {
+                    char Src[64];
+                    if (ptile->GetFloat(4007) == 6006.0 || ptile->GetFloat(4007) == 102.0) {
+                        float time = Tile::GetMaximumDepth();
+                        ptile->Set(4013, time, true);
+                    }
+                    BSAudio* v14 = &BSAudio::QInstance();
+                    BSSoundHandle* v30 = v14->GetSoundHandleByName(&v36, "GAMESlotsActivate", 289u);
+                    v30->Play(false);
+                    SlotMachineMenu::pMe->iLuckSkill = pPlayer->GetClampedActorValue(ActorValue::LUCK);
+                    SlotMachineMenu::pMe->iCurrentBet = g_slotMachineMinBet;
+                    const char* v15 = sCurrentBetText.String();
+                    SlotMachineMenu::pMe->pTiles[0]->Set(g_slotMachineMenuTrait_Value, v15, true);
+                    SlotMachineMenu::pMe->pTiles[0]->Poke(SlotMachineMenu::iUT_X, 1.0f);
+                    SlotMachineMenu::pMe->pTiles[0]->Set(SlotMachineMenu::iUT_X, g_slotMachineMinBet);
+                    const char* v16 = sChipCountText.String();
+                    SlotMachineMenu::pMe->pTiles[1]->Set(g_slotMachineMenuTrait_Value, v16, true);
+                    SlotMachineMenu::pMe->pTiles[1]->Poke(SlotMachineMenu::iUT_X, 1.0f);
+                    TESCasinoChips* v17 = SlotMachineMenu::pCasino->GetChipType();
+                    int32_t ItemCountinContainer = pPlayer->GetInventoryObjectCount(v17);
+                    SlotMachineMenu::pMe->pTiles[1]->Set(SlotMachineMenu::iUT_X, ItemCountinContainer);
+                    if (BSstrlen(SlotMachineMenu::pCasino->GetFullName())) {
+                        const char* v19 = sCasinoEarningsText.String();
+                        BSsprintf(Src, 64, "%s %s", SlotMachineMenu::pCasino->GetFullName(), v19);
+                    }
+                    else {
+                        BSsprintf(Src, 64, "%s Earnings: ", SlotMachineMenu::pCasino->GetFormEditorID());
+                    }
+                    SlotMachineMenu::pMe->pTiles[2]->Set(g_slotMachineMenuTrait_Value, Src, true);
+                    Tile* TileByName = Tile::GetTileByName(SlotMachineMenu::pMe->pTiles[2], "SMM_TotalEarningsValue");
+                    TileByName->Set(4003, 0);
+                    SlotMachineMenu::pMe->UpdateEarningsString();
+                    const char* v21 = sSpinText.String();
+                    SlotMachineMenu::pMe->pTiles[3]->Set(4036, v21, true);
+                    const char* v22 = sIncreaseBetText.String();
+                    SlotMachineMenu::pMe->pTiles[4]->Set(4036, v22, true);
+                    const char* v23 = sDecreaseBetText.String();
+                    SlotMachineMenu::pMe->pTiles[5]->Set(4036, v23, true);
+                    const char* v24 = sPayoutListText.String();
+                    SlotMachineMenu::pMe->pTiles[6]->Set(4036, v24, true);
+                    const char* v25 = gs_sBetMax.String();
+                    SlotMachineMenu::pMe->pTiles[7]->Set(4036, v25, true);
+                    const char* v26 = sSlotPressAnyButtonText.String();
+                    SlotMachineMenu::pMe->pTiles[9]->Set(4036, v26, true);
+                    if (SlotMachineMenu::pMe->pTiles[8]) {
+                        const char* v27 = sExit.String();
+                        SlotMachineMenu::pMe->pTiles[8]->Set(4036, v27, true);
+                    }
+                    if (SlotMachineMenu::pMe->InitializeCasinoData()) {
+                        SlotMachineMenu::pMe->Prepare3DElements();
+                        SlotMachineMenu::pMe->PrepForVisibility(false);
+                        return ptile;
+                    }
+
+                    SlotMachineMenu::Close();
+                    return nullptr;
+                }
+
+                Warning(
+                    "MENUS: SlotMachine Menu Creation Failed... Are your menu and art resources up to "
+                    "date?"
+                );
+                return nullptr;
+            }
+
+            if ((SlotMachineMenu::pMe) && (SlotMachineMenu::pMe->pMenu) && (SlotMachineMenu::pMe)) {
+                delete SlotMachineMenu::pMe;
+            }
+
             return nullptr;
         }
+
+        char apText[264];
+        BSsprintf(apText, 260, sGamblingBrokeText.String());
+        Interface::ShowMessage(
+            apText, 0, "Interface\\Icons\\Message Icons\\glow_message_vaultboy_surprised.dds", nullptr, 2.0f, false
+        );
+        BSAudio* v11 = &BSAudio::QInstance();
+        BSSoundHandle* v32 = v11->GetSoundHandleByName(&th_s, "UIPopUpMessageGeneral", 289u);
+        v32->Play(false);
+        return nullptr;
     }
+
+    char apDest[264];
+    BSsprintf(apDest, 260, sGamblingBannedText.String());
+    Interface::ShowMessage(
+        apDest, 0, "Interface\\Icons\\Message Icons\\glow_message_vaultboy_surprised.dds", nullptr, 2.0f, false
+    );
+    BSAudio* v9 = &BSAudio::QInstance();
+    BSSoundHandle* v33 = v9->GetSoundHandleByName(&arHandle, "UIPopUpMessageGeneral", 289u);
+    v33->Play(false);
+    return nullptr;
 }

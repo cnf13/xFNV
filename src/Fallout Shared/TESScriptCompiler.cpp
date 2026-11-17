@@ -236,10 +236,9 @@ bool ScriptCompiler::CompileLine(Script* apScript, ScriptCompileData* apCompileD
                 ScriptCompiler::ScriptError(apCompileData, "Syntax Error.  Invalid block type in 'begin' command.");
                 return false;
             }
-            else {
-                ScriptCompiler::ScriptError(apCompileData, "Syntax Error.  Missing block type in 'begin' command.");
-                return false;
-            }
+
+            ScriptCompiler::ScriptError(apCompileData, "Syntax Error.  Missing block type in 'begin' command.");
+            return false;
         }
         case FLOW_END: {
             if (ibeginEndJumpOffset) {
@@ -418,21 +417,19 @@ bool ScriptCompiler::CompileLine(Script* apScript, ScriptCompileData* apCompileD
                 );
                 return false;
             }
-            if (pFunctionDef_2->bReferenceFunction) {
-                if (apScriptLine->uiRefObjectIndex) {
-                    Script::RefVariable* pScriptRefObj =
-                        apCompileData->GetReferencedObject(apScriptLine->uiRefObjectIndex);
-                    if (!dynamic_cast<TESObjectREFR*>(pScriptRefObj->form) && !pScriptRefObj->varIdx) {
-                        ScriptCompiler::ScriptError(
-                            apCompileData,
-                            "Syntax error.  Invalid reference '%s' (only object references and reference variables are "
-                            "allowed in this context).",
-                            pScriptRefObj->name.String()
-                        );
-                        return false;
-                    }
+            if ((pFunctionDef_2->bReferenceFunction) && (apScriptLine->uiRefObjectIndex)) {
+                Script::RefVariable* pScriptRefObj = apCompileData->GetReferencedObject(apScriptLine->uiRefObjectIndex);
+                if (!dynamic_cast<TESObjectREFR*>(pScriptRefObj->form) && !pScriptRefObj->varIdx) {
+                    ScriptCompiler::ScriptError(
+                        apCompileData,
+                        "Syntax error.  Invalid reference '%s' (only object references and reference variables are "
+                        "allowed in this context).",
+                        pScriptRefObj->name.String()
+                    );
+                    return false;
                 }
             }
+
             if (pFunctionDef_2->pParameters) {
                 uint16_t sCount_2 = pFunctionDef_2->sParamCount;
                 if (!pFunctionDef_2->pCompileFunction(
@@ -469,10 +466,9 @@ bool ScriptCompiler::CompileLine(Script* apScript, ScriptCompileData* apCompileD
             LABEL_101:;
                 return true;
             }
-            else {
-                ScriptCompiler::ScriptError(apCompileData, "MAX_SCRIPT_SIZE exceeded.\r\nCompiled script not saved!");
-                return false;
-            }
+
+            ScriptCompiler::ScriptError(apCompileData, "MAX_SCRIPT_SIZE exceeded.\r\nCompiled script not saved!");
+            return false;
         }
     }
 }
@@ -1090,13 +1086,12 @@ bool ScriptCompiler::StandardCompile(
                 *reinterpret_cast<uint16_t*>(pActualParams) = sCurrentParam;
                 return true;
             }
-            else {
-                ScriptCompiler::ScriptError(
-                    apCompileData, "Missing parameter %s.\r\nCompiled script not saved!",
-                    apParameters[sCurrentParam].pParamName
-                );
-                return false;
-            }
+
+            ScriptCompiler::ScriptError(
+                apCompileData, "Missing parameter %s.\r\nCompiled script not saved!",
+                apParameters[sCurrentParam].pParamName
+            );
+            return false;
         }
         if (!bLookForVariable && (currentWord.uiRefObjectIndex || currentWord.cVariableType)) {
             ScriptCompiler::ScriptError(
@@ -1990,10 +1985,8 @@ bool ScriptCompileData::GetVariable(SCRIPT_WORD* apCurrentWord) {
             pScript = pRef->GetScriptPointer();
         }
         else {
-            if (apCurrentWord->pForm) {
-                if (apCurrentWord->pForm->GetFormType() == QUST_ID) {
-                    pScript = TESScriptableForm::GetFormScript(apCurrentWord->pForm);
-                }
+            if ((apCurrentWord->pForm) && (apCurrentWord->pForm->GetFormType() == QUST_ID)) {
+                pScript = TESScriptableForm::GetFormScript(apCurrentWord->pForm);
             }
         }
         if (pScript) {
@@ -2001,61 +1994,55 @@ bool ScriptCompileData::GetVariable(SCRIPT_WORD* apCurrentWord) {
             if (apCurrentWord->cVariableType) {
                 return true;
             }
-            else {
-                apCurrentWord->uiVariableID = 0;
-                return false;
-            }
-        }
-        else {
+
             apCurrentWord->uiVariableID = 0;
             return false;
         }
+
+        apCurrentWord->uiVariableID = 0;
+        return false;
     }
-    else {
-        if (apCurrentWord->uiRefObjectIndex) {
-            apCurrentWord->uiVariableID = 0;
-            apCurrentWord->cVariableType = 0;
-            return false;
-        }
-        else {
-            BSSimpleList<ScriptVariable*>* pList = &listVariables;
-            apCurrentWord->uiVariableID = 0;
-            while (pList && pList->m_item) {
-                ScriptVariable* pVar = pList->m_item;
-                if (!_strnicmp(pVar->cName.pString, apCurrentWord->pText, size)) {
-                    char nextchar = pVar->cName.pString[size];
-                    if (!std::isalnum(nextchar) && (nextchar != 45 && nextchar != 95)) {
-                        if (pVar->data.bIsInteger) {
-                            apCurrentWord->cVariableType = 115;
-                        }
-                        else {
-                            apCurrentWord->cVariableType = 102;
-                        }
-                        apCurrentWord->uiVariableID = pVar->data.uiID;
-                        return true;
-                    }
-                }
-                pList = pList->m_pkNext;
-            }
-            if (pCurrentScript &&
-                (apCurrentWord->cVariableType =
-                     pCurrentScript->FindVariable(apCurrentWord->pText, &apCurrentWord->uiVariableID)) != 0) {
-                return true;
-            }
-            else {
-                if (pDataHandler->GetGlobal(apCurrentWord->pText) && GetReferencedObject(apCurrentWord, false, false)) {
-                    apCurrentWord->uiVariableID = 0;
-                    apCurrentWord->cVariableType = 71;
-                    return true;
+
+    if (apCurrentWord->uiRefObjectIndex) {
+        apCurrentWord->uiVariableID = 0;
+        apCurrentWord->cVariableType = 0;
+        return false;
+    }
+
+    BSSimpleList<ScriptVariable*>* pList = &listVariables;
+    apCurrentWord->uiVariableID = 0;
+    while (pList && pList->m_item) {
+        ScriptVariable* pVar = pList->m_item;
+        if (!_strnicmp(pVar->cName.pString, apCurrentWord->pText, size)) {
+            char nextchar = pVar->cName.pString[size];
+            if (!std::isalnum(nextchar) && (nextchar != 45 && nextchar != 95)) {
+                if (pVar->data.bIsInteger) {
+                    apCurrentWord->cVariableType = 115;
                 }
                 else {
-                    apCurrentWord->uiVariableID = 0;
-                    apCurrentWord->cVariableType = 0;
-                    return false;
+                    apCurrentWord->cVariableType = 102;
                 }
+                apCurrentWord->uiVariableID = pVar->data.uiID;
+                return true;
             }
         }
+        pList = pList->m_pkNext;
     }
+    if (pCurrentScript &&
+        (apCurrentWord->cVariableType =
+             pCurrentScript->FindVariable(apCurrentWord->pText, &apCurrentWord->uiVariableID)) != 0) {
+        return true;
+    }
+
+    if (pDataHandler->GetGlobal(apCurrentWord->pText) && GetReferencedObject(apCurrentWord, false, false)) {
+        apCurrentWord->uiVariableID = 0;
+        apCurrentWord->cVariableType = 71;
+        return true;
+    }
+
+    apCurrentWord->uiVariableID = 0;
+    apCurrentWord->cVariableType = 0;
+    return false;
 }
 
 bool ScriptCompileData::GetReferencedObject(SCRIPT_WORD* apCurrentWord, bool abAddRefVariable, bool abAllowUnknownRef) {

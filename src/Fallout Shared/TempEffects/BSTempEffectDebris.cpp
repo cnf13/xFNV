@@ -80,12 +80,11 @@ BSTempEffectDebris::~BSTempEffectDebris() {
     if (pFilename) {
         pModelLoader->ReleaseModel(pFilename, false, 1u);
     }
-    if (sp3D.m_pObject) {
-        if (sp3D.m_pObject->m_pkParent) {
-            NiNode* pParent = sp3D.m_pObject->m_pkParent;
-            pParent->DetachChild(sp3D.m_pObject);
-        }
+    if ((sp3D.m_pObject) && (sp3D.m_pObject->m_pkParent)) {
+        NiNode* pParent = sp3D.m_pObject->m_pkParent;
+        pParent->DetachChild(sp3D.m_pObject);
     }
+
     if (iNumHWThreads == 1) {
         bhkWorld::Activate(sp3D.m_pObject, true, true, false);
         bhkWorld::RemoveObjects(sp3D.m_pObject, true, false);
@@ -174,28 +173,26 @@ void BSTempEffectDebris::Init(
         BSCloningProcess cloneProcess(1.0f);
         sp3D.operator=(static_cast<NiAVObject*>(pmodel->Clone(cloneProcess)));
     }
-    if (sp3D.m_pObject) {
-        if (pCell) {
-            NiNode* psceneParent = static_cast<NiNode*>(pCell->GetDynamicNode());
-            if (psceneParent) {
-                NiAVObject* v8 = sp3D.m_pObject;
-                psceneParent->AttachChild(v8, 1);
-            }
-            sp3D.m_pObject->SetTranslate(aPosition);
-            sp3D.m_pObject->SetRotate(aRotation);
-            sp3D.m_pObject->SetScale(afScale);
-            BSShaderManager::SetObjectTypeRecurse(sp3D.m_pObject, BSShaderManager::BSSM_OBJ_MISC);
-            InitHavok(apSourceRef);
-            sp3D.m_pObject->UpdateProperties();
-            NiUpdateData UpdateData(fCellAppTime, true, false);
-            sp3D.m_pObject->Update(UpdateData);
-            TESHavokUtilities::AddVelocity(sp3D.m_pObject, aStartLinearVelocity, true);
-            TESHavokUtilities::AddAngularVelocity(sp3D.m_pObject, aStartAngularVelocity, true);
-            ReferenceProcessLists.AddTempEffect(this);
-            if (bUseDebrisCounter) {
-                BSTempEffectDebris::AddtoDebrisCounter(this);
-                BSTempEffectDebris::LimitDebrisObjects();
-            }
+    if ((sp3D.m_pObject) && (pCell)) {
+        NiNode* psceneParent = static_cast<NiNode*>(pCell->GetDynamicNode());
+        if (psceneParent) {
+            NiAVObject* v8 = sp3D.m_pObject;
+            psceneParent->AttachChild(v8, 1);
+        }
+        sp3D.m_pObject->SetTranslate(aPosition);
+        sp3D.m_pObject->SetRotate(aRotation);
+        sp3D.m_pObject->SetScale(afScale);
+        BSShaderManager::SetObjectTypeRecurse(sp3D.m_pObject, BSShaderManager::BSSM_OBJ_MISC);
+        InitHavok(apSourceRef);
+        sp3D.m_pObject->UpdateProperties();
+        NiUpdateData UpdateData(fCellAppTime, true, false);
+        sp3D.m_pObject->Update(UpdateData);
+        TESHavokUtilities::AddVelocity(sp3D.m_pObject, aStartLinearVelocity, true);
+        TESHavokUtilities::AddAngularVelocity(sp3D.m_pObject, aStartAngularVelocity, true);
+        ReferenceProcessLists.AddTempEffect(this);
+        if (bUseDebrisCounter) {
+            BSTempEffectDebris::AddtoDebrisCounter(this);
+            BSTempEffectDebris::LimitDebrisObjects();
         }
     }
 }
@@ -210,19 +207,12 @@ void BSTempEffectDebris::InitHavok(TESObjectREFR* apSourceRef) {
         }
         else {
             pn = proot->IsNode();
-            if (!bhkNiCollisionObject::GetbhkNiCollisionObject(pav)) {
-                if (pn) {
-                    if (pn->GetArrayCount()) {
-                        if (pn->GetAt(0)) {
-                            pav = pn->GetAt(0);
-                            bhkNiCollisionObject* pcol = bhkNiCollisionObject::GetbhkNiCollisionObject(pav);
-                            if (!pcol && pn->GetArrayCount() > 1) {
-                                if (pn->GetAt(1u)) {
-                                    pav = pn->GetAt(1u);
-                                }
-                            }
-                        }
-                    }
+            if ((!bhkNiCollisionObject::GetbhkNiCollisionObject(pav)) && (pn) && (pn->GetArrayCount()) &&
+                (pn->GetAt(0))) {
+                pav = pn->GetAt(0);
+                bhkNiCollisionObject* pcol = bhkNiCollisionObject::GetbhkNiCollisionObject(pav);
+                if ((!pcol && pn->GetArrayCount() > 1) && (pn->GetAt(1u))) {
+                    pav = pn->GetAt(1u);
                 }
             }
         }
@@ -231,15 +221,14 @@ void BSTempEffectDebris::InitHavok(TESObjectREFR* apSourceRef) {
             if (pcell) {
                 bhkWorld* pw = pcell->GetbhkWorld();
                 if (pw) {
-                    if (apSourceRef) {
-                        if (apSourceRef->IsActor()) {
-                            // GetCollisionFilter fills kFilter and returns its address, which GetGroup is called on.
-                            CFilter kFilter;
-                            static_cast<MobileObject*>(apSourceRef)->MobileObject::GetCollisionFilter(&kFilter.iFilter);
-                            uint32_t Group = kFilter.GetGroup();
-                            bhkWorld::SetGroup(pav, Group, true, true);
-                        }
+                    if ((apSourceRef) && (apSourceRef->IsActor())) {
+                        // GetCollisionFilter fills kFilter and returns its address, which GetGroup is called on.
+                        CFilter kFilter;
+                        static_cast<MobileObject*>(apSourceRef)->MobileObject::GetCollisionFilter(&kFilter.iFilter);
+                        uint32_t Group = kFilter.GetGroup();
+                        bhkWorld::SetGroup(pav, Group, true, true);
                     }
+
                     pw->AddObjectsAndMoveController(pav, proot);
                 }
             }
@@ -254,33 +243,29 @@ void BSTempEffectDebris::AddtoDebrisCounter(BSTempEffectDebris* abDebrisObject) 
 }
 
 void BSTempEffectDebris::RemoveFromDebrisCounter(BSTempEffectDebris* abDebrisObject) {
-    if (abDebrisObject) {
-        if (!DebrisLimitList.IsEmpty()) {
-            bool bFound = false;
-            void* iter = DebrisLimitList.m_pkTail;
-            while (iter && !bFound) {
-                if (DebrisLimitList.Get(iter) == abDebrisObject) {
-                    DebrisLimitList.RemovePos(iter);
-                    bFound = true;
-                }
-                else {
-                    DebrisLimitList.GetPrev(iter);
-                }
+    if ((abDebrisObject) && (!DebrisLimitList.IsEmpty())) {
+        bool bFound = false;
+        void* iter = DebrisLimitList.m_pkTail;
+        while (iter && !bFound) {
+            if (DebrisLimitList.Get(iter) == abDebrisObject) {
+                DebrisLimitList.RemovePos(iter);
+                bFound = true;
+            }
+            else {
+                DebrisLimitList.GetPrev(iter);
             }
         }
     }
 }
 
 void BSTempEffectDebris::LimitDebrisObjects() {
-    if (!DebrisLimitList.IsEmpty()) {
-        if (DebrisLimitList.m_uiCount > iDebrisMaxCount.Int()) {
-            int32_t ikill = DebrisLimitList.m_uiCount - iDebrisMaxCount.Int();
-            for (void* iter = DebrisLimitList.m_pkTail; iter && ikill > 0; iter = DebrisLimitList.GetPrevPos(iter)) {
-                BSTempEffectDebris* pdebris = DebrisLimitList.Get(iter);
-                if (pdebris) {
-                    pdebris->SetForceDelete(true);
-                    --ikill;
-                }
+    if ((!DebrisLimitList.IsEmpty()) && (DebrisLimitList.m_uiCount > iDebrisMaxCount.Int())) {
+        int32_t ikill = DebrisLimitList.m_uiCount - iDebrisMaxCount.Int();
+        for (void* iter = DebrisLimitList.m_pkTail; iter && ikill > 0; iter = DebrisLimitList.GetPrevPos(iter)) {
+            BSTempEffectDebris* pdebris = DebrisLimitList.Get(iter);
+            if (pdebris) {
+                pdebris->SetForceDelete(true);
+                --ikill;
             }
         }
     }

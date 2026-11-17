@@ -53,10 +53,9 @@ NiObject* NiMultiTargetTransformController::CreateClone(NiCloningProcess& kCloni
         CopyMembers(v4, kCloning);
         return v4;
     }
-    else {
-        CopyMembers(nullptr, kCloning);
-        return nullptr;
-    }
+
+    CopyMembers(nullptr, kCloning);
+    return nullptr;
 }
 
 // The targets are taken as they resolve, without a type check.

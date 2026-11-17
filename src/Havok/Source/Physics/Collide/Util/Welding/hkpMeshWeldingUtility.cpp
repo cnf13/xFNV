@@ -253,10 +253,9 @@ uint8_t* isSameTriangle(uint8_t* a1, const hkpTriangleShape* a2, const hkpTriang
         *a1 = 1;
         return a1;
     }
-    else {
-        *a1 = 0;
-        return a1;
-    }
+
+    *a1 = 0;
+    return a1;
 }
 
 // Whether both points are vertices of the triangle, each within 0.001 in x, y and z.
@@ -292,10 +291,9 @@ uint8_t* triangleHasVertices(uint8_t* a1, const hkVector4* a2, const hkVector4* 
         *a1 = 1;
         return a1;
     }
-    else {
-        *a1 = 0;
-        return a1;
-    }
+
+    *a1 = 0;
+    return a1;
 }
 
 // Whether two directions are almost perpendicular: |dot3| below 0.05.
@@ -446,9 +444,8 @@ int32_t hkpMeshWeldingUtility::calcEdgeAngleBitcode(float cosAngle) {
     if ((!(v1 > 0.0)) || (v5 == v1)) {
         return v2;
     }
-    else {
-        return v2 - 1;
-    }
+
+    return v2 - 1;
 }
 
 // KEEP: an uninitialised read. createSingularVertexArray writes sharedIndices[j] only for the edge vertex one of the
@@ -995,9 +992,8 @@ int32_t hkpMeshWeldingUtility::calcEdgeAngleBitcode(hkVector4* a1) {
     if (!(v1 > 0.0) || a3 == v1) {
         return v2;
     }
-    else {
-        return v2 - 1;
-    }
+
+    return v2 - 1;
 }
 
 void hkHistogram::addEntry(float lo, float hi, float value) {

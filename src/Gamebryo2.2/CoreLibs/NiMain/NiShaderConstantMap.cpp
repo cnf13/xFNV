@@ -124,9 +124,8 @@ bool NiShaderConstantMap::LookUpPredefinedMapping(
             uiMappingID = v5->m_uiMappingID;
             return true;
         }
-        else {
-            return false;
-        }
+
+        return false;
     }
     return result;
 }
@@ -345,14 +344,13 @@ NiDynamicEffect* NiShaderConstantMap::GetDynamicEffectForObject(
             while (true) {
                 v14 = m_pProjShadowList->m_pItem;
                 m_pProjShadowList = m_pProjShadowList->m_pNext;
-                if (v14) {
-                    if (v14->m_bOn) {
-                        int32_t v15 = v13++;
-                        if (v15 == uiObjectIndex) {
-                            break;
-                        }
+                if ((v14) && (v14->m_bOn)) {
+                    int32_t v15 = v13++;
+                    if (v15 == uiObjectIndex) {
+                        break;
                     }
                 }
+
                 if (!m_pProjShadowList) {
                     return nullptr;
                 }
@@ -388,14 +386,13 @@ NiDynamicEffect* NiShaderConstantMap::GetDynamicEffectForObject(
     while (true) {
         v14 = m_pProjLightList->m_pItem;
         m_pProjLightList = m_pProjLightList->m_pNext;
-        if (v14) {
-            if (v14->m_bOn) {
-                int32_t v18 = v17++;
-                if (v18 == uiObjectIndex) {
-                    break;
-                }
+        if ((v14) && (v14->m_bOn)) {
+            int32_t v18 = v17++;
+            if (v18 == uiObjectIndex) {
+                break;
             }
         }
+
         if (!m_pProjLightList) {
             return nullptr;
         }
@@ -449,18 +446,15 @@ bool NiShaderConstantMap::ParseKeyName(
     strcpy_s(Str, 260, pszOrigName);
     strcpy_s(pszTrueName, 260, pszOrigName);
     char* v5 = std::strchr(Str, 95);
-    if (v5) {
-        if (std::isdigit(v5[1])) {
-            if (!v5[2]) {
-                char* v7 = strtok_s(Str, "_", &Context);
-                char* v8 = strtok_s(nullptr, "_", &Context);
-                if (v8) {
-                    uiRegisterCount = std::atoi(v8);
-                    NiStrcpy(pszTrueName, uiMaxLen, v7);
-                }
-            }
+    if ((v5) && (std::isdigit(v5[1])) && (!v5[2])) {
+        char* v7 = strtok_s(Str, "_", &Context);
+        char* v8 = strtok_s(nullptr, "_", &Context);
+        if (v8) {
+            uiRegisterCount = std::atoi(v8);
+            NiStrcpy(pszTrueName, uiMaxLen, v7);
         }
     }
+
     return true;
 }
 

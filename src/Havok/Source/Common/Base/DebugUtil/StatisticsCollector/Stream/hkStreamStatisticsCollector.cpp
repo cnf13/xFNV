@@ -91,40 +91,40 @@ void hkStreamStatisticsCollector::addReferencedObject(
     int32_t flags
 ) {
     // EXE-INLINED none: hkStreamStatisticsCollector::hasSpace
-    if (m_stream.getCapacity() > m_stream.getSize() + static_cast<int32_t>(sizeof(Command)) + 64) {
-        // EXE-INLINED none: hkStreamStatisticsCollector::_isKnown
-        if (obj && m_knownObjects.getWithDefault(obj, 0) == 0) {
-            // EXE-INLINED none: hkStreamStatisticsCollector::_addKnown
-            m_knownObjects.insert(obj, 1);
-            if ((flags & 1) != 0) {
-                obj->calcContentStatistics(this, findClassType(obj));
-            }
-            else {
-                int32_t iSize = getReferencedObjectSize(obj);
-                _startObject(fieldName, obj, iSize);
-                obj->calcContentStatistics(this, findClassType(obj));
-                _endObject();
-            }
+    if ((m_stream.getCapacity() > m_stream.getSize() + static_cast<int32_t>(sizeof(Command)) + 64) &&
+        (obj && m_knownObjects.getWithDefault(obj, 0) == 0))
+    // EXE-INLINED none: hkStreamStatisticsCollector::_isKnown
+    {
+        // EXE-INLINED none: hkStreamStatisticsCollector::_addKnown
+        m_knownObjects.insert(obj, 1);
+        if ((flags & 1) != 0) {
+            obj->calcContentStatistics(this, findClassType(obj));
+        }
+        else {
+            int32_t iSize = getReferencedObjectSize(obj);
+            _startObject(fieldName, obj, iSize);
+            obj->calcContentStatistics(this, findClassType(obj));
+            _endObject();
         }
     }
 }
 
 void hkStreamStatisticsCollector::addObject(const hkClass& cls, const char* fieldName, const void* obj, int32_t flags) {
     // EXE-INLINED none: hkStreamStatisticsCollector::hasSpace
-    if (m_stream.getCapacity() > m_stream.getSize() + static_cast<int32_t>(sizeof(Command)) + 64) {
-        // EXE-INLINED none: hkStreamStatisticsCollector::_isKnown
-        if (obj && m_knownObjects.getWithDefault(obj, 0) == 0) {
-            // EXE-INLINED none: hkStreamStatisticsCollector::_addKnown
-            m_knownObjects.insert(obj, 1);
-            if ((flags & 1) != 0) {
-                hkStatisticsCollectorUtil::addClassContentsAll(obj, cls, this);
-            }
-            else {
-                int32_t iSize = cls.getObjectSize();
-                _startObject(fieldName, obj, iSize);
-                hkStatisticsCollectorUtil::addClassContentsAll(obj, cls, this);
-                _endObject();
-            }
+    if ((m_stream.getCapacity() > m_stream.getSize() + static_cast<int32_t>(sizeof(Command)) + 64) &&
+        (obj && m_knownObjects.getWithDefault(obj, 0) == 0))
+    // EXE-INLINED none: hkStreamStatisticsCollector::_isKnown
+    {
+        // EXE-INLINED none: hkStreamStatisticsCollector::_addKnown
+        m_knownObjects.insert(obj, 1);
+        if ((flags & 1) != 0) {
+            hkStatisticsCollectorUtil::addClassContentsAll(obj, cls, this);
+        }
+        else {
+            int32_t iSize = cls.getObjectSize();
+            _startObject(fieldName, obj, iSize);
+            hkStatisticsCollectorUtil::addClassContentsAll(obj, cls, this);
+            _endObject();
         }
     }
 }
@@ -137,27 +137,26 @@ void hkStreamStatisticsCollector::addChunk(
     int32_t allocSize
 ) {
     // EXE-INLINED none: hkStreamStatisticsCollector::hasSpace
-    if (m_stream.getCapacity() > m_stream.getSize() + static_cast<int32_t>(sizeof(Command)) + 64) {
-        if (usedSize || allocSize) {
-            int32_t aiSize = 0;
-            int32_t iPad = 0;
-            if (name) {
-                aiSize = hkString::strLen(name) + 1;
-                iPad = aiSize % 2;
-            }
-            Command* pCmd = _newCommand(aiSize + iPad, &m_stream);
-            pCmd->m_cmd = 'C';
-            pCmd->m_slen = iPad + aiSize;
-            pCmd->m_memSize = usedSize;
-            pCmd->m_allocSize =
-                allocSize ? hkMemoryRouter::getInstance().heap().getAllocatedSize(chunkAddress, allocSize) : 0;
-            // The name follows the Command in the stream's untyped bytes.
-            char* pName = reinterpret_cast<char*>(pCmd) + sizeof(Command);
-            if (aiSize > 0) {
-                hkString::memCpy(pName, name, aiSize);
-                if (iPad) {
-                    pName[aiSize] = 0;
-                }
+    if ((m_stream.getCapacity() > m_stream.getSize() + static_cast<int32_t>(sizeof(Command)) + 64) &&
+        (usedSize || allocSize)) {
+        int32_t aiSize = 0;
+        int32_t iPad = 0;
+        if (name) {
+            aiSize = hkString::strLen(name) + 1;
+            iPad = aiSize % 2;
+        }
+        Command* pCmd = _newCommand(aiSize + iPad, &m_stream);
+        pCmd->m_cmd = 'C';
+        pCmd->m_slen = iPad + aiSize;
+        pCmd->m_memSize = usedSize;
+        pCmd->m_allocSize =
+            allocSize ? hkMemoryRouter::getInstance().heap().getAllocatedSize(chunkAddress, allocSize) : 0;
+        // The name follows the Command in the stream's untyped bytes.
+        char* pName = reinterpret_cast<char*>(pCmd) + sizeof(Command);
+        if (aiSize > 0) {
+            hkString::memCpy(pName, name, aiSize);
+            if (iPad) {
+                pName[aiSize] = 0;
             }
         }
     }

@@ -35,12 +35,10 @@ BSDLCSystemUtility::~BSDLCSystemUtility() {
 
 // The PC opens the Steam overlay's store page of the running app.
 void BSDLCSystemUtility::ShowMarketplace(uint32_t anPlayerIndex) {
-    if (SteamFriends()) {
-        if (SteamUtils()) {
-            ISteamUtils* pUtils = SteamUtils();
-            ISteamFriends* pFriends = SteamFriends();
-            pFriends->ActivateGameOverlayToStore(pUtils->GetAppID());
-        }
+    if ((SteamFriends()) && (SteamUtils())) {
+        ISteamUtils* pUtils = SteamUtils();
+        ISteamFriends* pFriends = SteamFriends();
+        pFriends->ActivateGameOverlayToStore(pUtils->GetAppID());
     }
 }
 

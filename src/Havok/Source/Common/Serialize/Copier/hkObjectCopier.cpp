@@ -885,9 +885,8 @@ int32_t hkObjectCopier::getNumElements(const hkClassMember& member) {
     if (member.getCstyleArraySize()) {
         return member.getCstyleArraySize();
     }
-    else {
-        return 1;
-    }
+
+    return 1;
 }
 
 // Writes nelem plain members of msize bytes each. The vector and matrix types go out as their 4-byte reals, so that a

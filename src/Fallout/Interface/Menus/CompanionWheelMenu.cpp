@@ -181,14 +181,13 @@ void CompanionWheelMenu::DoIdle() {
     char v8 = 0;
     float sThumbLX = 0.0f;
     float sThumbLY = 0.0f;
-    if (m_nTimeToClearSubtitle) {
-        if (BSGetTickCount() > m_nTimeToClearSubtitle) {
-            m_nTimeToClearSubtitle = 0;
-            if (pTiles[12]) {
-                pTiles[12]->Set(4036, "", true);
-            }
+    if ((m_nTimeToClearSubtitle) && (BSGetTickCount() > m_nTimeToClearSubtitle)) {
+        m_nTimeToClearSubtitle = 0;
+        if (pTiles[12]) {
+            pTiles[12]->Set(4036, "", true);
         }
     }
+
     if (Interface::IsTopMenuID(Interface::eCompanionWheelMenu)) {
         InterfaceManager::Instance();
         if (InterfaceManager::Has360Controller()) {
@@ -247,12 +246,12 @@ bool CompanionWheelMenu::DoGamepad(int32_t aiButton, float afValue) {
         }
         return true;
     }
-    else {
-        if (aiButton == 10) {
-            DoClick(11, pTiles[11]);
-            return true;
-        }
+
+    if (aiButton == 10) {
+        DoClick(11, pTiles[11]);
+        return true;
     }
+
     return (bool)v5;
 }
 
@@ -291,20 +290,17 @@ void CompanionWheelMenu::RunTopicScript(TESTopic* a2) {
     }
     if (matchingInfo_1) {
         resultScript = matchingInfo_1->GetResultScript(TIRS_BEGIN);
-        if (resultScript) {
-            if (resultScript->GetHeader()->dataSize) {
-                extraDataList = m_pRelatedCompanion->TESObjectREFR::GetExtra();
-                scriptLocals = extraDataList->GetScriptLocals();
-                resultScript->Run(m_pRelatedCompanion, scriptLocals, nullptr, true);
-            }
+        if ((resultScript) && (resultScript->GetHeader()->dataSize)) {
+            extraDataList = m_pRelatedCompanion->TESObjectREFR::GetExtra();
+            scriptLocals = extraDataList->GetScriptLocals();
+            resultScript->Run(m_pRelatedCompanion, scriptLocals, nullptr, true);
         }
+
         v8 = matchingInfo_1->GetResultScript(TIRS_END);
-        if (v8) {
-            if (v8->GetHeader()->dataSize) {
-                v3 = m_pRelatedCompanion->TESObjectREFR::GetExtra();
-                v5 = v3->GetScriptLocals();
-                v8->Run(m_pRelatedCompanion, v5, nullptr, true);
-            }
+        if ((v8) && (v8->GetHeader()->dataSize)) {
+            v3 = m_pRelatedCompanion->TESObjectREFR::GetExtra();
+            v5 = v3->GetScriptLocals();
+            v8->Run(m_pRelatedCompanion, v5, nullptr, true);
         }
     }
 }
@@ -427,11 +423,10 @@ void CompanionWheelMenu::HandleMouseoverForTile(int32_t aiID, uint8_t a2) {
         BSAudio* v3 = &BSAudio::QInstance();
         BSSoundHandle* SoundHandleByName = v3->GetSoundHandleByName(&a1, "UIPipBoyScroll", 289u);
         SoundHandleByName->Play(false);
-        if (m_CurrentlySelectedTile != CompanionWheelMenu::TI_NO_TILE) {
-            if (pTiles[m_CurrentlySelectedTile]) {
-                pTiles[m_CurrentlySelectedTile]->Set(Tile::kTileValue_User10, 0);
-            }
+        if ((m_CurrentlySelectedTile != CompanionWheelMenu::TI_NO_TILE) && (pTiles[m_CurrentlySelectedTile])) {
+            pTiles[m_CurrentlySelectedTile]->Set(Tile::kTileValue_User10, 0);
         }
+
         switch (m_CurrentlySelectedTile) {
             case CompanionWheelMenu::TI_AGGRESSIVE_PASSIVE_BUTTON: {
                 if (pTiles[m_CurrentlySelectedTile]) {
@@ -468,11 +463,10 @@ void CompanionWheelMenu::HandleMouseoverForTile(int32_t aiID, uint8_t a2) {
             }
         }
         m_CurrentlySelectedTile = static_cast<CompanionWheelMenu::TILE_INDEX>(aiID);
-        if (m_CurrentlySelectedTile != CompanionWheelMenu::TI_NO_TILE) {
-            if (pTiles[m_CurrentlySelectedTile]) {
-                pTiles[m_CurrentlySelectedTile]->Set(Tile::kTileValue_User10, 1);
-            }
+        if ((m_CurrentlySelectedTile != CompanionWheelMenu::TI_NO_TILE) && (pTiles[m_CurrentlySelectedTile])) {
+            pTiles[m_CurrentlySelectedTile]->Set(Tile::kTileValue_User10, 1);
         }
+
         switch (aiID) {
             case 0: {
                 const char* v8;
@@ -683,124 +677,122 @@ void CompanionWheelMenu::Do_ToggleStayFollow() {
 }
 
 void CompanionWheelMenu::Do_UseStim() {
-    if (this->m_pRelatedCompanion) {
-        if (pPlayer) {
-            TESForm* DefaultObject = BGSDefaultObjectManager::GetDefaultObject(DO_STIMPAK);
-            TESBoundObject* apObject = dynamic_cast<TESBoundObject*>(DefaultObject);
-            if (apObject) {
-                ItemChange* InventoryItem_0 = pPlayer->GetInventoryItem(apObject, 0);
-                if (InventoryItem_0) {
-                    double BodyPartCondition;
-                    double v3;
-                    double v4;
-                    double v5;
-                    double v6;
-                    double v7;
-                    float HealthPercentage = this->m_pRelatedCompanion->GetHealthPercentage();
-                    int32_t v20 = 0;
-                    Actor* m_pRelatedCompanion = this->m_pRelatedCompanion;
-                    if (m_pRelatedCompanion) {
-                        BodyPartCondition = CombatFormulas::GetBodyPartCondition(
-                            m_pRelatedCompanion, ActorValue::LEFT_ATTACK_CONDITION, false
-                        );
-                    }
-                    else {
-                        BodyPartCondition =
-                            CombatFormulas::GetBodyPartCondition(nullptr, ActorValue::LEFT_ATTACK_CONDITION, false);
-                    }
-                    float v24 = BodyPartCondition;
-                    if (v24 == 0.0) {
-                        v20 = 1;
-                    }
-                    Actor* v16 = this->m_pRelatedCompanion;
-                    if (v16) {
-                        v3 = CombatFormulas::GetBodyPartCondition(v16, ActorValue::LEFT_MOBILITY_CONDITION, false);
-                    }
-                    else {
-                        v3 = CombatFormulas::GetBodyPartCondition(nullptr, ActorValue::LEFT_MOBILITY_CONDITION, false);
-                    }
-                    float v27 = v3;
-                    if (v27 == 0.0) {
-                        ++v20;
-                    }
-                    Actor* v15 = this->m_pRelatedCompanion;
-                    if (v15) {
-                        v4 = CombatFormulas::GetBodyPartCondition(v15, ActorValue::RIGHT_MOBILITY_CONDITION, false);
-                    }
-                    else {
-                        v4 = CombatFormulas::GetBodyPartCondition(nullptr, ActorValue::RIGHT_MOBILITY_CONDITION, false);
-                    }
-                    float v25 = v4;
-                    if (v25 == 0.0) {
-                        ++v20;
-                    }
-                    Actor* v14 = this->m_pRelatedCompanion;
-                    if (v14) {
-                        v5 = CombatFormulas::GetBodyPartCondition(v14, ActorValue::RIGHT_ATTACK_CONDITION, false);
-                    }
-                    else {
-                        v5 = CombatFormulas::GetBodyPartCondition(nullptr, ActorValue::RIGHT_ATTACK_CONDITION, false);
-                    }
-                    float v21 = v5;
-                    if (v21 == 0.0) {
-                        ++v20;
-                    }
-                    Actor* v13 = this->m_pRelatedCompanion;
-                    if (v13) {
-                        v6 = CombatFormulas::GetBodyPartCondition(v13, ActorValue::PERCEPTION_CONDITION, false);
-                    }
-                    else {
-                        v6 = CombatFormulas::GetBodyPartCondition(nullptr, ActorValue::PERCEPTION_CONDITION, false);
-                    }
-                    float v23 = v6;
-                    if (v23 == 0.0) {
-                        ++v20;
-                    }
-                    Actor* v12 = this->m_pRelatedCompanion;
-                    if (v12) {
-                        v7 = CombatFormulas::GetBodyPartCondition(v12, ActorValue::ENDURANCE_CONDITION, false);
-                    }
-                    else {
-                        v7 = CombatFormulas::GetBodyPartCondition(nullptr, ActorValue::ENDURANCE_CONDITION, false);
-                    }
-                    float v26 = v7;
-                    if (v26 == 0.0) {
-                        ++v20;
-                    }
-                    if (HealthPercentage < 1.0 || v20 > 0) {
-                        ExtraDataList* m_item;
-                        if (HealthPercentage < 1.0) {
-                            ExtraDataList* apList;
-                            if (InventoryItem_0->pExtraObjectList) {
-                                apList = InventoryItem_0->pExtraObjectList->m_item;
-                            }
-                            else {
-                                apList = nullptr;
-                            }
-                            AlchemyItem* v8 = dynamic_cast<AlchemyItem*>(InventoryItem_0->pContainerObj);
-                            this->m_pRelatedCompanion->DrinkPotion(v8, apList, true);
-                        }
+    if ((this->m_pRelatedCompanion) && (pPlayer)) {
+        TESForm* DefaultObject = BGSDefaultObjectManager::GetDefaultObject(DO_STIMPAK);
+        TESBoundObject* apObject = dynamic_cast<TESBoundObject*>(DefaultObject);
+        if (apObject) {
+            ItemChange* InventoryItem_0 = pPlayer->GetInventoryItem(apObject, 0);
+            if (InventoryItem_0) {
+                double BodyPartCondition;
+                double v3;
+                double v4;
+                double v5;
+                double v6;
+                double v7;
+                float HealthPercentage = this->m_pRelatedCompanion->GetHealthPercentage();
+                int32_t v20 = 0;
+                Actor* m_pRelatedCompanion = this->m_pRelatedCompanion;
+                if (m_pRelatedCompanion) {
+                    BodyPartCondition = CombatFormulas::GetBodyPartCondition(
+                        m_pRelatedCompanion, ActorValue::LEFT_ATTACK_CONDITION, false
+                    );
+                }
+                else {
+                    BodyPartCondition =
+                        CombatFormulas::GetBodyPartCondition(nullptr, ActorValue::LEFT_ATTACK_CONDITION, false);
+                }
+                float v24 = BodyPartCondition;
+                if (v24 == 0.0) {
+                    v20 = 1;
+                }
+                Actor* v16 = this->m_pRelatedCompanion;
+                if (v16) {
+                    v3 = CombatFormulas::GetBodyPartCondition(v16, ActorValue::LEFT_MOBILITY_CONDITION, false);
+                }
+                else {
+                    v3 = CombatFormulas::GetBodyPartCondition(nullptr, ActorValue::LEFT_MOBILITY_CONDITION, false);
+                }
+                float v27 = v3;
+                if (v27 == 0.0) {
+                    ++v20;
+                }
+                Actor* v15 = this->m_pRelatedCompanion;
+                if (v15) {
+                    v4 = CombatFormulas::GetBodyPartCondition(v15, ActorValue::RIGHT_MOBILITY_CONDITION, false);
+                }
+                else {
+                    v4 = CombatFormulas::GetBodyPartCondition(nullptr, ActorValue::RIGHT_MOBILITY_CONDITION, false);
+                }
+                float v25 = v4;
+                if (v25 == 0.0) {
+                    ++v20;
+                }
+                Actor* v14 = this->m_pRelatedCompanion;
+                if (v14) {
+                    v5 = CombatFormulas::GetBodyPartCondition(v14, ActorValue::RIGHT_ATTACK_CONDITION, false);
+                }
+                else {
+                    v5 = CombatFormulas::GetBodyPartCondition(nullptr, ActorValue::RIGHT_ATTACK_CONDITION, false);
+                }
+                float v21 = v5;
+                if (v21 == 0.0) {
+                    ++v20;
+                }
+                Actor* v13 = this->m_pRelatedCompanion;
+                if (v13) {
+                    v6 = CombatFormulas::GetBodyPartCondition(v13, ActorValue::PERCEPTION_CONDITION, false);
+                }
+                else {
+                    v6 = CombatFormulas::GetBodyPartCondition(nullptr, ActorValue::PERCEPTION_CONDITION, false);
+                }
+                float v23 = v6;
+                if (v23 == 0.0) {
+                    ++v20;
+                }
+                Actor* v12 = this->m_pRelatedCompanion;
+                if (v12) {
+                    v7 = CombatFormulas::GetBodyPartCondition(v12, ActorValue::ENDURANCE_CONDITION, false);
+                }
+                else {
+                    v7 = CombatFormulas::GetBodyPartCondition(nullptr, ActorValue::ENDURANCE_CONDITION, false);
+                }
+                float v26 = v7;
+                if (v26 == 0.0) {
+                    ++v20;
+                }
+                if (HealthPercentage < 1.0 || v20 > 0) {
+                    ExtraDataList* m_item;
+                    if (HealthPercentage < 1.0) {
+                        ExtraDataList* apList;
                         if (InventoryItem_0->pExtraObjectList) {
-                            m_item = InventoryItem_0->pExtraObjectList->m_item;
+                            apList = InventoryItem_0->pExtraObjectList->m_item;
                         }
                         else {
-                            m_item = nullptr;
+                            apList = nullptr;
                         }
-                        TESBoundObject* FormFlags = InventoryItem_0->pContainerObj;
-                        pPlayer->RemoveItem(FormFlags, m_item, 1, false, false, nullptr, nullptr, nullptr, true, false);
-                        this->m_pRelatedCompanion->UpdateMagic(false, true);
-                        this->m_pRelatedCompanion->RestoreActorValue(ActorValue::BRAIN_CONDITION, 1000.0f);
-                        this->m_pRelatedCompanion->RestoreActorValue(ActorValue::LEFT_MOBILITY_CONDITION, 1000.0f);
-                        this->m_pRelatedCompanion->RestoreActorValue(ActorValue::RIGHT_MOBILITY_CONDITION, 1000.0f);
-                        this->m_pRelatedCompanion->RestoreActorValue(ActorValue::LEFT_ATTACK_CONDITION, 1000.0f);
-                        this->m_pRelatedCompanion->RestoreActorValue(ActorValue::RIGHT_ATTACK_CONDITION, 1000.0f);
-                        this->m_pRelatedCompanion->RestoreActorValue(ActorValue::ENDURANCE_CONDITION, 1000.0f);
-                        this->m_pRelatedCompanion->RestoreActorValue(ActorValue::PERCEPTION_CONDITION, 1000.0f);
-                        TESTopic* BarkTopicByType = FollowerBarks::GetBarkTopicByType(FollowerBarks::BARK_REGENERATING);
-                        SpeakTopic(BarkTopicByType);
+                        AlchemyItem* v8 = dynamic_cast<AlchemyItem*>(InventoryItem_0->pContainerObj);
+                        this->m_pRelatedCompanion->DrinkPotion(v8, apList, true);
                     }
-                    delete InventoryItem_0;
+                    if (InventoryItem_0->pExtraObjectList) {
+                        m_item = InventoryItem_0->pExtraObjectList->m_item;
+                    }
+                    else {
+                        m_item = nullptr;
+                    }
+                    TESBoundObject* FormFlags = InventoryItem_0->pContainerObj;
+                    pPlayer->RemoveItem(FormFlags, m_item, 1, false, false, nullptr, nullptr, nullptr, true, false);
+                    this->m_pRelatedCompanion->UpdateMagic(false, true);
+                    this->m_pRelatedCompanion->RestoreActorValue(ActorValue::BRAIN_CONDITION, 1000.0f);
+                    this->m_pRelatedCompanion->RestoreActorValue(ActorValue::LEFT_MOBILITY_CONDITION, 1000.0f);
+                    this->m_pRelatedCompanion->RestoreActorValue(ActorValue::RIGHT_MOBILITY_CONDITION, 1000.0f);
+                    this->m_pRelatedCompanion->RestoreActorValue(ActorValue::LEFT_ATTACK_CONDITION, 1000.0f);
+                    this->m_pRelatedCompanion->RestoreActorValue(ActorValue::RIGHT_ATTACK_CONDITION, 1000.0f);
+                    this->m_pRelatedCompanion->RestoreActorValue(ActorValue::ENDURANCE_CONDITION, 1000.0f);
+                    this->m_pRelatedCompanion->RestoreActorValue(ActorValue::PERCEPTION_CONDITION, 1000.0f);
+                    TESTopic* BarkTopicByType = FollowerBarks::GetBarkTopicByType(FollowerBarks::BARK_REGENERATING);
+                    SpeakTopic(BarkTopicByType);
                 }
+                delete InventoryItem_0;
             }
         }
     }
@@ -809,226 +801,207 @@ void CompanionWheelMenu::Do_UseStim() {
 void CompanionWheelMenu::TransitionFromCloseToTalkTo() {
     Actor* pActionActor = pPlayer;
     Actor* pactor = m_pRelatedCompanion;
-    if (pactor) {
-        if (!pactor->IsDying()) {
-            BaseProcess* pprocess = pactor->pCurrentProcess;
-            if (pprocess) {
-                if ((!pprocess->GetCommandingActor() || pactor->IsDead(false)) && !pprocess->GetFadeState()) {
-                    BaseProcess* pPlayerProc = pActionActor->pCurrentProcess;
-                    TESPackage* pactionpackage = pPlayerProc->GetPackageThatIsRunning();
-                    TESPackage* potherpackage = pprocess->GetPackageThatIsRunning();
-                    if (pActionActor) {
-                        BaseProcess* v22;
-                        BaseProcess* v23;
-                        if (pactor->IsInCombat() && (pActionActor == pPlayer && pactor->IsPlayerTeammate())) {
-                            pVATS.QuitVATSPlayback(false, false);
-                            Interface::QueueMenuCreate(
-                                Interface::OPEN_DIALOG, pactor, nullptr, nullptr, Interface::CMM_STANDARD, false
-                            );
-                            return;
-                        }
-                        if ((!pactor->IsInCombat() || pactor->IsKnockedOut()) &&
+    if ((pactor) && (!pactor->IsDying())) {
+        BaseProcess* pprocess = pactor->pCurrentProcess;
+        if ((pprocess) && ((!pprocess->GetCommandingActor() || pactor->IsDead(false)) && !pprocess->GetFadeState())) {
+            BaseProcess* pPlayerProc = pActionActor->pCurrentProcess;
+            TESPackage* pactionpackage = pPlayerProc->GetPackageThatIsRunning();
+            TESPackage* potherpackage = pprocess->GetPackageThatIsRunning();
+            if (pActionActor) {
+                BaseProcess* v22;
+                BaseProcess* v23;
+                if (pactor->IsInCombat() && (pActionActor == pPlayer && pactor->IsPlayerTeammate())) {
+                    pVATS.QuitVATSPlayback(false, false);
+                    Interface::QueueMenuCreate(
+                        Interface::OPEN_DIALOG, pactor, nullptr, nullptr, Interface::CMM_STANDARD, false
+                    );
+                    return;
+                }
+                if ((!pactor->IsInCombat() || pactor->IsKnockedOut()) &&
+                    (pActionActor != pPlayer ||
+                     (pactor->GetSitSleepState() == SIT_SLEEP_NORMAL ||
+                      (pactor->GetSitSleepState() == SIT_SLEEP_IS_SLEEPING ||
+                       (pactor->GetSitSleepState() == SIT_SLEEP_IS_SITTING ||
+                        ((v23 = pactor->pCurrentProcess, v23->GetFurnitureMarker()) &&
+                         (v22 = pactor->pCurrentProcess, v22->GetFurnitureMarker()->cNumber > 19u))))))) {
+                    if (!pactor->IsReanimated() && !pactor->IsDead(false) &&
+                        (pActionActor != pPlayer || (!pactor->IsKnockedOut() || !pactor->GetEssential()))) {
+                        TESPackage* v1;
+                        TESPackage* v2;
+                        TESPackage* v3;
+                        if ((pActionActor == pPlayer ||
+                             (pactor == pPlayer &&
+                              ((v1 = pActionActor->GetCurrentPackage(), v1->IsInterruptPackage()) ||
+                               ((v2 = pActionActor->GetCurrentPackage(), v2->GetPackType() == PACKAGE_TYPE_EXPLORE) ||
+                                (v3 = pActionActor->GetCurrentPackage(),
+                                 v3->GetPackType() == PACKAGE_TYPE_AMBUSH))))) &&
                             (pActionActor != pPlayer ||
-                             (pactor->GetSitSleepState() == SIT_SLEEP_NORMAL ||
-                              (pactor->GetSitSleepState() == SIT_SLEEP_IS_SLEEPING ||
-                               (pactor->GetSitSleepState() == SIT_SLEEP_IS_SITTING ||
-                                ((v23 = pactor->pCurrentProcess, v23->GetFurnitureMarker()) &&
-                                 (v22 = pactor->pCurrentProcess, v22->GetFurnitureMarker()->cNumber > 19u))))))) {
-                            if (!pactor->IsReanimated() && !pactor->IsDead(false) &&
-                                (pActionActor != pPlayer || (!pactor->IsKnockedOut() || !pactor->GetEssential()))) {
-                                TESPackage* v1;
-                                TESPackage* v2;
-                                TESPackage* v3;
-                                if (pActionActor == pPlayer ||
-                                    (pactor == pPlayer &&
-                                     ((v1 = pActionActor->GetCurrentPackage(), v1->IsInterruptPackage()) ||
-                                      ((v2 = pActionActor->GetCurrentPackage(),
-                                        v2->GetPackType() == PACKAGE_TYPE_EXPLORE) ||
-                                       (v3 = pActionActor->GetCurrentPackage(),
-                                        v3->GetPackType() == PACKAGE_TYPE_AMBUSH))))) {
-                                    if (pActionActor != pPlayer ||
-                                        ((!pactor->IsKnockedOut() &&
-                                          (!pPlayer->IsSneaking() || pactor->IsPlayerTeammate())) ||
-                                         pactor->GetGhost())) {
-                                        BaseProcess* CurrentAIProcess;
-                                        TESTopic* pgreetTopic = nullptr;
-                                        if (pActionActor == pPlayer ||
-                                            (CurrentAIProcess = pActionActor->pCurrentProcess,
-                                             CurrentAIProcess->GetNeedTalkPlayer())) {
-                                            pgreetTopic = TESTopic::GetTopic(DT_TOPIC, 0);
-                                        }
-                                        DialogueItem* pgreetDialogue = nullptr;
-                                        if (pgreetTopic) {
-                                            if (pActionActor == pPlayer) {
-                                                pgreetDialogue = pgreetTopic->CreateDialogueItem(
-                                                    pactor, pPlayer, nullptr, nullptr, false
-                                                );
-                                            }
-                                            else {
-                                                BaseProcess* v20 = pActionActor->pCurrentProcess;
-                                                if (v20->GetNeedTalkPlayer()) {
-                                                    pgreetDialogue = pgreetTopic->CreateDialogueItem(
-                                                        pActionActor, pPlayer, nullptr, nullptr, false
-                                                    );
-                                                }
-                                            }
-                                        }
-                                        if (pgreetDialogue &&
-                                            (pgreetDialogue->pInfo->IsGoodbye() &&
-                                             (pgreetDialogue->FirstResponse() && !pgreetDialogue->NextResponse()))) {
-                                            if (pactor->GetSitSleepState() == SIT_SLEEP_IS_SLEEPING) {
-                                                BaseProcess* v19 = pactor->pCurrentProcess;
-                                                v19->SetNeedTalkPlayer(true);
-                                                pactor->InitiateGetUpPackage();
-                                                return;
-                                            }
-                                            if (pactor == pPlayer) {
-                                                pActionActor->SayForceGoodbyeGreetingToPlayer(
-                                                    pgreetTopic, false, false
-                                                );
-                                            }
-                                            else {
-                                                pactor->SayForceGoodbyeGreetingToPlayer(pgreetTopic, false, false);
-                                            }
-                                        }
-                                        else {
-                                            BaseProcess* v18 = pactor->pCurrentProcess;
-                                            if (v18->GetFurnitureMarker()) {
-                                                BaseProcess* v17 = pactor->pCurrentProcess;
-                                                if (v17->GetFurnitureMarker()->cNumber > 19u) {
-                                                    BaseProcess* v16 = pactor->pCurrentProcess;
-                                                    v16->AddPostAnimationAction(
-                                                        BaseProcess::POSTANIM_ACTION_GETOUT_OF_FURNITURE
-                                                    );
-                                                }
-                                            }
-                                            if (pactor->GetSitSleepState() == SIT_SLEEP_NORMAL) {
-                                                NiPoint3 v40 = pActionActor->GetLocationOnReference();
-                                                pactor->RequestRotate(v40, false);
-                                            }
-                                            TESTopic* ptopic = nullptr;
-                                            Actor* pspeaker = nullptr;
-                                            if (pActionActor == pPlayer) {
-                                                if (!pactor->IsPathingComplete() && !pactor->IsRotating()) {
-                                                    BaseProcess* v15 = pactor->pCurrentProcess;
-                                                    v15->EndMoveMessage(pactor);
-                                                }
-                                                pActionActor->StopAttack();
-                                                pactor->StopAttack();
-                                                TESPackage* CurrentPackage = pActionActor->GetCurrentPackage();
-                                                DialoguePackage* ppack = dynamic_cast<DialoguePackage*>(CurrentPackage);
-                                                if (ppack) {
-                                                    ptopic = ppack->ptopic;
-                                                }
-                                                pspeaker = m_pRelatedCompanion;
-                                                if (pactor->GetCurrentTarget() == pPlayer) {
-                                                    if (potherpackage) {
-                                                        if (potherpackage->GetPackType() == PACKAGE_TYPE_EXPLORE) {
-                                                            if (!potherpackage->GetPackageSchedule() ||
-                                                                potherpackage->GetPackageSchedule()->PSData.iDuration) {
-                                                                pprocess->AddToProcedureIndexRunning(pactor, 1);
-                                                            }
-                                                            else {
-                                                                pprocess->AddToProcedureIndexRunning(pActionActor, 2);
-                                                            }
-                                                        }
-                                                    }
-                                                }
-                                                BSAudio* v5 = &BSAudio::QInstance();
-                                                v5->EndAllSoundsOfType(4u);
-                                                pactor->InterruptCast();
-                                                if (pactor->GetSitSleepState() == SIT_SLEEP_IS_SLEEPING) {
-                                                    BaseProcess* v14 = pactor->pCurrentProcess;
-                                                    v14->SetNeedTalkPlayer(true);
-                                                    pactor->InitiateGetUpPackage();
-                                                }
-                                                else {
-                                                    Actor* pact = pActionActor;
-                                                    if (pActionActor == pPlayer) {
-                                                        pact = pactor;
-                                                    }
-                                                    pVATS.QuitVATSPlayback(false, false);
-                                                    Interface::QueueMenuCreate(
-                                                        Interface::OPEN_DIALOG, pact, ptopic, nullptr,
-                                                        Interface::CMM_STANDARD, false
-                                                    );
-                                                }
-                                            }
-                                            else {
-                                                if (Interface::GetMenuModeType() != Interface::eDialogMenu) {
-                                                    BaseProcess* v13 = pPlayer->pCurrentProcess;
-                                                    if (!v13->CanForceGreet(pActionActor)) {
-                                                        return;
-                                                    }
-                                                    BSAudio* v6 = &BSAudio::QInstance();
-                                                    v6->EndAllSoundsOfType(4u);
-                                                    pActionActor->StopAttack();
-                                                    pactor->StopAttack();
-                                                    pspeaker = pActionActor;
-                                                    if (!pActionActor->IsInCombat()) {
-                                                        TESPackage* v7 = pActionActor->GetCurrentPackage();
-                                                        DialoguePackage* ppack_2 = dynamic_cast<DialoguePackage*>(v7);
-                                                        if (ppack_2) {
-                                                            ptopic = ppack_2->ptopic;
-                                                        }
-                                                    }
-                                                    if (!pactionpackage->GetPackageSchedule() ||
-                                                        pactionpackage->GetPackageSchedule()->PSData.iDuration) {
-                                                        BaseProcess* v11 = pActionActor->pCurrentProcess;
-                                                        v11->AddToProcedureIndexRunning(pActionActor, 1);
-                                                    }
-                                                    else {
-                                                        BaseProcess* pprocess_2 = pActionActor->pCurrentProcess;
-                                                        pprocess_2->AddToProcedureIndexRunning(pActionActor, 2);
-                                                    }
-                                                    pactor->InterruptCast();
-                                                    if (pactor == pPlayer) {
-                                                        pactor->ForceIdleAnimation();
-                                                    }
-                                                    else {
-                                                        BaseProcess* v10 = pactor->pCurrentProcess;
-                                                        v10->AddPostAnimationAction(
-                                                            BaseProcess::POSTANIM_FORCEIDLE_ANIMATION
-                                                        );
-                                                    }
-                                                    if (pActionActor == pPlayer) {
-                                                        pActionActor->ForceIdleAnimation();
-                                                    }
-                                                    else {
-                                                        BaseProcess* v9 = pActionActor->pCurrentProcess;
-                                                        v9->AddPostAnimationAction(
-                                                            BaseProcess::POSTANIM_FORCEIDLE_ANIMATION
-                                                        );
-                                                    }
-                                                    pVATS.QuitVATSPlayback(false, false);
-                                                    Actor* pact_2 = pActionActor;
-                                                    if (pActionActor == pPlayer) {
-                                                        pact_2 = pactor;
-                                                    }
-                                                    Interface::QueueMenuCreate(
-                                                        Interface::OPEN_DIALOG, pact_2, ptopic, nullptr,
-                                                        Interface::CMM_STANDARD, false
-                                                    );
-                                                }
-                                            }
-                                        }
-                                        if (pgreetDialogue) {
-                                            delete pgreetDialogue;
-                                        }
+                             ((!pactor->IsKnockedOut() && (!pPlayer->IsSneaking() || pactor->IsPlayerTeammate())) ||
+                              pactor->GetGhost()))) {
+                            BaseProcess* CurrentAIProcess;
+                            TESTopic* pgreetTopic = nullptr;
+                            if (pActionActor == pPlayer ||
+                                (CurrentAIProcess = pActionActor->pCurrentProcess,
+                                 CurrentAIProcess->GetNeedTalkPlayer())) {
+                                pgreetTopic = TESTopic::GetTopic(DT_TOPIC, 0);
+                            }
+                            DialogueItem* pgreetDialogue = nullptr;
+                            if (pgreetTopic) {
+                                if (pActionActor == pPlayer) {
+                                    pgreetDialogue =
+                                        pgreetTopic->CreateDialogueItem(pactor, pPlayer, nullptr, nullptr, false);
+                                }
+                                else {
+                                    BaseProcess* v20 = pActionActor->pCurrentProcess;
+                                    if (v20->GetNeedTalkPlayer()) {
+                                        pgreetDialogue = pgreetTopic->CreateDialogueItem(
+                                            pActionActor, pPlayer, nullptr, nullptr, false
+                                        );
                                     }
                                 }
                             }
-                        }
-                        else {
-                            if (pactor->GetCombatController()) {
-                                if (pActionActor == pPlayer && pactor->GetCombatController()->QSwimAllowed()) {
-                                    char msg[200];
-                                    const char* v8 = sActivateNPCCalmed.String();
-                                    std::sprintf(msg, "%s %s", pactor->GetFullName(), v8);
-                                    Interface::ShowMessage(msg, 0, nullptr, nullptr, 2.0f, false);
+                            if (pgreetDialogue &&
+                                (pgreetDialogue->pInfo->IsGoodbye() &&
+                                 (pgreetDialogue->FirstResponse() && !pgreetDialogue->NextResponse()))) {
+                                if (pactor->GetSitSleepState() == SIT_SLEEP_IS_SLEEPING) {
+                                    BaseProcess* v19 = pactor->pCurrentProcess;
+                                    v19->SetNeedTalkPlayer(true);
+                                    pactor->InitiateGetUpPackage();
+                                    return;
+                                }
+                                if (pactor == pPlayer) {
+                                    pActionActor->SayForceGoodbyeGreetingToPlayer(pgreetTopic, false, false);
+                                }
+                                else {
+                                    pactor->SayForceGoodbyeGreetingToPlayer(pgreetTopic, false, false);
                                 }
                             }
+                            else {
+                                BaseProcess* v18 = pactor->pCurrentProcess;
+                                if (v18->GetFurnitureMarker()) {
+                                    BaseProcess* v17 = pactor->pCurrentProcess;
+                                    if (v17->GetFurnitureMarker()->cNumber > 19u) {
+                                        BaseProcess* v16 = pactor->pCurrentProcess;
+                                        v16->AddPostAnimationAction(BaseProcess::POSTANIM_ACTION_GETOUT_OF_FURNITURE);
+                                    }
+                                }
+                                if (pactor->GetSitSleepState() == SIT_SLEEP_NORMAL) {
+                                    NiPoint3 v40 = pActionActor->GetLocationOnReference();
+                                    pactor->RequestRotate(v40, false);
+                                }
+                                TESTopic* ptopic = nullptr;
+                                Actor* pspeaker = nullptr;
+                                if (pActionActor == pPlayer) {
+                                    if (!pactor->IsPathingComplete() && !pactor->IsRotating()) {
+                                        BaseProcess* v15 = pactor->pCurrentProcess;
+                                        v15->EndMoveMessage(pactor);
+                                    }
+                                    pActionActor->StopAttack();
+                                    pactor->StopAttack();
+                                    TESPackage* CurrentPackage = pActionActor->GetCurrentPackage();
+                                    DialoguePackage* ppack = dynamic_cast<DialoguePackage*>(CurrentPackage);
+                                    if (ppack) {
+                                        ptopic = ppack->ptopic;
+                                    }
+                                    pspeaker = m_pRelatedCompanion;
+                                    if ((pactor->GetCurrentTarget() == pPlayer) && (potherpackage) &&
+                                        (potherpackage->GetPackType() == PACKAGE_TYPE_EXPLORE)) {
+                                        if (!potherpackage->GetPackageSchedule() ||
+                                            potherpackage->GetPackageSchedule()->PSData.iDuration) {
+                                            pprocess->AddToProcedureIndexRunning(pactor, 1);
+                                        }
+                                        else {
+                                            pprocess->AddToProcedureIndexRunning(pActionActor, 2);
+                                        }
+                                    }
+
+                                    BSAudio* v5 = &BSAudio::QInstance();
+                                    v5->EndAllSoundsOfType(4u);
+                                    pactor->InterruptCast();
+                                    if (pactor->GetSitSleepState() == SIT_SLEEP_IS_SLEEPING) {
+                                        BaseProcess* v14 = pactor->pCurrentProcess;
+                                        v14->SetNeedTalkPlayer(true);
+                                        pactor->InitiateGetUpPackage();
+                                    }
+                                    else {
+                                        Actor* pact = pActionActor;
+                                        if (pActionActor == pPlayer) {
+                                            pact = pactor;
+                                        }
+                                        pVATS.QuitVATSPlayback(false, false);
+                                        Interface::QueueMenuCreate(
+                                            Interface::OPEN_DIALOG, pact, ptopic, nullptr, Interface::CMM_STANDARD,
+                                            false
+                                        );
+                                    }
+                                }
+                                else {
+                                    if (Interface::GetMenuModeType() != Interface::eDialogMenu) {
+                                        BaseProcess* v13 = pPlayer->pCurrentProcess;
+                                        if (!v13->CanForceGreet(pActionActor)) {
+                                            return;
+                                        }
+                                        BSAudio* v6 = &BSAudio::QInstance();
+                                        v6->EndAllSoundsOfType(4u);
+                                        pActionActor->StopAttack();
+                                        pactor->StopAttack();
+                                        pspeaker = pActionActor;
+                                        if (!pActionActor->IsInCombat()) {
+                                            TESPackage* v7 = pActionActor->GetCurrentPackage();
+                                            DialoguePackage* ppack_2 = dynamic_cast<DialoguePackage*>(v7);
+                                            if (ppack_2) {
+                                                ptopic = ppack_2->ptopic;
+                                            }
+                                        }
+                                        if (!pactionpackage->GetPackageSchedule() ||
+                                            pactionpackage->GetPackageSchedule()->PSData.iDuration) {
+                                            BaseProcess* v11 = pActionActor->pCurrentProcess;
+                                            v11->AddToProcedureIndexRunning(pActionActor, 1);
+                                        }
+                                        else {
+                                            BaseProcess* pprocess_2 = pActionActor->pCurrentProcess;
+                                            pprocess_2->AddToProcedureIndexRunning(pActionActor, 2);
+                                        }
+                                        pactor->InterruptCast();
+                                        if (pactor == pPlayer) {
+                                            pactor->ForceIdleAnimation();
+                                        }
+                                        else {
+                                            BaseProcess* v10 = pactor->pCurrentProcess;
+                                            v10->AddPostAnimationAction(BaseProcess::POSTANIM_FORCEIDLE_ANIMATION);
+                                        }
+                                        if (pActionActor == pPlayer) {
+                                            pActionActor->ForceIdleAnimation();
+                                        }
+                                        else {
+                                            BaseProcess* v9 = pActionActor->pCurrentProcess;
+                                            v9->AddPostAnimationAction(BaseProcess::POSTANIM_FORCEIDLE_ANIMATION);
+                                        }
+                                        pVATS.QuitVATSPlayback(false, false);
+                                        Actor* pact_2 = pActionActor;
+                                        if (pActionActor == pPlayer) {
+                                            pact_2 = pactor;
+                                        }
+                                        Interface::QueueMenuCreate(
+                                            Interface::OPEN_DIALOG, pact_2, ptopic, nullptr, Interface::CMM_STANDARD,
+                                            false
+                                        );
+                                    }
+                                }
+                            }
+                            if (pgreetDialogue) {
+                                delete pgreetDialogue;
+                            }
                         }
+                    }
+                }
+                else {
+                    if ((pactor->GetCombatController()) &&
+                        (pActionActor == pPlayer && pactor->GetCombatController()->QSwimAllowed())) {
+                        char msg[200];
+                        const char* v8 = sActivateNPCCalmed.String();
+                        std::sprintf(msg, "%s %s", pactor->GetFullName(), v8);
+                        Interface::ShowMessage(msg, 0, nullptr, nullptr, 2.0f, false);
                     }
                 }
             }
@@ -1037,19 +1010,18 @@ void CompanionWheelMenu::TransitionFromCloseToTalkTo() {
 }
 
 void CompanionWheelMenu::DisplayCompanionWheelSubtitle(BSStringT<char> asText, BSSoundHandle ahSound) {
-    if (asText.GetLength()) {
-        if (gs_bGeneralSubtitles_Gameplay.Bool() ||
-            (m_pRelatedCompanion && static_cast<uint8_t>(m_pRelatedCompanion->GetShowSubtitles()))) {
-            if (pTiles[12]) {
-                pTiles[12]->Set(4036, asText.pString, true);
-            }
-            float Duration = static_cast<float>(ahSound.GetDuration());
-            if (Duration == 0.0) {
-                double v3 = static_cast<double>(std::strlen(asText.pString));
-                Duration = fNoticeTextTimePerCharacter.Float() * v3 * 1000.0;
-            }
-            m_nTimeToClearSubtitle = static_cast<int64_t>(static_cast<double>(BSGetTickCount()) + Duration);
+    if ((asText.GetLength()) &&
+        (gs_bGeneralSubtitles_Gameplay.Bool() ||
+         (m_pRelatedCompanion && static_cast<uint8_t>(m_pRelatedCompanion->GetShowSubtitles())))) {
+        if (pTiles[12]) {
+            pTiles[12]->Set(4036, asText.pString, true);
         }
+        float Duration = static_cast<float>(ahSound.GetDuration());
+        if (Duration == 0.0) {
+            double v3 = static_cast<double>(std::strlen(asText.pString));
+            Duration = fNoticeTextTimePerCharacter.Float() * v3 * 1000.0;
+        }
+        m_nTimeToClearSubtitle = static_cast<int64_t>(static_cast<double>(BSGetTickCount()) + Duration);
     }
 }
 
@@ -1157,21 +1129,16 @@ Tile* CompanionWheelMenu::Create(Actor* apRelatedCompanion) {
             CompanionWheelMenu::pMe->PrepForVisibility(false);
             return ptile;
         }
-        else {
-            Warning("MENUS: Companion Wheel Menu Creation Failed... Are your menu and art resources up to date?");
-            return nullptr;
-        }
-    }
-    else {
-        if (CompanionWheelMenu::pMe) {
-            if (CompanionWheelMenu::pMe->pMenu) {
-                if (CompanionWheelMenu::pMe) {
-                    delete CompanionWheelMenu::pMe;
-                }
-            }
-        }
+
+        Warning("MENUS: Companion Wheel Menu Creation Failed... Are your menu and art resources up to date?");
         return nullptr;
     }
+
+    if ((CompanionWheelMenu::pMe) && (CompanionWheelMenu::pMe->pMenu) && (CompanionWheelMenu::pMe)) {
+        delete CompanionWheelMenu::pMe;
+    }
+
+    return nullptr;
 }
 
 void InterfaceManager::InternalSetMenuMode(eMenuModeType aiMode) {

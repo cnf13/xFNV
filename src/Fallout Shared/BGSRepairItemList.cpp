@@ -126,35 +126,33 @@ bool BGSRepairItemList::CanItemRepairForm(TESForm* apRepairItem, TESForm* apForm
         if (prepairlist->HasRepairItem(apRepairItem)) {
             return true;
         }
-        else {
-            fHasJuryRiggingPerk = 0.0;
-            BGSEntryPoint::HandleEntryPoint(BGSEntryPoint::HAS_JURY_RIGGING, pPlayer, &fHasJuryRiggingPerk);
-            if (fHasJuryRiggingPerk > 0.0) {
-                int32_t FormType = apForm->GetFormType();
-                if (FormType == apRepairItem->GetFormType() && !apRepairItem->GetQuestObject()) {
-                    int32_t v8 = apForm->GetFormType();
-                    if (v8 == ARMO_ID) {
-                        TESObjectARMO* pRepairArmor = static_cast<TESObjectARMO*>(apRepairItem);
-                        TESObjectARMO* pArmor = static_cast<TESObjectARMO*>(apForm);
-                        if (pRepairArmor->TESBipedModelForm::GetPlayable()) {
-                            int32_t ArmorWeight = pRepairArmor->TESObjectARMO::GetArmorWeight();
-                            if (ArmorWeight == pArmor->TESObjectARMO::GetArmorWeight()) {
-                                if (pRepairArmor->eEquipType == pArmor->eEquipType) {
-                                    return true;
-                                }
-                            }
+
+        fHasJuryRiggingPerk = 0.0;
+        BGSEntryPoint::HandleEntryPoint(BGSEntryPoint::HAS_JURY_RIGGING, pPlayer, &fHasJuryRiggingPerk);
+        if (fHasJuryRiggingPerk > 0.0) {
+            int32_t FormType = apForm->GetFormType();
+            if (FormType == apRepairItem->GetFormType() && !apRepairItem->GetQuestObject()) {
+                int32_t v8 = apForm->GetFormType();
+                if (v8 == ARMO_ID) {
+                    TESObjectARMO* pRepairArmor = static_cast<TESObjectARMO*>(apRepairItem);
+                    TESObjectARMO* pArmor = static_cast<TESObjectARMO*>(apForm);
+                    if (pRepairArmor->TESBipedModelForm::GetPlayable()) {
+                        int32_t ArmorWeight = pRepairArmor->TESObjectARMO::GetArmorWeight();
+                        if ((ArmorWeight == pArmor->TESObjectARMO::GetArmorWeight()) &&
+                            (pRepairArmor->eEquipType == pArmor->eEquipType)) {
+                            return true;
                         }
                     }
-                    else {
-                        TESObjectWEAP* pRepairWeapon = static_cast<TESObjectWEAP*>(apRepairItem);
-                        TESObjectWEAP* pWeapon = static_cast<TESObjectWEAP*>(apForm);
-                        if (v8 == WEAP_ID && pRepairWeapon->TESObjectWEAP::GetIsPlayable()) {
-                            ActorValue::Index WeaponSkill = pRepairWeapon->TESObjectWEAP::GetWeaponSkill();
-                            if (WeaponSkill == pWeapon->TESObjectWEAP::GetWeaponSkill()) {
-                                WEAPON_TYPE WeaponType = pRepairWeapon->TESObjectWEAP::GetWeaponType();
-                                if (WeaponType == pWeapon->TESObjectWEAP::GetWeaponType()) {
-                                    return true;
-                                }
+                }
+                else {
+                    TESObjectWEAP* pRepairWeapon = static_cast<TESObjectWEAP*>(apRepairItem);
+                    TESObjectWEAP* pWeapon = static_cast<TESObjectWEAP*>(apForm);
+                    if (v8 == WEAP_ID && pRepairWeapon->TESObjectWEAP::GetIsPlayable()) {
+                        ActorValue::Index WeaponSkill = pRepairWeapon->TESObjectWEAP::GetWeaponSkill();
+                        if (WeaponSkill == pWeapon->TESObjectWEAP::GetWeaponSkill()) {
+                            WEAPON_TYPE WeaponType = pRepairWeapon->TESObjectWEAP::GetWeaponType();
+                            if (WeaponType == pWeapon->TESObjectWEAP::GetWeaponType()) {
+                                return true;
                             }
                         }
                     }

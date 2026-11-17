@@ -40,7 +40,7 @@ TallGrassGroup::TallGrassGroup(
     );
     Clear();
     NiTriBasedGeomData* pGeomData = apCachedGeometry->spTriGeomData.m_pObject;
-    if (apCachedGeometry->bTristrip == true) {
+    if (apCachedGeometry->bTristrip) {
         spGrassGeometry = new TallGrassTriStrips(static_cast<NiTriStripsData*>(pGeomData));
     }
     else {

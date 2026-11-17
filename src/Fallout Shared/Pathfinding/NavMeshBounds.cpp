@@ -94,50 +94,45 @@ NiPoint3 NavMeshBounds::DistanceFromPointToBounds(const NiPoint3& aPoint) {
             result = retVal;
             return result;
         }
-        else {
-            result = NiPoint3_ZERO;
-            return result;
-        }
-    }
-    else {
-        NiPoint3 bestPoint;
-        float fbestDistanceSqr = 3.4028235e+38f;
-        for (uint32_t i = 0;; ++i) {
-            float zdiff;
-            uint32_t FormFlags = Triangles.iSize;
-            if (i >= FormFlags) {
-                break;
-            }
-            rt::eh_vector_constructor_iterator(aTriVerts, sizeof(NiPoint3), 3, &emptyPointConstructor);
-            aTriVerts[0] =
-                Vertices.GetAt(static_cast<int32_t>((&Triangles.GetAt(static_cast<int32_t>(i)))->Vertices[0]));
-            aTriVerts[1] =
-                Vertices.GetAt(static_cast<int32_t>((&Triangles.GetAt(static_cast<int32_t>(i)))->Vertices[1]));
-            aTriVerts[2] =
-                Vertices.GetAt(static_cast<int32_t>((&Triangles.GetAt(static_cast<int32_t>(i)))->Vertices[2]));
-            float maxzdelta = BoundingBoxMax.z - BoundingBoxMin.z;
-            if (NavMeshMath::IsPointInsideTriangle(
-                    aTriVerts[0], aTriVerts[1], aTriVerts[2], aPoint, zdiff, maxzdelta, maxzdelta
-                )) {
-                ::new (&result) NiPoint3(0.0f, 0.0f, zdiff);
-                return result;
-            }
-            for (int32_t e = 0; e < 3; ++e) {
-                int32_t f = e + 1;
-                if (e == 2) {
-                    f = 0;
-                }
-                NiPoint3 pointOnEdge = NavMeshMath::ProjectPointOntoSegment(aPoint, aTriVerts[e], aTriVerts[f]);
-                float fdistSqr = (aPoint - pointOnEdge).SqrLength();
-                if (fbestDistanceSqr > static_cast<double>(fdistSqr)) {
-                    bestPoint = pointOnEdge;
-                    fbestDistanceSqr = fdistSqr;
-                }
-            }
-        }
-        ::new (&result) NiPoint3(bestPoint - aPoint);
+
+        result = NiPoint3_ZERO;
         return result;
     }
+
+    NiPoint3 bestPoint;
+    float fbestDistanceSqr = 3.4028235e+38f;
+    for (uint32_t i = 0;; ++i) {
+        float zdiff;
+        uint32_t FormFlags = Triangles.iSize;
+        if (i >= FormFlags) {
+            break;
+        }
+        rt::eh_vector_constructor_iterator(aTriVerts, sizeof(NiPoint3), 3, &emptyPointConstructor);
+        aTriVerts[0] = Vertices.GetAt(static_cast<int32_t>((&Triangles.GetAt(static_cast<int32_t>(i)))->Vertices[0]));
+        aTriVerts[1] = Vertices.GetAt(static_cast<int32_t>((&Triangles.GetAt(static_cast<int32_t>(i)))->Vertices[1]));
+        aTriVerts[2] = Vertices.GetAt(static_cast<int32_t>((&Triangles.GetAt(static_cast<int32_t>(i)))->Vertices[2]));
+        float maxzdelta = BoundingBoxMax.z - BoundingBoxMin.z;
+        if (NavMeshMath::IsPointInsideTriangle(
+                aTriVerts[0], aTriVerts[1], aTriVerts[2], aPoint, zdiff, maxzdelta, maxzdelta
+            )) {
+            ::new (&result) NiPoint3(0.0f, 0.0f, zdiff);
+            return result;
+        }
+        for (int32_t e = 0; e < 3; ++e) {
+            int32_t f = e + 1;
+            if (e == 2) {
+                f = 0;
+            }
+            NiPoint3 pointOnEdge = NavMeshMath::ProjectPointOntoSegment(aPoint, aTriVerts[e], aTriVerts[f]);
+            float fdistSqr = (aPoint - pointOnEdge).SqrLength();
+            if (fbestDistanceSqr > static_cast<double>(fdistSqr)) {
+                bestPoint = pointOnEdge;
+                fbestDistanceSqr = fdistSqr;
+            }
+        }
+    }
+    ::new (&result) NiPoint3(bestPoint - aPoint);
+    return result;
 }
 
 // The arrays are new[]'d through ourMalloc: the size is -1 when the count times the item size overflows, and only

@@ -551,12 +551,11 @@ int32_t bhkRigidBody::LoadCInfo(NiStream& arStream) {
         );
         return uiSize;
     }
-    else {
-        bhkRigidBodyCinfo::Serialized kForm{};
-        arStream.Istr()->BinaryRead(&kForm, sizeof(kForm), nullptr, 0);
-        pInfo->ReadSerialized(kForm);
-        return uiSize;
-    }
+
+    bhkRigidBodyCinfo::Serialized kForm{};
+    arStream.Istr()->BinaryRead(&kForm, sizeof(kForm), nullptr, 0);
+    pInfo->ReadSerialized(kForm);
+    return uiSize;
 }
 
 // Builds the Havok body from the creation info, which it first clamps in place: the penetration depth into
@@ -1065,9 +1064,8 @@ hkpMotion* bhkRigidBody::GetStoredDynamicMotion() {
     if (v3) {
         return v3->getStoredDynamicMotion();
     }
-    else {
-        return nullptr;
-    }
+
+    return nullptr;
 }
 
 // Returns the wrapped Havok object as the body.
@@ -1079,9 +1077,8 @@ hkpRigidBody* bhkRigidBody::operator*() const {
     if (this) {
         return Gethk();
     }
-    else {
-        return nullptr;
-    }
+
+    return nullptr;
 }
 
 // Puts a constraint or an action at the head of kActionConstrants, through a NiPointer temporary; anything else is
@@ -1322,19 +1319,17 @@ const float bhkRigidBody::GetMaxAngularVelocity() {
         if (pdm) {
             return hkUFloat8_intToReal[pdm->m_motionState.m_maxAngularVelocity.m_value];
         }
-        else {
-            // Reads the maximum angular velocity from the body's own motion (a fixed or keyframed body has no stored
-            // dynamic motion).
-            hkUFloat8 v5;
-            float afValue = hkUFloat8_intToReal[static_cast<hkpRigidBody*>(phkObject)
-                                                    ->m_motion.m_motionState.m_maxAngularVelocity.m_value];
-            v5.operator=(afValue);
-            return hkUFloat8_intToReal[v5.m_value];
-        }
+
+        // Reads the maximum angular velocity from the body's own motion (a fixed or keyframed body has no stored
+        // dynamic motion).
+        hkUFloat8 v5;
+        float afValue = hkUFloat8_intToReal[static_cast<hkpRigidBody*>(phkObject)
+                                                ->m_motion.m_motionState.m_maxAngularVelocity.m_value];
+        v5.operator=(afValue);
+        return hkUFloat8_intToReal[v5.m_value];
     }
-    else {
-        return 0.0f;
-    }
+
+    return 0.0f;
 }
 
 // Adds the body's action constraints to apWorld, up to the first empty entry; with flag 4 set, only the fixed
@@ -1397,25 +1392,25 @@ void bhkRigidBody::ApplyHardKeyframe(const NiPoint3& arPos, const NiQuaternion& 
         // EXE-INLINED 0x560D80
         hkpRigidBody* pBody = static_cast<hkpRigidBody*>(phkObject);
         const hkVector4& rLinVel = pBody ? pBody->getLinearVelocity() : hkVector4::getZero();
-        if (!rLinVel.equals4(hkVector4::getZero(), 0.001f)) {
-            // EXE-INLINED 0x561690
-            if (pBody) {
-                MarkWrite();
-                pBody->setLinearVelocity(hkVector4::getZero());
-                UnMarkWrite();
-            }
+        if ((!rLinVel.equals4(hkVector4::getZero(), 0.001f)) && (pBody))
+        // EXE-INLINED 0x561690
+        {
+            MarkWrite();
+            pBody->setLinearVelocity(hkVector4::getZero());
+            UnMarkWrite();
         }
+
         // EXE-INLINED 0x560E10
         pBody = static_cast<hkpRigidBody*>(phkObject);
         const hkVector4& rAngVel = pBody ? pBody->getAngularVelocity() : hkVector4::getZero();
-        if (!rAngVel.equals4(hkVector4::getZero(), 0.001f)) {
-            // EXE-INLINED 0x5617C0
-            if (pBody) {
-                MarkWrite();
-                pBody->setAngularVelocity(hkVector4::getZero());
-                UnMarkWrite();
-            }
+        if ((!rAngVel.equals4(hkVector4::getZero(), 0.001f)) && (pBody))
+        // EXE-INLINED 0x5617C0
+        {
+            MarkWrite();
+            pBody->setAngularVelocity(hkVector4::getZero());
+            UnMarkWrite();
         }
+
         return;
     }
     float fDeltaTime = bhkWorld::fDeltaTime;
@@ -1448,12 +1443,12 @@ void bhkRigidBody::ApplyHardKeyframe(const NiPoint3& arPos, const NiQuaternion& 
             apSetPosLock->Lock(nullptr);
         }
         SetPosition(arPos);
-        if (apSetPosLock) {
-            // EXE-INLINED none: BSSpinLock::Unlock
-            if (!--apSetPosLock->uiLockCount) {
-                apSetPosLock->uiOwningThread = 0;
-            }
+        if ((apSetPosLock) && (!--apSetPosLock->uiLockCount))
+        // EXE-INLINED none: BSSpinLock::Unlock
+        {
+            apSetPosLock->uiOwningThread = 0;
         }
+
         SetLinearVelocity(hkVector4::getZero());
     }
     else {
@@ -1657,10 +1652,7 @@ void bhkRigidBody::SetFixed(NiAVObject* apObject, int32_t abFix, int32_t abAddRe
 
 bool bhkRigidBody::IsMotionTypeDynamic(const hkpMotion::MotionType& areMotion) {
     int32_t v1 = areMotion;
-    if ((areMotion > 0) && ((v1 <= 3) || (v1 == 6))) {
-        return true;
-    }
-    return false;
+    return (areMotion > 0) && ((v1 <= 3) || (v1 == 6));
 }
 
 // The class loader's factory.

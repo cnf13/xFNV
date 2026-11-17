@@ -9,18 +9,13 @@ BSNetworkSystemUtility::~BSNetworkSystemUtility() {}
 void BSNetworkSystemUtility::Idle() {
     bool bWasOnline = this->m_online;
     bool bOnline = false;
-    if (SteamAPI_IsSteamRunning()) {
-        if (SteamUser()) {
-            if (SteamUser()->BLoggedOn()) {
-                bOnline = true;
-            }
-        }
+    if ((SteamAPI_IsSteamRunning()) && (SteamUser()) && (SteamUser()->BLoggedOn())) {
+        bOnline = true;
     }
+
     this->m_online = bOnline;
-    if (this->m_online != bWasOnline) {
-        if (m_callback) {
-            m_callback(BSNetworkSystemUtility::NetworkStatusChanged, this->m_online);
-        }
+    if ((this->m_online != bWasOnline) && (m_callback)) {
+        m_callback(BSNetworkSystemUtility::NetworkStatusChanged, this->m_online);
     }
 }
 

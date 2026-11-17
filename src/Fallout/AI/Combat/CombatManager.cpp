@@ -123,10 +123,8 @@ void CombatManager::Update(bool abTimeStopped) {
         CombatTimer::UpdateTimer(afElapsedTime);
         for (uint32_t i = 0; i < CombatGroups.GetSize(); ++i) {
             CombatGroup* pgroup = CombatGroups.operator[](i);
-            if (pgroup) {
-                if (!pgroup->IsEmpty()) {
-                    pgroup->Update();
-                }
+            if ((pgroup) && (!pgroup->IsEmpty())) {
+                pgroup->Update();
             }
         }
         pThreatMap->UpdateThreats();
@@ -156,15 +154,13 @@ void CombatManager::UpdateMainThread(bool abTimeStopped) {
     if (igroupCount) {
         for (uint32_t i = 0; i < igroupCount; ++i) {
             CombatGroup* pgroup = CombatGroups.operator[](i);
-            if (pgroup) {
-                if (pgroup->IsEmpty()) {
-                    CombatGroup* pDeleted = pgroup;
-                    if (pDeleted) {
-                        delete pDeleted;
-                    }
-                    CombatGroup* pNull = nullptr;
-                    CombatGroups.SetAt(i, pNull);
+            if ((pgroup) && (pgroup->IsEmpty())) {
+                CombatGroup* pDeleted = pgroup;
+                if (pDeleted) {
+                    delete pDeleted;
                 }
+                CombatGroup* pNull = nullptr;
+                CombatGroups.SetAt(i, pNull);
             }
         }
         if (!CombatGroups.m_usESize) {
@@ -315,24 +311,20 @@ uint32_t CombatManager::GetCombatantCount(Actor* apActor, uint32_t* apNumLost) {
             break;
         }
         CombatGroup* pgroup = CombatGroups.operator[](i);
-        if (pgroup) {
-            if (!apActor || pgroup->IsTarget(apActor)) {
-                uint32_t igroupCount = pgroup->GetMemberCount();
-                if (igroupCount) {
-                    CombatGroup* pPlayerGroup = pPlayer->GetCombatGroup();
-                    if (pgroup == pPlayerGroup) {
-                        --igroupCount;
-                    }
+        if ((pgroup) && (!apActor || pgroup->IsTarget(apActor))) {
+            uint32_t igroupCount = pgroup->GetMemberCount();
+            if (igroupCount) {
+                CombatGroup* pPlayerGroup = pPlayer->GetCombatGroup();
+                if (pgroup == pPlayerGroup) {
+                    --igroupCount;
                 }
-                icount += igroupCount;
-                if (apActor) {
-                    if (apNumLost) {
-                        pgroup->GetTargetLastDetectedTimeStamp(&flastDetectedTimeStamp, apActor);
-                        double fElapsed = flastDetectedTimeStamp.ElapsedTime();
-                        if (fCombatDetectionLostTime.Float() < fElapsed) {
-                            *apNumLost += igroupCount;
-                        }
-                    }
+            }
+            icount += igroupCount;
+            if ((apActor) && (apNumLost)) {
+                pgroup->GetTargetLastDetectedTimeStamp(&flastDetectedTimeStamp, apActor);
+                double fElapsed = flastDetectedTimeStamp.ElapsedTime();
+                if (fCombatDetectionLostTime.Float() < fElapsed) {
+                    *apNumLost += igroupCount;
                 }
             }
         }
@@ -477,28 +469,27 @@ bool CombatManager::GetWanttoHelpGroup(Actor* apActor, Actor* apActorToHelp) {
     if (!apActor->GetShouldHelp(apActorToHelp)) {
         return false;
     }
-    if (apActor) {
-        if (apActorToHelp) {
-            pTargetsCombatGroup = apActorToHelp->GetCombatGroup();
-            if (pTargetsCombatGroup) {
-                targetCount = pTargetsCombatGroup->GetTargetCount();
-                for (i = 0; i < targetCount; ++i) {
-                    apActora = pTargetsCombatGroup->GetTarget(i);
-                    if (apActor->GetShouldHelp(apActora)) {
-                        return false;
-                    }
+    if ((apActor) && (apActorToHelp)) {
+        pTargetsCombatGroup = apActorToHelp->GetCombatGroup();
+        if (pTargetsCombatGroup) {
+            targetCount = pTargetsCombatGroup->GetTargetCount();
+            for (i = 0; i < targetCount; ++i) {
+                apActora = pTargetsCombatGroup->GetTarget(i);
+                if (apActor->GetShouldHelp(apActora)) {
+                    return false;
                 }
-                memberCount = pTargetsCombatGroup->GetMemberCount();
-                for (j = 0; ((uint32_t)j) < memberCount; ++j) {
-                    pMember = static_cast<PlayerCharacter*>(pTargetsCombatGroup->GetMember(j));
-                    a4 = FIGHT_REACTION_NEUTRAL;
-                    if (apActor->GetShouldAttackActor(pMember, false, a4, false)) {
-                        return false;
-                    }
+            }
+            memberCount = pTargetsCombatGroup->GetMemberCount();
+            for (j = 0; ((uint32_t)j) < memberCount; ++j) {
+                pMember = static_cast<PlayerCharacter*>(pTargetsCombatGroup->GetMember(j));
+                a4 = FIGHT_REACTION_NEUTRAL;
+                if (apActor->GetShouldAttackActor(pMember, false, a4, false)) {
+                    return false;
                 }
             }
         }
     }
+
     return true;
 }
 
@@ -512,11 +503,10 @@ void CombatManager::AddSpectatorForCombatGroup(Actor* apSpectator, Actor* apComb
             apSpectator->InitiateSpectator();
             pPackage = static_cast<SpectatorPackage*>(currentAIProcess->GetCurrentPackage());
         }
-        if (pPackage) {
-            if (((int32_t)pPackage->TESPackage::GetPackType()) == 24) {
-                pPackage->AddThreatFromActorToCombatTarget(*apCombatant);
-            }
+        if ((pPackage) && (((int32_t)pPackage->TESPackage::GetPackType()) == 24)) {
+            pPackage->AddThreatFromActorToCombatTarget(*apCombatant);
         }
+
         AddLocalActor(apSpectator);
     }
 }
@@ -528,9 +518,8 @@ CombatController* CombatManager::CreateCombatController(Actor* apActor, TESPacka
     if (v5) {
         return ::new (v5) CombatController(apActor, combatGroup, apPackage);
     }
-    else {
-        return nullptr;
-    }
+
+    return nullptr;
 }
 
 void CombatManager::InitializeData() {
@@ -598,12 +587,11 @@ void CombatManager::ClearData(bool abNotifyGroupMembers) {
     if (pLocalActorTargetingMap) {
         delete pLocalActorTargetingMap;
     }
-    if (spDebugGeometry.m_pObject) {
-        if (spDebugGeometry.m_pObject->m_pkParent) {
-            NiNode* Parent = spDebugGeometry.m_pObject->m_pkParent;
-            Parent->DetachChild(spDebugGeometry.m_pObject);
-        }
+    if ((spDebugGeometry.m_pObject) && (spDebugGeometry.m_pObject->m_pkParent)) {
+        NiNode* Parent = spDebugGeometry.m_pObject->m_pkParent;
+        Parent->DetachChild(spDebugGeometry.m_pObject);
     }
+
     spDebugGeometry.operator=(static_cast<NiNode*>(nullptr));
 }
 
@@ -622,83 +610,76 @@ void CombatManager::UpdateDebugGeometry() {
             }
         }
     }
-    if (spDebugGeometry.m_pObject) {
-        if (spDebugGeometry.m_pObject->m_pkParent) {
-            NiNode* Parent = spDebugGeometry.m_pObject->m_pkParent;
-            Parent->DetachChild(spDebugGeometry.m_pObject);
-        }
+    if ((spDebugGeometry.m_pObject) && (spDebugGeometry.m_pObject->m_pkParent)) {
+        NiNode* Parent = spDebugGeometry.m_pObject->m_pkParent;
+        Parent->DetachChild(spDebugGeometry.m_pObject);
     }
+
     spDebugGeometry.operator=(static_cast<NiNode*>(nullptr));
-    if (pPlayer->GetParentCell()) {
-        if (pPlayer->GetParentCell()->GetMarkerNode()) {
-            if (bDebugCombatDetectionEvents.Bool()) {
-                if (!spDebugGeometry.m_pObject) {
-                    NiNode* v7;
-                    NiNode* apMemory = static_cast<NiNode*>(NiMemObject::operator new(sizeof(NiNode)));
-                    if (apMemory) {
-                        v7 = ::new (apMemory) NiNode(0);
-                    }
-                    else {
-                        v7 = nullptr;
-                    }
-                    spDebugGeometry.operator=(v7);
-                }
-                uint32_t inumHighActors =
-                    (&ReferenceProcessLists.MobProcessArray)->GetProcessLevelTail(PROCESS_TYPE_HIGH);
-                for (uint32_t i_2 = 0; i_2 < inumHighActors + 1; ++i_2) {
-                    MobileObject* pmob;
-                    if (i_2 == inumHighActors) {
-                        pmob = pPlayer;
-                    }
-                    else {
-                        pmob = (&ReferenceProcessLists.MobProcessArray)->GetItem(i_2);
-                    }
-                    Actor* pactor_2 = static_cast<Actor*>(pmob);
-                    if (pmob) {
-                        if (pactor_2->IsActor()) {
-                            Actor* pactor_3 = pactor_2;
-                            BaseProcess* pBaseProc = pactor_2->pCurrentProcess;
-                            DetectionEvent* pdetectionEvent = pBaseProc->GetActorsDetectionEvent(pactor_3);
-                            if (pdetectionEvent) {
-                                NiColorA arrowColor(0.0f, 0.25f, 0.25f, 0.5f);
-                                NiColorA sphereColor(0.0f, 0.75f, 0.75f, 0.5f);
-                                NiColorA kUnusedColor(1.0f, 0.62f, 0.16f, 0.5f);
-                                float fradius = static_cast<double>(pdetectionEvent->iActionValue) + 32.0;
-                                NiAVObject* psphere = BSTestObjects::CreateSphere(fradius, 10, 10, &sphereColor);
-                                psphere->SetTranslate(pdetectionEvent->Location);
-                                NiNode* pDebugRoot = spDebugGeometry.m_pObject;
-                                pDebugRoot->AttachChild(psphere, 1);
-                                actorLoc = pactor_3->GetLocationOnReference();
-                                NiAVObject* parrow = BSTestObjects::Create3DArrow(
-                                    actorLoc, pdetectionEvent->Location, 2.0f, 2.0f, &arrowColor, &sphereColor
-                                );
-                                NiNode* v3 = spDebugGeometry.m_pObject;
-                                v3->AttachChild(parrow, 1);
-                            }
-                        }
-                    }
-                }
-            }
-            if (spDebugGeometry.m_pObject) {
-                NiAlphaProperty* palpha;
-                NiAlphaProperty* v10 =
-                    static_cast<NiAlphaProperty*>(NiMemObject::operator new(sizeof(NiAlphaProperty)));
-                if (v10) {
-                    palpha = ::new (v10) NiAlphaProperty;
+    if ((pPlayer->GetParentCell()) && (pPlayer->GetParentCell()->GetMarkerNode())) {
+        if (bDebugCombatDetectionEvents.Bool()) {
+            if (!spDebugGeometry.m_pObject) {
+                NiNode* v7;
+                NiNode* apMemory = static_cast<NiNode*>(NiMemObject::operator new(sizeof(NiNode)));
+                if (apMemory) {
+                    v7 = ::new (apMemory) NiNode(0);
                 }
                 else {
-                    palpha = nullptr;
+                    v7 = nullptr;
                 }
-                palpha->SetAlphaBlending(true);
-                spDebugGeometry.m_pObject->AttachProperty(palpha);
-                AddNoLightingPropertyRecurse(spDebugGeometry.m_pObject);
-                BSShaderManager::PrepareObject(spDebugGeometry.m_pObject, 0, 0);
-                NiNode* MarkerNode = pPlayer->GetParentCell()->GetMarkerNode();
-                MarkerNode->AttachChild(spDebugGeometry.m_pObject, 1);
-                spDebugGeometry.m_pObject->UpdateProperties();
-                NiUpdateData UpdateData(0.0f, false, false);
-                spDebugGeometry.m_pObject->Update(UpdateData);
+                spDebugGeometry.operator=(v7);
             }
+            uint32_t inumHighActors = (&ReferenceProcessLists.MobProcessArray)->GetProcessLevelTail(PROCESS_TYPE_HIGH);
+            for (uint32_t i_2 = 0; i_2 < inumHighActors + 1; ++i_2) {
+                MobileObject* pmob;
+                if (i_2 == inumHighActors) {
+                    pmob = pPlayer;
+                }
+                else {
+                    pmob = (&ReferenceProcessLists.MobProcessArray)->GetItem(i_2);
+                }
+                Actor* pactor_2 = static_cast<Actor*>(pmob);
+                if ((pmob) && (pactor_2->IsActor())) {
+                    Actor* pactor_3 = pactor_2;
+                    BaseProcess* pBaseProc = pactor_2->pCurrentProcess;
+                    DetectionEvent* pdetectionEvent = pBaseProc->GetActorsDetectionEvent(pactor_3);
+                    if (pdetectionEvent) {
+                        NiColorA arrowColor(0.0f, 0.25f, 0.25f, 0.5f);
+                        NiColorA sphereColor(0.0f, 0.75f, 0.75f, 0.5f);
+                        NiColorA kUnusedColor(1.0f, 0.62f, 0.16f, 0.5f);
+                        float fradius = static_cast<double>(pdetectionEvent->iActionValue) + 32.0;
+                        NiAVObject* psphere = BSTestObjects::CreateSphere(fradius, 10, 10, &sphereColor);
+                        psphere->SetTranslate(pdetectionEvent->Location);
+                        NiNode* pDebugRoot = spDebugGeometry.m_pObject;
+                        pDebugRoot->AttachChild(psphere, 1);
+                        actorLoc = pactor_3->GetLocationOnReference();
+                        NiAVObject* parrow = BSTestObjects::Create3DArrow(
+                            actorLoc, pdetectionEvent->Location, 2.0f, 2.0f, &arrowColor, &sphereColor
+                        );
+                        NiNode* v3 = spDebugGeometry.m_pObject;
+                        v3->AttachChild(parrow, 1);
+                    }
+                }
+            }
+        }
+        if (spDebugGeometry.m_pObject) {
+            NiAlphaProperty* palpha;
+            NiAlphaProperty* v10 = static_cast<NiAlphaProperty*>(NiMemObject::operator new(sizeof(NiAlphaProperty)));
+            if (v10) {
+                palpha = ::new (v10) NiAlphaProperty;
+            }
+            else {
+                palpha = nullptr;
+            }
+            palpha->SetAlphaBlending(true);
+            spDebugGeometry.m_pObject->AttachProperty(palpha);
+            AddNoLightingPropertyRecurse(spDebugGeometry.m_pObject);
+            BSShaderManager::PrepareObject(spDebugGeometry.m_pObject, 0, 0);
+            NiNode* MarkerNode = pPlayer->GetParentCell()->GetMarkerNode();
+            MarkerNode->AttachChild(spDebugGeometry.m_pObject, 1);
+            spDebugGeometry.m_pObject->UpdateProperties();
+            NiUpdateData UpdateData(0.0f, false, false);
+            spDebugGeometry.m_pObject->Update(UpdateData);
         }
     }
 }
@@ -794,28 +775,26 @@ uint32_t CombatManager::FindLocalActorsInRadius(
         Actor* pactor = nullptr;
         int64_t itargetingBitfield = 0;
         pLocalActorTargetingMap->GetNext(it, pactor, itargetingBitfield);
-        if (pactor) {
-            if (!pactor->IsDead(false) && !pactor->GetDisabled() && !pactor->GetDelete()) {
-                NiPoint3 actorLoc = pactor->CalculateAnticipatedLocation(afTime);
-                NiPoint3 vec = aLocation - actorLoc;
-                double v9 = vec.SqrLength();
-                if (fsquaredRadius > v9) {
-                    ++inumActorsInRadius;
-                    if (pactor == apAttackingActor) {
-                        ++inumSelfInRadius;
+        if ((pactor) && (!pactor->IsDead(false) && !pactor->GetDisabled() && !pactor->GetDelete())) {
+            NiPoint3 actorLoc = pactor->CalculateAnticipatedLocation(afTime);
+            NiPoint3 vec = aLocation - actorLoc;
+            double v9 = vec.SqrLength();
+            if (fsquaredRadius > v9) {
+                ++inumActorsInRadius;
+                if (pactor == apAttackingActor) {
+                    ++inumSelfInRadius;
+                }
+                else {
+                    CombatGroup* v10 = pactor->GetCombatGroup();
+                    if (v10 == pcombatGroup) {
+                        ++inumGroupMembersInRadius;
                     }
                     else {
-                        CombatGroup* v10 = pactor->GetCombatGroup();
-                        if (v10 == pcombatGroup) {
-                            ++inumGroupMembersInRadius;
+                        if ((igrouptargetBit & itargetingBitfield) != 0) {
+                            ++inumTargetsInRadius;
                         }
                         else {
-                            if ((igrouptargetBit & itargetingBitfield) != 0) {
-                                ++inumTargetsInRadius;
-                            }
-                            else {
-                                ++inumNonTargetsInRadius;
-                            }
+                            ++inumNonTargetsInRadius;
                         }
                     }
                 }
@@ -909,11 +888,10 @@ bool CombatManager::ShouldPlayCombatMusic() {
                             }
                             fnearbyGroupCombatStrength =
                                 pgroup->GetMemberCombatStrength(nullptr) + fnearbyGroupCombatStrength;
-                            if (bnearbyGroupDetected) {
-                                if (fnearbyGroupCombatStrength >
-                                    fplayerCombatStrength * fCombatMusicPlayerNearStrengthMult.Float()) {
-                                    bplayCombatMusic = true;
-                                }
+                            if ((bnearbyGroupDetected) &&
+                                (fnearbyGroupCombatStrength >
+                                 fplayerCombatStrength * fCombatMusicPlayerNearStrengthMult.Float())) {
+                                bplayCombatMusic = true;
                             }
                         }
                     }

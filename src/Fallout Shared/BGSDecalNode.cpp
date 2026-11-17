@@ -41,9 +41,8 @@ NiObject* BGSDecalNode::CreateClone(NiCloningProcess& arCloneData) {
     if (v4) {
         return ::new (v4) BGSDecalNode;
     }
-    else {
-        return nullptr;
-    }
+
+    return nullptr;
 }
 
 void BGSDecalNode::OnVisible(NiCullingProcess& arCuller) {

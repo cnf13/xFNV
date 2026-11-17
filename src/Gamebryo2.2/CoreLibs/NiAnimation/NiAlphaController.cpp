@@ -32,10 +32,9 @@ NiObject* NiAlphaController::CreateClone(NiCloningProcess& kCloning) {
         CopyMembers(v3, kCloning);
         return v3;
     }
-    else {
-        CopyMembers(nullptr, kCloning);
-        return nullptr;
-    }
+
+    CopyMembers(nullptr, kCloning);
+    return nullptr;
 }
 
 void NiAlphaController::LoadBinary(NiStream& kStream) {
@@ -62,11 +61,10 @@ void NiAlphaController::LinkObject(NiStream& kStream) {
         }
         m_pObject = m_spInterpolator.m_pObject;
         if (static_cast<const void*>(m_pObject) != static_cast<const void*>(v5)) {
-            if (m_pObject) {
-                if (!InterlockedDecrementUInt32(&m_pObject->m_uiRefCount)) {
-                    m_pObject->DeleteThis();
-                }
+            if ((m_pObject) && (!InterlockedDecrementUInt32(&m_pObject->m_uiRefCount))) {
+                m_pObject->DeleteThis();
             }
+
             m_spInterpolator.m_pObject = v5;
             if (v5) {
                 InterlockedIncrementUInt32(&v5->m_uiRefCount);

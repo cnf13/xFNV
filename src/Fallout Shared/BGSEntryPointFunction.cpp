@@ -199,11 +199,10 @@ void BGSEntryPointFunction::EntryPointFunction::AddLeveledList(
             while (ecx0 && (!ecx0->IsEmpty() && ecx0->m_item)) {
                 ContainerObject* m_item = ecx0->m_item;
                 TESBoundObject* pObj = nullptr;
-                if (m_item->pObj) {
-                    if (m_item->pObj->IsBoundObject()) {
-                        pObj = m_item->pObj;
-                    }
+                if ((m_item->pObj) && (m_item->pObj->IsBoundObject())) {
+                    pObj = m_item->pObj;
                 }
+
                 if (pObj) {
                     Script* apScript = TESScriptableForm::GetFormScript(m_item->pObj);
                     if (apScript) {
@@ -219,13 +218,11 @@ void BGSEntryPointFunction::EntryPointFunction::AddLeveledList(
                             }
                             v10 = v7;
                             v7->SetCount(1);
-                            if (v7) {
-                                if (!v7->GetScript()) {
-                                    v7->SetScript(apScript);
-                                    Script* Script_ = v7->GetScript();
-                                    ScriptLocals* v6 = Script_->CloneLocals();
-                                    v7->SetScriptLocals(v6);
-                                }
+                            if ((v7) && (!v7->GetScript())) {
+                                v7->SetScript(apScript);
+                                Script* Script_ = v7->GetScript();
+                                ScriptLocals* v6 = Script_->CloneLocals();
+                                v7->SetScriptLocals(v6);
                             }
                         }
                         a1->AddObjecttoContainer(pObj, v10, 1);
@@ -255,17 +252,15 @@ void BGSEntryPointFunction::EntryPointFunction::AddActivateChoice(
         BSSimpleList<void*>* v6 = static_cast<BSSimpleList<void*>*>(*apFunctionArgument);
         TESObjectREFR* ownerObject = static_cast<TESObjectREFR*>(apFunctionArgument[1]);
         a2 = static_cast<BGSEntryPointFunctionDataActivateChoice*>(apData);
-        if (v6) {
-            if (a2) {
-                if (static_cast<uint8_t>(a2->GetRunImmediately())) {
-                    Script* Script_ = &a2->ActivateChoiceScript;
-                    if (Script_) {
-                        Script_->Run(ownerObject, nullptr, nullptr, false);
-                    }
+        if ((v6) && (a2)) {
+            if (static_cast<uint8_t>(a2->GetRunImmediately())) {
+                Script* Script_ = &a2->ActivateChoiceScript;
+                if (Script_) {
+                    Script_->Run(ownerObject, nullptr, nullptr, false);
                 }
-                else {
-                    v6->AddHead(*reinterpret_cast<void**>(&a2));
-                }
+            }
+            else {
+                v6->AddHead(*reinterpret_cast<void**>(&a2));
             }
         }
     }
@@ -444,12 +439,11 @@ bool BGSEntryPointFunctionDataActivateChoice::Compare(BGSEntryPointFunctionData*
 
 void BGSEntryPointFunctionDataActivateChoice::Save() {
     BGSEntryPointFunctionData::Save();
-    if (pActivateChoiceLabel) {
-        if (std::strlen(pActivateChoiceLabel)) {
-            uint32_t v1 = BSstrlen(pActivateChoiceLabel);
-            TESForm::AddChunkArray(EPF2_ID, pActivateChoiceLabel, v1 + 1);
-        }
+    if ((pActivateChoiceLabel) && (std::strlen(pActivateChoiceLabel))) {
+        uint32_t v1 = BSstrlen(pActivateChoiceLabel);
+        TESForm::AddChunkArray(EPF2_ID, pActivateChoiceLabel, v1 + 1);
     }
+
     TESForm::AddChunk(EPF3_ID, cFlags);
     Script* Name = &ActivateChoiceScript;
     Name->SaveResultScript();

@@ -673,10 +673,9 @@ bool bhkNiTriStripsShape::GetSubMaterialVarType(uint32_t aiKey, MATERIAL_VARIANT
         if (aeType == MVT_PLATFORM) {
             return ((m_pObject->m_usDataFlags & 32) != 0);
         }
-        else {
-            if (aeType == MVT_STAIRS) {
-                return ((m_pObject->m_usDataFlags & 2048) != 0);
-            }
+
+        if (aeType == MVT_STAIRS) {
+            return ((m_pObject->m_usDataFlags & 2048) != 0);
         }
     }
     return (bool)result;

@@ -53,10 +53,8 @@ ActorCause::~ActorCause() {
 }
 
 void ActorCause::DecRefCount() {
-    if (!NiAtomicDecrement(*reinterpret_cast<int32_t*>(&iRefCount))) {
-        if (this) {
-            delete this;
-        }
+    if ((!NiAtomicDecrement(*reinterpret_cast<int32_t*>(&iRefCount))) && (this)) {
+        delete this;
     }
 }
 
@@ -211,21 +209,19 @@ void ActorCause::ClearActor(Actor* apActor) {
     while (plist && !plist->IsEmpty()) {
         ActorCause* pcause = plist->m_item;
         plist = plist->m_pkNext;
-        if (pcause) {
-            if (pcause->IsValid()) {
-                if (pcause->pActor == apActor) {
-                    pcause->FreeDetectionList();
-                }
-                BSSimpleList<DetectionState*>* pdetection = pcause->pWitnesses;
-                bool bfound = false;
-                while (!bfound && (pdetection && pdetection->m_item)) {
-                    DetectionState* pstate = pdetection->m_item;
-                    pdetection = pdetection->m_pkNext;
-                    if (pstate->pActor == apActor) {
-                        pcause->pWitnesses->Remove(pstate);
-                        ourFree(pstate);
-                        bfound = true;
-                    }
+        if ((pcause) && (pcause->IsValid())) {
+            if (pcause->pActor == apActor) {
+                pcause->FreeDetectionList();
+            }
+            BSSimpleList<DetectionState*>* pdetection = pcause->pWitnesses;
+            bool bfound = false;
+            while (!bfound && (pdetection && pdetection->m_item)) {
+                DetectionState* pstate = pdetection->m_item;
+                pdetection = pdetection->m_pkNext;
+                if (pstate->pActor == apActor) {
+                    pcause->pWitnesses->Remove(pstate);
+                    ourFree(pstate);
+                    bfound = true;
                 }
             }
         }

@@ -23,7 +23,7 @@ public:
     void KillCinfo(bool abCreated) override;
     hkSerializableCinfo& CreateCinfo(bool& arCreated) override;
     const NiRTTI* GetRTTI() const override;
-    virtual ~bhkCachingShapePhantom();
+    ~bhkCachingShapePhantom() override;
     // Clones into memory charged to the Havok context, under the engine's clone critical section.
     NiObject* CreateClone(NiCloningProcess& arCloneData) override;
     void GetViewerStrings(NiTPrimitiveArray<char*>* apStrings) override;

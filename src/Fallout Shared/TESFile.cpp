@@ -64,9 +64,8 @@ TESFile* TESFile::GetFileForTempID(uint32_t aiID) {
     if (TESFile::pOwnedTempIDMap && TESFile::pOwnedTempIDMap->GetAt(aiID, pownerfile)) {
         return pownerfile;
     }
-    else {
-        return nullptr;
-    }
+
+    return nullptr;
 }
 
 uint32_t TESFile::GetFORMSize() const {
@@ -129,18 +128,16 @@ bool TESFile::SetOffset(uint32_t newoffset) {
             Warning("MASTERFILE: SetFilePointer() in SetOffset failed with error:\n%s", std::strerror(errno));
             return false;
         }
-        else {
-            m_formoffset = 0;
-            m_chunkoffset = 0;
-            ourMemset(&m_currentform, 0, sizeof(FORM));
-            GetTESForm();
-            return true;
-        }
-    }
-    else {
+
+        m_formoffset = 0;
+        m_chunkoffset = 0;
         ourMemset(&m_currentform, 0, sizeof(FORM));
-        return false;
+        GetTESForm();
+        return true;
     }
+
+    ourMemset(&m_currentform, 0, sizeof(FORM));
+    return false;
 }
 
 // Finds apForm's record in this file, entering the groups it may belong in, and leaves the file on it.
@@ -185,11 +182,10 @@ TES_RETURN_CODE TESFile::AddTESForm(TESForm* apForm) {
     uint32_t iBufferSize = apForm->GetFormBufferSize();
     void* pFormBuffer = apForm->GetFormBuffer();
     TES_RETURN_CODE v6 = EasyWrite(pFormBuffer, iBufferSize);
-    if (apForm->GetFormBuffer()) {
-        if (apForm->GetFormBufferSize()) {
-            ++fileHeaderInfo.uiFormCount;
-        }
+    if ((apForm->GetFormBuffer()) && (apForm->GetFormBufferSize())) {
+        ++fileHeaderInfo.uiFormCount;
     }
+
     apForm->FreeFormBuffer();
     return v6;
 }
@@ -937,11 +933,10 @@ TESFile::TESFile(const char* apPath, const char* apFilename, NiFile::OpenMode au
     fileHeaderInfo.uiNextFormID = 2048;
     fileHeaderInfo.fVersion = 1.34f;
     if (OpenTES(apPath, apFilename, auiAccessMode, false)) {
-        if (m_FileInfo.nFileSizeHigh || m_FileInfo.nFileSizeLow) {
-            if (LoadTESInfo()) {
-                Warning("MASTERFILE: File '%s' is not a valid TES file.", apFilename);
-            }
+        if ((m_FileInfo.nFileSizeHigh || m_FileInfo.nFileSizeLow) && (LoadTESInfo())) {
+            Warning("MASTERFILE: File '%s' is not a valid TES file.", apFilename);
         }
+
         if (!CloseTES()) {
             Warning("MASTERFILE: Could not close file '%s'.", apFilename);
         }
@@ -1517,10 +1512,8 @@ void TESFile::StartAndEndGroupsForForm(TESForm* apForm) {
         FORM_GROUP* pstopgroup = nullptr;
         for (BSSimpleList<FORM_GROUP*>* pgrouplist = GetGroupList(); pgrouplist; pgrouplist = pgrouplist->m_pkNext) {
             pgroup = pgrouplist->m_item;
-            if (pgroup) {
-                if (!apForm->BelongsInGroup(&pgroup->GroupData, true, true)) {
-                    pstopgroup = pgroup;
-                }
+            if ((pgroup) && (!apForm->BelongsInGroup(&pgroup->GroupData, true, true))) {
+                pstopgroup = pgroup;
             }
         }
         if (pstopgroup) {

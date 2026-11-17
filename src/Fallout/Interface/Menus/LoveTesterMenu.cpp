@@ -1151,36 +1151,32 @@ NiCamera* LoveTesterMenu::SetupCamera() {
 }
 
 void LoveTesterMenu::NextPage([[maybe_unused]] LoveTesterMenu::LoveTesterButton* apButton, ...) {
-    if (LoveTesterMenu::pInstance) {
-        if (LoveTesterMenu::pInstance->bAnimFinished) {
-            LoveTesterMenu::pInstance->TurnPage(true);
-            LoveTesterMenu::pInstance->RefreshPage();
-        }
+    if ((LoveTesterMenu::pInstance) && (LoveTesterMenu::pInstance->bAnimFinished)) {
+        LoveTesterMenu::pInstance->TurnPage(true);
+        LoveTesterMenu::pInstance->RefreshPage();
     }
 }
 
 void LoveTesterMenu::Draw3DElements() {
-    if (LoveTesterMenu::pInstance) {
-        if (LoveTesterMenu::sp3DCamera.m_pObject) {
-            NiRenderer* Renderer_ = NiRenderer::GetRenderer();
-            Renderer_->ClearBuffer(nullptr, 4u);
-            SceneGraph* apSceneGraph = Main::GetWorldSceneGraph();
-            BSCullingProcess* apCuller = apSceneGraph->pCuller;
-            apCuller->PushCullMode(BSCullingProcess::BSCP_CULL_ALLPASS);
-            NiCamera* pcam = LoveTesterMenu::sp3DCamera.m_pObject;
-            NiCamera::HandleEyeFinityFOVScale(pcam, 0.65f);
-            InterfaceManager* v1 = InterfaceManager::Instance();
-            BSShaderAccumulator* v2 = v1->Get3dAccumulator();
-            NiPointer<BSShaderAccumulator> spaccum(v2);
-            BSShaderAccumulator* afScale = spaccum.m_pObject;
-            apCuller->SetAccumulator(afScale);
-            ShadowSceneNode* ShadowSceneNode_ = BSShaderManager::GetShadowSceneNode(1);
-            BSShaderUtil::AccumulateScene(pcam, ShadowSceneNode_, *apCuller);
-            BSShaderAccumulator* v4 = spaccum.m_pObject;
-            BSShaderUtil::RenderScene(pcam, v4, false);
-            apCuller->SetAccumulator(nullptr);
-            apCuller->PopCullMode();
-        }
+    if ((LoveTesterMenu::pInstance) && (LoveTesterMenu::sp3DCamera.m_pObject)) {
+        NiRenderer* Renderer_ = NiRenderer::GetRenderer();
+        Renderer_->ClearBuffer(nullptr, 4u);
+        SceneGraph* apSceneGraph = Main::GetWorldSceneGraph();
+        BSCullingProcess* apCuller = apSceneGraph->pCuller;
+        apCuller->PushCullMode(BSCullingProcess::BSCP_CULL_ALLPASS);
+        NiCamera* pcam = LoveTesterMenu::sp3DCamera.m_pObject;
+        NiCamera::HandleEyeFinityFOVScale(pcam, 0.65f);
+        InterfaceManager* v1 = InterfaceManager::Instance();
+        BSShaderAccumulator* v2 = v1->Get3dAccumulator();
+        NiPointer<BSShaderAccumulator> spaccum(v2);
+        BSShaderAccumulator* afScale = spaccum.m_pObject;
+        apCuller->SetAccumulator(afScale);
+        ShadowSceneNode* ShadowSceneNode_ = BSShaderManager::GetShadowSceneNode(1);
+        BSShaderUtil::AccumulateScene(pcam, ShadowSceneNode_, *apCuller);
+        BSShaderAccumulator* v4 = spaccum.m_pObject;
+        BSShaderUtil::RenderScene(pcam, v4, false);
+        apCuller->SetAccumulator(nullptr);
+        apCuller->PopCullMode();
     }
 }
 
@@ -1282,62 +1278,58 @@ void LoveTesterMenu::Create(int32_t aiTotalPoints) {
         }
     }
     else {
-        if (pmenu) {
-            if (pmenu->pMenu) {
-                delete pmenu;
-            }
+        if ((pmenu) && (pmenu->pMenu)) {
+            delete pmenu;
         }
     }
 }
 
 void LoveTesterMenu::RefreshTotalPointsValue(LoveTesterMenu::LoveTesterTextItem* apItem) {
-    if (apItem->pText[0u]) {
-        if (apItem->pText[1]) {
-            int32_t v1;
-            int32_t v2;
-            int32_t v4;
-            int32_t v5 = LoveTesterMenu::pInstance->iAvailablePoints - PlayerCharacter::GetSumOfSPECIALStats();
+    if ((apItem->pText[0u]) && (apItem->pText[1])) {
+        int32_t v1;
+        int32_t v2;
+        int32_t v4;
+        int32_t v5 = LoveTesterMenu::pInstance->iAvailablePoints - PlayerCharacter::GetSumOfSPECIALStats();
+        if (v5 / 10 >= 9) {
+            v4 = 9;
+        }
+        else {
+            v4 = v5 / 10;
+        }
+        if (v4 <= 0) {
+            v2 = 0;
+        }
+        else {
+            int32_t v3;
             if (v5 / 10 >= 9) {
-                v4 = 9;
+                v3 = 9;
             }
             else {
-                v4 = v5 / 10;
+                v3 = v5 / 10;
             }
-            if (v4 <= 0) {
-                v2 = 0;
-            }
-            else {
-                int32_t v3;
-                if (v5 / 10 >= 9) {
-                    v3 = 9;
-                }
-                else {
-                    v3 = v5 / 10;
-                }
-                v2 = v3;
-            }
-            if (v5 % 10 >= 0) {
-                v1 = v5 % 10;
-            }
-            else {
-                v1 = 0;
-            }
-            apItem->pTextObj[0u]->SetAppCulled(false);
-            if (v2 <= 0) {
-                apItem->pText[0u]->SetTexture(
-                    BSShaderProperty::TEXTYPE_DIFFUSE, 0, LoveTesterMenu::pInstance->spAVValues->m_pObject
-                );
-            }
-            else {
-                apItem->pText[0u]->SetTexture(
-                    BSShaderProperty::TEXTYPE_DIFFUSE, 0, LoveTesterMenu::pInstance->spAVValues[v2].m_pObject
-                );
-            }
-            apItem->pTextObj[1]->SetAppCulled(false);
-            apItem->pText[1]->SetTexture(
-                BSShaderProperty::TEXTYPE_DIFFUSE, 0, LoveTesterMenu::pInstance->spAVValues[v1].m_pObject
+            v2 = v3;
+        }
+        if (v5 % 10 >= 0) {
+            v1 = v5 % 10;
+        }
+        else {
+            v1 = 0;
+        }
+        apItem->pTextObj[0u]->SetAppCulled(false);
+        if (v2 <= 0) {
+            apItem->pText[0u]->SetTexture(
+                BSShaderProperty::TEXTYPE_DIFFUSE, 0, LoveTesterMenu::pInstance->spAVValues->m_pObject
             );
         }
+        else {
+            apItem->pText[0u]->SetTexture(
+                BSShaderProperty::TEXTYPE_DIFFUSE, 0, LoveTesterMenu::pInstance->spAVValues[v2].m_pObject
+            );
+        }
+        apItem->pTextObj[1]->SetAppCulled(false);
+        apItem->pText[1]->SetTexture(
+            BSShaderProperty::TEXTYPE_DIFFUSE, 0, LoveTesterMenu::pInstance->spAVValues[v1].m_pObject
+        );
     }
 }
 

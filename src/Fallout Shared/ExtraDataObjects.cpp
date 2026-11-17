@@ -1962,10 +1962,8 @@ ExtraDismemberedLimbs::~ExtraDismemberedLimbs() {
 void ExtraDismemberedLimbs::RemoveLimb(BGSBodyPart::LIMB_ENUM aeLimb, bool abRemoved) {
     for (uint32_t i = 0; i < DismemberedLimbs.iSize; ++i) {
         DismemberedLimb* pdismemberedLimb = DismemberedLimbs.operator[](i);
-        if (pdismemberedLimb) {
-            if (pdismemberedLimb->cLimb == aeLimb) {
-                pdismemberedLimb->bLimbRemoved = abRemoved;
-            }
+        if ((pdismemberedLimb) && (pdismemberedLimb->cLimb == aeLimb)) {
+            pdismemberedLimb->bLimbRemoved = abRemoved;
         }
     }
 }
@@ -2235,28 +2233,27 @@ bool ExtraFollowerSwimBreadcrumbs::UpdateLeaderInfo(
         return false;
     }
     bool baddedCrumb = false;
-    if (aeLeaderState != eLeaderState) {
-        if (eLeaderState) {
-            ExtraFollowerSwimBreadcrumb* pcrumb;
-            void* apMemory = ourMalloc(sizeof(ExtraFollowerSwimBreadcrumb));
-            if (apMemory) {
-                pcrumb = ::new (apMemory) ExtraFollowerSwimBreadcrumb;
-            }
-            else {
-                pcrumb = nullptr;
-            }
-            ExtraFollowerSwimBreadcrumb* pcrumb_2 = pcrumb;
-            pcrumb->StartLocation.x = LeaderLocation.x;
-            pcrumb->StartLocation.y = LeaderLocation.y;
-            pcrumb->StartLocation.z = LeaderLocation.z;
-            pcrumb_2->StartNavMeshID = LeaderNavMeshID;
-            pcrumb_2->EndLocation = aLeaderLocation;
-            pcrumb_2->EndNavMeshID = aLeaderNavMeshID;
-            pcrumb_2->bEnteringWater = aeLeaderState == BREADCRUMB_STATE_IN_WATER;
-            CrumbList.AddTail(pcrumb_2);
-            baddedCrumb = true;
+    if ((aeLeaderState != eLeaderState) && (eLeaderState)) {
+        ExtraFollowerSwimBreadcrumb* pcrumb;
+        void* apMemory = ourMalloc(sizeof(ExtraFollowerSwimBreadcrumb));
+        if (apMemory) {
+            pcrumb = ::new (apMemory) ExtraFollowerSwimBreadcrumb;
         }
+        else {
+            pcrumb = nullptr;
+        }
+        ExtraFollowerSwimBreadcrumb* pcrumb_2 = pcrumb;
+        pcrumb->StartLocation.x = LeaderLocation.x;
+        pcrumb->StartLocation.y = LeaderLocation.y;
+        pcrumb->StartLocation.z = LeaderLocation.z;
+        pcrumb_2->StartNavMeshID = LeaderNavMeshID;
+        pcrumb_2->EndLocation = aLeaderLocation;
+        pcrumb_2->EndNavMeshID = aLeaderNavMeshID;
+        pcrumb_2->bEnteringWater = aeLeaderState == BREADCRUMB_STATE_IN_WATER;
+        CrumbList.AddTail(pcrumb_2);
+        baddedCrumb = true;
     }
+
     LeaderLocation = aLeaderLocation;
     LeaderNavMeshID = aLeaderNavMeshID;
     eLeaderState = aeLeaderState;
@@ -2384,18 +2381,16 @@ bool ExtraPatrolRefInUseData::GetCanBeUsedBy(const TESObjectREFR* apPotentialUse
         User = (uint32_t)0;
         return true;
     }
-    else {
-        if (formByNumericID->IsActor() &&
-            (formByNumericID->IsRestrained() ||
-             (formByNumericID->IsUnConscious() ||
-              (formByNumericID->GetCurrentProcessType() && (!formByNumericID->GetRunsInLow()))))) {
-            User = (uint32_t)0;
-            return true;
-        }
-        else {
-            return false;
-        }
+
+    if (formByNumericID->IsActor() &&
+        (formByNumericID->IsRestrained() ||
+         (formByNumericID->IsUnConscious() ||
+          (formByNumericID->GetCurrentProcessType() && (!formByNumericID->GetRunsInLow()))))) {
+        User = (uint32_t)0;
+        return true;
     }
+
+    return false;
 }
 
 ExtraScale::ExtraScale(float afScale) : BSExtraData(EXTRA_SCALE), fScale(afScale) {}
@@ -2431,17 +2426,16 @@ void ExtraSecuritronFace::ApplyFace(NiAVObject* apMesh) {
             NiPointer<NiSourceTexture> TexPtr(static_cast<NiSourceTexture*>(nullptr));
             GetPersonality(&Personality);
             GetMood(&Mood);
-            if (Personality.GetLength()) {
-                if (Mood.GetLength()) {
-                    char apDest[268];
-                    char path[268];
-                    BSsprintf(
-                        apDest, 260, "Textures\\creatures\\Securitron\\%s_%s.dds", Personality.String(), Mood.String()
-                    );
-                    SwapPlatformLanguageTexturePath(apDest, path, 260u);
-                    TES::pInstance->CreateTextureImage(path, TexPtr, false, false);
-                }
+            if ((Personality.GetLength()) && (Mood.GetLength())) {
+                char apDest[268];
+                char path[268];
+                BSsprintf(
+                    apDest, 260, "Textures\\creatures\\Securitron\\%s_%s.dds", Personality.String(), Mood.String()
+                );
+                SwapPlatformLanguageTexturePath(apDest, path, 260u);
+                TES::pInstance->CreateTextureImage(path, TexPtr, false, false);
             }
+
             int32_t Type = NiShadeProperty::GetType();
             BSShaderNoLightingProperty* pFaceShader =
                 static_cast<BSShaderNoLightingProperty*>(pFace->GetProperty(Type));
@@ -2792,12 +2786,10 @@ void ExtraGuardedRefData::AddGuard(Actor* apActor) {
 void ExtraGuardedRefData::NotifyGuardsAboutActivation(TESObjectREFR* apObject, TESObjectREFR* apActionRef) {
     for (uint32_t i = 0; i < Guards.iSize; ++i) {
         Actor* pactor = static_cast<Actor*>(TESForm::GetFormByNumericID(Guards.operator[](i)));
-        if (pactor) {
-            if (pactor->IsReference() && pactor->IsActor()) {
-                BaseProcess* pproc = pactor->pCurrentProcess;
-                if (pproc) {
-                    pproc->NotifyGuardAboutActivation(pactor, apActionRef, apObject);
-                }
+        if ((pactor) && (pactor->IsReference() && pactor->IsActor())) {
+            BaseProcess* pproc = pactor->pCurrentProcess;
+            if (pproc) {
+                pproc->NotifyGuardAboutActivation(pactor, apActionRef, apObject);
             }
         }
     }
@@ -2835,23 +2827,21 @@ bool DoorTeleportData::InitItem(TESForm* apOwner) {
             }
             return true;
         }
-        else {
-            TESBoundObject* ObjectReference = pLinkedDoor->GetObjectReference();
-            int32_t X_4 = pLinkedDoor->GetObjectReference()->iFormID;
-            const char* X = ObjectReference->GetFormEditorID();
-            int32_t FormType = pLinkedDoor->GetObjectReference()->GetFormType();
-            Warning(
-                "MASTERFILE: Linked door (%08X) in teleport data points to invalid object (%s %s(%08X)).", tempID,
-                formEnumString[FormType].pFormString, X, X_4
-            );
-            pLinkedDoor = nullptr;
-            return false;
-        }
-    }
-    else {
-        Warning("MASTERFILE: Could not find linked door (%08X) in teleport data init.", tempID);
+
+        TESBoundObject* ObjectReference = pLinkedDoor->GetObjectReference();
+        int32_t X_4 = pLinkedDoor->GetObjectReference()->iFormID;
+        const char* X = ObjectReference->GetFormEditorID();
+        int32_t FormType = pLinkedDoor->GetObjectReference()->GetFormType();
+        Warning(
+            "MASTERFILE: Linked door (%08X) in teleport data points to invalid object (%s %s(%08X)).", tempID,
+            formEnumString[FormType].pFormString, X, X_4
+        );
+        pLinkedDoor = nullptr;
         return false;
     }
+
+    Warning("MASTERFILE: Could not find linked door (%08X) in teleport data init.", tempID);
+    return false;
 }
 
 void MobileObject::SetCurrentAIProcess(BaseProcess* appross) {

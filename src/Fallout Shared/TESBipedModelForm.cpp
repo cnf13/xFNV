@@ -338,11 +338,10 @@ const char* TESBipedModelForm::GetMessageIcon(TESForm* apObj, TESObjectREFR* apR
     }
     TESActorBase* Owner = static_cast<TESActorBase*>(apRef->GetOwner());
     TESActorBase::SEX aeSex = TESActorBase::SEX_MALE;
-    if (Owner) {
-        if (Owner->GetFormType() == 42) {
-            aeSex = Owner->GetSex();
-        }
+    if ((Owner) && (Owner->GetFormType() == 42)) {
+        aeSex = Owner->GetSex();
     }
+
     return v4->GetMessageIcon(aeSex);
 }
 
@@ -356,11 +355,10 @@ const char* TESBipedModelForm::GetWorldModel(TESForm* apObj, TESObjectREFR* apRe
     }
     TESForm* powner = apRef->GetOwner();
     TESActorBase::SEX esex = TESActorBase::SEX_MALE;
-    if (powner) {
-        if (powner->GetFormType() == NPC__ID) {
-            esex = static_cast<TESActorBase*>(powner)->TESActorBase::GetSex();
-        }
+    if ((powner) && (powner->GetFormType() == NPC__ID)) {
+        esex = static_cast<TESActorBase*>(powner)->TESActorBase::GetSex();
     }
+
     return pbipedModel->GetWorldModel_0(esex);
 }
 
@@ -374,11 +372,10 @@ const char* TESBipedModelForm::GetIcon_0(TESForm* apObj, TESObjectREFR* apRef) {
     }
     TESForm* powner = apRef->GetOwner();
     TESActorBase::SEX esex = TESActorBase::SEX_MALE;
-    if (powner) {
-        if (powner->GetFormType() == NPC__ID) {
-            esex = static_cast<TESActorBase*>(powner)->TESActorBase::GetSex();
-        }
+    if ((powner) && (powner->GetFormType() == NPC__ID)) {
+        esex = static_cast<TESActorBase*>(powner)->TESActorBase::GetSex();
     }
+
     return pbipedModel->GetIcon(esex);
 }
 

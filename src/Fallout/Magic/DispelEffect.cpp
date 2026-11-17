@@ -63,18 +63,17 @@ void DispelEffect::Start() {
     while (plist && !plist->IsEmpty()) {
         ActiveEffect* peffect = plist->m_item;
         BSSimpleList<ActiveEffect*>* pnext = plist->m_pkNext;
-        if (peffect) {
-            if (peffect != this) {
-                MagicItem* pspell = peffect->pSpell;
-                if (pspell->GetSpellType() == MagicSystem::SPELL) {
-                    double v2 = pspell->GetCost(bselfCast ? pcasterActor : nullptr);
-                    double SequenceWeight = fMagnitude;
-                    if (fMagicDispelMagnitudeMult.Float() * SequenceWeight >= v2) {
-                        peffect->Dispel(false);
-                    }
+        if ((peffect) && (peffect != this)) {
+            MagicItem* pspell = peffect->pSpell;
+            if (pspell->GetSpellType() == MagicSystem::SPELL) {
+                double v2 = pspell->GetCost(bselfCast ? pcasterActor : nullptr);
+                double SequenceWeight = fMagnitude;
+                if (fMagicDispelMagnitudeMult.Float() * SequenceWeight >= v2) {
+                    peffect->Dispel(false);
                 }
             }
         }
+
         plist = pnext;
     }
 }
@@ -84,7 +83,6 @@ ActiveEffect* DispelEffect::Instantiate(MagicCaster* a1, MagicItem* a2, EffectIt
     if (v5) {
         return ::new (v5) DispelEffect(a1, a2, a3);
     }
-    else {
-        return nullptr;
-    }
+
+    return nullptr;
 }

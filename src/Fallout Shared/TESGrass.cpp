@@ -330,9 +330,8 @@ char* TESGrass::GetModelPath() {
     if (cModel.pString) {
         return cModel.pString;
     }
-    else {
-        return const_cast<char*>("");
-    }
+
+    return const_cast<char*>("");
 }
 
 float TESGrass::GetWaveOffsetRange() {

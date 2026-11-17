@@ -59,9 +59,8 @@ static uint32_t calcPermute(uint32_t a1) {
     if ((v7 & 1) != 0) {
         return v7 >> 1 ^ 0xEDB88320u;
     }
-    else {
-        return v7 >> 1;
-    }
+
+    return v7 >> 1;
 }
 
 hkCrc32StreamWriter::hkCrc32StreamWriter(uint32_t startCrc) : m_crc32(~startCrc) {}

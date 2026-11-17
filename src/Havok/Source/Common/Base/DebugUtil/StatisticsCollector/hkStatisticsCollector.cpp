@@ -42,9 +42,8 @@ int32_t hkStatisticsCollector::getReferencedObjectSize(const hkReferencedObject*
         if (v3) {
             return v3->getObjectSize();
         }
-        else {
-            return 0;
-        }
+
+        return 0;
     }
     return result;
 }

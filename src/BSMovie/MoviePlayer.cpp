@@ -70,10 +70,9 @@ bool Movie::PlayBackground(const char* apFileName, bool abPreloadBink) {
         bLoading = false;
         return true;
     }
-    else {
-        bLoading = false;
-        return false;
-    }
+
+    bLoading = false;
+    return false;
 }
 
 bool Movie::Update(bool abAllowInterruption, bool abLoop, bool abLetterBoxed) {
@@ -353,12 +352,10 @@ void MoviePlayer::IncreaseSequenceThreadPriority() {
 }
 
 void MoviePlayer::Resume() {
-    if (!pCurrentMovie) {
-        if (pPausedMovie) {
-            pCurrentMovie = pPausedMovie;
-            pPausedMovie = nullptr;
-            pCurrentMovie->Resume();
-        }
+    if ((!pCurrentMovie) && (pPausedMovie)) {
+        pCurrentMovie = pPausedMovie;
+        pPausedMovie = nullptr;
+        pCurrentMovie->Resume();
     }
 }
 
@@ -386,9 +383,8 @@ float MoviePlayer::CalculateScale(uint32_t afWidth, uint32_t afHeight, bool abLe
     if (abLetterBoxed) {
         return (float)(((double)GetScreenWidth()) / ((double)afWidth));
     }
-    else {
-        return (float)(((double)GetScreenHeight()) / ((double)afHeight));
-    }
+
+    return (float)(((double)GetScreenHeight()) / ((double)afHeight));
 }
 
 // The horizontal position the movie is drawn at: half the gap left by the scaled movie in the screen width, plus the
@@ -407,9 +403,8 @@ float MoviePlayer::CalculateYOffset(float afScale, uint32_t afHeight, bool abLet
     if (abLetterBoxed) {
         return (float)((((double)GetScreenHeight()) - (((double)afHeight) * afScale)) / 2.0);
     }
-    else {
-        return (float)0.0;
-    }
+
+    return (float)0.0;
 }
 
 void MoviePlayer::WaitForSequenceToBegin() {

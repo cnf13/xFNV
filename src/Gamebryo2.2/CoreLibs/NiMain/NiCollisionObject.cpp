@@ -72,9 +72,8 @@ void NiCollisionObject::AddViewerStrings(NiTPrimitiveArray<char*>* pkStrings) {
 
 void NiCollisionObject::SetSceneGraphObject(NiAVObject* pkSceneObject) {
     m_pkSceneObject = pkSceneObject;
-    if (pkSceneObject) {
-        if (static_cast<const void*>(pkSceneObject->m_spCollisionObject.m_pObject) != static_cast<const void*>(this)) {
-            pkSceneObject->SetCollisionObject(this);
-        }
+    if ((pkSceneObject) &&
+        (static_cast<const void*>(pkSceneObject->m_spCollisionObject.m_pObject) != static_cast<const void*>(this))) {
+        pkSceneObject->SetCollisionObject(this);
     }
 }

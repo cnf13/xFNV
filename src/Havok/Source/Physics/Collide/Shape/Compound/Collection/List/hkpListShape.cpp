@@ -290,22 +290,19 @@ hkBool hkpListShape::castRayImpl(const hkpShapeRayCastInput& input, hkpShapeRayC
     if (!input.m_rayShapeCollectionFilter) {
         for (int32_t i = 0; i < m_childInfo.m_size; ++i) {
             // EXE-INLINED none: hkpListShape::isChildEnabled
-            if (static_cast<uint32_t>(i) >= MAX_DISABLED_CHILDREN || (m_enabledChildren[i >> 5] & (1 << (i & 31)))) {
-                if (m_childInfo.m_data[i].m_shape->castRayImpl(input, results).m_bool) {
-                    hitKey = i;
-                }
+            if ((static_cast<uint32_t>(i) >= MAX_DISABLED_CHILDREN || (m_enabledChildren[i >> 5] & (1 << (i & 31)))) &&
+                (m_childInfo.m_data[i].m_shape->castRayImpl(input, results).m_bool)) {
+                hitKey = i;
             }
         }
     }
     else {
         for (int32_t i = 0; i < m_childInfo.m_size; ++i) {
             // EXE-INLINED none: hkpListShape::isChildEnabled
-            if (static_cast<uint32_t>(i) >= MAX_DISABLED_CHILDREN || (m_enabledChildren[i >> 5] & (1 << (i & 31)))) {
-                if (input.m_rayShapeCollectionFilter->isCollisionEnabled(input, *this, *this, i).m_bool) {
-                    if (m_childInfo.m_data[i].m_shape->castRayImpl(input, results).m_bool) {
-                        hitKey = i;
-                    }
-                }
+            if ((static_cast<uint32_t>(i) >= MAX_DISABLED_CHILDREN || (m_enabledChildren[i >> 5] & (1 << (i & 31)))) &&
+                (input.m_rayShapeCollectionFilter->isCollisionEnabled(input, *this, *this, i).m_bool) &&
+                (m_childInfo.m_data[i].m_shape->castRayImpl(input, results).m_bool)) {
+                hitKey = i;
             }
         }
     }
@@ -346,15 +343,14 @@ void hkpListShape::castRayWithCollectorImpl(
     else {
         for (int32_t i = 0; i < m_childInfo.m_size; ++i) {
             // EXE-INLINED none: hkpListShape::isChildEnabled
-            if (static_cast<uint32_t>(i) >= MAX_DISABLED_CHILDREN || (m_enabledChildren[i >> 5] & (1 << (i & 31)))) {
-                if (input.m_rayShapeCollectionFilter->isCollisionEnabled(input, *this, *this, i).m_bool) {
-                    const hkpShape* childShape = m_childInfo.m_data[i].m_shape;
-                    childBody.m_motion.pState = cdBody.m_motion.pState;
-                    childBody.m_parent = &cdBody;
-                    childBody.m_shape = childShape;
-                    childBody.m_shapeKey = i;
-                    childShape->castRayWithCollectorImpl(input, childBody, collector);
-                }
+            if ((static_cast<uint32_t>(i) >= MAX_DISABLED_CHILDREN || (m_enabledChildren[i >> 5] & (1 << (i & 31)))) &&
+                (input.m_rayShapeCollectionFilter->isCollisionEnabled(input, *this, *this, i).m_bool)) {
+                const hkpShape* childShape = m_childInfo.m_data[i].m_shape;
+                childBody.m_motion.pState = cdBody.m_motion.pState;
+                childBody.m_parent = &cdBody;
+                childBody.m_shape = childShape;
+                childBody.m_shapeKey = i;
+                childShape->castRayWithCollectorImpl(input, childBody, collector);
             }
         }
     }

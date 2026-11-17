@@ -308,17 +308,14 @@ void VATSMenu::DoClick(int32_t aiID, Tile* apTarget) {
             break;
         }
     }
-    if (pVATSTarget) {
-        if (pVATSTarget->IsActor()) {
-            eVATSTargetLimb = ActorValue::PERCEPTION_CONDITION;
-        }
+    if ((pVATSTarget) && (pVATSTarget->IsActor())) {
+        eVATSTargetLimb = ActorValue::PERCEPTION_CONDITION;
     }
+
     VATSMenu::SetupSpecialAttackButtons(pWeapon);
     SetTargetLimb();
-    if (pVATS.GetVATSLight()) {
-        if (pVATSTarget) {
-            pVATS.UpdateVATSLight(pVATSTarget);
-        }
+    if ((pVATS.GetVATSLight()) && (pVATSTarget)) {
+        pVATS.UpdateVATSLight(pVATSTarget);
     }
 }
 
@@ -2168,15 +2165,14 @@ bool VATSMenu::PrecalcTargetHitChances() {
         UpdateChanceToHit();
         return true;
     }
-    if (i) {
-        if (i->m_item) {
-            pCurrentLimb = i->m_item;
-            if (!i->m_item->bFirstTimeShown) {
-                VATSMenu::ShowTargetLimb(true);
-                i->m_item->bFirstTimeShown = true;
-            }
+    if ((i) && (i->m_item)) {
+        pCurrentLimb = i->m_item;
+        if (!i->m_item->bFirstTimeShown) {
+            VATSMenu::ShowTargetLimb(true);
+            i->m_item->bFirstTimeShown = true;
         }
     }
+
     char bContinue = 1;
     for (BSSimpleList<VATSBodyPart*>* j = &currentTarget->kBodyParts;; j = j->m_pkNext) {
         if (!j || j->IsEmpty()) {
@@ -2205,10 +2201,8 @@ bool VATSMenu::PrecalcTargetHitChances() {
                     bContinue = 0;
                 }
                 UpdateHitChanceForBodyPartData(j);
-                if (bContinue) {
-                    if (!j->m_pkNext) {
-                        break;
-                    }
+                if ((bContinue) && (!j->m_pkNext)) {
+                    break;
                 }
             }
         }
@@ -2570,10 +2564,9 @@ bool VATSMenu::LimbOnScreen(VATSBodyPart* apLimb) {
         apLimb->bOnScreen = true;
         return true;
     }
-    else {
-        apLimb->bOnScreen = false;
-        return false;
-    }
+
+    apLimb->bOnScreen = false;
+    return false;
 }
 
 // The player's chance to hit the body part apList holds (its first item) on the current target, with the player's
@@ -2779,137 +2772,127 @@ void VATSMenu::Close() {
     FNVD_INLINED_LOCAL(BSSoundHandle, th_s, std::nullopt, std::nullopt);
     float fFortune;
     float fStranger;
-    if (VATSMenu::pVatsMenu) {
-        if (VATSMenu::pVatsMenu->xFadeState == Interface::FADE_SHOWN) {
-            if (!VATSMenu::pVatsMenu->bClosing) {
-                BSAudio* v0 = &BSAudio::QInstance();
-                v0->UnPauseWorldSounds();
-            }
-            VATSMenu::pVatsMenu->bClosing = true;
-            int32_t ClassStatic = VATSMenu::GetClassStatic();
-            Tile* ptile = Menu::GetMenuByClass(ClassStatic);
-            if (ptile) {
-                if (VATSMenu::pVatsMenu) {
-                    if (!VATSMenu::Destructibles.IsEmpty()) {
-                        VATSMenu::Destructibles.RemoveAll();
+    if ((VATSMenu::pVatsMenu) && (VATSMenu::pVatsMenu->xFadeState == Interface::FADE_SHOWN)) {
+        if (!VATSMenu::pVatsMenu->bClosing) {
+            BSAudio* v0 = &BSAudio::QInstance();
+            v0->UnPauseWorldSounds();
+        }
+        VATSMenu::pVatsMenu->bClosing = true;
+        int32_t ClassStatic = VATSMenu::GetClassStatic();
+        Tile* ptile = Menu::GetMenuByClass(ClassStatic);
+        if (ptile) {
+            if (VATSMenu::pVatsMenu) {
+                if (!VATSMenu::Destructibles.IsEmpty()) {
+                    VATSMenu::Destructibles.RemoveAll();
+                }
+                InterfaceManager* v2 = InterfaceManager::Instance();
+                v2->RefreshActivateREFR();
+                BSAudio* v3 = &BSAudio::QInstance();
+                v3->EndAllSoundsOfType(256u);
+                if (!pSaveLoadGame->GetSaveGameLoading()) {
+                    BSAudioManager* mgr = &BSAudioManager::QInstance();
+                    BSSoundHandle soundHand;
+                    if (VATSMenu::xTargetList.IsEmpty()) {
+                        BSSoundHandle* arHandle = mgr->GetSoundHandleByName(&th_s, "UIVATSEnterFail", 289u);
+                        soundHand.operator=(*arHandle);
                     }
-                    InterfaceManager* v2 = InterfaceManager::Instance();
-                    v2->RefreshActivateREFR();
-                    BSAudio* v3 = &BSAudio::QInstance();
-                    v3->EndAllSoundsOfType(256u);
-                    if (!pSaveLoadGame->GetSaveGameLoading()) {
-                        BSAudioManager* mgr = &BSAudioManager::QInstance();
-                        BSSoundHandle soundHand;
-                        if (VATSMenu::xTargetList.IsEmpty()) {
-                            BSSoundHandle* arHandle = mgr->GetSoundHandleByName(&th_s, "UIVATSEnterFail", 289u);
-                            soundHand.operator=(*arHandle);
+                    else {
+                        BSSoundHandle* SoundHandleByName = mgr->GetSoundHandleByName(&apHandle, "UIVATSExit", 289u);
+                        soundHand.operator=(*SoundHandleByName);
+                    }
+                    soundHand.Play(false);
+                }
+                ptile->Set(Tile::kTileValue_DeleteOnFade, 1);
+                VATSMenu::pVatsMenu->StartFadeOut();
+            }
+            if (pVATS.GetCount()) {
+                BSAudioManager* mgr_2 = &BSAudioManager::QInstance();
+                BSSoundHandle soundHand_2;
+                BSSoundHandle* v10 = mgr_2->GetSoundHandleByName(&v15, "UIVATSReady", 289u);
+                soundHand_2.operator=(*v10);
+                soundHand_2.Play(false);
+                fFortune = fVATSFortuneOdds.Float();
+                fStranger = fVATSStrangerOdds.Float();
+                BGSEntryPoint::HandleEntryPoint(BGSEntryPoint::MODIFY_VATS_HELPER_CHANCE, pPlayer, &fFortune);
+                BGSEntryPoint::HandleEntryPoint(BGSEntryPoint::MODIFY_VATS_HELPER_CHANCE, pPlayer, &fStranger);
+                if ((VATS::pStranger) && (pVATSTarget) &&
+                    (pVATSTarget->IsActor() && !static_cast<Actor*>(pVATSTarget)->Actor::GetEssential())) {
+                    double v4 = RandomFloat(0.0f, 1.0f);
+                    if (fStranger >= v4) {
+                        TESFaction* pfaction = static_cast<TESFaction*>(
+                            BGSDefaultObjectManager::GetDefaultObject(DO_PERK_STRANGER_FACTION)
+                        );
+                        if ((pfaction) && (!static_cast<Actor*>(pVATSTarget)->Actor::IsInFaction(pfaction))) {
+                            VATS_COMMAND* pcommand;
+                            VATS_COMMAND* apMemory = static_cast<VATS_COMMAND*>(ourMalloc(sizeof(VATS_COMMAND)));
+                            if (apMemory) {
+                                pcommand = ::new (apMemory) VATS_COMMAND;
+                            }
+                            else {
+                                pcommand = nullptr;
+                            }
+                            pcommand->eLimb = ActorValue::PERCEPTION_CONDITION;
+                            pcommand->cFireShots = 5;
+                            pcommand->eAction = ActionPoints::ACTION_ATTACK_PISTOL;
+                            pcommand->bStranger = true;
+                            pcommand->pTarget = pVATSTarget;
+                            pcommand->bSuccess = true;
+                            pVATS.QueueAction(pcommand);
+                            VATS::pStranger->StartCombat(
+                                static_cast<Actor*>(pVATSTarget), nullptr, true, true, false, 0, true, nullptr
+                            );
+                        }
+                    }
+                }
+
+                if ((VATS::pMissFortune) && (pVATSTarget) &&
+                    (pVATSTarget->IsActor() && !static_cast<Actor*>(pVATSTarget)->Actor::GetEssential())) {
+                    double v5 = RandomFloat(0.0f, 1.0f);
+                    if (fFortune >= v5) {
+                        VATS_COMMAND* pcommand_3;
+                        VATS_COMMAND* v13 = static_cast<VATS_COMMAND*>(ourMalloc(sizeof(VATS_COMMAND)));
+                        if (v13) {
+                            pcommand_3 = ::new (v13) VATS_COMMAND;
                         }
                         else {
-                            BSSoundHandle* SoundHandleByName = mgr->GetSoundHandleByName(&apHandle, "UIVATSExit", 289u);
-                            soundHand.operator=(*SoundHandleByName);
+                            pcommand_3 = nullptr;
                         }
-                        soundHand.Play(false);
-                    }
-                    ptile->Set(Tile::kTileValue_DeleteOnFade, 1);
-                    VATSMenu::pVatsMenu->StartFadeOut();
-                }
-                if (pVATS.GetCount()) {
-                    BSAudioManager* mgr_2 = &BSAudioManager::QInstance();
-                    BSSoundHandle soundHand_2;
-                    BSSoundHandle* v10 = mgr_2->GetSoundHandleByName(&v15, "UIVATSReady", 289u);
-                    soundHand_2.operator=(*v10);
-                    soundHand_2.Play(false);
-                    fFortune = fVATSFortuneOdds.Float();
-                    fStranger = fVATSStrangerOdds.Float();
-                    BGSEntryPoint::HandleEntryPoint(BGSEntryPoint::MODIFY_VATS_HELPER_CHANCE, pPlayer, &fFortune);
-                    BGSEntryPoint::HandleEntryPoint(BGSEntryPoint::MODIFY_VATS_HELPER_CHANCE, pPlayer, &fStranger);
-                    if (VATS::pStranger) {
-                        if (pVATSTarget) {
-                            if (pVATSTarget->IsActor() && !static_cast<Actor*>(pVATSTarget)->Actor::GetEssential()) {
-                                double v4 = RandomFloat(0.0f, 1.0f);
-                                if (fStranger >= v4) {
-                                    TESFaction* pfaction = static_cast<TESFaction*>(
-                                        BGSDefaultObjectManager::GetDefaultObject(DO_PERK_STRANGER_FACTION)
-                                    );
-                                    if (pfaction) {
-                                        if (!static_cast<Actor*>(pVATSTarget)->Actor::IsInFaction(pfaction)) {
-                                            VATS_COMMAND* pcommand;
-                                            VATS_COMMAND* apMemory =
-                                                static_cast<VATS_COMMAND*>(ourMalloc(sizeof(VATS_COMMAND)));
-                                            if (apMemory) {
-                                                pcommand = ::new (apMemory) VATS_COMMAND;
-                                            }
-                                            else {
-                                                pcommand = nullptr;
-                                            }
-                                            pcommand->eLimb = ActorValue::PERCEPTION_CONDITION;
-                                            pcommand->cFireShots = 5;
-                                            pcommand->eAction = ActionPoints::ACTION_ATTACK_PISTOL;
-                                            pcommand->bStranger = true;
-                                            pcommand->pTarget = pVATSTarget;
-                                            pcommand->bSuccess = true;
-                                            pVATS.QueueAction(pcommand);
-                                            VATS::pStranger->StartCombat(
-                                                static_cast<Actor*>(pVATSTarget), nullptr, true, true, false, 0, true,
-                                                nullptr
-                                            );
-                                        }
-                                    }
-                                }
-                            }
-                        }
-                    }
-                    if (VATS::pMissFortune) {
-                        if (pVATSTarget) {
-                            if (pVATSTarget->IsActor() && !static_cast<Actor*>(pVATSTarget)->Actor::GetEssential()) {
-                                double v5 = RandomFloat(0.0f, 1.0f);
-                                if (fFortune >= v5) {
-                                    VATS_COMMAND* pcommand_3;
-                                    VATS_COMMAND* v13 = static_cast<VATS_COMMAND*>(ourMalloc(sizeof(VATS_COMMAND)));
-                                    if (v13) {
-                                        pcommand_3 = ::new (v13) VATS_COMMAND;
-                                    }
-                                    else {
-                                        pcommand_3 = nullptr;
-                                    }
-                                    pcommand_3->eLimb = ActorValue::PERCEPTION_CONDITION;
-                                    pcommand_3->cFireShots = 5;
-                                    pcommand_3->eAction = ActionPoints::ACTION_ATTACK_PISTOL;
-                                    pcommand_3->bMissFortune = true;
-                                    pcommand_3->pTarget = pVATSTarget;
-                                    pcommand_3->bSuccess = true;
-                                    pVATS.QueueAction(pcommand_3);
-                                    VATS::pMissFortune->StartCombat(
-                                        static_cast<Actor*>(pVATSTarget), nullptr, true, true, false, 0, true, nullptr
-                                    );
-                                }
-                            }
-                        }
-                    }
-                    pVATS.SetMode(VATS::VATS_PLAYBACK, false);
-                }
-                else {
-                    pVATS.SetMode(VATS::VATS_MODE_NONE, false);
-                    bFOVTargetReached = false;
-                    if (VATS::pStranger) {
-                        delete VATS::pStranger;
-                        VATS::pStranger = nullptr;
-                    }
-                    if (VATS::pMissFortune) {
-                        delete VATS::pMissFortune;
-                        VATS::pMissFortune = nullptr;
+                        pcommand_3->eLimb = ActorValue::PERCEPTION_CONDITION;
+                        pcommand_3->cFireShots = 5;
+                        pcommand_3->eAction = ActionPoints::ACTION_ATTACK_PISTOL;
+                        pcommand_3->bMissFortune = true;
+                        pcommand_3->pTarget = pVATSTarget;
+                        pcommand_3->bSuccess = true;
+                        pVATS.QueueAction(pcommand_3);
+                        VATS::pMissFortune->StartCombat(
+                            static_cast<Actor*>(pVATSTarget), nullptr, true, true, false, 0, true, nullptr
+                        );
                     }
                 }
-                FOVATSEffectManager* VATSEffect = Interface::GetVATSEffect();
-                VATSEffect->SetTarget(nullptr, BGSBodyPart::LIMB_NONE, false);
-                FOVATSEffectManager* v7 = Interface::GetVATSEffect();
-                v7->ClearMultiTargets();
-                bcancelVATS = 0;
+
+                pVATS.SetMode(VATS::VATS_PLAYBACK, false);
             }
             else {
                 pVATS.SetMode(VATS::VATS_MODE_NONE, false);
                 bFOVTargetReached = false;
+                if (VATS::pStranger) {
+                    delete VATS::pStranger;
+                    VATS::pStranger = nullptr;
+                }
+                if (VATS::pMissFortune) {
+                    delete VATS::pMissFortune;
+                    VATS::pMissFortune = nullptr;
+                }
             }
+            FOVATSEffectManager* VATSEffect = Interface::GetVATSEffect();
+            VATSEffect->SetTarget(nullptr, BGSBodyPart::LIMB_NONE, false);
+            FOVATSEffectManager* v7 = Interface::GetVATSEffect();
+            v7->ClearMultiTargets();
+            bcancelVATS = 0;
+        }
+        else {
+            pVATS.SetMode(VATS::VATS_MODE_NONE, false);
+            bFOVTargetReached = false;
         }
     }
 }
@@ -2932,9 +2915,8 @@ VATS_COMMAND* VATSMenu::GetCurrentQueuedAction() {
     if (VATSMenu::pVatsMenu && VATSMenu::pVatsMenu->bDataInTemporaryVATSCommand) {
         return &VATSMenu::pVatsMenu->kCurrentCommand;
     }
-    else {
-        return nullptr;
-    }
+
+    return nullptr;
 }
 
 // The target sorts Create passes are VATSMenu's VATSMenu_SortAngle and VATSMenu_SortDirection (VATSMenu.h). The numeric
@@ -3505,193 +3487,175 @@ bool VATSMenu::BuildTargetList() {
                 !pact->pTarget->GetVATStarget();
             v143 = v142;
         }
-        if (pact) {
-            if (!pact->pTarget->IsDead(false)) {
-                if (pact->pTarget->Get3D()) {
-                    if (pact->pTarget->GetCurrentProcessType() == PROCESS_TYPE_HIGH && !pact->pTarget->IsChild(false) &&
-                        !v143) {
-                        float fdist = pact->pTarget->GetDistanceFromReference(pPlayer, false, false);
-                        if (!(fdist < 2.0)) {
-                            float* v3 = &fVATSMaxEngageDistance.Float();
-                            if (!(*v3 < static_cast<double>(fdist)) &&
-                                pPlayer->LineOfSight(true, pact->pTarget, true, nullptr, true)) {
-                                float* v7;
-                                float* v8;
-                                float* v9;
-                                if (fmaxNPCDist < static_cast<double>(fdist)) {
-                                    fmaxNPCDist = fdist;
-                                }
-                                alignas(16) NiPoint3 targetPoint = pact->pTarget->Get3D()->GetWorldTranslate();
-                                float x = 0.0;
-                                float y = 0.0;
-                                SceneGraph* v4 = Main::GetWorldSceneGraph();
-                                v4->GetCamera()->WorldPtToScreenPt(targetPoint, x, y, 1e-05f);
-                                bool v137 = !(x <= 0.0) && (!(y <= 0.0) && (!(x >= 1.0) && !(y >= 1.0)));
-                                char v136 = v137;
-                                if (v137) {
-                                    bvalidTargetsFound = true;
-                                }
-                                else {
-                                    TESActorBase* bonScreen = pact->pTarget->GetActorBase();
-                                    BGSBodyPartData* pbodyPartData = bonScreen->GetBodyPartData();
-                                    BGSBodyPart** pbodyPartArray = pbodyPartData->pPartArray;
-                                    for (BGSBodyPart::LIMB_ENUM eindex = BGSBodyPart::LIMB_TORSO;
-                                         eindex < BGSBodyPart::LIMB_COUNT;
-                                         eindex = static_cast<BGSBodyPart::LIMB_ENUM>(eindex + 1)) {
-                                        if (pbodyPartArray[eindex]) {
-                                            Actor* pTarget = plist->m_item->pTarget;
-                                            const char* fZeroTolerance =
-                                                pbodyPartData->GetBodyPart(eindex)->GetTargetName();
-                                            NiNode* v5 = pTarget->Get3D();
-                                            NiAVObject* plimb = BSUtilities::GetObjectByName(v5, fZeroTolerance);
-                                            if (plimb) {
-                                                float v130;
-                                                alignas(16) float v131;
-                                                const NiPoint3* WorldTranslate = &plimb->GetWorldTranslate();
-                                                SceneGraph* v6 = Main::GetWorldSceneGraph();
-                                                v6->GetCamera()->WorldPtToScreenPt(*WorldTranslate, v130, v131, 1e-05f);
-                                                if (v130 > 0.0 && (v131 > 0.0 && (v130 < 1.0 && v131 < 1.0))) {
-                                                    v136 = 1;
-                                                    bvalidTargetsFound = true;
-                                                    break;
-                                                }
-                                            }
-                                        }
-                                    }
-                                }
-                                if (((!binterior ||
-                                      (v7 = &fSneakMaxDistance.Float(), !(*v7 < static_cast<double>(fdist)))) &&
-                                     (binterior ||
-                                      (v8 = &fSneakExteriorDistanceMult.Float(),
-                                       (v9 = &fSneakMaxDistance.Float(), !(fdist > *v8 * *v9))))) ||
-                                    v136) {
-                                    if (pact->pTarget->Get3D()) {
-                                        TESObjectWEAP* ptargetWeapon;
-                                        ItemChange* ptargetWeaponItem;
-                                        VATSTarget* v125[2];
-                                        VATSTarget* vt;
-                                        VATSTarget* v127 = static_cast<VATSTarget*>(ourMalloc(sizeof(VATSTarget)));
-                                        if (v127) {
-                                            vt = ::new (v127) VATSTarget;
-                                        }
-                                        else {
-                                            vt = nullptr;
-                                        }
-                                        v125[1] = vt;
-                                        v125[0] = vt;
-                                        vt->eType = 1;
-                                        v125[0]->pTargetRef = (TESObjectREFR*)pact->pTarget;
-                                        v125[0]->bChancesCalculated = false;
-                                        CompassTarget* m_item = plist->m_item;
-                                        v125[0]->bHostile = m_item->bIsHostile;
-                                        // Reads the target's base through Actor::GetActorBase without testing that the
-                                        // reference is an actor, as the game does.
-                                        TESActorBase* ptargetBase =
-                                            static_cast<Actor*>(v125[0]->pTargetRef)->GetActorBase();
-                                        BGSBodyPart** ppartArray = ptargetBase->GetBodyPartData()->pPartArray;
-                                        for (int32_t j = 0; j < 15; ++j) {
-                                            if (ppartArray[j]) {
-                                                VATSBodyPart* v118[2];
-                                                VATSBodyPart* v119;
-                                                VATSBodyPart* v120 =
-                                                    static_cast<VATSBodyPart*>(ourMalloc(sizeof(VATSBodyPart)));
-                                                if (v120) {
-                                                    v119 = ::new (v120) VATSBodyPart;
-                                                }
-                                                else {
-                                                    v119 = nullptr;
-                                                }
-                                                v118[1] = v119;
-                                                v118[0] = v119;
-                                                v119->bOnScreen = false;
-                                                v118[0]->bChanceCalculated = false;
-                                                v118[0]->bFirstTimeShown = false;
-                                                v118[0]->bNeedsRecalc = true;
-                                                v118[0]->kPos = NiPoint3_ZERO;
-                                                v118[0]->fChance = 0.0f;
-                                                v118[0]->eBodyPart = j;
-                                                v125[0]->kBodyParts.AddHead(*v118);
-                                            }
-                                        }
-                                        NiNode* pweaponBone = nullptr;
-                                        if (v125[0]->pTargetRef->IsActor()) {
-                                            BaseProcess* pprocess =
-                                                static_cast<Actor*>(v125[0]->pTargetRef)->GetCurrentAIProcess();
-                                            BipedAnim* v11 = v125[0]->pTargetRef->GetBiped();
-                                            pweaponBone = pprocess->GetWeaponBone(v11);
-                                        }
-                                        if (v125[0]->pTargetRef->IsActor()) {
-                                            ptargetWeaponItem = static_cast<Actor*>(v125[0]->pTargetRef)
-                                                                    ->GetCurrentAIProcess()
-                                                                    ->GetCurrentWeapon();
-                                        }
-                                        else {
-                                            ptargetWeaponItem = nullptr;
-                                        }
-                                        ItemChange* v113 = ptargetWeaponItem;
-                                        if (ptargetWeaponItem) {
-                                            ptargetWeapon = static_cast<TESObjectWEAP*>(v113->pContainerObj);
-                                        }
-                                        else {
-                                            ptargetWeapon = nullptr;
-                                        }
-                                        TESObjectWEAP* ptargetWeapon_2 = ptargetWeapon;
-                                        if (pweaponBone) {
-                                            if (ptargetWeapon_2) {
-                                                if (!ptargetWeapon_2->IsEmbeddedWeapon()) {
-                                                    VATSBodyPart* v108[2];
-                                                    VATSBodyPart* v109;
-                                                    VATSBodyPart* v110 =
-                                                        static_cast<VATSBodyPart*>(ourMalloc(sizeof(VATSBodyPart)));
-                                                    if (v110) {
-                                                        v109 = ::new (v110) VATSBodyPart;
-                                                    }
-                                                    else {
-                                                        v109 = nullptr;
-                                                    }
-                                                    v108[1] = v109;
-                                                    v108[0] = v109;
-                                                    v109->bOnScreen = false;
-                                                    v108[0]->bChanceCalculated = false;
-                                                    v108[0]->bFirstTimeShown = false;
-                                                    v108[0]->bNeedsRecalc = true;
-                                                    v108[0]->kPos = NiPoint3_ZERO;
-                                                    v108[0]->eBodyPart = 14;
-                                                    v125[0]->kBodyParts.AddHead(*v108);
-                                                }
-                                            }
-                                        }
-                                        if (v125[0]->kBodyParts.IsEmpty()) {
-                                            VATSBodyPart* v105[2];
-                                            VATSBodyPart* v106;
-                                            v125[0]->eType = 2;
-                                            VATSBodyPart* v107 =
-                                                static_cast<VATSBodyPart*>(ourMalloc(sizeof(VATSBodyPart)));
-                                            if (v107) {
-                                                v106 = ::new (v107) VATSBodyPart;
-                                            }
-                                            else {
-                                                v106 = nullptr;
-                                            }
-                                            v105[1] = v106;
-                                            v105[0] = v106;
-                                            v106->eBodyPart = -1;
-                                            v105[0]->bOnScreen = false;
-                                            v105[0]->bChanceCalculated = false;
-                                            v105[0]->bFirstTimeShown = false;
-                                            v105[0]->bNeedsRecalc = true;
-                                            v105[0]->kPos = NiPoint3_ZERO;
-                                            v125[0]->kBodyParts.AddHead(*v105);
-                                        }
-                                        VATSMenu::xTargetList.AddHead(*v125);
+        if ((pact) && (!pact->pTarget->IsDead(false)) && (pact->pTarget->Get3D()) &&
+            (pact->pTarget->GetCurrentProcessType() == PROCESS_TYPE_HIGH && !pact->pTarget->IsChild(false) && !v143)) {
+            float fdist = pact->pTarget->GetDistanceFromReference(pPlayer, false, false);
+            if (!(fdist < 2.0)) {
+                float* v3 = &fVATSMaxEngageDistance.Float();
+                if (!(*v3 < static_cast<double>(fdist)) &&
+                    pPlayer->LineOfSight(true, pact->pTarget, true, nullptr, true)) {
+                    float* v7;
+                    float* v8;
+                    float* v9;
+                    if (fmaxNPCDist < static_cast<double>(fdist)) {
+                        fmaxNPCDist = fdist;
+                    }
+                    alignas(16) NiPoint3 targetPoint = pact->pTarget->Get3D()->GetWorldTranslate();
+                    float x = 0.0;
+                    float y = 0.0;
+                    SceneGraph* v4 = Main::GetWorldSceneGraph();
+                    v4->GetCamera()->WorldPtToScreenPt(targetPoint, x, y, 1e-05f);
+                    bool v137 = !(x <= 0.0) && (!(y <= 0.0) && (!(x >= 1.0) && !(y >= 1.0)));
+                    char v136 = v137;
+                    if (v137) {
+                        bvalidTargetsFound = true;
+                    }
+                    else {
+                        TESActorBase* bonScreen = pact->pTarget->GetActorBase();
+                        BGSBodyPartData* pbodyPartData = bonScreen->GetBodyPartData();
+                        BGSBodyPart** pbodyPartArray = pbodyPartData->pPartArray;
+                        for (BGSBodyPart::LIMB_ENUM eindex = BGSBodyPart::LIMB_TORSO; eindex < BGSBodyPart::LIMB_COUNT;
+                             eindex = static_cast<BGSBodyPart::LIMB_ENUM>(eindex + 1)) {
+                            if (pbodyPartArray[eindex]) {
+                                Actor* pTarget = plist->m_item->pTarget;
+                                const char* fZeroTolerance = pbodyPartData->GetBodyPart(eindex)->GetTargetName();
+                                NiNode* v5 = pTarget->Get3D();
+                                NiAVObject* plimb = BSUtilities::GetObjectByName(v5, fZeroTolerance);
+                                if (plimb) {
+                                    float v130;
+                                    alignas(16) float v131;
+                                    const NiPoint3* WorldTranslate = &plimb->GetWorldTranslate();
+                                    SceneGraph* v6 = Main::GetWorldSceneGraph();
+                                    v6->GetCamera()->WorldPtToScreenPt(*WorldTranslate, v130, v131, 1e-05f);
+                                    if (v130 > 0.0 && (v131 > 0.0 && (v130 < 1.0 && v131 < 1.0))) {
+                                        v136 = 1;
+                                        bvalidTargetsFound = true;
+                                        break;
                                     }
                                 }
                             }
                         }
                     }
+                    if ((((!binterior || (v7 = &fSneakMaxDistance.Float(), !(*v7 < static_cast<double>(fdist)))) &&
+                          (binterior ||
+                           (v8 = &fSneakExteriorDistanceMult.Float(),
+                            (v9 = &fSneakMaxDistance.Float(), !(fdist > *v8 * *v9))))) ||
+                         v136) &&
+                        (pact->pTarget->Get3D())) {
+                        TESObjectWEAP* ptargetWeapon;
+                        ItemChange* ptargetWeaponItem;
+                        VATSTarget* v125[2];
+                        VATSTarget* vt;
+                        VATSTarget* v127 = static_cast<VATSTarget*>(ourMalloc(sizeof(VATSTarget)));
+                        if (v127) {
+                            vt = ::new (v127) VATSTarget;
+                        }
+                        else {
+                            vt = nullptr;
+                        }
+                        v125[1] = vt;
+                        v125[0] = vt;
+                        vt->eType = 1;
+                        v125[0]->pTargetRef = (TESObjectREFR*)pact->pTarget;
+                        v125[0]->bChancesCalculated = false;
+                        CompassTarget* m_item = plist->m_item;
+                        v125[0]->bHostile = m_item->bIsHostile;
+                        // Reads the target's base through Actor::GetActorBase without testing that the
+                        // reference is an actor, as the game does.
+                        TESActorBase* ptargetBase = static_cast<Actor*>(v125[0]->pTargetRef)->GetActorBase();
+                        BGSBodyPart** ppartArray = ptargetBase->GetBodyPartData()->pPartArray;
+                        for (int32_t j = 0; j < 15; ++j) {
+                            if (ppartArray[j]) {
+                                VATSBodyPart* v118[2];
+                                VATSBodyPart* v119;
+                                VATSBodyPart* v120 = static_cast<VATSBodyPart*>(ourMalloc(sizeof(VATSBodyPart)));
+                                if (v120) {
+                                    v119 = ::new (v120) VATSBodyPart;
+                                }
+                                else {
+                                    v119 = nullptr;
+                                }
+                                v118[1] = v119;
+                                v118[0] = v119;
+                                v119->bOnScreen = false;
+                                v118[0]->bChanceCalculated = false;
+                                v118[0]->bFirstTimeShown = false;
+                                v118[0]->bNeedsRecalc = true;
+                                v118[0]->kPos = NiPoint3_ZERO;
+                                v118[0]->fChance = 0.0f;
+                                v118[0]->eBodyPart = j;
+                                v125[0]->kBodyParts.AddHead(*v118);
+                            }
+                        }
+                        NiNode* pweaponBone = nullptr;
+                        if (v125[0]->pTargetRef->IsActor()) {
+                            BaseProcess* pprocess = static_cast<Actor*>(v125[0]->pTargetRef)->GetCurrentAIProcess();
+                            BipedAnim* v11 = v125[0]->pTargetRef->GetBiped();
+                            pweaponBone = pprocess->GetWeaponBone(v11);
+                        }
+                        if (v125[0]->pTargetRef->IsActor()) {
+                            ptargetWeaponItem =
+                                static_cast<Actor*>(v125[0]->pTargetRef)->GetCurrentAIProcess()->GetCurrentWeapon();
+                        }
+                        else {
+                            ptargetWeaponItem = nullptr;
+                        }
+                        ItemChange* v113 = ptargetWeaponItem;
+                        if (ptargetWeaponItem) {
+                            ptargetWeapon = static_cast<TESObjectWEAP*>(v113->pContainerObj);
+                        }
+                        else {
+                            ptargetWeapon = nullptr;
+                        }
+                        TESObjectWEAP* ptargetWeapon_2 = ptargetWeapon;
+                        if ((pweaponBone) && (ptargetWeapon_2) && (!ptargetWeapon_2->IsEmbeddedWeapon())) {
+                            VATSBodyPart* v108[2];
+                            VATSBodyPart* v109;
+                            VATSBodyPart* v110 = static_cast<VATSBodyPart*>(ourMalloc(sizeof(VATSBodyPart)));
+                            if (v110) {
+                                v109 = ::new (v110) VATSBodyPart;
+                            }
+                            else {
+                                v109 = nullptr;
+                            }
+                            v108[1] = v109;
+                            v108[0] = v109;
+                            v109->bOnScreen = false;
+                            v108[0]->bChanceCalculated = false;
+                            v108[0]->bFirstTimeShown = false;
+                            v108[0]->bNeedsRecalc = true;
+                            v108[0]->kPos = NiPoint3_ZERO;
+                            v108[0]->eBodyPart = 14;
+                            v125[0]->kBodyParts.AddHead(*v108);
+                        }
+
+                        if (v125[0]->kBodyParts.IsEmpty()) {
+                            VATSBodyPart* v105[2];
+                            VATSBodyPart* v106;
+                            v125[0]->eType = 2;
+                            VATSBodyPart* v107 = static_cast<VATSBodyPart*>(ourMalloc(sizeof(VATSBodyPart)));
+                            if (v107) {
+                                v106 = ::new (v107) VATSBodyPart;
+                            }
+                            else {
+                                v106 = nullptr;
+                            }
+                            v105[1] = v106;
+                            v105[0] = v106;
+                            v106->eBodyPart = -1;
+                            v105[0]->bOnScreen = false;
+                            v105[0]->bChanceCalculated = false;
+                            v105[0]->bFirstTimeShown = false;
+                            v105[0]->bNeedsRecalc = true;
+                            v105[0]->kPos = NiPoint3_ZERO;
+                            v125[0]->kBodyParts.AddHead(*v105);
+                        }
+                        VATSMenu::xTargetList.AddHead(*v125);
+                    }
                 }
             }
         }
+
         plist = plist->m_pkNext;
     }
     if (fmaxNPCDist != 0.0) {
@@ -3730,124 +3694,115 @@ bool VATSMenu::BuildTargetList() {
             TESObjectREFR* phitRef = pdestructibleIter->m_item;
             if (!phitRef->IsExplosion()) {
                 double DistanceFromReference;
-                if (!(fmaxNPCDist > 0.0) ||
-                    (DistanceFromReference = pdestructibleIter->m_item->GetDistanceFromReference(pPlayer, false, false),
-                     !(fmaxNPCDist < DistanceFromReference))) {
-                    if (!pdestructibleIter->m_item->GetDestroyed() && !pdestructibleIter->m_item->GetDisabled() &&
-                        !pdestructibleIter->m_item->GetDelete()) {
-                        float* v19;
-                        if (!binterior || (v19 = &fSneakMaxDistance.Float(), !(*v19 < static_cast<double>(fdist_2)))) {
-                            float* v20;
-                            float* v21;
-                            if (binterior ||
-                                (v20 = &fSneakExteriorDistanceMult.Float(),
-                                 (v21 = &fSneakMaxDistance.Float(), !(fdist_2 > *v20 * *v21)))) {
-                                if (pdestructibleIter->m_item->GetVATStarget()) {
-                                    Projectile* pproj;
-                                    Actor* v96 = static_cast<Actor*>(pdestructibleIter->m_item);
-                                    if (!v96->IsProjectile() ||
-                                        (pproj = static_cast<Projectile*>(pdestructibleIter->m_item),
-                                         pproj->GetShooter() != pPlayer)) {
-                                        if (!pdestructibleIter->m_item->GetDestroyed()) {
-                                            alignas(16) VATSBodyPart* v89[2];
-                                            VATSBodyPart* v90;
-                                            alignas(16) VATSTarget* v92[2];
-                                            VATSTarget* v93;
-                                            VATSTarget* v94 = static_cast<VATSTarget*>(ourMalloc(sizeof(VATSTarget)));
-                                            if (v94) {
-                                                v93 = ::new (v94) VATSTarget;
-                                            }
-                                            else {
-                                                v93 = nullptr;
-                                            }
-                                            v92[1] = v93;
-                                            v92[0] = v93;
-                                            v93->eType = 2;
-                                            BSSimpleList<TESObjectREFR*>* v22 = pdestructibleIter;
-                                            v92[0]->pTargetRef = v22->m_item;
-                                            v92[0]->bChancesCalculated = false;
-                                            v92[0]->bHostile = false;
-                                            VATSBodyPart* v91 =
-                                                static_cast<VATSBodyPart*>(ourMalloc(sizeof(VATSBodyPart)));
-                                            if (v91) {
-                                                v90 = ::new (v91) VATSBodyPart;
-                                            }
-                                            else {
-                                                v90 = nullptr;
-                                            }
-                                            v89[1] = v90;
-                                            v89[0] = v90;
-                                            v90->eBodyPart = -1;
-                                            v89[0]->bOnScreen = false;
-                                            v89[0]->bChanceCalculated = false;
-                                            v89[0]->bFirstTimeShown = false;
-                                            v89[0]->bNeedsRecalc = true;
-                                            v89[0]->kPos = NiPoint3_ZERO;
-                                            v92[0]->kBodyParts.AddHead(*v89);
-                                            if (!bvalidTargetsFound) {
-                                                TESObjectREFR* bonScreen_2 = pdestructibleIter->m_item;
-                                                alignas(16) NiPoint3 targetPoint_2 =
-                                                    bonScreen_2->Get3D()->GetWorldTranslate();
-                                                float x_2 = 0.0;
-                                                float y_2 = 0.0;
-                                                SceneGraph* v23 = Main::GetWorldSceneGraph();
-                                                v23->GetCamera()->WorldPtToScreenPt(targetPoint_2, x_2, y_2, 1e-05f);
-                                                bool v84 = !(x_2 <= 0.0) &&
-                                                    (!(y_2 <= 0.0) && (!(x_2 >= 1.0) && !(y_2 >= 1.0)));
-                                                bool v83 = v84;
-                                                if (v84) {
-                                                    bhkPickData pd;
-                                                    NiPoint3 origin =
-                                                        Main::GetWorldSceneGraph()->GetCamera()->GetWorldTranslate();
-                                                    CFilter fltr;
-                                                    CFilter kPlayerFilter;
-                                                    fltr.iFilter = 0;
-                                                    fltr.SetLayer(L_LOS);
-                                                    pPlayer->GetCollisionFilter(&kPlayerFilter.iFilter);
-                                                    fltr.SetGroup(kPlayerFilter.GetGroup());
-                                                    pd.SetFilter(fltr);
-                                                    hkpAllRayHitCollector collector;
-                                                    pd.SetAllCollector(&collector);
-                                                    pd.NiSetFrom(origin);
-                                                    TESObjectREFR* v76 = pdestructibleIter->m_item;
-                                                    NiNode* v26 = v76->Get3D();
-                                                    const NiBound* WorldBound = &v26->GetWorldBound();
-                                                    pd.NiSetTo(WorldBound->m_kCenter);
-                                                    TESObjectREFR* v75 = pdestructibleIter->m_item;
-                                                    NiNode* v28 = v75->Get3D();
-                                                    const NiBound* v29 = &v28->GetWorldBound();
-                                                    pd.NiSetLength(v29->m_kCenter - origin);
-                                                    bhkWorld* v73 = pPlayer->GetParentCell()->GetbhkWorld();
-                                                    if (v73->PickObject(pd)) {
-                                                        if (pd.pAllCollector) {
-                                                            for (int32_t i = 0; !bvalidTargetsFound; ++i) {
-                                                                int32_t FormHealth_0 =
-                                                                    (&pd.pAllCollector->getHits())->m_size;
-                                                                if (i >= FormHealth_0) {
-                                                                    break;
-                                                                }
-                                                                const hkpWorldRayCastOutput* v32 =
-                                                                    &(&pd.pAllCollector->getHits())
-                                                                         ->operator[]<hkpWorldRayCastOutput>(i);
-                                                                hkpWorldRayCastOutput point(*v32);
-                                                                NiNode* pav = static_cast<NiNode*>(
-                                                                    GetAVObjectForCollidable(point.m_rootCollidable)
-                                                                );
-                                                                if (pav) {
-                                                                    TESObjectREFR* v68 = pdestructibleIter->m_item;
-                                                                    if (pav == v68->Get3D()) {
-                                                                        bvalidTargetsFound = true;
-                                                                    }
-                                                                }
-                                                            }
-                                                        }
+                if ((!(fmaxNPCDist > 0.0) ||
+                     (DistanceFromReference =
+                          pdestructibleIter->m_item->GetDistanceFromReference(pPlayer, false, false),
+                      !(fmaxNPCDist < DistanceFromReference))) &&
+                    (!pdestructibleIter->m_item->GetDestroyed() && !pdestructibleIter->m_item->GetDisabled() &&
+                     !pdestructibleIter->m_item->GetDelete())) {
+                    float* v19;
+                    if (!binterior || (v19 = &fSneakMaxDistance.Float(), !(*v19 < static_cast<double>(fdist_2)))) {
+                        float* v20;
+                        float* v21;
+                        if ((binterior ||
+                             (v20 = &fSneakExteriorDistanceMult.Float(),
+                              (v21 = &fSneakMaxDistance.Float(), !(fdist_2 > *v20 * *v21)))) &&
+                            (pdestructibleIter->m_item->GetVATStarget())) {
+                            Projectile* pproj;
+                            Actor* v96 = static_cast<Actor*>(pdestructibleIter->m_item);
+                            if ((!v96->IsProjectile() ||
+                                 (pproj = static_cast<Projectile*>(pdestructibleIter->m_item),
+                                  pproj->GetShooter() != pPlayer)) &&
+                                (!pdestructibleIter->m_item->GetDestroyed())) {
+                                alignas(16) VATSBodyPart* v89[2];
+                                VATSBodyPart* v90;
+                                alignas(16) VATSTarget* v92[2];
+                                VATSTarget* v93;
+                                VATSTarget* v94 = static_cast<VATSTarget*>(ourMalloc(sizeof(VATSTarget)));
+                                if (v94) {
+                                    v93 = ::new (v94) VATSTarget;
+                                }
+                                else {
+                                    v93 = nullptr;
+                                }
+                                v92[1] = v93;
+                                v92[0] = v93;
+                                v93->eType = 2;
+                                BSSimpleList<TESObjectREFR*>* v22 = pdestructibleIter;
+                                v92[0]->pTargetRef = v22->m_item;
+                                v92[0]->bChancesCalculated = false;
+                                v92[0]->bHostile = false;
+                                VATSBodyPart* v91 = static_cast<VATSBodyPart*>(ourMalloc(sizeof(VATSBodyPart)));
+                                if (v91) {
+                                    v90 = ::new (v91) VATSBodyPart;
+                                }
+                                else {
+                                    v90 = nullptr;
+                                }
+                                v89[1] = v90;
+                                v89[0] = v90;
+                                v90->eBodyPart = -1;
+                                v89[0]->bOnScreen = false;
+                                v89[0]->bChanceCalculated = false;
+                                v89[0]->bFirstTimeShown = false;
+                                v89[0]->bNeedsRecalc = true;
+                                v89[0]->kPos = NiPoint3_ZERO;
+                                v92[0]->kBodyParts.AddHead(*v89);
+                                if (!bvalidTargetsFound) {
+                                    TESObjectREFR* bonScreen_2 = pdestructibleIter->m_item;
+                                    alignas(16) NiPoint3 targetPoint_2 = bonScreen_2->Get3D()->GetWorldTranslate();
+                                    float x_2 = 0.0;
+                                    float y_2 = 0.0;
+                                    SceneGraph* v23 = Main::GetWorldSceneGraph();
+                                    v23->GetCamera()->WorldPtToScreenPt(targetPoint_2, x_2, y_2, 1e-05f);
+                                    bool v84 = !(x_2 <= 0.0) && (!(y_2 <= 0.0) && (!(x_2 >= 1.0) && !(y_2 >= 1.0)));
+                                    bool v83 = v84;
+                                    if (v84) {
+                                        bhkPickData pd;
+                                        NiPoint3 origin = Main::GetWorldSceneGraph()->GetCamera()->GetWorldTranslate();
+                                        CFilter fltr;
+                                        CFilter kPlayerFilter;
+                                        fltr.iFilter = 0;
+                                        fltr.SetLayer(L_LOS);
+                                        pPlayer->GetCollisionFilter(&kPlayerFilter.iFilter);
+                                        fltr.SetGroup(kPlayerFilter.GetGroup());
+                                        pd.SetFilter(fltr);
+                                        hkpAllRayHitCollector collector;
+                                        pd.SetAllCollector(&collector);
+                                        pd.NiSetFrom(origin);
+                                        TESObjectREFR* v76 = pdestructibleIter->m_item;
+                                        NiNode* v26 = v76->Get3D();
+                                        const NiBound* WorldBound = &v26->GetWorldBound();
+                                        pd.NiSetTo(WorldBound->m_kCenter);
+                                        TESObjectREFR* v75 = pdestructibleIter->m_item;
+                                        NiNode* v28 = v75->Get3D();
+                                        const NiBound* v29 = &v28->GetWorldBound();
+                                        pd.NiSetLength(v29->m_kCenter - origin);
+                                        bhkWorld* v73 = pPlayer->GetParentCell()->GetbhkWorld();
+                                        if ((v73->PickObject(pd)) && (pd.pAllCollector)) {
+                                            for (int32_t i = 0; !bvalidTargetsFound; ++i) {
+                                                int32_t FormHealth_0 = (&pd.pAllCollector->getHits())->m_size;
+                                                if (i >= FormHealth_0) {
+                                                    break;
+                                                }
+                                                const hkpWorldRayCastOutput* v32 =
+                                                    &(&pd.pAllCollector->getHits())
+                                                         ->operator[]<hkpWorldRayCastOutput>(i);
+                                                hkpWorldRayCastOutput point(*v32);
+                                                NiNode* pav = static_cast<NiNode*>(
+                                                    GetAVObjectForCollidable(point.m_rootCollidable)
+                                                );
+                                                if (pav) {
+                                                    TESObjectREFR* v68 = pdestructibleIter->m_item;
+                                                    if (pav == v68->Get3D()) {
+                                                        bvalidTargetsFound = true;
                                                     }
                                                 }
                                             }
-                                            VATSMenu::xTargetList.AddHead(*v92);
                                         }
                                     }
                                 }
+                                VATSMenu::xTargetList.AddHead(*v92);
                             }
                         }
                     }
@@ -3882,25 +3837,22 @@ bool VATSMenu::BuildTargetList() {
         SceneGraph* v38 = Main::GetWorldSceneGraph();
         pd_2.NiSetLength(v38->GetCamera()->GetWorldDirection() * v59);
         bhkWorld* v56 = pPlayer->GetParentCell()->GetbhkWorld();
-        if (v56->PickObject(pd_2)) {
-            if (pd_2.pAllCollector) {
-                for (int32_t i_2 = 0; !bvalidTargetsFound; ++i_2) {
-                    int32_t v41 = (&pd_2.pAllCollector->getHits())->m_size;
-                    if (i_2 >= v41) {
-                        break;
-                    }
-                    const hkpWorldRayCastOutput* v42 =
-                        &(&pd_2.pAllCollector->getHits())->operator[]<hkpWorldRayCastOutput>(i_2);
-                    hkpWorldRayCastOutput point_2(*v42);
-                    NiAVObject* pav_2 = GetAVObjectForCollidable(point_2.m_rootCollidable);
-                    if (pav_2) {
-                        TESObjectREFR* phitRef_2 = TESObjectREFR::FindReferenceFor3D(pav_2);
-                        if (phitRef_2) {
-                            if (BGSDestructibleObjectForm::IsDestructible(phitRef_2->GetObjectReference()) &&
-                                phitRef_2->IsProjectile()) {
-                                bvalidTargetsFound = true;
-                            }
-                        }
+        if ((v56->PickObject(pd_2)) && (pd_2.pAllCollector)) {
+            for (int32_t i_2 = 0; !bvalidTargetsFound; ++i_2) {
+                int32_t v41 = (&pd_2.pAllCollector->getHits())->m_size;
+                if (i_2 >= v41) {
+                    break;
+                }
+                const hkpWorldRayCastOutput* v42 =
+                    &(&pd_2.pAllCollector->getHits())->operator[]<hkpWorldRayCastOutput>(i_2);
+                hkpWorldRayCastOutput point_2(*v42);
+                NiAVObject* pav_2 = GetAVObjectForCollidable(point_2.m_rootCollidable);
+                if (pav_2) {
+                    TESObjectREFR* phitRef_2 = TESObjectREFR::FindReferenceFor3D(pav_2);
+                    if ((phitRef_2) &&
+                        (BGSDestructibleObjectForm::IsDestructible(phitRef_2->GetObjectReference()) &&
+                         phitRef_2->IsProjectile())) {
+                        bvalidTargetsFound = true;
                     }
                 }
             }
@@ -4031,9 +3983,8 @@ int32_t VATSMenu::SortAngle(VATSTarget* apObject1, VATSTarget* apObject2) {
     if (!(v14 > static_cast<double>(v12))) {
         return v14 < static_cast<double>(v12);
     }
-    else {
-        return -1;
-    }
+
+    return -1;
 }
 
 // The headings are rounded to float; a NaN heading sorts as equal.
@@ -4271,16 +4222,13 @@ void VATSMenu::RemoveTarget(TESObjectREFR* apRef) {
         for (BSSimpleList<VATSTarget*>* plist = &VATSMenu::xTargetList; plist && !plist->IsEmpty();
              plist = plist->m_pkNext) {
             if (plist->m_item->pTargetRef == apRef) {
-                if (pVATSTarget == apRef) {
-                    if (VATSMenu::pVatsMenu) {
-                        VATSMenu::pVatsMenu->DoClick(2, nullptr);
-                    }
+                if ((pVATSTarget == apRef) && (VATSMenu::pVatsMenu)) {
+                    VATSMenu::pVatsMenu->DoClick(2, nullptr);
                 }
+
                 VATSMenu::xTargetList.Remove(plist->m_item);
-                if (VATSMenu::xTargetList.IsEmpty()) {
-                    if (VATSMenu::pVatsMenu) {
-                        VATSMenu::Close();
-                    }
+                if ((VATSMenu::xTargetList.IsEmpty()) && (VATSMenu::pVatsMenu)) {
+                    VATSMenu::Close();
                 }
             }
         }
@@ -4330,27 +4278,23 @@ bool IsDesiredAttackControlPressed(DesiredAttackType desiredAttack, bool held, i
         if (held) {
             return InterfaceManager::CheckMenuButton(button, true) == 0;
         }
-        else {
-            return InterfaceManager::CheckMenuButton(button, true) == 2;
-        }
+
+        return InterfaceManager::CheckMenuButton(button, true) == 2;
     }
-    else {
-        Controls* Controls_ = appMain->GetControls();
-        // The toggle flags Controls' button tests take: 1 for a press, 0 while held.
-        int32_t iToggleFlags = !held;
-        if (desiredAttack == DESIRED_ATTACK_NORMAL) {
-            return Controls_->GetMouseButton(0, iToggleFlags) && aiMouseKey;
-        }
-        else {
-            if (desiredAttack == DESIRED_ATTACK_SPECIAL) {
-                return Controls_->GetKeyboardButton(19, iToggleFlags) || bWeaponSpecialSelected;
-            }
-            else {
-                return desiredAttack == DESIRED_ATTACK_SPECIAL_2 &&
-                    (Controls_->GetKeyboardButton(33, iToggleFlags) || g_bIsVATSSpecialAttack2);
-            }
-        }
+
+    Controls* Controls_ = appMain->GetControls();
+    // The toggle flags Controls' button tests take: 1 for a press, 0 while held.
+    int32_t iToggleFlags = !held;
+    if (desiredAttack == DESIRED_ATTACK_NORMAL) {
+        return Controls_->GetMouseButton(0, iToggleFlags) && aiMouseKey;
     }
+
+    if (desiredAttack == DESIRED_ATTACK_SPECIAL) {
+        return Controls_->GetKeyboardButton(19, iToggleFlags) || bWeaponSpecialSelected;
+    }
+
+    return desiredAttack == DESIRED_ATTACK_SPECIAL_2 &&
+        (Controls_->GetKeyboardButton(33, iToggleFlags) || g_bIsVATSSpecialAttack2);
 }
 
 BSSimpleList<VATS_COMMAND*>* VATS::GetCommandList() {

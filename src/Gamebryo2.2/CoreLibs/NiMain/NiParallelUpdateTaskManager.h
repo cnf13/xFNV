@@ -15,7 +15,7 @@ public:
     // The task that signals the render semaphore. The class has no members of its own beyond NiTask's.
     class SignalTask : public NiTask {
     public:
-        void DoTask() {
+        void DoTask() override {
             NiParallelUpdateTaskManager::Get()->SignalRenderSema();
             m_eStatus = COMPLETED;
         }

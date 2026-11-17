@@ -29,7 +29,7 @@ public:
     void KillCinfo(bool abCreated) override;
     uint32_t QCinfoSize() const override;
     hkSerializableCinfo& CreateCinfo(bool& arCreated) override;
-    virtual ~bhkRagdollConstraint();
+    ~bhkRagdollConstraint() override;
 
     // Allocates the constraint, builds its base and its creation info pointer, and counts it.
     static NiObject* CreateObject();

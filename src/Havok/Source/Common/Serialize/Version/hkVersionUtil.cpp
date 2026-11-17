@@ -394,16 +394,15 @@ int32_t PackfileObjectCopier::areMembersCompatible(const hkClassMember& src, con
     uint8_t v11 = dst.m_subtype.m_storage;
     bool v19 = v10 == v11 || (v10 == 29 && v11 == 33);
     bool v14 = false;
-    if (v10 == 28 && v11 == 20) {
-        if (dst.getClass()) {
-            const hkClass* v12 = &dst.getStructClass();
-            const char* v17 = v12->getName();
-            const char* v13 = hkReferencedObjectClass.getName();
-            if (!hkString::strCmp(v13, v17)) {
-                v14 = true;
-            }
+    if ((v10 == 28 && v11 == 20) && (dst.getClass())) {
+        const hkClass* v12 = &dst.getStructClass();
+        const char* v17 = v12->getName();
+        const char* v13 = hkReferencedObjectClass.getName();
+        if (!hkString::strCmp(v13, v17)) {
+            v14 = true;
         }
     }
+
     return hkObjectCopier::areMembersCompatible(src, dst) || (srca || (dsta || (v18 && (v19 || v14))));
 }
 

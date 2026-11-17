@@ -84,14 +84,12 @@ uint16_t ScriptLocals::GetSaveSize() {
     }
     uint16_t isize = v7 + 2;
     for (SCRIPT_LOCAL* plocal : *m_pLocalList) {
-        if (plocal) {
-            if (0.0 != plocal->fValue) {
-                if (IsReferenceVariable(plocal->uiID)) {
-                    isize += 8;
-                }
-                else {
-                    isize += 12;
-                }
+        if ((plocal) && (0.0 != plocal->fValue)) {
+            if (IsReferenceVariable(plocal->uiID)) {
+                isize += 8;
+            }
+            else {
+                isize += 12;
             }
         }
     }
@@ -301,21 +299,19 @@ void ScriptLocals::SaveGame() {
     uint16_t* pcount = static_cast<uint16_t*>(pSaveLoadGameOLD->m_pBuffer);
     pSaveLoadGameOLD->SaveGameDataOLD(&icount, 2u);
     for (SCRIPT_LOCAL* plocal : *m_pLocalList) {
-        if (plocal) {
-            if (0.0 != plocal->fValue) {
-                if (IsReferenceVariable(plocal->uiID)) {
-                    irefID = 0;
-                    Script::GetNumericIDFromDouble(irefID, plocal->fValue);
-                    ivarID = plocal->uiID | 0x80000000u;
-                    pSaveLoadGameOLD->SaveGameDataOLD(&ivarID, 4u);
-                    pSaveLoadGameOLD->SaveNumericID(&irefID, 4u);
-                }
-                else {
-                    pSaveLoadGameOLD->SaveGameDataOLD(plocal, 4u);
-                    pSaveLoadGameOLD->SaveGameDataOLD(&plocal->fValue, 8u);
-                }
-                ++icount;
+        if ((plocal) && (0.0 != plocal->fValue)) {
+            if (IsReferenceVariable(plocal->uiID)) {
+                irefID = 0;
+                Script::GetNumericIDFromDouble(irefID, plocal->fValue);
+                ivarID = plocal->uiID | 0x80000000u;
+                pSaveLoadGameOLD->SaveGameDataOLD(&ivarID, 4u);
+                pSaveLoadGameOLD->SaveNumericID(&irefID, 4u);
             }
+            else {
+                pSaveLoadGameOLD->SaveGameDataOLD(plocal, 4u);
+                pSaveLoadGameOLD->SaveGameDataOLD(&plocal->fValue, 8u);
+            }
+            ++icount;
         }
     }
     *pcount = icount;
@@ -483,21 +479,19 @@ void ScriptLocals::SaveGame(BGSSaveFormBuffer* apBuffer) {
     uint32_t icount = 0;
     uint32_t isaveGameBufferPos = apBuffer->StartVariableSizedValue();
     for (SCRIPT_LOCAL* plocal : *m_pLocalList) {
-        if (plocal) {
-            if (0.0 != plocal->fValue) {
-                if (IsReferenceVariable(plocal->uiID)) {
-                    uint32_t irefID = 0;
-                    Script::GetNumericIDFromDouble(irefID, plocal->fValue);
-                    ivarID = plocal->uiID | 0x80000000u;
-                    apBuffer->SaveDataEndian(&ivarID, 4u, 0);
-                    apBuffer->SaveFormID(irefID, 0);
-                }
-                else {
-                    apBuffer->SaveDataEndian(plocal, 4u, 0);
-                    apBuffer->SaveDataEndian(&plocal->fValue, 8u, 0);
-                }
-                ++icount;
+        if ((plocal) && (0.0 != plocal->fValue)) {
+            if (IsReferenceVariable(plocal->uiID)) {
+                uint32_t irefID = 0;
+                Script::GetNumericIDFromDouble(irefID, plocal->fValue);
+                ivarID = plocal->uiID | 0x80000000u;
+                apBuffer->SaveDataEndian(&ivarID, 4u, 0);
+                apBuffer->SaveFormID(irefID, 0);
             }
+            else {
+                apBuffer->SaveDataEndian(plocal, 4u, 0);
+                apBuffer->SaveDataEndian(&plocal->fValue, 8u, 0);
+            }
+            ++icount;
         }
     }
     apBuffer->SaveVariableSizedValue(icount, isaveGameBufferPos);
@@ -1067,15 +1061,14 @@ char* Script::GetCompiledData() {
 }
 
 bool Script::NeedsUpdate(ScriptCompileData* apCompileData) {
-    if (GetFormEditorIDLength()) {
-        if (apCompileData->cScriptName.GetLength()) {
-            char* v6 = apCompileData->cScriptName.pString;
-            const char* v2 = GetFormEditorID();
-            if (BSstricmp(v2, v6)) {
-                return true;
-            }
+    if ((GetFormEditorIDLength()) && (apCompileData->cScriptName.GetLength())) {
+        char* v6 = apCompileData->cScriptName.pString;
+        const char* v2 = GetFormEditorID();
+        if (BSstricmp(v2, v6)) {
+            return true;
         }
     }
+
     if (m_header.dataSize != apCompileData->header.dataSize) {
         return true;
     }

@@ -37,29 +37,28 @@ NiPoint3* SearchPackage::LookForTarget(NiPoint3* a1, TESObjectREFR* a2) {
         *a1 = this->LocationCenter;
         return a1;
     }
-    else {
-        if (coverPoints.IsEmpty()) {
-            TESWorldSpace* v11 = a2->GetWorldSpace();
-            TESObjectCELL* pcell = a2->GetParentCell();
-            NiPoint3 kTargetPos = this->LocationCenter;
-            NiPoint3 v19 = a2->GetLocationOnReference();
-            FindCoverToSearch(v19, kTargetPos, pcell, v11);
-        }
-        if (coverPoints.IsEmpty() || iCurrentCover >= coverPoints.iSize) {
-            arg0 = *HighProcess::ComputeRandomPoint(&v13, this->LocationCenter, 800.0f, 300.0f, false);
-            TESObjectCELL* v8 = a2->GetParentCell();
-            TESWorldSpace* v6 = a2->GetWorldSpace();
-            Pathing::FindPointOnNavMesh(v6, v8, arg0, 300.0f, &arg0);
-        }
-        else {
-            PathingCoverLocation* v5 = &coverPoints.operator[](static_cast<uint32_t>(iCurrentCover));
-            PathingCoverLocation v16(*v5);
-            ++iCurrentCover;
-            arg0 = v16.GetLocation();
-        }
-        *a1 = arg0;
-        return a1;
+
+    if (coverPoints.IsEmpty()) {
+        TESWorldSpace* v11 = a2->GetWorldSpace();
+        TESObjectCELL* pcell = a2->GetParentCell();
+        NiPoint3 kTargetPos = this->LocationCenter;
+        NiPoint3 v19 = a2->GetLocationOnReference();
+        FindCoverToSearch(v19, kTargetPos, pcell, v11);
     }
+    if (coverPoints.IsEmpty() || iCurrentCover >= coverPoints.iSize) {
+        arg0 = *HighProcess::ComputeRandomPoint(&v13, this->LocationCenter, 800.0f, 300.0f, false);
+        TESObjectCELL* v8 = a2->GetParentCell();
+        TESWorldSpace* v6 = a2->GetWorldSpace();
+        Pathing::FindPointOnNavMesh(v6, v8, arg0, 300.0f, &arg0);
+    }
+    else {
+        PathingCoverLocation* v5 = &coverPoints.operator[](static_cast<uint32_t>(iCurrentCover));
+        PathingCoverLocation v16(*v5);
+        ++iCurrentCover;
+        arg0 = v16.GetLocation();
+    }
+    *a1 = arg0;
+    return a1;
 }
 
 // The origin location is constructed and destroyed right after SetOrigin, before SetThreat.

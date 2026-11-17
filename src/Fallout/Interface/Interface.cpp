@@ -133,18 +133,16 @@ char GetIsMapMenuFogOfWar() {
     if (InterfaceManager::Instance() && ((singleton = InterfaceManager::Instance()), singleton->IsDoneFirstInit())) {
         return (int8_t)GetMapMenuFogOfWar();
     }
-    else {
-        return 0;
-    }
+
+    return 0;
 }
 
 int32_t BSMAX_2(int32_t a1, char a2) {
     if (a1 <= a2) {
         return a2;
     }
-    else {
-        return a1;
-    }
+
+    return a1;
 }
 
 void ModalMessageMenuCallback() {
@@ -212,11 +210,9 @@ bool Interface::ShowSubtitle(
     );
     if (InterfaceManager::Instance()) {
         InterfaceManager* v5 = InterfaceManager::Instance();
-        if (v5->bFirstInit) {
-            if (HUDMainMenu::pme) {
-                v7 = ahandle;
-                HUDMainMenu::pme->ShowSubtitle(apString, v7, aSpeakerLoc, apTarget, abForceShow);
-            }
+        if ((v5->bFirstInit) && (HUDMainMenu::pme)) {
+            v7 = ahandle;
+            HUDMainMenu::pme->ShowSubtitle(apString, v7, aSpeakerLoc, apTarget, abForceShow);
         }
     }
     bool v12 = false;
@@ -234,13 +230,11 @@ void Interface::SetMapMenuVisible(bool abVisibility, bool abAnyVisibleState) {
             Tile* pmap = Menu::GetMenuByClass(1023);
             bool bis_vis = Interface::IsMenuIDVisible(Interface::ePipBoyData, abAnyVisibleState ? 11 : 0);
             if (!abVisibility || bis_vis) {
-                if (!abVisibility && bis_vis) {
-                    if (pmap) {
-                        Menu* Menu_ = pmap->GetMenu();
-                        Menu_->StartFadeOut();
-                        Menu* v16 = pmap->GetMenu();
-                        v16->DoLeave(0, nullptr);
-                    }
+                if ((!abVisibility && bis_vis) && (pmap)) {
+                    Menu* Menu_ = pmap->GetMenu();
+                    Menu_->StartFadeOut();
+                    Menu* v16 = pmap->GetMenu();
+                    v16->DoLeave(0, nullptr);
                 }
             }
             else {
@@ -294,15 +288,13 @@ void Interface::SetMapMenuVisible(bool abVisibility, bool abAnyVisibleState) {
 void Interface::OpenConsole() {
     if (InterfaceManager::Instance()) {
         InterfaceManager* v0 = InterfaceManager::Instance();
-        if (v0->IsDoneFirstInit()) {
-            if (MenuConsole::Instance(false)) {
-                MenuConsole* v1 = MenuConsole::Instance(true);
-                if (!v1->IsVisible()) {
-                    MenuConsole* v2 = MenuConsole::Instance(true);
-                    v2->ToggleVisible();
-                    InterfaceManager* v3 = InterfaceManager::Instance();
-                    v3->AddToEnterStack(3);
-                }
+        if ((v0->IsDoneFirstInit()) && (MenuConsole::Instance(false))) {
+            MenuConsole* v1 = MenuConsole::Instance(true);
+            if (!v1->IsVisible()) {
+                MenuConsole* v2 = MenuConsole::Instance(true);
+                v2->ToggleVisible();
+                InterfaceManager* v3 = InterfaceManager::Instance();
+                v3->AddToEnterStack(3);
             }
         }
     }
@@ -390,12 +382,10 @@ void Interface::SetInventoryMenuVisible(bool abVisibility, bool abAnyVisibleStat
                 }
             }
             else {
-                if (isMenuIDVisible) {
-                    if (inventoryMenu) {
-                        v17 = inventoryMenu->GetMenu();
-                        v17->StartFadeOut();
-                        InventoryMenu::SavePageState();
-                    }
+                if ((isMenuIDVisible) && (inventoryMenu)) {
+                    v17 = inventoryMenu->GetMenu();
+                    v17->StartFadeOut();
+                    InventoryMenu::SavePageState();
                 }
             }
         }
@@ -413,11 +403,9 @@ void Interface::SetStatsMenuVisible(bool abVisibility, bool abAnyVisibleState) {
             Tile* pmap = Menu::GetMenuByClass(1023);
             bool bis_vis = Interface::IsMenuIDVisible(Interface::eStatsMenu, abAnyVisibleState ? 11 : 0);
             if (!abVisibility || bis_vis) {
-                if (!abVisibility && bis_vis) {
-                    if (pstat) {
-                        Menu* Menu_ = pstat->GetMenu();
-                        Menu_->StartFadeOut();
-                    }
+                if ((!abVisibility && bis_vis) && (pstat)) {
+                    Menu* Menu_ = pstat->GetMenu();
+                    Menu_->StartFadeOut();
                 }
             }
             else {
@@ -513,23 +501,22 @@ void Interface::UpdateActorValue(ActorValue::Index aeWhich) {
     TileMenu* menuByClass;
     if (InterfaceManager::Instance()) {
         singleton = InterfaceManager::Instance();
-        if (singleton->IsDoneFirstInit()) {
-            if (Interface::IsMenuIDVisible(Interface::eStatsMenu, static_cast<Interface::FADE_STATE>(11))) {
-                menuByClass = static_cast<TileMenu*>(Menu::GetMenuByClass(1003));
-                if (menuByClass) {
-                    menu = menuByClass->GetMenu();
-                    v3 = dynamic_cast<StatsMenu*>(menu);
+        if ((singleton->IsDoneFirstInit()) &&
+            (Interface::IsMenuIDVisible(Interface::eStatsMenu, static_cast<Interface::FADE_STATE>(11)))) {
+            menuByClass = static_cast<TileMenu*>(Menu::GetMenuByClass(1003));
+            if (menuByClass) {
+                menu = menuByClass->GetMenu();
+                v3 = dynamic_cast<StatsMenu*>(menu);
+            }
+            else {
+                v3 = nullptr;
+            }
+            if (v3) {
+                if (((int32_t)aeWhich) == 77) {
+                    static_cast<StatsMenu*>(v3)->UpdateAllActorValues();
                 }
                 else {
-                    v3 = nullptr;
-                }
-                if (v3) {
-                    if (((int32_t)aeWhich) == 77) {
-                        static_cast<StatsMenu*>(v3)->UpdateAllActorValues();
-                    }
-                    else {
-                        static_cast<StatsMenu*>(v3)->UpdateActorValue(aeWhich);
-                    }
+                    static_cast<StatsMenu*>(v3)->UpdateActorValue(aeWhich);
                 }
             }
         }
@@ -620,13 +607,11 @@ Tile* Interface::CreateContainerMenu(TESObjectREFR* apContainer, Interface::CONT
     if (!singleton->IsDoneFirstInit()) {
         return nullptr;
     }
-    if ((aeMode == CMM_STANDARD) && (!apContainer->IsActor())) {
-        if (apContainer->GetOwner()) {
-            if (!apContainer->IsAnOwner(pPlayer, true)) {
-                aeMode = CMM_PICKPOCKET;
-            }
-        }
+    if (((aeMode == CMM_STANDARD) && (!apContainer->IsActor())) && (apContainer->GetOwner()) &&
+        (!apContainer->IsAnOwner(pPlayer, true))) {
+        aeMode = CMM_PICKPOCKET;
     }
+
     return ContainerMenu::Create(apContainer, aeMode);
 }
 
@@ -725,9 +710,8 @@ Tile* Interface::CreateDialogMenu(TESObjectREFR* apSpeaker, TESTopic* apGreetTop
             DialogMenu::Create(static_cast<Actor*>(apSpeaker), apGreetTopic, static_cast<Actor*>(apSpeakeras))
         );
     }
-    else {
-        return nullptr;
-    }
+
+    return nullptr;
 }
 
 // The pip-boy must be closed, unless the request is the pause or message menu. The player name entry request builds
@@ -997,67 +981,59 @@ bool Interface::FindTextReplacementString(
     bool abAddPushText
 ) {
     bool bfound = false;
-    if (apString) {
-        if (*apString) {
-            if (apOutBuffer) {
-                if (aiBufferSize) {
-                    int32_t iindex = Interface::MatchTextReplaceConstantToGameSettings(apString);
-                    if (iindex < 28) {
-                        Interface::GetControlPushTextFor(iindex, apOutBuffer, abAddPushText);
-                        bfound = true;
-                    }
-                    if (!bfound) {
-                        TESGlobal* pglob = static_cast<TESGlobal*>(TESForm::GetFormByEditorID(apString));
-                        if (pglob) {
-                            if (pglob->GetFormType() == GLOB_ID) {
-                                if (pglob->GetType() == 102) {
-                                    BSsprintf(apOutBuffer, static_cast<int32_t>(aiBufferSize), "%.2f", pglob->fValue);
-                                }
-                                else {
-                                    BSsprintf(
-                                        apOutBuffer, static_cast<int32_t>(aiBufferSize), "%i",
-                                        static_cast<int32_t>(pglob->fValue)
-                                    );
-                                }
-                                bfound = true;
-                            }
-                        }
-                    }
-                    if (!bfound && !BSstricmp(apString, "PCName")) {
-                        const char* FullName = pPlayer->GetFullName();
-                        BSstrcpy(apOutBuffer, static_cast<int32_t>(aiBufferSize), FullName);
-                        bfound = true;
-                    }
-                    if (!bfound && !BSstricmp(apString, "PCRace")) {
-                        const char* RaceFullName = pPlayer->GetRaceFullName();
-                        BSstrcpy(apOutBuffer, static_cast<int32_t>(aiBufferSize), RaceFullName);
-                        bfound = true;
-                    }
-                    if (!bfound && !BSstricmp(apString, "PCSex")) {
-                        TESActorBase::SEX Sex = pPlayer->GetSex();
-                        const char* v11 = pSexNameGS[Sex]->String();
-                        BSstrcpy(apOutBuffer, static_cast<int32_t>(aiBufferSize), v11);
-                        bfound = true;
-                    }
-                    if (!bfound && !BSstricmp(apString, "PCSexPronoun")) {
-                        TESActorBase::SEX v6 = pPlayer->GetSex();
-                        const char* v7 = pSexPronounGS[v6]->String();
-                        BSstrcpy(apOutBuffer, static_cast<int32_t>(aiBufferSize), v7);
-                        bfound = true;
-                    }
-                    if (!bfound && !BSstricmp(apString, "PCSexPossessive")) {
-                        TESActorBase::SEX v8 = pPlayer->GetSex();
-                        const char* v12 = pSexPossessiveGS[v8]->String();
-                        BSstrcpy(apOutBuffer, static_cast<int32_t>(aiBufferSize), v12);
-                        bfound = true;
-                    }
-                    if (!bfound) {
-                        return Interface::TestConstantForGameSettings(apString, apOutBuffer);
-                    }
+    if ((apString) && (*apString) && (apOutBuffer) && (aiBufferSize)) {
+        int32_t iindex = Interface::MatchTextReplaceConstantToGameSettings(apString);
+        if (iindex < 28) {
+            Interface::GetControlPushTextFor(iindex, apOutBuffer, abAddPushText);
+            bfound = true;
+        }
+        if (!bfound) {
+            TESGlobal* pglob = static_cast<TESGlobal*>(TESForm::GetFormByEditorID(apString));
+            if ((pglob) && (pglob->GetFormType() == GLOB_ID)) {
+                if (pglob->GetType() == 102) {
+                    BSsprintf(apOutBuffer, static_cast<int32_t>(aiBufferSize), "%.2f", pglob->fValue);
                 }
+                else {
+                    BSsprintf(
+                        apOutBuffer, static_cast<int32_t>(aiBufferSize), "%i", static_cast<int32_t>(pglob->fValue)
+                    );
+                }
+                bfound = true;
             }
         }
+        if (!bfound && !BSstricmp(apString, "PCName")) {
+            const char* FullName = pPlayer->GetFullName();
+            BSstrcpy(apOutBuffer, static_cast<int32_t>(aiBufferSize), FullName);
+            bfound = true;
+        }
+        if (!bfound && !BSstricmp(apString, "PCRace")) {
+            const char* RaceFullName = pPlayer->GetRaceFullName();
+            BSstrcpy(apOutBuffer, static_cast<int32_t>(aiBufferSize), RaceFullName);
+            bfound = true;
+        }
+        if (!bfound && !BSstricmp(apString, "PCSex")) {
+            TESActorBase::SEX Sex = pPlayer->GetSex();
+            const char* v11 = pSexNameGS[Sex]->String();
+            BSstrcpy(apOutBuffer, static_cast<int32_t>(aiBufferSize), v11);
+            bfound = true;
+        }
+        if (!bfound && !BSstricmp(apString, "PCSexPronoun")) {
+            TESActorBase::SEX v6 = pPlayer->GetSex();
+            const char* v7 = pSexPronounGS[v6]->String();
+            BSstrcpy(apOutBuffer, static_cast<int32_t>(aiBufferSize), v7);
+            bfound = true;
+        }
+        if (!bfound && !BSstricmp(apString, "PCSexPossessive")) {
+            TESActorBase::SEX v8 = pPlayer->GetSex();
+            const char* v12 = pSexPossessiveGS[v8]->String();
+            BSstrcpy(apOutBuffer, static_cast<int32_t>(aiBufferSize), v12);
+            bfound = true;
+        }
+        if (!bfound) {
+            return Interface::TestConstantForGameSettings(apString, apOutBuffer);
+        }
     }
+
     return bfound;
 }
 
@@ -1134,16 +1110,12 @@ bool Interface::IsMenuIDVisible(enumMenus aeMenuID, uint32_t abFadeStatesThatCou
         return false;
     }
     if (aeMenuID == eMainFour) {
-        if (IsPipBoyOpened()) {
-            if (IsMenuIDVisible(eStatsMenu, abFadeStatesThatCountAsVisible) ||
-                IsMenuIDVisible(eInventoryMenu, abFadeStatesThatCountAsVisible) ||
-                IsMenuIDVisible(ePipBoyRepair, abFadeStatesThatCountAsVisible) ||
-                IsMenuIDVisible(eItemModMenu, abFadeStatesThatCountAsVisible) ||
-                IsMenuIDVisible(ePipBoyData, abFadeStatesThatCountAsVisible)) {
-                return true;
-            }
-        }
-        return false;
+        return (IsPipBoyOpened()) &&
+            (IsMenuIDVisible(eStatsMenu, abFadeStatesThatCountAsVisible) ||
+             IsMenuIDVisible(eInventoryMenu, abFadeStatesThatCountAsVisible) ||
+             IsMenuIDVisible(ePipBoyRepair, abFadeStatesThatCountAsVisible) ||
+             IsMenuIDVisible(eItemModMenu, abFadeStatesThatCountAsVisible) ||
+             IsMenuIDVisible(ePipBoyData, abFadeStatesThatCountAsVisible));
     }
     if (abFadeStatesThatCountAsVisible != 0) {
         Tile* pMenuTile = Menu::GetMenuByClass(aeMenuID);
@@ -1189,13 +1161,14 @@ bool Interface::IsTopMenuID(enumMenus aeMenuID) {
         return false;
     }
     int32_t aiTop = InterfaceManager::Instance()->GetEnterStackTop();
-    if (aiTop == eMainFour) {
-        // The four main menus are all shown at once, so any of them counts as the top one.
-        if (aeMenuID == eStatsMenu || aeMenuID == eInventoryMenu || aeMenuID == ePipBoyRepair ||
-            aeMenuID == ePipBoyData || aeMenuID == eItemModMenu) {
-            return IsMenuIDVisible(aeMenuID, static_cast<FADE_STATE>(0));
-        }
+    if ((aiTop == eMainFour) &&
+        (aeMenuID == eStatsMenu || aeMenuID == eInventoryMenu || aeMenuID == ePipBoyRepair || aeMenuID == ePipBoyData ||
+         aeMenuID == eItemModMenu))
+    // The four main menus are all shown at once, so any of them counts as the top one.
+    {
+        return IsMenuIDVisible(aeMenuID, static_cast<FADE_STATE>(0));
     }
+
     return aiTop == aeMenuID;
 }
 
@@ -1655,11 +1628,10 @@ NiNode* Interface::CopyOrDeepCopyNode(NiNode* apNode) {
         v5 = (-1);
         return v3;
     }
-    else {
-        v2 = static_cast<NiNode*>(apNode->Clone(apCloneProc));
-        v5 = (-1);
-        return v2;
-    }
+
+    v2 = static_cast<NiNode*>(apNode->Clone(apCloneProc));
+    v5 = (-1);
+    return v2;
 }
 
 bool Interface::PlayNifSounds(NiControllerSequence* apSequence) {
@@ -1717,14 +1689,12 @@ bool Interface::ShowMessage(
     );
     if (InterfaceManager::Instance()) {
         InterfaceManager* v6 = InterfaceManager::Instance();
-        if (v6->IsDoneFirstInit()) {
-            if (HUDMainMenu::pme) {
-                // Interface::ShowMessage takes aeEmotion as an int and passes it on as the HUD's emotion.
-                HUDMainMenu::pme->ShowMessage(
-                    apString, static_cast<HUDMainMenu::HUD_MESSAGE_EMOTION>(aeEmotion), apIconFilename, apSoundName,
-                    afShowSeconds, abMoveToHead
-                );
-            }
+        if ((v6->IsDoneFirstInit()) && (HUDMainMenu::pme)) {
+            // Interface::ShowMessage takes aeEmotion as an int and passes it on as the HUD's emotion.
+            HUDMainMenu::pme->ShowMessage(
+                apString, static_cast<HUDMainMenu::HUD_MESSAGE_EMOTION>(aeEmotion), apIconFilename, apSoundName,
+                afShowSeconds, abMoveToHead
+            );
         }
     }
     return false;
@@ -2011,19 +1981,16 @@ void Interface::RestoreMenuElements() {
                     pmenutile->GetFloat(Tile::kTileValue_IsolatedVisible) == 0.0;
                 pmenutile->GetModel()->SetAppCulled(bCull);
             }
-            if (pglow) {
-                if (pglow->GetModel()) {
-                    bool bCull = pglow->GetFloat(Tile::kTileValue_Visible) == 0.0 ||
-                        pglow->GetFloat(Tile::kTileValue_IsolatedVisible) == 0.0;
-                    pglow->GetModel()->SetAppCulled(bCull);
-                }
+            if ((pglow) && (pglow->GetModel())) {
+                bool bCull = pglow->GetFloat(Tile::kTileValue_Visible) == 0.0 ||
+                    pglow->GetFloat(Tile::kTileValue_IsolatedVisible) == 0.0;
+                pglow->GetModel()->SetAppCulled(bCull);
             }
-            if (pnoglow) {
-                if (pnoglow->GetModel()) {
-                    bool bCull = pnoglow->GetFloat(Tile::kTileValue_Visible) == 0.0 ||
-                        pnoglow->GetFloat(Tile::kTileValue_IsolatedVisible) == 0.0;
-                    pnoglow->GetModel()->SetAppCulled(bCull);
-                }
+
+            if ((pnoglow) && (pnoglow->GetModel())) {
+                bool bCull = pnoglow->GetFloat(Tile::kTileValue_Visible) == 0.0 ||
+                    pnoglow->GetFloat(Tile::kTileValue_IsolatedVisible) == 0.0;
+                pnoglow->GetModel()->SetAppCulled(bCull);
             }
         }
     }
@@ -2545,11 +2512,9 @@ void Interface::SetItemModMenuVisible(bool abVisibility, bool abAnyVisibleState,
                 }
             }
             else {
-                if (isMenuIDVisible) {
-                    if (itemModMenu) {
-                        v17 = itemModMenu->GetMenu();
-                        v17->StartFadeOut();
-                    }
+                if ((isMenuIDVisible) && (itemModMenu)) {
+                    v17 = itemModMenu->GetMenu();
+                    v17->StartFadeOut();
                 }
             }
         }
@@ -2597,12 +2562,11 @@ void Interface::GetControlPushTextFor(int32_t aiIndex, char* axReturn, bool abAd
                 pbuttonSetting = psMouse[v10];
             }
         }
-        if (pbuttonSetting) {
-            if (pbuttonSetting->String()) {
-                const char* v7 = pbuttonSetting->String();
-                ourStrcpy(axReturn, v7);
-            }
+        if ((pbuttonSetting) && (pbuttonSetting->String())) {
+            const char* v7 = pbuttonSetting->String();
+            ourStrcpy(axReturn, v7);
         }
+
         if (abAddPushText) {
             BSStringT<char> xtemp;
             if (*axReturn) {
@@ -2665,19 +2629,16 @@ void Interface::IsolateElementsOfMenu(
                     pnoglow->Set(Tile::kTileValue_IsolatedVisible, 1);
                 }
             }
-            if (pglow) {
-                if (pglow->GetModel()) {
-                    bool bCull = pglow->GetFloat(Tile::kTileValue_Visible) == 0.0 ||
-                        pglow->GetFloat(Tile::kTileValue_IsolatedVisible) == 0.0;
-                    pglow->GetModel()->SetAppCulled(bCull);
-                }
+            if ((pglow) && (pglow->GetModel())) {
+                bool bCull = pglow->GetFloat(Tile::kTileValue_Visible) == 0.0 ||
+                    pglow->GetFloat(Tile::kTileValue_IsolatedVisible) == 0.0;
+                pglow->GetModel()->SetAppCulled(bCull);
             }
-            if (pnoglow) {
-                if (pnoglow->GetModel()) {
-                    bool bCull = abGlowOnly || pnoglow->GetFloat(Tile::kTileValue_Visible) == 0.0 ||
-                        pnoglow->GetFloat(Tile::kTileValue_IsolatedVisible) == 0.0;
-                    pnoglow->GetModel()->SetAppCulled(bCull);
-                }
+
+            if ((pnoglow) && (pnoglow->GetModel())) {
+                bool bCull = abGlowOnly || pnoglow->GetFloat(Tile::kTileValue_Visible) == 0.0 ||
+                    pnoglow->GetFloat(Tile::kTileValue_IsolatedVisible) == 0.0;
+                pnoglow->GetModel()->SetAppCulled(bCull);
             }
         }
         if (apMenuTile->GetModel()) {
@@ -2717,10 +2678,9 @@ NiPoint3* Interface::GetActivatePickLocation(NiPoint3* apResult) {
         ::new (apResult) NiPoint3(v2->GetActivatePickLocation());
         return apResult;
     }
-    else {
-        *apResult = NiPoint3_ZERO;
-        return apResult;
-    }
+
+    *apResult = NiPoint3_ZERO;
+    return apResult;
 }
 
 void Interface::SetFirstChanceTextureRelease_00703920() {
@@ -2790,11 +2750,9 @@ void Interface::SetRepairMenuVisible(bool abVisibility, bool abAnyVisibleState, 
                 }
             }
             else {
-                if (bisVisible) {
-                    if (prepair) {
-                        Menu* v16 = prepair->GetMenu();
-                        v16->StartFadeOut();
-                    }
+                if ((bisVisible) && (prepair)) {
+                    Menu* v16 = prepair->GetMenu();
+                    v16->StartFadeOut();
                 }
             }
         }
@@ -2970,22 +2928,19 @@ uint8_t MapMenu::GetCurrentMapPage() {
 // the main thread (or queues the menu when the game runs more than one hardware thread).
 void MessageMenu_SetDisabled(uint8_t abDisable) {
     bMessageMenuDisabled = abDisable;
-    if (MessageMenu::pMe) {
-        if (bMessageMenuDisabled) {
-            MessageMenu::Close();
-        }
+    if ((MessageMenu::pMe) && (bMessageMenuDisabled)) {
+        MessageMenu::Close();
     }
-    if (!MessageMenu::pMe && !bMessageMenuDisabled) {
-        if (MessageMenu::GetQueueHead()) {
-            // The compare on the setting's value is signed.
-            if (static_cast<int32_t>(iNumHWThreads.UInt()) > 1) {
-                Interface::QueueMenuCreate(
-                    Interface::OPEN_MESSAGE, nullptr, nullptr, nullptr, Interface::CMM_STANDARD, false
-                );
-            }
-            else {
-                MessageMenu::Create();
-            }
+
+    if ((!MessageMenu::pMe && !bMessageMenuDisabled) && (MessageMenu::GetQueueHead())) {
+        // The compare on the setting's value is signed.
+        if (static_cast<int32_t>(iNumHWThreads.UInt()) > 1) {
+            Interface::QueueMenuCreate(
+                Interface::OPEN_MESSAGE, nullptr, nullptr, nullptr, Interface::CMM_STANDARD, false
+            );
+        }
+        else {
+            MessageMenu::Create();
         }
     }
 }

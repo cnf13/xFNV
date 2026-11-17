@@ -120,21 +120,20 @@ void MenuTopic::FillResponseList(TESQuest* apQuest, TESTopic* apTopic, TESTopicI
     TESResponse* presponse = lResponseList.pHead;
     int32_t i = 0;
     while (presponse) {
-        if (presponse->GetResponseTextLength()) {
-            if (!bGeneralTopic || !i) {
-                DialogueResponse* pMenuResponse;
-                DialogueResponse* apMemory = static_cast<DialogueResponse*>(ourMalloc(sizeof(DialogueResponse)));
-                if (apMemory) {
-                    pMenuResponse = ::new (apMemory) DialogueResponse(apQuest, apTopic, apInfo, apSpeaker, presponse);
-                }
-                else {
-                    pMenuResponse = nullptr;
-                }
-                DialogueResponse* pMenuResponse_2 = pMenuResponse;
-                lResponses.AddTail(pMenuResponse_2);
-                ++i;
+        if ((presponse->GetResponseTextLength()) && (!bGeneralTopic || !i)) {
+            DialogueResponse* pMenuResponse;
+            DialogueResponse* apMemory = static_cast<DialogueResponse*>(ourMalloc(sizeof(DialogueResponse)));
+            if (apMemory) {
+                pMenuResponse = ::new (apMemory) DialogueResponse(apQuest, apTopic, apInfo, apSpeaker, presponse);
             }
+            else {
+                pMenuResponse = nullptr;
+            }
+            DialogueResponse* pMenuResponse_2 = pMenuResponse;
+            lResponses.AddTail(pMenuResponse_2);
+            ++i;
         }
+
         presponse = presponse->pNext;
     }
 }
@@ -508,11 +507,10 @@ bool MenuTopicManager::NextTopic() {
 void MenuTopicManager::ClearTopicList(BSSimpleList<MenuTopic*>* apList, bool abClearGreeting) {
     pCurrentTopic = nullptr;
     BSSimpleList<MenuTopic*>* pList = apList;
-    if (!abClearGreeting) {
-        if (apList) {
-            pList = apList->m_pkNext;
-        }
+    if ((!abClearGreeting) && (apList)) {
+        pList = apList->m_pkNext;
     }
+
     while (pList && !pList->IsEmpty()) {
         if (!pList->m_item->bGeneralTopic) {
             MenuTopic* apThis = pList->m_item;
@@ -578,117 +576,113 @@ bool MenuTopicManager::Initialize(TESObjectREFR* apSpeaker, TESTopic* apForceGre
 
 bool MenuTopicManager::DoSpeechChallengeCheck(MenuTopic* pSpeechTopic) {
     bool bdummy;
-    if (pSpeechTopic) {
-        if (pSpeechTopic->pInfo->IsSpeechChallenge()) {
-            float fDisposition;
-            if (pSpeaker->IsActor()) {
-                fDisposition = static_cast<float>(static_cast<Actor*>(pSpeaker)->GetDisposition(pPlayer, nullptr));
-            }
-            else {
-                fDisposition = fSpeechChallengeDispositionBase.Float();
-            }
-            uint32_t SpeechChallengeDifficultyMult = pSpeechTopic->pInfo->GetSpeechChallengeDifficultyMult();
-            float fSpeech = pPlayer->GetClampedActorFloatValue(ActorValue::SPEECH);
-            int32_t iChallengeChance =
-                GamePlayFormulas::GetSpeechChallengeChance(fSpeech, fDisposition, SpeechChallengeDifficultyMult);
-            int32_t idieRoll = Random() % 100;
-            if (idieRoll < iChallengeChance) {
-                int32_t State = pSpeechTopic->pInfo->eDifficulty;
-                iLastDialogXP =
-                    ExperiencePoints::GetExperiencePoints(ExperiencePoints::ACTIVITY_SPEECH_CHALLENGE, State - 1);
-            }
-            else {
-                bSpeechChallengeLoss = true;
-                MiscStatManager::Increment(MiscStatManager::MS_SPEECH_FAILURES);
-                TESTopic* pspeechFailTopic = TESTopic::GetTopic(DT_TOPIC, 11);
-                TESTopic* afDisposition = pSpeechTopic->pTopic;
-                TESTopicInfo* pspeechFailInfo =
-                    pspeechFailTopic->GetMatchingInfo(bdummy, pSpeaker, pPlayer, false, afDisposition, nullptr);
-                if (pspeechFailInfo) {
-                    MenuTopic* pnewTopic;
-                    BSSimpleList<MenuTopic*>* pnewList;
-                    BSSimpleList<MenuTopic*>* v18 =
-                        static_cast<BSSimpleList<MenuTopic*>*>(ourMalloc(sizeof(BSSimpleList<MenuTopic*>)));
-                    if (v18) {
-                        pnewList = ::new (v18) BSSimpleList<MenuTopic*>;
-                    }
-                    else {
-                        pnewList = nullptr;
-                    }
-                    MenuTopic* apMemory = static_cast<MenuTopic*>(ourMalloc(sizeof(MenuTopic)));
-                    if (apMemory) {
-                        TESObjectREFR* afDispositiona = pSpeaker;
-                        TESQuest* OwnerQuest = pspeechFailTopic->GetOwnerQuest(pspeechFailInfo);
-                        pnewTopic = ::new (apMemory)
-                            MenuTopic(OwnerQuest, pspeechFailTopic, pspeechFailInfo, afDispositiona, false);
-                    }
-                    else {
-                        pnewTopic = nullptr;
-                    }
-                    MenuTopic* pnewTopic_2 = pnewTopic;
-                    pnewTopic->FirstResponse();
-                    pSpeechTopic->pInfo->SetSaidOnce();
-                    if (pSpeechTopic->pInfo->IsSayOnce() || pSpeechTopic->pInfo->IsSayOnceADay()) {
-                        if (pSpeechTopic->pInfo->IsSayOnceADay() && pSpeaker->IsMobileObject()) {
-                            MobileObject* pmob = static_cast<MobileObject*>(pSpeaker);
-                            pmob->AddSayOnceTopicInfo(pSpeechTopic->pInfo);
-                        }
-                        GetCurrentTopicList()->Remove(pSpeechTopic);
-                    }
-                    MenuTopic* pnewTopic_3 = GetGreeting();
-                    pnewList->AddTail(pnewTopic_3);
-                    pnewList->AddTail(pnewTopic_2);
-                    PushTopicList(pnewList);
-                    FirstTopic(true);
+    if ((pSpeechTopic) && (pSpeechTopic->pInfo->IsSpeechChallenge())) {
+        float fDisposition;
+        if (pSpeaker->IsActor()) {
+            fDisposition = static_cast<float>(static_cast<Actor*>(pSpeaker)->GetDisposition(pPlayer, nullptr));
+        }
+        else {
+            fDisposition = fSpeechChallengeDispositionBase.Float();
+        }
+        uint32_t SpeechChallengeDifficultyMult = pSpeechTopic->pInfo->GetSpeechChallengeDifficultyMult();
+        float fSpeech = pPlayer->GetClampedActorFloatValue(ActorValue::SPEECH);
+        int32_t iChallengeChance =
+            GamePlayFormulas::GetSpeechChallengeChance(fSpeech, fDisposition, SpeechChallengeDifficultyMult);
+        int32_t idieRoll = Random() % 100;
+        if (idieRoll < iChallengeChance) {
+            int32_t State = pSpeechTopic->pInfo->eDifficulty;
+            iLastDialogXP =
+                ExperiencePoints::GetExperiencePoints(ExperiencePoints::ACTIVITY_SPEECH_CHALLENGE, State - 1);
+        }
+        else {
+            bSpeechChallengeLoss = true;
+            MiscStatManager::Increment(MiscStatManager::MS_SPEECH_FAILURES);
+            TESTopic* pspeechFailTopic = TESTopic::GetTopic(DT_TOPIC, 11);
+            TESTopic* afDisposition = pSpeechTopic->pTopic;
+            TESTopicInfo* pspeechFailInfo =
+                pspeechFailTopic->GetMatchingInfo(bdummy, pSpeaker, pPlayer, false, afDisposition, nullptr);
+            if (pspeechFailInfo) {
+                MenuTopic* pnewTopic;
+                BSSimpleList<MenuTopic*>* pnewList;
+                BSSimpleList<MenuTopic*>* v18 =
+                    static_cast<BSSimpleList<MenuTopic*>*>(ourMalloc(sizeof(BSSimpleList<MenuTopic*>)));
+                if (v18) {
+                    pnewList = ::new (v18) BSSimpleList<MenuTopic*>;
                 }
                 else {
-                    Warning(
-                        WARN_DIALOGUE,
-                        "SpeechChallengeFailure topic had no matching info for this topic; returning to original "
-                        "list."
-                    );
+                    pnewList = nullptr;
                 }
-                if (pSpeaker->IsActor()) {
-                    float iDifficultyMult = GamePlayFormulas::GetSpeechFailPenalty(iChallengeChance);
-                    static_cast<Actor*>(pSpeaker)->ModifyDispositionTowardActor(pPlayer, iDifficultyMult);
+                MenuTopic* apMemory = static_cast<MenuTopic*>(ourMalloc(sizeof(MenuTopic)));
+                if (apMemory) {
+                    TESObjectREFR* afDispositiona = pSpeaker;
+                    TESQuest* OwnerQuest = pspeechFailTopic->GetOwnerQuest(pspeechFailInfo);
+                    pnewTopic = ::new (apMemory)
+                        MenuTopic(OwnerQuest, pspeechFailTopic, pspeechFailInfo, afDispositiona, false);
                 }
+                else {
+                    pnewTopic = nullptr;
+                }
+                MenuTopic* pnewTopic_2 = pnewTopic;
+                pnewTopic->FirstResponse();
+                pSpeechTopic->pInfo->SetSaidOnce();
+                if (pSpeechTopic->pInfo->IsSayOnce() || pSpeechTopic->pInfo->IsSayOnceADay()) {
+                    if (pSpeechTopic->pInfo->IsSayOnceADay() && pSpeaker->IsMobileObject()) {
+                        MobileObject* pmob = static_cast<MobileObject*>(pSpeaker);
+                        pmob->AddSayOnceTopicInfo(pSpeechTopic->pInfo);
+                    }
+                    GetCurrentTopicList()->Remove(pSpeechTopic);
+                }
+                MenuTopic* pnewTopic_3 = GetGreeting();
+                pnewList->AddTail(pnewTopic_3);
+                pnewList->AddTail(pnewTopic_2);
+                PushTopicList(pnewList);
+                FirstTopic(true);
+            }
+            else {
+                Warning(
+                    WARN_DIALOGUE,
+                    "SpeechChallengeFailure topic had no matching info for this topic; returning to original "
+                    "list."
+                );
+            }
+            if (pSpeaker->IsActor()) {
+                float iDifficultyMult = GamePlayFormulas::GetSpeechFailPenalty(iChallengeChance);
+                static_cast<Actor*>(pSpeaker)->ModifyDispositionTowardActor(pPlayer, iDifficultyMult);
             }
         }
     }
+
     return bSpeechChallengeLoss;
 }
 
 void MenuTopicManager::Update() {
     MenuTopic* CurrentTopic = GetCurrentTopic();
-    if (CurrentTopic) {
-        if (CurrentTopic->pInfo) {
-            CurrentTopic->pInfo->AddTopicList();
-        }
+    if ((CurrentTopic) && (CurrentTopic->pInfo)) {
+        CurrentTopic->pInfo->AddTopicList();
     }
+
     if (bSpeechChallengeLoss && (CurrentTopic && !CurrentTopic->bTopicIsChoice)) {
         PopTopicList();
         bSpeechChallengeLoss = false;
     }
     else {
-        if (CurrentTopic) {
-            if (!CurrentTopic->bGeneralTopic) {
-                BSSimpleList<TESTopic*>* pTopics;
-                bool EntryPoint = CurrentTopic->bTopicIsChoice;
-                if (EntryPoint) {
-                    pTopics = &CurrentTopic->pInfo->GetConversationData()->m_listLinkTo;
-                }
-                else {
-                    pTopics = pPlayer->GetTopicList();
-                }
-                TESTopic* apPreviousTopic = CurrentTopic->pTopic;
-                if (pTopics) {
-                    BSSimpleList<MenuTopic*>* CurrentTopicList = GetCurrentTopicList();
-                    ClearTopicList(CurrentTopicList, false);
-                    FillTopicList(pTopics, false, EntryPoint, apPreviousTopic);
-                }
-                if (bSpeechChallengeLoss) {
-                    bSpeechChallengeLoss = false;
-                }
+        if ((CurrentTopic) && (!CurrentTopic->bGeneralTopic)) {
+            BSSimpleList<TESTopic*>* pTopics;
+            bool EntryPoint = CurrentTopic->bTopicIsChoice;
+            if (EntryPoint) {
+                pTopics = &CurrentTopic->pInfo->GetConversationData()->m_listLinkTo;
+            }
+            else {
+                pTopics = pPlayer->GetTopicList();
+            }
+            TESTopic* apPreviousTopic = CurrentTopic->pTopic;
+            if (pTopics) {
+                BSSimpleList<MenuTopic*>* CurrentTopicList = GetCurrentTopicList();
+                ClearTopicList(CurrentTopicList, false);
+                FillTopicList(pTopics, false, EntryPoint, apPreviousTopic);
+            }
+            if (bSpeechChallengeLoss) {
+                bSpeechChallengeLoss = false;
             }
         }
     }
@@ -720,14 +714,12 @@ void MenuTopicManager::FillTopicList(
                     if (pTopic->IsRemappedRumors() && !pactor->HasNoRumors()) {
                         MenuTopic* apitem = nullptr;
                         MenuTopic* pMenuTopic = (&pSpeaker->m_Extra)->GetInfoGeneralTopic(pSpeaker);
-                        if (pMenuTopic) {
-                            if (!bgeneral) {
-                                if (pMenuTopic->FirstResponse() && !bgeneral &&
-                                    !GetCurrentTopicList()->IsInList(pMenuTopic)) {
-                                    GetCurrentTopicList()->AddTail(pMenuTopic);
-                                }
-                                bgeneral = true;
+                        if ((pMenuTopic) && (!bgeneral)) {
+                            if (pMenuTopic->FirstResponse() && !bgeneral &&
+                                !GetCurrentTopicList()->IsInList(pMenuTopic)) {
+                                GetCurrentTopicList()->AddTail(pMenuTopic);
                             }
+                            bgeneral = true;
                         }
                     }
                     bDispositionFailure = false;
@@ -768,13 +760,9 @@ void MenuTopicManager::FillTopicList(
                                 pMenuTopic_2 = nullptr;
                             }
                         }
-                        if (bSetTopic) {
-                            if (pMenuTopic_2) {
-                                if (!pMenuTopic_2->pInfo->IsSayOnce()) {
-                                    (&pSpeaker->m_Extra)->SetInfoGeneralTopic(pMenuTopic_2);
-                                    pSpeaker->AddChange(CHANGE_REFR_EXTRA_GAME_ONLY);
-                                }
-                            }
+                        if ((bSetTopic) && (pMenuTopic_2) && (!pMenuTopic_2->pInfo->IsSayOnce())) {
+                            (&pSpeaker->m_Extra)->SetInfoGeneralTopic(pMenuTopic_2);
+                            pSpeaker->AddChange(CHANGE_REFR_EXTRA_GAME_ONLY);
                         }
                     }
                 }

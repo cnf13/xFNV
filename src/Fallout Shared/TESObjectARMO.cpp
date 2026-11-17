@@ -392,21 +392,19 @@ void TESObjectARMO::Save() {
             while (tList && tList->m_item) {
                 FOLEY_SOUND* fsnd = tList->m_item;
                 tList = tList->m_pkNext;
-                if (fsnd) {
-                    if (fsnd->pSound) {
-                        tsnd.~FOLEY_SOUND();
-                        ::new (&tsnd) FOLEY_SOUND;
-                        // The saved record holds the sound's form ID in the pointer field.
-                        tsnd.pSound = reinterpret_cast<TESSound*>(static_cast<uintptr_t>(fsnd->pSound->iFormID));
-                        tsnd.iChance = fsnd->iChance;
-                        tsnd.eType = fsnd->eType;
-                        if (TESForm::QEndianSwapOnSave()) {
-                            tsnd.Endian();
-                        }
-                        TESForm::__AddChunkData(SNAM_ID, &tsnd, 12u);
-                        if (TESForm::QEndianSwapOnSave()) {
-                            tsnd.Endian();
-                        }
+                if ((fsnd) && (fsnd->pSound)) {
+                    tsnd.~FOLEY_SOUND();
+                    ::new (&tsnd) FOLEY_SOUND;
+                    // The saved record holds the sound's form ID in the pointer field.
+                    tsnd.pSound = reinterpret_cast<TESSound*>(static_cast<uintptr_t>(fsnd->pSound->iFormID));
+                    tsnd.iChance = fsnd->iChance;
+                    tsnd.eType = fsnd->eType;
+                    if (TESForm::QEndianSwapOnSave()) {
+                        tsnd.Endian();
+                    }
+                    TESForm::__AddChunkData(SNAM_ID, &tsnd, 12u);
+                    if (TESForm::QEndianSwapOnSave()) {
+                        tsnd.Endian();
                     }
                 }
             }
@@ -460,17 +458,15 @@ void TESObjectARMO::InitItem() {
         BGSBipedModelList::InitItem(this);
         BGSPickupPutdownSounds::InitItem(this);
         if (bIsFoleyBase || !this->pFoleySoundList) {
-            if (bIsFoleyBase) {
-                if (this->pFoleySoundList) {
-                    BSSimpleList<FOLEY_SOUND*>* tList = this->pFoleySoundList;
-                    while (tList && tList->m_item) {
-                        FOLEY_SOUND* fsnd = tList->m_item;
-                        tList = tList->m_pkNext;
-                        if (fsnd->pSound) {
-                            fsnd->pSound = static_cast<TESSound*>(TESForm::GetFormByNumericID(
-                                static_cast<uint32_t>(reinterpret_cast<uintptr_t>(fsnd->pSound))
-                            ));
-                        }
+            if ((bIsFoleyBase) && (this->pFoleySoundList)) {
+                BSSimpleList<FOLEY_SOUND*>* tList = this->pFoleySoundList;
+                while (tList && tList->m_item) {
+                    FOLEY_SOUND* fsnd = tList->m_item;
+                    tList = tList->m_pkNext;
+                    if (fsnd->pSound) {
+                        fsnd->pSound = static_cast<TESSound*>(TESForm::GetFormByNumericID(
+                            static_cast<uint32_t>(reinterpret_cast<uintptr_t>(fsnd->pSound))
+                        ));
                     }
                 }
             }
@@ -490,18 +486,17 @@ void TESObjectARMO::Copy(TESForm* apCopy) {
     if (parmo) {
         CopyAllComponents(apCopy);
         data = parmo->data;
-        if (bIsFoleyBase) {
-            if (this->pFoleySoundList) {
-                for (FOLEY_SOUND*& rpItem : this->pFoleySoundList->ItemsUntilNull()) {
-                    ourFree(rpItem);
-                }
-                this->pFoleySoundList->RemoveAll();
-                void* pFoleySoundList = this->pFoleySoundList;
-                if (pFoleySoundList) {
-                    delete static_cast<BSSimpleList<ActiveEffect*>*>(pFoleySoundList);
-                }
+        if ((bIsFoleyBase) && (this->pFoleySoundList)) {
+            for (FOLEY_SOUND*& rpItem : this->pFoleySoundList->ItemsUntilNull()) {
+                ourFree(rpItem);
+            }
+            this->pFoleySoundList->RemoveAll();
+            void* pFoleySoundList = this->pFoleySoundList;
+            if (pFoleySoundList) {
+                delete static_cast<BSSimpleList<ActiveEffect*>*>(pFoleySoundList);
             }
         }
+
         bIsFoleyBase = parmo->bIsFoleyBase;
         if (bIsFoleyBase) {
             BSSimpleList<FOLEY_SOUND*>* v3;
@@ -519,20 +514,18 @@ void TESObjectARMO::Copy(TESForm* apCopy) {
                 while (tList_2 && tList_2->m_item) {
                     FOLEY_SOUND* fsnd = tList_2->m_item;
                     tList_2 = tList_2->m_pkNext;
-                    if (fsnd) {
-                        if (fsnd->pSound) {
-                            FOLEY_SOUND* tsnd;
-                            FOLEY_SOUND* apMemory = static_cast<FOLEY_SOUND*>(ourMalloc(sizeof(FOLEY_SOUND)));
-                            if (apMemory) {
-                                tsnd = ::new (apMemory) FOLEY_SOUND;
-                            }
-                            else {
-                                tsnd = nullptr;
-                            }
-                            FOLEY_SOUND* tsnd_2 = tsnd;
-                            *tsnd = *fsnd;
-                            this->pFoleySoundList->AddHead(tsnd_2);
+                    if ((fsnd) && (fsnd->pSound)) {
+                        FOLEY_SOUND* tsnd;
+                        FOLEY_SOUND* apMemory = static_cast<FOLEY_SOUND*>(ourMalloc(sizeof(FOLEY_SOUND)));
+                        if (apMemory) {
+                            tsnd = ::new (apMemory) FOLEY_SOUND;
                         }
+                        else {
+                            tsnd = nullptr;
+                        }
+                        FOLEY_SOUND* tsnd_2 = tsnd;
+                        *tsnd = *fsnd;
+                        this->pFoleySoundList->AddHead(tsnd_2);
                     }
                 }
             }
@@ -630,11 +623,10 @@ TESSound* TESObjectARMO::GetFoleySound(ENUM_FOLEY_SOUND aeType) {
     while (pList && (!pList->IsEmpty() && !pSound)) {
         FOLEY_SOUND* pData = pList->m_item;
         pList = pList->m_pkNext;
-        if (pData->pSound) {
-            // Random() & 99 is compared with the chance byte signed.
-            if (pData->eType == aeType && static_cast<int32_t>(Random() & 99) < pData->iChance) {
-                pSound = pData->pSound;
-            }
+        if ((pData->pSound) && (pData->eType == aeType && static_cast<int32_t>(Random() & 99) < pData->iChance))
+        // Random() & 99 is compared with the chance byte signed.
+        {
+            pSound = pData->pSound;
         }
     }
     return pSound;

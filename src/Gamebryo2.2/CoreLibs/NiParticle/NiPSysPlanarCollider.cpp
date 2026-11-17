@@ -406,7 +406,6 @@ NiObject* NiPSysPlanarCollider::CreateObject() {
         return ::new (v0)
             NiPSysPlanarCollider(1.0, false, false, nullptr, nullptr, 1.0, 1.0, NiPoint3_UNIT_X, NiPoint3_UNIT_Y);
     }
-    else {
-        return nullptr;
-    }
+
+    return nullptr;
 }

@@ -115,40 +115,38 @@ bool CreatureSounds::LoadCreatureSound(TESFile* apFile, CREATURE_SOUND_TYPE aeTy
 }
 
 void CreatureSounds::AddCreatureSound(CREATURE_SOUND* apSound, CREATURE_SOUND_TYPE aeType) {
-    if (apSound) {
-        if (aeType >= CREA_SOUND_LEFT && aeType < CREA_SOUND_COUNT) {
-            if (!pSoundListArray[aeType]) {
-                BSSimpleList<CREATURE_SOUND*>* v4;
-                BSSimpleList<CREATURE_SOUND*>* v6 =
-                    static_cast<BSSimpleList<CREATURE_SOUND*>*>(ourMalloc(sizeof(BSSimpleList<CREATURE_SOUND*>)));
-                if (v6) {
-                    v4 = ::new (v6) BSSimpleList<CREATURE_SOUND*>;
-                }
-                else {
-                    v4 = nullptr;
-                }
-                pSoundListArray[aeType] = v4;
-            }
-            BSSimpleList<CREATURE_SOUND*>* plist = GetCreatureSoundList(aeType);
-            BSSimpleList<CREATURE_SOUND*>* plastlist = nullptr;
-            while (plist) {
-                if (plist->IsEmpty()) {
-                    break;
-                }
-                int32_t iChance = plist->m_item->iChance;
-                if (iChance > apSound->iChance) {
-                    break;
-                }
-                plastlist = plist;
-                plist = plist->m_pkNext;
-            }
-            if (plist) {
-                plist->AddHead(apSound);
+    if ((apSound) && (aeType >= CREA_SOUND_LEFT && aeType < CREA_SOUND_COUNT)) {
+        if (!pSoundListArray[aeType]) {
+            BSSimpleList<CREATURE_SOUND*>* v4;
+            BSSimpleList<CREATURE_SOUND*>* v6 =
+                static_cast<BSSimpleList<CREATURE_SOUND*>*>(ourMalloc(sizeof(BSSimpleList<CREATURE_SOUND*>)));
+            if (v6) {
+                v4 = ::new (v6) BSSimpleList<CREATURE_SOUND*>;
             }
             else {
-                if (plastlist) {
-                    plastlist->AddTail(apSound);
-                }
+                v4 = nullptr;
+            }
+            pSoundListArray[aeType] = v4;
+        }
+        BSSimpleList<CREATURE_SOUND*>* plist = GetCreatureSoundList(aeType);
+        BSSimpleList<CREATURE_SOUND*>* plastlist = nullptr;
+        while (plist) {
+            if (plist->IsEmpty()) {
+                break;
+            }
+            int32_t iChance = plist->m_item->iChance;
+            if (iChance > apSound->iChance) {
+                break;
+            }
+            plastlist = plist;
+            plist = plist->m_pkNext;
+        }
+        if (plist) {
+            plist->AddHead(apSound);
+        }
+        else {
+            if (plastlist) {
+                plastlist->AddTail(apSound);
             }
         }
     }
@@ -166,19 +164,17 @@ BSSimpleList<CREATURE_SOUND*>* CreatureSounds::GetCreatureSoundList(CREATURE_SOU
 void CreatureSounds::Save() {
     for (int32_t i = 0; i < CREA_SOUND_COUNT; ++i) {
         BSSimpleList<CREATURE_SOUND*>* plist = GetCreatureSoundList(static_cast<CREATURE_SOUND_TYPE>(i));
-        if (plist) {
-            if (!plist->IsEmpty()) {
-                TESForm::AddChunk(CSDT_ID, static_cast<uint32_t>(i));
-                while (plist && !plist->IsEmpty()) {
-                    CREATURE_SOUND* pdata = plist->m_item;
-                    uint32_t tempint = 0;
-                    if (pdata->pSound) {
-                        tempint = pdata->pSound->iFormID;
-                    }
-                    TESForm::AddChunk(CSDI_ID, tempint);
-                    TESForm::AddChunk(CSDC_ID, pdata->iChance);
-                    plist = plist->m_pkNext;
+        if ((plist) && (!plist->IsEmpty())) {
+            TESForm::AddChunk(CSDT_ID, static_cast<uint32_t>(i));
+            while (plist && !plist->IsEmpty()) {
+                CREATURE_SOUND* pdata = plist->m_item;
+                uint32_t tempint = 0;
+                if (pdata->pSound) {
+                    tempint = pdata->pSound->iFormID;
                 }
+                TESForm::AddChunk(CSDI_ID, tempint);
+                TESForm::AddChunk(CSDC_ID, pdata->iChance);
+                plist = plist->m_pkNext;
             }
         }
     }
@@ -216,10 +212,8 @@ void CreatureSounds::operator delete(void* apMemory) {
 
 // Copies the two fields, not the padding after iChance.
 void CreatureSounds::CopyCreatureSound(CREATURE_SOUND* apCopyTo, CREATURE_SOUND* apCopyFrom) {
-    if (apCopyTo) {
-        if (apCopyFrom) {
-            apCopyTo->pSound = apCopyFrom->pSound;
-            apCopyTo->iChance = apCopyFrom->iChance;
-        }
+    if ((apCopyTo) && (apCopyFrom)) {
+        apCopyTo->pSound = apCopyFrom->pSound;
+        apCopyTo->iChance = apCopyFrom->iChance;
     }
 }

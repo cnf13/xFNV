@@ -81,20 +81,16 @@ void BGSTouchSpellForm::InitItem(TESForm* apOwner) {
         else {
             penchantment_2 = nullptr;
         }
-        if (penchantment_2) {
-            if (apOwner) {
-                if (!penchantment_2->IsValidEnchantForObject(apOwner)) {
-                    const char* v8 = apOwner->GetFormEditorID();
-                    int32_t v5 = apOwner->iFormID;
-                    const char* v4 = pFormTouchSpell->GetFormEditorID();
-                    Warning(
-                        "MASTERFILE: Enchanting (%08X) '%s' has invalid effect trigger type or effect for object "
-                        "(%08X) '%s'.",
-                        pFormTouchSpell->iFormID, v4, v5, v8
-                    );
-                    pFormTouchSpell = nullptr;
-                }
-            }
+        if ((penchantment_2) && (apOwner) && (!penchantment_2->IsValidEnchantForObject(apOwner))) {
+            const char* v8 = apOwner->GetFormEditorID();
+            int32_t v5 = apOwner->iFormID;
+            const char* v4 = pFormTouchSpell->GetFormEditorID();
+            Warning(
+                "MASTERFILE: Enchanting (%08X) '%s' has invalid effect trigger type or effect for object "
+                "(%08X) '%s'.",
+                pFormTouchSpell->iFormID, v4, v5, v8
+            );
+            pFormTouchSpell = nullptr;
         }
     }
 }

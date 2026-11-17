@@ -163,11 +163,10 @@ INITIAL_DATA_TYPE BGSSaveLoadInitialData::SaveInitialData(
             if (pRef->GetRefPersists()) {
                 kCreatedRefData.cCreatedReferenceFlags |= 2;
             }
-            if (pRef->IsMobileObject()) {
-                if (static_cast<MobileObject*>(pRef)->IsTalkingActivator()) {
-                    kCreatedRefData.cCreatedReferenceFlags |= 4;
-                }
+            if ((pRef->IsMobileObject()) && (static_cast<MobileObject*>(pRef)->IsTalkingActivator())) {
+                kCreatedRefData.cCreatedReferenceFlags |= 4;
             }
+
             apSaveGameBuffer->SaveDataEndian(&kCreatedRefData, sizeof(CreatedReferenceInitialData), 0);
             break;
         }
@@ -349,10 +348,8 @@ INITIAL_DATA_TYPE BGSSaveLoadInitialData::LoadInitialData(
                 );
             }
             if (!pRef->Get3D() || (pCell && TES::pInstance->IsCellLoaded(pCell, false))) {
-                if (pRef->Get3D()) {
-                    if (pRef->IsActor()) {
-                        pRef->InitHavok();
-                    }
+                if ((pRef->Get3D()) && (pRef->IsActor())) {
+                    pRef->InitHavok();
                 }
             }
             else {

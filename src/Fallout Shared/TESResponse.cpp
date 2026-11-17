@@ -35,9 +35,8 @@ SettingT<INISettingCollection> TESResponse::sFileTypeLTF("sFileTypeLTF:Voice", "
 SettingT<GameSettingCollection> gs_iStandardEmotionValue("iStandardEmotionValue", 100);
 
 void TESResponse::Load(TESFile* apFile) {
-    if (apFile) {
-        if (((int32_t)apFile->GetTESChunk()) == 1413763668) {
-            apFile->GetChunkData(this, 0x18u);
+    if ((apFile) && (((int32_t)apFile->GetTESChunk()) == 1413763668)) {
+        apFile->GetChunkData(this, 0x18u);
 #if FNVD_64BIT
             // The file's record is the 0x18-byte RESPONSE_DATA, with 4-byte form IDs at 8 and 0x10.
             TESFile::WidenFormIDRecords(
@@ -48,7 +47,6 @@ void TESResponse::Load(TESFile* apFile) {
             if (apFile->QEndian()) {
                 Data.Endian();
             }
-        }
     }
 }
 
@@ -397,20 +395,16 @@ void TESResponse::GetAudioFilename(
     TESTopicInfo* apOwnerInfo,
     BSStringT<char>& aFilename
 ) {
-    if (apOwnerQuest) {
-        if (apOwnerTopic) {
-            if (apOwnerInfo) {
-                uint32_t temp = GetResponseID();
-                if (temp) {
-                    char cBuffer[268];
-                    TESResponse::GetAudioQuestTopicCombined(apOwnerQuest, apOwnerTopic, cBuffer, 260u);
-                    int32_t uiFormID = apOwnerInfo->iFormID & 0xFFFFFF;
-                    aFilename.SPrintF("%s_%08X_%u", cBuffer, uiFormID, temp);
-                }
-                else {
-                    aFilename.Set("New Response", 0u);
-                }
-            }
+    if ((apOwnerQuest) && (apOwnerTopic) && (apOwnerInfo)) {
+        uint32_t temp = GetResponseID();
+        if (temp) {
+            char cBuffer[268];
+            TESResponse::GetAudioQuestTopicCombined(apOwnerQuest, apOwnerTopic, cBuffer, 260u);
+            int32_t uiFormID = apOwnerInfo->iFormID & 0xFFFFFF;
+            aFilename.SPrintF("%s_%08X_%u", cBuffer, uiFormID, temp);
+        }
+        else {
+            aFilename.Set("New Response", 0u);
         }
     }
 }
@@ -455,31 +449,27 @@ void TESResponse::GetAudioQuestTopicCombined(
     char* apOutBuffer,
     uint32_t aiBufferSize
 ) {
-    if (apOutBuffer) {
-        if (aiBufferSize) {
-            *apOutBuffer = 0;
-            if (apQuest) {
-                if (apTopic) {
-                    char Destination[264];
-                    char Str[264];
-                    const char* v4 = apQuest->GetEditorName();
-                    ourStrcpy(Destination, v4);
-                    const char* v5 = apTopic->GetFormEditorID();
-                    ourStrcpy(Str, v5);
-                    uint32_t iqlen = std::strlen(Destination);
-                    if (std::strlen(Str) + iqlen > 25) {
-                        uint32_t v6 = 15;
-                        if (iqlen <= 10) {
-                            v6 = 10 - iqlen + 15;
-                        }
-                        else {
-                            Destination[10] = 0;
-                        }
-                        Str[v6] = 0;
-                    }
-                    BSsprintf(apOutBuffer, aiBufferSize, "%s_%s", Destination, Str);
+    if ((apOutBuffer) && (aiBufferSize)) {
+        *apOutBuffer = 0;
+        if ((apQuest) && (apTopic)) {
+            char Destination[264];
+            char Str[264];
+            const char* v4 = apQuest->GetEditorName();
+            ourStrcpy(Destination, v4);
+            const char* v5 = apTopic->GetFormEditorID();
+            ourStrcpy(Str, v5);
+            uint32_t iqlen = std::strlen(Destination);
+            if (std::strlen(Str) + iqlen > 25) {
+                uint32_t v6 = 15;
+                if (iqlen <= 10) {
+                    v6 = 10 - iqlen + 15;
                 }
+                else {
+                    Destination[10] = 0;
+                }
+                Str[v6] = 0;
             }
+            BSsprintf(apOutBuffer, aiBufferSize, "%s_%s", Destination, Str);
         }
     }
 }

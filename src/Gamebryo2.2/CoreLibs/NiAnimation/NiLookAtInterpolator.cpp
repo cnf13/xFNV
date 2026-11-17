@@ -45,10 +45,9 @@ NiObject* NiLookAtInterpolator::CreateClone(NiCloningProcess& kCloning) {
         CopyMembers(pkObject, kCloning);
         return pkObject;
     }
-    else {
-        CopyMembers(nullptr, kCloning);
-        return nullptr;
-    }
+
+    CopyMembers(nullptr, kCloning);
+    return nullptr;
 }
 
 // The look-at target is kept as a raw pointer: it is resolved again by name through ResolveDependencies.
@@ -370,7 +369,8 @@ void NiLookAtInterpolator::GetActiveTimeRange(float& fBeginKeyTime, float& fEndK
     fEndKeyTime = -FLT_MAX;
     for (uint32_t i = 0; i < 3; i++) {
         if (m_aspInterpolators[i]) {
-            float fBegin, fEnd;
+            float fBegin;
+            float fEnd;
             m_aspInterpolators[i]->GetActiveTimeRange(fBegin, fEnd);
             if (fBegin != fEnd) {
                 if (fBegin < fBeginKeyTime) {
@@ -501,7 +501,6 @@ NiObject* NiLookAtInterpolator::CreateObject() {
     if (v0) {
         return ::new (v0) NiLookAtInterpolator(nullptr, NiLookAtInterpolator::X, false);
     }
-    else {
-        return nullptr;
-    }
+
+    return nullptr;
 }

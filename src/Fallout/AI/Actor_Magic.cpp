@@ -267,12 +267,10 @@ void Actor::EffectAdded(ActiveEffect* apEffect) {
 }
 
 void Actor::EffectRemoved(ActiveEffect* apEffect) {
-    if (apEffect) {
-        if (pCurrentProcess) {
-            apEffect->GetEffectSetting();
-            if (NiAlphaProperty::GetType()) {
-                pCurrentProcess->SetRefreshFlareFlags();
-            }
+    if ((apEffect) && (pCurrentProcess)) {
+        apEffect->GetEffectSetting();
+        if (NiAlphaProperty::GetType()) {
+            pCurrentProcess->SetRefreshFlareFlags();
         }
     }
 }
@@ -363,12 +361,11 @@ float Actor::CheckResistance(MagicCaster* apCaster, MagicItem* apSpell, ActiveEf
 void Actor::SetRefraction(bool abEnable, float afRefractionPower) {
     BaseProcess* currentAIProcess;
     float v8 = afRefractionPower;
-    if (abEnable && (afRefractionPower <= 0.0)) {
-        if (MobileObject::GetCurrentAIProcess()) {
-            currentAIProcess = MobileObject::GetCurrentAIProcess();
-            v8 = currentAIProcess->GetScriptRefractionPower();
-        }
+    if ((abEnable && (afRefractionPower <= 0.0)) && (MobileObject::GetCurrentAIProcess())) {
+        currentAIProcess = MobileObject::GetCurrentAIProcess();
+        v8 = currentAIProcess->GetScriptRefractionPower();
     }
+
     uint8_t v7 = (uint8_t)abEnable;
     if (abEnable && (v8 <= 0.0)) {
         v7 = 0;
@@ -385,16 +382,14 @@ void Actor::SetRefraction(bool abEnable, float afRefractionPower) {
 // player's selected scroll. The enchantment is fetched again from the book's TESEnchantableForm after the removal, and
 // that result is cast.
 void Actor::CastScroll(TESObjectBOOK* apScroll, MagicTarget* apTarget) {
-    if (apScroll && apScroll->IsScroll()) {
-        if (apScroll->TESEnchantableForm::GetFormEnchanting()) {
-            static_cast<TESObjectREFR*>(this)->RemoveItem(
-                apScroll, nullptr, 1, false, false, nullptr, nullptr, nullptr, true, false
-            );
-            EnchantmentItem* pEnchantment = apScroll->TESEnchantableForm::GetFormEnchanting();
-            static_cast<MagicCaster*>(this)->CastSpell(static_cast<MagicItem*>(pEnchantment), apTarget, false);
-            if (this == pPlayer) {
-                pPlayer->SetSelectedScroll(nullptr);
-            }
+    if ((apScroll && apScroll->IsScroll()) && (apScroll->TESEnchantableForm::GetFormEnchanting())) {
+        static_cast<TESObjectREFR*>(this)->RemoveItem(
+            apScroll, nullptr, 1, false, false, nullptr, nullptr, nullptr, true, false
+        );
+        EnchantmentItem* pEnchantment = apScroll->TESEnchantableForm::GetFormEnchanting();
+        static_cast<MagicCaster*>(this)->CastSpell(static_cast<MagicItem*>(pEnchantment), apTarget, false);
+        if (this == pPlayer) {
+            pPlayer->SetSelectedScroll(nullptr);
         }
     }
 }
@@ -429,37 +424,29 @@ bool Actor::CheckCastWhenStrikesEnchantment(
     }
     if (!v22) {
         TESObjectWEAP* FormFlags = nullptr;
-        if (apWeapon) {
-            if (apWeapon->pContainerObj) {
-                if (apWeapon->pContainerObj->GetFormType() == WEAP_ID) {
-                    FormFlags = static_cast<TESObjectWEAP*>(apWeapon->pContainerObj);
-                }
-            }
+        if ((apWeapon) && (apWeapon->pContainerObj) && (apWeapon->pContainerObj->GetFormType() == WEAP_ID)) {
+            FormFlags = static_cast<TESObjectWEAP*>(apWeapon->pContainerObj);
         }
-        if (!FormFlags) {
-            if (apProjectile) {
-                if (apProjectile->pWeaponSource) {
-                    FormFlags = apProjectile->pWeaponSource;
-                }
-            }
+
+        if ((!FormFlags) && (apProjectile) && (apProjectile->pWeaponSource)) {
+            FormFlags = apProjectile->pWeaponSource;
         }
+
         if (apWeapon) {
             ppoison = apWeapon->GetPoison();
         }
         if (FormFlags) {
             FormEnchanting = FormFlags->pFormEnchanting;
-            if (!FormEnchanting) {
-                if (apProjectile) {
-                    BGSExplosion* Explosion_;
-                    if (apProjectile->GetProjectileBase()) {
-                        Explosion_ = apProjectile->GetProjectileBase()->GetExplosion();
-                    }
-                    else {
-                        Explosion_ = nullptr;
-                    }
-                    if (Explosion_) {
-                        FormEnchanting = Explosion_->pFormEnchanting;
-                    }
+            if ((!FormEnchanting) && (apProjectile)) {
+                BGSExplosion* Explosion_;
+                if (apProjectile->GetProjectileBase()) {
+                    Explosion_ = apProjectile->GetProjectileBase()->GetExplosion();
+                }
+                else {
+                    Explosion_ = nullptr;
+                }
+                if (Explosion_) {
+                    FormEnchanting = Explosion_->pFormEnchanting;
                 }
             }
         }
@@ -583,9 +570,8 @@ float Actor::GetAlpha() {
     if ((!pCurrentProcess) || pCurrentProcess->GetProcessLevel()) {
         return 1.0;
     }
-    else {
-        return static_cast<HighProcess*>(pCurrentProcess)->QMaxAlpha();
-    }
+
+    return static_cast<HighProcess*>(pCurrentProcess)->QMaxAlpha();
 }
 
 bool Actor::GetShouldCheckMagicNode() {
@@ -782,17 +768,14 @@ void Actor::UpdateAlpha() {
 
 CastPowerItem* Actor::GetCastPowerItem(SpellItem* apPower) {
     CastPowerItem* pitem = nullptr;
-    if (apPower) {
-        if ((&CastPowers)->m_item) {
-            for (BSSimpleList<void*>* plist = &CastPowers; plist && !pitem; plist = plist->m_pkNext) {
-                if (plist->m_item) {
-                    if (*static_cast<SpellItem**>(plist->m_item) == apPower) {
-                        pitem = static_cast<CastPowerItem*>(plist->m_item);
-                    }
-                }
+    if ((apPower) && ((&CastPowers)->m_item)) {
+        for (BSSimpleList<void*>* plist = &CastPowers; plist && !pitem; plist = plist->m_pkNext) {
+            if ((plist->m_item) && (*static_cast<SpellItem**>(plist->m_item) == apPower)) {
+                pitem = static_cast<CastPowerItem*>(plist->m_item);
             }
         }
     }
+
     return pitem;
 }
 
@@ -1094,61 +1077,56 @@ void Actor::AttachCastingArt(MagicItem* apSpell) {
     EffectSetting* pavEffect = nullptr;
     if (apSpell) {
         pavEffect = apSpell->GetAVEffect(MagicSystem::SELF);
-        if (pavEffect) {
-            if (pavEffect->GetModelLength()) {
-                pdata3D = MagicProjectile::Clone3D_0(pavEffect);
-            }
+        if ((pavEffect) && (pavEffect->GetModelLength())) {
+            pdata3D = MagicProjectile::Clone3D_0(pavEffect);
         }
     }
     NiNode* pnode = GetMagicNode();
-    if (pnode) {
-        if (pdata3D) {
-            NiControllerSequence* pseq;
-            pnode->RemoveAllChildren();
-            pnode->AttachChild(pdata3D, 1);
-            if (pavEffect->data.pLight) {
-                if (!Main::GetSceneIsComplex()) {
-                    MagicLight* plight;
-                    if (pLight) {
-                        MagicLight* apThis = pLight;
-                        if (apThis) {
-                            delete apThis;
-                        }
-                    }
-                    pLight = nullptr;
-                    MagicLight* v10 = static_cast<MagicLight*>(ourMalloc(sizeof(MagicLight)));
-                    if (v10) {
-                        plight = ::new (v10) MagicLight(pavEffect->data.pLight->iFormID, pnode);
-                    }
-                    else {
-                        plight = nullptr;
-                    }
-                    pLight = plight;
+    if ((pnode) && (pdata3D)) {
+        NiControllerSequence* pseq;
+        pnode->RemoveAllChildren();
+        pnode->AttachChild(pdata3D, 1);
+        if ((pavEffect->data.pLight) && (!Main::GetSceneIsComplex())) {
+            MagicLight* plight;
+            if (pLight) {
+                MagicLight* apThis = pLight;
+                if (apThis) {
+                    delete apThis;
                 }
             }
-            NiControllerManager* pmanager = static_cast<NiControllerManager*>(
-                NiObject::DynamicCastStatic(&NiControllerManager::ms_RTTI, pdata3D->GetControllers())
-            );
-            if (pmanager) {
-                NiFixedString* g_SpecialIdle_Cast = get_g_SpecialIdle_Cast();
-                pseq = pmanager->GetSequenceByName(*g_SpecialIdle_Cast);
+            pLight = nullptr;
+            MagicLight* v10 = static_cast<MagicLight*>(ourMalloc(sizeof(MagicLight)));
+            if (v10) {
+                plight = ::new (v10) MagicLight(pavEffect->data.pLight->iFormID, pnode);
             }
             else {
-                pseq = nullptr;
+                plight = nullptr;
             }
-            if (pseq) {
-                pmanager->DeactivateAll(0.0f);
-                pmanager->ActivateSequence(pseq, 0, false, 1.0f, 0.0f, nullptr);
-                pmanager->SetActive(true);
-                pseq->SetOffset(-3.4028235e+38f);
-                if (pLight) {
-                    float v6 = pseq->m_fEndKeyTime * 0.75;
-                    pLight->Fade(true, v6);
-                }
-            }
+            pLight = plight;
+        }
+
+        NiControllerManager* pmanager = static_cast<NiControllerManager*>(
+            NiObject::DynamicCastStatic(&NiControllerManager::ms_RTTI, pdata3D->GetControllers())
+        );
+        if (pmanager) {
+            NiFixedString* g_SpecialIdle_Cast = get_g_SpecialIdle_Cast();
+            pseq = pmanager->GetSequenceByName(*g_SpecialIdle_Cast);
+        }
+        else {
+            pseq = nullptr;
+        }
+        if (pseq) {
+            pmanager->DeactivateAll(0.0f);
+            pmanager->ActivateSequence(pseq, 0, false, 1.0f, 0.0f, nullptr);
+            pmanager->SetActive(true);
+            pseq->SetOffset(-3.4028235e+38f);
             if (pLight) {
-                pLight->Update(0.0f);
+                float v6 = pseq->m_fEndKeyTime * 0.75;
+                pLight->Fade(true, v6);
             }
+        }
+        if (pLight) {
+            pLight->Update(0.0f);
         }
     }
 }
@@ -1157,9 +1135,8 @@ float Actor::GetAlphaMult() {
     if (pCurrentProcess) {
         return pCurrentProcess->GetAlphaMult();
     }
-    else {
-        return 1.0;
-    }
+
+    return 1.0;
 }
 
 void Actor::CheckDeletedCaster(MagicCaster* apMagicCaster) {

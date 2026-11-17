@@ -230,17 +230,16 @@ hkpIslandsAgentEntriesInfo* getIslandEntriesInfo(
         r_esi->m_data[r_esi->m_size - 1].m_island = island;
         return &r_esi->m_data[r_esi->m_size - 1];
     }
-    else {
-        hkpIslandsAgentEntriesInfo* m_data = r_esi->begin();
-        while (island != m_data->m_island) {
-            ++v2;
-            ++m_data;
-            if (v2 >= r_esi->m_size) {
-                goto LABEL_5;
-            }
+
+    hkpIslandsAgentEntriesInfo* m_data = r_esi->begin();
+    while (island != m_data->m_island) {
+        ++v2;
+        ++m_data;
+        if (v2 >= r_esi->m_size) {
+            goto LABEL_5;
         }
-        return &r_esi->m_data[v2];
     }
+    return &r_esi->m_data[v2];
 }
 
 // The broad phase's entity pair listener. While the simulation collects cross-island pairs, a pair of two movable

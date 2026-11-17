@@ -370,9 +370,8 @@ const hkVariant* hkClassMember::getAttribute(const char* id) const {
     if (m_attributes) {
         return m_attributes->getAttribute(id);
     }
-    else {
-        return nullptr;
-    }
+
+    return nullptr;
 }
 
 const hkClassMember::TypeProperties& hkClassMember::getClassMemberTypeProperties(Type type) {

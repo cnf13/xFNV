@@ -181,10 +181,8 @@ void GridCellArray::UpdateRefSounds() {
     for (i = GridArray::GetDimension(); x < i; i = GridArray::GetDimension()) {
         for (y = 0; y < GridArray::GetDimension(); ++y) {
             v3 = Get(x, y);
-            if (v3) {
-                if (v3->pCell) {
-                    v3->pCell->UpdateRefSounds();
-                }
+            if ((v3) && (v3->pCell)) {
+                v3->pCell->UpdateRefSounds();
             }
         }
         ++x;
@@ -200,10 +198,8 @@ void GridCellArray::ToggleCollisionGeometry() {
         for (uint32_t x = 0; x < GetDimension(); ++x) {
             for (uint32_t y = 0; y < GetDimension(); ++y) {
                 GridCell* pGridCell = Get(x, y);
-                if (pGridCell->pCell) {
-                    if (pGridCell->pCell->GetAttached()) {
-                        pGridCell->pCell->SetCollisionGeometryDisplay(bShow);
-                    }
+                if ((pGridCell->pCell) && (pGridCell->pCell->GetAttached())) {
+                    pGridCell->pCell->SetCollisionGeometryDisplay(bShow);
                 }
             }
         }
@@ -583,10 +579,8 @@ void GridCellArray::ShowPrimitives(bool abShow) {
         for (x = 0; x < GridArray::GetDimension(); ++x) {
             for (y = 0; y < GridArray::GetDimension(); ++y) {
                 cell = Get(x, y);
-                if (cell->pCell) {
-                    if (cell->pCell->GetAttached()) {
-                        cell->pCell->ShowPrimitives(abShow);
-                    }
+                if ((cell->pCell) && (cell->pCell->GetAttached())) {
+                    cell->pCell->ShowPrimitives(abShow);
                 }
             }
         }
@@ -611,12 +605,10 @@ void GridCellArray::AttachAllLand3D() {
         for (uint32_t x = 0; x < CastingType; ++x) {
             for (uint32_t y = 0; y < CastingType; ++y) {
                 GridCell* v3 = Get(x, y);
-                if (v3) {
-                    if (v3->pCell) {
-                        TESObjectLAND* Land = v3->pCell->GetLand();
-                        Land->Attach3D();
-                        v3->pCell->SetupMopp();
-                    }
+                if ((v3) && (v3->pCell)) {
+                    TESObjectLAND* Land = v3->pCell->GetLand();
+                    Land->Attach3D();
+                    v3->pCell->SetupMopp();
                 }
             }
         }

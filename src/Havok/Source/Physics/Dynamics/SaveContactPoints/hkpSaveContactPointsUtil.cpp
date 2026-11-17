@@ -1073,43 +1073,36 @@ void hkpSaveContactPointsUtil::loadContactPointsInternal(
             m_bodyA = v6->m_bodyA;
             m_bodyB = v6->m_bodyB;
         }
-        if (m_bodyA) {
-            if (m_bodyB) {
-                if (selector.isEntityOk(m_bodyA) || selector.isEntityOk(m_bodyB)) {
-                    hkpAgentNnEntry* Agent = hkAgentNnMachine_FindAgent(&m_bodyA->m_collidable, &m_bodyB->m_collidable);
-                    if (Agent) {
-                        if (v6->endianCheckUint32() != hkpSerializedAgentNnEntry::ENDIAN_CHECK_VALUE) {
-                            hkpSaveContactPointsEndianUtil::swapEndianTypeInCollisionEntry(
-                                world->m_collisionInput, *v6
-                            );
-                        }
-                        hkResult v10 = hkpSaveContactPointsUtil::deserializeCollisionEntry(
-                            input, *v6, m_bodyA, m_bodyB, world->m_collisionInput, Agent
-                        );
-                        if (input.m_removeSerializedAgentsWhenLoaded) {
-                            if (v10) {
-                                sys->m_contacts.m_data[i]->removeReference();
-                                int32_t v11 = --sys->m_contacts.m_size;
-                                if (v11 != i) {
-                                    sys->m_contacts.m_data[i] = sys->m_contacts.m_data[v11];
-                                }
-                            }
+        if ((m_bodyA) && (m_bodyB)) {
+            if (selector.isEntityOk(m_bodyA) || selector.isEntityOk(m_bodyB)) {
+                hkpAgentNnEntry* Agent = hkAgentNnMachine_FindAgent(&m_bodyA->m_collidable, &m_bodyB->m_collidable);
+                if (Agent) {
+                    if (v6->endianCheckUint32() != hkpSerializedAgentNnEntry::ENDIAN_CHECK_VALUE) {
+                        hkpSaveContactPointsEndianUtil::swapEndianTypeInCollisionEntry(world->m_collisionInput, *v6);
+                    }
+                    hkResult v10 = hkpSaveContactPointsUtil::deserializeCollisionEntry(
+                        input, *v6, m_bodyA, m_bodyB, world->m_collisionInput, Agent
+                    );
+                    if ((input.m_removeSerializedAgentsWhenLoaded) && (v10)) {
+                        sys->m_contacts.m_data[i]->removeReference();
+                        int32_t v11 = --sys->m_contacts.m_size;
+                        if (v11 != i) {
+                            sys->m_contacts.m_data[i] = sys->m_contacts.m_data[v11];
                         }
                     }
                 }
-                v4 = world;
             }
+            v4 = world;
         }
+
         v5 = i - 1;
     }
     if (v4->m_criticalOperationsLockCount-- == 1 && !v4->m_blockExecutingPendingOperations.m_bool) {
         if (v4->m_pendingOperationsCount) {
             v4->internal_executePendingOperations();
         }
-        if (v4->m_pendingOperationQueueCount == 1) {
-            if (v4->m_pendingBodyOperationsCount) {
-                v4->internal_executePendingBodyOperations();
-            }
+        if ((v4->m_pendingOperationQueueCount == 1) && (v4->m_pendingBodyOperationsCount)) {
+            v4->internal_executePendingBodyOperations();
         }
     }
 }

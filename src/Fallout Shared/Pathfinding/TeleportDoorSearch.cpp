@@ -163,11 +163,10 @@ bool TeleportDoorSearch::IsGoalNode(const AStarNode<ParentSpaceNode, TeleportLin
         return (bool)((uint8_t)(apNode->tNodeData.bWorldSpace &&
                                 (mapData && (mapData->iUsableWidth && mapData->iUsableHeight))));
     }
-    else {
-        return (bool)((uint8_t)((((uint8_t)apNode->tNodeData.bWorldSpace) == ((uint8_t)GoalNode.bWorldSpace)) &&
-                                ((apNode->tNodeData.pInteriorCell == GoalNode.pInteriorCell) &&
-                                 (apNode->tNodeData.pWorldSpace == GoalNode.pWorldSpace))));
-    }
+
+    return (bool)((uint8_t)((((uint8_t)apNode->tNodeData.bWorldSpace) == ((uint8_t)GoalNode.bWorldSpace)) &&
+                            ((apNode->tNodeData.pInteriorCell == GoalNode.pInteriorCell) &&
+                             (apNode->tNodeData.pWorldSpace == GoalNode.pWorldSpace))));
 }
 
 bool TeleportDoorSearch::BuildNodePath(

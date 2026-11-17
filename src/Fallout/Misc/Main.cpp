@@ -465,23 +465,19 @@ static void WinProc_SDL(const SDL_Event& kEvent) {
         // WM_NCACTIVATE with wParam 0, then WM_ACTIVATE with WA_INACTIVE: the window lost the focus.
         case SDL_EVENT_WINDOW_FOCUS_LOST: {
             bWindowDeactivated = true;
-            if (appMain) {
-                if (appMain->bGameActive) {
-                    if (appMain->bOnIdle) {
-                        if (!Interface::IsMenuQueuedToOpen() && !Menu::GetMenuByClass(1013) &&
-                            !Menu::GetMenuByClass(1007)) {
-                            Interface::QueueMenuCreate(
-                                Interface::OPEN_PAUSE, nullptr, nullptr, nullptr, Interface::CMM_STANDARD, false
-                            );
-                        }
-                    }
-                    if (appMain) {
-                        if (!spcameraPath.m_pObject) {
-                            appMain->SetActive(false);
-                        }
-                    }
+            if ((appMain) && (appMain->bGameActive)) {
+                if ((appMain->bOnIdle) &&
+                    (!Interface::IsMenuQueuedToOpen() && !Menu::GetMenuByClass(1013) && !Menu::GetMenuByClass(1007))) {
+                    Interface::QueueMenuCreate(
+                        Interface::OPEN_PAUSE, nullptr, nullptr, nullptr, Interface::CMM_STANDARD, false
+                    );
+                }
+
+                if ((appMain) && (!spcameraPath.m_pObject)) {
+                    appMain->SetActive(false);
                 }
             }
+
             break;
         }
         // WM_MOUSEMOVE: the cursor's position in the window (the background-mouse menus).
@@ -492,22 +488,21 @@ static void WinProc_SDL(const SDL_Event& kEvent) {
         // WM_NCHITTEST: while Controls exist, the cursor is hidden over the window's client area and shown elsewhere.
         case SDL_EVENT_WINDOW_MOUSE_ENTER:
         case SDL_EVENT_WINDOW_MOUSE_LEAVE: {
-            if (appMain) {
-                if (appMain->GetControls()) {
-                    if (kEvent.type == SDL_EVENT_WINDOW_MOUSE_ENTER) {
-                        if (bIsCursorVisible) {
-                            SDL_HideCursor();
-                            bIsCursorVisible = false;
-                        }
+            if ((appMain) && (appMain->GetControls())) {
+                if (kEvent.type == SDL_EVENT_WINDOW_MOUSE_ENTER) {
+                    if (bIsCursorVisible) {
+                        SDL_HideCursor();
+                        bIsCursorVisible = false;
                     }
-                    else {
-                        if (!bIsCursorVisible) {
-                            SDL_ShowCursor();
-                            bIsCursorVisible = true;
-                        }
+                }
+                else {
+                    if (!bIsCursorVisible) {
+                        SDL_ShowCursor();
+                        bIsCursorVisible = true;
                     }
                 }
             }
+
             break;
         }
         // WM_WINDOWPOSCHANGED: the window's new position.
@@ -526,418 +521,410 @@ int32_t WINAPI WinMain(HINSTANCE__* hInstance, HINSTANCE__* hPrevInstance, char*
         platform::ShowMessageBox("There is already an instance of Fallout: New Vegas running", "Error", 0);
         return 0;
     }
-    else {
-        if (platform::RemoteSession()) {
-            platform::ShowMessageBox("This application cannot be run from remote desktop.", "Error", 0);
+
+    if (platform::RemoteSession()) {
+        platform::ShowMessageBox("This application cannot be run from remote desktop.", "Error", 0);
+        return 0;
+    }
+
+    char pPath[264];
+    bool v86 = true;
+    bool y = gs_bSkipInitializationFlows_MESSAGES.Bool();
+    bool x = bSkipProgramFlows_MESSAGES.Bool();
+    bool* v5 = &gs_bAllowYesToAll_MESSAGES.Bool();
+    MessageHandler::Init(true, *v5, x, y, &MessageBoxA_0);
+    MessageHandler::SetWarningFileName("Warnings.txt");
+    MessageHandler::SetProgramFlowFileName("ProgramFlow.txt");
+    MessageHandler::SetProgrammerOutputFileName("ProgrammerOutput.txt");
+    MessageHandler::SetCrashTraceFileName("StackTrace.txt");
+    // GetSystemInfo's dwNumberOfProcessors: the logical processors.
+    int32_t* v6 = &iNumHWThreads.Int();
+    *v6 = static_cast<int32_t>(std::thread::hardware_concurrency());
+    TESMain_LoadIniFile(pPath);
+    if (iNumHWThreads.Int() == 1) {
+        iNumHWThreads.Int() = 2;
+    }
+    // The game ends here when FindWindowA finds another instance's window of class pAppClassName, after
+    // bringing it to the front (SetForegroundWindow). SDL cannot reach another process's window; the
+    // single-instance check above already ends a second instance.
+    {
+        BSWin32TaskletManager* v71;
+        char File[264];
+        FillUserNameGlobal(pAppClassName);
+        BSSystemUtility::QInstance().pEventNotificationCallback = &SystemUtilityEventNotificationCallback;
+        BSSystemUtility* v7 = &BSSystemUtility::QInstance();
+        v7->GetMsgDialogUtility()->pIdleCallback = &SystemUtilityDialogIdleCallback;
+        NiStaticDataManager::Init(nullptr);
+        BSMain::InitSDM();
+        FixedStrings::InitSDM();
+        Menu::InitSDM();
+        BSShaderSDM::InitSDM();
+        TES::InitSDM();
+        SetMemContext(MEM_CONTEXT_UNKNOWN);
+        BSFadeNode::SetMaxAlphaAccessFunc(&BSFadeNode::GetLinkedActorAlpha);
+        BSSoundHandle::SetAddMovingSoundCallback(&BSFadeNode::AddMovingSoundCallback);
+        NiSourceTexture::SetDestroyAppDataFlag(true);
+        BSStream::InitLoaders();
+        BSSearchPath::InitCallback();
+        AutoMemContext apMemory(
+            MEM_CONTEXT_HAVOK, true, "D:\\_Fallout3\\Platforms\\Common\\Code\\Fallout\\Misc\\Main.cpp", 2272
+        );
+        FOCollisionListener::Instance();
+        apMemory.Leave();
+        apMemory.Enter(
+            MEM_CONTEXT_GAMEBRIO, true, "D:\\_Fallout3\\Platforms\\Common\\Code\\Fallout\\Misc\\Main.cpp", 2278
+        );
+        BSTexturePalette::Init();
+        apMemory.Leave();
+        InitSteamAPI();
+        // The command line's arguments, the program first.
+        for (const std::string& kArgument : platform::CommandLine()) {
+            if ((kArgument[0] == '-') && (!_stricmp(kArgument.c_str() + 1, "nocloud"))) {
+                SteamAPICallbacks* Singleton = SteamAPICallbacks::GetSingleton();
+                Singleton->SetNoCloud(false);
+            }
+        }
+        RegSettingCollection* Collection = SettingT<RegSettingCollection>::GetCollection();
+        Collection->ReadSettingsFromFile("Software\\Bethesda Softworks\\Fallout");
+        INISettingCollection* v11 = SettingT<INISettingCollection>::GetCollection();
+        v11->ReadSettingsFromFile(pPath);
+        const char* PersonalPath = BSUtilities::GetPersonalPath();
+        BSstrcpy(pPath, 260, PersonalPath);
+        BSstrcat(pPath, 260, pAppININame);
+        INIPrefSettingCollection* v13 = SettingT<INIPrefSettingCollection>::GetCollection();
+        v13->ReadSettingsFromFile(pPath);
+        const char* v14 = BSUtilities::GetPersonalPath();
+        BSstrcpy(pPath, 260, v14);
+        BSstrcat(pPath, 260, pAppPrefININame);
+        RendererSettingCollection* v15 = SettingT<RendererSettingCollection>::GetCollection();
+        v15->ReadSettingsFromFile(pPath);
+        INIPrefSettingCollection* v16 = SettingT<INIPrefSettingCollection>::GetCollection();
+        v16->ReadSettingsFromFile(pPath);
+        if (iNumHWThreads.Int() == 1) {
+            iNumHWThreads.Int() = 2;
+        }
+        if (CreateDisplayDriver()) {
+            BSShaderManager::Shutdown(eTrue);
+            v71 = static_cast<BSWin32TaskletManager*>(&BSTaskletManager::QInstance());
+            v71->ShutdownAllTasks();
+            GetInstalledPathRegistryKey(File, 260u);
+            BSstrcat(File, 260, "FalloutNVLauncher.exe");
+            // The game ends after starting the launcher whether or not the launcher started, as the game does.
+            platform::Open(File);
             return 0;
         }
+
+        FaderManager* v69;
+        Main* v70;
+        const char* sUnessentialFileCacheList = gs_sUnessentialFileCacheList_General.String();
+        const char* ya = gs_sEssentialFileCacheList_General.String();
+        BSFileCache* v17 = &BSFileCache::QInstance();
+        v17->SetFileCacheList(ya, sUnessentialFileCacheList);
+        FileFinder* v74 = static_cast<FileFinder*>(ourMalloc(sizeof(FileFinder)));
+        if (v74) {
+            int32_t yb = gs_iFileLogging_MESSAGES.Int();
+            const char* v18 = gs_sBasePath.String();
+            ::new (v74) FileFinder(v18, yb, false);
+        }
+        FileFinder::AddPath_0("DATA");
+        bool yc = gs_bSkipInitializationFlows_MESSAGES.Bool();
+        bool xa = bSkipProgramFlows_MESSAGES.Bool();
+        bool* v19 = &gs_bAllowYesToAll_MESSAGES.Bool();
+        MessageHandler::Init(v86, *v19, xa, yc, &MessageBoxA_0);
+        MessageHandler::SetWarningFileName("Warnings.txt");
+        MessageHandler::SetProgramFlowFileName("ProgramFlow.txt");
+        MessageHandler::SetProgrammerOutputFileName("ProgrammerOutput.txt");
+        MessageHandler::SetCrashTraceFileName("StackTrace.txt");
+        apMemory.Enter(
+            MEM_CONTEXT_FILESYSTEM, true, "D:\\_Fallout3\\Platforms\\Common\\Code\\Fallout\\Misc\\Main.cpp", 2450
+        );
+        InitializationFlow();
+        BSFileCache* v20 = &BSFileCache::QInstance();
+        v20->ForcePauseFileCaching();
+        apMemory.Leave();
+        apMemory.Enter(
+            MEM_CONTEXT_ARCHIVES, true, "D:\\_Fallout3\\Platforms\\Common\\Code\\Fallout\\Misc\\Main.cpp", 2460
+        );
+        SetupArchiveSettings_AndLoadBSAs();
+        apMemory.Leave();
+        // The window is SDL's, and SDL reads the input: its video and gamepad parts. The window matches the
+        // game's: icon resource 101, a 320x240 client area at 0,0, shown; Alt+F4 does not close it, as the
+        // game's window procedure swallows WM_SYSKEYDOWN.
+        SDL_SetHint(SDL_HINT_WINDOWS_INTRESOURCE_ICON, "101");
+        SDL_SetHint(SDL_HINT_WINDOWS_CLOSE_ON_ALT_F4, "0");
+        SDL_Init(SDL_INIT_VIDEO | SDL_INIT_GAMEPAD);
+#if defined(_WIN32)
+        pSDLMainWindow = SDL_CreateWindow(pAppClassName, 320, 240, 0);
+#else
+        // Linux: created hidden, and shown at its final size by Renderer::Init, so that the 320x240 window
+        // does not stand on the desktop for the seconds before the device takes it.
+        pSDLMainWindow = SDL_CreateWindow(pAppClassName, 320, 240, SDL_WINDOW_HIDDEN);
+#endif
+        SDL_SetWindowPosition(pSDLMainWindow, 0, 0);
+        // A display that goes away (the compositor or session ending) is a quit request, as the window's
+        // close is, so the game ends through its quit path, not Xlib's exit().
+        platform::QuitOnDisplayLoss(pSDLMainWindow);
+        HWND__* window_1 = GetNativeWindow_SDL(pSDLMainWindow);
+        Main* v73 = static_cast<Main*>(ourMalloc(sizeof(Main)));
+        if (v73) {
+            v70 = ::new (v73) Main(window_1, hInstance);
+        }
         else {
-            char pPath[264];
-            bool v86 = true;
-            bool y = gs_bSkipInitializationFlows_MESSAGES.Bool();
-            bool x = bSkipProgramFlows_MESSAGES.Bool();
-            bool* v5 = &gs_bAllowYesToAll_MESSAGES.Bool();
-            MessageHandler::Init(true, *v5, x, y, &MessageBoxA_0);
-            MessageHandler::SetWarningFileName("Warnings.txt");
-            MessageHandler::SetProgramFlowFileName("ProgramFlow.txt");
-            MessageHandler::SetProgrammerOutputFileName("ProgrammerOutput.txt");
-            MessageHandler::SetCrashTraceFileName("StackTrace.txt");
-            // GetSystemInfo's dwNumberOfProcessors: the logical processors.
-            int32_t* v6 = &iNumHWThreads.Int();
-            *v6 = static_cast<int32_t>(std::thread::hardware_concurrency());
-            TESMain_LoadIniFile(pPath);
-            if (iNumHWThreads.Int() == 1) {
-                iNumHWThreads.Int() = 2;
+            v70 = nullptr;
+        }
+        appMain = v70;
+        apMemory.Enter(
+            MEM_CONTEXT_INTERFACE, true, "D:\\_Fallout3\\Platforms\\Common\\Code\\Fallout\\Misc\\Main.cpp", 2552
+        );
+        FaderManager* v72 = static_cast<FaderManager*>(ourMalloc(sizeof(FaderManager)));
+        if (v72) {
+            v69 = ::new (v72) FaderManager;
+        }
+        else {
+            v69 = nullptr;
+        }
+        pFaderManager = v69;
+        apMemory.Leave();
+        InitializationFlow("Initializing Renderer...");
+        appMain->InitRenderer();
+        NiTexture::bLoadDirectToRenderer = true;
+        NiDX9Renderer* Renderer_ = static_cast<NiDX9Renderer*>(NiRenderer::GetRenderer());
+        Renderer_->LockRenderer();
+        NiDX9Renderer* v22 = static_cast<NiDX9Renderer*>(NiRenderer::GetRenderer());
+        v22->AddLostDeviceNotificationFunc(&Main::LostDeviceCallback, nullptr);
+        NiDX9Renderer* v23 = static_cast<NiDX9Renderer*>(NiRenderer::GetRenderer());
+        v23->AddResetNotificationFunc(&Main::ResetDeviceCallback, nullptr);
+        Main_ShaderInit();
+        appMain->InitSceneGraph();
+        Interface::Init(true);
+        BSFaceGenManager::InitializeSystem();
+        appMain->SetActive(true);
+        NavMeshRender::InitSingleton();
+        Main_ImagespaceInit();
+        NiDX9Renderer* v24 = static_cast<NiDX9Renderer*>(NiRenderer::GetRenderer());
+        v24->UnlockRenderer();
+        BGSMoviePlayer::Create();
+        const char* v25 = gs_sIntroSequence_General.String();
+        pMoviePlayer->StartSequence(v25, false, -1, true, true, 0.0f);
+        apMemory.Leave();
+        SceneGraph* WorldSceneGraph = Main::GetWorldSceneGraph();
+        appMain->InitTES(WorldSceneGraph);
+        SceneGraph* v27 = Main::GetWorldSceneGraph();
+        BSFaceGenManager::SetCamera(v27->GetCamera());
+        SceneGraph* v28 = Main::GetWorldSceneGraph();
+        BSTreeManager::SetCamera(v28->GetCamera());
+        if (iNumHWThreads.Int() > 1) {
+            AILinearTaskThreadManager* v29 = AILinearTaskThreadManager::QInstance();
+            v29->CreateThreads();
+        }
+        Pathing::Init();
+        PathManager* v30 = PathManager::QInstance();
+        v30->Initialize();
+        if (bUseObstacleAvoidance.Bool()) {
+            NavMeshObstacleManager* Instance = NavMeshObstacleManager::GetInstance();
+            Instance->Initialize();
+        }
+        ScreenSplatter::Init();
+        ScreenCustomSplatter::Init();
+        int32_t v89 = 0;
+        char* a2 = nullptr;
+        NiPoint3 initialPos(2048.0f, 2048.0f, 128.0f);
+        TESWorldSpace* sUnessentialFileCacheLista =
+            static_cast<TESWorldSpace*>(pDataHandler->GetWorldSpaceList()->m_item);
+        TES::pInstance->SetWorldSpace(sUnessentialFileCacheLista);
+        pPlayer->Preload1stPersonAnimsFileList();
+        pSaveLoadGameOLD->m_bAllowChanges = true;
+        InitializationFlow("Initializing Actor Locations...");
+        ReferenceProcessLists.InitPackageLocations();
+        pDataHandler->UpdateAutoCalcNPCs();
+        pSaveLoadGame->SetGlobalAllowChanges(true);
+        InitializationFlow("Loading initial area...");
+        Main::InitStartCell(a2, &initialPos);
+        InitializationFlow("Placing player...");
+        Main::InitPlayerStart(initialPos);
+        Interface::InitSecond();
+        appMain->bOnIdle = true;
+        ArchiveManager::SetStartupFinished();
+        if (pPlayer->GetParentCell()) {
+            pMoviePlayer->WaitForSequenceToEnd();
+        }
+        else {
+            pDataHandler->SetMasterFileLargeBuffer(-1);
+            InitializationFlow();
+            Interface::CreateStartMenu();
+            pMoviePlayer->WaitForSequenceToEnd();
+            InitializationFlow();
+        }
+        pIOManager->LoadAllQueuedPriorities();
+        InitializationFlow("Begin Idle loop...");
+        bool v99 = false;
+        while (true) {
+            // The pending window events go through WinProc_SDL; the focus test is SDL's input focus.
+            SDL_Event kEvent;
+            while (SDL_PollEvent(&kEvent)) {
+                WinProc_SDL(kEvent);
             }
-            // The game ends here when FindWindowA finds another instance's window of class pAppClassName, after
-            // bringing it to the front (SetForegroundWindow). SDL cannot reach another process's window; the
-            // single-instance check above already ends a second instance.
-            {
-                BSWin32TaskletManager* v71;
-                char File[264];
-                FillUserNameGlobal(pAppClassName);
-                BSSystemUtility::QInstance().pEventNotificationCallback = &SystemUtilityEventNotificationCallback;
-                BSSystemUtility* v7 = &BSSystemUtility::QInstance();
-                v7->GetMsgDialogUtility()->pIdleCallback = &SystemUtilityDialogIdleCallback;
-                NiStaticDataManager::Init(nullptr);
-                BSMain::InitSDM();
-                FixedStrings::InitSDM();
-                Menu::InitSDM();
-                BSShaderSDM::InitSDM();
-                TES::InitSDM();
-                SetMemContext(MEM_CONTEXT_UNKNOWN);
-                BSFadeNode::SetMaxAlphaAccessFunc(&BSFadeNode::GetLinkedActorAlpha);
-                BSSoundHandle::SetAddMovingSoundCallback(&BSFadeNode::AddMovingSoundCallback);
-                NiSourceTexture::SetDestroyAppDataFlag(true);
-                BSStream::InitLoaders();
-                BSSearchPath::InitCallback();
-                AutoMemContext apMemory(
-                    MEM_CONTEXT_HAVOK, true, "D:\\_Fallout3\\Platforms\\Common\\Code\\Fallout\\Misc\\Main.cpp", 2272
-                );
-                FOCollisionListener::Instance();
-                apMemory.Leave();
-                apMemory.Enter(
-                    MEM_CONTEXT_GAMEBRIO, true, "D:\\_Fallout3\\Platforms\\Common\\Code\\Fallout\\Misc\\Main.cpp", 2278
-                );
-                BSTexturePalette::Init();
-                apMemory.Leave();
-                InitSteamAPI();
-                // The command line's arguments, the program first.
-                for (const std::string& kArgument : platform::CommandLine()) {
-                    if (kArgument[0] == '-') {
-                        if (!_stricmp(kArgument.c_str() + 1, "nocloud")) {
-                            SteamAPICallbacks* Singleton = SteamAPICallbacks::GetSingleton();
-                            Singleton->SetNoCloud(false);
-                        }
-                    }
-                }
-                RegSettingCollection* Collection = SettingT<RegSettingCollection>::GetCollection();
-                Collection->ReadSettingsFromFile("Software\\Bethesda Softworks\\Fallout");
-                INISettingCollection* v11 = SettingT<INISettingCollection>::GetCollection();
-                v11->ReadSettingsFromFile(pPath);
-                const char* PersonalPath = BSUtilities::GetPersonalPath();
-                BSstrcpy(pPath, 260, PersonalPath);
-                BSstrcat(pPath, 260, pAppININame);
-                INIPrefSettingCollection* v13 = SettingT<INIPrefSettingCollection>::GetCollection();
-                v13->ReadSettingsFromFile(pPath);
-                const char* v14 = BSUtilities::GetPersonalPath();
-                BSstrcpy(pPath, 260, v14);
-                BSstrcat(pPath, 260, pAppPrefININame);
-                RendererSettingCollection* v15 = SettingT<RendererSettingCollection>::GetCollection();
-                v15->ReadSettingsFromFile(pPath);
-                INIPrefSettingCollection* v16 = SettingT<INIPrefSettingCollection>::GetCollection();
-                v16->ReadSettingsFromFile(pPath);
-                if (iNumHWThreads.Int() == 1) {
-                    iNumHWThreads.Int() = 2;
-                }
-                if (CreateDisplayDriver()) {
-                    BSShaderManager::Shutdown(eTrue);
-                    v71 = static_cast<BSWin32TaskletManager*>(&BSTaskletManager::QInstance());
-                    v71->ShutdownAllTasks();
-                    GetInstalledPathRegistryKey(File, 260u);
-                    BSstrcat(File, 260, "FalloutNVLauncher.exe");
-                    // The game ends after starting the launcher whether or not the launcher started, as the game does.
-                    platform::Open(File);
-                    return 0;
+            if ((SDL_GetWindowFlags(pSDLMainWindow) & SDL_WINDOW_INPUT_FOCUS) ||
+                (TES::pInstance->CellTestRunning() || (spcameraPath.m_pObject || bAlwaysActive.Bool()))) {
+                NiDX9Renderer* v32 = static_cast<NiDX9Renderer*>(NiRenderer::GetRenderer());
+                IDirect3DDevice9* D3DDevice = v32->GetD3DDevice();
+                int32_t v79 = D3DDevice->TestCooperativeLevel();
+                if (v79 >= 0) {
+                    appMain->OnIdle();
                 }
                 else {
-                    FaderManager* v69;
-                    Main* v70;
-                    const char* sUnessentialFileCacheList = gs_sUnessentialFileCacheList_General.String();
-                    const char* ya = gs_sEssentialFileCacheList_General.String();
-                    BSFileCache* v17 = &BSFileCache::QInstance();
-                    v17->SetFileCacheList(ya, sUnessentialFileCacheList);
-                    FileFinder* v74 = static_cast<FileFinder*>(ourMalloc(sizeof(FileFinder)));
-                    if (v74) {
-                        int32_t yb = gs_iFileLogging_MESSAGES.Int();
-                        const char* v18 = gs_sBasePath.String();
-                        ::new (v74) FileFinder(v18, yb, false);
-                    }
-                    FileFinder::AddPath_0("DATA");
-                    bool yc = gs_bSkipInitializationFlows_MESSAGES.Bool();
-                    bool xa = bSkipProgramFlows_MESSAGES.Bool();
-                    bool* v19 = &gs_bAllowYesToAll_MESSAGES.Bool();
-                    MessageHandler::Init(v86, *v19, xa, yc, &MessageBoxA_0);
-                    MessageHandler::SetWarningFileName("Warnings.txt");
-                    MessageHandler::SetProgramFlowFileName("ProgramFlow.txt");
-                    MessageHandler::SetProgrammerOutputFileName("ProgrammerOutput.txt");
-                    MessageHandler::SetCrashTraceFileName("StackTrace.txt");
-                    apMemory.Enter(
-                        MEM_CONTEXT_FILESYSTEM, true, "D:\\_Fallout3\\Platforms\\Common\\Code\\Fallout\\Misc\\Main.cpp",
-                        2450
-                    );
-                    InitializationFlow();
-                    BSFileCache* v20 = &BSFileCache::QInstance();
-                    v20->ForcePauseFileCaching();
-                    apMemory.Leave();
-                    apMemory.Enter(
-                        MEM_CONTEXT_ARCHIVES, true, "D:\\_Fallout3\\Platforms\\Common\\Code\\Fallout\\Misc\\Main.cpp",
-                        2460
-                    );
-                    SetupArchiveSettings_AndLoadBSAs();
-                    apMemory.Leave();
-                    // The window is SDL's, and SDL reads the input: its video and gamepad parts. The window matches the
-                    // game's: icon resource 101, a 320x240 client area at 0,0, shown; Alt+F4 does not close it, as the
-                    // game's window procedure swallows WM_SYSKEYDOWN.
-                    SDL_SetHint(SDL_HINT_WINDOWS_INTRESOURCE_ICON, "101");
-                    SDL_SetHint(SDL_HINT_WINDOWS_CLOSE_ON_ALT_F4, "0");
-                    SDL_Init(SDL_INIT_VIDEO | SDL_INIT_GAMEPAD);
-#if defined(_WIN32)
-                    pSDLMainWindow = SDL_CreateWindow(pAppClassName, 320, 240, 0);
-#else
-                    // Linux: created hidden, and shown at its final size by Renderer::Init, so that the 320x240 window
-                    // does not stand on the desktop for the seconds before the device takes it.
-                    pSDLMainWindow = SDL_CreateWindow(pAppClassName, 320, 240, SDL_WINDOW_HIDDEN);
-#endif
-                    SDL_SetWindowPosition(pSDLMainWindow, 0, 0);
-                    // A display that goes away (the compositor or session ending) is a quit request, as the window's
-                    // close is, so the game ends through its quit path, not Xlib's exit().
-                    platform::QuitOnDisplayLoss(pSDLMainWindow);
-                    HWND__* window_1 = GetNativeWindow_SDL(pSDLMainWindow);
-                    Main* v73 = static_cast<Main*>(ourMalloc(sizeof(Main)));
-                    if (v73) {
-                        v70 = ::new (v73) Main(window_1, hInstance);
-                    }
-                    else {
-                        v70 = nullptr;
-                    }
-                    appMain = v70;
-                    apMemory.Enter(
-                        MEM_CONTEXT_INTERFACE, true, "D:\\_Fallout3\\Platforms\\Common\\Code\\Fallout\\Misc\\Main.cpp",
-                        2552
-                    );
-                    FaderManager* v72 = static_cast<FaderManager*>(ourMalloc(sizeof(FaderManager)));
-                    if (v72) {
-                        v69 = ::new (v72) FaderManager;
-                    }
-                    else {
-                        v69 = nullptr;
-                    }
-                    pFaderManager = v69;
-                    apMemory.Leave();
-                    InitializationFlow("Initializing Renderer...");
-                    appMain->InitRenderer();
-                    NiTexture::bLoadDirectToRenderer = true;
-                    NiDX9Renderer* Renderer_ = static_cast<NiDX9Renderer*>(NiRenderer::GetRenderer());
-                    Renderer_->LockRenderer();
-                    NiDX9Renderer* v22 = static_cast<NiDX9Renderer*>(NiRenderer::GetRenderer());
-                    v22->AddLostDeviceNotificationFunc(&Main::LostDeviceCallback, nullptr);
-                    NiDX9Renderer* v23 = static_cast<NiDX9Renderer*>(NiRenderer::GetRenderer());
-                    v23->AddResetNotificationFunc(&Main::ResetDeviceCallback, nullptr);
-                    Main_ShaderInit();
-                    appMain->InitSceneGraph();
-                    Interface::Init(true);
-                    BSFaceGenManager::InitializeSystem();
-                    appMain->SetActive(true);
-                    NavMeshRender::InitSingleton();
-                    Main_ImagespaceInit();
-                    NiDX9Renderer* v24 = static_cast<NiDX9Renderer*>(NiRenderer::GetRenderer());
-                    v24->UnlockRenderer();
-                    BGSMoviePlayer::Create();
-                    const char* v25 = gs_sIntroSequence_General.String();
-                    pMoviePlayer->StartSequence(v25, false, -1, true, true, 0.0f);
-                    apMemory.Leave();
-                    SceneGraph* WorldSceneGraph = Main::GetWorldSceneGraph();
-                    appMain->InitTES(WorldSceneGraph);
-                    SceneGraph* v27 = Main::GetWorldSceneGraph();
-                    BSFaceGenManager::SetCamera(v27->GetCamera());
-                    SceneGraph* v28 = Main::GetWorldSceneGraph();
-                    BSTreeManager::SetCamera(v28->GetCamera());
-                    if (iNumHWThreads.Int() > 1) {
-                        AILinearTaskThreadManager* v29 = AILinearTaskThreadManager::QInstance();
-                        v29->CreateThreads();
-                    }
-                    Pathing::Init();
-                    PathManager* v30 = PathManager::QInstance();
-                    v30->Initialize();
-                    if (bUseObstacleAvoidance.Bool()) {
-                        NavMeshObstacleManager* Instance = NavMeshObstacleManager::GetInstance();
-                        Instance->Initialize();
-                    }
-                    ScreenSplatter::Init();
-                    ScreenCustomSplatter::Init();
-                    int32_t v89 = 0;
-                    char* a2 = nullptr;
-                    NiPoint3 initialPos(2048.0f, 2048.0f, 128.0f);
-                    TESWorldSpace* sUnessentialFileCacheLista =
-                        static_cast<TESWorldSpace*>(pDataHandler->GetWorldSpaceList()->m_item);
-                    TES::pInstance->SetWorldSpace(sUnessentialFileCacheLista);
-                    pPlayer->Preload1stPersonAnimsFileList();
-                    pSaveLoadGameOLD->m_bAllowChanges = true;
-                    InitializationFlow("Initializing Actor Locations...");
-                    ReferenceProcessLists.InitPackageLocations();
-                    pDataHandler->UpdateAutoCalcNPCs();
-                    pSaveLoadGame->SetGlobalAllowChanges(true);
-                    InitializationFlow("Loading initial area...");
-                    Main::InitStartCell(a2, &initialPos);
-                    InitializationFlow("Placing player...");
-                    Main::InitPlayerStart(initialPos);
-                    Interface::InitSecond();
-                    appMain->bOnIdle = true;
-                    ArchiveManager::SetStartupFinished();
-                    if (pPlayer->GetParentCell()) {
-                        pMoviePlayer->WaitForSequenceToEnd();
-                    }
-                    else {
-                        pDataHandler->SetMasterFileLargeBuffer(-1);
-                        InitializationFlow();
-                        Interface::CreateStartMenu();
-                        pMoviePlayer->WaitForSequenceToEnd();
-                        InitializationFlow();
-                    }
-                    pIOManager->LoadAllQueuedPriorities();
-                    InitializationFlow("Begin Idle loop...");
-                    bool v99 = false;
-                    while (true) {
-                        // The pending window events go through WinProc_SDL; the focus test is SDL's input focus.
-                        SDL_Event kEvent;
-                        while (SDL_PollEvent(&kEvent)) {
-                            WinProc_SDL(kEvent);
-                        }
-                        if ((SDL_GetWindowFlags(pSDLMainWindow) & SDL_WINDOW_INPUT_FOCUS) ||
-                            (TES::pInstance->CellTestRunning() || (spcameraPath.m_pObject || bAlwaysActive.Bool()))) {
-                            NiDX9Renderer* v32 = static_cast<NiDX9Renderer*>(NiRenderer::GetRenderer());
-                            IDirect3DDevice9* D3DDevice = v32->GetD3DDevice();
-                            int32_t v79 = D3DDevice->TestCooperativeLevel();
-                            if (v79 >= 0) {
-                                appMain->OnIdle();
-                            }
-                            else {
-                                NiDX9Renderer* v33 = static_cast<NiDX9Renderer*>(NiRenderer::GetRenderer());
-                                v33->BeginOffScreenFrame();
-                                NiDX9Renderer* v34 = static_cast<NiDX9Renderer*>(NiRenderer::GetRenderer());
-                                v34->EndOffScreenFrame();
-                                Sleep(50u);
-                            }
-                            if (v99) {
-                                v99 = false;
-                                BSAudio* v35 = &BSAudio::QInstance();
-                                v35->UnPauseSynchTimer();
-                                FalloutAudioMedia::MediaMenuUnPause();
-                                FalloutRadio::Update(false);
-                                BSAudio* v36 = &BSAudio::QInstance();
-                                v36->Update(true);
-                            }
-                            if (!v99 && appMain->oneMore && v79 >= 0) {
-                                LoadingMenu::ResumeBackgroundThread();
-                                appMain->oneMore = false;
-                            }
-                        }
-                        else {
-                            if (!v99) {
-                                v99 = true;
-                                if (!LoadingMenuThread::GetByte49()) {
-                                    uint32_t CurrentThreadId = GetCurrentThreadId();
-                                    if (CurrentThreadId == appMain->uiThreadID) {
-                                        LoadingMenu::SuspendBackgroundThread();
-                                        appMain->oneMore = true;
-                                    }
-                                }
-                                BSAudio* v38 = &BSAudio::QInstance();
-                                v38->PauseSynchTimer();
-                                FalloutAudioMedia::MediaMenuPause();
-                                FalloutRadio::Update(false);
-                                BSAudio* v39 = &BSAudio::QInstance();
-                                v39->Update(true);
-                                BSShaderAccumulator* v40 = appMain->QDrawWorldAccum();
-                                v40->ClearSunQueries();
-                                BGSDecalManager* v41 = BGSDecalManager::GetSingleton();
-                                v41->ClearPendingQueries();
-                                FOVATSEffectManager* VATSEffect = Interface::GetVATSEffect();
-                                VATSEffect->FreeOcclusionQueries();
-                                // A full-screen window is not re-fitted here; the full-screen window is the device's
-                                // (Direct3D 9's, dxvk's SDL backend).
-                            }
-                            Sleep(50u);
-                        }
-                        if (appMain->bQuitGame) {
-                            break;
-                        }
-                        if (appMain->GameReset()) {
-                            appMain->PerformGameReset(true);
-                        }
-                    }
-                    appMain->bOnIdle = false;
-                    DestroySteamAPICallbacks();
-                    Interface::HideMenus();
-                    Interface::CloseAllSupportMenus(false);
-                    if (Main::spMenuBGTexture.m_pObject) {
-                        BSRenderedTexture* yd = Main::spMenuBGTexture.m_pObject;
-                        BSTextureManager* TextureManager = BSShaderManager::TextureManagerPtr();
-                        TextureManager->ReturnRenderedTexture(yd);
-                        Main::spMenuBGTexture.operator=(static_cast<BSRenderedTexture*>(nullptr));
-                    }
-                    if (Main::spInterfaceFXTex.m_pObject) {
-                        BSRenderedTexture* ye = Main::spInterfaceFXTex.m_pObject;
-                        BSTextureManager* v44 = BSShaderManager::TextureManagerPtr();
-                        v44->ReturnRenderedTexture(ye);
-                        Main::spInterfaceFXTex.operator=(static_cast<BSRenderedTexture*>(nullptr));
-                    }
-                    if (Main::spVATSTex.m_pObject) {
-                        BSRenderedTexture* yf = Main::spVATSTex.m_pObject;
-                        BSTextureManager* v45 = BSShaderManager::TextureManagerPtr();
-                        v45->ReturnRenderedTexture(yf);
-                        Main::spVATSTex.operator=(static_cast<BSRenderedTexture*>(nullptr));
-                    }
-                    TaskQueueInterface::SetActive(false);
-                    if (NiParallelUpdateTaskManager::Get()) {
-                        NiParallelUpdateTaskManager::Shutdown();
-                    }
-                    pModelLoader->CancelAllFiles();
-                    if (iNumHWThreads.Int() > 1) {
-                        AILinearTaskThreadManager* v46 = AILinearTaskThreadManager::QInstance();
-                        v46->DestroyThreads();
-                    }
-                    BGSMoviePlayer::Destroy();
-                    Main::DestroyInterfaceSceneGraph();
-                    Main::DestroyInterface3DSceneGraph();
-                    Interface::Free();
-                    if (TES::pInstance->pSky) {
-                        TES::pInstance->pSky->Destroy();
-                    }
-                    ScreenSplatter::Shutdown();
-                    ScreenCustomSplatter::Shutdown();
-                    FORenderedTerminal::ReleaseStaticGeometry();
-                    FalloutRadio::Shutdown();
-                    FalloutAudioMedia::MediaClose();
-                    FalloutAudioMedia::Shutdown();
-                    BSAudio* v67 = &BSAudio::QInstance();
-                    v67->Shutdown();
-                    InitializationFlow();
-                    BGSDecalManager::Destroy_();
-                    DecalCaster::ClearInstance();
-                    HitCaster::ClearInstance();
-                    if (bUseObstacleAvoidance.Bool()) {
-                        NavMeshObstacleManager* v47 = NavMeshObstacleManager::GetInstance();
-                        v47->Release();
-                    }
-                    if (TES::pInstance) {
-                        delete TES::pInstance;
-                    }
-                    BGSTerrainManager::DeallocateStaticNodes();
-                    PathManager* v48 = PathManager::QInstance();
-                    v48->Release();
-                    BSFaceGenManager::DestroySystem();
-                    CombatManager::Destroy();
-                    BSWin32TaskletManager* v66 = static_cast<BSWin32TaskletManager*>(&BSTaskletManager::QInstance());
-                    v66->ShutdownAllTasks();
-                    BSTreeManager::Destroy();
-                    BGSLoadedReferenceCollection::Destroy();
-                    EffectSettingCollection::Reset();
-                    ImpactMixer::DeInitialize();
-                    if (pFaderManager) {
-                        delete pFaderManager;
-                    }
-                    if (appMain) {
-                        delete appMain;
-                    }
-                    appMain = nullptr;
-                    BSFileCache* v65 = &BSFileCache::QInstance();
-                    v65->Shutdown();
-                    char* yg = SettingT<INIPrefSettingCollection>::GetCollection()->pSettingFile;
-                    INIPrefSettingCollection* v49 = SettingT<INIPrefSettingCollection>::GetCollection();
-                    v49->SaveAll(yg);
-                    NiDX9Renderer* v50 = static_cast<NiDX9Renderer*>(NiRenderer::GetRenderer());
-                    v50->RemoveResetNotificationFunc(&Main::ResetDeviceCallback);
-                    NiDX9Renderer* v51 = static_cast<NiDX9Renderer*>(NiRenderer::GetRenderer());
-                    v51->RemoveLostDeviceNotificationFunc(&Main::LostDeviceCallback);
-                    NavMeshRender::Destroy();
-                    BSTexturePalette::Kill();
-                    BSShaderSDM::KillSDM();
-                    BSShaderManager::Shutdown(eTrue);
-                    FileFinder::Close();
-                    TES::KillSDM();
-                    BSMain::KillSDM();
-                    FixedStrings::KillSDM();
-                    Menu::KillSDM();
-                    NiStaticDataManager::Shutdown();
-                    MemoryManagerFile apFile("ExitData.mhd");
-                    MemoryManager* v52 = &MemoryManager::Instance();
-                    v52->OutputDebugInfo(&apFile, false);
-                    return 0;
+                    NiDX9Renderer* v33 = static_cast<NiDX9Renderer*>(NiRenderer::GetRenderer());
+                    v33->BeginOffScreenFrame();
+                    NiDX9Renderer* v34 = static_cast<NiDX9Renderer*>(NiRenderer::GetRenderer());
+                    v34->EndOffScreenFrame();
+                    Sleep(50u);
+                }
+                if (v99) {
+                    v99 = false;
+                    BSAudio* v35 = &BSAudio::QInstance();
+                    v35->UnPauseSynchTimer();
+                    FalloutAudioMedia::MediaMenuUnPause();
+                    FalloutRadio::Update(false);
+                    BSAudio* v36 = &BSAudio::QInstance();
+                    v36->Update(true);
+                }
+                if (!v99 && appMain->oneMore && v79 >= 0) {
+                    LoadingMenu::ResumeBackgroundThread();
+                    appMain->oneMore = false;
                 }
             }
+            else {
+                if (!v99) {
+                    v99 = true;
+                    if (!LoadingMenuThread::GetByte49()) {
+                        uint32_t CurrentThreadId = GetCurrentThreadId();
+                        if (CurrentThreadId == appMain->uiThreadID) {
+                            LoadingMenu::SuspendBackgroundThread();
+                            appMain->oneMore = true;
+                        }
+                    }
+                    BSAudio* v38 = &BSAudio::QInstance();
+                    v38->PauseSynchTimer();
+                    FalloutAudioMedia::MediaMenuPause();
+                    FalloutRadio::Update(false);
+                    BSAudio* v39 = &BSAudio::QInstance();
+                    v39->Update(true);
+                    BSShaderAccumulator* v40 = appMain->QDrawWorldAccum();
+                    v40->ClearSunQueries();
+                    BGSDecalManager* v41 = BGSDecalManager::GetSingleton();
+                    v41->ClearPendingQueries();
+                    FOVATSEffectManager* VATSEffect = Interface::GetVATSEffect();
+                    VATSEffect->FreeOcclusionQueries();
+                    // A full-screen window is not re-fitted here; the full-screen window is the device's
+                    // (Direct3D 9's, dxvk's SDL backend).
+                }
+                Sleep(50u);
+            }
+            if (appMain->bQuitGame) {
+                break;
+            }
+            if (appMain->GameReset()) {
+                appMain->PerformGameReset(true);
+            }
         }
+        appMain->bOnIdle = false;
+        DestroySteamAPICallbacks();
+        Interface::HideMenus();
+        Interface::CloseAllSupportMenus(false);
+        if (Main::spMenuBGTexture.m_pObject) {
+            BSRenderedTexture* yd = Main::spMenuBGTexture.m_pObject;
+            BSTextureManager* TextureManager = BSShaderManager::TextureManagerPtr();
+            TextureManager->ReturnRenderedTexture(yd);
+            Main::spMenuBGTexture.operator=(static_cast<BSRenderedTexture*>(nullptr));
+        }
+        if (Main::spInterfaceFXTex.m_pObject) {
+            BSRenderedTexture* ye = Main::spInterfaceFXTex.m_pObject;
+            BSTextureManager* v44 = BSShaderManager::TextureManagerPtr();
+            v44->ReturnRenderedTexture(ye);
+            Main::spInterfaceFXTex.operator=(static_cast<BSRenderedTexture*>(nullptr));
+        }
+        if (Main::spVATSTex.m_pObject) {
+            BSRenderedTexture* yf = Main::spVATSTex.m_pObject;
+            BSTextureManager* v45 = BSShaderManager::TextureManagerPtr();
+            v45->ReturnRenderedTexture(yf);
+            Main::spVATSTex.operator=(static_cast<BSRenderedTexture*>(nullptr));
+        }
+        TaskQueueInterface::SetActive(false);
+        if (NiParallelUpdateTaskManager::Get()) {
+            NiParallelUpdateTaskManager::Shutdown();
+        }
+        pModelLoader->CancelAllFiles();
+        if (iNumHWThreads.Int() > 1) {
+            AILinearTaskThreadManager* v46 = AILinearTaskThreadManager::QInstance();
+            v46->DestroyThreads();
+        }
+        BGSMoviePlayer::Destroy();
+        Main::DestroyInterfaceSceneGraph();
+        Main::DestroyInterface3DSceneGraph();
+        Interface::Free();
+        if (TES::pInstance->pSky) {
+            TES::pInstance->pSky->Destroy();
+        }
+        ScreenSplatter::Shutdown();
+        ScreenCustomSplatter::Shutdown();
+        FORenderedTerminal::ReleaseStaticGeometry();
+        FalloutRadio::Shutdown();
+        FalloutAudioMedia::MediaClose();
+        FalloutAudioMedia::Shutdown();
+        BSAudio* v67 = &BSAudio::QInstance();
+        v67->Shutdown();
+        InitializationFlow();
+        BGSDecalManager::Destroy_();
+        DecalCaster::ClearInstance();
+        HitCaster::ClearInstance();
+        if (bUseObstacleAvoidance.Bool()) {
+            NavMeshObstacleManager* v47 = NavMeshObstacleManager::GetInstance();
+            v47->Release();
+        }
+        if (TES::pInstance) {
+            delete TES::pInstance;
+        }
+        BGSTerrainManager::DeallocateStaticNodes();
+        PathManager* v48 = PathManager::QInstance();
+        v48->Release();
+        BSFaceGenManager::DestroySystem();
+        CombatManager::Destroy();
+        BSWin32TaskletManager* v66 = static_cast<BSWin32TaskletManager*>(&BSTaskletManager::QInstance());
+        v66->ShutdownAllTasks();
+        BSTreeManager::Destroy();
+        BGSLoadedReferenceCollection::Destroy();
+        EffectSettingCollection::Reset();
+        ImpactMixer::DeInitialize();
+        if (pFaderManager) {
+            delete pFaderManager;
+        }
+        if (appMain) {
+            delete appMain;
+        }
+        appMain = nullptr;
+        BSFileCache* v65 = &BSFileCache::QInstance();
+        v65->Shutdown();
+        char* yg = SettingT<INIPrefSettingCollection>::GetCollection()->pSettingFile;
+        INIPrefSettingCollection* v49 = SettingT<INIPrefSettingCollection>::GetCollection();
+        v49->SaveAll(yg);
+        NiDX9Renderer* v50 = static_cast<NiDX9Renderer*>(NiRenderer::GetRenderer());
+        v50->RemoveResetNotificationFunc(&Main::ResetDeviceCallback);
+        NiDX9Renderer* v51 = static_cast<NiDX9Renderer*>(NiRenderer::GetRenderer());
+        v51->RemoveLostDeviceNotificationFunc(&Main::LostDeviceCallback);
+        NavMeshRender::Destroy();
+        BSTexturePalette::Kill();
+        BSShaderSDM::KillSDM();
+        BSShaderManager::Shutdown(eTrue);
+        FileFinder::Close();
+        TES::KillSDM();
+        BSMain::KillSDM();
+        FixedStrings::KillSDM();
+        Menu::KillSDM();
+        NiStaticDataManager::Shutdown();
+        MemoryManagerFile apFile("ExitData.mhd");
+        MemoryManager* v52 = &MemoryManager::Instance();
+        v52->OutputDebugInfo(&apFile, false);
+        return 0;
     }
 }
 
@@ -997,7 +984,7 @@ void MessageMenuCallback() {
         }
         std::_Exit(0);
     }
-    else if (MessageMenuResult == 2) {
+    if (MessageMenuResult == 2) {
         Interface::MessageMenuYesToAll();
     }
 }
@@ -1119,13 +1106,11 @@ int32_t MessageBoxA_0(const char* apText, const char* apCaption, uint32_t aiType
             if (!Renderer::GetFullScreen() || !Renderer::GetHWND()) {
                 if (appMain) {
                     uint32_t CurrentThreadId = GetCurrentThreadId();
-                    if (CurrentThreadId != appMain->uiThreadID) {
-                        if (appMain->GetControls()) {
-                            Controls* Controls_ = appMain->GetControls();
-                            if (!Controls_->IsMouseInBackground()) {
-                                Controls* v9 = appMain->GetControls();
-                                v9->SetMouseBackgroundStatus(true);
-                            }
+                    if ((CurrentThreadId != appMain->uiThreadID) && (appMain->GetControls())) {
+                        Controls* Controls_ = appMain->GetControls();
+                        if (!Controls_->IsMouseInBackground()) {
+                            Controls* v9 = appMain->GetControls();
+                            v9->SetMouseBackgroundStatus(true);
                         }
                     }
                 }
@@ -1162,13 +1147,11 @@ int32_t MessageBoxA_0(const char* apText, const char* apCaption, uint32_t aiType
                     else {
                         if (appMain) {
                             uint32_t v4 = GetCurrentThreadId();
-                            if (v4 != appMain->uiThreadID) {
-                                if (appMain->GetControls()) {
-                                    Controls* v5 = appMain->GetControls();
-                                    if (!v5->IsMouseInBackground()) {
-                                        Controls* v6 = appMain->GetControls();
-                                        v6->SetMouseBackgroundStatus(true);
-                                    }
+                            if ((v4 != appMain->uiThreadID) && (appMain->GetControls())) {
+                                Controls* v5 = appMain->GetControls();
+                                if (!v5->IsMouseInBackground()) {
+                                    Controls* v6 = appMain->GetControls();
+                                    v6->SetMouseBackgroundStatus(true);
                                 }
                             }
                         }
@@ -1188,9 +1171,8 @@ int32_t MessageBoxA_0(const char* apText, const char* apCaption, uint32_t aiType
     if ((aiType & 15) == 2) {
         return 5;
     }
-    else {
-        return 6;
-    }
+
+    return 6;
 }
 
 Main::Main(HWND__* ahWnd, HINSTANCE__* ahInstance)
@@ -2368,18 +2350,14 @@ void Main::Swap() {
         }
     }
     else {
-        if (!TES::pInstance->pInteriorCell) {
-            if (*TES::pInstance->pWorldSpace->GetCanopyShadowTextureName()) {
-                if (TES::pInstance->pGridCellA) {
-                    if (GridCellArray::GetRecreateCanopyShadowMaskTexture()) {
-                        TES::pInstance->pGridCellA->RecreateCanopyShadowMaskTexture();
-                    }
-                }
-            }
+        if ((!TES::pInstance->pInteriorCell) && (*TES::pInstance->pWorldSpace->GetCanopyShadowTextureName()) &&
+            (TES::pInstance->pGridCellA) && (GridCellArray::GetRecreateCanopyShadowMaskTexture())) {
+            TES::pInstance->pGridCellA->RecreateCanopyShadowMaskTexture();
         }
+
         DrawWorld(nullptr, false, false);
     }
-    if (ReturnTrue() == true) {
+    if (ReturnTrue()) {
         BSShaderManager::RenderDebugTexture();
     }
     Interface::DrawHUDMenu3D();
@@ -2581,12 +2559,11 @@ void Main::DrawWorldStandard(BSRenderedTexture* apDestination, bool abSkipFirstP
     bool bdo1stPerson = !b1stPersonCulled &&
         (!abSkipFirstPerson && (!Interface::GetVATSEffect()->GetTarget() && !DialogMenu::IsDialogActive()));
     bool bglareocclude = false;
-    if (bdo1stPerson) {
-        if (psun) {
-            bglareocclude = psun->GetSunGlareNode()->GetAppCulled();
-            psun->GetSunGlareNode()->SetAppCulled(true);
-        }
+    if ((bdo1stPerson) && (psun)) {
+        bglareocclude = psun->GetSunGlareNode()->GetAppCulled();
+        psun->GetSunGlareNode()->SetAppCulled(true);
     }
+
     bool useScopeScissoring = !IsEyefinity();
     bool bgunscope = Interface::IsGunScopeVisible();
     if (bgunscope) {
@@ -2601,11 +2578,10 @@ void Main::DrawWorldStandard(BSRenderedTexture* apDestination, bool abSkipFirstP
         }
     }
     DrawWorld_DrawScene(psun, bdo1stPerson, false, bissuesVATSQuery);
-    if (bdo1stPerson) {
-        if (psun) {
-            psun->GetSunGlareNode()->SetAppCulled(bglareocclude);
-        }
+    if ((bdo1stPerson) && (psun)) {
+        psun->GetSunGlareNode()->SetAppCulled(bglareocclude);
     }
+
     ImageSpaceEffectDepthOfField* pdofeffect = static_cast<ImageSpaceEffectDepthOfField*>(
         pimagespacemanager->GetEffect(ImageSpaceManager::EFFECT_DEPTH_OF_FIELD)
     );
@@ -2621,11 +2597,10 @@ void Main::DrawWorldStandard(BSRenderedTexture* apDestination, bool abSkipFirstP
         DrawWorld_Add1stPersonToDepthBuffer(apRenderTexture);
         DrawWorld_RestartRenderTexture(apRenderTexture, bmultiSampleEnabled, 0);
     }
-    if (BSShaderManager::IsRefractionEnabled()) {
-        if (spDrawWorldAccum.m_pObject->GetRefractivePassCount()) {
-            DrawWorld_Refraction(spDrawWorldAccum.m_pObject, apRenderTexture);
-        }
+    if ((BSShaderManager::IsRefractionEnabled()) && (spDrawWorldAccum.m_pObject->GetRefractivePassCount())) {
+        DrawWorld_Refraction(spDrawWorldAccum.m_pObject, apRenderTexture);
     }
+
     if (bdo1stPerson) {
         DrawWorld_Setup1stPerson();
         DrawWorld_RestartRenderTexture(apRenderTexture, bmultiSampleEnabled, 0);
@@ -2641,22 +2616,19 @@ void Main::DrawWorldStandard(BSRenderedTexture* apDestination, bool abSkipFirstP
     if (bisdepthoffieldactive) {
         DrawWorld_DoDepth(spDrawWorldAccum.m_pObject, apRenderTexture);
     }
-    if (bsunbeamsactive && !TES::pInstance->pInteriorCell) {
-        if (Main::pSky) {
-            if (Main::pSky->pSun) {
-                Sun* pSun = Main::pSky->pSun;
-                NiPoint3 sunPos = pSun->GetRoot()->GetWorldTranslate();
-                float sunz = 0.0f;
-                float suny = 0.0f;
-                float sunx = 0.0f;
-                SceneGraph* psg = Main::GetWorldSceneGraph();
-                bool btrans = psg->GetCamera()->WorldPtToScreenPt3(sunPos, sunx, suny, sunz, 1e-05f);
-                NiPoint2* pSunPos = ::new (&v14) NiPoint2(sunx, suny);
-                ImageSpaceManager* ImageSpaceManager_ = BSShaderManager::GetImageSpaceManager();
-                ImageSpaceManager_->SetSunPosition(*pSunPos);
-            }
-        }
+    if ((bsunbeamsactive && !TES::pInstance->pInteriorCell) && (Main::pSky) && (Main::pSky->pSun)) {
+        Sun* pSun = Main::pSky->pSun;
+        NiPoint3 sunPos = pSun->GetRoot()->GetWorldTranslate();
+        float sunz = 0.0f;
+        float suny = 0.0f;
+        float sunx = 0.0f;
+        SceneGraph* psg = Main::GetWorldSceneGraph();
+        bool btrans = psg->GetCamera()->WorldPtToScreenPt3(sunPos, sunx, suny, sunz, 1e-05f);
+        NiPoint2* pSunPos = ::new (&v14) NiPoint2(sunx, suny);
+        ImageSpaceManager* ImageSpaceManager_ = BSShaderManager::GetImageSpaceManager();
+        ImageSpaceManager_->SetSunPosition(*pSunPos);
     }
+
     if (BSShaderManager::GetImageSpaceEffects()) {
         DrawWorld_ImageSpace(bmultiSampleEnabled, apRenderTexture, prenderer, apDestination);
         if ((ScreenCustomSplatter::IsActiveSplatter() || ScreenSplatter::IsActiveSplatter()) &&
@@ -2823,33 +2795,30 @@ void Main::DrawWorld_UpdateOffscreenBuffers() {
             for (int32_t icurCloseActor = 0; icurCloseActor < inumCloseActors && icount < imaxActorShadows_3;
                  ++icurCloseActor) {
                 Actor* pactor = pcloseActorsA[icurCloseActor];
-                if (pactor->Get3D()) {
-                    if (pactor->Get3D()->m_pkParent) {
-                        if (pactor->HasShadow() && pactor->GetSitSleepState() != SIT_SLEEP_IS_SITTING &&
-                            !pactor->IsRefractive()) {
-                            NiPoint3* pBound;
-                            const NiFixedString* pExtraBoundTag = &BSBound::Tag();
-                            NiNode* v11 = pactor->Get3D();
-                            BSBound* pbound = static_cast<BSBound*>(v11->GetExtraData(*pExtraBoundTag));
-                            if (pbound) {
-                                pBound = &pbound->Extents;
-                            }
-                            else {
-                                pBound = &NiPoint3_ZERO;
-                            }
-                            float x = pBound->x;
-                            float y = pBound->y;
-                            float z = pBound->z;
-                            float pRendererc = BSMAX(x, y);
-                            float fbradius = BSMAX(pRendererc, z);
-                            NiNode* v12 = pactor->Get3D();
-                            const NiBound* WorldBound = &v12->GetWorldBound();
-                            if (WorldBound->m_fRadius < fbradius * 3.0) {
-                                NiNode* v14 = pactor->Get3D();
-                                pssnode_2->AddShadowLight(v14);
-                                ++icount;
-                            }
-                        }
+                if ((pactor->Get3D()) && (pactor->Get3D()->m_pkParent) &&
+                    (pactor->HasShadow() && pactor->GetSitSleepState() != SIT_SLEEP_IS_SITTING &&
+                     !pactor->IsRefractive())) {
+                    NiPoint3* pBound;
+                    const NiFixedString* pExtraBoundTag = &BSBound::Tag();
+                    NiNode* v11 = pactor->Get3D();
+                    BSBound* pbound = static_cast<BSBound*>(v11->GetExtraData(*pExtraBoundTag));
+                    if (pbound) {
+                        pBound = &pbound->Extents;
+                    }
+                    else {
+                        pBound = &NiPoint3_ZERO;
+                    }
+                    float x = pBound->x;
+                    float y = pBound->y;
+                    float z = pBound->z;
+                    float pRendererc = BSMAX(x, y);
+                    float fbradius = BSMAX(pRendererc, z);
+                    NiNode* v12 = pactor->Get3D();
+                    const NiBound* WorldBound = &v12->GetWorldBound();
+                    if (WorldBound->m_fRadius < fbradius * 3.0) {
+                        NiNode* v14 = pactor->Get3D();
+                        pssnode_2->AddShadowLight(v14);
+                        ++icount;
                     }
                 }
             }
@@ -2876,61 +2845,60 @@ void Main::DrawWorld_UpdateOffscreenBuffers() {
                 ShadowSceneLight* psslight = pssnode_2->GetFirstShadowLight();
                 int32_t ienabledShadows = 0;
                 while (psslight) {
-                    if (psslight->GetLight()) {
-                        if (psslight->GetShadowScene()) {
-                            NiLight* v19;
-                            NiAVObject* v20;
-                            NiAVObject* v21;
-                            NiBound kbound;
-                            NiPoint3 kShadowCasterPos;
-                            if (!psslight->IsFadedOut()) {
-                                NiLight* Light = psslight->GetLight();
-                                if (Light->GetAppCulled()) {
-                                    NiAVObject* ShadowScene = psslight->GetShadowScene();
-                                    if (ShadowScene->GetAppCulled()) {
-                                        psslight->SetFadeTarget(0.0f, true);
-                                    }
-                                    else {
-                                        if (ienabledShadows < imaxActorShadows_3) {
-                                            NiLight* v18 = psslight->GetLight();
-                                            v18->SetAppCulled(false);
-                                        }
-                                        psslight->SetFadeTarget(0.0f, false);
-                                    }
+                    if ((psslight->GetLight()) && (psslight->GetShadowScene())) {
+                        NiLight* v19;
+                        NiAVObject* v20;
+                        NiAVObject* v21;
+                        NiBound kbound;
+                        NiPoint3 kShadowCasterPos;
+                        if (!psslight->IsFadedOut()) {
+                            NiLight* Light = psslight->GetLight();
+                            if (Light->GetAppCulled()) {
+                                NiAVObject* ShadowScene = psslight->GetShadowScene();
+                                if (ShadowScene->GetAppCulled()) {
+                                    psslight->SetFadeTarget(0.0f, true);
                                 }
-                            }
-                            if (ienabledShadows >= imaxActorShadows_3 ||
-                                ((v19 = psslight->GetLight(), v19->GetAppCulled()) ||
-                                 ((v20 = psslight->GetShadowScene(), v20->GetAppCulled()) ||
-                                  ((v21 = psslight->GetShadowScene(),
-                                    (kbound = v21->GetWorldBound(),
-                                     (kShadowCasterPos = psslight->GetShadowScene()->GetWorldTranslate(),
-                                      (psslight->ComputeWeightedShadowLight(nullptr, kShadowCasterPos),
-                                       (psslight->TestFrustumCull(*pculler), psslight->GetFrustumCull() == 255))))) ||
-                                   !(psslight->fShadowLODDimmer >= 0.05))))) {
-                                NiLight* v26 = psslight->GetLight();
-                                v26->SetAppCulled(true);
-                            }
-                            else {
-                                ++ienabledShadows;
-                                NiUpdateData UpdateData(0.0f, false, false);
-                                NiLight* v22 = psslight->GetLight();
-                                v22->Update(UpdateData);
-                                psslight->AccumulateGeometry(pculler, ienabledShadows - 1);
-                                psslight->InsertUnusedFence();
-                                ShadowSceneNode* ShadowSceneNode_ = BSShaderManager::GetShadowSceneNode(0);
-                                BSPortalGraph* ppgraph = ShadowSceneNode_->GetPortalGraph();
-                                ShadowSceneLight* pExtraBoundTaga = psslight;
-                                ShadowSceneNode* v24 = BSShaderManager::GetShadowSceneNode(0);
-                                v24->UpdateQueuedLight(pExtraBoundTaga);
-                                if (Renderer::bActorSelfShadowing.Bool()) {
-                                    NiAVObject* v25 = psslight->GetShadowScene();
-                                    psslight->AddObject(v25);
+                                else {
+                                    if (ienabledShadows < imaxActorShadows_3) {
+                                        NiLight* v18 = psslight->GetLight();
+                                        v18->SetAppCulled(false);
+                                    }
+                                    psslight->SetFadeTarget(0.0f, false);
                                 }
-                                psslight->RemoveUnusedGeom();
                             }
                         }
+                        if (ienabledShadows >= imaxActorShadows_3 ||
+                            ((v19 = psslight->GetLight(), v19->GetAppCulled()) ||
+                             ((v20 = psslight->GetShadowScene(), v20->GetAppCulled()) ||
+                              ((v21 = psslight->GetShadowScene(),
+                                (kbound = v21->GetWorldBound(),
+                                 (kShadowCasterPos = psslight->GetShadowScene()->GetWorldTranslate(),
+                                  (psslight->ComputeWeightedShadowLight(nullptr, kShadowCasterPos),
+                                   (psslight->TestFrustumCull(*pculler), psslight->GetFrustumCull() == 255))))) ||
+                               !(psslight->fShadowLODDimmer >= 0.05))))) {
+                            NiLight* v26 = psslight->GetLight();
+                            v26->SetAppCulled(true);
+                        }
+                        else {
+                            ++ienabledShadows;
+                            NiUpdateData UpdateData(0.0f, false, false);
+                            NiLight* v22 = psslight->GetLight();
+                            v22->Update(UpdateData);
+                            psslight->AccumulateGeometry(pculler, ienabledShadows - 1);
+                            psslight->InsertUnusedFence();
+                            ShadowSceneNode* ShadowSceneNode_ = BSShaderManager::GetShadowSceneNode(0);
+                            BSPortalGraph* ppgraph = ShadowSceneNode_->GetPortalGraph();
+                            ShadowSceneLight* pExtraBoundTaga = psslight;
+                            ShadowSceneNode* v24 = BSShaderManager::GetShadowSceneNode(0);
+                            v24->UpdateQueuedLight(pExtraBoundTaga);
+                            if (Renderer::bActorSelfShadowing.Bool()) {
+                                NiAVObject* v25 = psslight->GetShadowScene();
+                                psslight->AddObject(v25);
+                            }
+                            psslight->RemoveUnusedGeom();
+                        }
                     }
+
                     psslight = pssnode_2->GetNextShadowLight();
                 }
                 while (ienabledShadows + 17 < 21) {
@@ -3519,13 +3487,11 @@ Sun* Main::DrawWorld_Init() {
     BSShaderAccumulator::SetDisplayBoundingSpheres(*v7);
     BSShaderManager::bDepthRestored = false;
     Sun* psun = nullptr;
-    if (TES::pInstance->pSky) {
-        if (TES::pInstance->pSky->pSun) {
-            if (TES::pInstance->pSky->eMode == Sky::SM_FULL || TES::pInstance->pSky->eMode == Sky::SM_FAKEEXTERIOR) {
-                return TES::pInstance->pSky->pSun;
-            }
-        }
+    if ((TES::pInstance->pSky) && (TES::pInstance->pSky->pSun) &&
+        (TES::pInstance->pSky->eMode == Sky::SM_FULL || TES::pInstance->pSky->eMode == Sky::SM_FAKEEXTERIOR)) {
+        return TES::pInstance->pSky->pSun;
     }
+
     return psun;
 }
 
@@ -3570,41 +3536,34 @@ void Main::DrawWorld_DrawScene(Sun* psun, int32_t abDo1stPerson, bool abWirefram
         NiAVObject* pavobj = nullptr;
         NiNode* pnode = nullptr;
         pavobj = pssn->GetAtChecked(0);
-        if (pavobj) {
-            if (!pavobj->GetAppCulled()) {
-                lAccumThree.AddTail(pavobj);
-            }
+        if ((pavobj) && (!pavobj->GetAppCulled())) {
+            lAccumThree.AddTail(pavobj);
         }
+
         pavobj = pssn->GetAtChecked(1u);
-        if (pavobj) {
-            if (!pavobj->GetAppCulled()) {
-                lAccumThree.AddTail(pavobj);
-            }
+        if ((pavobj) && (!pavobj->GetAppCulled())) {
+            lAccumThree.AddTail(pavobj);
         }
+
         pavobj = pssn->GetAtChecked(2u);
-        if (pavobj) {
-            if (!pavobj->GetAppCulled()) {
-                pnode = pavobj->IsNode();
-            }
+        if ((pavobj) && (!pavobj->GetAppCulled())) {
+            pnode = pavobj->IsNode();
         }
+
         if (pnode) {
             pavobj = pnode->GetAtChecked(0);
-            if (pavobj) {
-                if (!pavobj->GetAppCulled()) {
-                    lAccumOne.AddTail(pavobj);
-                }
+            if ((pavobj) && (!pavobj->GetAppCulled())) {
+                lAccumOne.AddTail(pavobj);
             }
+
             pavobj = pnode->GetAtChecked(1u);
-            if (pavobj) {
-                if (!pavobj->GetAppCulled()) {
-                    lAccumOne.AddTail(pavobj);
-                }
+            if ((pavobj) && (!pavobj->GetAppCulled())) {
+                lAccumOne.AddTail(pavobj);
             }
+
             pavobj = pnode->GetAtChecked(2u);
-            if (pavobj) {
-                if (!pavobj->GetAppCulled()) {
-                    lAccumOne.AddTail(pavobj);
-                }
+            if ((pavobj) && (!pavobj->GetAppCulled())) {
+                lAccumOne.AddTail(pavobj);
             }
         }
         pavobj = pssn->GetAtChecked(3u);
@@ -3615,52 +3574,40 @@ void Main::DrawWorld_DrawScene(Sun* psun, int32_t abDo1stPerson, bool abWirefram
             ShadowSceneNode* ShadowSceneNode_ = BSShaderManager::GetShadowSceneNode(0);
             if (ShadowSceneNode_->HasVisibleUnboundSpace()) {
                 pavobj = pnode->GetAtChecked(0);
-                if (pavobj) {
-                    if (!pavobj->GetAppCulled()) {
-                        lAccumTwo.AddTail(pavobj);
-                    }
+                if ((pavobj) && (!pavobj->GetAppCulled())) {
+                    lAccumTwo.AddTail(pavobj);
                 }
+
                 pavobj = pnode->GetAtChecked(1u);
-                if (pavobj) {
-                    if (!pavobj->GetAppCulled()) {
-                        lAccumOne.AddTail(pavobj);
-                    }
+                if ((pavobj) && (!pavobj->GetAppCulled())) {
+                    lAccumOne.AddTail(pavobj);
                 }
+
                 pavobj = pnode->GetAtChecked(2u);
                 if (pavobj) {
                     pnode = pavobj->IsNode();
-                    if (pnode) {
-                        if (!pnode->GetAppCulled()) {
-                            for (int32_t i_2 = 0;; ++i_2) {
-                                uint32_t ArrayCount = pnode->GetArrayCount();
-                                if (i_2 >= ArrayCount) {
-                                    break;
-                                }
-                                pavobj = pnode->GetAt(i_2);
-                                if (pavobj) {
-                                    if (i_2 != 4) {
-                                        if (i_2) {
-                                            NiNode* pchnode_2 = pavobj->IsNode();
-                                            if (pchnode_2) {
-                                                if (!pchnode_2->GetAppCulled()) {
-                                                    for (int32_t j_2 = i_2 == 6;; ++j_2) {
-                                                        uint32_t v14 = pchnode_2->GetArrayCount();
-                                                        if (j_2 >= v14) {
-                                                            break;
-                                                        }
-                                                        NiAVObject* pchobj_2 = pchnode_2->GetAt(j_2);
-                                                        if (pchobj_2) {
-                                                            if (!pchobj_2->GetAppCulled()) {
-                                                                if (j_2 % 2) {
-                                                                    lAccumOne.AddTail(pchobj_2);
-                                                                }
-                                                                else {
-                                                                    lAccumTwo.AddTail(pchobj_2);
-                                                                }
-                                                            }
-                                                        }
-                                                    }
-                                                }
+                    if ((pnode) && (!pnode->GetAppCulled())) {
+                        for (int32_t i_2 = 0;; ++i_2) {
+                            uint32_t ArrayCount = pnode->GetArrayCount();
+                            if (i_2 >= ArrayCount) {
+                                break;
+                            }
+                            pavobj = pnode->GetAt(i_2);
+                            if ((pavobj) && (i_2 != 4) && (i_2)) {
+                                NiNode* pchnode_2 = pavobj->IsNode();
+                                if ((pchnode_2) && (!pchnode_2->GetAppCulled())) {
+                                    for (int32_t j_2 = i_2 == 6;; ++j_2) {
+                                        uint32_t v14 = pchnode_2->GetArrayCount();
+                                        if (j_2 >= v14) {
+                                            break;
+                                        }
+                                        NiAVObject* pchobj_2 = pchnode_2->GetAt(j_2);
+                                        if ((pchobj_2) && (!pchobj_2->GetAppCulled())) {
+                                            if (j_2 % 2) {
+                                                lAccumOne.AddTail(pchobj_2);
+                                            }
+                                            else {
+                                                lAccumTwo.AddTail(pchobj_2);
                                             }
                                         }
                                     }
@@ -3674,27 +3621,23 @@ void Main::DrawWorld_DrawScene(Sun* psun, int32_t abDo1stPerson, bool abWirefram
                 pavobj = pnode->GetAtChecked(2u);
                 if (pavobj) {
                     pnode = pavobj->IsNode();
-                    if (pnode) {
-                        if (!pnode->GetAppCulled()) {
-                            pavobj = pnode->GetAtChecked(7u);
-                            if (pavobj) {
-                                pnode = pavobj->IsNode();
-                                if (pnode) {
-                                    for (int32_t j_3 = 0;; ++j_3) {
-                                        uint32_t v15 = pnode->GetArrayCount();
-                                        if (j_3 >= v15) {
-                                            break;
+                    if ((pnode) && (!pnode->GetAppCulled())) {
+                        pavobj = pnode->GetAtChecked(7u);
+                        if (pavobj) {
+                            pnode = pavobj->IsNode();
+                            if (pnode) {
+                                for (int32_t j_3 = 0;; ++j_3) {
+                                    uint32_t v15 = pnode->GetArrayCount();
+                                    if (j_3 >= v15) {
+                                        break;
+                                    }
+                                    NiAVObject* pchobj_3 = pnode->GetAt(j_3);
+                                    if ((pchobj_3) && (!pchobj_3->GetAppCulled())) {
+                                        if (j_3 % 2) {
+                                            lAccumOne.AddTail(pchobj_3);
                                         }
-                                        NiAVObject* pchobj_3 = pnode->GetAt(j_3);
-                                        if (pchobj_3) {
-                                            if (!pchobj_3->GetAppCulled()) {
-                                                if (j_3 % 2) {
-                                                    lAccumOne.AddTail(pchobj_3);
-                                                }
-                                                else {
-                                                    lAccumTwo.AddTail(pchobj_3);
-                                                }
-                                            }
+                                        else {
+                                            lAccumTwo.AddTail(pchobj_3);
                                         }
                                     }
                                 }
@@ -3721,34 +3664,31 @@ void Main::DrawWorld_DrawScene(Sun* psun, int32_t abDo1stPerson, bool abWirefram
             int32_t ispcount = 0;
             while (kRoomIter) {
                 BSMultiBoundRoom* pRoom = pportalgraph->GetMBRoomAccumList()->GetNext(kRoomIter).m_pObject;
-                if (pRoom) {
-                    if (!pRoom->kPortalList.IsEmpty()) {
-                        NiTListItem<BSPortal*>* kPortalIter = pRoom->kPortalList.m_pkHead;
-                        while (kPortalIter) {
-                            BSPortal* pportal = pRoom->kPortalList.GetNext(kPortalIter);
-                            if (pportal) {
-                                BSPortalSharedNode* v20 = pportal->QSharedGeometryNode();
-                                if (pculler->AddShared(v20)) {
-                                    BSPortalSharedNode* spnode = pportal->QSharedGeometryNode();
-                                    if (spnode) {
-                                        if (pportal->pMultiBoundRoom[0]) {
-                                            if (pportal->pMultiBoundRoom[1]) {
-                                                BSPortal* v50 = pportal;
-                                                NiCamera* Camera = pculler->m_pkCamera;
-                                                ShadowSceneNode* v21 = BSShaderManager::GetShadowSceneNode(0);
-                                                v21->BuildSharedCompoundFrustum(Camera, v50);
-                                            }
-                                        }
-                                        if (ispcount % 2) {
-                                            NiAVObject* v67 = spnode;
-                                            lAccumOne.AddTail(v67);
-                                        }
-                                        else {
-                                            NiAVObject* v66 = spnode;
-                                            lAccumTwo.AddTail(v66);
-                                        }
-                                        ++ispcount;
+                if ((pRoom) && (!pRoom->kPortalList.IsEmpty())) {
+                    NiTListItem<BSPortal*>* kPortalIter = pRoom->kPortalList.m_pkHead;
+                    while (kPortalIter) {
+                        BSPortal* pportal = pRoom->kPortalList.GetNext(kPortalIter);
+                        if (pportal) {
+                            BSPortalSharedNode* v20 = pportal->QSharedGeometryNode();
+                            if (pculler->AddShared(v20)) {
+                                BSPortalSharedNode* spnode = pportal->QSharedGeometryNode();
+                                if (spnode) {
+                                    if ((pportal->pMultiBoundRoom[0]) && (pportal->pMultiBoundRoom[1])) {
+                                        BSPortal* v50 = pportal;
+                                        NiCamera* Camera = pculler->m_pkCamera;
+                                        ShadowSceneNode* v21 = BSShaderManager::GetShadowSceneNode(0);
+                                        v21->BuildSharedCompoundFrustum(Camera, v50);
                                     }
+
+                                    if (ispcount % 2) {
+                                        NiAVObject* v67 = spnode;
+                                        lAccumOne.AddTail(v67);
+                                    }
+                                    else {
+                                        NiAVObject* v66 = spnode;
+                                        lAccumTwo.AddTail(v66);
+                                    }
+                                    ++ispcount;
                                 }
                             }
                         }
@@ -3795,55 +3735,49 @@ void Main::DrawWorld_DrawScene(Sun* psun, int32_t abDo1stPerson, bool abWirefram
             }
         }
         else {
-            if (pnode) {
-                if (!pnode->GetAppCulled()) {
-                    for (int32_t i = 0;; ++i) {
-                        uint32_t v9 = pnode->GetArrayCount();
-                        if (i >= v9) {
-                            break;
-                        }
-                        pavobj = pnode->GetAt(i);
-                        if (pavobj) {
-                            NiNode* pcnode = pavobj->IsNode();
-                            if (pcnode) {
-                                if (!pcnode->GetAppCulled()) {
-                                    for (int32_t j = 0;; ++j) {
-                                        uint32_t v10 = pcnode->GetArrayCount();
-                                        if (j >= v10) {
-                                            break;
-                                        }
-                                        NiAVObject* pchobj = pcnode->GetAt(j);
-                                        if (pchobj) {
-                                            NiNode* pchnode = pchobj->IsNode();
-                                            if (pchnode) {
-                                                if (!pchnode->GetAppCulled()) {
-                                                    for (int32_t k = j == 6;; ++k) {
-                                                        uint32_t v11 = pchnode->GetArrayCount();
-                                                        if (k >= v11) {
-                                                            break;
-                                                        }
-                                                        NiAVObject* pkGrandChild = pchnode->GetAt(k);
-                                                        if (pkGrandChild) {
-                                                            if (!pkGrandChild->NiAVObject::GetAppCulled()) {
-                                                                if (i % 2) {
-                                                                    lAccumOne.AddTail(pkGrandChild);
-                                                                }
-                                                                else {
-                                                                    lAccumTwo.AddTail(pkGrandChild);
-                                                                }
-                                                            }
-                                                        }
+            if ((pnode) && (!pnode->GetAppCulled())) {
+                for (int32_t i = 0;; ++i) {
+                    uint32_t v9 = pnode->GetArrayCount();
+                    if (i >= v9) {
+                        break;
+                    }
+                    pavobj = pnode->GetAt(i);
+                    if (pavobj) {
+                        NiNode* pcnode = pavobj->IsNode();
+                        if ((pcnode) && (!pcnode->GetAppCulled())) {
+                            for (int32_t j = 0;; ++j) {
+                                uint32_t v10 = pcnode->GetArrayCount();
+                                if (j >= v10) {
+                                    break;
+                                }
+                                NiAVObject* pchobj = pcnode->GetAt(j);
+                                if (pchobj) {
+                                    NiNode* pchnode = pchobj->IsNode();
+                                    if (pchnode) {
+                                        if (!pchnode->GetAppCulled()) {
+                                            for (int32_t k = j == 6;; ++k) {
+                                                uint32_t v11 = pchnode->GetArrayCount();
+                                                if (k >= v11) {
+                                                    break;
+                                                }
+                                                NiAVObject* pkGrandChild = pchnode->GetAt(k);
+                                                if ((pkGrandChild) && (!pkGrandChild->NiAVObject::GetAppCulled())) {
+                                                    if (i % 2) {
+                                                        lAccumOne.AddTail(pkGrandChild);
+                                                    }
+                                                    else {
+                                                        lAccumTwo.AddTail(pkGrandChild);
                                                     }
                                                 }
                                             }
-                                            else {
-                                                if (i % 2) {
-                                                    lAccumOne.AddTail(pchobj);
-                                                }
-                                                else {
-                                                    lAccumTwo.AddTail(pchobj);
-                                                }
-                                            }
+                                        }
+                                    }
+                                    else {
+                                        if (i % 2) {
+                                            lAccumOne.AddTail(pchobj);
+                                        }
+                                        else {
+                                            lAccumTwo.AddTail(pchobj);
                                         }
                                     }
                                 }
@@ -3854,37 +3788,32 @@ void Main::DrawWorld_DrawScene(Sun* psun, int32_t abDo1stPerson, bool abWirefram
             }
         }
         pavobj = pssn->GetAtChecked(4u);
-        if (pavobj) {
-            if (!pavobj->GetAppCulled()) {
-                lAccumThree.AddTail(pavobj);
-            }
+        if ((pavobj) && (!pavobj->GetAppCulled())) {
+            lAccumThree.AddTail(pavobj);
         }
+
         pavobj = pssn->GetAtChecked(5u);
-        if (pavobj) {
-            if (!pavobj->GetAppCulled()) {
-                lAccumThree.AddTail(pavobj);
-            }
+        if ((pavobj) && (!pavobj->GetAppCulled())) {
+            lAccumThree.AddTail(pavobj);
         }
+
         pavobj = pssn->GetAtChecked(6u);
-        if (pavobj) {
-            if (!pavobj->GetAppCulled()) {
-                lAccumOne.AddTail(pavobj);
-            }
+        if ((pavobj) && (!pavobj->GetAppCulled())) {
+            lAccumOne.AddTail(pavobj);
         }
+
         for (int32_t i_4 = 7;; ++i_4) {
             uint32_t v26 = pssn->GetArrayCount();
             if (i_4 >= v26) {
                 break;
             }
             pavobj = pssn->GetAt(i_4);
-            if (pavobj) {
-                if (!pavobj->GetAppCulled()) {
-                    if (i_4 % 2) {
-                        lAccumOne.AddTail(pavobj);
-                    }
-                    else {
-                        lAccumTwo.AddTail(pavobj);
-                    }
+            if ((pavobj) && (!pavobj->GetAppCulled())) {
+                if (i_4 % 2) {
+                    lAccumOne.AddTail(pavobj);
+                }
+                else {
+                    lAccumTwo.AddTail(pavobj);
                 }
             }
         }
@@ -4097,14 +4026,13 @@ void Main::DrawWorld_Setup1stPerson() {
         v30 = pRootCamera->GetWorldTransform();
         sp1stPersonAdjustedCamera.m_pObject->SetWorldTranslate(p1stPersonCamera->GetWorldTranslate() + invertedPos);
         sp1stPersonAdjustedCamera.m_pObject->SetWorldRotate(v30.m_Rotate);
-        if (pPlayer->GetWeaponSightingNode()) {
-            if (!pPlayer->IsReloading() && !pVATS.IsInVats()) {
-                NiAVObject* WeaponSightingNode = pPlayer->GetWeaponSightingNode();
-                sp1stPersonAdjustedCamera.m_pObject->SetWorldTranslate(
-                    WeaponSightingNode->GetWorldTranslate() + invertedPos
-                );
-            }
+        if ((pPlayer->GetWeaponSightingNode()) && (!pPlayer->IsReloading() && !pVATS.IsInVats())) {
+            NiAVObject* WeaponSightingNode = pPlayer->GetWeaponSightingNode();
+            sp1stPersonAdjustedCamera.m_pObject->SetWorldTranslate(
+                WeaponSightingNode->GetWorldTranslate() + invertedPos
+            );
         }
+
         NiPoint3 kOrgPos = pPlayerNode->GetTranslate();
         pPlayerNode->SetTranslate(NiPoint3_ZERO);
         pPlayerNode->Update(arData);
@@ -4239,63 +4167,58 @@ void Main::DrawWorld_MTRender1stPerson(
             }
         }
     }
-    if (!Interface::GetCurrentRenderedMenu() ||
-        (v20 = static_cast<FOPipboyManager*>(Interface::GetCurrentRenderedMenu()), v20 == Interface::GetPipboy())) {
-        if (!Interface::IsInPipboyMenu() || !pPlayer->IsRefractive()) {
-            BSRenderState::SetColorWriteEnable(15u, BSRS_LOCK);
-            MTRenderingSystem::QInstance()->WaitOnThreadStage(MTRenderingSystem::THREAD_2, 22);
-            BSShaderUtil::RenderScene(sp1stPersonAdjustedCamera.m_pObject, spDraw1stPersonAccum.m_pObject, false);
-            BSRenderState::RestoreColorWriteEnable(BSRS_LOCK);
-            BSSimpleList<NiPointer<BSTempEffect>>* pTempParticleList = &ReferenceProcessLists.GlobalTempEffectList;
-            if (pTempParticleList) {
-                if (!pTempParticleList->IsEmpty()) {
-                    NiPoint3 ISNodeDiff(0.0f, 0.0f, 0.0f);
-                    if (pPlayer->GetWeaponSightingNode()) {
-                        if (!pPlayer->IsReloading() && !pVATS.IsInVats()) {
-                            const NiPoint3* pNewViewportg = &p1stPersonCamera->GetWorldTranslate();
-                            NiAVObject* WeaponSightingNode = pPlayer->GetWeaponSightingNode();
-                            ISNodeDiff = WeaponSightingNode->GetWorldTranslate() - *pNewViewportg;
-                        }
-                    }
-                    SceneGraph* WorldSceneGraph = Main::GetWorldSceneGraph();
-                    NiCamera* pcamera_2 = WorldSceneGraph->GetCamera();
-                    BSCullingProcess* apCullingProcess = WorldSceneGraph->pCuller;
-                    sptempaccum_2.SetPointer(&spDrawWorldAccum);
-                    NiPoint3 cameraPos = pcamera_2->GetWorldTranslate();
-                    pcamera_2->SetWorldTranslate(cameraPos + ISNodeDiff);
-                    BSShaderAccumulator* pNewViewporth = sptempaccum_2.m_pObject;
-                    apCullingProcess->SetAccumulator(pNewViewporth);
-                    sptempaccum_2.m_pObject->b1stPerson = true;
-                    bool bShouldRender = false;
-                    // Walks the list with the same local, taking each node's item before moving on.
-                    while (pTempParticleList) {
-                        BSTempEffect* pEffect = pTempParticleList->m_item.m_pObject;
-                        pTempParticleList = pTempParticleList->m_pkNext;
-                        if (pEffect) {
-                            if (pEffect->IsFirstPerson()) {
-                                bShouldRender = true;
-                                NiAVObject* v23 = pEffect->Get3D();
-                                v23->SetAppCulled(false);
-                                NiAVObject* v24 = pEffect->Get3D();
-                                BSShaderUtil::AccumulateScene(pcamera_2, v24, *apCullingProcess);
-                                NiAVObject* v25 = pEffect->Get3D();
-                                v25->SetAppCulled(true);
-                            }
-                        }
-                    }
-                    if (bShouldRender) {
-                        BSShaderAccumulator* pGlowNode0 = sptempaccum_2.m_pObject;
-                        BSShaderUtil::RenderScene(pcamera_2, pGlowNode0, false);
-                    }
-                    apCullingProcess->SetAccumulator(nullptr);
-                    sptempaccum_2.m_pObject->b1stPerson = false;
-                    sptempaccum_2.operator=(static_cast<BSShaderAccumulator*>(nullptr));
-                    pcamera_2->SetWorldTranslate(cameraPos);
-                    sptempaccum_2.~NiPointer<BSShaderAccumulator>();
+    if ((!Interface::GetCurrentRenderedMenu() ||
+         (v20 = static_cast<FOPipboyManager*>(Interface::GetCurrentRenderedMenu()), v20 == Interface::GetPipboy())) &&
+        (!Interface::IsInPipboyMenu() || !pPlayer->IsRefractive())) {
+        BSRenderState::SetColorWriteEnable(15u, BSRS_LOCK);
+        MTRenderingSystem::QInstance()->WaitOnThreadStage(MTRenderingSystem::THREAD_2, 22);
+        BSShaderUtil::RenderScene(sp1stPersonAdjustedCamera.m_pObject, spDraw1stPersonAccum.m_pObject, false);
+        BSRenderState::RestoreColorWriteEnable(BSRS_LOCK);
+        BSSimpleList<NiPointer<BSTempEffect>>* pTempParticleList = &ReferenceProcessLists.GlobalTempEffectList;
+        if ((pTempParticleList) && (!pTempParticleList->IsEmpty())) {
+            NiPoint3 ISNodeDiff(0.0f, 0.0f, 0.0f);
+            if ((pPlayer->GetWeaponSightingNode()) && (!pPlayer->IsReloading() && !pVATS.IsInVats())) {
+                const NiPoint3* pNewViewportg = &p1stPersonCamera->GetWorldTranslate();
+                NiAVObject* WeaponSightingNode = pPlayer->GetWeaponSightingNode();
+                ISNodeDiff = WeaponSightingNode->GetWorldTranslate() - *pNewViewportg;
+            }
+
+            SceneGraph* WorldSceneGraph = Main::GetWorldSceneGraph();
+            NiCamera* pcamera_2 = WorldSceneGraph->GetCamera();
+            BSCullingProcess* apCullingProcess = WorldSceneGraph->pCuller;
+            sptempaccum_2.SetPointer(&spDrawWorldAccum);
+            NiPoint3 cameraPos = pcamera_2->GetWorldTranslate();
+            pcamera_2->SetWorldTranslate(cameraPos + ISNodeDiff);
+            BSShaderAccumulator* pNewViewporth = sptempaccum_2.m_pObject;
+            apCullingProcess->SetAccumulator(pNewViewporth);
+            sptempaccum_2.m_pObject->b1stPerson = true;
+            bool bShouldRender = false;
+            // Walks the list with the same local, taking each node's item before moving on.
+            while (pTempParticleList) {
+                BSTempEffect* pEffect = pTempParticleList->m_item.m_pObject;
+                pTempParticleList = pTempParticleList->m_pkNext;
+                if ((pEffect) && (pEffect->IsFirstPerson())) {
+                    bShouldRender = true;
+                    NiAVObject* v23 = pEffect->Get3D();
+                    v23->SetAppCulled(false);
+                    NiAVObject* v24 = pEffect->Get3D();
+                    BSShaderUtil::AccumulateScene(pcamera_2, v24, *apCullingProcess);
+                    NiAVObject* v25 = pEffect->Get3D();
+                    v25->SetAppCulled(true);
                 }
             }
+            if (bShouldRender) {
+                BSShaderAccumulator* pGlowNode0 = sptempaccum_2.m_pObject;
+                BSShaderUtil::RenderScene(pcamera_2, pGlowNode0, false);
+            }
+            apCullingProcess->SetAccumulator(nullptr);
+            sptempaccum_2.m_pObject->b1stPerson = false;
+            sptempaccum_2.operator=(static_cast<BSShaderAccumulator*>(nullptr));
+            pcamera_2->SetWorldTranslate(cameraPos);
+            sptempaccum_2.~NiPointer<BSShaderAccumulator>();
         }
     }
+
     if (BSShaderManager::IsRefractionEnabled()) {
         AutoMemContext tempMemContext_2(
             MEM_CONTEXT_IMAGE_SPACE, true, "D:\\_Fallout3\\Platforms\\Common\\Code\\Fallout\\Misc\\Main.cpp", 0x22B5
@@ -4331,28 +4254,27 @@ void Main::DrawWorld_MTRender1stPerson(
     }
     float pNewViewportj = pPlayer->GetWorldFOV();
     BSShaderManager::SetFOV(pNewViewportj);
-    if (apSun) {
-        if (!apSun->GetSunGlareNode()->GetAppCulled()) {
-            bool bcull = apSun->GetSunGlareNode()->GetAppCulled();
-            apSun->GetSunGlareNode()->SetAppCulled(false);
-            SceneGraph* apSceneGraph_2 = Main::GetWorldSceneGraph();
-            NiCamera* pcamera_3 = apSceneGraph_2->GetCamera();
-            BSCullingProcess* apCuller_2 = apSceneGraph_2->pCuller;
-            sptempaccum_4.SetPointer(&spDrawWorldAccum);
-            BSShaderAccumulator* pNewViewportk = sptempaccum_4.m_pObject;
-            apCuller_2->SetAccumulator(pNewViewportk);
-            sptempaccum_4.m_pObject->b1stPerson = true;
-            NiBillboardNode* pGlowNode0a = apSun->GetSunGlareNode();
-            BSShaderUtil::AccumulateScene(pcamera_3, pGlowNode0a, *apCuller_2);
-            BSShaderAccumulator* pGlowNode0b = sptempaccum_4.m_pObject;
-            BSShaderUtil::RenderScene(pcamera_3, pGlowNode0b, false);
-            apCuller_2->SetAccumulator(nullptr);
-            sptempaccum_4.m_pObject->b1stPerson = false;
-            sptempaccum_4.operator=(static_cast<BSShaderAccumulator*>(nullptr));
-            apSun->GetSunGlareNode()->SetAppCulled(bcull);
-            sptempaccum_4.~NiPointer<BSShaderAccumulator>();
-        }
+    if ((apSun) && (!apSun->GetSunGlareNode()->GetAppCulled())) {
+        bool bcull = apSun->GetSunGlareNode()->GetAppCulled();
+        apSun->GetSunGlareNode()->SetAppCulled(false);
+        SceneGraph* apSceneGraph_2 = Main::GetWorldSceneGraph();
+        NiCamera* pcamera_3 = apSceneGraph_2->GetCamera();
+        BSCullingProcess* apCuller_2 = apSceneGraph_2->pCuller;
+        sptempaccum_4.SetPointer(&spDrawWorldAccum);
+        BSShaderAccumulator* pNewViewportk = sptempaccum_4.m_pObject;
+        apCuller_2->SetAccumulator(pNewViewportk);
+        sptempaccum_4.m_pObject->b1stPerson = true;
+        NiBillboardNode* pGlowNode0a = apSun->GetSunGlareNode();
+        BSShaderUtil::AccumulateScene(pcamera_3, pGlowNode0a, *apCuller_2);
+        BSShaderAccumulator* pGlowNode0b = sptempaccum_4.m_pObject;
+        BSShaderUtil::RenderScene(pcamera_3, pGlowNode0b, false);
+        apCuller_2->SetAccumulator(nullptr);
+        sptempaccum_4.m_pObject->b1stPerson = false;
+        sptempaccum_4.operator=(static_cast<BSShaderAccumulator*>(nullptr));
+        apSun->GetSunGlareNode()->SetAppCulled(bcull);
+        sptempaccum_4.~NiPointer<BSShaderAccumulator>();
     }
+
     if (apSun) {
         apSun->CalculateSunGlare(2u, spDrawWorldAccum.m_pObject, Main::spWorldRoot.m_pObject->GetCamera());
     }
@@ -4363,62 +4285,60 @@ void Main::DrawWorld_MTRender1stPerson(
 }
 
 void Main::DrawWorld_RenderedMenuScene() {
-    if (!Main::spVATSTex.m_pObject) {
-        if (Interface::GetCurrentRenderedMenu()) {
-            FOPipboyManager* CurrentRenderedMenu = static_cast<FOPipboyManager*>(Interface::GetCurrentRenderedMenu());
-            if (CurrentRenderedMenu != Interface::GetPipboy()) {
-                NiCamera* v18;
-                SceneGraph* WorldSceneGraph = Main::GetWorldSceneGraph();
-                BSCullingProcess* cullingProcess = WorldSceneGraph->pCuller;
-                cullingProcess->PushCullMode(BSCullingProcess::BSCP_CULL_ALLPASS);
-                FORenderedMenu* v2 = Interface::GetCurrentRenderedMenu();
-                if (v2->GetCamera()) {
-                    FORenderedMenu* v3 = Interface::GetCurrentRenderedMenu();
-                    v18 = v3->GetCamera();
-                }
-                else {
-                    v18 = WorldSceneGraph->GetCamera();
-                }
-                cullingProcess->m_pkCamera = v18;
-                cullingProcess->SetAccumulator(spRenderedMenuAccum.m_pObject);
-                ShadowSceneNode* ShadowSceneNode_ = BSShaderManager::GetShadowSceneNode(0);
-                spRenderedMenuAccum.m_pObject->SetShadowSceneNode(ShadowSceneNode_);
-                // Letterboxed while rendering to the default target group (or none): the framebuffer's viewport.
-                NiRenderer* pCurrentRenderer;
-                NiRenderer* pDefaultRenderer;
-                NiRenderTargetGroup* pDefaultGroup;
-                if (BSShaderManager::bLetterbox &&
-                    (!NiRenderer::GetRenderer()->GetCurrentRenderTargetGroup() ||
-                     (pCurrentRenderer = NiRenderer::GetRenderer(), pDefaultRenderer = NiRenderer::GetRenderer(),
-                      pDefaultGroup = pDefaultRenderer->GetDefaultRenderTargetGroup(),
-                      pCurrentRenderer->GetCurrentRenderTargetGroup() == pDefaultGroup))) {
-                    v18->SetViewPort(BSShaderManager::kFramebufferViewport);
-                }
-                else {
-                    // The viewport is built with NiColorA's constructor, as the game does: left, right, top, bottom.
-                    NiRect<float> kViewport;
-                    ::new (&kViewport) NiColorA(0.0f, 1.0f, 1.0f, 0.0f);
-                    v18->SetViewPort(kViewport);
-                }
-                FORenderedMenu* v14 = Interface::GetCurrentRenderedMenu();
-                NiAVObject* v7 = v14->GetParentNodeToRender();
-                BSShaderUtil::AccumulateScene(v18, v7, *cullingProcess);
-                BSShaderManager::SetRenderMode(15u);
-                BSRenderState::SetZWriteEnable(false, BSRS_LOCK);
-                BSRenderState::SetColorWriteEnable(8u, BSRS_LOCK);
-                BSShaderAccumulator* fB = spRenderedMenuAccum.m_pObject;
-                BSShaderUtil::RenderScene(v18, fB, false);
-                BSShaderManager::SetRenderMode(0);
-                BSRenderState::RestoreColorWriteEnable(BSRS_LOCK);
-                BSRenderState::RestoreZWriteEnable(BSRS_LOCK);
-                FORenderedMenu* v13 = Interface::GetCurrentRenderedMenu();
-                NiAVObject* v8 = v13->GetParentNodeToRender();
-                BSShaderUtil::AccumulateScene(v18, v8, *cullingProcess);
-                BSShaderAccumulator* fBa = spRenderedMenuAccum.m_pObject;
-                BSShaderUtil::RenderScene(v18, fBa, false);
-                cullingProcess->SetAccumulator(nullptr);
-                cullingProcess->PopCullMode();
+    if ((!Main::spVATSTex.m_pObject) && (Interface::GetCurrentRenderedMenu())) {
+        FOPipboyManager* CurrentRenderedMenu = static_cast<FOPipboyManager*>(Interface::GetCurrentRenderedMenu());
+        if (CurrentRenderedMenu != Interface::GetPipboy()) {
+            NiCamera* v18;
+            SceneGraph* WorldSceneGraph = Main::GetWorldSceneGraph();
+            BSCullingProcess* cullingProcess = WorldSceneGraph->pCuller;
+            cullingProcess->PushCullMode(BSCullingProcess::BSCP_CULL_ALLPASS);
+            FORenderedMenu* v2 = Interface::GetCurrentRenderedMenu();
+            if (v2->GetCamera()) {
+                FORenderedMenu* v3 = Interface::GetCurrentRenderedMenu();
+                v18 = v3->GetCamera();
             }
+            else {
+                v18 = WorldSceneGraph->GetCamera();
+            }
+            cullingProcess->m_pkCamera = v18;
+            cullingProcess->SetAccumulator(spRenderedMenuAccum.m_pObject);
+            ShadowSceneNode* ShadowSceneNode_ = BSShaderManager::GetShadowSceneNode(0);
+            spRenderedMenuAccum.m_pObject->SetShadowSceneNode(ShadowSceneNode_);
+            // Letterboxed while rendering to the default target group (or none): the framebuffer's viewport.
+            NiRenderer* pCurrentRenderer;
+            NiRenderer* pDefaultRenderer;
+            NiRenderTargetGroup* pDefaultGroup;
+            if (BSShaderManager::bLetterbox &&
+                (!NiRenderer::GetRenderer()->GetCurrentRenderTargetGroup() ||
+                 (pCurrentRenderer = NiRenderer::GetRenderer(), pDefaultRenderer = NiRenderer::GetRenderer(),
+                  pDefaultGroup = pDefaultRenderer->GetDefaultRenderTargetGroup(),
+                  pCurrentRenderer->GetCurrentRenderTargetGroup() == pDefaultGroup))) {
+                v18->SetViewPort(BSShaderManager::kFramebufferViewport);
+            }
+            else {
+                // The viewport is built with NiColorA's constructor, as the game does: left, right, top, bottom.
+                NiRect<float> kViewport;
+                ::new (&kViewport) NiColorA(0.0f, 1.0f, 1.0f, 0.0f);
+                v18->SetViewPort(kViewport);
+            }
+            FORenderedMenu* v14 = Interface::GetCurrentRenderedMenu();
+            NiAVObject* v7 = v14->GetParentNodeToRender();
+            BSShaderUtil::AccumulateScene(v18, v7, *cullingProcess);
+            BSShaderManager::SetRenderMode(15u);
+            BSRenderState::SetZWriteEnable(false, BSRS_LOCK);
+            BSRenderState::SetColorWriteEnable(8u, BSRS_LOCK);
+            BSShaderAccumulator* fB = spRenderedMenuAccum.m_pObject;
+            BSShaderUtil::RenderScene(v18, fB, false);
+            BSShaderManager::SetRenderMode(0);
+            BSRenderState::RestoreColorWriteEnable(BSRS_LOCK);
+            BSRenderState::RestoreZWriteEnable(BSRS_LOCK);
+            FORenderedMenu* v13 = Interface::GetCurrentRenderedMenu();
+            NiAVObject* v8 = v13->GetParentNodeToRender();
+            BSShaderUtil::AccumulateScene(v18, v8, *cullingProcess);
+            BSShaderAccumulator* fBa = spRenderedMenuAccum.m_pObject;
+            BSShaderUtil::RenderScene(v18, fBa, false);
+            cullingProcess->SetAccumulator(nullptr);
+            cullingProcess->PopCullMode();
         }
     }
 }
@@ -4478,14 +4398,13 @@ int32_t Main::DrawWorld_RenderedMenu(void* apPipboyGeom, NiDX9Renderer* apRender
         p1stPersonNode->Update(kupdate);
         p1stPersonNode->SetTranslate(p1stnodetransform.m_Translate);
         kcamtransform.MakeIdentity();
-        if (pcam_2) {
-            if (pcam_2->m_pkParent) {
-                kcamtransform = *&pcam_2->m_pkParent->m_kLocal;
-                const NiPoint3* camera1st_Translate_8 = &p1stPersonCamera->GetWorldTranslate();
-                pcam_2->m_pkParent->SetTranslate(*camera1st_Translate_8);
-                pcam_2->m_pkParent->Update(kupdate);
-            }
+        if ((pcam_2) && (pcam_2->m_pkParent)) {
+            kcamtransform = *&pcam_2->m_pkParent->m_kLocal;
+            const NiPoint3* camera1st_Translate_8 = &p1stPersonCamera->GetWorldTranslate();
+            pcam_2->m_pkParent->SetTranslate(*camera1st_Translate_8);
+            pcam_2->m_pkParent->Update(kupdate);
         }
+
         NiPoint3 camera1st_Translate = -p1stPersonNode->GetWorldTranslate();
         ShadowSceneNode* ShadowSceneNode_ = BSShaderManager::GetShadowSceneNode(0);
         ShadowSceneNode_->SetLightingOffset(camera1st_Translate);
@@ -4580,12 +4499,11 @@ int32_t Main::DrawWorld_RenderedMenu(void* apPipboyGeom, NiDX9Renderer* apRender
     if (static_cast<uint8_t>(IsPipboyActive)) {
         p1stPersonNode->Update(kupdate);
         p1stPersonNode->SetAlwaysDraw(balwaysdraw);
-        if (pcam_2) {
-            if (pcam_2->m_pkParent) {
-                pcam_2->m_pkParent->SetTranslate(kcamtransform.m_Translate);
-                pcam_2->m_pkParent->Update(kupdate);
-            }
+        if ((pcam_2) && (pcam_2->m_pkParent)) {
+            pcam_2->m_pkParent->SetTranslate(kcamtransform.m_Translate);
+            pcam_2->m_pkParent->Update(kupdate);
         }
+
         NiPoint3 camera1st_Translatea = NiPoint3_ZERO;
         ShadowSceneNode* v21 = BSShaderManager::GetShadowSceneNode(0);
         v21->SetLightingOffset(camera1st_Translatea);
@@ -4617,12 +4535,11 @@ void Main::PerformGameReset(bool abCreateMainMenu) {
     else {
         pnode = nullptr;
     }
-    if (pnode) {
-        if (pnode->m_pkParent) {
-            NiNode* Parent = pnode->m_pkParent;
-            Parent->DetachChild(p3D);
-        }
+    if ((pnode) && (pnode->m_pkParent)) {
+        NiNode* Parent = pnode->m_pkParent;
+        Parent->DetachChild(p3D);
     }
+
     NiAVObject* p3D_2 = pPlayer->Get3D(false);
     if (p3D_2) {
         pnode_2 = p3D_2->IsNode();
@@ -4630,12 +4547,11 @@ void Main::PerformGameReset(bool abCreateMainMenu) {
     else {
         pnode_2 = nullptr;
     }
-    if (pnode_2) {
-        if (pnode_2->m_pkParent) {
-            NiNode* v5 = pnode_2->m_pkParent;
-            v5->DetachChild(p3D_2);
-        }
+    if ((pnode_2) && (pnode_2->m_pkParent)) {
+        NiNode* v5 = pnode_2->m_pkParent;
+        v5->DetachChild(p3D_2);
     }
+
     TES::pInstance->ClearAllCells(false, false);
     // INT32_MAX: no current grid cell, as TES's constructor sets it.
     TES::pInstance->iCurrentGridX = INT32_MAX;
@@ -4800,12 +4716,8 @@ bool Main::ResetDeviceCallback(bool abBeforeReset, [[maybe_unused]] void* apData
                     _D3DLOCKED_RECT* apOutRect;
                     NiRenderedTexture* apOutTex;
                     pCell->GetCanopyShadowMask(apOutTex, apOutRect);
-                    if (apOutTex) {
-                        if (apOutRect) {
-                            if (apOutRect->pBits) {
-                                apOutRect->pBits = nullptr;
-                            }
-                        }
+                    if ((apOutTex) && (apOutRect) && (apOutRect->pBits)) {
+                        apOutRect->pBits = nullptr;
                     }
                 }
             }
@@ -4819,11 +4731,9 @@ bool Main::ResetDeviceCallback(bool abBeforeReset, [[maybe_unused]] void* apData
         if (BSShaderManager::bHDR) {
             ImageSpaceEffectHDR::ClearAdaptedLight();
         }
-        if (TES::pInstance->GetWaterSystem()) {
-            if (TESWaterSystem::GetWaterEnabled()) {
-                TES::pInstance->GetWaterSystem()->DisableWaterSystem(true, false);
-                TES::pInstance->GetWaterSystem()->EnableWaterSystem();
-            }
+        if ((TES::pInstance->GetWaterSystem()) && (TESWaterSystem::GetWaterEnabled())) {
+            TES::pInstance->GetWaterSystem()->DisableWaterSystem(true, false);
+            TES::pInstance->GetWaterSystem()->EnableWaterSystem();
         }
     }
     return true;
@@ -5007,12 +4917,8 @@ void Controls::DeleteInstance() {
 }
 
 void MessageHandler::Close() {
-    if (MessageHandler::pHandler) {
-        if (!MessageHandler::pHandler->bStatic) {
-            if (MessageHandler::pHandler) {
-                delete MessageHandler::pHandler;
-            }
-        }
+    if ((MessageHandler::pHandler) && (!MessageHandler::pHandler->bStatic) && (MessageHandler::pHandler)) {
+        delete MessageHandler::pHandler;
     }
 }
 

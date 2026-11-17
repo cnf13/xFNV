@@ -623,13 +623,13 @@ void HUDMainMenu::DoIdle() {
 
     if (bShowEnemyHealth) {
         bool bHostile = false;
-        if (this->pCurrentEnemy) {
-            if ((pPlayer->IsActorPerceived(this->pCurrentEnemy) &&
-                 pPlayer->IsActorPerceived(this->pCurrentEnemy)->bIsHostile) ||
-                this->pCurrentEnemy->IsInCombatWithActor(pPlayer)) {
-                bHostile = true;
-            }
+        if ((this->pCurrentEnemy) &&
+            ((pPlayer->IsActorPerceived(this->pCurrentEnemy) &&
+              pPlayer->IsActorPerceived(this->pCurrentEnemy)->bIsHostile) ||
+             this->pCurrentEnemy->IsInCombatWithActor(pPlayer))) {
+            bHostile = true;
         }
+
         this->pTiles[HMMT_ENEMY_HEALTH_BRACKET]->Set(Tile::kTileValue_Visible, 1);
         this->pTiles[HMMT_ENEMY_HEALTH_METER]->Set(Tile::kTileValue_Visible, 1);
         this->pTiles[HMMT_ENEMY_HEALTH_NAME]->Set(Tile::kTileValue_Visible, 1);
@@ -905,46 +905,46 @@ bool HUDMainMenu::ShowSubtitle(
     else {
         pActor = nullptr;
     }
-    if (apString) {
-        if (gs_bGeneralSubtitles_Gameplay.Bool() || (pActor && static_cast<uint8_t>(pActor->GetShowSubtitles()))) {
-            HUDMainMenu::SubtitleData* newSubtitle;
-            HUDMainMenu::SubtitleData* apMemory =
-                static_cast<HUDMainMenu::SubtitleData*>(ourMalloc(sizeof(HUDMainMenu::SubtitleData)));
-            if (apMemory) {
-                newSubtitle = ::new (apMemory) HUDMainMenu::SubtitleData;
+    if ((apString) &&
+        (gs_bGeneralSubtitles_Gameplay.Bool() || (pActor && static_cast<uint8_t>(pActor->GetShowSubtitles())))) {
+        HUDMainMenu::SubtitleData* newSubtitle;
+        HUDMainMenu::SubtitleData* apMemory =
+            static_cast<HUDMainMenu::SubtitleData*>(ourMalloc(sizeof(HUDMainMenu::SubtitleData)));
+        if (apMemory) {
+            newSubtitle = ::new (apMemory) HUDMainMenu::SubtitleData;
+        }
+        else {
+            newSubtitle = nullptr;
+        }
+        HUDMainMenu::SubtitleData* newSubtitle_2 = newSubtitle;
+        BSstrcpy(newSubtitle->strText, 260, apString);
+        newSubtitle->SpeakerLoc = aSpeakerLoc;
+        newSubtitle_2->fDurationSecs = static_cast<double>(ahandle.GetDuration()) / 1000.0;
+        if (newSubtitle_2->fDurationSecs == 0.0) {
+            double v7 = static_cast<double>(std::strlen(apString));
+            newSubtitle_2->fDurationSecs = fNoticeTextTimePerCharacter.Float() * v7;
+        }
+        if (abForceShow) {
+            newSubtitle_2->iPriority = 0x7FFFFFFF;
+        }
+        else {
+            if (apTarget == pPlayer) {
+                newSubtitle_2->iPriority = 0;
             }
             else {
-                newSubtitle = nullptr;
-            }
-            HUDMainMenu::SubtitleData* newSubtitle_2 = newSubtitle;
-            BSstrcpy(newSubtitle->strText, 260, apString);
-            newSubtitle->SpeakerLoc = aSpeakerLoc;
-            newSubtitle_2->fDurationSecs = static_cast<double>(ahandle.GetDuration()) / 1000.0;
-            if (newSubtitle_2->fDurationSecs == 0.0) {
-                double v7 = static_cast<double>(std::strlen(apString));
-                newSubtitle_2->fDurationSecs = fNoticeTextTimePerCharacter.Float() * v7;
-            }
-            if (abForceShow) {
-                newSubtitle_2->iPriority = 0x7FFFFFFF;
-            }
-            else {
-                if (apTarget == pPlayer) {
-                    newSubtitle_2->iPriority = 0;
+                if (apTarget) {
+                    newSubtitle_2->iPriority = 2;
                 }
                 else {
-                    if (apTarget) {
-                        newSubtitle_2->iPriority = 2;
-                    }
-                    else {
-                        newSubtitle_2->iPriority = 1;
-                    }
+                    newSubtitle_2->iPriority = 1;
                 }
             }
-            newSubtitle_2->uiSubtitleStartTime = HudTimer.iLastTime;
-            xSubtitles.Add(newSubtitle_2);
-            bresult = true;
         }
+        newSubtitle_2->uiSubtitleStartTime = HudTimer.iLastTime;
+        xSubtitles.Add(newSubtitle_2);
+        bresult = true;
     }
+
     return bresult;
 }
 
@@ -1286,23 +1286,21 @@ void HUDMainMenu::UpdateExplosiveIndicator() {
         const NiPoint3* z = &pPlayer->GetLocationOnReference();
         const NiPoint3* v4 = &pMob->GetLocationOnReference();
         double v17 = (*v4 - *z).Length();
-        if (fExplosiveIndicatorDistance.Float() > v17) {
-            if (pPos) {
-                Tile* pnew = pTiles[HMMT_EXPLOSIVE_INDICATOR]->xChildren.GetNext(pPos);
-                if (pnew->GetFadeFinished(Tile::kTileValue_Alpha) && pnew->GetFloat(Tile::kTileValue_Alpha) == 0.0) {
-                    float afEnd = fHudOpacity.Float() * 255.0;
-                    pnew->AddFadeControl(Tile::kTileValue_Alpha, 0.0f, afEnd, 0.5f, Tile::TFCT_STANDARD);
-                }
-                const NiPoint3* za = &pPlayer->GetLocationOnReference();
-                const NiPoint3* v6 = &pMob->GetLocationOnReference();
-                float fangle = GetZAngleFromVector(*v6 - *za);
-                SceneGraph* WorldSceneGraph = Main::GetWorldSceneGraph();
-                float fangle2 = GetZAngleFromVector(WorldSceneGraph->GetCamera()->GetWorldDirection());
-                float v15 = fangle2 - fangle;
-                pnew->GetModel()->SetRotate(v15, 0.0f, 1.0f, 0.0f);
-                NiUpdateData update(0.0f, true, false);
-                pnew->GetModel()->Update(update);
+        if ((fExplosiveIndicatorDistance.Float() > v17) && (pPos)) {
+            Tile* pnew = pTiles[HMMT_EXPLOSIVE_INDICATOR]->xChildren.GetNext(pPos);
+            if (pnew->GetFadeFinished(Tile::kTileValue_Alpha) && pnew->GetFloat(Tile::kTileValue_Alpha) == 0.0) {
+                float afEnd = fHudOpacity.Float() * 255.0;
+                pnew->AddFadeControl(Tile::kTileValue_Alpha, 0.0f, afEnd, 0.5f, Tile::TFCT_STANDARD);
             }
+            const NiPoint3* za = &pPlayer->GetLocationOnReference();
+            const NiPoint3* v6 = &pMob->GetLocationOnReference();
+            float fangle = GetZAngleFromVector(*v6 - *za);
+            SceneGraph* WorldSceneGraph = Main::GetWorldSceneGraph();
+            float fangle2 = GetZAngleFromVector(WorldSceneGraph->GetCamera()->GetWorldDirection());
+            float v15 = fangle2 - fangle;
+            pnew->GetModel()->SetRotate(v15, 0.0f, 1.0f, 0.0f);
+            NiUpdateData update(0.0f, true, false);
+            pnew->GetModel()->Update(update);
         }
     }
     while (pPos) {
@@ -2347,12 +2345,11 @@ HUDMainMenu::SubtitleData* HUDMainMenu::GetNextSubtitle() {
         float fcurrSqrDist = (xSubtitles.GetAt(isubtitleCt)->SpeakerLoc - playerLoc).SqrLength();
         if (pResult || (v3 = std::pow(500.0f, 2), !(fcurrSqrDist <= v3))) {
             int32_t iPriority;
-            if (!pResult ||
-                (!(fClosestSqrDist > static_cast<double>(fcurrSqrDist)) ||
-                 (iPriority = xSubtitles.GetAt(isubtitleCt)->iPriority, iPriority < pResult->iPriority))) {
-                if (xSubtitles.GetAt(isubtitleCt)->iPriority != 0x7FFFFFFF) {
-                    continue;
-                }
+            if ((!pResult ||
+                 (!(fClosestSqrDist > static_cast<double>(fcurrSqrDist)) ||
+                  (iPriority = xSubtitles.GetAt(isubtitleCt)->iPriority, iPriority < pResult->iPriority))) &&
+                (xSubtitles.GetAt(isubtitleCt)->iPriority != 0x7FFFFFFF)) {
+                continue;
             }
         }
         pResult = xSubtitles.GetAt(isubtitleCt);
@@ -2819,16 +2816,14 @@ void HUDMainMenu::ClearGunScope() {
     NiNode* v1;
     NiAVObject* v2;
     NiNode* v3;
-    if (HUDMainMenu::pme) {
-        if ((&HUDMainMenu::spScopeModel)->m_pObject) {
-            v0 = (&HUDMainMenu::spScopeModel)->m_pObject;
-            if (v0->GetAtChecked(0)) {
-                v3 = (&HUDMainMenu::spScopeModel)->m_pObject;
-                v1 = (&HUDMainMenu::spScopeModel)->m_pObject;
-                v2 = v1->GetAt(0);
-                v3->DetachChild(v2);
-                HUDMainMenu::pme->bScopeVisible = false;
-            }
+    if ((HUDMainMenu::pme) && ((&HUDMainMenu::spScopeModel)->m_pObject)) {
+        v0 = (&HUDMainMenu::spScopeModel)->m_pObject;
+        if (v0->GetAtChecked(0)) {
+            v3 = (&HUDMainMenu::spScopeModel)->m_pObject;
+            v1 = (&HUDMainMenu::spScopeModel)->m_pObject;
+            v2 = v1->GetAt(0);
+            v3->DetachChild(v2);
+            HUDMainMenu::pme->bScopeVisible = false;
         }
     }
 }
@@ -4666,14 +4661,12 @@ void HUDMainMenu::SetMenuMode(HUD_MENU_MODE aeMenuMode) {
 void HUDMainMenu::SetGunScopeVisible(bool abVisibleFlag) {
     NiNode* v1;
     NiNode* v2;
-    if (HUDMainMenu::pme) {
-        if ((&HUDMainMenu::spScopeModel)->operator->()) {
-            v1 = (&HUDMainMenu::spScopeModel)->operator->();
-            if (v1->GetAtChecked(0)) {
-                HUDMainMenu::pme->bScopeVisible = (bool)((uint8_t)abVisibleFlag);
-                v2 = (&HUDMainMenu::spScopeModel)->operator->();
-                v2->NiAVObject::SetAppCulled(!abVisibleFlag);
-            }
+    if ((HUDMainMenu::pme) && ((&HUDMainMenu::spScopeModel)->operator->())) {
+        v1 = (&HUDMainMenu::spScopeModel)->operator->();
+        if (v1->GetAtChecked(0)) {
+            HUDMainMenu::pme->bScopeVisible = (bool)((uint8_t)abVisibleFlag);
+            v2 = (&HUDMainMenu::spScopeModel)->operator->();
+            v2->NiAVObject::SetAppCulled(!abVisibleFlag);
         }
     }
 }
@@ -4798,28 +4791,26 @@ void HUDMainMenu::HandleHealthbarForCrosshairActor(TESObjectREFR* apRef, bool ab
         Actor* a1 = apRef->IsActor() ? static_cast<Actor*>(apRef) : nullptr;
         bool v5 = a1 && a1->IsDead(false);
         v7 = v5;
-        if (a1) {
-            if ((pPlayer->IsActorPerceived(a1) && pPlayer->IsActorPerceived(a1)->bIsHostile) ||
-                a1->IsInCombatWithActor(pPlayer)) {
-                v8 = 1;
-            }
+        if ((a1) &&
+            ((pPlayer->IsActorPerceived(a1) && pPlayer->IsActorPerceived(a1)->bIsHostile) ||
+             a1->IsInCombatWithActor(pPlayer))) {
+            v8 = 1;
         }
-        if (a1) {
-            if (!v5 && !a1->IsDead(false)) {
-                int32_t v2 = a1->GetActorValue(ActorValue::HEALTH);
-                if (v2 < a1->GetBaseActorValue(ActorValue::HEALTH) && !HUDMainMenu::pme->pTiles[32]->IsTrue(4003)) {
-                    HUDMainMenu::SetEnemyActor(a1);
-                    HUDMainMenu::pme->pTiles[21]->Set(4003, 1);
-                    HUDMainMenu::pme->pTiles[22]->Set(4003, 1);
-                    HUDMainMenu::pme->pTiles[23]->Set(4003, 1);
-                    HUDMainMenu::pme->pTiles[23]->Set(4003, 1);
-                    HUDMainMenu::pme->pTiles[62]->Set(4084, (v8 != 0) + 1);
-                    HUDMainMenu::pme->pTiles[21]->AddNeedsUpdate(8);
-                    HUDMainMenu::pme->pTiles[22]->AddNeedsUpdate(8);
-                    HUDMainMenu::pme->pTiles[23]->AddNeedsUpdate(8);
-                    HUDMainMenu::pme->pTiles[23]->AddNeedsUpdate(8);
-                    HUDMainMenu::pme->UpdateEnemyHealth(a1);
-                }
+
+        if ((a1) && (!v5 && !a1->IsDead(false))) {
+            int32_t v2 = a1->GetActorValue(ActorValue::HEALTH);
+            if (v2 < a1->GetBaseActorValue(ActorValue::HEALTH) && !HUDMainMenu::pme->pTiles[32]->IsTrue(4003)) {
+                HUDMainMenu::SetEnemyActor(a1);
+                HUDMainMenu::pme->pTiles[21]->Set(4003, 1);
+                HUDMainMenu::pme->pTiles[22]->Set(4003, 1);
+                HUDMainMenu::pme->pTiles[23]->Set(4003, 1);
+                HUDMainMenu::pme->pTiles[23]->Set(4003, 1);
+                HUDMainMenu::pme->pTiles[62]->Set(4084, (v8 != 0) + 1);
+                HUDMainMenu::pme->pTiles[21]->AddNeedsUpdate(8);
+                HUDMainMenu::pme->pTiles[22]->AddNeedsUpdate(8);
+                HUDMainMenu::pme->pTiles[23]->AddNeedsUpdate(8);
+                HUDMainMenu::pme->pTiles[23]->AddNeedsUpdate(8);
+                HUDMainMenu::pme->UpdateEnemyHealth(a1);
             }
         }
     }
@@ -5181,54 +5172,52 @@ void HUDMainMenu::UpdateMeter(
     static int32_t iUT_TotalWidth = Tile::AddUserTrait("_TotalWidth", -1);
     static int32_t iUT_ImageWidth = Tile::AddUserTrait("_ImageWidth", -1);
     static int32_t iUT_OriginalX = Tile::AddUserTrait("_OriginalX", -1);
-    if (apTile) {
-        if (HUDMainMenu::pme) {
-            int32_t a3;
-            if (!(afMeterPercent > 1.0)) {
-                if (afMeterPercent < 0.0) {
-                    afMeterPercent = 0.0;
-                }
+    if ((apTile) && (HUDMainMenu::pme)) {
+        int32_t a3;
+        if (!(afMeterPercent > 1.0)) {
+            if (afMeterPercent < 0.0) {
+                afMeterPercent = 0.0;
             }
-            else {
-                afMeterPercent = 1.0;
-            }
-            int32_t Float = static_cast<int32_t>(apTile->GetFloat(iUT_TotalWidth));
-            int32_t v8 = static_cast<int32_t>(apTile->GetFloat(iUT_ImageWidth));
-            if (aeJustify == HUDMainMenu::HJ_CENTER) {
-                float v6;
-                if (!(afMeterPercent >= 0.0)) {
-                    v6 = 0.0;
-                }
-                else {
-                    v6 = afMeterPercent;
-                }
-                a3 = 2 * v8 * static_cast<int32_t>(static_cast<double>(Float) * v6 / static_cast<double>(2 * v8));
-            }
-            else {
-                float v5;
-                if (!(afMeterPercent >= 0.0)) {
-                    v5 = 0.0;
-                }
-                else {
-                    v5 = afMeterPercent;
-                }
-                a3 = v8 * static_cast<int32_t>(static_cast<double>(Float) * v5 / static_cast<double>(v8));
-            }
-            if (a3 < aiMinTicks * v8) {
-                a3 = aiMinTicks * v8;
-            }
-            int32_t aiValue = static_cast<int32_t>(apTile->GetFloat(iUT_OriginalX));
-            if (aeJustify == HUDMainMenu::HJ_RIGHT) {
-                aiValue -= a3;
-            }
-            else {
-                if (aeJustify == HUDMainMenu::HJ_CENTER) {
-                    aiValue -= a3 / 2;
-                }
-            }
-            apTile->Set(4017, a3);
-            apTile->Set(4001, iNumPixelShift + aiValue);
         }
+        else {
+            afMeterPercent = 1.0;
+        }
+        int32_t Float = static_cast<int32_t>(apTile->GetFloat(iUT_TotalWidth));
+        int32_t v8 = static_cast<int32_t>(apTile->GetFloat(iUT_ImageWidth));
+        if (aeJustify == HUDMainMenu::HJ_CENTER) {
+            float v6;
+            if (!(afMeterPercent >= 0.0)) {
+                v6 = 0.0;
+            }
+            else {
+                v6 = afMeterPercent;
+            }
+            a3 = 2 * v8 * static_cast<int32_t>(static_cast<double>(Float) * v6 / static_cast<double>(2 * v8));
+        }
+        else {
+            float v5;
+            if (!(afMeterPercent >= 0.0)) {
+                v5 = 0.0;
+            }
+            else {
+                v5 = afMeterPercent;
+            }
+            a3 = v8 * static_cast<int32_t>(static_cast<double>(Float) * v5 / static_cast<double>(v8));
+        }
+        if (a3 < aiMinTicks * v8) {
+            a3 = aiMinTicks * v8;
+        }
+        int32_t aiValue = static_cast<int32_t>(apTile->GetFloat(iUT_OriginalX));
+        if (aeJustify == HUDMainMenu::HJ_RIGHT) {
+            aiValue -= a3;
+        }
+        else {
+            if (aeJustify == HUDMainMenu::HJ_CENTER) {
+                aiValue -= a3 / 2;
+            }
+        }
+        apTile->Set(4017, a3);
+        apTile->Set(4001, iNumPixelShift + aiValue);
     }
 }
 
@@ -5245,115 +5234,105 @@ void HUDMainMenu::UpdateMeter(
     static int32_t g_VATSMenuTrait_ImageWidth = Tile::AddUserTrait("_ImageWidth", -1);
     static int32_t g_VATSMenuTrait_OriginalX = Tile::AddUserTrait("_OriginalX", -1);
     static int32_t g_VATSMenuTrait_Brightness = Tile::AddUserTrait("_Brightness", -1);
-    if (apMeterTile) {
-        if (apGhostMeterTile) {
-            if (HUDMainMenu::pme) {
-                int32_t itotalNewWidth;
-                int32_t inewWidth;
-                if (!(afMeterPercent > 1.0)) {
-                    if (afMeterPercent < 0.0) {
-                        afMeterPercent = 0.0f;
-                    }
-                }
-                else {
-                    afMeterPercent = 1.0f;
-                }
-                if (!(afGhostMeterPercent > 1.0)) {
-                    if (afGhostMeterPercent < 0.0) {
-                        afGhostMeterPercent = 0.0f;
-                    }
-                }
-                else {
-                    afGhostMeterPercent = 1.0f;
-                }
-                int32_t imeterWidth = static_cast<int32_t>(apMeterTile->GetFloat(g_VATSMenuTrait_TotalWidth));
-                int32_t iimageWidth = static_cast<int32_t>(apMeterTile->GetFloat(g_VATSMenuTrait_ImageWidth));
+    if ((apMeterTile) && (apGhostMeterTile) && (HUDMainMenu::pme)) {
+        int32_t itotalNewWidth;
+        int32_t inewWidth;
+        if (!(afMeterPercent > 1.0)) {
+            if (afMeterPercent < 0.0) {
+                afMeterPercent = 0.0f;
+            }
+        }
+        else {
+            afMeterPercent = 1.0f;
+        }
+        if (!(afGhostMeterPercent > 1.0)) {
+            if (afGhostMeterPercent < 0.0) {
+                afGhostMeterPercent = 0.0f;
+            }
+        }
+        else {
+            afGhostMeterPercent = 1.0f;
+        }
+        int32_t imeterWidth = static_cast<int32_t>(apMeterTile->GetFloat(g_VATSMenuTrait_TotalWidth));
+        int32_t iimageWidth = static_cast<int32_t>(apMeterTile->GetFloat(g_VATSMenuTrait_ImageWidth));
+        if (aeJustify == HUDMainMenu::HJ_CENTER) {
+            itotalNewWidth =
+                2 * iimageWidth *
+                static_cast<int32_t>(
+                    static_cast<double>(imeterWidth) * afGhostMeterPercent / static_cast<double>(2 * iimageWidth)
+                );
+        }
+        else {
+            itotalNewWidth =
+                iimageWidth *
+                static_cast<int32_t>(
+                    static_cast<double>(imeterWidth) * afGhostMeterPercent / static_cast<double>(iimageWidth)
+                );
+        }
+        if (aeJustify == HUDMainMenu::HJ_CENTER) {
+            float v8;
+            if (!(afMeterPercent >= 0.0)) {
+                v8 = 0.0f;
+            }
+            else {
+                v8 = afMeterPercent;
+            }
+            inewWidth = 2 * iimageWidth *
+                static_cast<int32_t>(static_cast<double>(imeterWidth) * v8 / static_cast<double>(2 * iimageWidth));
+        }
+        else {
+            float v7;
+            if (!(afMeterPercent >= 0.0)) {
+                v7 = 0.0f;
+            }
+            else {
+                v7 = afMeterPercent;
+            }
+            inewWidth = iimageWidth *
+                static_cast<int32_t>(static_cast<double>(imeterWidth) * v7 / static_cast<double>(iimageWidth));
+        }
+        int32_t inewX = static_cast<int32_t>(apMeterTile->GetFloat(g_VATSMenuTrait_OriginalX));
+        if (aeJustify == HUDMainMenu::HJ_RIGHT) {
+            inewX -= inewWidth;
+        }
+        else {
+            if (aeJustify == HUDMainMenu::HJ_CENTER) {
+                inewX -= inewWidth / 2;
+            }
+        }
+        int32_t ighostWidth = itotalNewWidth;
+        int32_t ighostX = static_cast<int32_t>(apGhostMeterTile->GetFloat(g_VATSMenuTrait_OriginalX));
+        if (aeJustify == HUDMainMenu::HJ_RIGHT) {
+            ighostX = inewX - (itotalNewWidth - inewWidth);
+            int32_t Float = static_cast<int32_t>(apGhostMeterTile->GetFloat(g_VATSMenuTrait_OriginalX));
+            ighostWidth = BSMIN(itotalNewWidth - inewWidth, Float - ighostX);
+        }
+        else {
+            if (aeJustify) {
                 if (aeJustify == HUDMainMenu::HJ_CENTER) {
-                    itotalNewWidth = 2 * iimageWidth *
-                        static_cast<int32_t>(
-                                         static_cast<double>(imeterWidth) * afGhostMeterPercent /
-                                         static_cast<double>(2 * iimageWidth)
-                        );
-                }
-                else {
-                    itotalNewWidth =
-                        iimageWidth *
-                        static_cast<int32_t>(
-                            static_cast<double>(imeterWidth) * afGhostMeterPercent / static_cast<double>(iimageWidth)
-                        );
-                }
-                if (aeJustify == HUDMainMenu::HJ_CENTER) {
-                    float v8;
-                    if (!(afMeterPercent >= 0.0)) {
-                        v8 = 0.0f;
+                    ighostX -= itotalNewWidth / 2;
+                    ighostWidth = inewX - ighostX;
+                    Tile* ptile = apGhostMeterTile->xChildren.GetHead();
+                    ptile->Set(4017, inewX - ighostX);
+                    ptile->Set(4001, inewWidth + inewX);
+                    if (!ptile->HasFadeControl(4009)) {
+                        ptile->AddFadeControl(4009, 0.0f, 255.0f, 1.0f, Tile::TFCT_NONLINEAR_LONG_DARK_REPEATING);
                     }
-                    else {
-                        v8 = afMeterPercent;
-                    }
-                    inewWidth = 2 * iimageWidth *
-                        static_cast<int32_t>(
-                                    static_cast<double>(imeterWidth) * v8 / static_cast<double>(2 * iimageWidth)
-                        );
-                }
-                else {
-                    float v7;
-                    if (!(afMeterPercent >= 0.0)) {
-                        v7 = 0.0f;
-                    }
-                    else {
-                        v7 = afMeterPercent;
-                    }
-                    inewWidth = iimageWidth *
-                        static_cast<int32_t>(static_cast<double>(imeterWidth) * v7 / static_cast<double>(iimageWidth));
-                }
-                int32_t inewX = static_cast<int32_t>(apMeterTile->GetFloat(g_VATSMenuTrait_OriginalX));
-                if (aeJustify == HUDMainMenu::HJ_RIGHT) {
-                    inewX -= inewWidth;
-                }
-                else {
-                    if (aeJustify == HUDMainMenu::HJ_CENTER) {
-                        inewX -= inewWidth / 2;
-                    }
-                }
-                int32_t ighostWidth = itotalNewWidth;
-                int32_t ighostX = static_cast<int32_t>(apGhostMeterTile->GetFloat(g_VATSMenuTrait_OriginalX));
-                if (aeJustify == HUDMainMenu::HJ_RIGHT) {
-                    ighostX = inewX - (itotalNewWidth - inewWidth);
-                    int32_t Float = static_cast<int32_t>(apGhostMeterTile->GetFloat(g_VATSMenuTrait_OriginalX));
-                    ighostWidth = BSMIN(itotalNewWidth - inewWidth, Float - ighostX);
-                }
-                else {
-                    if (aeJustify) {
-                        if (aeJustify == HUDMainMenu::HJ_CENTER) {
-                            ighostX -= itotalNewWidth / 2;
-                            ighostWidth = inewX - ighostX;
-                            Tile* ptile = apGhostMeterTile->xChildren.GetHead();
-                            ptile->Set(4017, inewX - ighostX);
-                            ptile->Set(4001, inewWidth + inewX);
-                            if (!ptile->HasFadeControl(4009)) {
-                                ptile->AddFadeControl(
-                                    4009, 0.0f, 255.0f, 1.0f, Tile::TFCT_NONLINEAR_LONG_DARK_REPEATING
-                                );
-                            }
-                        }
-                    }
-                    else {
-                        ighostX += inewWidth;
-                    }
-                }
-                if (!inewWidth && ighostWidth < aiMinTicks * iimageWidth) {
-                    ighostWidth = aiMinTicks * iimageWidth;
-                }
-                apMeterTile->Set(4017, inewWidth);
-                apMeterTile->Set(4001, inewX);
-                apGhostMeterTile->Set(4017, ighostWidth);
-                apGhostMeterTile->Set(4001, ighostX);
-                if (!apGhostMeterTile->HasFadeControl(4009)) {
-                    apGhostMeterTile->AddFadeControl(
-                        4009, 0.0f, 255.0f, 1.0f, Tile::TFCT_NONLINEAR_LONG_DARK_REPEATING
-                    );
                 }
             }
+            else {
+                ighostX += inewWidth;
+            }
+        }
+        if (!inewWidth && ighostWidth < aiMinTicks * iimageWidth) {
+            ighostWidth = aiMinTicks * iimageWidth;
+        }
+        apMeterTile->Set(4017, inewWidth);
+        apMeterTile->Set(4001, inewX);
+        apGhostMeterTile->Set(4017, ighostWidth);
+        apGhostMeterTile->Set(4001, ighostX);
+        if (!apGhostMeterTile->HasFadeControl(4009)) {
+            apGhostMeterTile->AddFadeControl(4009, 0.0f, 255.0f, 1.0f, Tile::TFCT_NONLINEAR_LONG_DARK_REPEATING);
         }
     }
 }
@@ -5393,20 +5372,17 @@ float HUDMainMenu::HeadingBetweenLocations(const NiPoint3& aStart, const NiPoint
 }
 
 void HUDMainMenu::DisplayQuestReminder(TESQuest* apQuest) {
-    if (HUDMainMenu::pme) {
-        if (apQuest) {
-            if (!HUDMainMenu::pme->AreObjectivesShowing() && HUDMainMenu::pme->xQuestObjectives.IsEmpty()) {
-                for (BSSimpleList<BGSQuestObjective*>* plist = apQuest->GetObjectiveList(); plist && !plist->IsEmpty();
-                     plist = plist->m_pkNext) {
-                    BGSQuestObjective** v1 = &plist->m_item;
-                    if ((*v1)->GetStatus(1)) {
-                        BGSQuestObjective** v2 = &plist->m_item;
-                        if (!(*v2)->GetStatus(2)) {
-                            BGSQuestObjective** v3 = &plist->m_item;
-                            const char* DisplayText = (*v3)->GetDisplayText();
-                            HUDMainMenu::ShowQuestObjective(DisplayText, false, true);
-                        }
-                    }
+    if ((HUDMainMenu::pme) && (apQuest) &&
+        (!HUDMainMenu::pme->AreObjectivesShowing() && HUDMainMenu::pme->xQuestObjectives.IsEmpty())) {
+        for (BSSimpleList<BGSQuestObjective*>* plist = apQuest->GetObjectiveList(); plist && !plist->IsEmpty();
+             plist = plist->m_pkNext) {
+            BGSQuestObjective** v1 = &plist->m_item;
+            if ((*v1)->GetStatus(1)) {
+                BGSQuestObjective** v2 = &plist->m_item;
+                if (!(*v2)->GetStatus(2)) {
+                    BGSQuestObjective** v3 = &plist->m_item;
+                    const char* DisplayText = (*v3)->GetDisplayText();
+                    HUDMainMenu::ShowQuestObjective(DisplayText, false, true);
                 }
             }
         }
@@ -5471,21 +5447,17 @@ void HUDMainMenu::ClearXPMeterFinishedMoving() {
 }
 
 void HUDMainMenu::InitGunScope(TESModel* apModelFilename) {
-    if (HUDMainMenu::pme) {
-        if (HUDMainMenu::spScopeModel.m_pObject) {
-            HUDMainMenu::ClearGunScope();
-            if (apModelFilename) {
-                if (apModelFilename->GetModelLength()) {
-                    // Fetches the scope node before it loads the model.
-                    NiNode* pScopeModel = HUDMainMenu::spScopeModel.m_pObject;
-                    NiNode* pModel =
-                        pModelLoader->LoadFile(apModelFilename->GetModel(), LOD_MULT_NONE, true, false, false, false);
-                    pScopeModel->AttachChild(pModel, true);
-                    HUDMainMenu::spScopeModel.m_pObject->SetAppCulled(true);
-                    NiUpdateData UpdateData1(0.0f, false, false);
-                    HUDMainMenu::spScopeModel.m_pObject->Update(UpdateData1);
-                }
-            }
+    if ((HUDMainMenu::pme) && (HUDMainMenu::spScopeModel.m_pObject)) {
+        HUDMainMenu::ClearGunScope();
+        if ((apModelFilename) && (apModelFilename->GetModelLength())) {
+            // Fetches the scope node before it loads the model.
+            NiNode* pScopeModel = HUDMainMenu::spScopeModel.m_pObject;
+            NiNode* pModel =
+                pModelLoader->LoadFile(apModelFilename->GetModel(), LOD_MULT_NONE, true, false, false, false);
+            pScopeModel->AttachChild(pModel, true);
+            HUDMainMenu::spScopeModel.m_pObject->SetAppCulled(true);
+            NiUpdateData UpdateData1(0.0f, false, false);
+            HUDMainMenu::spScopeModel.m_pObject->Update(UpdateData1);
         }
     }
 }
@@ -5524,21 +5496,19 @@ void HUDMainMenu::SetLocationText(const HUDMainMenu::HUDTravelLocData& aLocation
         }
         else {
             pLastLocation = aLocationData.pMarker;
-            if (aLocationData.pMarker) {
-                if (aLocationData.pMarker->GetMapMarkerData()) {
-                    if (HUDMainMenu::pme->pTiles[16]->GetFadeFinished(4009) &&
-                        HUDMainMenu::pme->pTiles[16]->GetFloat(4009) == 0.0) {
-                        MapMarkerData* MapMarkerData_ = aLocationData.pMarker->GetMapMarkerData();
-                        const char* LocationName = MapMarkerData_->GetLocationName();
-                        HUDMainMenu::pme->pTiles[16]->Set(4036, LocationName, true);
-                        float afEnd = fHudOpacity.Float() * 255.0;
-                        HUDMainMenu::pme->pTiles[16]->AddFadeControl(4009, 0.0f, afEnd, 2.0f, Tile::TFCT_STANDARD);
-                        uint32_t Time = appTimer.iLastTime;
-                        HUDMainMenu::pme->pTiles[16]->Set(Tile::kTileValue_User0, Time);
-                    }
-                    HUDMainMenu::pme->pTiles[15]->RemoveFadeControl(4009);
-                    HUDMainMenu::pme->pTiles[15]->Set(4009, 0.0f, true);
+            if ((aLocationData.pMarker) && (aLocationData.pMarker->GetMapMarkerData())) {
+                if (HUDMainMenu::pme->pTiles[16]->GetFadeFinished(4009) &&
+                    HUDMainMenu::pme->pTiles[16]->GetFloat(4009) == 0.0) {
+                    MapMarkerData* MapMarkerData_ = aLocationData.pMarker->GetMapMarkerData();
+                    const char* LocationName = MapMarkerData_->GetLocationName();
+                    HUDMainMenu::pme->pTiles[16]->Set(4036, LocationName, true);
+                    float afEnd = fHudOpacity.Float() * 255.0;
+                    HUDMainMenu::pme->pTiles[16]->AddFadeControl(4009, 0.0f, afEnd, 2.0f, Tile::TFCT_STANDARD);
+                    uint32_t Time = appTimer.iLastTime;
+                    HUDMainMenu::pme->pTiles[16]->Set(Tile::kTileValue_User0, Time);
                 }
+                HUDMainMenu::pme->pTiles[15]->RemoveFadeControl(4009);
+                HUDMainMenu::pme->pTiles[15]->Set(4009, 0.0f, true);
             }
         }
     }
@@ -5570,25 +5540,23 @@ void HUDMainMenu::SetVisibilityFlag(int32_t a1, int32_t a2) {
 void HUDMainMenu::Revert() {
     int32_t MenuID_0 = HUDMainMenu::GetMenuID();
     Tile* MenuByClass = Menu::GetMenuByClass(MenuID_0);
-    if (MenuByClass) {
-        if (MenuByClass->GetMenu()) {
-            HUDMainMenu* pHUD = static_cast<HUDMainMenu*>(MenuByClass->GetMenu());
-            pHUD->pCurrentEnemy = nullptr;
-            pHUD->uiQuestReminderTimer = 0;
-            pHUD->uiDDTdisplayTimer = -1;
-            pHUD->uiEnemyDDTdisplayTimer = -1;
-            pHUD->bForceObjectiveReminders = false;
-            pHUD->pTiles[50]->Set(4003, 0);
-            pHUD->bXPMeterFinishedMoving = false;
-            HUDMainMenu::pme->pTiles[44]->Set(4003, 0);
-            HUDMainMenu::pme->pTiles[45]->Set(4003, 0);
-            HUDMainMenu::pme->pTiles[46]->Set(4003, 0);
-            HUDMainMenu::pme->pTiles[47]->Set(4003, 0);
-            HUDMainMenu::pme->pTiles[48]->Set(4003, 0);
-            HUDMainMenu::pme->pTiles[49]->Set(4003, 0);
-            g_XPBarState = 1;
-            HUDMainMenu::pme->bKillQuestUpdates = true;
-        }
+    if ((MenuByClass) && (MenuByClass->GetMenu())) {
+        HUDMainMenu* pHUD = static_cast<HUDMainMenu*>(MenuByClass->GetMenu());
+        pHUD->pCurrentEnemy = nullptr;
+        pHUD->uiQuestReminderTimer = 0;
+        pHUD->uiDDTdisplayTimer = -1;
+        pHUD->uiEnemyDDTdisplayTimer = -1;
+        pHUD->bForceObjectiveReminders = false;
+        pHUD->pTiles[50]->Set(4003, 0);
+        pHUD->bXPMeterFinishedMoving = false;
+        HUDMainMenu::pme->pTiles[44]->Set(4003, 0);
+        HUDMainMenu::pme->pTiles[45]->Set(4003, 0);
+        HUDMainMenu::pme->pTiles[46]->Set(4003, 0);
+        HUDMainMenu::pme->pTiles[47]->Set(4003, 0);
+        HUDMainMenu::pme->pTiles[48]->Set(4003, 0);
+        HUDMainMenu::pme->pTiles[49]->Set(4003, 0);
+        g_XPBarState = 1;
+        HUDMainMenu::pme->bKillQuestUpdates = true;
     }
 }
 

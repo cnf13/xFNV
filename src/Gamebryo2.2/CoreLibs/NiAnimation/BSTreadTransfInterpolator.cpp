@@ -46,10 +46,9 @@ NiObject* BSTreadTransfInterpolator::CreateClone(NiCloningProcess& kCloning) {
         CopyMembers(pkObject_2, kCloning);
         return pkObject_2;
     }
-    else {
-        CopyMembers(nullptr, kCloning);
-        return nullptr;
-    }
+
+    CopyMembers(nullptr, kCloning);
+    return nullptr;
 }
 
 // Links is built as new[] builds it: the element count is stored before the array.

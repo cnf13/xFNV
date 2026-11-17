@@ -38,9 +38,8 @@ void* getAgentData(hkpAgentNnEntry* entry) {
     if (entry->m_streamCommand == 4) {
         return &entry[2];
     }
-    else {
-        return &entry[1].m_contactMgr;
-    }
+
+    return &entry[1].m_contactMgr;
 }
 
 void hkpWorldAgentUtil::invalidateTim(hkpEntity* entity, const hkpCollisionInput& collisionInput) {

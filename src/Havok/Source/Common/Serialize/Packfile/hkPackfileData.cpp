@@ -185,9 +185,8 @@ const char* hkPackfileData::getContentsTypeName() const {
     if (m_topLevelObject) {
         return m_trackedObjects.getWithDefault(m_topLevelObject, 0);
     }
-    else {
-        return nullptr;
-    }
+
+    return nullptr;
 }
 
 void hkPackfileData::calcContentStatistics(hkStatisticsCollector* a1, const hkClass* a2) const {

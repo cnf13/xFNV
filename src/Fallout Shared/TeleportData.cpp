@@ -92,9 +92,8 @@ TESForm* DoorTeleportData::GetTeleportSpace() {
     if (pLinkedDoor) {
         return pLinkedDoor->GetSpace();
     }
-    else {
-        return nullptr;
-    }
+
+    return nullptr;
 }
 
 // Reads an XTEL chunk (0x4C455458) into the teleport: the file's door form ID goes into pLinkedDoor (InitItem resolves

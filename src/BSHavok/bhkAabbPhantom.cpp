@@ -161,9 +161,8 @@ hkpAabbPhantom* bhkAabbPhantom::operator*() const {
     if (this) {
         return static_cast<hkpAabbPhantom*>(GethkObject());
     }
-    else {
-        return nullptr;
-    }
+
+    return nullptr;
 }
 
 // Fills arInfo's world-object part, then copies the wrapped phantom's box into it.

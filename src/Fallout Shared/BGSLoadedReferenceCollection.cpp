@@ -57,15 +57,12 @@ void BGSLoadedReferenceCollection::AddReference(TESObjectREFR* apRef) {
     if (apRef->GetObjectReference() == pRadiationMarker) {
         RadiationMap.AddReference(apRef);
     }
-    if (aeFormType == EXPL_ID) {
-        if (apRef->GetExtraData(93u)) {
-            RadiationMap.AddReference(apRef);
-        }
+    if ((aeFormType == EXPL_ID) && (apRef->GetExtraData(93u))) {
+        RadiationMap.AddReference(apRef);
     }
-    if (aeFormType == DOOR_ID) {
-        if (apRef->GetTeleport()) {
-            TeleportDoorMap.AddReference(apRef);
-        }
+
+    if ((aeFormType == DOOR_ID) && (apRef->GetTeleport())) {
+        TeleportDoorMap.AddReference(apRef);
     }
 }
 
@@ -91,10 +88,8 @@ void BGSLoadedReferenceCollection::RemoveReference(TESObjectREFR* apRef) {
     if (aeFormType == EXPL_ID) {
         RadiationMap.RemoveReference(apRef);
     }
-    if (aeFormType == DOOR_ID) {
-        if (apRef->GetTeleport()) {
-            TeleportDoorMap.RemoveReference(apRef);
-        }
+    if ((aeFormType == DOOR_ID) && (apRef->GetTeleport())) {
+        TeleportDoorMap.RemoveReference(apRef);
     }
 }
 

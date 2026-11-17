@@ -82,18 +82,16 @@ void DarknessEffect::Start() {
         ptargetActor = nullptr;
     }
     ValueModifierEffect::Start();
-    if (ptargetActor) {
-        if (ptargetActor->Get3D()) {
-            float fnewDarkness = 1.0 - ptargetActor->GetActorFloatValue(eWhichActorValue) / 100.0;
-            if (fnewDarkness < 0.0) {
-                fnewDarkness = 0.0f;
-            }
-            if (fnewDarkness > 1.0) {
-                fnewDarkness = 1.0f;
-            }
-            NiNode* v1 = ptargetActor->Get3D();
-            BSShaderManager::RecursiveSetForcedDarkness(v1, fnewDarkness);
+    if ((ptargetActor) && (ptargetActor->Get3D())) {
+        float fnewDarkness = 1.0 - ptargetActor->GetActorFloatValue(eWhichActorValue) / 100.0;
+        if (fnewDarkness < 0.0) {
+            fnewDarkness = 0.0f;
         }
+        if (fnewDarkness > 1.0) {
+            fnewDarkness = 1.0f;
+        }
+        NiNode* v1 = ptargetActor->Get3D();
+        BSShaderManager::RecursiveSetForcedDarkness(v1, fnewDarkness);
     }
 }
 
@@ -106,18 +104,16 @@ void DarknessEffect::Finish() {
     else {
         ptargetActor = nullptr;
     }
-    if (ptargetActor) {
-        if (ptargetActor->Get3D()) {
-            float fnewDarkness = 1.0 - ptargetActor->GetActorFloatValue(eWhichActorValue) / 100.0;
-            if (fnewDarkness < 0.0) {
-                fnewDarkness = 0.0f;
-            }
-            if (fnewDarkness > 1.0) {
-                fnewDarkness = 1.0f;
-            }
-            NiNode* v1 = ptargetActor->Get3D();
-            BSShaderManager::RecursiveSetForcedDarkness(v1, fnewDarkness);
+    if ((ptargetActor) && (ptargetActor->Get3D())) {
+        float fnewDarkness = 1.0 - ptargetActor->GetActorFloatValue(eWhichActorValue) / 100.0;
+        if (fnewDarkness < 0.0) {
+            fnewDarkness = 0.0f;
         }
+        if (fnewDarkness > 1.0) {
+            fnewDarkness = 1.0f;
+        }
+        NiNode* v1 = ptargetActor->Get3D();
+        BSShaderManager::RecursiveSetForcedDarkness(v1, fnewDarkness);
     }
 }
 
@@ -126,7 +122,6 @@ ActiveEffect* DarknessEffect::Instantiate(MagicCaster* apCaster, MagicItem* apSp
     if (apMemory) {
         return ::new (apMemory) DarknessEffect(apCaster, apSpell, apEffect);
     }
-    else {
-        return nullptr;
-    }
+
+    return nullptr;
 }

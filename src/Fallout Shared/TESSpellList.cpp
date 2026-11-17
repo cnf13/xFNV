@@ -332,16 +332,14 @@ bool TESSpellList::AddSpell(TESForm* apSpellIn) {
         AddSpell(static_cast<SpellItem*>(apSpellIn));
         return true;
     }
-    else {
-        SpellItem* pspell = dynamic_cast<SpellItem*>(apSpellIn);
-        TESLevSpell* pleveledSpell = dynamic_cast<TESLevSpell*>(apSpellIn);
-        if (pspell) {
-            return AddSpell(pspell);
-        }
-        else {
-            return pleveledSpell && AddSpell(pleveledSpell);
-        }
+
+    SpellItem* pspell = dynamic_cast<SpellItem*>(apSpellIn);
+    TESLevSpell* pleveledSpell = dynamic_cast<TESLevSpell*>(apSpellIn);
+    if (pspell) {
+        return AddSpell(pspell);
     }
+
+    return pleveledSpell && AddSpell(pleveledSpell);
 }
 
 bool TESSpellList::AddSpell(TESLevSpell* apSpellIn) {

@@ -96,10 +96,8 @@ void CombatProcedureAttackGrenade::Update() {
                                 v3->SetShotsToFire(1);
                                 pattacker->QueueAttack(ANIM_GROUP_ATTACK_THROW);
                                 eState = CombatProcedureAttackGrenade::ATTACK_STATE_ATTACKING;
-                                if (pexplosion) {
-                                    if (CombatUtilities::IsDangerousExplosion(pexplosion)) {
-                                        pCombatDialogueManager->StartDialogue(pCombatController, DT_COMBAT, 4, true);
-                                    }
+                                if ((pexplosion) && (CombatUtilities::IsDangerousExplosion(pexplosion))) {
+                                    pCombatDialogueManager->StartDialogue(pCombatController, DT_COMBAT, 4, true);
                                 }
                             }
                         }
@@ -184,23 +182,21 @@ bool CombatProcedureAttackGrenade::GetTargetedPoint(NiPoint3& arTargetedPoint, N
             barcValid = true;
         }
     }
-    if (barcValid) {
-        if (pexplosion) {
-            NiPoint3 hitLocation;
-            if (bTargetLocation) {
-                hitLocation = TargetLocation;
-            }
-            else {
-                hitLocation = TargetedPoint;
-                hitLocation.z = (&ptarget->GetLocationOnReference())->z;
-            }
-            float ftime =
-                CombatUtilities::ComputeProjectileTime_(pprojectile, arReleasePoint, hitLocation, bHighArc, 0.0f);
-            if (!CheckExplosion(pexplosion, hitLocation, ftime)) {
-                barcValid = false;
-            }
+    if ((barcValid) && (pexplosion)) {
+        NiPoint3 hitLocation;
+        if (bTargetLocation) {
+            hitLocation = TargetLocation;
+        }
+        else {
+            hitLocation = TargetedPoint;
+            hitLocation.z = (&ptarget->GetLocationOnReference())->z;
+        }
+        float ftime = CombatUtilities::ComputeProjectileTime_(pprojectile, arReleasePoint, hitLocation, bHighArc, 0.0f);
+        if (!CheckExplosion(pexplosion, hitLocation, ftime)) {
+            barcValid = false;
         }
     }
+
     if (!barcValid && bTargetLocation) {
         pCombatController->pCombatState->SetTargetFlushed(true);
         SetFinished();
@@ -307,8 +303,7 @@ NiPoint3* CombatProcedureAttackGrenade::CalculateTargetedPoint(NiPoint3* a1) {
         *a1 = ecx0;
         return a1;
     }
-    else {
-        *a1 = NiPoint3_ZERO;
-        return a1;
-    }
+
+    *a1 = NiPoint3_ZERO;
+    return a1;
 }

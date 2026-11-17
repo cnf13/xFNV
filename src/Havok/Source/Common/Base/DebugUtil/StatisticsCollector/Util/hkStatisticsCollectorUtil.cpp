@@ -402,46 +402,46 @@ hkBool* hkStatisticsCollectorUtil::isMemberSimple(hkBool* apResult, const hkClas
         apResult->m_bool = 1;
         return apResult;
     }
-    else {
-        switch (mem.m_type.m_storage) {
-            case 1:
-            case 2:
-            case 3:
-            case 4:
-            case 5:
-            case 6:
-            case 7:
-            case 8:
-            case 9:
-            case 10:
-            case 11:
-            case 12:
-            case 13:
-            case 14:
-            case 15:
-            case 16:
-            case 17:
-            case 18:
-            case 21:
-            case 24:
-            case 30:
-            case 31:
-            case 32: {
-                goto LABEL_3;
-            }
-            case 25: {
-                const hkClass* StructClass = &mem.getStructClass();
-                hkStatisticsCollectorUtil::isClassSimple(apResult, *StructClass);
-                result = apResult;
-                break;
-            }
-            default: {
-                apResult->m_bool = 0;
-                result = apResult;
-                break;
-            }
+
+    switch (mem.m_type.m_storage) {
+        case 1:
+        case 2:
+        case 3:
+        case 4:
+        case 5:
+        case 6:
+        case 7:
+        case 8:
+        case 9:
+        case 10:
+        case 11:
+        case 12:
+        case 13:
+        case 14:
+        case 15:
+        case 16:
+        case 17:
+        case 18:
+        case 21:
+        case 24:
+        case 30:
+        case 31:
+        case 32: {
+            goto LABEL_3;
+        }
+        case 25: {
+            const hkClass* StructClass = &mem.getStructClass();
+            hkStatisticsCollectorUtil::isClassSimple(apResult, *StructClass);
+            result = apResult;
+            break;
+        }
+        default: {
+            apResult->m_bool = 0;
+            result = apResult;
+            break;
         }
     }
+
     return result;
 }
 
@@ -454,19 +454,18 @@ hkBool* hkStatisticsCollectorUtil::_isClassSimple(hkBool* apResult, const hkClas
         apResult->m_bool = 1;
         return apResult;
     }
-    else {
-        while (true) {
-            const hkClassMember* DeclaredMember = &clsIn.getDeclaredMember(v3);
-            if (!hkStatisticsCollectorUtil::isMemberSimple(&v6, *DeclaredMember)->m_bool) {
-                break;
-            }
-            if (++v3 >= NumDeclaredMembers) {
-                goto LABEL_4;
-            }
+
+    while (true) {
+        const hkClassMember* DeclaredMember = &clsIn.getDeclaredMember(v3);
+        if (!hkStatisticsCollectorUtil::isMemberSimple(&v6, *DeclaredMember)->m_bool) {
+            break;
         }
-        apResult->m_bool = 0;
-        return apResult;
+        if (++v3 >= NumDeclaredMembers) {
+            goto LABEL_4;
+        }
     }
+    apResult->m_bool = 0;
+    return apResult;
 }
 
 hkBool* hkStatisticsCollectorUtil::isClassSimple(hkBool* apResult, const hkClass& clsIn) {

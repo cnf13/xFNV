@@ -446,12 +446,11 @@ NiAVObject* BGSProjectile::Clone3D(TESObjectREFR* pRequester, bool deepCopy) {
             }
         }
     }
-    if (pav) {
-        if (pav->IsFadeNode()) {
-            BSFadeNode* v5 = pav->IsFadeNode();
-            v5->SetIgnoreFade(true);
-        }
+    if ((pav) && (pav->IsFadeNode())) {
+        BSFadeNode* v5 = pav->IsFadeNode();
+        v5->SetIgnoreFade(true);
     }
+
     return pav;
 }
 
@@ -584,9 +583,8 @@ float BGSProjectile::GetGravity() {
     if (IsFlagSet(MOTION_GRENADE)) {
         return (float)1.0;
     }
-    else {
-        return Data.fGravity;
-    }
+
+    return Data.fGravity;
 }
 
 ENUM_FORM_ID BGSProjectile::GetProjectileRefFormType() {
@@ -635,35 +633,32 @@ GrenadeProjectile* BGSProjectile::InitLiveGrenade(
     TESObjectWEAP* apGrenade
 ) {
     GrenadeProjectile* v10 = nullptr;
-    if (apProjectile) {
-        if (apProjectile->GetMotionType() == BGSProjectile::MOTION_GRENADE) {
-            GrenadeProjectile* v7;
-            GrenadeProjectile* pGrenadeProjectile =
-                static_cast<GrenadeProjectile*>(ourMalloc(sizeof(GrenadeProjectile)));
-            if (pGrenadeProjectile) {
-                v7 = ::new (pGrenadeProjectile)
-                    GrenadeProjectile(apProjectile, apSource, apGrenade, NiPoint3_ZERO, 0.0f, 0.0f);
+    if ((apProjectile) && (apProjectile->GetMotionType() == BGSProjectile::MOTION_GRENADE)) {
+        GrenadeProjectile* v7;
+        GrenadeProjectile* pGrenadeProjectile = static_cast<GrenadeProjectile*>(ourMalloc(sizeof(GrenadeProjectile)));
+        if (pGrenadeProjectile) {
+            v7 = ::new (pGrenadeProjectile)
+                GrenadeProjectile(apProjectile, apSource, apGrenade, NiPoint3_ZERO, 0.0f, 0.0f);
+        }
+        else {
+            v7 = nullptr;
+        }
+        v10 = v7;
+    }
+
+    if (v10) {
+        if ((apSource) && (apSource->IsActor())) {
+            ActorCause* v6;
+            ActorCause* pActorCause = static_cast<ActorCause*>(ourMalloc(sizeof(ActorCause)));
+            if (pActorCause) {
+                v6 = ::new (pActorCause) ActorCause(apSource);
             }
             else {
-                v7 = nullptr;
+                v6 = nullptr;
             }
-            v10 = v7;
+            v10->SetActorCause(v6);
         }
-    }
-    if (v10) {
-        if (apSource) {
-            if (apSource->IsActor()) {
-                ActorCause* v6;
-                ActorCause* pActorCause = static_cast<ActorCause*>(ourMalloc(sizeof(ActorCause)));
-                if (pActorCause) {
-                    v6 = ::new (pActorCause) ActorCause(apSource);
-                }
-                else {
-                    v6 = nullptr;
-                }
-                v10->SetActorCause(v6);
-            }
-        }
+
         v10->SetFlag(Projectile::ACTIVE_IN_INVENTORY, true);
         v10->pDesiredTarget = apTarget;
         v10->Initialize();

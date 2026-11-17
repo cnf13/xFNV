@@ -102,10 +102,9 @@ hkBool* hkBufferedStreamWriter::seekTellSupported(hkBool* arResult) const {
         arResult->m_bool = m_bool;
         return arResult;
     }
-    else {
-        arResult->m_bool = 1;
-        return arResult;
-    }
+
+    arResult->m_bool = 1;
+    return arResult;
 }
 
 // Moves the write position.
@@ -154,9 +153,8 @@ int32_t hkBufferedStreamWriter::tell() const {
     if (v2 < 0) {
         return (-1);
     }
-    else {
-        return (int32_t)(v2 + ((uint32_t)m_bufSize));
-    }
+
+    return (int32_t)(v2 + ((uint32_t)m_bufSize));
 }
 
 void hkBufferedStreamWriter::calcContentStatistics(hkStatisticsCollector* collector, const hkClass* cls) const {

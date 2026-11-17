@@ -57,10 +57,9 @@ NiObject* NiTriShape::CreateClone(NiCloningProcess& kCloning) {
         CopyMembers(pkClone, kCloning);
         return pkClone;
     }
-    else {
-        CopyMembers(nullptr, kCloning);
-        return nullptr;
-    }
+
+    CopyMembers(nullptr, kCloning);
+    return nullptr;
 }
 
 // NiTriStrips uses the same function.
@@ -138,9 +137,8 @@ NiTriShape* NiTriShape::Create(NiTriShapeData* a1) {
     if (v3) {
         return ::new (v3) NiTriShape(a1);
     }
-    else {
-        return nullptr;
-    }
+
+    return nullptr;
 }
 
 NiObject* NiTriShape::CreateObject() {

@@ -26,7 +26,7 @@ public:
     bool CanShare(NiCloningProcess& arCloneData) override;
     void BuildDisplayGeometry(NiNode* apNode, const NiColor& arDefColor) override;
     void DestroyDisplayGeometry() override;
-    virtual ~bhkBvTreeShape();
+    ~bhkBvTreeShape() override;
 
     // The shape collection the tree is built over.
     bhkShapeCollection* GetShapeCollection();

@@ -518,11 +518,10 @@ hkBool hkDataClassNative::isSuperClass(const hkDataClassImpl* k) const {
         result.m_bool = 1;
         return result;
     }
-    else {
-    LABEL_4:;
-        result.m_bool = 0;
-        return result;
-    }
+
+LABEL_4:;
+    result.m_bool = 0;
+    return result;
 }
 
 int32_t hkDataClassNative::getNumDeclaredMembers() const {
@@ -696,16 +695,14 @@ hkDataArrayImpl* hkDataArrayNative::asArray(int32_t index) const {
         return ::new (pResult)
             hkDataArrayNative(m_world, address, m_tupleCount, elementStride, m_nativeType, m_class, 0);
     }
-    else {
-        hkMemoryRouter* Instance = &hkMemoryRouter::getInstance();
-        hkDataArrayNative* pResult =
-            static_cast<hkDataArrayNative*>(Instance->m_heap->blockAlloc(sizeof(hkDataArrayNative)));
-        pResult->m_memSize = 44;
-        const hkClassMemberAccessor::SimpleArray* pArray =
-            static_cast<const hkClassMemberAccessor::SimpleArray*>(address);
-        return ::new (pResult)
-            hkDataArrayNative(m_world, pArray->data, pArray->size, 0, hkClassMember::TYPE_VOID, nullptr, 0);
-    }
+
+    hkMemoryRouter* Instance = &hkMemoryRouter::getInstance();
+    hkDataArrayNative* pResult =
+        static_cast<hkDataArrayNative*>(Instance->m_heap->blockAlloc(sizeof(hkDataArrayNative)));
+    pResult->m_memSize = 44;
+    const hkClassMemberAccessor::SimpleArray* pArray = static_cast<const hkClassMemberAccessor::SimpleArray*>(address);
+    return ::new (pResult)
+        hkDataArrayNative(m_world, pArray->data, pArray->size, 0, hkClassMember::TYPE_VOID, nullptr, 0);
 }
 
 hkDataObjectNative::~hkDataObjectNative() {}

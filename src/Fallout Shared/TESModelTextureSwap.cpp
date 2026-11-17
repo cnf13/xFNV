@@ -226,10 +226,8 @@ bool TESModelTextureSwap::UnpackTextureSwapChunkData(void* apData, uint32_t aiDa
                 pdata += ireadsize;
                 auiSize -= ireadsize;
             }
-            if (apDest[0]) {
-                if (pnewtexture) {
-                    AddTexSwap(apDest, igeomindex, pnewtexture);
-                }
+            if ((apDest[0]) && (pnewtexture)) {
+                AddTexSwap(apDest, igeomindex, pnewtexture);
             }
         }
     }
@@ -292,25 +290,23 @@ TEX_SWAP* TESModelTextureSwap::GetTexSwap(int32_t aiIndex) {
 }
 
 void TESModelTextureSwap::AddTexSwap(const char* apObjName, int32_t aiIndex, BGSTextureSet* apTexSet) {
-    if (apObjName) {
-        if (apTexSet) {
-            TEX_SWAP* a2 = GetTexSwap(aiIndex);
-            if (!a2) {
-                TEX_SWAP* v4;
-                TEX_SWAP* apMemory = static_cast<TEX_SWAP*>(ourMalloc(sizeof(TEX_SWAP)));
-                if (apMemory) {
-                    v4 = ::new (apMemory) TEX_SWAP;
-                }
-                else {
-                    v4 = nullptr;
-                }
-                a2 = v4;
-                BSstrcpy(v4->pGeomName, 128, apObjName);
-                v4->iGeomIndex = aiIndex;
-                TextureSwapList.AddHead(a2);
+    if ((apObjName) && (apTexSet)) {
+        TEX_SWAP* a2 = GetTexSwap(aiIndex);
+        if (!a2) {
+            TEX_SWAP* v4;
+            TEX_SWAP* apMemory = static_cast<TEX_SWAP*>(ourMalloc(sizeof(TEX_SWAP)));
+            if (apMemory) {
+                v4 = ::new (apMemory) TEX_SWAP;
             }
-            a2->pNewTexture = apTexSet;
+            else {
+                v4 = nullptr;
+            }
+            a2 = v4;
+            BSstrcpy(v4->pGeomName, 128, apObjName);
+            v4->iGeomIndex = aiIndex;
+            TextureSwapList.AddHead(a2);
         }
+        a2->pNewTexture = apTexSet;
     }
 }
 
@@ -375,37 +371,36 @@ bool TESModelTextureSwap::SwapTexturesRecurse(
         else {
             if (ap3D->IsGeometry()) {
                 TEX_SWAP* pswap = nullptr;
-                if (apSwapMap->GetAt(aiGeomIndex, pswap)) {
-                    if (pswap) {
-                        if (pswap->pNewTexture == BGSTextureSet::GetNullTextureSet()) {
-                            ap3D->SetAppCulled(true);
+                if ((apSwapMap->GetAt(aiGeomIndex, pswap)) && (pswap)) {
+                    if (pswap->pNewTexture == BGSTextureSet::GetNullTextureSet()) {
+                        ap3D->SetAppCulled(true);
+                    }
+                    else {
+                        int32_t v5;
+                        NiShadeProperty* pprop = static_cast<NiShadeProperty*>(ap3D->GetProperty(3));
+                        if (pprop) {
+                            int32_t bPPLightingProp =
+                                pprop->iShaderPropertyType >= 8 && pprop->iShaderPropertyType <= 12;
+                            v5 = bPPLightingProp;
                         }
                         else {
-                            int32_t v5;
-                            NiShadeProperty* pprop = static_cast<NiShadeProperty*>(ap3D->GetProperty(3));
-                            if (pprop) {
-                                int32_t bPPLightingProp =
-                                    pprop->iShaderPropertyType >= 8 && pprop->iShaderPropertyType <= 12;
-                                v5 = bPPLightingProp;
-                            }
-                            else {
-                                v5 = 0;
-                            }
-                            BSShaderPPLightingProperty* pbssprop =
-                                v5 ? static_cast<BSShaderPPLightingProperty*>(pprop) : nullptr;
-                            if (pbssprop) {
-                                BSShaderTextureSet* pnewset = pswap->pNewTexture->CreateShaderTextureSet();
-                                pbssprop->SetTextureSet(pnewset);
-                                pbssprop->LoadTextureSet(nullptr, nullptr);
-                                pbssprop->SetFlagsFromTextures();
-                            }
+                            v5 = 0;
                         }
-                        apSwapMap->RemoveAt(aiGeomIndex);
-                        if (!apSwapMap->m_uiCount) {
-                            return true;
+                        BSShaderPPLightingProperty* pbssprop =
+                            v5 ? static_cast<BSShaderPPLightingProperty*>(pprop) : nullptr;
+                        if (pbssprop) {
+                            BSShaderTextureSet* pnewset = pswap->pNewTexture->CreateShaderTextureSet();
+                            pbssprop->SetTextureSet(pnewset);
+                            pbssprop->LoadTextureSet(nullptr, nullptr);
+                            pbssprop->SetFlagsFromTextures();
                         }
                     }
+                    apSwapMap->RemoveAt(aiGeomIndex);
+                    if (!apSwapMap->m_uiCount) {
+                        return true;
+                    }
                 }
+
                 ++aiGeomIndex;
             }
         }

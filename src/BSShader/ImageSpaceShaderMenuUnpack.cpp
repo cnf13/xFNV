@@ -155,10 +155,9 @@ void ImageSpaceShaderMenuUnpack::Render(
                 NiIncRefCount(v11);
             }
             NiRefObject* v26 = (NiRefObject*)RenderedTexture;
-            if (RenderedTexture) {
-                if (!InterlockedDecrementInt32(reinterpret_cast<int32_t*>(&RenderedTexture->m_uiRefCount))) {
-                    v26->DeleteThis();
-                }
+            if ((RenderedTexture) &&
+                (!InterlockedDecrementInt32(reinterpret_cast<int32_t*>(&RenderedTexture->m_uiRefCount)))) {
+                v26->DeleteThis();
             }
         }
         NiScreenElements* v27 = static_cast<NiScreenElements*>(BSShaderManager::pImageSpaceManager->spMenuUnpackGeom);

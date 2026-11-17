@@ -63,12 +63,11 @@ BSTempEffectParticle::~BSTempEffectParticle() {
     if (pFilename) {
         pModelLoader->ReleaseModel(pFilename, false, 1u);
     }
-    if (spParticleObject.m_pObject) {
-        if (spParticleObject.m_pObject->m_pkParent) {
-            NiNode* pParent = spParticleObject.m_pObject->m_pkParent;
-            pParent->DetachChild(spParticleObject.m_pObject);
-        }
+    if ((spParticleObject.m_pObject) && (spParticleObject.m_pObject->m_pkParent)) {
+        NiNode* pParent = spParticleObject.m_pObject->m_pkParent;
+        pParent->DetachChild(spParticleObject.m_pObject);
     }
+
     spParticleObject = static_cast<NiAVObject*>(nullptr);
 }
 
@@ -344,11 +343,10 @@ bool BSTempEffectParticle::LoadGame() {
             bvalid = false;
         }
     }
-    if (!bvalid) {
-        if (icontrollerDataSize) {
-            pSaveLoadGameOLD->AdvanceBuffer(icontrollerDataSize);
-        }
+    if ((!bvalid) && (icontrollerDataSize)) {
+        pSaveLoadGameOLD->AdvanceBuffer(icontrollerDataSize);
     }
+
     if (pSaveLoadGameOLD->UseSaveGameBlocks()) {
         uint8_t* icurrentBufferPosition = static_cast<uint8_t*>(pSaveLoadGameOLD->m_pBuffer);
         uint8_t* iendBufferPosition = &istartBufferPosition[iblockSize];
@@ -424,11 +422,10 @@ void BSTempEffectParticle::Init(
     if (spmodel.m_pObject) {
         spParticleObject.operator=(static_cast<NiAVObject*>(nullptr));
         uint32_t iresult = 0;
-        if ((aiFlags & 1) != 0) {
-            if (TES::pInstance) {
-                iresult = TES::pInstance->GetUnusedCachedParticleObject(spmodel.m_pObject, spParticleObject);
-            }
+        if (((aiFlags & 1) != 0) && (TES::pInstance)) {
+            iresult = TES::pInstance->GetUnusedCachedParticleObject(spmodel.m_pObject, spParticleObject);
         }
+
         if (!iresult) {
             if (spmodel.m_pObject->m_uiRefCount > 2) {
                 if ((aiFlags & 2) != 0) {

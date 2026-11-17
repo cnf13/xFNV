@@ -211,10 +211,9 @@ uint32_t PathingCoverLocation::GetKey() {
         apMemory.~NiPointer<NavMesh>();
         return v7;
     }
-    else {
-        apMemory.~NiPointer<NavMesh>();
-        return 0;
-    }
+
+    apMemory.~NiPointer<NavMesh>();
+    return 0;
 }
 
 bool PathingCoverLocation::CheckDynamicCoverValid(uint32_t aiLastMovedTime) {

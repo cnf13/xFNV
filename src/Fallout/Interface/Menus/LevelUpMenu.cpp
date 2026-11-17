@@ -225,31 +225,29 @@ bool LevelUpMenu::DoGamepad(int32_t a1, float a2) {
     bool bhandled = false;
     switch (a1) {
         case 3: {
-            if (eCurrentPage == LevelUpMenu::PI_SKILLS_PAGE) {
-                if (lbSkillsList.GetHighlightedItem()) {
-                    Tile* v4 = static_cast<Tile*>(lbSkillsList.GetHighlightedItem());
-                    Tile* parrowTile_2 = v4->GetChildByID(14);
-                    if (parrowTile_2->IsTrue(4003)) {
-                        parrowTile_2->PlayTileSound(4043);
-                        DoClick(14, parrowTile_2);
-                    }
-                    bhandled = true;
+            if ((eCurrentPage == LevelUpMenu::PI_SKILLS_PAGE) && (lbSkillsList.GetHighlightedItem())) {
+                Tile* v4 = static_cast<Tile*>(lbSkillsList.GetHighlightedItem());
+                Tile* parrowTile_2 = v4->GetChildByID(14);
+                if (parrowTile_2->IsTrue(4003)) {
+                    parrowTile_2->PlayTileSound(4043);
+                    DoClick(14, parrowTile_2);
                 }
+                bhandled = true;
             }
+
             break;
         }
         case 4: {
-            if (eCurrentPage == LevelUpMenu::PI_SKILLS_PAGE) {
-                if (lbSkillsList.GetHighlightedItem()) {
-                    Tile* v3 = static_cast<Tile*>(lbSkillsList.GetHighlightedItem());
-                    Tile* parrowTile = v3->GetChildByID(13);
-                    if (parrowTile->IsTrue(4003)) {
-                        parrowTile->PlayTileSound(4043);
-                        DoClick(13, parrowTile);
-                    }
-                    bhandled = true;
+            if ((eCurrentPage == LevelUpMenu::PI_SKILLS_PAGE) && (lbSkillsList.GetHighlightedItem())) {
+                Tile* v3 = static_cast<Tile*>(lbSkillsList.GetHighlightedItem());
+                Tile* parrowTile = v3->GetChildByID(13);
+                if (parrowTile->IsTrue(4003)) {
+                    parrowTile->PlayTileSound(4043);
+                    DoClick(13, parrowTile);
                 }
+                bhandled = true;
             }
+
             break;
         }
         case 9: {
@@ -329,38 +327,37 @@ void LevelUpMenu::ApplyPerkEffects(Tile* apTile) {
     else {
         pprevRankEntry = pcurrPerk->GetPerkEntryByRank(uccurrPerkRank - 1);
     }
-    if (pcurrPerkEntry) {
-        if (pcurrPerkEntry->GetType() == PERK_ENTRY_TYPE_ABILITY) {
-            SpellItem* pAbility = static_cast<BGSAbilityPerkEntry*>(pcurrPerkEntry)->pAbility;
-            SpellItem* pprevAbility =
-                pprevRankEntry ? static_cast<BGSAbilityPerkEntry*>(pprevRankEntry)->pAbility : nullptr;
-            LevelUpMenu::PerkEffectList.Clear(true);
-            // The upcast to the spell's effect list tests the spell for null, as the game does.
-            BSSimpleList<EffectItem*>* peffectObj = pAbility;
-            for (EffectItem*& rpItem : peffectObj->ItemsUntilNull()) {
-                EffectItemData perkEffect;
-                perkEffect.iActorValue = rpItem->GetActorValueIndex();
-                perkEffect.iMagnitude = rpItem->GetMagnitude();
-                if (perkEffect.iActorValue != ActorValue::VALUE_NONE) {
-                    BSSimpleList<EffectItem*>* pprevRankEffectObj = pprevAbility;
-                    for (EffectItem*& rpItem_2 : pprevRankEffectObj->ItemsUntilNull()) {
-                        ActorValue::Index ActorValueIndex = rpItem_2->GetActorValueIndex();
-                        if (ActorValueIndex == perkEffect.iActorValue) {
-                            int32_t Magnitude = rpItem_2->GetMagnitude();
-                            perkEffect.iMagnitude -= Magnitude;
-                        }
+    if ((pcurrPerkEntry) && (pcurrPerkEntry->GetType() == PERK_ENTRY_TYPE_ABILITY)) {
+        SpellItem* pAbility = static_cast<BGSAbilityPerkEntry*>(pcurrPerkEntry)->pAbility;
+        SpellItem* pprevAbility =
+            pprevRankEntry ? static_cast<BGSAbilityPerkEntry*>(pprevRankEntry)->pAbility : nullptr;
+        LevelUpMenu::PerkEffectList.Clear(true);
+        // The upcast to the spell's effect list tests the spell for null, as the game does.
+        BSSimpleList<EffectItem*>* peffectObj = pAbility;
+        for (EffectItem*& rpItem : peffectObj->ItemsUntilNull()) {
+            EffectItemData perkEffect;
+            perkEffect.iActorValue = rpItem->GetActorValueIndex();
+            perkEffect.iMagnitude = rpItem->GetMagnitude();
+            if (perkEffect.iActorValue != ActorValue::VALUE_NONE) {
+                BSSimpleList<EffectItem*>* pprevRankEffectObj = pprevAbility;
+                for (EffectItem*& rpItem_2 : pprevRankEffectObj->ItemsUntilNull()) {
+                    ActorValue::Index ActorValueIndex = rpItem_2->GetActorValueIndex();
+                    if (ActorValueIndex == perkEffect.iActorValue) {
+                        int32_t Magnitude = rpItem_2->GetMagnitude();
+                        perkEffect.iMagnitude -= Magnitude;
                     }
-                    if (!apTile->IsTrue(LevelUpMenu::iUT_Selected)) {
-                        perkEffect.iMagnitude = -perkEffect.iMagnitude;
-                    }
-                    if (rpItem->pEffectSetting->IsDetrimental(perkEffect.iActorValue)) {
-                        perkEffect.iMagnitude = -perkEffect.iMagnitude;
-                    }
-                    LevelUpMenu::PerkEffectList.Add(perkEffect);
                 }
+                if (!apTile->IsTrue(LevelUpMenu::iUT_Selected)) {
+                    perkEffect.iMagnitude = -perkEffect.iMagnitude;
+                }
+                if (rpItem->pEffectSetting->IsDetrimental(perkEffect.iActorValue)) {
+                    perkEffect.iMagnitude = -perkEffect.iMagnitude;
+                }
+                LevelUpMenu::PerkEffectList.Add(perkEffect);
             }
         }
     }
+
     lbSkillsList.Traverse(&LevelUpMenu::PerkUpdateFunc, 0, 0x7FFFFFFF);
 }
 
@@ -564,21 +561,16 @@ Tile* LevelUpMenu::CreateMenu() {
             LevelUpMenu::pMe->SetCurrentPage(LevelUpMenu::PI_SKILLS_PAGE);
             return th_s;
         }
-        else {
-            Warning("MENUS: Level Up Menu Creation Failed... Are your menu and art resources up to date?");
-            return nullptr;
-        }
-    }
-    else {
-        if (LevelUpMenu::pMe) {
-            if (LevelUpMenu::pMe->pMenu) {
-                if (LevelUpMenu::pMe) {
-                    delete LevelUpMenu::pMe;
-                }
-            }
-        }
+
+        Warning("MENUS: Level Up Menu Creation Failed... Are your menu and art resources up to date?");
         return nullptr;
     }
+
+    if ((LevelUpMenu::pMe) && (LevelUpMenu::pMe->pMenu) && (LevelUpMenu::pMe)) {
+        delete LevelUpMenu::pMe;
+    }
+
+    return nullptr;
 }
 
 void LevelUpMenu::SetPerkAlphaIfRequirementsNotMet(Tile* a1, BGSPerk* a2) {

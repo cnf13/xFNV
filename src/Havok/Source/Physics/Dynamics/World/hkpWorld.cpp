@@ -2029,14 +2029,13 @@ void hkpWorld::reenableCollisionBetweenEntityPair(hkpEntity* entityA, hkpEntity*
     if (m_broadPhase->areAabbsOverlapping(handleA, handleB)) {
         const hkpLinkedCollidable* collA = &entityA->m_collidable;
         const hkpLinkedCollidable* collB = &entityB->m_collidable;
-        if (m_collisionFilter->isCollisionEnabled(*collA, *collB).m_bool) {
-            if (!hkAgentNnMachine_FindAgent(collA, collB)) {
-                hkpTypedBroadPhaseHandlePair pair;
-                pair.m_a = handleA;
-                pair.m_b = handleB;
-                // A null filter stays null; otherwise its hkpCollidableCollidableFilter base (+8).
-                m_broadPhaseDispatcher->addPairs(&pair, 1, m_collisionFilter);
-            }
+        if ((m_collisionFilter->isCollisionEnabled(*collA, *collB).m_bool) &&
+            (!hkAgentNnMachine_FindAgent(collA, collB))) {
+            hkpTypedBroadPhaseHandlePair pair;
+            pair.m_a = handleA;
+            pair.m_b = handleB;
+            // A null filter stays null; otherwise its hkpCollidableCollidableFilter base (+8).
+            m_broadPhaseDispatcher->addPairs(&pair, 1, m_collisionFilter);
         }
     }
 }
@@ -4771,10 +4770,9 @@ hkBool* enumerateAllInactiveEntitiesInWorld(hkBool* apResult, const hkpWorld* ap
         apResult->m_bool = 1;
         return apResult;
     }
-    else {
-        apResult->m_bool = 0;
-        return apResult;
-    }
+
+    apResult->m_bool = 0;
+    return apResult;
 }
 
 hkBool* enumerateAllActiveEntitiesInWorld(hkBool* apResult, const hkpWorld* apWorld, hkpPhysicsSystem* apSystem) {

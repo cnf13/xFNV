@@ -281,11 +281,10 @@ bool NiBoxBV::BoxTriTestIntersect(
             return false;
         }
     }
-    else if (NdD < -R) {
-        // EXE-INLINED 0x4B6190
-        if (NdD + (fTime * (N.x * W.x + N.y * W.y + N.z * W.z)) < -R) {
-            return false;
-        }
+    else if ((NdD < -R) && (NdD + (fTime * (N.x * W.x + N.y * W.y + N.z * W.z)) < -R))
+    // EXE-INLINED 0x4B6190
+    {
+        return false;
     }
 
     // EXE-INLINED 0x4B6190
@@ -451,10 +450,8 @@ bool NiBoxBV::BoxBoxTestIntersect(
                 return false;
             }
         }
-        else if (AD0[i] < -R01) {
-            if (AD1[i] < -R01) {
-                return false;
-            }
+        else if ((AD0[i] < -R01) && (AD1[i] < -R01)) {
+            return false;
         }
     }
 
@@ -491,10 +488,8 @@ bool NiBoxBV::BoxBoxTestIntersect(
             return false;
         }
     }
-    else if (R < -R01) {
-        if (B[1].Dot(D1) < -R01) {
-            return false;
-        }
+    else if ((R < -R01) && (B[1].Dot(D1) < -R01)) {
+        return false;
     }
 
     // The axis B[2]: the "below" side calls Dot.
@@ -509,10 +504,8 @@ bool NiBoxBV::BoxBoxTestIntersect(
             return false;
         }
     }
-    else if (R < -R01) {
-        if (B[2].Dot(D1) < -R01) {
-            return false;
-        }
+    else if ((R < -R01) && (B[2].Dot(D1) < -R01)) {
+        return false;
     }
 
     // A[0] x B[0]
@@ -525,10 +518,8 @@ bool NiBoxBV::BoxBoxTestIntersect(
             return false;
         }
     }
-    else if (R < -R01) {
-        if (AD1[2] * AB[1][0] - AD1[1] * AB[2][0] < -R01) {
-            return false;
-        }
+    else if ((R < -R01) && (AD1[2] * AB[1][0] - AD1[1] * AB[2][0] < -R01)) {
+        return false;
     }
 
     // A[0] x B[1]
@@ -541,10 +532,8 @@ bool NiBoxBV::BoxBoxTestIntersect(
             return false;
         }
     }
-    else if (R < -R01) {
-        if (AD1[2] * AB[1][1] - AD1[1] * AB[2][1] < -R01) {
-            return false;
-        }
+    else if ((R < -R01) && (AD1[2] * AB[1][1] - AD1[1] * AB[2][1] < -R01)) {
+        return false;
     }
 
     // A[0] x B[2]
@@ -557,10 +546,8 @@ bool NiBoxBV::BoxBoxTestIntersect(
             return false;
         }
     }
-    else if (R < -R01) {
-        if (AD1[2] * AB[1][2] - AD1[1] * AB[2][2] < -R01) {
-            return false;
-        }
+    else if ((R < -R01) && (AD1[2] * AB[1][2] - AD1[1] * AB[2][2] < -R01)) {
+        return false;
     }
 
     // A[1] x B[0]
@@ -573,10 +560,8 @@ bool NiBoxBV::BoxBoxTestIntersect(
             return false;
         }
     }
-    else if (R < -R01) {
-        if (AD1[0] * AB[2][0] - AD1[2] * AB[0][0] < -R01) {
-            return false;
-        }
+    else if ((R < -R01) && (AD1[0] * AB[2][0] - AD1[2] * AB[0][0] < -R01)) {
+        return false;
     }
 
     // A[1] x B[1]
@@ -589,10 +574,8 @@ bool NiBoxBV::BoxBoxTestIntersect(
             return false;
         }
     }
-    else if (R < -R01) {
-        if (AD1[0] * AB[2][1] - AD1[2] * AB[0][1] < -R01) {
-            return false;
-        }
+    else if ((R < -R01) && (AD1[0] * AB[2][1] - AD1[2] * AB[0][1] < -R01)) {
+        return false;
     }
 
     // A[1] x B[2]
@@ -605,10 +588,8 @@ bool NiBoxBV::BoxBoxTestIntersect(
             return false;
         }
     }
-    else if (R < -R01) {
-        if (AD1[0] * AB[2][2] - AD1[2] * AB[0][2] < -R01) {
-            return false;
-        }
+    else if ((R < -R01) && (AD1[0] * AB[2][2] - AD1[2] * AB[0][2] < -R01)) {
+        return false;
     }
 
     // A[2] x B[0]
@@ -621,10 +602,8 @@ bool NiBoxBV::BoxBoxTestIntersect(
             return false;
         }
     }
-    else if (R < -R01) {
-        if (AD1[1] * AB[0][0] - AD1[0] * AB[1][0] < -R01) {
-            return false;
-        }
+    else if ((R < -R01) && (AD1[1] * AB[0][0] - AD1[0] * AB[1][0] < -R01)) {
+        return false;
     }
 
     // A[2] x B[1]
@@ -637,10 +616,8 @@ bool NiBoxBV::BoxBoxTestIntersect(
             return false;
         }
     }
-    else if (R < -R01) {
-        if (AD1[1] * AB[0][1] - AD1[0] * AB[1][1] < -R01) {
-            return false;
-        }
+    else if ((R < -R01) && (AD1[1] * AB[0][1] - AD1[0] * AB[1][1] < -R01)) {
+        return false;
     }
 
     // A[2] x B[2]
@@ -653,10 +630,8 @@ bool NiBoxBV::BoxBoxTestIntersect(
             return false;
         }
     }
-    else if (R < -R01) {
-        if (AD1[1] * AB[0][2] - AD1[0] * AB[1][2] < -R01) {
-            return false;
-        }
+    else if ((R < -R01) && (AD1[1] * AB[0][2] - AD1[0] * AB[1][2] < -R01)) {
+        return false;
     }
 
     // The axes W x A[i] and W x B[i], tested against kWxD0 = W x D0 alone.
@@ -738,8 +713,9 @@ bool NiBoxBV::BoxBoxTestIntersect(
         extA[2] * __builtin_fabsf(AB[2][0] * afWB[1] - AB[2][1] * afWB[0]);
     R1 = extB[0] * __builtin_fabsf(afWB[1]) + extB[1] * __builtin_fabsf(afWB[0]);
     R01 = R0 + R1;
+    // Inverting the float test into `return R <= R01` would change the NaN result.
     if (R > R01) {
-        return false;
+        return false; // NOLINT(readability-simplify-boolean-expr)
     }
 
     return true;
@@ -785,7 +761,10 @@ bool NiBoxBV::BoxSphereTestIntersect(
     kDeltaV.y = kV1.y - kV0.y;
     kDeltaV.z = kV1.z - kV0.z;
 
-    float fSqrDist, fR0, fR1, fR2;
+    float fSqrDist;
+    float fR0;
+    float fR1;
+    float fR2;
     // EXE-INLINED 0x439090
     if (kDeltaV.x == NiPoint3_ZERO.x && kDeltaV.y == NiPoint3_ZERO.y && kDeltaV.z == NiPoint3_ZERO.z) {
         fSqrDist = NiSqrDistance::Compute(kSBV.m_kSphere.m_kCenter, kBBV.m_kBox, fR0, fR1, fR2);

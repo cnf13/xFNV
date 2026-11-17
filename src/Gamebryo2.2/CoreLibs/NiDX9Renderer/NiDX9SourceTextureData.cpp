@@ -286,11 +286,11 @@ bool NiDX9SourceTextureData::LoadTextureFile(
         strcpy_s(acStandardFilename, 260, a1);
         NiPath::Standardize(acStandardFilename);
         NiFilename kFilename(acStandardFilename);
-        if (NiStricmp(kFilename.m_acExt, ".bmp")) {
-            if (NiStricmp(kFilename.m_acExt, ".tga") && NiStricmp(kFilename.m_acExt, ".dds")) {
-                return false;
-            }
+        if ((NiStricmp(kFilename.m_acExt, ".bmp")) &&
+            (NiStricmp(kFilename.m_acExt, ".tga") && NiStricmp(kFilename.m_acExt, ".dds"))) {
+            return false;
         }
+
         pkFile = NiFile::GetFile(acStandardFilename, NiFile::READ_ONLY, 0x8000);
         if (!pkFile) {
             return false;

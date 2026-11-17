@@ -55,20 +55,19 @@ void DisintegrateArmorEffect::SaveGame(Actor* a1) {
     ActiveEffect::SaveGame(a1);
     if (pSaveLoadGameOLD->GetCurrentVersion() >= 55u) {
         earmorPosition = BO_NONE;
-        if (pArmor) {
-            if (pArmor->pContainerObj) {
-                TESObjectARMO* parmor = dynamic_cast<TESObjectARMO*>(pArmor->pContainerObj);
-                if (parmor) {
-                    // The slots are counted as an integer and passed as FillsBipedSlot's BIPED_OBJECT.
-                    for (uint32_t ibiped = 0; ibiped < 20; ++ibiped) {
-                        if (parmor->FillsBipedSlot(static_cast<BIPED_OBJECT>(ibiped), false, nullptr)) {
-                            earmorPosition = static_cast<BIPED_OBJECT>(ibiped);
-                            break;
-                        }
+        if ((pArmor) && (pArmor->pContainerObj)) {
+            TESObjectARMO* parmor = dynamic_cast<TESObjectARMO*>(pArmor->pContainerObj);
+            if (parmor) {
+                // The slots are counted as an integer and passed as FillsBipedSlot's BIPED_OBJECT.
+                for (uint32_t ibiped = 0; ibiped < 20; ++ibiped) {
+                    if (parmor->FillsBipedSlot(static_cast<BIPED_OBJECT>(ibiped), false, nullptr)) {
+                        earmorPosition = static_cast<BIPED_OBJECT>(ibiped);
+                        break;
                     }
                 }
             }
         }
+
         pSaveLoadGameOLD->SaveGameDataOLD(&earmorPosition, 4u);
     }
 }
@@ -137,7 +136,6 @@ ActiveEffect* DisintegrateArmorEffect::Instantiate(MagicCaster* apCaster, MagicI
     if (apMemory) {
         return ::new (apMemory) DisintegrateArmorEffect(apCaster, apSpell, apEffect);
     }
-    else {
-        return nullptr;
-    }
+
+    return nullptr;
 }

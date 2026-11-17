@@ -33,10 +33,9 @@ NiObject* NiFloatExtraDataController::CreateClone(NiCloningProcess& kCloning) {
         CopyMembers(pkClone, kCloning);
         return pkClone;
     }
-    else {
-        CopyMembers(nullptr, kCloning);
-        return nullptr;
-    }
+
+    CopyMembers(nullptr, kCloning);
+    return nullptr;
 }
 
 // Files before 10.1.0.104 also store the link to an old-style float data, which LinkObject resolves.
@@ -108,9 +107,8 @@ NiInterpolator* NiFloatExtraDataController::CreatePoseInterpolator(uint16_t usIn
         NiFloatExtraData* pkData = static_cast<NiFloatExtraData*>(m_spExtraData.m_pObject);
         return ::new (v3) NiFloatInterpolator(pkData->m_fValue);
     }
-    else {
-        return nullptr;
-    }
+
+    return nullptr;
 }
 
 // apInterp must be a NiFloatInterpolator; the extra data is not null-checked.

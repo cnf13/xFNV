@@ -191,10 +191,9 @@ NavMeshMath::ProjectPointOntoSegment(const NiPoint3& aPoint, const NiPoint3& aLi
         }
         return result;
     }
-    else {
-        result = aLineStart;
-        return result;
-    }
+
+    result = aLineStart;
+    return result;
 }
 
 // The points are flattened to x and y and passed to the NiPoint2 overload, built from the last argument back. Its
@@ -259,33 +258,31 @@ NiPoint3 NavMeshMath::ClosestPointOnSegmentToLine3(
         result = aSegmentStart;
         return result;
     }
-    else {
-        NiPoint3 v18;
-        float v17 = (aLineStart.x - aSegmentEnd.x) * (aLineEnd.y - aSegmentEnd.y) -
-            (aLineStart.y - aSegmentEnd.y) * (aLineEnd.x - aSegmentEnd.x);
-        float v15 = (aLineStart.x - aSegmentStart.x) * (aLineEnd.y - aSegmentStart.y) -
-            (aLineStart.y - aSegmentStart.y) * (aLineEnd.x - aSegmentStart.x);
-        float v16 = v15 / (v15 - v17);
-        NiPoint3* v6 = &(resulta = aSegmentEnd - aSegmentStart);
-        NiPoint3* v7 = &(dst = v16 * *v6);
-        v18 = aSegmentStart + *v7;
-        if (!(v17 * v15 > 0.0)) {
-            result = v18;
-            return result;
-        }
-        else {
-            NiPoint3* v8 = &(v12 = v18 - aSegmentStart);
-            double v10 = v8->SqrLength();
-            NiPoint3* v9 = &(v11 = v18 - aSegmentEnd);
-            if (!(v9->SqrLength() > v10)) {
-                result = aSegmentEnd;
-            }
-            else {
-                result = aSegmentStart;
-            }
-            return result;
-        }
+
+    NiPoint3 v18;
+    float v17 = (aLineStart.x - aSegmentEnd.x) * (aLineEnd.y - aSegmentEnd.y) -
+        (aLineStart.y - aSegmentEnd.y) * (aLineEnd.x - aSegmentEnd.x);
+    float v15 = (aLineStart.x - aSegmentStart.x) * (aLineEnd.y - aSegmentStart.y) -
+        (aLineStart.y - aSegmentStart.y) * (aLineEnd.x - aSegmentStart.x);
+    float v16 = v15 / (v15 - v17);
+    NiPoint3* v6 = &(resulta = aSegmentEnd - aSegmentStart);
+    NiPoint3* v7 = &(dst = v16 * *v6);
+    v18 = aSegmentStart + *v7;
+    if (!(v17 * v15 > 0.0)) {
+        result = v18;
+        return result;
     }
+
+    NiPoint3* v8 = &(v12 = v18 - aSegmentStart);
+    double v10 = v8->SqrLength();
+    NiPoint3* v9 = &(v11 = v18 - aSegmentEnd);
+    if (!(v9->SqrLength() > v10)) {
+        result = aSegmentEnd;
+    }
+    else {
+        result = aSegmentStart;
+    }
+    return result;
 }
 
 float NavMeshMath::DistanceFromSegment(
@@ -317,21 +314,19 @@ float NavMeshMath::DistanceFromSegment(
             NiPoint3* v8 = &(v11 = aPoint - v15);
             return v8->Length();
         }
-        else {
-            if (apRetInSegment) {
-                *apRetInSegment = false;
-            }
-            NiPoint3* v6 = &(v13 = aPoint - aLineEnd);
-            return v6->Length();
-        }
-    }
-    else {
+
         if (apRetInSegment) {
             *apRetInSegment = false;
         }
-        NiPoint3* v4 = &(v14 = aPoint - aLineStart);
-        return v4->Length();
+        NiPoint3* v6 = &(v13 = aPoint - aLineEnd);
+        return v6->Length();
     }
+
+    if (apRetInSegment) {
+        *apRetInSegment = false;
+    }
+    NiPoint3* v4 = &(v14 = aPoint - aLineStart);
+    return v4->Length();
 }
 
 bool NavMeshMath::DoCircleAndSegmentIntersect(
@@ -504,70 +499,61 @@ bool NavMeshMath::CircleSegmentIntersection(
             }
             return true;
         }
+
+        aResults.eType = NavMeshMath::CSI_NONE;
+        return false;
+    }
+
+    bool v7 = result0->fSegmentParam >= -fEpsilon && result0->fSegmentParam <= fEpsilon + 1.0;
+    bool v6 = result1->fSegmentParam >= -fEpsilon && result1->fSegmentParam <= fEpsilon + 1.0;
+    if (v7 && v6) {
+        aResults.eType = NavMeshMath::CSI_TWOPOINTS;
+        if (!(fEpsilon > static_cast<double>(result0->fSegmentParam)) && !(result0->fSegmentParam > 1.0 - fEpsilon)) {
+            aResults.Results[0u].eType = NavMeshMath::CSIT_EDGE;
+        }
         else {
-            aResults.eType = NavMeshMath::CSI_NONE;
+            aResults.Results[0u].eType = NavMeshMath::CSIT_ENDPOINT;
+        }
+        if (!(fEpsilon > static_cast<double>(result1->fSegmentParam)) && !(result1->fSegmentParam > 1.0 - fEpsilon)) {
+            aResults.Results[1].eType = NavMeshMath::CSIT_EDGE;
+        }
+        else {
+            aResults.Results[1].eType = NavMeshMath::CSIT_ENDPOINT;
+        }
+        return true;
+    }
+
+    if (!v7 || v6) {
+        if (v7 || !v6) {
+            if (!(fr2 > relativeSegment.Start.SqrXYLength())) {
+                aResults.eType = NavMeshMath::CSI_NONE;
+            }
+            else {
+                aResults.eType = NavMeshMath::CSI_CONTAINED;
+            }
             return false;
         }
-    }
-    else {
-        bool v7 = result0->fSegmentParam >= -fEpsilon && result0->fSegmentParam <= fEpsilon + 1.0;
-        bool v6 = result1->fSegmentParam >= -fEpsilon && result1->fSegmentParam <= fEpsilon + 1.0;
-        if (v7 && v6) {
-            aResults.eType = NavMeshMath::CSI_TWOPOINTS;
-            if (!(fEpsilon > static_cast<double>(result0->fSegmentParam)) &&
-                !(result0->fSegmentParam > 1.0 - fEpsilon)) {
-                aResults.Results[0u].eType = NavMeshMath::CSIT_EDGE;
-            }
-            else {
-                aResults.Results[0u].eType = NavMeshMath::CSIT_ENDPOINT;
-            }
-            if (!(fEpsilon > static_cast<double>(result1->fSegmentParam)) &&
-                !(result1->fSegmentParam > 1.0 - fEpsilon)) {
-                aResults.Results[1].eType = NavMeshMath::CSIT_EDGE;
-            }
-            else {
-                aResults.Results[1].eType = NavMeshMath::CSIT_ENDPOINT;
-            }
-            return true;
+
+        aResults.eType = NavMeshMath::CSI_ONEPOINT_LOWER;
+        result0->CircleParam.operator=(result1->CircleParam);
+        result0->fSegmentParam = result1->fSegmentParam;
+        if (!(fEpsilon > static_cast<double>(result0->fSegmentParam)) && !(result0->fSegmentParam > 1.0 - fEpsilon)) {
+            aResults.Results[0u].eType = NavMeshMath::CSIT_EDGE;
         }
         else {
-            if (!v7 || v6) {
-                if (v7 || !v6) {
-                    if (!(fr2 > relativeSegment.Start.SqrXYLength())) {
-                        aResults.eType = NavMeshMath::CSI_NONE;
-                    }
-                    else {
-                        aResults.eType = NavMeshMath::CSI_CONTAINED;
-                    }
-                    return false;
-                }
-                else {
-                    aResults.eType = NavMeshMath::CSI_ONEPOINT_LOWER;
-                    result0->CircleParam.operator=(result1->CircleParam);
-                    result0->fSegmentParam = result1->fSegmentParam;
-                    if (!(fEpsilon > static_cast<double>(result0->fSegmentParam)) &&
-                        !(result0->fSegmentParam > 1.0 - fEpsilon)) {
-                        aResults.Results[0u].eType = NavMeshMath::CSIT_EDGE;
-                    }
-                    else {
-                        aResults.Results[0u].eType = NavMeshMath::CSIT_ENDPOINT;
-                    }
-                    return true;
-                }
-            }
-            else {
-                aResults.eType = NavMeshMath::CSI_ONEPOINT_UPPER;
-                if (!(fEpsilon > static_cast<double>(result0->fSegmentParam)) &&
-                    !(result0->fSegmentParam > 1.0 - fEpsilon)) {
-                    aResults.Results[0u].eType = NavMeshMath::CSIT_EDGE;
-                }
-                else {
-                    aResults.Results[0u].eType = NavMeshMath::CSIT_ENDPOINT;
-                }
-                return true;
-            }
+            aResults.Results[0u].eType = NavMeshMath::CSIT_ENDPOINT;
         }
+        return true;
     }
+
+    aResults.eType = NavMeshMath::CSI_ONEPOINT_UPPER;
+    if (!(fEpsilon > static_cast<double>(result0->fSegmentParam)) && !(result0->fSegmentParam > 1.0 - fEpsilon)) {
+        aResults.Results[0u].eType = NavMeshMath::CSIT_EDGE;
+    }
+    else {
+        aResults.Results[0u].eType = NavMeshMath::CSIT_ENDPOINT;
+    }
+    return true;
 }
 
 NavMeshMath::CIRCLE_CIRCLE_TANGENT NavMeshMath::ComputeTangentPoints(
@@ -597,54 +583,53 @@ NavMeshMath::CIRCLE_CIRCLE_TANGENT NavMeshMath::ComputeTangentPoints(
         aResults.eType = NavMeshMath::CCT_NONE;
         return NavMeshMath::CCT_NONE;
     }
-    else {
-        float deltaRadius = fradius1 - fradius2;
-        float deltaRadius_sqr = deltaRadius * deltaRadius;
-        if (deltaRadius_sqr <= static_cast<double>(sqr_length)) {
-            double v6;
-            float ratio = 1.0 / sqr_length;
-            float v9 = sqr_length - deltaRadius_sqr;
-            float dist = std::sqrt(v9);
-            if (aDirection) {
-                aResults.Results[0u].Direction = AD_CW;
-                aResults.Results[0u].Circle1Param.fCos = (deltaRadius * v.x - v.y * dist) * ratio;
-                v6 = (deltaRadius * v.y + v.x * dist) * ratio;
-            }
-            else {
-                aResults.Results[0u].Direction = AD_CCW;
-                aResults.Results[0u].Circle1Param.fCos = (deltaRadius * v.x + v.y * dist) * ratio;
-                v6 = (deltaRadius * v.y - v.x * dist) * ratio;
-            }
-            aResults.Results[0u].Circle1Param.fSin = v6;
-            aResults.Results[ivalidCount].Circle2Param.fCos = aResults.Results[ivalidCount].Circle1Param.fCos;
-            aResults.Results[ivalidCount].Circle2Param.fSin = aResults.Results[ivalidCount].Circle1Param.fSin;
-            ++ivalidCount;
+
+    float deltaRadius = fradius1 - fradius2;
+    float deltaRadius_sqr = deltaRadius * deltaRadius;
+    if (deltaRadius_sqr <= static_cast<double>(sqr_length)) {
+        double v6;
+        float ratio = 1.0 / sqr_length;
+        float v9 = sqr_length - deltaRadius_sqr;
+        float dist = std::sqrt(v9);
+        if (aDirection) {
+            aResults.Results[0u].Direction = AD_CW;
+            aResults.Results[0u].Circle1Param.fCos = (deltaRadius * v.x - v.y * dist) * ratio;
+            v6 = (deltaRadius * v.y + v.x * dist) * ratio;
         }
-        float sumRadius = fradius1 + fradius2;
-        float sumRadius_sqr = sumRadius * sumRadius;
-        if (sumRadius_sqr <= static_cast<double>(sqr_length)) {
-            double v7;
-            float ratio_2 = 1.0 / sqr_length;
-            float v8 = sqr_length - sumRadius_sqr;
-            float dist_2 = std::sqrt(v8);
-            if (aDirection) {
-                aResults.Results[ivalidCount].Direction = AD_CCW;
-                aResults.Results[ivalidCount].Circle1Param.fCos = (sumRadius * v.x - v.y * dist_2) * ratio_2;
-                v7 = (sumRadius * v.y + v.x * dist_2) * ratio_2;
-            }
-            else {
-                aResults.Results[ivalidCount].Direction = AD_CW;
-                aResults.Results[ivalidCount].Circle1Param.fCos = (sumRadius * v.x + v.y * dist_2) * ratio_2;
-                v7 = (sumRadius * v.y - v.x * dist_2) * ratio_2;
-            }
-            aResults.Results[ivalidCount].Circle1Param.fSin = v7;
-            aResults.Results[ivalidCount].Circle2Param.fCos = -aResults.Results[ivalidCount].Circle1Param.fCos;
-            aResults.Results[ivalidCount].Circle2Param.fSin = -aResults.Results[ivalidCount].Circle1Param.fSin;
-            ++ivalidCount;
+        else {
+            aResults.Results[0u].Direction = AD_CCW;
+            aResults.Results[0u].Circle1Param.fCos = (deltaRadius * v.x + v.y * dist) * ratio;
+            v6 = (deltaRadius * v.y - v.x * dist) * ratio;
         }
-        aResults.eType = static_cast<NavMeshMath::CIRCLE_CIRCLE_TANGENT>(ivalidCount);
-        return static_cast<NavMeshMath::CIRCLE_CIRCLE_TANGENT>(ivalidCount);
+        aResults.Results[0u].Circle1Param.fSin = v6;
+        aResults.Results[ivalidCount].Circle2Param.fCos = aResults.Results[ivalidCount].Circle1Param.fCos;
+        aResults.Results[ivalidCount].Circle2Param.fSin = aResults.Results[ivalidCount].Circle1Param.fSin;
+        ++ivalidCount;
     }
+    float sumRadius = fradius1 + fradius2;
+    float sumRadius_sqr = sumRadius * sumRadius;
+    if (sumRadius_sqr <= static_cast<double>(sqr_length)) {
+        double v7;
+        float ratio_2 = 1.0 / sqr_length;
+        float v8 = sqr_length - sumRadius_sqr;
+        float dist_2 = std::sqrt(v8);
+        if (aDirection) {
+            aResults.Results[ivalidCount].Direction = AD_CCW;
+            aResults.Results[ivalidCount].Circle1Param.fCos = (sumRadius * v.x - v.y * dist_2) * ratio_2;
+            v7 = (sumRadius * v.y + v.x * dist_2) * ratio_2;
+        }
+        else {
+            aResults.Results[ivalidCount].Direction = AD_CW;
+            aResults.Results[ivalidCount].Circle1Param.fCos = (sumRadius * v.x + v.y * dist_2) * ratio_2;
+            v7 = (sumRadius * v.y - v.x * dist_2) * ratio_2;
+        }
+        aResults.Results[ivalidCount].Circle1Param.fSin = v7;
+        aResults.Results[ivalidCount].Circle2Param.fCos = -aResults.Results[ivalidCount].Circle1Param.fCos;
+        aResults.Results[ivalidCount].Circle2Param.fSin = -aResults.Results[ivalidCount].Circle1Param.fSin;
+        ++ivalidCount;
+    }
+    aResults.eType = static_cast<NavMeshMath::CIRCLE_CIRCLE_TANGENT>(ivalidCount);
+    return static_cast<NavMeshMath::CIRCLE_CIRCLE_TANGENT>(ivalidCount);
 }
 
 float NavMeshMath::DistanceFromLine(const NiPoint3& aPoint, const NiPoint3& aLineStart, const NiPoint3& aLineEnd) {
@@ -688,18 +673,15 @@ int32_t NavMeshMath::SegmentPlaneIntersection(
             *apRet = (v7 = aLineStart + *v6);
             return 1;
         }
-        else {
-            return 0;
-        }
+
+        return 0;
     }
-    else {
-        if (v10 == 0.0) {
-            return -1;
-        }
-        else {
-            return 0;
-        }
+
+    if (v10 == 0.0) {
+        return -1;
     }
+
+    return 0;
 }
 
 bool NavMeshMath::SegmentCircleIntersection(

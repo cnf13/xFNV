@@ -429,9 +429,8 @@ NiObject* BSPSysArrayEmitter::CreateObject() {
     if (v2) {
         return ::new (v2) BSPSysArrayEmitter;
     }
-    else {
-        return nullptr;
-    }
+
+    return nullptr;
 }
 
 NiPSysEmitter::~NiPSysEmitter() {}

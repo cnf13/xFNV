@@ -216,12 +216,11 @@ void Menu::StartFadeOut() {
         }
         Interface::AddMenuFade(this, afSecs);
         xFadeState = Interface::FADING_OUT;
-        if (iIsModal) {
-            if (pMenu->Tile::IsTrue(6002)) {
-                Interface::PopFromEnterStack(static_cast<Interface::enumMenus>(iIsModal), false);
-                Interface::SetCurrentFocusTarget(nullptr);
-            }
+        if ((iIsModal) && (pMenu->Tile::IsTrue(6002))) {
+            Interface::PopFromEnterStack(static_cast<Interface::enumMenus>(iIsModal), false);
+            Interface::SetCurrentFocusTarget(nullptr);
         }
+
         Interface::UpdateAllTimers();
     }
 }

@@ -39,10 +39,9 @@ char* GetGunWobble(ANIM_GROUP_WEAPON_ENUM aeWeaponType, float afTime, NiMatrix3&
         apReturnWobble = (result = *v4 * LocalTransform->m_Rotate);
         return pWobbleBoneName[aeWeaponType];
     }
-    else {
-        apReturnWobble = NiMatrix3_IDENTITY;
-        return nullptr;
-    }
+
+    apReturnWobble = NiMatrix3_IDENTITY;
+    return nullptr;
 }
 
 void ClearGunWobble(ANIM_GROUP_WEAPON_ENUM aeWeaponType, NiNode* apRoot) {

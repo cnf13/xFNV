@@ -1245,413 +1245,387 @@ bool TESNPC::Activate(
         }
         return false;
     }
-    else {
-        char msg[304];
-        if (!pactor->IsDead(false) || pactor->GetLifeState() == ACTOR_LIFE_STATE_ESSENTIAL_DOWN) {
-            if (pactor->IsUnConscious() ||
-                (pactor->IsKnockedOut() || pactor->GetLifeState() == ACTOR_LIFE_STATE_ESSENTIAL_DOWN)) {
-                const char* a2 = sNoTalkUnConscious.String();
-                std::sprintf(msg, "%s %s", pactor->GetFullName(), a2);
-                Interface::ShowMessage(
-                    msg, 0, "Interfac\\Icons\\Message Icons\\glow_message_vaultboy_surprised.dds", nullptr, 2.0f, false
-                );
-                return false;
-            }
-            if (pactor->IsFleeing(false)) {
-                CombatController* pcombat = pactor->GetCombatController();
-                if (!pcombat || (!pcombat->IsActoraCombatTarget(pPlayer) || pPlayer->GetBlocked())) {
-                    const char* a2a = sNoTalkFleeing.String();
-                    std::sprintf(msg, "%s %s", pactor->GetFullName(), a2a);
-                    Interface::ShowMessage(
-                        msg, 0, "Interface\\Icons\\Message Icons\\glow_message_vaultboy_sad.dds", nullptr, 2.0f, false
-                    );
-                    return false;
-                }
-            }
-        }
-        if (pactor->IsPlayerTeammate() && apActionRef == pPlayer) {
-            if (Actor::IsConsciousAndNotAttackingPlayer(pactor)) {
-                Interface::QueueMenuCreate(
-                    Interface::OPEN_COMPANION_WHEEL, apItemActivated, nullptr, nullptr, Interface::CMM_NONE, false
-                );
-            }
+
+    char msg[304];
+    if (!pactor->IsDead(false) || pactor->GetLifeState() == ACTOR_LIFE_STATE_ESSENTIAL_DOWN) {
+        if (pactor->IsUnConscious() ||
+            (pactor->IsKnockedOut() || pactor->GetLifeState() == ACTOR_LIFE_STATE_ESSENTIAL_DOWN)) {
+            const char* a2 = sNoTalkUnConscious.String();
+            std::sprintf(msg, "%s %s", pactor->GetFullName(), a2);
+            Interface::ShowMessage(
+                msg, 0, "Interfac\\Icons\\Message Icons\\glow_message_vaultboy_surprised.dds", nullptr, 2.0f, false
+            );
             return false;
         }
-        else {
-            if (pActionActor) {
-                TESPackage* peditorpack = (&pActionActor->m_Extra)->GetPackageExtra();
-                if (pActionActor != pPlayer) {
-                    if (peditorpack) {
-                        if (peditorpack->GetPackType() == PACKAGE_TYPE_DIALOGUE) {
-                            ExtraDataList* pextra = &pactor->m_Extra;
-                            TESObjectREFR* PackageExtraTarget = pextra->GetPackageExtraTarget();
-                            (&pActionActor->m_Extra)
-                                ->SetPackageExtra(peditorpack, 4, PackageExtraTarget, true, true, false);
-                            if (peditorpack->GetOncePerDay()) {
-                                char Day = appCalendar.GetDay();
-                                pActionActor->SetRunOnceExtraPackage(peditorpack, Day);
-                            }
-                            BaseProcess* v47 = pactor->pCurrentProcess;
-                            v47->PackageDone(pActionActor, peditorpack);
-                            pactor->AddChange(CHANGE_REFR_EXTRA_GAME_ONLY);
-                        }
-                    }
-                }
-                if (pActionActor != pPlayer) {
-                    if (pActionActor->pCurrentProcess) {
-                        BaseProcess* v46 = pActionActor->pCurrentProcess;
-                        v46->SetTargetActivated(true);
-                    }
-                }
-                if (pactor->IsInCombat() && (pActionActor == pPlayer && pactor->IsPlayerTeammate())) {
-                    pVATS.QuitVATSPlayback(false, false);
-                    Interface::QueueMenuCreate(
-                        Interface::OPEN_DIALOG, pactor, nullptr, nullptr, Interface::CMM_STANDARD, false
-                    );
-                }
-                else {
-                    BaseProcess* v44;
-                    BaseProcess* v45;
-                    if ((!pactor->IsInCombat() || pactor->IsKnockedOut()) &&
-                        (pActionActor != pPlayer ||
-                         (pactor->GetSitSleepState() == SIT_SLEEP_NORMAL ||
-                          (pactor->GetSitSleepState() == SIT_SLEEP_IS_SLEEPING ||
-                           (pactor->GetSitSleepState() == SIT_SLEEP_IS_SITTING ||
-                            ((v45 = pactor->pCurrentProcess, v45->GetFurnitureMarker()) &&
-                             (v44 = pactor->pCurrentProcess, v44->GetFurnitureMarker()->cNumber > 19u))))))) {
-                        if (pactor->IsReanimated()) {
-                            return false;
-                        }
-                        if (pactor->IsDead(false)) {
-                            if (pActionActor == pPlayer) {
-                                Interface::QueueMenuCreate(
-                                    Interface::OPEN_CONTAINER, apItemActivated, nullptr, nullptr,
-                                    Interface::CMM_STANDARD, false
-                                );
-                            }
-                            else {
-                                if (apObjecttoGet) {
-                                    if (!dynamic_cast<TESNPC*>(apObjecttoGet)) {
-                                        apItemActivated->RemoveItem(
-                                            apObjecttoGet, nullptr, aicount, false, false, pActionActor, nullptr,
-                                            nullptr, true, false
-                                        );
-                                    }
-                                }
-                            }
-                        }
-                        else {
-                            TESPackage* v9;
-                            TESPackage* v10;
-                            TESPackage* v11;
-                            FIGHT_REACTION ereaction = FIGHT_REACTION_NEUTRAL;
-                            if (!pactor->IsRestrained() && !pactor->IsParalyzed()) {
-                                if (pActionActor == pPlayer ||
-                                    !pActionActor->GetShouldAttackActor(pactor, false, ereaction, false)) {
-                                    if (!pactor->IsActoraGuard() &&
-                                        pactor->GetShouldAttackActor(pActionActor, false, ereaction, false) &&
-                                        !pActionActor->IsSneaking()) {
-                                        BaseProcess* v42 = pactor->pCurrentProcess;
-                                        if (v42->EnterCombat(
-                                                pactor, pActionActor, true, true, nullptr, false, false, true, 0, false,
-                                                false, true, nullptr
-                                            )) {
-                                            return true;
-                                        }
-                                    }
-                                }
-                                else {
-                                    BaseProcess* v43 = pActionActor->pCurrentProcess;
-                                    if (v43->EnterCombat(
-                                            pActionActor, pactor, false, true, nullptr, false, false, true, 0, false,
-                                            false, true, nullptr
-                                        )) {
-                                        return true;
-                                    }
-                                }
-                            }
-                            if (pActionActor == pPlayer && (pactor->IsKnockedOut() && pactor->GetEssential())) {
-                                return false;
-                            }
-                            if (pActionActor == pPlayer ||
-                                (pactor == pPlayer &&
-                                 ((v9 = pActionActor->GetCurrentPackage(), v9->IsInterruptPackage()) ||
-                                  ((v10 = pActionActor->GetCurrentPackage(),
-                                    v10->GetPackType() == PACKAGE_TYPE_EXPLORE) ||
-                                   (v11 = pActionActor->GetCurrentPackage(),
-                                    v11->GetPackType() == PACKAGE_TYPE_AMBUSH))))) {
-                                if (pActionActor == pPlayer &&
-                                    ((pactor->IsKnockedOut() ||
-                                      (pPlayer->IsSneaking() && !pactor->IsPlayerTeammate())) &&
-                                     !pactor->GetGhost())) {
-                                    if (!pactor->IsKnockedOut()) {
-                                        BaseProcess* v41 = pactor->pCurrentProcess;
-                                        if (v41->GetPickpocketed()) {
-                                            const char* a2b = gs_sNoPickPocketAgain.String();
-                                            std::sprintf(msg, "%s %s", pactor->GetFullName(), a2b);
-                                            Interface::ShowMessage(
-                                                msg, 0,
-                                                "Interface\\Icons\\Message Icons\\glow_message_vaultboy_sad.dds",
-                                                nullptr, 2.0f, false
-                                            );
-                                            return false;
-                                        }
-                                    }
-                                    Interface::QueueMenuCreate(
-                                        Interface::OPEN_CONTAINER, apItemActivated, nullptr, nullptr,
-                                        Interface::CMM_PICKPOCKET, false
-                                    );
-                                }
-                                else {
-                                    BaseProcess* v40;
-                                    TESTopic* pgreetTopic = nullptr;
-                                    if (pActionActor == pPlayer ||
-                                        (v40 = pActionActor->pCurrentProcess, v40->GetNeedTalkPlayer())) {
-                                        pgreetTopic = TESTopic::GetTopic(DT_TOPIC, 0);
-                                    }
-                                    DialogueItem* pgreetDialogue = nullptr;
-                                    if (pgreetTopic) {
-                                        if (pActionActor == pPlayer) {
-                                            pgreetDialogue = pgreetTopic->CreateDialogueItem(
-                                                pactor, pPlayer, nullptr, nullptr, false
-                                            );
-                                        }
-                                        else {
-                                            BaseProcess* v39 = pActionActor->pCurrentProcess;
-                                            if (v39->GetNeedTalkPlayer()) {
-                                                pgreetDialogue = pgreetTopic->CreateDialogueItem(
-                                                    pActionActor, pPlayer, nullptr, nullptr, false
-                                                );
-                                            }
-                                        }
-                                    }
-                                    if (pgreetDialogue &&
-                                        (pgreetDialogue->pInfo->IsGoodbye() &&
-                                         (pgreetDialogue->FirstResponse() && !pgreetDialogue->NextResponse()))) {
-                                        if (pactor->GetSitSleepState() == SIT_SLEEP_IS_SLEEPING) {
-                                            BaseProcess* v38 = pactor->pCurrentProcess;
-                                            v38->SetNeedTalkPlayer(true);
-                                            pactor->InitiateGetUpPackage();
-                                            return true;
-                                        }
-                                        if (pactor == pPlayer) {
-                                            pActionActor->SayForceGoodbyeGreetingToPlayer(pgreetTopic, false, false);
-                                        }
-                                        else {
-                                            pactor->SayForceGoodbyeGreetingToPlayer(pgreetTopic, false, false);
-                                        }
-                                    }
-                                    else {
-                                        BaseProcess* v37 = pactor->pCurrentProcess;
-                                        if (v37->GetFurnitureMarker()) {
-                                            BaseProcess* v36 = pactor->pCurrentProcess;
-                                            if (v36->GetFurnitureMarker()->cNumber > 19u) {
-                                                BaseProcess* v35 = pactor->pCurrentProcess;
-                                                v35->AddPostAnimationAction(
-                                                    BaseProcess::POSTANIM_ACTION_GETOUT_OF_FURNITURE
-                                                );
-                                            }
-                                        }
-                                        if (pactor->GetSitSleepState() == SIT_SLEEP_NORMAL) {
-                                            NiPoint3 v73 = pActionActor->GetLocationOnReference();
-                                            pactor->RequestRotate(v73, false);
-                                        }
-                                        TESTopic* ptopic = nullptr;
-                                        Actor* pspeaker = nullptr;
-                                        if (pActionActor == pPlayer) {
-                                            if (!pactor->IsPathingComplete() && !pactor->IsRotating()) {
-                                                BaseProcess* v34 = pactor->pCurrentProcess;
-                                                v34->EndMoveMessage(pactor);
-                                            }
-                                            pActionActor->StopAttack();
-                                            pactor->StopAttack();
-                                            TESPackage* CurrentPackage = pActionActor->GetCurrentPackage();
-                                            DialoguePackage* ppack = dynamic_cast<DialoguePackage*>(CurrentPackage);
-                                            if (ppack) {
-                                                ptopic = ppack->ptopic;
-                                            }
-                                            pspeaker = static_cast<Actor*>(apItemActivated);
-                                            if (pactor->GetCurrentTarget() == pPlayer) {
-                                                if (potherpackage) {
-                                                    if (potherpackage->GetPackType() == PACKAGE_TYPE_EXPLORE) {
-                                                        if (!potherpackage->GetPackageSchedule() ||
-                                                            potherpackage->GetPackageSchedule()->PSData.iDuration) {
-                                                            pprocess->AddToProcedureIndexRunning(pactor, 1);
-                                                        }
-                                                        else {
-                                                            pprocess->AddToProcedureIndexRunning(pActionActor, 2);
-                                                        }
-                                                    }
-                                                }
-                                            }
-                                            BSAudio* v13 = &BSAudio::QInstance();
-                                            v13->EndAllSoundsOfType(4u);
-                                            pactor->InterruptCast();
-                                            if (pactor->GetSitSleepState() == SIT_SLEEP_IS_SLEEPING) {
-                                                BaseProcess* v33 = pactor->pCurrentProcess;
-                                                v33->SetNeedTalkPlayer(true);
-                                                pactor->InitiateGetUpPackage();
-                                            }
-                                            else {
-                                                Actor* pact = pActionActor;
-                                                if (pActionActor == pPlayer) {
-                                                    pact = pactor;
-                                                }
-                                                pVATS.QuitVATSPlayback(false, false);
-                                                Interface::QueueMenuCreate(
-                                                    Interface::OPEN_DIALOG, pact, ptopic, nullptr,
-                                                    Interface::CMM_STANDARD, false
-                                                );
-                                            }
-                                        }
-                                        else {
-                                            if (Interface::GetMenuModeType() != Interface::eDialogMenu) {
-                                                BaseProcess* v32 = pPlayer->pCurrentProcess;
-                                                if (!v32->CanForceGreet(pActionActor)) {
-                                                    return false;
-                                                }
-                                                BSAudio* v14 = &BSAudio::QInstance();
-                                                v14->EndAllSoundsOfType(4u);
-                                                pActionActor->StopAttack();
-                                                pactor->StopAttack();
-                                                pspeaker = pActionActor;
-                                                if (!pActionActor->IsInCombat()) {
-                                                    TESPackage* v15 = pActionActor->GetCurrentPackage();
-                                                    DialoguePackage* ppack_2 = dynamic_cast<DialoguePackage*>(v15);
-                                                    if (ppack_2) {
-                                                        ptopic = ppack_2->ptopic;
-                                                    }
-                                                }
-                                                if (!pactionpackage->GetPackageSchedule() ||
-                                                    pactionpackage->GetPackageSchedule()->PSData.iDuration) {
-                                                    BaseProcess* v30 = pActionActor->pCurrentProcess;
-                                                    v30->AddToProcedureIndexRunning(pActionActor, 1);
-                                                }
-                                                else {
-                                                    BaseProcess* v31 = pActionActor->pCurrentProcess;
-                                                    v31->AddToProcedureIndexRunning(pActionActor, 2);
-                                                }
-                                                pactor->InterruptCast();
-                                                if (pactor == pPlayer) {
-                                                    pactor->ForceIdleAnimation();
-                                                }
-                                                else {
-                                                    BaseProcess* v29 = pactor->pCurrentProcess;
-                                                    v29->AddPostAnimationAction(
-                                                        BaseProcess::POSTANIM_FORCEIDLE_ANIMATION
-                                                    );
-                                                }
-                                                if (pActionActor == pPlayer) {
-                                                    pActionActor->ForceIdleAnimation();
-                                                }
-                                                else {
-                                                    BaseProcess* v28 = pActionActor->pCurrentProcess;
-                                                    v28->AddPostAnimationAction(
-                                                        BaseProcess::POSTANIM_FORCEIDLE_ANIMATION
-                                                    );
-                                                }
-                                                pVATS.QuitVATSPlayback(false, false);
-                                                Actor* pact_2 = pActionActor;
-                                                if (pActionActor == pPlayer) {
-                                                    pact_2 = pactor;
-                                                }
-                                                Interface::QueueMenuCreate(
-                                                    Interface::OPEN_DIALOG, pact_2, ptopic, nullptr,
-                                                    Interface::CMM_STANDARD, false
-                                                );
-                                            }
-                                        }
-                                    }
-                                    if (pgreetDialogue) {
-                                        delete pgreetDialogue;
-                                    }
-                                }
-                            }
-                            else {
-                                if (apObjecttoGet) {
-                                    if (!dynamic_cast<TESNPC*>(apObjecttoGet)) {
-                                        pactor->RemoveItem(
-                                            apObjecttoGet, nullptr, aicount, true, false, pActionActor, nullptr,
-                                            nullptr, true, false
-                                        );
-                                        pActionActor->PickpocketAlarm(pactor, apObjecttoGet, aicount);
-                                        return true;
-                                    }
-                                }
-                                TESPackage* v16 = pActionActor->GetCurrentPackage();
-                                if (v16->GetPackType() == PACKAGE_TYPE_ESCORT) {
-                                    BaseProcess* v27 = pActionActor->pCurrentProcess;
-                                    v27->AddToProcedureIndexRunning(pActionActor, 2);
-                                }
-                                else {
-                                    if (pActionActor->GetCurrentPackage()) {
-                                        TESPackage* v17 = pActionActor->GetCurrentPackage();
-                                        if (v17->GetPackType() != PACKAGE_TYPE_FOLLOW) {
-                                            BaseProcess* v26 = pActionActor->pCurrentProcess;
-                                            v26->AddToProcedureIndexRunning(pActionActor, 1);
-                                        }
-                                    }
-                                    if (pactor != pPlayer) {
-                                        if (pactor != pActionActor) {
-                                            if (pactor->GetCurrentPackage()) {
-                                                TESPackage* v18 = pactor->GetCurrentPackage();
-                                                if (v18->GetPackType() != PACKAGE_TYPE_FOLLOW) {
-                                                    TESPackage* v19 = pactor->GetCurrentPackage();
-                                                    if (v19->GetPackType() != PACKAGE_TYPE_ESCORT) {
-                                                        pprocess->AddToProcedureIndexRunning(pactor, 1);
-                                                    }
-                                                }
-                                            }
-                                        }
-                                        if (pactor != pActionActor && pactor->GetSitSleepState() == SIT_SLEEP_NORMAL) {
-                                            if (pActionActor->IsinDialogue()) {
-                                                DialoguePackage* ppack_3 =
-                                                    static_cast<DialoguePackage*>(pActionActor->GetCurrentPackage());
-                                                if (!ppack_3->GetDialogueNoHeadtrack() &&
-                                                    !ppack_3->GetDialogueDoNotControlTarget()) {
-                                                    NiPoint3 v74 = pActionActor->GetLocationOnReference();
-                                                    pactor->RequestRotate(v74, false);
-                                                }
-                                            }
-                                            else {
-                                                NiPoint3 v75 = pActionActor->GetLocationOnReference();
-                                                pactor->RequestRotate(v75, false);
-                                            }
-                                        }
-                                        if (!pActionActor->IsinDialogue() && pActionActor->IsNpc() && pactor->IsNpc()) {
-                                            BaseProcess* v25 = pActionActor->pCurrentProcess;
-                                            v25->AddToProcedureIndexRunning(pActionActor, 1);
-                                            if (pActionActor->InitiateDialogue(
-                                                    pactor, nullptr, nullptr, true, false, false, nullptr, false, false
-                                                )) {
-                                                BaseProcess* v24 = pActionActor->pCurrentProcess;
-                                                v24->AddToProcedureIndexRunning(pActionActor, 2);
-                                                pprocess->AddToProcedureIndexRunning(pactor, 2);
-                                            }
-                                        }
-                                    }
-                                }
-                            }
-                        }
-                    }
-                    else {
-                        if (pactor->GetCombatController() &&
-                            (pActionActor == pPlayer && pactor->GetCombatController()->QSwimAllowed())) {
-                            char apText[204];
-                            const char* v20 = sActivateNPCCalmed.String();
-                            std::sprintf(apText, "%s %s", GetFullName(), v20);
-                            Interface::ShowMessage(apText, 0, nullptr, nullptr, 2.0f, false);
-                            return false;
-                        }
-                    }
-                }
-                return true;
-            }
-            else {
+        if (pactor->IsFleeing(false)) {
+            CombatController* pcombat = pactor->GetCombatController();
+            if (!pcombat || (!pcombat->IsActoraCombatTarget(pPlayer) || pPlayer->GetBlocked())) {
+                const char* a2a = sNoTalkFleeing.String();
+                std::sprintf(msg, "%s %s", pactor->GetFullName(), a2a);
+                Interface::ShowMessage(
+                    msg, 0, "Interface\\Icons\\Message Icons\\glow_message_vaultboy_sad.dds", nullptr, 2.0f, false
+                );
                 return false;
             }
         }
     }
+    if (pactor->IsPlayerTeammate() && apActionRef == pPlayer) {
+        if (Actor::IsConsciousAndNotAttackingPlayer(pactor)) {
+            Interface::QueueMenuCreate(
+                Interface::OPEN_COMPANION_WHEEL, apItemActivated, nullptr, nullptr, Interface::CMM_NONE, false
+            );
+        }
+        return false;
+    }
+
+    if (pActionActor) {
+        TESPackage* peditorpack = (&pActionActor->m_Extra)->GetPackageExtra();
+        if ((pActionActor != pPlayer) && (peditorpack) && (peditorpack->GetPackType() == PACKAGE_TYPE_DIALOGUE)) {
+            ExtraDataList* pextra = &pactor->m_Extra;
+            TESObjectREFR* PackageExtraTarget = pextra->GetPackageExtraTarget();
+            (&pActionActor->m_Extra)->SetPackageExtra(peditorpack, 4, PackageExtraTarget, true, true, false);
+            if (peditorpack->GetOncePerDay()) {
+                char Day = appCalendar.GetDay();
+                pActionActor->SetRunOnceExtraPackage(peditorpack, Day);
+            }
+            BaseProcess* v47 = pactor->pCurrentProcess;
+            v47->PackageDone(pActionActor, peditorpack);
+            pactor->AddChange(CHANGE_REFR_EXTRA_GAME_ONLY);
+        }
+
+        if ((pActionActor != pPlayer) && (pActionActor->pCurrentProcess)) {
+            BaseProcess* v46 = pActionActor->pCurrentProcess;
+            v46->SetTargetActivated(true);
+        }
+
+        if (pactor->IsInCombat() && (pActionActor == pPlayer && pactor->IsPlayerTeammate())) {
+            pVATS.QuitVATSPlayback(false, false);
+            Interface::QueueMenuCreate(
+                Interface::OPEN_DIALOG, pactor, nullptr, nullptr, Interface::CMM_STANDARD, false
+            );
+        }
+        else {
+            BaseProcess* v44;
+            BaseProcess* v45;
+            if ((!pactor->IsInCombat() || pactor->IsKnockedOut()) &&
+                (pActionActor != pPlayer ||
+                 (pactor->GetSitSleepState() == SIT_SLEEP_NORMAL ||
+                  (pactor->GetSitSleepState() == SIT_SLEEP_IS_SLEEPING ||
+                   (pactor->GetSitSleepState() == SIT_SLEEP_IS_SITTING ||
+                    ((v45 = pactor->pCurrentProcess, v45->GetFurnitureMarker()) &&
+                     (v44 = pactor->pCurrentProcess, v44->GetFurnitureMarker()->cNumber > 19u))))))) {
+                if (pactor->IsReanimated()) {
+                    return false;
+                }
+                if (pactor->IsDead(false)) {
+                    if (pActionActor == pPlayer) {
+                        Interface::QueueMenuCreate(
+                            Interface::OPEN_CONTAINER, apItemActivated, nullptr, nullptr, Interface::CMM_STANDARD, false
+                        );
+                    }
+                    else {
+                        if ((apObjecttoGet) && (!dynamic_cast<TESNPC*>(apObjecttoGet))) {
+                            apItemActivated->RemoveItem(
+                                apObjecttoGet, nullptr, aicount, false, false, pActionActor, nullptr, nullptr, true,
+                                false
+                            );
+                        }
+                    }
+                }
+                else {
+                    TESPackage* v9;
+                    TESPackage* v10;
+                    TESPackage* v11;
+                    FIGHT_REACTION ereaction = FIGHT_REACTION_NEUTRAL;
+                    if (!pactor->IsRestrained() && !pactor->IsParalyzed()) {
+                        if (pActionActor == pPlayer ||
+                            !pActionActor->GetShouldAttackActor(pactor, false, ereaction, false)) {
+                            if (!pactor->IsActoraGuard() &&
+                                pactor->GetShouldAttackActor(pActionActor, false, ereaction, false) &&
+                                !pActionActor->IsSneaking()) {
+                                BaseProcess* v42 = pactor->pCurrentProcess;
+                                if (v42->EnterCombat(
+                                        pactor, pActionActor, true, true, nullptr, false, false, true, 0, false, false,
+                                        true, nullptr
+                                    )) {
+                                    return true;
+                                }
+                            }
+                        }
+                        else {
+                            BaseProcess* v43 = pActionActor->pCurrentProcess;
+                            if (v43->EnterCombat(
+                                    pActionActor, pactor, false, true, nullptr, false, false, true, 0, false, false,
+                                    true, nullptr
+                                )) {
+                                return true;
+                            }
+                        }
+                    }
+                    if (pActionActor == pPlayer && (pactor->IsKnockedOut() && pactor->GetEssential())) {
+                        return false;
+                    }
+                    if (pActionActor == pPlayer ||
+                        (pactor == pPlayer &&
+                         ((v9 = pActionActor->GetCurrentPackage(), v9->IsInterruptPackage()) ||
+                          ((v10 = pActionActor->GetCurrentPackage(), v10->GetPackType() == PACKAGE_TYPE_EXPLORE) ||
+                           (v11 = pActionActor->GetCurrentPackage(), v11->GetPackType() == PACKAGE_TYPE_AMBUSH))))) {
+                        if (pActionActor == pPlayer &&
+                            ((pactor->IsKnockedOut() || (pPlayer->IsSneaking() && !pactor->IsPlayerTeammate())) &&
+                             !pactor->GetGhost())) {
+                            if (!pactor->IsKnockedOut()) {
+                                BaseProcess* v41 = pactor->pCurrentProcess;
+                                if (v41->GetPickpocketed()) {
+                                    const char* a2b = gs_sNoPickPocketAgain.String();
+                                    std::sprintf(msg, "%s %s", pactor->GetFullName(), a2b);
+                                    Interface::ShowMessage(
+                                        msg, 0, "Interface\\Icons\\Message Icons\\glow_message_vaultboy_sad.dds",
+                                        nullptr, 2.0f, false
+                                    );
+                                    return false;
+                                }
+                            }
+                            Interface::QueueMenuCreate(
+                                Interface::OPEN_CONTAINER, apItemActivated, nullptr, nullptr, Interface::CMM_PICKPOCKET,
+                                false
+                            );
+                        }
+                        else {
+                            BaseProcess* v40;
+                            TESTopic* pgreetTopic = nullptr;
+                            if (pActionActor == pPlayer ||
+                                (v40 = pActionActor->pCurrentProcess, v40->GetNeedTalkPlayer())) {
+                                pgreetTopic = TESTopic::GetTopic(DT_TOPIC, 0);
+                            }
+                            DialogueItem* pgreetDialogue = nullptr;
+                            if (pgreetTopic) {
+                                if (pActionActor == pPlayer) {
+                                    pgreetDialogue =
+                                        pgreetTopic->CreateDialogueItem(pactor, pPlayer, nullptr, nullptr, false);
+                                }
+                                else {
+                                    BaseProcess* v39 = pActionActor->pCurrentProcess;
+                                    if (v39->GetNeedTalkPlayer()) {
+                                        pgreetDialogue = pgreetTopic->CreateDialogueItem(
+                                            pActionActor, pPlayer, nullptr, nullptr, false
+                                        );
+                                    }
+                                }
+                            }
+                            if (pgreetDialogue &&
+                                (pgreetDialogue->pInfo->IsGoodbye() &&
+                                 (pgreetDialogue->FirstResponse() && !pgreetDialogue->NextResponse()))) {
+                                if (pactor->GetSitSleepState() == SIT_SLEEP_IS_SLEEPING) {
+                                    BaseProcess* v38 = pactor->pCurrentProcess;
+                                    v38->SetNeedTalkPlayer(true);
+                                    pactor->InitiateGetUpPackage();
+                                    return true;
+                                }
+                                if (pactor == pPlayer) {
+                                    pActionActor->SayForceGoodbyeGreetingToPlayer(pgreetTopic, false, false);
+                                }
+                                else {
+                                    pactor->SayForceGoodbyeGreetingToPlayer(pgreetTopic, false, false);
+                                }
+                            }
+                            else {
+                                BaseProcess* v37 = pactor->pCurrentProcess;
+                                if (v37->GetFurnitureMarker()) {
+                                    BaseProcess* v36 = pactor->pCurrentProcess;
+                                    if (v36->GetFurnitureMarker()->cNumber > 19u) {
+                                        BaseProcess* v35 = pactor->pCurrentProcess;
+                                        v35->AddPostAnimationAction(BaseProcess::POSTANIM_ACTION_GETOUT_OF_FURNITURE);
+                                    }
+                                }
+                                if (pactor->GetSitSleepState() == SIT_SLEEP_NORMAL) {
+                                    NiPoint3 v73 = pActionActor->GetLocationOnReference();
+                                    pactor->RequestRotate(v73, false);
+                                }
+                                TESTopic* ptopic = nullptr;
+                                Actor* pspeaker = nullptr;
+                                if (pActionActor == pPlayer) {
+                                    if (!pactor->IsPathingComplete() && !pactor->IsRotating()) {
+                                        BaseProcess* v34 = pactor->pCurrentProcess;
+                                        v34->EndMoveMessage(pactor);
+                                    }
+                                    pActionActor->StopAttack();
+                                    pactor->StopAttack();
+                                    TESPackage* CurrentPackage = pActionActor->GetCurrentPackage();
+                                    DialoguePackage* ppack = dynamic_cast<DialoguePackage*>(CurrentPackage);
+                                    if (ppack) {
+                                        ptopic = ppack->ptopic;
+                                    }
+                                    pspeaker = static_cast<Actor*>(apItemActivated);
+                                    if ((pactor->GetCurrentTarget() == pPlayer) && (potherpackage) &&
+                                        (potherpackage->GetPackType() == PACKAGE_TYPE_EXPLORE)) {
+                                        if (!potherpackage->GetPackageSchedule() ||
+                                            potherpackage->GetPackageSchedule()->PSData.iDuration) {
+                                            pprocess->AddToProcedureIndexRunning(pactor, 1);
+                                        }
+                                        else {
+                                            pprocess->AddToProcedureIndexRunning(pActionActor, 2);
+                                        }
+                                    }
+
+                                    BSAudio* v13 = &BSAudio::QInstance();
+                                    v13->EndAllSoundsOfType(4u);
+                                    pactor->InterruptCast();
+                                    if (pactor->GetSitSleepState() == SIT_SLEEP_IS_SLEEPING) {
+                                        BaseProcess* v33 = pactor->pCurrentProcess;
+                                        v33->SetNeedTalkPlayer(true);
+                                        pactor->InitiateGetUpPackage();
+                                    }
+                                    else {
+                                        Actor* pact = pActionActor;
+                                        if (pActionActor == pPlayer) {
+                                            pact = pactor;
+                                        }
+                                        pVATS.QuitVATSPlayback(false, false);
+                                        Interface::QueueMenuCreate(
+                                            Interface::OPEN_DIALOG, pact, ptopic, nullptr, Interface::CMM_STANDARD,
+                                            false
+                                        );
+                                    }
+                                }
+                                else {
+                                    if (Interface::GetMenuModeType() != Interface::eDialogMenu) {
+                                        BaseProcess* v32 = pPlayer->pCurrentProcess;
+                                        if (!v32->CanForceGreet(pActionActor)) {
+                                            return false;
+                                        }
+                                        BSAudio* v14 = &BSAudio::QInstance();
+                                        v14->EndAllSoundsOfType(4u);
+                                        pActionActor->StopAttack();
+                                        pactor->StopAttack();
+                                        pspeaker = pActionActor;
+                                        if (!pActionActor->IsInCombat()) {
+                                            TESPackage* v15 = pActionActor->GetCurrentPackage();
+                                            DialoguePackage* ppack_2 = dynamic_cast<DialoguePackage*>(v15);
+                                            if (ppack_2) {
+                                                ptopic = ppack_2->ptopic;
+                                            }
+                                        }
+                                        if (!pactionpackage->GetPackageSchedule() ||
+                                            pactionpackage->GetPackageSchedule()->PSData.iDuration) {
+                                            BaseProcess* v30 = pActionActor->pCurrentProcess;
+                                            v30->AddToProcedureIndexRunning(pActionActor, 1);
+                                        }
+                                        else {
+                                            BaseProcess* v31 = pActionActor->pCurrentProcess;
+                                            v31->AddToProcedureIndexRunning(pActionActor, 2);
+                                        }
+                                        pactor->InterruptCast();
+                                        if (pactor == pPlayer) {
+                                            pactor->ForceIdleAnimation();
+                                        }
+                                        else {
+                                            BaseProcess* v29 = pactor->pCurrentProcess;
+                                            v29->AddPostAnimationAction(BaseProcess::POSTANIM_FORCEIDLE_ANIMATION);
+                                        }
+                                        if (pActionActor == pPlayer) {
+                                            pActionActor->ForceIdleAnimation();
+                                        }
+                                        else {
+                                            BaseProcess* v28 = pActionActor->pCurrentProcess;
+                                            v28->AddPostAnimationAction(BaseProcess::POSTANIM_FORCEIDLE_ANIMATION);
+                                        }
+                                        pVATS.QuitVATSPlayback(false, false);
+                                        Actor* pact_2 = pActionActor;
+                                        if (pActionActor == pPlayer) {
+                                            pact_2 = pactor;
+                                        }
+                                        Interface::QueueMenuCreate(
+                                            Interface::OPEN_DIALOG, pact_2, ptopic, nullptr, Interface::CMM_STANDARD,
+                                            false
+                                        );
+                                    }
+                                }
+                            }
+                            if (pgreetDialogue) {
+                                delete pgreetDialogue;
+                            }
+                        }
+                    }
+                    else {
+                        if ((apObjecttoGet) && (!dynamic_cast<TESNPC*>(apObjecttoGet))) {
+                            pactor->RemoveItem(
+                                apObjecttoGet, nullptr, aicount, true, false, pActionActor, nullptr, nullptr, true,
+                                false
+                            );
+                            pActionActor->PickpocketAlarm(pactor, apObjecttoGet, aicount);
+                            return true;
+                        }
+
+                        TESPackage* v16 = pActionActor->GetCurrentPackage();
+                        if (v16->GetPackType() == PACKAGE_TYPE_ESCORT) {
+                            BaseProcess* v27 = pActionActor->pCurrentProcess;
+                            v27->AddToProcedureIndexRunning(pActionActor, 2);
+                        }
+                        else {
+                            if (pActionActor->GetCurrentPackage()) {
+                                TESPackage* v17 = pActionActor->GetCurrentPackage();
+                                if (v17->GetPackType() != PACKAGE_TYPE_FOLLOW) {
+                                    BaseProcess* v26 = pActionActor->pCurrentProcess;
+                                    v26->AddToProcedureIndexRunning(pActionActor, 1);
+                                }
+                            }
+                            if (pactor != pPlayer) {
+                                if ((pactor != pActionActor) && (pactor->GetCurrentPackage())) {
+                                    TESPackage* v18 = pactor->GetCurrentPackage();
+                                    if (v18->GetPackType() != PACKAGE_TYPE_FOLLOW) {
+                                        TESPackage* v19 = pactor->GetCurrentPackage();
+                                        if (v19->GetPackType() != PACKAGE_TYPE_ESCORT) {
+                                            pprocess->AddToProcedureIndexRunning(pactor, 1);
+                                        }
+                                    }
+                                }
+
+                                if (pactor != pActionActor && pactor->GetSitSleepState() == SIT_SLEEP_NORMAL) {
+                                    if (pActionActor->IsinDialogue()) {
+                                        DialoguePackage* ppack_3 =
+                                            static_cast<DialoguePackage*>(pActionActor->GetCurrentPackage());
+                                        if (!ppack_3->GetDialogueNoHeadtrack() &&
+                                            !ppack_3->GetDialogueDoNotControlTarget()) {
+                                            NiPoint3 v74 = pActionActor->GetLocationOnReference();
+                                            pactor->RequestRotate(v74, false);
+                                        }
+                                    }
+                                    else {
+                                        NiPoint3 v75 = pActionActor->GetLocationOnReference();
+                                        pactor->RequestRotate(v75, false);
+                                    }
+                                }
+                                if (!pActionActor->IsinDialogue() && pActionActor->IsNpc() && pactor->IsNpc()) {
+                                    BaseProcess* v25 = pActionActor->pCurrentProcess;
+                                    v25->AddToProcedureIndexRunning(pActionActor, 1);
+                                    if (pActionActor->InitiateDialogue(
+                                            pactor, nullptr, nullptr, true, false, false, nullptr, false, false
+                                        )) {
+                                        BaseProcess* v24 = pActionActor->pCurrentProcess;
+                                        v24->AddToProcedureIndexRunning(pActionActor, 2);
+                                        pprocess->AddToProcedureIndexRunning(pactor, 2);
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+            else {
+                if (pactor->GetCombatController() &&
+                    (pActionActor == pPlayer && pactor->GetCombatController()->QSwimAllowed())) {
+                    char apText[204];
+                    const char* v20 = sActivateNPCCalmed.String();
+                    std::sprintf(apText, "%s %s", GetFullName(), v20);
+                    Interface::ShowMessage(apText, 0, nullptr, nullptr, 2.0f, false);
+                    return false;
+                }
+            }
+        }
+        return true;
+    }
+
+    return false;
 }
 
 void TESNPC::UnClone3D(TESObjectREFR* apRequester) {
@@ -1932,43 +1906,38 @@ void TESNPC::SwapEyes(TESEyes* apSwapToEyes) {
                 NiTexturingProperty* ptexprop;
                 NiPropertyState* pstateleft = &spLeftEye.m_pObject->m_PropertyState;
                 NiPropertyState* pstateright = &spRightEye.m_pObject->m_PropertyState;
-                if (pstateleft) {
-                    if (pstateright) {
-                        int32_t v11;
-                        int32_t v13;
-                        NiShadeProperty* pshadeleft = pstateleft->GetShade();
-                        if (pshadeleft) {
-                            if (pshadeleft->iShaderPropertyType >= 8) {}
-                        }
-                        if (pshadeleft) {
-                            int32_t v12 = pshadeleft->iShaderPropertyType >= 8 && pshadeleft->iShaderPropertyType <= 12;
-                            v13 = v12;
-                        }
-                        else {
-                            v13 = 0;
-                        }
-                        BSShaderPPLightingProperty* pshaderpropLightingLeft =
-                            v13 ? static_cast<BSShaderPPLightingProperty*>(pshadeleft) : nullptr;
-                        NiShadeProperty* pshaderight = pstateright->GetShade();
-                        if (pshaderight) {
-                            int32_t v10 =
-                                pshaderight->iShaderPropertyType >= 8 && pshaderight->iShaderPropertyType <= 12;
-                            v11 = v10;
-                        }
-                        else {
-                            v11 = 0;
-                        }
-                        BSShaderPPLightingProperty* pshaderpropLightingRight =
-                            v11 ? static_cast<BSShaderPPLightingProperty*>(pshaderight) : nullptr;
-                        if (pshaderpropLightingLeft) {
-                            if (pshaderpropLightingRight) {
-                                pshaderpropLightingLeft->SetDiffuseTexture(0, sptexBase.m_pObject);
-                                pshaderpropLightingRight->SetDiffuseTexture(0, sptexBase.m_pObject);
-                                return;
-                            }
-                        }
+                if ((pstateleft) && (pstateright)) {
+                    int32_t v11;
+                    int32_t v13;
+                    NiShadeProperty* pshadeleft = pstateleft->GetShade();
+                    if ((pshadeleft) && (pshadeleft->iShaderPropertyType >= 8)) {}
+
+                    if (pshadeleft) {
+                        int32_t v12 = pshadeleft->iShaderPropertyType >= 8 && pshadeleft->iShaderPropertyType <= 12;
+                        v13 = v12;
+                    }
+                    else {
+                        v13 = 0;
+                    }
+                    BSShaderPPLightingProperty* pshaderpropLightingLeft =
+                        v13 ? static_cast<BSShaderPPLightingProperty*>(pshadeleft) : nullptr;
+                    NiShadeProperty* pshaderight = pstateright->GetShade();
+                    if (pshaderight) {
+                        int32_t v10 = pshaderight->iShaderPropertyType >= 8 && pshaderight->iShaderPropertyType <= 12;
+                        v11 = v10;
+                    }
+                    else {
+                        v11 = 0;
+                    }
+                    BSShaderPPLightingProperty* pshaderpropLightingRight =
+                        v11 ? static_cast<BSShaderPPLightingProperty*>(pshaderight) : nullptr;
+                    if ((pshaderpropLightingLeft) && (pshaderpropLightingRight)) {
+                        pshaderpropLightingLeft->SetDiffuseTexture(0, sptexBase.m_pObject);
+                        pshaderpropLightingRight->SetDiffuseTexture(0, sptexBase.m_pObject);
+                        return;
                     }
                 }
+
                 void* apMemory = NiMemObject::operator new(sizeof(NiTexturingProperty));
                 if (apMemory) {
                     ptexprop = ::new (apMemory) NiTexturingProperty;
@@ -2069,13 +2038,11 @@ void TESNPC::ClearHead() {
 void TESNPC::InitHead(BSFaceGenNiNode*& apOutNodeBiped, BSFaceGenNiNode*& apOutNodeSkinned) {
     spHeadBiped.operator=(static_cast<BSFaceGenNiNode*>(nullptr));
     spHeadSkinned.operator=(static_cast<BSFaceGenNiNode*>(nullptr));
-    if (!spHeadBiped.m_pObject && !spHeadSkinned.m_pObject) {
-        if (GetFormRace()) {
-            TESRace* FormHealth_0 = GetFormRace();
-            FormHealth_0->CreateHead(apOutNodeBiped, apOutNodeSkinned, this, true, false, TESActorBase::SEX_MALE);
-            TESRace* v4 = GetFormRace();
-            sLastRaceFaceNum = v4->GetFaceCoordNum();
-        }
+    if ((!spHeadBiped.m_pObject && !spHeadSkinned.m_pObject) && (GetFormRace())) {
+        TESRace* FormHealth_0 = GetFormRace();
+        FormHealth_0->CreateHead(apOutNodeBiped, apOutNodeSkinned, this, true, false, TESActorBase::SEX_MALE);
+        TESRace* v4 = GetFormRace();
+        sLastRaceFaceNum = v4->GetFaceCoordNum();
     }
 }
 
@@ -2752,227 +2719,208 @@ void TESNPC::InitParts(TESObjectREFR* apRef, BipedAnim* apBipedAnim, bool abForc
 void TESNPC::LinearFaceGenHeadLoad(TESObjectREFR* apRef, BipedAnim* apBipedAnim) {
     NiMatrix3 matrot;
     NiPointer<NiObject> spTempObject(nullptr);
-    if (BSFaceGenManager::GetInstance()) {
-        if (apBipedAnim->root) {
-            if (BSFaceGenManager::GetUseFaceGenHeads() &&
-                (apRef != pPlayer || !pPlayer->Is1stPersonBiped(apBipedAnim))) {
-                NiAVObject* pobjTemp = apRef->TESObjectREFR::Get3D();
-                NiNode* pnodeBase = nullptr;
-                if (pobjTemp) {
-                    pnodeBase = pobjTemp->IsNode();
-                }
-                NiNode* pHeadNode = apBipedAnim->GetParentBone(BIPED_BONE_HEAD);
-                NiAVObjectPalette* ptmpPal = nullptr;
-                if (apRef->GetAnimation()) {
-                    Animation* v3 = apRef->GetAnimation();
-                    if (v3->GetControllerManager()) {
-                        Animation* v4 = apRef->GetAnimation();
-                        NiControllerManager* ControllerManager = v4->GetControllerManager();
-                        ptmpPal = ControllerManager->GetObjectPalette();
+    if ((BSFaceGenManager::GetInstance()) && (apBipedAnim->root) &&
+        (BSFaceGenManager::GetUseFaceGenHeads() && (apRef != pPlayer || !pPlayer->Is1stPersonBiped(apBipedAnim)))) {
+        NiAVObject* pobjTemp = apRef->TESObjectREFR::Get3D();
+        NiNode* pnodeBase = nullptr;
+        if (pobjTemp) {
+            pnodeBase = pobjTemp->IsNode();
+        }
+        NiNode* pHeadNode = apBipedAnim->GetParentBone(BIPED_BONE_HEAD);
+        NiAVObjectPalette* ptmpPal = nullptr;
+        if (apRef->GetAnimation()) {
+            Animation* v3 = apRef->GetAnimation();
+            if (v3->GetControllerManager()) {
+                Animation* v4 = apRef->GetAnimation();
+                NiControllerManager* ControllerManager = v4->GetControllerManager();
+                ptmpPal = ControllerManager->GetObjectPalette();
+            }
+        }
+        NiDefaultAVObjectPalette* ppal = static_cast<NiDefaultAVObjectPalette*>(ptmpPal);
+        if (pHeadNode && pnodeBase) {
+            if (!apRef->GetFaceNodeBiped(pHeadNode) && !apRef->GetFaceNodeSkinned(pHeadNode)) {
+                BSFaceGenAnimationData* panimdata_3;
+                NiAVObject* pobjTemp2;
+                uint32_t ichild;
+                NiTriBasedGeom* pgeom_2;
+                uint32_t ichildcount;
+                BSFaceGenNiNode* pfaceBiped = nullptr;
+                BSFaceGenNiNode* pfaceSkinned = nullptr;
+                BSFaceGenAnimationData* panimdata = nullptr;
+                NiPointer<NiGeometryData> spdata(nullptr);
+                NiPointer<NiSkinPartition> spskinpart(nullptr);
+                if (spHeadBiped.m_pObject) {
+                    if (spHeadSkinned.m_pObject && spHeadSkinned.m_pObject->m_uiRefCount <= 1) {
+                        pfaceBiped = spHeadBiped.m_pObject;
                     }
-                }
-                NiDefaultAVObjectPalette* ppal = static_cast<NiDefaultAVObjectPalette*>(ptmpPal);
-                if (pHeadNode && pnodeBase) {
-                    if (!apRef->GetFaceNodeBiped(pHeadNode) && !apRef->GetFaceNodeSkinned(pHeadNode)) {
-                        BSFaceGenAnimationData* panimdata_3;
-                        NiAVObject* pobjTemp2;
-                        uint32_t ichild;
-                        NiTriBasedGeom* pgeom_2;
-                        uint32_t ichildcount;
-                        BSFaceGenNiNode* pfaceBiped = nullptr;
-                        BSFaceGenNiNode* pfaceSkinned = nullptr;
-                        BSFaceGenAnimationData* panimdata = nullptr;
-                        NiPointer<NiGeometryData> spdata(nullptr);
-                        NiPointer<NiSkinPartition> spskinpart(nullptr);
-                        if (spHeadBiped.m_pObject) {
-                            if (spHeadSkinned.m_pObject && spHeadSkinned.m_pObject->m_uiRefCount <= 1) {
-                                pfaceBiped = spHeadBiped.m_pObject;
-                            }
-                            else {
-                                BSCloningProcess cloneData(1.0f);
-                                pfaceBiped = static_cast<BSFaceGenNiNode*>(spHeadBiped.m_pObject->Clone(cloneData));
-                            }
-                            ichildcount = pfaceBiped->GetArrayCount();
-                            for (ichild = 0; ichild < ichildcount; ++ichild) {
-                                NiTriBasedGeom* pgeom;
-                                pobjTemp2 = pfaceBiped->GetAt(ichild);
-                                if (pobjTemp2) {
-                                    pgeom = pobjTemp2->IsTriBasedGeom();
-                                }
-                                else {
-                                    pgeom = nullptr;
-                                }
-                                pgeom_2 = pgeom;
-                                if (pgeom) {
-                                    if (spHeadBiped.operator!=(pfaceBiped)) {
-                                        pgeom_2->GetModelData()->CreateDeepCopy(spTempObject);
-                                        spdata.operator=(static_cast<NiGeometryData*>(spTempObject.m_pObject));
-                                        if (spdata.m_pObject) {
-                                            NiGeometryData* fScale = spdata.m_pObject;
-                                            pgeom_2->SetModelData(fScale);
-                                        }
-                                    }
-                                }
-                            }
-                            if (spHeadBiped.operator!=(pfaceBiped)) {
-                                BSFaceGenAnimationData* v6 = pfaceBiped->GetAnimationData();
-                                panimdata = v6->CreateCopyBS();
-                                if (panimdata) {
-                                    pfaceBiped->SetAnimationData(panimdata);
-                                }
-                            }
-                        }
-                        if (spHeadSkinned.m_pObject) {
-                            if (spHeadSkinned.m_pObject->m_uiRefCount > 1) {
-                                BSCloningProcess cloneData_2(1.0f);
-                                pfaceSkinned =
-                                    static_cast<BSFaceGenNiNode*>(spHeadSkinned.m_pObject->Clone(cloneData_2));
-                            }
-                            else {
-                                pfaceSkinned = spHeadSkinned.m_pObject;
-                            }
-                            ichildcount = pfaceSkinned->GetArrayCount();
-                            for (ichild = 0; ichild < ichildcount; ++ichild) {
-                                NiTriBasedGeom* pgeom_3;
-                                pobjTemp2 = pfaceSkinned->GetAt(ichild);
-                                if (pobjTemp2) {
-                                    pgeom_3 = pobjTemp2->IsTriBasedGeom();
-                                }
-                                else {
-                                    pgeom_3 = nullptr;
-                                }
-                                pgeom_2 = pgeom_3;
-                                if (pgeom_3) {
-                                    if (spHeadSkinned.operator!=(pfaceSkinned)) {
-                                        pgeom_2->GetModelData()->CreateDeepCopy(spTempObject);
-                                        spdata.operator=(static_cast<NiGeometryData*>(spTempObject.m_pObject));
-                                        if (spdata.m_pObject) {
-                                            NiGeometryData* afScale = spdata.m_pObject;
-                                            pgeom_2->SetModelData(afScale);
-                                        }
-                                    }
-                                    if (pgeom_2->GetSkinInstance()) {
-                                        if (pgeom_2->GetSkinInstance()->GetSkinPartition()) {
-                                            BSFaceGenModel* v7;
-                                            BSFaceGenModelExtraData* pextraModel =
-                                                BSFaceGenManager::GetFaceGenModelExtraData(pgeom_2);
-                                            if (pextraModel &&
-                                                (pextraModel->GetModel() &&
-                                                 (v7 = pextraModel->GetModel(), v7->GetSkinInstance()))) {
-                                                BSFaceGenModel* v8 = pextraModel->GetModel();
-                                                NiSkinInstance* pskinModel = v8->GetSkinInstance();
-                                                NiSkinInstance* pskinNew = pgeom_2->GetSkinInstance();
-                                                NiAVObject** pbones = pskinModel->m_ppkBones;
-                                                uint32_t ibonecount = pskinModel->GetSkinData()->m_uiBones;
-                                                for (uint32_t ibone = 0; ibone < ibonecount; ++ibone) {
-                                                    pskinNew->SetBone(ibone, pbones[ibone]);
-                                                }
-                                            }
-                                            else {
-                                                int32_t CastingType = iFormID;
-                                                Warning(
-                                                    "MODELS: Could not correctly handle skinning for duplicate NPC "
-                                                    "\"%s\" (%08X).",
-                                                    GetFormEditorID(), CastingType
-                                                );
-                                            }
-                                            pgeom_2->GetSkinInstance()->GetSkinPartition()->CreateDeepCopy(
-                                                spTempObject
-                                            );
-                                            spskinpart.operator=(static_cast<NiSkinPartition*>(spTempObject.m_pObject));
-                                            if (spskinpart.m_pObject) {
-                                                NiSkinPartition* v11 = spskinpart.m_pObject;
-                                                pgeom_2->GetSkinInstance()->SetSkinPartition(v11);
-                                            }
-                                        }
-                                    }
-                                }
-                            }
-                            if (spHeadSkinned.operator!=(pfaceSkinned)) {
-                                if (panimdata) {
-                                    pfaceSkinned->SetAnimationData(panimdata);
-                                }
-                                else {
-                                    BSFaceGenAnimationData* panimdata_2 = pfaceSkinned->GetAnimationData();
-                                    panimdata = panimdata_2->CreateCopyBS();
-                                    if (panimdata) {
-                                        pfaceSkinned->SetAnimationData(panimdata);
-                                    }
-                                }
-                            }
-                        }
-                        if (!spHeadBiped.m_pObject && !spHeadSkinned.m_pObject) {
-                            if (pFormRace) {
-                                pFormRace->CreateHead(
-                                    pfaceBiped, pfaceSkinned, this, false, false, TESActorBase::SEX_MALE
-                                );
-                                sLastRaceFaceNum = pFormRace->GetFaceCoordNum();
-                                spHeadBiped.operator=(pfaceBiped);
-                                spHeadSkinned.operator=(pfaceSkinned);
-                            }
-                        }
-                        if (!pfaceBiped && !pfaceSkinned) {
-                            Warning(
-                                "MODELS: Cannot create a head for an NPC (%d) (no race or bad race data).", iFormID
-                            );
-                        }
-                        if (pfaceBiped) {
-                            if (pfaceBiped->GetAnimationData()) {
-                                if (apRef->GetHealth() <= 0.0) {
-                                    BSFaceGenAnimationData* v17 = pfaceBiped->GetAnimationData();
-                                    v17->SetDead(true, true);
-                                    BSFaceGenAnimationData* v16 = pfaceBiped->GetAnimationData();
-                                    v16->SetMustUpdate(true);
-                                }
-                            }
-                            pfaceBiped->SetAnimationUpdate(true);
-                            pfaceBiped->SetApplyRotToParent(true);
-                            pfaceBiped->SetTranslate(NiPoint3_ZERO);
-                            pfaceBiped->SetRotate(NiMatrix3_IDENTITY);
-                            pHeadNode->AttachChild(pfaceBiped, 1);
-                            pfaceBiped->pActor = static_cast<Actor*>(apRef);
-                            RecurseAndAddObjectsToPalette(pfaceBiped, ppal);
-                        }
-                        if (pfaceSkinned) {
-                            matrot = NiMatrix3_IDENTITY;
-                            pfaceSkinned->SetAnimationUpdate(pfaceBiped == nullptr);
-                            pfaceSkinned->SetApplyRotToParent(pfaceBiped == nullptr);
-                            pfaceSkinned->SetTranslate(NiPoint3_ZERO);
-                            pnodeBase->AttachChild(pfaceSkinned, 1);
-                            pfaceSkinned->pActor = static_cast<Actor*>(apRef);
-                            RecurseAndAddObjectsToPalette(pfaceSkinned, ppal);
-                            pfaceSkinned->FixSkinInstances(pnodeBase, true);
-                        }
-                        if (pfaceBiped) {
-                            panimdata_3 = pfaceBiped->GetAnimationData();
+                    else {
+                        BSCloningProcess cloneData(1.0f);
+                        pfaceBiped = static_cast<BSFaceGenNiNode*>(spHeadBiped.m_pObject->Clone(cloneData));
+                    }
+                    ichildcount = pfaceBiped->GetArrayCount();
+                    for (ichild = 0; ichild < ichildcount; ++ichild) {
+                        NiTriBasedGeom* pgeom;
+                        pobjTemp2 = pfaceBiped->GetAt(ichild);
+                        if (pobjTemp2) {
+                            pgeom = pobjTemp2->IsTriBasedGeom();
                         }
                         else {
-                            panimdata_3 = nullptr;
+                            pgeom = nullptr;
                         }
-                        panimdata = panimdata_3;
-                        if (!panimdata_3) {
-                            BSFaceGenAnimationData* panimdata_4;
-                            if (pfaceSkinned) {
-                                panimdata_4 = pfaceSkinned->GetAnimationData();
+                        pgeom_2 = pgeom;
+                        if ((pgeom) && (spHeadBiped.operator!=(pfaceBiped))) {
+                            pgeom_2->GetModelData()->CreateDeepCopy(spTempObject);
+                            spdata.operator=(static_cast<NiGeometryData*>(spTempObject.m_pObject));
+                            if (spdata.m_pObject) {
+                                NiGeometryData* fScale = spdata.m_pObject;
+                                pgeom_2->SetModelData(fScale);
                             }
-                            else {
-                                panimdata_4 = nullptr;
-                            }
-                            panimdata = panimdata_4;
-                        }
-                        if (panimdata) {
-                            panimdata->ResetCurrentMorphs(0.0f, true, true, true, true, false);
                         }
                     }
-                    NiUpdateData UpdateData(0.0f, false, false);
-                    pnodeBase->Update(UpdateData);
+                    if (spHeadBiped.operator!=(pfaceBiped)) {
+                        BSFaceGenAnimationData* v6 = pfaceBiped->GetAnimationData();
+                        panimdata = v6->CreateCopyBS();
+                        if (panimdata) {
+                            pfaceBiped->SetAnimationData(panimdata);
+                        }
+                    }
+                }
+                if (spHeadSkinned.m_pObject) {
+                    if (spHeadSkinned.m_pObject->m_uiRefCount > 1) {
+                        BSCloningProcess cloneData_2(1.0f);
+                        pfaceSkinned = static_cast<BSFaceGenNiNode*>(spHeadSkinned.m_pObject->Clone(cloneData_2));
+                    }
+                    else {
+                        pfaceSkinned = spHeadSkinned.m_pObject;
+                    }
+                    ichildcount = pfaceSkinned->GetArrayCount();
+                    for (ichild = 0; ichild < ichildcount; ++ichild) {
+                        NiTriBasedGeom* pgeom_3;
+                        pobjTemp2 = pfaceSkinned->GetAt(ichild);
+                        if (pobjTemp2) {
+                            pgeom_3 = pobjTemp2->IsTriBasedGeom();
+                        }
+                        else {
+                            pgeom_3 = nullptr;
+                        }
+                        pgeom_2 = pgeom_3;
+                        if (pgeom_3) {
+                            if (spHeadSkinned.operator!=(pfaceSkinned)) {
+                                pgeom_2->GetModelData()->CreateDeepCopy(spTempObject);
+                                spdata.operator=(static_cast<NiGeometryData*>(spTempObject.m_pObject));
+                                if (spdata.m_pObject) {
+                                    NiGeometryData* afScale = spdata.m_pObject;
+                                    pgeom_2->SetModelData(afScale);
+                                }
+                            }
+                            if ((pgeom_2->GetSkinInstance()) && (pgeom_2->GetSkinInstance()->GetSkinPartition())) {
+                                BSFaceGenModel* v7;
+                                BSFaceGenModelExtraData* pextraModel =
+                                    BSFaceGenManager::GetFaceGenModelExtraData(pgeom_2);
+                                if (pextraModel &&
+                                    (pextraModel->GetModel() &&
+                                     (v7 = pextraModel->GetModel(), v7->GetSkinInstance()))) {
+                                    BSFaceGenModel* v8 = pextraModel->GetModel();
+                                    NiSkinInstance* pskinModel = v8->GetSkinInstance();
+                                    NiSkinInstance* pskinNew = pgeom_2->GetSkinInstance();
+                                    NiAVObject** pbones = pskinModel->m_ppkBones;
+                                    uint32_t ibonecount = pskinModel->GetSkinData()->m_uiBones;
+                                    for (uint32_t ibone = 0; ibone < ibonecount; ++ibone) {
+                                        pskinNew->SetBone(ibone, pbones[ibone]);
+                                    }
+                                }
+                                else {
+                                    int32_t CastingType = iFormID;
+                                    Warning(
+                                        "MODELS: Could not correctly handle skinning for duplicate NPC "
+                                        "\"%s\" (%08X).",
+                                        GetFormEditorID(), CastingType
+                                    );
+                                }
+                                pgeom_2->GetSkinInstance()->GetSkinPartition()->CreateDeepCopy(spTempObject);
+                                spskinpart.operator=(static_cast<NiSkinPartition*>(spTempObject.m_pObject));
+                                if (spskinpart.m_pObject) {
+                                    NiSkinPartition* v11 = spskinpart.m_pObject;
+                                    pgeom_2->GetSkinInstance()->SetSkinPartition(v11);
+                                }
+                            }
+                        }
+                    }
+                    if (spHeadSkinned.operator!=(pfaceSkinned)) {
+                        if (panimdata) {
+                            pfaceSkinned->SetAnimationData(panimdata);
+                        }
+                        else {
+                            BSFaceGenAnimationData* panimdata_2 = pfaceSkinned->GetAnimationData();
+                            panimdata = panimdata_2->CreateCopyBS();
+                            if (panimdata) {
+                                pfaceSkinned->SetAnimationData(panimdata);
+                            }
+                        }
+                    }
+                }
+                if ((!spHeadBiped.m_pObject && !spHeadSkinned.m_pObject) && (pFormRace)) {
+                    pFormRace->CreateHead(pfaceBiped, pfaceSkinned, this, false, false, TESActorBase::SEX_MALE);
+                    sLastRaceFaceNum = pFormRace->GetFaceCoordNum();
+                    spHeadBiped.operator=(pfaceBiped);
+                    spHeadSkinned.operator=(pfaceSkinned);
+                }
+
+                if (!pfaceBiped && !pfaceSkinned) {
+                    Warning("MODELS: Cannot create a head for an NPC (%d) (no race or bad race data).", iFormID);
+                }
+                if (pfaceBiped) {
+                    if ((pfaceBiped->GetAnimationData()) && (apRef->GetHealth() <= 0.0)) {
+                        BSFaceGenAnimationData* v17 = pfaceBiped->GetAnimationData();
+                        v17->SetDead(true, true);
+                        BSFaceGenAnimationData* v16 = pfaceBiped->GetAnimationData();
+                        v16->SetMustUpdate(true);
+                    }
+
+                    pfaceBiped->SetAnimationUpdate(true);
+                    pfaceBiped->SetApplyRotToParent(true);
+                    pfaceBiped->SetTranslate(NiPoint3_ZERO);
+                    pfaceBiped->SetRotate(NiMatrix3_IDENTITY);
+                    pHeadNode->AttachChild(pfaceBiped, 1);
+                    pfaceBiped->pActor = static_cast<Actor*>(apRef);
+                    RecurseAndAddObjectsToPalette(pfaceBiped, ppal);
+                }
+                if (pfaceSkinned) {
+                    matrot = NiMatrix3_IDENTITY;
+                    pfaceSkinned->SetAnimationUpdate(pfaceBiped == nullptr);
+                    pfaceSkinned->SetApplyRotToParent(pfaceBiped == nullptr);
+                    pfaceSkinned->SetTranslate(NiPoint3_ZERO);
+                    pnodeBase->AttachChild(pfaceSkinned, 1);
+                    pfaceSkinned->pActor = static_cast<Actor*>(apRef);
+                    RecurseAndAddObjectsToPalette(pfaceSkinned, ppal);
+                    pfaceSkinned->FixSkinInstances(pnodeBase, true);
+                }
+                if (pfaceBiped) {
+                    panimdata_3 = pfaceBiped->GetAnimationData();
                 }
                 else {
-                    Warning(
-                        "MODELS: Cannot create a head for an NPC (%d) that does not have a biped-head node.", iFormID
-                    );
+                    panimdata_3 = nullptr;
+                }
+                panimdata = panimdata_3;
+                if (!panimdata_3) {
+                    BSFaceGenAnimationData* panimdata_4;
+                    if (pfaceSkinned) {
+                        panimdata_4 = pfaceSkinned->GetAnimationData();
+                    }
+                    else {
+                        panimdata_4 = nullptr;
+                    }
+                    panimdata = panimdata_4;
+                }
+                if (panimdata) {
+                    panimdata->ResetCurrentMorphs(0.0f, true, true, true, true, false);
                 }
             }
+            NiUpdateData UpdateData(0.0f, false, false);
+            pnodeBase->Update(UpdateData);
+        }
+        else {
+            Warning("MODELS: Cannot create a head for an NPC (%d) that does not have a biped-head node.", iFormID);
         }
     }
 }
@@ -3165,23 +3113,21 @@ void TESNPC::LoadObjectArray(
 ) {
     apBipedAnim->InitNaked(pFormRace, static_cast<TESActorBase::SEX>((actorData.iActorBaseFlags & 1) != 0));
     Actor* pactor = static_cast<Actor*>(apRef);
-    if (apRef) {
-        if (pactor->pCurrentProcess) {
-            BaseProcess* CurrentAIProcess = pactor->pCurrentProcess;
-            CurrentAIProcess->Set3DUpdateFlag(RESET_MODEL);
-        }
+    if ((apRef) && (pactor->pCurrentProcess)) {
+        BaseProcess* CurrentAIProcess = pactor->pCurrentProcess;
+        CurrentAIProcess->Set3DUpdateFlag(RESET_MODEL);
     }
+
     for (uint32_t i = 0; i < apObjectArray->iSize; ++i) {
         TESBoundObject* pboundObject = apObjectArray->operator[](i);
         InitWornObject(apRef, apBipedAnim, pboundObject);
     }
     FixDisplayedHeadParts(apRef, nullptr);
-    if (pactor) {
-        if (pactor->pCurrentProcess) {
-            BaseProcess* v4 = pactor->pCurrentProcess;
-            v4->ClearAll3DUpdateFlags();
-        }
+    if ((pactor) && (pactor->pCurrentProcess)) {
+        BaseProcess* v4 = pactor->pCurrentProcess;
+        v4->ClearAll3DUpdateFlags();
     }
+
     apBipedAnim->LoadBipedParts(true);
     NiAVObject* p3D = apRef->Get3D();
     if (p3D) {
@@ -3199,12 +3145,10 @@ void TESNPC::BuildObjectArray(
 ) {
     for (uint32_t i = 0; i < 20; ++i) {
         BIPOBJECT* pbipObject = apBipedAnim->GetBipObject(static_cast<BIPED_OBJECT>(i));
-        if (pbipObject->pParent) {
-            if (pbipObject->pParent->IsBoundObject()) {
-                TESBoundObject* pboundObject = static_cast<TESBoundObject*>(pbipObject->pParent);
-                if (!apObjectArray->IsInArray(pboundObject)) {
-                    apObjectArray->Add(pboundObject);
-                }
+        if ((pbipObject->pParent) && (pbipObject->pParent->IsBoundObject())) {
+            TESBoundObject* pboundObject = static_cast<TESBoundObject*>(pbipObject->pParent);
+            if (!apObjectArray->IsInArray(pboundObject)) {
+                apObjectArray->Add(pboundObject);
             }
         }
     }
@@ -3215,127 +3159,120 @@ void TESNPC::SetHairColor(uint32_t aiVal) {
 }
 
 void TESNPC::FixNPCNormals(TESObjectREFR* apRef) {
-    if (apRef) {
-        if (BSFaceGenManager::GetFixNormals()) {
-            NiAVObject* pobj = (NiAVObject*)apRef->Get3D();
-            uint32_t ichildren = 0;
-            BSFaceGenNiNode* phead = (&spHeadSkinned.operator=(apRef->GetFaceNode(nullptr)))->m_pObject;
-            const char* HeadPartNodeName = TESRace::GetHeadPartNodeName(RHP_HEAD);
-            NiAVObject* ptemp = BSUtilities::GetObjectByName(pobj, HeadPartNodeName);
-            NiTriBasedGeom* pface = ptemp ? ptemp->IsTriBasedGeom() : nullptr;
-            if (pface) {
-                if (phead) {
-                    if (!phead->GetFixedNormals()) {
-                        ptemp = BSUtilities::GetObjectByName(pobj, "UpperBody");
+    if ((apRef) && (BSFaceGenManager::GetFixNormals())) {
+        NiAVObject* pobj = (NiAVObject*)apRef->Get3D();
+        uint32_t ichildren = 0;
+        BSFaceGenNiNode* phead = (&spHeadSkinned.operator=(apRef->GetFaceNode(nullptr)))->m_pObject;
+        const char* HeadPartNodeName = TESRace::GetHeadPartNodeName(RHP_HEAD);
+        NiAVObject* ptemp = BSUtilities::GetObjectByName(pobj, HeadPartNodeName);
+        NiTriBasedGeom* pface = ptemp ? ptemp->IsTriBasedGeom() : nullptr;
+        if ((pface) && (phead)) {
+            if (!phead->GetFixedNormals()) {
+                ptemp = BSUtilities::GetObjectByName(pobj, "UpperBody");
+                if (ptemp) {
+                    NiNode* pupperbody = ptemp->IsNode();
+                    if (pupperbody) {
+                        NiTriBasedGeom* pshape_2;
+                        NiMaterialProperty* pmat;
+                        NiProperty* pprop;
+                        ptemp = pupperbody->GetAtChecked(0);
                         if (ptemp) {
-                            NiNode* pupperbody = ptemp->IsNode();
-                            if (pupperbody) {
-                                NiTriBasedGeom* pshape_2;
-                                NiMaterialProperty* pmat;
-                                NiProperty* pprop;
-                                ptemp = pupperbody->GetAtChecked(0);
-                                if (ptemp) {
-                                    NiNode* pnode = ptemp->IsNode();
-                                    if (pnode) {
-                                        ichildren = pnode->GetChildCount();
-                                        for (uint32_t i = 0; i < ichildren; ++i) {
-                                            NiTriBasedGeom* pshape;
-                                            ptemp = pnode->GetAt(i);
-                                            if (ptemp) {
-                                                pshape = ptemp->IsTriBasedGeom();
-                                            }
-                                            else {
-                                                pshape = nullptr;
-                                            }
-                                            pshape_2 = pshape;
-                                            if (pshape) {
-                                                pprop = pshape_2->GetProperty(2);
-                                                pmat = static_cast<NiMaterialProperty*>(
-                                                    NiObject::DynamicCastStatic(&NiMaterialProperty::ms_RTTI, pprop)
-                                                );
-                                                if (pmat) {
-                                                    const char* HandleString = (&pmat->m_kName)->GetHandleString();
-                                                    if (!_strnicmp(HandleString, "Skin", 4u) &&
-                                                        FixNormals(pshape_2, pface, 0.5f, true, false)) {
-                                                        goto LABEL_35;
-                                                    }
-                                                }
+                            NiNode* pnode = ptemp->IsNode();
+                            if (pnode) {
+                                ichildren = pnode->GetChildCount();
+                                for (uint32_t i = 0; i < ichildren; ++i) {
+                                    NiTriBasedGeom* pshape;
+                                    ptemp = pnode->GetAt(i);
+                                    if (ptemp) {
+                                        pshape = ptemp->IsTriBasedGeom();
+                                    }
+                                    else {
+                                        pshape = nullptr;
+                                    }
+                                    pshape_2 = pshape;
+                                    if (pshape) {
+                                        pprop = pshape_2->GetProperty(2);
+                                        pmat = static_cast<NiMaterialProperty*>(
+                                            NiObject::DynamicCastStatic(&NiMaterialProperty::ms_RTTI, pprop)
+                                        );
+                                        if (pmat) {
+                                            const char* HandleString = (&pmat->m_kName)->GetHandleString();
+                                            if (!_strnicmp(HandleString, "Skin", 4u) &&
+                                                FixNormals(pshape_2, pface, 0.5f, true, false)) {
+                                                goto LABEL_35;
                                             }
                                         }
                                     }
+                                }
+                            }
+                        }
+                        else {
+                            uint32_t i_2;
+                            ichildren = pupperbody->GetChildCount();
+                            for (i_2 = 0; i_2 < ichildren; ++i_2) {
+                                NiTriBasedGeom* pshape_3;
+                                ptemp = pupperbody->GetAt(i_2);
+                                if (ptemp) {
+                                    pshape_3 = ptemp->IsTriBasedGeom();
                                 }
                                 else {
-                                    uint32_t i_2;
-                                    ichildren = pupperbody->GetChildCount();
-                                    for (i_2 = 0; i_2 < ichildren; ++i_2) {
-                                        NiTriBasedGeom* pshape_3;
-                                        ptemp = pupperbody->GetAt(i_2);
-                                        if (ptemp) {
-                                            pshape_3 = ptemp->IsTriBasedGeom();
-                                        }
-                                        else {
-                                            pshape_3 = nullptr;
-                                        }
-                                        pshape_2 = pshape_3;
-                                        if (pshape_3) {
-                                            pprop = pshape_2->GetProperty(2);
-                                            pmat = static_cast<NiMaterialProperty*>(
-                                                NiObject::DynamicCastStatic(&NiMaterialProperty::ms_RTTI, pprop)
-                                            );
-                                            if (pmat) {
-                                                const char* v4;
-                                                v4 = (&pmat->m_kName)->GetHandleString();
-                                                if (!_strnicmp(v4, "Skin", 4u) &&
-                                                    FixNormals(pshape_2, pface, 0.5f, true, false)) {
-                                                LABEL_35:;
-                                                    phead->SetFixedNormals(true);
-                                                    break;
-                                                }
-                                            }
+                                    pshape_3 = nullptr;
+                                }
+                                pshape_2 = pshape_3;
+                                if (pshape_3) {
+                                    pprop = pshape_2->GetProperty(2);
+                                    pmat = static_cast<NiMaterialProperty*>(
+                                        NiObject::DynamicCastStatic(&NiMaterialProperty::ms_RTTI, pprop)
+                                    );
+                                    if (pmat) {
+                                        const char* v4;
+                                        v4 = (&pmat->m_kName)->GetHandleString();
+                                        if (!_strnicmp(v4, "Skin", 4u) &&
+                                            FixNormals(pshape_2, pface, 0.5f, true, false)) {
+                                        LABEL_35:;
+                                            phead->SetFixedNormals(true);
+                                            break;
                                         }
                                     }
                                 }
                             }
                         }
                     }
-                    if (pFormRace) {
-                        FaceGenNpcData npcdata;
-                        npcdata.pHair = GetHair();
-                        npcdata.fHairLength = GetHairLength();
-                        npcdata.pEyes = GetEyeColor();
-                        npcdata.eSex = GetSex();
-                        npcdata.iHairColor = GetHairColor();
-                        GetFaceCoord((&npcdata)->FaceCoord);
-                        if (!npcdata.pEyes) {
-                            if (pFormRace->GetEyeColorList()) {
-                                if (!pFormRace->GetEyeColorList()->IsEmpty()) {
-                                    npcdata.pEyes = pFormRace->GetEyeColorList()->m_item;
-                                }
-                            }
-                        }
-                        // ipart is unsigned and is passed as the head part.
-                        for (uint32_t ipart = 0; ipart < 8; ++ipart) {
-                            RACE_HEAD_PART v7 = static_cast<RACE_HEAD_PART>(ipart);
-                            TESActorBase::SEX Sex = GetSex();
-                            TESModel* element = pFormRace->GetHeadPartModel(Sex, v7);
-                            npcdata.pModel.Add(element);
-                            RACE_HEAD_PART v8 = static_cast<RACE_HEAD_PART>(ipart);
-                            TESActorBase::SEX v6 = GetSex();
-                            TESTexture* HeadPartTexture = pFormRace->GetHeadPartTexture(v6, v8);
-                            npcdata.pTexture.Add(HeadPartTexture);
-                            const char* v13 = TESRace::GetHeadPartNodeName(static_cast<RACE_HEAD_PART>(ipart));
-                            npcdata.pHeadPartNodeName.Add(v13);
-                            if (TESRace::GetFaceGenTexturing()) {
-                                NiPointer<NiTexture> spTempTexture(static_cast<NiTexture*>(nullptr));
-                                GetHeadPartModTexture(static_cast<RACE_HEAD_PART>(ipart), spTempTexture);
-                                npcdata.spTexBaseMod.Add(spTempTexture);
-                            }
-                        }
-                        npcdata.bFaceGenTexturing = TESRace::GetFaceGenTexturing();
-                        BSFaceGenManager::PrepareHeadForShaders(spHeadBiped.m_pObject, npcdata);
-                        BSFaceGenManager::PrepareHeadForShaders(spHeadSkinned.m_pObject, npcdata);
+                }
+            }
+            if (pFormRace) {
+                FaceGenNpcData npcdata;
+                npcdata.pHair = GetHair();
+                npcdata.fHairLength = GetHairLength();
+                npcdata.pEyes = GetEyeColor();
+                npcdata.eSex = GetSex();
+                npcdata.iHairColor = GetHairColor();
+                GetFaceCoord((&npcdata)->FaceCoord);
+                if ((!npcdata.pEyes) && (pFormRace->GetEyeColorList()) && (!pFormRace->GetEyeColorList()->IsEmpty())) {
+                    npcdata.pEyes = pFormRace->GetEyeColorList()->m_item;
+                }
+
+                // ipart is unsigned and is passed as the head part.
+                for (uint32_t ipart = 0; ipart < 8; ++ipart) {
+                    RACE_HEAD_PART v7 = static_cast<RACE_HEAD_PART>(ipart);
+                    TESActorBase::SEX Sex = GetSex();
+                    TESModel* element = pFormRace->GetHeadPartModel(Sex, v7);
+                    npcdata.pModel.Add(element);
+                    RACE_HEAD_PART v8 = static_cast<RACE_HEAD_PART>(ipart);
+                    TESActorBase::SEX v6 = GetSex();
+                    TESTexture* HeadPartTexture = pFormRace->GetHeadPartTexture(v6, v8);
+                    npcdata.pTexture.Add(HeadPartTexture);
+                    const char* v13 = TESRace::GetHeadPartNodeName(static_cast<RACE_HEAD_PART>(ipart));
+                    npcdata.pHeadPartNodeName.Add(v13);
+                    if (TESRace::GetFaceGenTexturing()) {
+                        NiPointer<NiTexture> spTempTexture(static_cast<NiTexture*>(nullptr));
+                        GetHeadPartModTexture(static_cast<RACE_HEAD_PART>(ipart), spTempTexture);
+                        npcdata.spTexBaseMod.Add(spTempTexture);
                     }
                 }
+                npcdata.bFaceGenTexturing = TESRace::GetFaceGenTexturing();
+                BSFaceGenManager::PrepareHeadForShaders(spHeadBiped.m_pObject, npcdata);
+                BSFaceGenManager::PrepareHeadForShaders(spHeadSkinned.m_pObject, npcdata);
             }
         }
     }
@@ -3447,25 +3384,23 @@ BSSimpleList<const char*>* TESNPC::BuildDefaultModelList(bool abArmor, bool abWe
         for (BIPED_OBJECT n = BO_HEAD; n < BIPED_OBJECT_COUNT; n = static_cast<BIPED_OBJECT>(n + 1)) {
             int32_t pextra = 0;
             TESObjectARMO* parmorObj = GetBestArmor(this, n);
-            if (parmorObj) {
-                if ((!pupperModel || !pupperModel->FillsBipedSlot(n, false, nullptr)) && !pModels[n]) {
-                    TESBipedModelForm* v4;
-                    if (parmorObj) {
-                        v4 = static_cast<TESBipedModelForm*>(parmorObj);
+            if ((parmorObj) && ((!pupperModel || !pupperModel->FillsBipedSlot(n, false, nullptr)) && !pModels[n])) {
+                TESBipedModelForm* v4;
+                if (parmorObj) {
+                    v4 = static_cast<TESBipedModelForm*>(parmorObj);
+                }
+                else {
+                    v4 = nullptr;
+                }
+                pModels[n] = v4;
+                if (pModels[n]) {
+                    pfilename = pModels[n]->GetBipedModel(esex);
+                    if (pfilename) {
+                        plist->AddHead(pfilename);
                     }
-                    else {
-                        v4 = nullptr;
-                    }
-                    pModels[n] = v4;
-                    if (pModels[n]) {
-                        pfilename = pModels[n]->GetBipedModel(esex);
-                        if (pfilename) {
-                            plist->AddHead(pfilename);
-                        }
-                    }
-                    if (n == BO_UPPER_BODY) {
-                        pupperModel = pModels[2];
-                    }
+                }
+                if (n == BO_UPPER_BODY) {
+                    pupperModel = pModels[2];
                 }
             }
         }

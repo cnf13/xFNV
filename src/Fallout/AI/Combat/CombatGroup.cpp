@@ -390,16 +390,15 @@ void CombatGroup::GetTargetDetectionLevel(
                 BaseProcess* v31 = pmember->pCurrentProcess;
                 DetectionState* p_detectionState = v31->GetDetectionState(apTarget, 0);
                 DetectionState detectionState;
-                if (pmember->GetCurrentProcessType()) {
-                    if (apTarget->GetCurrentProcessType()) {
-                        pmember->GetWorldLocation(&memberLoc);
-                        apTarget->GetWorldLocation(&targetLoc);
-                        if (memberLoc.GetDistanceSquared(targetLoc) < 67108864.0) {
-                            detectionState.iLevel = 1;
-                            p_detectionState = &detectionState;
-                        }
+                if ((pmember->GetCurrentProcessType()) && (apTarget->GetCurrentProcessType())) {
+                    pmember->GetWorldLocation(&memberLoc);
+                    apTarget->GetWorldLocation(&targetLoc);
+                    if (memberLoc.GetDistanceSquared(targetLoc) < 67108864.0) {
+                        detectionState.iLevel = 1;
+                        p_detectionState = &detectionState;
                     }
                 }
+
                 if (p_detectionState) {
                     if (p_detectionState->bLineofSight) {
                         ++pcombatTarget->cMemberLOSCount;
@@ -434,11 +433,9 @@ void CombatGroup::GetTargetDetectionLevel(
                         }
                     }
                     else {
-                        if (p_detectionState) {
-                            if (idetectionLevel > inewDetectionLevel) {
-                                inewDetectionLevel = idetectionLevel;
-                                pbestDetectingMember = pmember;
-                            }
+                        if ((p_detectionState) && (idetectionLevel > inewDetectionLevel)) {
+                            inewDetectionLevel = idetectionLevel;
+                            pbestDetectingMember = pmember;
                         }
                     }
                     if (bfindLastDetectedLocation) {
@@ -451,11 +448,11 @@ void CombatGroup::GetTargetDetectionLevel(
                     }
                 }
             }
-            if (inewDetectionLevel <= static_cast<int32_t>(fSneakNoticedMin.Float())) {
-                if (pcombatTarget->fLastAttackedMemberTimeStamp.ElapsedTime() < 1.0) {
-                    inewDetectionLevel = static_cast<int32_t>(fSneakNoticedMin.Float() + 1.0);
-                }
+            if ((inewDetectionLevel <= static_cast<int32_t>(fSneakNoticedMin.Float())) &&
+                (pcombatTarget->fLastAttackedMemberTimeStamp.ElapsedTime() < 1.0)) {
+                inewDetectionLevel = static_cast<int32_t>(fSneakNoticedMin.Float() + 1.0);
             }
+
             if (IsSearching() && icurrentDetectionLevel <= 0 && inewDetectionLevel > 0) {
                 if (-3.4028235e+38f == pcombatTarget->fLastDetectedTimeStamp.fTimeStamp) {
                     for (uint32_t i_2 = 0; i_2 < imemberCount; ++i_2) {
@@ -512,25 +509,23 @@ void CombatGroup::GetTargetDetectionLevel(
             if (fSneakNoticedMin.Float() < v28 && IsSearching()) {
                 BaseProcess* v27 = apTarget->pCurrentProcess;
                 DetectionEvent* pdetectionEvent = v27->GetActorsDetectionEvent(apTarget);
-                if (pdetectionEvent) {
-                    if (pdetectionEvent->fTimeStamp.ElapsedTime() < 5.0) {
-                        double v26 = pdetectionEvent->fTimeStamp.fTimeStamp;
-                        if (pcombatTarget->fDetectionEventTimeStamp.fTimeStamp < v26) {
-                            float fscore = 0.0f;
-                            if (idetectionEventLevel <= 0) {
-                                int32_t v14 = static_cast<int32_t>(fSneakNoticedMin.Float());
-                                fscore = static_cast<double>(idetectionEventLevel - v14) / 2.0 + 40.0;
-                            }
-                            else {
-                                float v25 = static_cast<double>(idetectionEventLevel) / 20.0;
-                                fscore = BSMIN(v25, 5.0f) + 55.0;
-                            }
-                            BGSWorldLocation worldLoc;
-                            TESForm* v15 = apTarget->GetSpace();
-                            worldLoc.SetLocation(pdetectionEvent->Location, v15);
-                            AddSearchLocation(worldLoc, fscore, 0);
-                            pcombatTarget->fDetectionEventTimeStamp.fTimeStamp = pdetectionEvent->fTimeStamp.fTimeStamp;
+                if ((pdetectionEvent) && (pdetectionEvent->fTimeStamp.ElapsedTime() < 5.0)) {
+                    double v26 = pdetectionEvent->fTimeStamp.fTimeStamp;
+                    if (pcombatTarget->fDetectionEventTimeStamp.fTimeStamp < v26) {
+                        float fscore = 0.0f;
+                        if (idetectionEventLevel <= 0) {
+                            int32_t v14 = static_cast<int32_t>(fSneakNoticedMin.Float());
+                            fscore = static_cast<double>(idetectionEventLevel - v14) / 2.0 + 40.0;
                         }
+                        else {
+                            float v25 = static_cast<double>(idetectionEventLevel) / 20.0;
+                            fscore = BSMIN(v25, 5.0f) + 55.0;
+                        }
+                        BGSWorldLocation worldLoc;
+                        TESForm* v15 = apTarget->GetSpace();
+                        worldLoc.SetLocation(pdetectionEvent->Location, v15);
+                        AddSearchLocation(worldLoc, fscore, 0);
+                        pcombatTarget->fDetectionEventTimeStamp.fTimeStamp = pdetectionEvent->fTimeStamp.fTimeStamp;
                     }
                 }
             }
@@ -561,9 +556,8 @@ uint32_t CombatGroup::GetMemberGroupStrategyAssignment(Actor* apMember) {
     if (CombatMemberForActor) {
         return CombatMemberForActor->iGroupStrategyAssignment;
     }
-    else {
-        return 0;
-    }
+
+    return 0;
 }
 
 uint32_t CombatGroup::GetMemberGroupStrategyAssignment(uint32_t aiIndex) {
@@ -811,22 +805,20 @@ bool CombatGroup::AddMember(Actor* apActor) {
         );
         return false;
     }
-    else {
-        CombatMember* v3 = FNVD_RECONSTRUCT(CombatMember)(&apMemory, apActor);
-        MemberArray.Add(*v3);
-        pCombatManager->NotifyCombatGroupAddedMember(this, apActor);
-        if (bDebugCombatGroups.Bool()) {
-            if (apActor->Get3D()) {
-                FNVD_INLINED_LOCAL(NiColorA, v8, std::nullopt, std::nullopt);
-                v8 = BSTestObjects::GetColor(iGroupNum);
-                NiColor color(v8.r, v8.g, v8.b);
-                NiNode* v4 = apActor->Get3D();
-                TintScenegraph(v4, color, nullptr);
-            }
-        }
-        ClusterUpdateTimer.ForceTrigger();
-        return true;
+
+    CombatMember* v3 = FNVD_RECONSTRUCT(CombatMember)(&apMemory, apActor);
+    MemberArray.Add(*v3);
+    pCombatManager->NotifyCombatGroupAddedMember(this, apActor);
+    if ((bDebugCombatGroups.Bool()) && (apActor->Get3D())) {
+        FNVD_INLINED_LOCAL(NiColorA, v8, std::nullopt, std::nullopt);
+        v8 = BSTestObjects::GetColor(iGroupNum);
+        NiColor color(v8.r, v8.g, v8.b);
+        NiNode* v4 = apActor->Get3D();
+        TintScenegraph(v4, color, nullptr);
     }
+
+    ClusterUpdateTimer.ForceTrigger();
+    return true;
 }
 
 CombatMember* CombatGroup::GetCombatMemberForActor(Actor* apActor) {
@@ -860,12 +852,11 @@ bool CombatGroup::AddTarget(Actor* apActor) {
         );
         return false;
     }
-    else {
-        CombatTarget* v4 = FNVD_RECONSTRUCT(CombatTarget)(&apMemory, apActor, iSearchCount);
-        TargetArray.Add(*v4);
-        pCombatManager->NotifyCombatGroupAddedTarget(this, apActor);
-        return true;
-    }
+
+    CombatTarget* v4 = FNVD_RECONSTRUCT(CombatTarget)(&apMemory, apActor, iSearchCount);
+    TargetArray.Add(*v4);
+    pCombatManager->NotifyCombatGroupAddedTarget(this, apActor);
+    return true;
 }
 
 void CombatGroup::RemoveAllMembers() {
@@ -1010,9 +1001,8 @@ CombatGroupCluster* CombatGroup::GetClusterForMember(Actor* apMember) {
     if (combatMemberForActor) {
         return combatMemberForActor->pCluster;
     }
-    else {
-        return nullptr;
-    }
+
+    return nullptr;
 }
 
 char CombatGroup::GetClusterIndex(CombatGroupCluster* apCluster) {
@@ -1023,9 +1013,8 @@ CombatGroupCluster* CombatGroup::GetCluster(char acIndex) {
     if (acIndex >= 0) {
         return *static_cast<CombatGroupCluster**>(&ClusterArray.operator[](acIndex));
     }
-    else {
-        return nullptr;
-    }
+
+    return nullptr;
 }
 
 void CombatGroup::SetSearchingMember(Actor* apMember) {
@@ -1059,12 +1048,11 @@ void CombatGroup::RemoveMember(Actor* apActor) {
             if (pSearchingMember == apActor) {
                 pSearchingMember = nullptr;
             }
-            if ((&::bDebugCombatGroups)->Bool()) {
-                if (apActor->Get3D()) {
-                    v2 = apActor->Get3D();
-                    UnTintScenegraph(v2);
-                }
+            if (((&::bDebugCombatGroups)->Bool()) && (apActor->Get3D())) {
+                v2 = apActor->Get3D();
+                UnTintScenegraph(v2);
             }
+
             return;
         }
     }
@@ -1474,9 +1462,8 @@ uint8_t CombatGroup::GetTargetMemberLOSCount(Actor* a2) {
     if (combatTargetForActor) {
         return combatTargetForActor->cMemberLOSCount;
     }
-    else {
-        return (uint8_t)0;
-    }
+
+    return (uint8_t)0;
 }
 
 // Centres the search area on the search locations, weighted by score, or on the members when there are none (the
@@ -1749,14 +1736,12 @@ void CombatGroup::UpdateGroupStrategy() {
                 fLastGroupStrategyChosenTimeStamp.fTimeStamp = kTimeStamp.fStartTime;
             }
         }
-        if (pGroupStrategy) {
-            if ((&UpdateStrategyTimer)->Check()) {
-                if (!pGroupStrategy->Update(this)) {
-                    pGroupStrategy = nullptr;
-                    bStrategyForced = false;
-                }
-                (&UpdateStrategyTimer)->Reset(1.0);
+        if ((pGroupStrategy) && ((&UpdateStrategyTimer)->Check())) {
+            if (!pGroupStrategy->Update(this)) {
+                pGroupStrategy = nullptr;
+                bStrategyForced = false;
             }
+            (&UpdateStrategyTimer)->Reset(1.0);
         }
     }
 }
@@ -1896,12 +1881,11 @@ void CombatGroup::UpdateClusters() {
                 BGSWorldLocation* WorldLocation = clusterData[i].pCombatMember->pActor->GetWorldLocation(&apLocation);
                 clusterData[i].WorldLoc = *WorldLocation;
                 clusterData[i].cClosestMember = -1;
-                if (clusterData[i].pCombatMember->pCluster) {
-                    if (fClusterDistance * fClusterDistance * 4.0 <
-                        clusterData[i].pCombatMember->pCluster->Center.GetDistanceSquared(clusterData[i].WorldLoc)) {
-                        --clusterData[i].pCombatMember->pCluster->iMemberCount;
-                        clusterData[i].pCombatMember->pCluster = nullptr;
-                    }
+                if ((clusterData[i].pCombatMember->pCluster) &&
+                    (fClusterDistance * fClusterDistance * 4.0 <
+                     clusterData[i].pCombatMember->pCluster->Center.GetDistanceSquared(clusterData[i].WorldLoc))) {
+                    --clusterData[i].pCombatMember->pCluster->iMemberCount;
+                    clusterData[i].pCombatMember->pCluster = nullptr;
                 }
             }
             for (uint32_t i_2 = 0;; ++i_2) {
@@ -2080,11 +2064,10 @@ bool CombatGroup::CheckRemoveCombatTarget(CombatTarget* apCombatTarget) {
         double v9 = apCombatTarget->fLastNoticedTimeStamp.ElapsedTime();
         if (fCombatTargetLostRemoveDistanceTime.Float() < v9) {
             bool v14 = false;
-            if (iSearchCount == 1) {
-                if (spPathingLOSGridMap.m_pObject) {
-                    v14 = spPathingLOSGridMap.m_pObject->fPercentSeen == 0.0;
-                }
+            if ((iSearchCount == 1) && (spPathingLOSGridMap.m_pObject)) {
+                v14 = spPathingLOSGridMap.m_pObject->fPercentSeen == 0.0;
             }
+
             if (v14) {
                 return true;
             }
@@ -2111,10 +2094,9 @@ bool CombatGroup::CheckRemoveCombatTarget(CombatTarget* apCombatTarget) {
            fCombatSearchTargetHiddenRemoveTime.Float() < v6)))) {
         return true;
     }
-    else {
-        return apCombatTarget->pActor->IsUnConscious() ||
-            (apCombatTarget->pActor->IsDead(false) && !apCombatTarget->pActor->IsDying());
-    }
+
+    return apCombatTarget->pActor->IsUnConscious() ||
+        (apCombatTarget->pActor->IsDead(false) && !apCombatTarget->pActor->IsDying());
 }
 
 bool CombatGroup::MergeGroup(CombatGroup* apCombatGroup) {
@@ -2360,28 +2342,24 @@ void CombatGroup::UpdateSearch() {
                         ++itargetedTargets;
                     }
                 }
-                if (itargetedTargets) {
-                    if (ilostTargetCount == itargetCount) {
-                        StartSearch();
-                    }
+                if ((itargetedTargets) && (ilostTargetCount == itargetCount)) {
+                    StartSearch();
                 }
             }
         }
     }
     if (IsSearching()) {
-        if (pSearchingMember) {
-            if (pSearchingMember->DidPathingFail() || !pSearchingMember->IsWaitingOnPath()) {
-                pSearchingMember = nullptr;
-            }
+        if ((pSearchingMember) && (pSearchingMember->DidPathingFail() || !pSearchingMember->IsWaitingOnPath())) {
+            pSearchingMember = nullptr;
         }
+
         if (SearchUpdateTimer.Check()) {
-            if (spPathingLOSGridMap.m_pObject) {
-                if (spPathingLOSGridMap.m_pObject->fPercentSeen > 0.9900000095367432) {
-                    spPathingLOSGridMap.m_pObject->ClearSeen();
-                    ++iSearchCount;
-                    SearchAreaUpdateTimer.ForceTrigger();
-                }
+            if ((spPathingLOSGridMap.m_pObject) && (spPathingLOSGridMap.m_pObject->fPercentSeen > 0.9900000095367432)) {
+                spPathingLOSGridMap.m_pObject->ClearSeen();
+                ++iSearchCount;
+                SearchAreaUpdateTimer.ForceTrigger();
             }
+
             bool bsearchAreaChanged = false;
             if (SearchAreaUpdateTimer.Check()) {
                 bsearchAreaChanged = UpdateSearchArea();
@@ -2392,29 +2370,28 @@ void CombatGroup::UpdateSearch() {
                 if (!spPathingLOSGridMap.m_pObject || bsearchAreaChanged) {
                     TESWorldSpace* pworld = nullptr;
                     TESObjectCELL* pcell = nullptr;
-                    if (SearchCenter.GetCellOrWorld(pcell, pworld)) {
-                        if (Pathing::FindClosestPointOnNavmesh(pworld, pcell, SearchFocalPoint, &closestPoint)) {
-                            PathingLocation searchPathingCenter(&closestPoint, pcell, pworld);
-                            if (searchPathingCenter.ResolveNavMeshInfo(nullptr)) {
-                                searchPathingCenter.SetLocationSimple(SearchCenter.Point);
-                                if (!spPathingLOSGridMap.m_pObject) {
-                                    PathingLOSGridMap* v8;
-                                    PathingLOSGridMap* v13 = static_cast<PathingLOSGridMap*>(
-                                        NiMemObject::operator new(sizeof(PathingLOSGridMap))
-                                    );
-                                    if (v13) {
-                                        v8 = ::new (v13) PathingLOSGridMap;
-                                    }
-                                    else {
-                                        v8 = nullptr;
-                                    }
-                                    spPathingLOSGridMap.operator=(v8);
+                    if ((SearchCenter.GetCellOrWorld(pcell, pworld)) &&
+                        (Pathing::FindClosestPointOnNavmesh(pworld, pcell, SearchFocalPoint, &closestPoint))) {
+                        PathingLocation searchPathingCenter(&closestPoint, pcell, pworld);
+                        if (searchPathingCenter.ResolveNavMeshInfo(nullptr)) {
+                            searchPathingCenter.SetLocationSimple(SearchCenter.Point);
+                            if (!spPathingLOSGridMap.m_pObject) {
+                                PathingLOSGridMap* v8;
+                                PathingLOSGridMap* v13 = static_cast<PathingLOSGridMap*>(
+                                    NiMemObject::operator new(sizeof(PathingLOSGridMap))
+                                );
+                                if (v13) {
+                                    v8 = ::new (v13) PathingLOSGridMap;
                                 }
-                                spPathingLOSGridMap.m_pObject->Initialize(searchPathingCenter, fSearchRadius);
-                                float* v3 = &fCombatSearchSightRadius.Float();
-                                spPathingLOSGridMap.m_pObject->SetSightRadius(*v3);
-                                bUpdateSearchDebugGeometry = true;
+                                else {
+                                    v8 = nullptr;
+                                }
+                                spPathingLOSGridMap.operator=(v8);
                             }
+                            spPathingLOSGridMap.m_pObject->Initialize(searchPathingCenter, fSearchRadius);
+                            float* v3 = &fCombatSearchSightRadius.Float();
+                            spPathingLOSGridMap.m_pObject->SetSightRadius(*v3);
+                            bUpdateSearchDebugGeometry = true;
                         }
                     }
                 }
@@ -2456,15 +2433,13 @@ void CombatGroup::UpdateSearch() {
             uint32_t idialogueMember = RandomInt(0, static_cast<int32_t>(imemberCount_2));
             Actor* pmember_2 = GetMember(idialogueMember);
             Actor* ptarget = pmember_2->GetCombatTarget();
-            if (pmember_2 != pPlayer) {
-                if (ptarget) {
-                    CombatTarget* pcombatTarget_3 = GetCombatTargetForActor(ptarget);
-                    if (!pcombatTarget_3 || -3.4028235e+38f == pcombatTarget_3->fLastDetectedTimeStamp.fTimeStamp) {
-                        pCombatDialogueManager->StartDialogue(pmember_2, ptarget, DT_DETECTION, 0, false, nullptr);
-                    }
-                    else {
-                        pCombatDialogueManager->StartDialogue(pmember_2, ptarget, DT_DETECTION, 1, false, nullptr);
-                    }
+            if ((pmember_2 != pPlayer) && (ptarget)) {
+                CombatTarget* pcombatTarget_3 = GetCombatTargetForActor(ptarget);
+                if (!pcombatTarget_3 || -3.4028235e+38f == pcombatTarget_3->fLastDetectedTimeStamp.fTimeStamp) {
+                    pCombatDialogueManager->StartDialogue(pmember_2, ptarget, DT_DETECTION, 0, false, nullptr);
+                }
+                else {
+                    pCombatDialogueManager->StartDialogue(pmember_2, ptarget, DT_DETECTION, 1, false, nullptr);
                 }
             }
         }
@@ -2566,9 +2541,8 @@ CombatGroup::FindSearchLocation(Actor* apMember, uint8_t acMinScore, BGSWorldLoc
     if (iindex == -1) {
         return nullptr;
     }
-    else {
-        return &GetSearchLocation(static_cast<uint32_t>(iindex));
-    }
+
+    return &GetSearchLocation(static_cast<uint32_t>(iindex));
 }
 
 void CombatGroup::CalculateTargetSearchLocationScores(
@@ -2603,25 +2577,22 @@ TESObjectREFR* CombatGroup::FindSearchDoor(Actor* apMember, float afMaxDistance,
             break;
         }
         CombatSearchDoor* searchDoor = &SearchTeleportDoors.operator[](i);
-        if (searchDoor->pDoor) {
-            if (searchDoor->pLinkedDoor) {
-                uint32_t cFailedAttempts = searchDoor->cFailedAttempts;
-                if (cFailedAttempts <= iCombatSearchMaxSearchDoorFailure.Int() && !searchDoor->bReserved &&
-                    !searchDoor->bInvestigated) {
-                    DoorTeleportData* pteleportData = searchDoor->pDoor->GetTeleport();
-                    if (pteleportData) {
-                        if (!abCheckExist ||
-                            (pteleportData->GetTeleportWorldLocation(&teleportWorldLoc),
-                             CombatUtilities::CanActorExistInSpace(apMember, teleportWorldLoc))) {
-                            searchDoor->pDoor->GetWorldLocation(&doorWorldLoc);
-                            if (!pcombatController ||
-                                pcombatController->pCombatState->CheckMovement(doorWorldLoc, true, false)) {
-                                float fdistanceSquared = memberWorldLoc.GetDistanceSquared(doorWorldLoc);
-                                if (fclosestDoorDistanceSquared > static_cast<double>(fdistanceSquared)) {
-                                    pclosestDoor = searchDoor->pDoor;
-                                    fclosestDoorDistanceSquared = fdistanceSquared;
-                                }
-                            }
+        if ((searchDoor->pDoor) && (searchDoor->pLinkedDoor)) {
+            uint32_t cFailedAttempts = searchDoor->cFailedAttempts;
+            if (cFailedAttempts <= iCombatSearchMaxSearchDoorFailure.Int() && !searchDoor->bReserved &&
+                !searchDoor->bInvestigated) {
+                DoorTeleportData* pteleportData = searchDoor->pDoor->GetTeleport();
+                if ((pteleportData) &&
+                    (!abCheckExist ||
+                     (pteleportData->GetTeleportWorldLocation(&teleportWorldLoc),
+                      CombatUtilities::CanActorExistInSpace(apMember, teleportWorldLoc)))) {
+                    searchDoor->pDoor->GetWorldLocation(&doorWorldLoc);
+                    if (!pcombatController ||
+                        pcombatController->pCombatState->CheckMovement(doorWorldLoc, true, false)) {
+                        float fdistanceSquared = memberWorldLoc.GetDistanceSquared(doorWorldLoc);
+                        if (fclosestDoorDistanceSquared > static_cast<double>(fdistanceSquared)) {
+                            pclosestDoor = searchDoor->pDoor;
+                            fclosestDoorDistanceSquared = fdistanceSquared;
                         }
                     }
                 }
@@ -2634,16 +2605,14 @@ TESObjectREFR* CombatGroup::FindSearchDoor(Actor* apMember, float afMaxDistance,
 void CombatGroup::AddSearchDoor(TESObjectREFR* apDoor) {
     if (!GetCombatSearchDoor(apDoor)) {
         DoorTeleportData* pteleportData = apDoor->GetTeleport();
-        if (pteleportData) {
-            if (pteleportData->pLinkedDoor) {
-                uint32_t iindex = SearchTeleportDoors.AddUninitialized();
-                (&SearchTeleportDoors.GetAt(static_cast<int32_t>(iindex)))->pDoor = apDoor;
-                TESObjectREFR* LinkedDoor = pteleportData->pLinkedDoor;
-                (&SearchTeleportDoors.GetAt(static_cast<int32_t>(iindex)))->pLinkedDoor = LinkedDoor;
-                (&SearchTeleportDoors.GetAt(static_cast<int32_t>(iindex)))->cFailedAttempts = 0;
-                (&SearchTeleportDoors.GetAt(static_cast<int32_t>(iindex)))->bReserved = false;
-                (&SearchTeleportDoors.GetAt(static_cast<int32_t>(iindex)))->bInvestigated = false;
-            }
+        if ((pteleportData) && (pteleportData->pLinkedDoor)) {
+            uint32_t iindex = SearchTeleportDoors.AddUninitialized();
+            (&SearchTeleportDoors.GetAt(static_cast<int32_t>(iindex)))->pDoor = apDoor;
+            TESObjectREFR* LinkedDoor = pteleportData->pLinkedDoor;
+            (&SearchTeleportDoors.GetAt(static_cast<int32_t>(iindex)))->pLinkedDoor = LinkedDoor;
+            (&SearchTeleportDoors.GetAt(static_cast<int32_t>(iindex)))->cFailedAttempts = 0;
+            (&SearchTeleportDoors.GetAt(static_cast<int32_t>(iindex)))->bReserved = false;
+            (&SearchTeleportDoors.GetAt(static_cast<int32_t>(iindex)))->bInvestigated = false;
         }
     }
 }
@@ -2659,13 +2628,9 @@ bool CombatGroup::CalculateSearchIgnoreLocations(Actor* apSearcher, BSSimpleArra
         Actor* Member = GetMember(aiIndex);
         if (Member != apSearcher) {
             CombatController* v6 = Member->GetCombatController();
-            if (v6) {
-                if (v6->IsSearching()) {
-                    if (Member->GetCurrentPathfindingGoal_008B3840(&ecx0)) {
-                        apIgnoreLocations->Add(ecx0);
-                        v9 = true;
-                    }
-                }
+            if ((v6) && (v6->IsSearching()) && (Member->GetCurrentPathfindingGoal_008B3840(&ecx0))) {
+                apIgnoreLocations->Add(ecx0);
+                v9 = true;
             }
         }
     }
@@ -2786,10 +2751,8 @@ Actor* CombatGroup::FindClusterPartner(Actor* apMember, Actor* apCurrentPartner,
         CombatController* ppartnerCombatController = ppartner->GetCombatController();
         if (ppartnerCombatController) {
             CombatLocationTarget* plocationTarget = ppartnerCombatController->pCombatState->pLocationTarget;
-            if (plocationTarget) {
-                if (plocationTarget->pRef == apMember) {
-                    return nullptr;
-                }
+            if ((plocationTarget) && (plocationTarget->pRef == apMember)) {
+                return nullptr;
             }
         }
     }
@@ -2809,20 +2772,18 @@ void CombatGroup::UpdateTargets() {
                     if (!a1) {
                         a1 = FindClosestMemberToActor(pPlayer, 1e+06f);
                     }
-                    if (a1) {
-                        if (!apCombatTarget->pActor->IsDead(false)) {
-                            if (-3.4028235e+38f == apCombatTarget->fLastDetectedTimeStamp.operator float()) {
-                                pCombatDialogueManager->StartDialogue(
-                                    a1, apCombatTarget->pActor, DT_DETECTION, 5, true,
-                                    static_cast<CombatController*>(nullptr)
-                                );
-                            }
-                            else {
-                                pCombatDialogueManager->StartDialogue(
-                                    a1, apCombatTarget->pActor, DT_DETECTION, 8, true,
-                                    static_cast<CombatController*>(nullptr)
-                                );
-                            }
+                    if ((a1) && (!apCombatTarget->pActor->IsDead(false))) {
+                        if (-3.4028235e+38f == apCombatTarget->fLastDetectedTimeStamp.operator float()) {
+                            pCombatDialogueManager->StartDialogue(
+                                a1, apCombatTarget->pActor, DT_DETECTION, 5, true,
+                                static_cast<CombatController*>(nullptr)
+                            );
+                        }
+                        else {
+                            pCombatDialogueManager->StartDialogue(
+                                a1, apCombatTarget->pActor, DT_DETECTION, 8, true,
+                                static_cast<CombatController*>(nullptr)
+                            );
                         }
                     }
                 }
@@ -3083,18 +3044,17 @@ bool CombatGroup::GetTargetLastDetectedLocation(Actor* apTarget, BGSWorldLocatio
 }
 
 void CombatGroup::CreateDebugGeometry(eBool abClear) {
-    if (spDebugGeometry.m_pObject) {
-        if (spDebugGeometry.m_pObject->m_pkParent) {
-            if (AILinearTaskThreadManager::ShouldQueue3DTask()) {
-                NiNode* pNode = spDebugGeometry.m_pObject;
-                TaskQueueInterface::GetInstance()->QueueNodeDetach(pNode);
-            }
-            else {
-                NiNode* pParent = spDebugGeometry.m_pObject->m_pkParent;
-                pParent->DetachChild(spDebugGeometry.m_pObject);
-            }
+    if ((spDebugGeometry.m_pObject) && (spDebugGeometry.m_pObject->m_pkParent)) {
+        if (AILinearTaskThreadManager::ShouldQueue3DTask()) {
+            NiNode* pNode = spDebugGeometry.m_pObject;
+            TaskQueueInterface::GetInstance()->QueueNodeDetach(pNode);
+        }
+        else {
+            NiNode* pParent = spDebugGeometry.m_pObject->m_pkParent;
+            pParent->DetachChild(spDebugGeometry.m_pObject);
         }
     }
+
     spDebugGeometry.operator=(static_cast<NiNode*>(nullptr));
     if (abClear != eFalse) {
         return;

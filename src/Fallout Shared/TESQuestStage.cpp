@@ -119,10 +119,7 @@ bool TESQuestStageItem::Load(TESFile* apFile) {
     uint32_t uiNextQuest = 0;
     apFile->GetChunkData(uiNextQuest);
     m_pNextQuest = reinterpret_cast<TESQuest*>(static_cast<uintptr_t>(uiNextQuest));
-    if (!apFile->NextChunk()) {
-        return false;
-    }
-    return true;
+    return apFile->NextChunk();
 }
 
 // Reads the item's own record and takes the log entry whose QSDT index matches ucIndex. The text is kept in
@@ -207,34 +204,28 @@ void TESQuestStageItem::Resolve(bool abAlwaysPass) {
                 pDate = nullptr;
             }
             m_pLogDate = pDate;
-            if (GetEndQuest()) {
-                if (m_pOwner) {
-                    m_pOwner->SetCompleted(true);
-                    if (m_pOwner == pPlayer->GetActiveQuest()) {
-                        pPlayer->SetActiveQuest(nullptr);
-                    }
+            if ((GetEndQuest()) && (m_pOwner)) {
+                m_pOwner->SetCompleted(true);
+                if (m_pOwner == pPlayer->GetActiveQuest()) {
+                    pPlayer->SetActiveQuest(nullptr);
                 }
             }
-            if (GetFailQuest()) {
-                if (m_pOwner) {
-                    m_pOwner->SetFailed(true);
-                    if (m_pOwner == pPlayer->GetActiveQuest()) {
-                        pPlayer->SetActiveQuest(nullptr);
-                    }
+
+            if ((GetFailQuest()) && (m_pOwner)) {
+                m_pOwner->SetFailed(true);
+                if (m_pOwner == pPlayer->GetActiveQuest()) {
+                    pPlayer->SetActiveQuest(nullptr);
                 }
             }
+
             if (m_bHasLogEntry) {
                 pPlayer->AddQuestStageItem(this);
             }
             Script* apResultScript = &cResultScript;
-            if (Script::GetProcessScripts()) {
-                if (apResultScript) {
-                    if ((&apResultScript->m_header)->dataSize) {
-                        (&apResultScript->m_header)->bIsQuestScript = false;
-                        ScriptLocals* ScriptLocals_ = (&pPlayer->m_Extra)->GetScriptLocals();
-                        apResultScript->Run(pPlayer, ScriptLocals_, nullptr, true);
-                    }
-                }
+            if ((Script::GetProcessScripts()) && (apResultScript) && ((&apResultScript->m_header)->dataSize)) {
+                (&apResultScript->m_header)->bIsQuestScript = false;
+                ScriptLocals* ScriptLocals_ = (&pPlayer->m_Extra)->GetScriptLocals();
+                apResultScript->Run(pPlayer, ScriptLocals_, nullptr, true);
             }
         }
     }

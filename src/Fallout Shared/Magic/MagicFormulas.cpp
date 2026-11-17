@@ -220,9 +220,8 @@ float MagicFormulas::CalcSunDamage(
         }
         return fMagicSunDamageBaseDamage.Float() * afMagnitude * v17 * v13 * v10 * v11;
     }
-    else {
-        return 0.0;
-    }
+
+    return 0.0;
 }
 
 // Each factor is rounded to a float local; the settings are read through Float, and the float BSMAX and the float
@@ -341,7 +340,6 @@ SkillLevel::Value MagicFormulas::GetMagicSpellLevel(float afSpellCost) {
     if (!(fMagicSpellLevelMasterMin.Float() > static_cast<double>(v7))) {
         return SkillLevel::MASTER;
     }
-    else {
-        return SkillLevel::EXPERT;
-    }
+
+    return SkillLevel::EXPERT;
 }

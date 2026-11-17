@@ -113,10 +113,9 @@ bool* hkQsTransform::isApproximatelyEqual(bool* a1, __m128* a2, uint32_t a3) {
              15) == 15;
         return a1;
     }
-    else {
-        *a1 = false;
-        return a1;
-    }
+
+    *a1 = false;
+    return a1;
 }
 
 // Copies the scale of each of the aiCount transforms at apSrc into the transforms at apDst. Writes nothing when aiCount

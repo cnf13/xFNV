@@ -67,20 +67,16 @@ void TESAnimation::AddKFFile(const char* apFilename) {
 }
 
 void TESAnimation::LoadAnimationChunk(TESAnimation* apAnimation, TESFile* apFile) {
-    if (apFile) {
-        if (apAnimation) {
-            if (apFile->GetTESChunk() == KFFZ_ID) {
-                uint32_t ChunkSize = apFile->GetChunkSize();
-                uint8_t* apData = static_cast<uint8_t*>(ourMalloc(ChunkSize));
-                char* apString = reinterpret_cast<char*>(apData);
-                apFile->GetChunkData(apData, 0);
-                while (*apString) {
-                    AddKFFile(apString);
-                    apString += BSstrlen(apString) + 1;
-                }
-                ourFree(apData);
-            }
+    if ((apFile) && (apAnimation) && (apFile->GetTESChunk() == KFFZ_ID)) {
+        uint32_t ChunkSize = apFile->GetChunkSize();
+        uint8_t* apData = static_cast<uint8_t*>(ourMalloc(ChunkSize));
+        char* apString = reinterpret_cast<char*>(apData);
+        apFile->GetChunkData(apData, 0);
+        while (*apString) {
+            AddKFFile(apString);
+            apString += BSstrlen(apString) + 1;
         }
+        ourFree(apData);
     }
 }
 

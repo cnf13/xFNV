@@ -132,12 +132,11 @@ void WaterShader::SetupGeometryTextures(const NiPropertyState* apState) {
         else {
             v3->m_kStages.m_pBase->m_pObject->m_spTexture = BSShaderManager::spDefaultNormalMap.m_pObject;
         }
-        if (BSShaderManager::pWaterRefractionTexture) {
-            if (m_pObject->bRefractions) {
-                NiD3DTextureStage* v7 = v3->m_kStages.m_pBase[1].m_pObject;
-                v7->m_spTexture = (NiTexture*)BSShaderManager::pWaterRefractionTexture->GetTexture(0);
-            }
+        if ((BSShaderManager::pWaterRefractionTexture) && (m_pObject->bRefractions)) {
+            NiD3DTextureStage* v7 = v3->m_kStages.m_pBase[1].m_pObject;
+            v7->m_spTexture = (NiTexture*)BSShaderManager::pWaterRefractionTexture->GetTexture(0);
         }
+
         BSRenderedTexture* v8 = m_pObject->spNoiseNormalMap.m_pObject;
         if (v8) {
             NiD3DTextureStage* v9 = v3->m_kStages.m_pBase[2].m_pObject;
@@ -153,12 +152,11 @@ void WaterShader::SetupGeometryTextures(const NiPropertyState* apState) {
             }
         }
         BSRenderedTexture* v11 = m_pObject->spDepthMap.m_pObject;
-        if (v11) {
-            if (m_pObject->bDepth) {
-                NiD3DTextureStage* v12 = v3->m_kStages.m_pBase[4].m_pObject;
-                v12->m_spTexture = (NiTexture*)v11->GetTexture(0);
-            }
+        if ((v11) && (m_pObject->bDepth)) {
+            NiD3DTextureStage* v12 = v3->m_kStages.m_pBase[4].m_pObject;
+            v12->m_spTexture = (NiTexture*)v11->GetTexture(0);
         }
+
         ApplyTextureStages();
     }
 }
@@ -320,15 +318,13 @@ void WaterShader::SetupGeometryConstants(const NiPropertyState* apState) {
 void WaterShader::PostGeometry(const NiPropertyState* apState) {
     WaterShaderProperty* pProperty = static_cast<WaterShaderProperty*>(apState->m_aspProps[3].m_pObject);
     BSShaderManager::eBSSMPassEnum v3 = BSShaderManager::eCurrentPass;
-    if (pProperty) {
-        if ((pProperty->ulFlags[1] & BSS2_Wireframe) != 0) {
-            BSRenderState::SetWireframeEnable(false, BSRS_NOLOCK);
-        }
+    if ((pProperty) && ((pProperty->ulFlags[1] & BSS2_Wireframe) != 0)) {
+        BSRenderState::SetWireframeEnable(false, BSRS_NOLOCK);
     }
-    if (v3 != BSShaderManager::BSSM_WATER_STENCIL && v3 != BSShaderManager::BSSM_WATER_STENCIL_Vc) {
-        if (pProperty->bDisplacement) {
-            BSRenderState::SetStencilEnable(false, BSRS_NOLOCK);
-        }
+
+    if ((v3 != BSShaderManager::BSSM_WATER_STENCIL && v3 != BSShaderManager::BSSM_WATER_STENCIL_Vc) &&
+        (pProperty->bDisplacement)) {
+        BSRenderState::SetStencilEnable(false, BSRS_NOLOCK);
     }
 }
 

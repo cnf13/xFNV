@@ -82,9 +82,8 @@ const hkpShapeContainer* hkpConvexListShape::getContainer() const {
     if (this) {
         return static_cast<const hkpShapeContainer*>(this);
     }
-    else {
-        return nullptr;
-    }
+
+    return nullptr;
 }
 
 void hkpConvexListShape::getAabbImpl(const hkTransform& localToWorld, float tolerance, hkAabb& out) const {

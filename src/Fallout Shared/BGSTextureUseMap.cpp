@@ -94,26 +94,24 @@ void BGSTextureUseMap::CollectTexUseDataRecursive(NiAVObject* ap3D, bool abCheck
 }
 
 void BGSTextureUseMap::AddTexUse(NiTexture* apTex, uint32_t aulMemorySize, TESForm* apForm) {
-    if (apTex) {
-        if (apForm) {
-            TEX_USER_DATA* pdata = nullptr;
-            if (!UserMap.GetAt(apTex, pdata) || !pdata) {
-                TEX_USER_DATA* pdata_2;
-                TEX_USER_DATA* apMemory = static_cast<TEX_USER_DATA*>(ourMalloc(sizeof(TEX_USER_DATA)));
-                if (apMemory) {
-                    pdata_2 = ::new (apMemory) TEX_USER_DATA;
-                }
-                else {
-                    pdata_2 = nullptr;
-                }
-                pdata = pdata_2;
-                UserMap.SetAt(apTex, pdata_2);
-                pdata->spTexture.operator=(apTex);
-                pdata->ulTextureSize = aulMemorySize;
+    if ((apTex) && (apForm)) {
+        TEX_USER_DATA* pdata = nullptr;
+        if (!UserMap.GetAt(apTex, pdata) || !pdata) {
+            TEX_USER_DATA* pdata_2;
+            TEX_USER_DATA* apMemory = static_cast<TEX_USER_DATA*>(ourMalloc(sizeof(TEX_USER_DATA)));
+            if (apMemory) {
+                pdata_2 = ::new (apMemory) TEX_USER_DATA;
             }
-            if (!pdata->UserList.IsInList(apForm)) {
-                pdata->UserList.AddHead(apForm);
+            else {
+                pdata_2 = nullptr;
             }
+            pdata = pdata_2;
+            UserMap.SetAt(apTex, pdata_2);
+            pdata->spTexture.operator=(apTex);
+            pdata->ulTextureSize = aulMemorySize;
+        }
+        if (!pdata->UserList.IsInList(apForm)) {
+            pdata->UserList.AddHead(apForm);
         }
     }
 }
@@ -196,26 +194,24 @@ bool BGSTextureUseMap::WriteToFile(const char* apFilename) {
             UserMap.GetNext(iter, pbasetex, pdata);
             NiSourceTexture* ptex =
                 static_cast<NiSourceTexture*>(NiObject::DynamicCastStatic(&NiSourceTexture::ms_RTTI, pbasetex));
-            if (ptex) {
-                if (pdata) {
-                    BSStringT<char> outstring;
-                    int32_t v6 = pdata->UserList.ItemsInList();
-                    uint32_t ulTextureSize = pdata->ulTextureSize;
-                    const NiFixedString* v2 = &ptex->GetFilename();
-                    outstring.SPrintF("%s\t%d bytes\t%i users\r\n", v2->GetHandleString(), ulTextureSize, v6);
-                    mapfile.BSFile::Write(outstring, true);
-                    BSSimpleList<TESForm*>* plist = &pdata->UserList;
-                    while (plist && !plist->IsEmpty()) {
-                        TESForm* puser = plist->m_item;
-                        plist = plist->m_pkNext;
-                        int32_t CastingType = puser->iFormID;
-                        const char* v5 = puser->GetFormEditorID();
-                        outstring.SPrintF("%s\t%s\t%08X\r\n", puser->GetFormTypeString(), v5, CastingType);
-                        mapfile.BSFile::Write(outstring, true);
-                    }
-                    outstring.SPrintF("\r\n");
+            if ((ptex) && (pdata)) {
+                BSStringT<char> outstring;
+                int32_t v6 = pdata->UserList.ItemsInList();
+                uint32_t ulTextureSize = pdata->ulTextureSize;
+                const NiFixedString* v2 = &ptex->GetFilename();
+                outstring.SPrintF("%s\t%d bytes\t%i users\r\n", v2->GetHandleString(), ulTextureSize, v6);
+                mapfile.BSFile::Write(outstring, true);
+                BSSimpleList<TESForm*>* plist = &pdata->UserList;
+                while (plist && !plist->IsEmpty()) {
+                    TESForm* puser = plist->m_item;
+                    plist = plist->m_pkNext;
+                    int32_t CastingType = puser->iFormID;
+                    const char* v5 = puser->GetFormEditorID();
+                    outstring.SPrintF("%s\t%s\t%08X\r\n", puser->GetFormTypeString(), v5, CastingType);
                     mapfile.BSFile::Write(outstring, true);
                 }
+                outstring.SPrintF("\r\n");
+                mapfile.BSFile::Write(outstring, true);
             }
         }
         mapfile.Close();

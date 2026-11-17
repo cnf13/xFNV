@@ -207,16 +207,14 @@ void* hkLargeBlockAllocator::criticalAlloc(uint32_t size) {
         *v3 = 1;
         return v3 + 4;
     }
-    else {
-        uint32_t* v5 = static_cast<uint32_t*>(m_server->criticalAlloc(size + 31 & 0xFFFFFFF0u));
-        if (v5) {
-            *v5 = 0;
-            return v5 + 4;
-        }
-        else {
-            return nullptr;
-        }
+
+    uint32_t* v5 = static_cast<uint32_t*>(m_server->criticalAlloc(size + 31 & 0xFFFFFFF0u));
+    if (v5) {
+        *v5 = 0;
+        return v5 + 4;
     }
+
+    return nullptr;
 }
 
 // The 16 bytes before the block are criticalAlloc's header, its first word where the block came from: 1 this
@@ -434,10 +432,9 @@ hkBool* hkLargeBlockAllocator::_resizeSingleBlockServerPage(hkBool* apResult, ui
         apResult->m_bool = 1;
         return apResult;
     }
-    else {
-        apResult->m_bool = 0;
-        return apResult;
-    }
+
+    apResult->m_bool = 0;
+    return apResult;
 }
 
 // dlmalloc's tmalloc_large: the smallest tree chunk of at least nb bytes, from nb's own bin (walking the size bits,
@@ -534,9 +531,8 @@ void* hkLargeBlockAllocator::_alloc(uint32_t nb) {
         if (nb + 256 >= m_topsize) {
             return nullptr;
         }
-        else {
-            return _allocFromTop(nb);
-        }
+
+        return _allocFromTop(nb);
     }
     return result;
 }
@@ -711,15 +707,14 @@ hkBool* hkLargeBlockAllocator::checkAllocations(hkBool* apResult, void** allocs,
         apResult->m_bool = 1;
         return apResult;
     }
-    else {
-        while (_checkUsedAlloc(allocs[v4])) {
-            if (++v4 >= size) {
-                goto LABEL_4;
-            }
+
+    while (_checkUsedAlloc(allocs[v4])) {
+        if (++v4 >= size) {
+            goto LABEL_4;
         }
-        apResult->m_bool = 0;
-        return apResult;
     }
+    apResult->m_bool = 0;
+    return apResult;
 }
 
 // Calls callback with the payload and payload size of every used block of every page. The block's size is read before
@@ -776,9 +771,8 @@ uint32_t hkLargeBlockAllocator::_computeTreeIndex(uint32_t s) {
                 14;
             return ((s >> (v4 + 7)) & 1) + (2 * v4);
         }
-        else {
-            return (uint32_t)31;
-        }
+
+        return (uint32_t)31;
     }
     return result;
 }

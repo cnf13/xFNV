@@ -137,10 +137,9 @@ uint16_t hkpReportContactMgr::addContactPointImpl(
         removeContactPointImpl(0, *a4.m_constraintOwner.m_storage);
         return -1;
     }
-    else {
-        m_skipNextNprocessCallbacks = event.m_nextProcessCallbackDelay;
-        return 0;
-    }
+
+    m_skipNextNprocessCallbacks = event.m_nextProcessCallbackDelay;
+    return 0;
 }
 
 hkResult hkpReportContactMgr::reserveContactPointsImpl(int32_t) {
@@ -264,9 +263,9 @@ hkpContactMgr::ToiAccept hkpReportContactMgr::addToiImpl(
         removeToiImpl(*a4.m_constraintOwner.m_storage, a9);
         return static_cast<hkpContactMgr::ToiAccept>(event.m_status);
     }
-    else {
-        a8 = event.m_projectedVelocity;
-    }
+
+    a8 = event.m_projectedVelocity;
+
     return static_cast<hkpContactMgr::ToiAccept>(result);
 }
 

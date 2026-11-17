@@ -538,10 +538,8 @@ void hkpConvexVerticesShape::setConnectivity(const hkpConvexVerticesConnectivity
         m_connectivity->removeReference();
     }
     this->m_connectivity = connect;
-    if (sort) {
-        if (connect) {
-            sortPlanes();
-        }
+    if ((sort) && (connect)) {
+        sortPlanes();
     }
 }
 

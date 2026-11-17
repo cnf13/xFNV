@@ -134,24 +134,21 @@ bool BSSoundHandle::SetPosition(const NiPoint3& apPosition) {
 }
 
 void BSSoundHandle::SetObjectToFollow(NiAVObject* apObj) {
-    if (this->iSoundID != -1) {
-        if (apObj) {
-            if (BSSoundHandle::pfnAddMovingSoundCallback) {
-                BSSoundHandle::pfnAddMovingSoundCallback(apObj);
-            }
-            uint32_t iSoundID = this->iSoundID;
-            BSAudioManager* v2 = &BSAudioManager::QInstance();
-            v2->SetObjectToFollow(iSoundID, apObj);
+    if ((this->iSoundID != -1) && (apObj)) {
+        if (BSSoundHandle::pfnAddMovingSoundCallback) {
+            BSSoundHandle::pfnAddMovingSoundCallback(apObj);
         }
+        uint32_t iSoundID = this->iSoundID;
+        BSAudioManager* v2 = &BSAudioManager::QInstance();
+        v2->SetObjectToFollow(iSoundID, apObj);
     }
 }
 
 void BSSoundHandle::SetCompletionCallback(void (*apfnCallback)(void*, bool), void* apContext) {
-    if (!BSAudio::pAudioInstance->bAudioEnabled) {
-        if (apfnCallback) {
-            apfnCallback(apContext, false);
-        }
+    if ((!BSAudio::pAudioInstance->bAudioEnabled) && (apfnCallback)) {
+        apfnCallback(apContext, false);
     }
+
     if (this->iSoundID != -1) {
         uint32_t iSoundID = this->iSoundID;
         BSAudioManager* v3 = &BSAudioManager::QInstance();
@@ -379,11 +376,10 @@ void BSSoundHandle::SetSynchStartTime(uint32_t aiStartTime) {
 }
 
 void BSSoundHandle::SetPlayCallback(void (*apfnCallback)(void*, int32_t), void* apContext) {
-    if (!BSAudio::pAudioInstance->bAudioEnabled) {
-        if (apfnCallback) {
-            apfnCallback(apContext, 0x1388);
-        }
+    if ((!BSAudio::pAudioInstance->bAudioEnabled) && (apfnCallback)) {
+        apfnCallback(apContext, 0x1388);
     }
+
     if (this->iSoundID != -1) {
         uint32_t iSoundID = this->iSoundID;
         BSAudioManager* v3 = &BSAudioManager::QInstance();

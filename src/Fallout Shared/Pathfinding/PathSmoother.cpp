@@ -645,22 +645,20 @@ char PathSmoother::PushPoint(
             v31 = (-1);
             return 0;
         }
-        else {
-            *aRetLocation = *&(v21 = aPoint->operator+(*aPushDelta));
-            v31 = static_cast<int32_t>((static_cast<uint32_t>(v31) & 0xffffff00u) | static_cast<uint32_t>((uint8_t)1));
-            v31 = static_cast<int32_t>((static_cast<uint32_t>(v31) & 0xffffff00u) | static_cast<uint32_t>((uint8_t)0));
-            v31 = (-1);
-            return 1;
-        }
-    }
-    else {
-        location = &(v20 = (&apReturnIntersectionLocation)->GetLocation());
-        *aRetLocation = *&(v19 = location->operator+(*aPushDelta));
+
+        *aRetLocation = *&(v21 = aPoint->operator+(*aPushDelta));
         v31 = static_cast<int32_t>((static_cast<uint32_t>(v31) & 0xffffff00u) | static_cast<uint32_t>((uint8_t)1));
         v31 = static_cast<int32_t>((static_cast<uint32_t>(v31) & 0xffffff00u) | static_cast<uint32_t>((uint8_t)0));
         v31 = (-1);
         return 1;
     }
+
+    location = &(v20 = (&apReturnIntersectionLocation)->GetLocation());
+    *aRetLocation = *&(v19 = location->operator+(*aPushDelta));
+    v31 = static_cast<int32_t>((static_cast<uint32_t>(v31) & 0xffffff00u) | static_cast<uint32_t>((uint8_t)1));
+    v31 = static_cast<int32_t>((static_cast<uint32_t>(v31) & 0xffffff00u) | static_cast<uint32_t>((uint8_t)0));
+    v31 = (-1);
+    return 1;
 }
 
 bool PathSmoother::CheckBoundsEdges() {

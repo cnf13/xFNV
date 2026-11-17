@@ -61,79 +61,78 @@ bool BGSSaveLoadGlobalData::LoadGlobalData(uint32_t auiGlobalDataType, BGSLoadGa
         SaveGameWarning("SAVELOAD: Unknown global data type %i in LoadGlobalData()", auiGlobalDataType);
         return false;
     }
-    else {
-        if (auiGlobalDataType == 1000) {
-            return true;
+
+    if (auiGlobalDataType == 1000) {
+        return true;
+    }
+
+    switch (auiGlobalDataType) {
+        case 0u: {
+            MiscStatManager::LoadGame(apLoadGameBuffer);
+            result = true;
+            break;
         }
-        else {
-            switch (auiGlobalDataType) {
-                case 0u: {
-                    MiscStatManager::LoadGame(apLoadGameBuffer);
-                    result = true;
-                    break;
-                }
-                case 1u: {
-                    BGSSaveLoadGlobalData::LoadLocationData(apLoadGameBuffer);
-                    result = true;
-                    break;
-                }
-                case 2u: {
-                    TES::pInstance->LoadGame(apLoadGameBuffer);
-                    result = true;
-                    break;
-                }
-                case 3u: {
-                    BGSSaveLoadGlobalData::LoadGlobals(apLoadGameBuffer);
-                    result = true;
-                    break;
-                }
-                case 4u: {
-                    ReferenceProcessLists.LoadGame(apLoadGameBuffer);
-                    result = true;
-                    break;
-                }
-                case 5u: {
-                    pCombatManager->LoadGame(apLoadGameBuffer);
-                    result = true;
-                    break;
-                }
-                case 6u: {
-                    Interface::LoadGame(apLoadGameBuffer);
-                    result = true;
-                    break;
-                }
-                case 7u: {
-                    BGSSaveLoadGlobalData::LoadEffects(apLoadGameBuffer);
-                    result = true;
-                    break;
-                }
-                case 8u: {
-                    Sky* Instance = Sky::GetInstance();
-                    Instance->LoadGame(apLoadGameBuffer);
-                    result = true;
-                    break;
-                }
-                case 9u: {
-                    ActorCause::LoadActorCausesList(apLoadGameBuffer);
-                    result = true;
-                    break;
-                }
-                case 10u: {
-                    FalloutRadio::LoadGame(apLoadGameBuffer);
-                    result = true;
-                    break;
-                }
-                case 11u: {
-                    FalloutAudio::LoadGame(apLoadGameBuffer);
-                    result = true;
-                    break;
-                }
-                default: {
-                    goto LABEL_18;
-                }
-            }
+        case 1u: {
+            BGSSaveLoadGlobalData::LoadLocationData(apLoadGameBuffer);
+            result = true;
+            break;
+        }
+        case 2u: {
+            TES::pInstance->LoadGame(apLoadGameBuffer);
+            result = true;
+            break;
+        }
+        case 3u: {
+            BGSSaveLoadGlobalData::LoadGlobals(apLoadGameBuffer);
+            result = true;
+            break;
+        }
+        case 4u: {
+            ReferenceProcessLists.LoadGame(apLoadGameBuffer);
+            result = true;
+            break;
+        }
+        case 5u: {
+            pCombatManager->LoadGame(apLoadGameBuffer);
+            result = true;
+            break;
+        }
+        case 6u: {
+            Interface::LoadGame(apLoadGameBuffer);
+            result = true;
+            break;
+        }
+        case 7u: {
+            BGSSaveLoadGlobalData::LoadEffects(apLoadGameBuffer);
+            result = true;
+            break;
+        }
+        case 8u: {
+            Sky* Instance = Sky::GetInstance();
+            Instance->LoadGame(apLoadGameBuffer);
+            result = true;
+            break;
+        }
+        case 9u: {
+            ActorCause::LoadActorCausesList(apLoadGameBuffer);
+            result = true;
+            break;
+        }
+        case 10u: {
+            FalloutRadio::LoadGame(apLoadGameBuffer);
+            result = true;
+            break;
+        }
+        case 11u: {
+            FalloutAudio::LoadGame(apLoadGameBuffer);
+            result = true;
+            break;
+        }
+        default: {
+            goto LABEL_18;
         }
     }
+
     return result;
 }
 
@@ -161,70 +160,69 @@ bool BGSSaveLoadGlobalData::InitGlobalData(uint32_t aiGlobalDataType, BGSLoadGam
         SaveGameWarning("DEFAULT: Unknown global data type %i in InitGlobalData()", aiGlobalDataType);
         return false;
     }
-    else {
-        if (aiGlobalDataType == 1000) {
-            return false;
+
+    if (aiGlobalDataType == 1000) {
+        return false;
+    }
+
+    switch (aiGlobalDataType) {
+        case 0u: {
+            result = false;
+            break;
         }
-        else {
-            switch (aiGlobalDataType) {
-                case 0u: {
-                    result = false;
-                    break;
-                }
-                case 1u: {
-                    result = false;
-                    break;
-                }
-                case 2u: {
-                    result = false;
-                    break;
-                }
-                case 3u: {
-                    result = false;
-                    break;
-                }
-                case 4u: {
-                    ReferenceProcessLists.InitLoadGame(apLoadGameBuffer);
-                    result = true;
-                    break;
-                }
-                case 5u: {
-                    pCombatManager->InitLoadGame(apLoadGameBuffer);
-                    result = true;
-                    break;
-                }
-                case 6u: {
-                    result = false;
-                    break;
-                }
-                case 7u: {
-                    result = false;
-                    break;
-                }
-                case 8u: {
-                    result = false;
-                    break;
-                }
-                case 9u: {
-                    ActorCause::InitLoadActorCausesList(apLoadGameBuffer);
-                    result = true;
-                    break;
-                }
-                case 10u: {
-                    FalloutRadio::InitLoadGame(apLoadGameBuffer);
-                    result = true;
-                    break;
-                }
-                case 11u: {
-                    result = false;
-                    break;
-                }
-                default: {
-                    goto LABEL_18;
-                }
-            }
+        case 1u: {
+            result = false;
+            break;
+        }
+        case 2u: {
+            result = false;
+            break;
+        }
+        case 3u: {
+            result = false;
+            break;
+        }
+        case 4u: {
+            ReferenceProcessLists.InitLoadGame(apLoadGameBuffer);
+            result = true;
+            break;
+        }
+        case 5u: {
+            pCombatManager->InitLoadGame(apLoadGameBuffer);
+            result = true;
+            break;
+        }
+        case 6u: {
+            result = false;
+            break;
+        }
+        case 7u: {
+            result = false;
+            break;
+        }
+        case 8u: {
+            result = false;
+            break;
+        }
+        case 9u: {
+            ActorCause::InitLoadActorCausesList(apLoadGameBuffer);
+            result = true;
+            break;
+        }
+        case 10u: {
+            FalloutRadio::InitLoadGame(apLoadGameBuffer);
+            result = true;
+            break;
+        }
+        case 11u: {
+            result = false;
+            break;
+        }
+        default: {
+            goto LABEL_18;
         }
     }
+
     return result;
 }
 
@@ -345,79 +343,78 @@ bool BGSSaveLoadGlobalData::SaveGlobalData(uint32_t aiGlobalDataType, BGSSaveGam
         SaveGameWarning("SAVELOAD: Unknown global data type %i in SaveGlobalData()", aiGlobalDataType);
         return false;
     }
-    else {
-        if (aiGlobalDataType == 1000) {
-            return true;
+
+    if (aiGlobalDataType == 1000) {
+        return true;
+    }
+
+    switch (aiGlobalDataType) {
+        case 0u: {
+            MiscStatManager::SaveGame(apSaveGameBuffer);
+            result = true;
+            break;
         }
-        else {
-            switch (aiGlobalDataType) {
-                case 0u: {
-                    MiscStatManager::SaveGame(apSaveGameBuffer);
-                    result = true;
-                    break;
-                }
-                case 1u: {
-                    BGSSaveLoadGlobalData::SaveLocationData(apSaveGameBuffer);
-                    result = true;
-                    break;
-                }
-                case 2u: {
-                    TES::pInstance->SaveGameBGS(apSaveGameBuffer);
-                    result = true;
-                    break;
-                }
-                case 3u: {
-                    BGSSaveLoadGlobalData::SaveGlobals(apSaveGameBuffer);
-                    result = true;
-                    break;
-                }
-                case 4u: {
-                    ReferenceProcessLists.SaveGame(apSaveGameBuffer);
-                    result = true;
-                    break;
-                }
-                case 5u: {
-                    pCombatManager->SaveGame(apSaveGameBuffer);
-                    result = true;
-                    break;
-                }
-                case 6u: {
-                    Interface::SaveGame(apSaveGameBuffer);
-                    result = true;
-                    break;
-                }
-                case 7u: {
-                    BGSSaveLoadGlobalData::SaveEffects(apSaveGameBuffer);
-                    result = true;
-                    break;
-                }
-                case 8u: {
-                    Sky* Instance = Sky::GetInstance();
-                    Instance->SaveGame(apSaveGameBuffer);
-                    result = true;
-                    break;
-                }
-                case 9u: {
-                    ActorCause::SaveActorCausesList(apSaveGameBuffer);
-                    result = true;
-                    break;
-                }
-                case 10u: {
-                    FalloutRadio::SaveGame(apSaveGameBuffer);
-                    result = true;
-                    break;
-                }
-                case 11u: {
-                    FalloutAudio::SaveGame(apSaveGameBuffer);
-                    result = true;
-                    break;
-                }
-                default: {
-                    goto LABEL_18;
-                }
-            }
+        case 1u: {
+            BGSSaveLoadGlobalData::SaveLocationData(apSaveGameBuffer);
+            result = true;
+            break;
+        }
+        case 2u: {
+            TES::pInstance->SaveGameBGS(apSaveGameBuffer);
+            result = true;
+            break;
+        }
+        case 3u: {
+            BGSSaveLoadGlobalData::SaveGlobals(apSaveGameBuffer);
+            result = true;
+            break;
+        }
+        case 4u: {
+            ReferenceProcessLists.SaveGame(apSaveGameBuffer);
+            result = true;
+            break;
+        }
+        case 5u: {
+            pCombatManager->SaveGame(apSaveGameBuffer);
+            result = true;
+            break;
+        }
+        case 6u: {
+            Interface::SaveGame(apSaveGameBuffer);
+            result = true;
+            break;
+        }
+        case 7u: {
+            BGSSaveLoadGlobalData::SaveEffects(apSaveGameBuffer);
+            result = true;
+            break;
+        }
+        case 8u: {
+            Sky* Instance = Sky::GetInstance();
+            Instance->SaveGame(apSaveGameBuffer);
+            result = true;
+            break;
+        }
+        case 9u: {
+            ActorCause::SaveActorCausesList(apSaveGameBuffer);
+            result = true;
+            break;
+        }
+        case 10u: {
+            FalloutRadio::SaveGame(apSaveGameBuffer);
+            result = true;
+            break;
+        }
+        case 11u: {
+            FalloutAudio::SaveGame(apSaveGameBuffer);
+            result = true;
+            break;
+        }
+        default: {
+            goto LABEL_18;
         }
     }
+
     return result;
 }
 
@@ -586,13 +583,11 @@ void BGSSaveLoadGlobalData::SaveGlobals(BGSSaveGameBuffer* apSaveGameBuffer) {
     uint32_t icount = 0;
     uint32_t isaveGameBufferPos = apSaveGameBuffer->StartVariableSizedValue();
     for (TESGlobal* pglobal : *pglobals) {
-        if (pglobal) {
-            if (!pglobal->TESForm::GetHasSpokenFlag()) {
-                apSaveGameBuffer->SaveFormID(pglobal, 0);
-                fvalue = pglobal->fValue;
-                apSaveGameBuffer->SaveDataEndian(&fvalue, 4u, 0);
-                ++icount;
-            }
+        if ((pglobal) && (!pglobal->TESForm::GetHasSpokenFlag())) {
+            apSaveGameBuffer->SaveFormID(pglobal, 0);
+            fvalue = pglobal->fValue;
+            apSaveGameBuffer->SaveDataEndian(&fvalue, 4u, 0);
+            ++icount;
         }
     }
     apSaveGameBuffer->SaveVariableSizedValue(icount, isaveGameBufferPos);
@@ -641,18 +636,16 @@ void BGSSaveLoadGlobalData::SaveEffects(BGSSaveGameBuffer* apSaveGameBuffer) {
     for (BSSimpleList<NiPointer<ImageSpaceModifierInstance>>* plist = &TES::pInstance->listActiveImageSpaceModifiers;
          plist; plist = plist->m_pkNext) {
         ImageSpaceModifierInstance* pmod = plist->m_item.m_pObject;
-        if (pmod) {
-            if (!pmod->QPermanent()) {
-                ImageSpaceModifierInstanceForm* pinstanceForm = pmod->IsForm();
-                if (pinstanceForm) {
-                    fstrength = pinstanceForm->fStrength;
-                    apSaveGameBuffer->SaveDataEndian(&fstrength, 4u, 0);
-                    double TickCount = TESImageSpaceModifier::GetTickCount();
-                    foffset = TickCount - pinstanceForm->fStartTime;
-                    apSaveGameBuffer->SaveDataEndian(&foffset, 4u, 0);
-                    apSaveGameBuffer->SaveFormID(pinstanceForm->pImageSpaceMod, 0);
-                    ++icount;
-                }
+        if ((pmod) && (!pmod->QPermanent())) {
+            ImageSpaceModifierInstanceForm* pinstanceForm = pmod->IsForm();
+            if (pinstanceForm) {
+                fstrength = pinstanceForm->fStrength;
+                apSaveGameBuffer->SaveDataEndian(&fstrength, 4u, 0);
+                double TickCount = TESImageSpaceModifier::GetTickCount();
+                foffset = TickCount - pinstanceForm->fStartTime;
+                apSaveGameBuffer->SaveDataEndian(&foffset, 4u, 0);
+                apSaveGameBuffer->SaveFormID(pinstanceForm->pImageSpaceMod, 0);
+                ++icount;
             }
         }
     }

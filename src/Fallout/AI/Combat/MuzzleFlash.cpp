@@ -151,9 +151,8 @@ TESModel* MuzzleFlash::GetMuzzleFlashModel() {
     if (pProjectile && pProjectile->GetHasMuzzleFlash()) {
         return &pProjectile->GetMuzzleFlashModel();
     }
-    else {
-        return nullptr;
-    }
+
+    return nullptr;
 }
 
 void MuzzleFlash::DetachLight() {
@@ -169,15 +168,14 @@ void MuzzleFlash::DetachLight() {
 
 void MuzzleFlash::Init(TESObjectREFR* apParentRef) {
     TESModel* pModel = GetMuzzleFlashModel();
-    if (pModel) {
-        if (pModel->GetModelLength()) {
-            const char* v2 = pModel->GetModel();
-            NiNode* pObject = pModelLoader->LoadFile(v2, LOD_MULT_NONE, true, false, false, false);
-            if (pObject) {
-                spAVObject.operator=(static_cast<NiAVObject*>(pObject->Clone()));
-            }
+    if ((pModel) && (pModel->GetModelLength())) {
+        const char* v2 = pModel->GetModel();
+        NiNode* pObject = pModelLoader->LoadFile(v2, LOD_MULT_NONE, true, false, false, false);
+        if (pObject) {
+            spAVObject.operator=(static_cast<NiAVObject*>(pObject->Clone()));
         }
     }
+
     if (spAVObject.m_pObject) {
         TESHavokUtilities::RemoveHavokFromSceneGraph(spAVObject.m_pObject);
         Position3D(apParentRef);
@@ -195,112 +193,103 @@ void MuzzleFlash::Init(TESObjectREFR* apParentRef) {
 void MuzzleFlash::Position3D(TESObjectREFR* apParentRef) {
     NiTransform kDest;
     NiMatrix3 result;
-    if (spAVObject.m_pObject) {
-        if (apParentRef) {
-            if (apParentRef->GetParentCell()) {
-                if (apParentRef->Get3D()) {
-                    NiAVObject* pprojectileNode;
-                    if (apParentRef->IsActor()) {
-                        pprojectileNode = apParentRef->GetFireNode();
+    if ((spAVObject.m_pObject) && (apParentRef) && (apParentRef->GetParentCell()) && (apParentRef->Get3D())) {
+        NiAVObject* pprojectileNode;
+        if (apParentRef->IsActor()) {
+            pprojectileNode = apParentRef->GetFireNode();
+        }
+        else {
+            NiAVObject* pprojectileNode_2;
+            if (pWeaponSource) {
+                NiNode* v2 = apParentRef->Get3D();
+                pprojectileNode_2 = pWeaponSource->GetFireNode(v2);
+            }
+            else {
+                pprojectileNode_2 = nullptr;
+            }
+            pprojectileNode = pprojectileNode_2;
+        }
+        bool bupdate = false;
+        float fupdateTime_2 = 0.0f;
+        if (pprojectileNode) {
+            NiNode* psceneParent;
+            NiTransform ktrans;
+            if (apParentRef == pPlayer) {
+                if (pPlayer->IsActually3rdPerson()) {
+                    psceneParent = pPlayer->Get3D();
+                }
+                else {
+                    psceneParent = static_cast<NiNode*>(pPlayer->Get3D(true));
+                }
+                NiTransform kplayerInvTransform;
+                if (psceneParent) {
+                    kplayerInvTransform.m_Rotate =
+                        *::new (&result) NiMatrix3((&psceneParent->GetWorldTransform())->m_Rotate.Transpose());
+                    kplayerInvTransform.m_fScale = 1.0 / (&psceneParent->GetWorldTransform())->m_fScale;
+                    kplayerInvTransform.m_Translate = -(&psceneParent->GetWorldTransform())->m_Translate;
+                    kplayerInvTransform.m_Translate = kplayerInvTransform.m_Rotate * kplayerInvTransform.m_Translate;
+                    kplayerInvTransform.m_Translate.operator*=(kplayerInvTransform.m_fScale);
+                }
+                ktrans = *::new (&kDest) NiTransform(kplayerInvTransform * pprojectileNode->GetWorldTransform());
+                bupdate = true;
+                if (pPlayer->IsActually3rdPerson()) {
+                    float fupdateTime;
+                    if (pPlayer->GetAnimation()) {
+                        Animation* v4 = pPlayer->GetAnimation();
+                        fupdateTime = v4->GetTime();
                     }
                     else {
-                        NiAVObject* pprojectileNode_2;
-                        if (pWeaponSource) {
-                            NiNode* v2 = apParentRef->Get3D();
-                            pprojectileNode_2 = pWeaponSource->GetFireNode(v2);
-                        }
-                        else {
-                            pprojectileNode_2 = nullptr;
-                        }
-                        pprojectileNode = pprojectileNode_2;
+                        fupdateTime = 0.0f;
                     }
-                    bool bupdate = false;
-                    float fupdateTime_2 = 0.0f;
-                    if (pprojectileNode) {
-                        NiNode* psceneParent;
-                        NiTransform ktrans;
-                        if (apParentRef == pPlayer) {
-                            if (pPlayer->IsActually3rdPerson()) {
-                                psceneParent = pPlayer->Get3D();
-                            }
-                            else {
-                                psceneParent = static_cast<NiNode*>(pPlayer->Get3D(true));
-                            }
-                            NiTransform kplayerInvTransform;
-                            if (psceneParent) {
-                                kplayerInvTransform.m_Rotate =
-                                    *::new (&result)
-                                        NiMatrix3((&psceneParent->GetWorldTransform())->m_Rotate.Transpose());
-                                kplayerInvTransform.m_fScale = 1.0 / (&psceneParent->GetWorldTransform())->m_fScale;
-                                kplayerInvTransform.m_Translate = -(&psceneParent->GetWorldTransform())->m_Translate;
-                                kplayerInvTransform.m_Translate =
-                                    kplayerInvTransform.m_Rotate * kplayerInvTransform.m_Translate;
-                                kplayerInvTransform.m_Translate.operator*=(kplayerInvTransform.m_fScale);
-                            }
-                            ktrans =
-                                *::new (&kDest) NiTransform(kplayerInvTransform * pprojectileNode->GetWorldTransform());
-                            bupdate = true;
-                            if (pPlayer->IsActually3rdPerson()) {
-                                float fupdateTime;
-                                if (pPlayer->GetAnimation()) {
-                                    Animation* v4 = pPlayer->GetAnimation();
-                                    fupdateTime = v4->GetTime();
-                                }
-                                else {
-                                    fupdateTime = 0.0f;
-                                }
-                                fupdateTime_2 = fupdateTime;
-                            }
-                            else {
-                                float fupdateTime_3;
-                                if (pPlayer->GetAnimation(true)) {
-                                    Animation* Animation_0 = pPlayer->GetAnimation(true);
-                                    fupdateTime_3 = Animation_0->GetTime();
-                                }
-                                else {
-                                    fupdateTime_3 = 0.0f;
-                                }
-                                fupdateTime_2 = fupdateTime_3;
-                            }
-                        }
-                        else {
-                            ktrans = pprojectileNode->GetWorldTransform();
-                            TESObjectCELL* pcell = apParentRef->GetParentCell();
-                            psceneParent = static_cast<NiNode*>(pcell->GetDynamicNode());
-                        }
-                        if (psceneParent) {
-                            NiNode* Parent = spAVObject.m_pObject->m_pkParent;
-                            if (psceneParent != Parent) {
-                                if (AILinearTaskThreadManager::ShouldQueue3DTask()) {
-                                    NiAVObject* v8 = spAVObject.m_pObject;
-                                    TaskQueueInterface* Instance = TaskQueueInterface::GetInstance();
-                                    Instance->QueueNodeAttach(v8, psceneParent, true, false);
-                                }
-                                else {
-                                    NiAVObject* v10 = spAVObject.m_pObject;
-                                    psceneParent->AttachChild(v10, 1);
-                                }
-                                NiNode* v11 = static_cast<NiNode*>(spAVObject.m_pObject);
-                                NiNode* v7 = v11->IsNode();
-                                BSShaderUtil::RecursiveSetPropertyFadeAlpha(v7, 1.0f);
-                            }
-                        }
-                        spAVObject.m_pObject->SetTranslate(ktrans.m_Translate);
-                        spAVObject.m_pObject->SetRotate(ktrans.m_Rotate);
-                        spAVObject.m_pObject->SetScale(ktrans.m_fScale);
-                        if (bupdate) {
-                            if (AILinearTaskThreadManager::ShouldQueue3DTask()) {
-                                if (bwarnOnce) {
-                                    Warning("Trying to update a Muzzle Flash when not in the main thread");
-                                    bwarnOnce = false;
-                                }
-                            }
-                            else {
-                                NiUpdateData UpdateData(fupdateTime_2, false, false);
-                                spAVObject.m_pObject->Update(UpdateData);
-                            }
-                        }
+                    fupdateTime_2 = fupdateTime;
+                }
+                else {
+                    float fupdateTime_3;
+                    if (pPlayer->GetAnimation(true)) {
+                        Animation* Animation_0 = pPlayer->GetAnimation(true);
+                        fupdateTime_3 = Animation_0->GetTime();
                     }
+                    else {
+                        fupdateTime_3 = 0.0f;
+                    }
+                    fupdateTime_2 = fupdateTime_3;
+                }
+            }
+            else {
+                ktrans = pprojectileNode->GetWorldTransform();
+                TESObjectCELL* pcell = apParentRef->GetParentCell();
+                psceneParent = static_cast<NiNode*>(pcell->GetDynamicNode());
+            }
+            if (psceneParent) {
+                NiNode* Parent = spAVObject.m_pObject->m_pkParent;
+                if (psceneParent != Parent) {
+                    if (AILinearTaskThreadManager::ShouldQueue3DTask()) {
+                        NiAVObject* v8 = spAVObject.m_pObject;
+                        TaskQueueInterface* Instance = TaskQueueInterface::GetInstance();
+                        Instance->QueueNodeAttach(v8, psceneParent, true, false);
+                    }
+                    else {
+                        NiAVObject* v10 = spAVObject.m_pObject;
+                        psceneParent->AttachChild(v10, 1);
+                    }
+                    NiNode* v11 = static_cast<NiNode*>(spAVObject.m_pObject);
+                    NiNode* v7 = v11->IsNode();
+                    BSShaderUtil::RecursiveSetPropertyFadeAlpha(v7, 1.0f);
+                }
+            }
+            spAVObject.m_pObject->SetTranslate(ktrans.m_Translate);
+            spAVObject.m_pObject->SetRotate(ktrans.m_Rotate);
+            spAVObject.m_pObject->SetScale(ktrans.m_fScale);
+            if (bupdate) {
+                if (AILinearTaskThreadManager::ShouldQueue3DTask()) {
+                    if (bwarnOnce) {
+                        Warning("Trying to update a Muzzle Flash when not in the main thread");
+                        bwarnOnce = false;
+                    }
+                }
+                else {
+                    NiUpdateData UpdateData(fupdateTime_2, false, false);
+                    spAVObject.m_pObject->Update(UpdateData);
                 }
             }
         }
@@ -308,40 +297,36 @@ void MuzzleFlash::Position3D(TESObjectREFR* apParentRef) {
 }
 
 void MuzzleFlash::AttachLight() {
-    if (spAVObject.m_pObject) {
-        if (pProjectile->Data.pMuzzleFlashLight) {
-            NiAVObject* v2 = spAVObject.m_pObject;
-            TESObjectLIGH* FormOne = pProjectile->Data.pMuzzleFlashLight;
-            spLight.operator=(FormOne->GenDynamic(nullptr, v2, true));
-        }
+    if ((spAVObject.m_pObject) && (pProjectile->Data.pMuzzleFlashLight)) {
+        NiAVObject* v2 = spAVObject.m_pObject;
+        TESObjectLIGH* FormOne = pProjectile->Data.pMuzzleFlashLight;
+        spLight.operator=(FormOne->GenDynamic(nullptr, v2, true));
     }
 }
 
 void MuzzleFlash::SpawnMuzzleFlash(TESObjectREFR* apParentRef, Projectile* apProjectile) {
-    if (apParentRef) {
-        if (apProjectile) {
-            if (apParentRef->IsActor()) {
-                BaseProcess* pprocess = static_cast<Actor*>(apParentRef)->GetCurrentAIProcess();
-                if (pprocess) {
-                    BGSProjectile* Time;
-                    TESObjectWEAP* Count;
-                    if (!pprocess->GetCurrentMuzzleFlash() ||
-                        ((Time = pprocess->GetCurrentMuzzleFlash()->pProjectile,
-                          Time != apProjectile->GetProjectileBase()) ||
-                         (Count = pprocess->GetCurrentMuzzleFlash()->pWeaponSource,
-                          Count != apProjectile->pWeaponSource))) {
-                        pprocess->ClearMuzzleFlash();
-                        pprocess->CreateMuzzleFlash(apProjectile, apParentRef);
-                    }
-                    if (pprocess->GetCurrentMuzzleFlash()) {
-                        MuzzleFlash* v4 = pprocess->GetCurrentMuzzleFlash();
-                        v4->Enable();
-                    }
+    if ((apParentRef) && (apProjectile)) {
+        if (apParentRef->IsActor()) {
+            BaseProcess* pprocess = static_cast<Actor*>(apParentRef)->GetCurrentAIProcess();
+            if (pprocess) {
+                BGSProjectile* Time;
+                TESObjectWEAP* Count;
+                if (!pprocess->GetCurrentMuzzleFlash() ||
+                    ((Time = pprocess->GetCurrentMuzzleFlash()->pProjectile,
+                      Time != apProjectile->GetProjectileBase()) ||
+                     (Count = pprocess->GetCurrentMuzzleFlash()->pWeaponSource,
+                      Count != apProjectile->pWeaponSource))) {
+                    pprocess->ClearMuzzleFlash();
+                    pprocess->CreateMuzzleFlash(apProjectile, apParentRef);
+                }
+                if (pprocess->GetCurrentMuzzleFlash()) {
+                    MuzzleFlash* v4 = pprocess->GetCurrentMuzzleFlash();
+                    v4->Enable();
                 }
             }
-            else {
-                ReferenceProcessLists.SpawnReferenceMuzzleFlash(apProjectile, apParentRef);
-            }
+        }
+        else {
+            ReferenceProcessLists.SpawnReferenceMuzzleFlash(apProjectile, apParentRef);
         }
     }
 }

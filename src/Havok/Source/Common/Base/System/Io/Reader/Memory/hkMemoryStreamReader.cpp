@@ -36,11 +36,10 @@ int32_t hkMemoryStreamReader::read(void* buf, int32_t nbytes) {
     }
     hkString::memCpy(buf, &m_buf[m_bufCurrent], v5);
     this->m_bufCurrent += v5;
-    if (!v5) {
-        if (nbytes) {
-            this->m_bufCurrent = m_bufSize + 1;
-        }
+    if ((!v5) && (nbytes)) {
+        this->m_bufCurrent = m_bufSize + 1;
     }
+
     return v5;
 }
 
@@ -56,11 +55,10 @@ int32_t hkMemoryStreamReader::skip(int32_t nbytes) {
         result = nbytes;
     }
     this->m_bufCurrent = result + m_bufCurrent;
-    if (!result) {
-        if (nbytes) {
-            this->m_bufCurrent = m_bufSize + 1;
-        }
+    if ((!result) && (nbytes)) {
+        this->m_bufCurrent = m_bufSize + 1;
     }
+
     return result;
 }
 

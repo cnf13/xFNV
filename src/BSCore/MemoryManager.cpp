@@ -172,12 +172,11 @@ void MemoryManager::AddPool(uint32_t aiBlockSize, uint32_t aiPoolSize, const cha
     void* pMem = MemoryManager_Singleton.Allocate(sizeof(MemoryPool));
     MemoryPool* pPool = pMem ? ::new (pMem) MemoryPool(aiBlockSize, aiPoolSize, apDesc) : nullptr;
     // The pool is read without a null check, as the game does; the delete below checks.
-    if (!pPool->pHeap) {
-        if (pPool) {
-            pPool->~MemoryPool();
-            MemoryManager_Singleton.Deallocate(pPool);
-        }
+    if ((!pPool->pHeap) && (pPool)) {
+        pPool->~MemoryPool();
+        MemoryManager_Singleton.Deallocate(pPool);
     }
+
     bAllowPoolUse = true;
     GetThreadMemContext() = eOldContext;
 }
@@ -517,14 +516,12 @@ uint32_t MemoryManager::ProcessMemoryProblem(IMemoryHeap* apHeap, int32_t aiMemo
         case 2: {
             if (BSFaceGenManager::GetModelCache()) {
                 BSFaceGenModelMap* ModelCache = BSFaceGenManager::GetModelCache();
-                if (ModelCache->bHasFaceGenData) {
-                    if (BSFaceGenManager::TryLockFaceGenAccess()) {
-                        if (BSFaceGenModelMap::GetCSEnterCounter() == 1) {
-                            BSFaceGenModelMap* v8 = BSFaceGenManager::GetModelCache();
-                            v8->UnloadAllEGMAndEGTData(false);
-                        }
-                        BSFaceGenManager::UnlockFaceGenAccess();
+                if ((ModelCache->bHasFaceGenData) && (BSFaceGenManager::TryLockFaceGenAccess())) {
+                    if (BSFaceGenModelMap::GetCSEnterCounter() == 1) {
+                        BSFaceGenModelMap* v8 = BSFaceGenManager::GetModelCache();
+                        v8->UnloadAllEGMAndEGTData(false);
                     }
+                    BSFaceGenManager::UnlockFaceGenAccess();
                 }
             }
             return aiMemoryPass + 1;

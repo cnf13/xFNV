@@ -1498,7 +1498,10 @@ void hkp3AxisSweep::queryBatchAabbSub(
         for (int32_t i = 0; i < openQueryNodes.m_size; ++i) {
             const hkpBpNode* nodes = m_nodes.m_data;
             const hkpBpNode* other = &nodes[openQueryNodes.m_data[i]];
-            uint32_t nodeMin, nodeMax, otherMin, otherMax;
+            uint32_t nodeMin;
+            uint32_t nodeMax;
+            uint32_t otherMin;
+            uint32_t otherMax;
             __builtin_memcpy(&nodeMin, &node->min_y, sizeof(uint32_t));
             __builtin_memcpy(&nodeMax, &node->max_y, sizeof(uint32_t));
             __builtin_memcpy(&otherMin, &other->min_y, sizeof(uint32_t));
@@ -1574,7 +1577,10 @@ void hkp3AxisSweep::queryBatchAabbSub(
         for (int32_t i = 0; i < openOtherNodes.m_size; ++i) {
             const hkpBpNode* nodes = m_nodes.m_data;
             const hkpBpNode* other = &nodes[openOtherNodes.m_data[i]];
-            uint32_t nodeMin, nodeMax, otherMin, otherMax;
+            uint32_t nodeMin;
+            uint32_t nodeMax;
+            uint32_t otherMin;
+            uint32_t otherMax;
             __builtin_memcpy(&nodeMin, &node->min_y, sizeof(uint32_t));
             __builtin_memcpy(&nodeMax, &node->max_y, sizeof(uint32_t));
             __builtin_memcpy(&otherMin, &other->min_y, sizeof(uint32_t));

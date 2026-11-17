@@ -132,13 +132,11 @@ int32_t hkLineSegmentUtil::closestPointLineSeg(
             );
             return 0;
         }
-        else {
-            a4.m_pointOnEdge.m_quad = a3.m_quad;
-            return 4;
-        }
+
+        a4.m_pointOnEdge.m_quad = a3.m_quad;
+        return 4;
     }
-    else {
-        a4.m_pointOnEdge.m_quad = m_quad;
-        return 8;
-    }
+
+    a4.m_pointOnEdge.m_quad = m_quad;
+    return 8;
 }

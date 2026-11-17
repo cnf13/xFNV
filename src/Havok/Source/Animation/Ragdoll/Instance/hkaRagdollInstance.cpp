@@ -263,9 +263,8 @@ hkpRigidBody* hkaRagdollInstance::getRigidBodyOfBone(int32_t i) const {
     if (v2 >= 0) {
         return m_rigidBodies.m_data[v2];
     }
-    else {
-        return nullptr;
-    }
+
+    return nullptr;
 }
 
 void hkaRagdollInstance::getPoseWorldSpace(hkQsTransform* poseOut) const {

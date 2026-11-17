@@ -76,50 +76,46 @@ void bhkNiCollisionObject::SetSyncMode(bhkNiCollisionObject::SYNCMODE aeMode) {
 }
 
 void BSTransCon::UpdateAllButTarget(float afTime, bool abSkipSelectiveUpdateTest) {
-    if (GetActive()) {
-        if (m_usNumInterps) {
-            NiNode* v12;
-            int32_t i;
-            NiQuatTransform ecx0;
-            int32_t v10 = m_usNumInterps - 1;
-            for (i = 0; i < v10; ++i) {
-                v12 = static_cast<NiNode*>(m_ppkTargets[i]);
-                if (v12) {
-                    if ((abSkipSelectiveUpdateTest || v12->GetSelectiveUpdate()) &&
-                        (!abSkipSelectiveUpdateTest || !v12->GetSelectiveUpdate()) &&
-                        m_pkBlendInterps[i].Update(afTime, v12, ecx0)) {
-                        if (ecx0.IsTranslateValid()) {
-                            NiQuatTransform* X = &ecx0;
-                            v12->SetTranslate(X->m_kTranslate);
-                        }
-                        if (ecx0.IsRotateValid()) {
-                            NiQuaternion* Xa = &ecx0.m_kRotate;
-                            v12->SetRotate_0(*Xa);
-                        }
-                        if (ecx0.IsScaleValid()) {
-                            float Xb = ecx0.m_fScale;
-                            v12->SetScale(Xb);
-                        }
-                    }
+    if ((GetActive()) && (m_usNumInterps)) {
+        NiNode* v12;
+        int32_t i;
+        NiQuatTransform ecx0;
+        int32_t v10 = m_usNumInterps - 1;
+        for (i = 0; i < v10; ++i) {
+            v12 = static_cast<NiNode*>(m_ppkTargets[i]);
+            if ((v12) &&
+                ((abSkipSelectiveUpdateTest || v12->GetSelectiveUpdate()) &&
+                 (!abSkipSelectiveUpdateTest || !v12->GetSelectiveUpdate()) &&
+                 m_pkBlendInterps[i].Update(afTime, v12, ecx0))) {
+                if (ecx0.IsTranslateValid()) {
+                    NiQuatTransform* X = &ecx0;
+                    v12->SetTranslate(X->m_kTranslate);
+                }
+                if (ecx0.IsRotateValid()) {
+                    NiQuaternion* Xa = &ecx0.m_kRotate;
+                    v12->SetRotate_0(*Xa);
+                }
+                if (ecx0.IsScaleValid()) {
+                    float Xb = ecx0.m_fScale;
+                    v12->SetScale(Xb);
                 }
             }
-            v12 = static_cast<NiNode*>(m_ppkTargets[i]);
-            if (v12) {
-                if ((abSkipSelectiveUpdateTest || v12->GetSelectiveUpdate()) &&
-                    m_pkBlendInterps[i].Update(afTime, v12, ecx0)) {
-                    if (ecx0.IsTranslateValid()) {
-                        NiQuatTransform* Xc = &ecx0;
-                        v12->SetTranslate(Xc->m_kTranslate);
-                    }
-                    if (ecx0.IsRotateValid()) {
-                        NiQuaternion* Xd = &ecx0.m_kRotate;
-                        v12->SetRotate_0(*Xd);
-                    }
-                    if (ecx0.IsScaleValid()) {
-                        float Xe = ecx0.m_fScale;
-                        v12->SetScale(Xe);
-                    }
-                }
+        }
+        v12 = static_cast<NiNode*>(m_ppkTargets[i]);
+        if ((v12) &&
+            ((abSkipSelectiveUpdateTest || v12->GetSelectiveUpdate()) &&
+             m_pkBlendInterps[i].Update(afTime, v12, ecx0))) {
+            if (ecx0.IsTranslateValid()) {
+                NiQuatTransform* Xc = &ecx0;
+                v12->SetTranslate(Xc->m_kTranslate);
+            }
+            if (ecx0.IsRotateValid()) {
+                NiQuaternion* Xd = &ecx0.m_kRotate;
+                v12->SetRotate_0(*Xd);
+            }
+            if (ecx0.IsScaleValid()) {
+                float Xe = ecx0.m_fScale;
+                v12->SetScale(Xe);
             }
         }
     }

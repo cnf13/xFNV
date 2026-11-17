@@ -662,10 +662,8 @@ NiAVObject* BSTestObjects::CreateBox(
         }
         colors_2 = colors;
         if (!apLeftColor || apRightColor) {
-            if (apRightColor) {
-                if (!apLeftColor) {
-                    apLeftColor = apRightColor;
-                }
+            if ((apRightColor) && (!apLeftColor)) {
+                apLeftColor = apRightColor;
             }
         }
         else {
@@ -901,11 +899,10 @@ NiAVObject* BSTestObjects::Create3DArrow(
     v50.y = shaftEnd.y - perpVector.y;
     v50.z = shaftEnd.z - perpVector.z;
     vertices[5] = v50;
-    if (apStartColor) {
-        if (!apEndColor) {
-            apEndColor = apStartColor;
-        }
+    if ((apStartColor) && (!apEndColor)) {
+        apEndColor = apStartColor;
     }
+
     if (apEndColor) {
         NiColorA* v9;
         NiColorA* v27 = static_cast<NiColorA*>(MemoryManager_Singleton.Allocate(6 * sizeof(NiColorA)));
@@ -1666,9 +1663,8 @@ NiAVObject* BSTestObjects::CreateCircle(float afRadius, uint16_t asSegments, con
         return (NiAVObject*)::new (v16)
             NiLines(asSegments, pvertices_2, pcolors_2, nullptr, 1, NiGeometryData::NBT_METHOD_NONE, pflags);
     }
-    else {
-        return nullptr;
-    }
+
+    return nullptr;
 }
 
 NiAVObject* BSTestObjects::CreateArrow(float afLength, const NiColorA* apColor) {
@@ -1780,15 +1776,14 @@ NiPoint3* NiPoint3::Perpendicular(NiPoint3* apResult) {
         }
         return apResult;
     }
-    else {
-        float v6 = std::fabs(static_cast<double>(z));
-        float v5 = std::fabs(static_cast<double>(x));
-        if (!(v5 > static_cast<double>(v6))) {
-            ::new (apResult) NiPoint3(UnitCross(NiPoint3_UNIT_X));
-        }
-        else {
-            ::new (apResult) NiPoint3(UnitCross(NiPoint3_UNIT_Z));
-        }
-        return apResult;
+
+    float v6 = std::fabs(static_cast<double>(z));
+    float v5 = std::fabs(static_cast<double>(x));
+    if (!(v5 > static_cast<double>(v6))) {
+        ::new (apResult) NiPoint3(UnitCross(NiPoint3_UNIT_X));
     }
+    else {
+        ::new (apResult) NiPoint3(UnitCross(NiPoint3_UNIT_Z));
+    }
+    return apResult;
 }

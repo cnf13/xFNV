@@ -231,10 +231,8 @@ void SkyShader::SetupGeometryConstants(const NiPropertyState* apState) {
         BSRenderState::SetAlphaBlendFunc(NiAlphaProperty::ALPHA_SRCALPHA, NiAlphaProperty::ALPHA_ONE, BSRS_NOLOCK);
     }
     NiStencilProperty* v14 = static_cast<NiStencilProperty*>(v4->m_aspProps[4].m_pObject);
-    if (v14) {
-        if ((v14->m_uFlags & 1) != 0) {
-            m_pkD3DRenderState->ApplyStencil(v14);
-        }
+    if ((v14) && ((v14->m_uFlags & 1) != 0)) {
+        m_pkD3DRenderState->ApplyStencil(v14);
     }
 }
 
@@ -246,10 +244,8 @@ void SkyShader::PostGeometry(const NiPropertyState* apState) {
         );
     }
     NiStencilProperty* pStencil = static_cast<NiStencilProperty*>(apState->m_aspProps[4].m_pObject);
-    if (pStencil) {
-        if ((pStencil->m_uFlags & 1) != 0) {
-            BSRenderState::SetStencilEnable(false, BSRS_NOLOCK);
-        }
+    if ((pStencil) && ((pStencil->m_uFlags & 1) != 0)) {
+        BSRenderState::SetStencilEnable(false, BSRS_NOLOCK);
     }
 }
 

@@ -328,11 +328,10 @@ void BSShaderData::SetupTexturesPPLightingShader(BSShaderPPLightingProperty* apS
     pTextureSet = this->pTextureSet;
     m_pObject = apShaderProp->spTextureSet.m_pObject;
     if (m_pObject != pTextureSet) {
-        if (m_pObject) {
-            if (!InterlockedDecrementUInt32(&m_pObject->m_uiRefCount)) {
-                m_pObject->DeleteThis();
-            }
+        if ((m_pObject) && (!InterlockedDecrementUInt32(&m_pObject->m_uiRefCount))) {
+            m_pObject->DeleteThis();
         }
+
         apShaderProp->spTextureSet.m_pObject = pTextureSet;
         if (pTextureSet) {
             InterlockedIncrementUInt32(&pTextureSet->m_uiRefCount);

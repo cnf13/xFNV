@@ -355,10 +355,8 @@ void hkpMouseSpringAction::setMousePosition(const hkVector4& mousePositionInWorl
          )) &
          7) != 7) {
         hkpEntity* m_entity = this->m_entity;
-        if (m_entity) {
-            if (m_entity->m_world) {
-                m_entity->activate();
-            }
+        if ((m_entity) && (m_entity->m_world)) {
+            m_entity->activate();
         }
     }
     m_mousePositionInWorld.m_quad = mousePositionInWorld.m_quad;

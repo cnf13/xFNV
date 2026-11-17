@@ -46,86 +46,84 @@ void CombatWorldStateArray::Update(CombatController* apCombatController) {
     CombatProcedure* pactionProcedure = apCombatController->pActionProcedure;
     CombatProcedure* pmovementProcedure = apCombatController->pMovementProcedure;
     CombatCoverLocation* pcoverLocation = pcombatState->GetCoverLocation();
-    if (pcoverLocation) {
-        if (!pcoverLocation->bDirtyFlag) {
-            if (pmovementProcedure && pmovementProcedure->GetType() == CombatProcedure::BE_IN_COVER) {
-                if (!pmovementProcedure->GetFailed()) {
-                    iatlocationValue |= 1 << pcoverLocation->iLocation;
-                }
+    if ((pcoverLocation) && (!pcoverLocation->bDirtyFlag)) {
+        if (pmovementProcedure && pmovementProcedure->GetType() == CombatProcedure::BE_IN_COVER) {
+            if (!pmovementProcedure->GetFailed()) {
+                iatlocationValue |= 1 << pcoverLocation->iLocation;
             }
-            else {
-                CombatUtilities::CalculateCoverPositions(apCombatController, pcoverLocation, &coverLocation, nullptr);
-                NiPoint3 vec = coverLocation - attackerWorldLoc.Point;
-                vec.z = vec.z * 0.10000000149011612;
-                if (vec.SqrLength() < 1024.0) {
-                    iatlocationValue |= 1 << pcoverLocation->iLocation;
-                }
+        }
+        else {
+            CombatUtilities::CalculateCoverPositions(apCombatController, pcoverLocation, &coverLocation, nullptr);
+            NiPoint3 vec = coverLocation - attackerWorldLoc.Point;
+            vec.z = vec.z * 0.10000000149011612;
+            if (vec.SqrLength() < 1024.0) {
+                iatlocationValue |= 1 << pcoverLocation->iLocation;
             }
         }
     }
-    if (pactionProcedure) {
-        if (!pactionProcedure->GetFailed() && pactionProcedure->GetType() == CombatProcedure::ACTIVATE_OBJECT) {
-            CombatProcedureActivateObject* pactivateProcedure =
-                static_cast<CombatProcedureActivateObject*>(pactionProcedure);
-            if (pactivateProcedure->pTargetRef) {
-                for (uint32_t i = 0; i < 5; ++i) {
-                    CombatState::TargetedObject* pcombatItem = pcombatState->GetTargetedObject(i);
-                    if (pcombatItem) {
-                        TESObjectREFR* v2 = pactivateProcedure->pTargetRef;
-                        if (pcombatItem->pRef == v2) {
-                            iatlocationValue |= 1 << (i + 17);
-                        }
+
+    if ((pactionProcedure) &&
+        (!pactionProcedure->GetFailed() && pactionProcedure->GetType() == CombatProcedure::ACTIVATE_OBJECT)) {
+        CombatProcedureActivateObject* pactivateProcedure =
+            static_cast<CombatProcedureActivateObject*>(pactionProcedure);
+        if (pactivateProcedure->pTargetRef) {
+            for (uint32_t i = 0; i < 5; ++i) {
+                CombatState::TargetedObject* pcombatItem = pcombatState->GetTargetedObject(i);
+                if (pcombatItem) {
+                    TESObjectREFR* v2 = pactivateProcedure->pTargetRef;
+                    if (pcombatItem->pRef == v2) {
+                        iatlocationValue |= 1 << (i + 17);
                     }
                 }
             }
         }
     }
-    if (ptarget) {
-        if (targetWorldLoc.GetDistanceSquared(attackerWorldLoc) < 589824.0 && !pcombatState->GetTargetUnreachable() &&
-            pcombatState->CheckMovement(targetWorldLoc, true, false)) {
-            iatlocationValue |= 2u;
-        }
+
+    if ((ptarget) &&
+        (targetWorldLoc.GetDistanceSquared(attackerWorldLoc) < 589824.0 && !pcombatState->GetTargetUnreachable() &&
+         pcombatState->CheckMovement(targetWorldLoc, true, false))) {
+        iatlocationValue |= 2u;
     }
+
     iatlocationValue |= 128u;
     iatlocationValue |= 256u;
     iatlocationValue |= 512u;
     iatlocationValue |= 0x10000u;
     CombatLocationTarget* plocationTarget = pcombatState->pLocationTarget;
-    if (plocationTarget) {
-        if (!plocationTarget->bNearTarget) {
-            switch (plocationTarget->cType) {
-                case 0: {
-                    iatlocationValue &= ~128u;
-                    break;
-                }
-                case 1: {
-                    iatlocationValue &= ~256u;
-                    break;
-                }
-                case 2: {
-                    iatlocationValue &= ~512u;
-                    break;
-                }
-                case 3: {
-                    iatlocationValue &= ~0x10000u;
-                    break;
-                }
-                default: {
-                    Warning("COMBAT: Unsupported target ref type %i in world state update", plocationTarget->cType);
-                    break;
-                }
+    if ((plocationTarget) && (!plocationTarget->bNearTarget)) {
+        switch (plocationTarget->cType) {
+            case 0: {
+                iatlocationValue &= ~128u;
+                break;
+            }
+            case 1: {
+                iatlocationValue &= ~256u;
+                break;
+            }
+            case 2: {
+                iatlocationValue &= ~512u;
+                break;
+            }
+            case 3: {
+                iatlocationValue &= ~0x10000u;
+                break;
+            }
+            default: {
+                Warning("COMBAT: Unsupported target ref type %i in world state update", plocationTarget->cType);
+                break;
             }
         }
     }
+
     if (pcombatState->cFleeState == 2) {
         iatlocationValue |= 0x1000u;
     }
-    if (pmovementProcedure) {
-        if (pmovementProcedure->GetType() == CombatProcedure::HIDE_FROM_TARGET && !pmovementProcedure->GetFailed() &&
-            !pmovementProcedure->GetFinished()) {
-            iatlocationValue |= 1024u;
-        }
+    if ((pmovementProcedure) &&
+        (pmovementProcedure->GetType() == CombatProcedure::HIDE_FROM_TARGET && !pmovementProcedure->GetFailed() &&
+         !pmovementProcedure->GetFinished())) {
+        iatlocationValue |= 1024u;
     }
+
     SetValue(COMBAT_WORLD_STATE_AT_LOCATION, iatlocationValue);
     SetValue(COMBAT_WORLD_STATE_NOT_AT_LOCATION, ~iatlocationValue);
     double AltTimer = pcombatState->fThreatScore;

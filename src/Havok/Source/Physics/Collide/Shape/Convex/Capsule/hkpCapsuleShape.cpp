@@ -251,7 +251,7 @@ hkBool hkpCapsuleShape::castRayImpl(const hkpShapeRayCastInput& input, hkpShapeR
     };
 
     hkBool result;
-    result.m_bool = [&]() __attribute__((always_inline)) -> char {
+    result.m_bool = [&] __attribute__((always_inline)) -> char {
         alignas(16) hkVector4 closest;
         closestPointLineSeg(input.m_from, m_vertexA, m_vertexB, closest);
         const __m128 kStartOffset = _mm_sub_ps(input.m_from.m_quad, closest.m_quad);

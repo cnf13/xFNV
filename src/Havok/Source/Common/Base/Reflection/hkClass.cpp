@@ -586,9 +586,8 @@ const hkVariant* hkClass::getAttribute(const char* id) const {
     if (m_attributes) {
         return m_attributes->getAttribute(id);
     }
-    else {
-        return nullptr;
-    }
+
+    return nullptr;
 }
 
 const hkVariant* hkCustomAttributes::getAttribute(const char* id) const {

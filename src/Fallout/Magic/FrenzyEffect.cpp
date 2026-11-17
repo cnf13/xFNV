@@ -69,15 +69,14 @@ bool FrenzyEffect::CheckTarget(MagicTarget* apTarget) {
     float afMagnitude;
     Character* pCharacter = dynamic_cast<Character*>(apTarget);
     uint8_t result = 0;
-    if (pCharacter) {
-        if ((!pCharacter->IsDead(false)) && (!pCharacter->IsDying())) {
-            afMagnitude = fMagnitude;
-            level = pCharacter->GetLevel();
-            if (MagicFormulas::CheckTargetLevelMagnitude(level, afMagnitude)) {
-                return true;
-            }
+    if ((pCharacter) && ((!pCharacter->IsDead(false)) && (!pCharacter->IsDying()))) {
+        afMagnitude = fMagnitude;
+        level = pCharacter->GetLevel();
+        if (MagicFormulas::CheckTargetLevelMagnitude(level, afMagnitude)) {
+            return true;
         }
     }
+
     return (bool)result;
 }
 
@@ -99,12 +98,8 @@ void FrenzyEffect::Start() {
     else {
         CasterAsActor = nullptr;
     }
-    if (TargetAsActor) {
-        if (CasterAsActor) {
-            if (TargetAsActor->IsInCombat()) {
-                bStartedInCombat = true;
-            }
-        }
+    if ((TargetAsActor) && (CasterAsActor) && (TargetAsActor->IsInCombat())) {
+        bStartedInCombat = true;
     }
 }
 
@@ -118,31 +113,29 @@ void FrenzyEffect::Finish() {
         else {
             TargetAsActor = nullptr;
         }
-        if (TargetAsActor) {
-            if (TargetAsActor->IsInCombat()) {
-                TargetAsActor->StopCombat(nullptr);
-                ProcessArray* ProcessArray_ = &ReferenceProcessLists.MobProcessArray;
-                uint32_t uiIndex = 0;
-                for (uint32_t i = ProcessArray_->GetProcessLevelTail(PROCESS_TYPE_HIGH); uiIndex < i;
-                     i = ProcessArray_->GetProcessLevelTail(PROCESS_TYPE_HIGH)) {
-                    Actor* Item = static_cast<Actor*>(ProcessArray_->GetItem(uiIndex));
-                    if (Item != TargetAsActor) {
-                        Actor* v2;
-                        if (Item && Item->IsActor()) {
-                            v2 = Item;
-                        }
-                        else {
-                            v2 = nullptr;
-                        }
-                        if (v2) {
-                            v2->RemoveFleeTarget(TargetAsActor);
-                            if (v2->IsInCombat()) {
-                                v2->StopCombat(TargetAsActor);
-                            }
+        if ((TargetAsActor) && (TargetAsActor->IsInCombat())) {
+            TargetAsActor->StopCombat(nullptr);
+            ProcessArray* ProcessArray_ = &ReferenceProcessLists.MobProcessArray;
+            uint32_t uiIndex = 0;
+            for (uint32_t i = ProcessArray_->GetProcessLevelTail(PROCESS_TYPE_HIGH); uiIndex < i;
+                 i = ProcessArray_->GetProcessLevelTail(PROCESS_TYPE_HIGH)) {
+                Actor* Item = static_cast<Actor*>(ProcessArray_->GetItem(uiIndex));
+                if (Item != TargetAsActor) {
+                    Actor* v2;
+                    if (Item && Item->IsActor()) {
+                        v2 = Item;
+                    }
+                    else {
+                        v2 = nullptr;
+                    }
+                    if (v2) {
+                        v2->RemoveFleeTarget(TargetAsActor);
+                        if (v2->IsInCombat()) {
+                            v2->StopCombat(TargetAsActor);
                         }
                     }
-                    ++uiIndex;
                 }
+                ++uiIndex;
             }
         }
     }
@@ -153,7 +146,6 @@ ActiveEffect* FrenzyEffect::Instantiate(MagicCaster* apCaster, MagicItem* apSpel
     if (v5) {
         return ::new (v5) FrenzyEffect(apCaster, apSpell, apEffect);
     }
-    else {
-        return nullptr;
-    }
+
+    return nullptr;
 }

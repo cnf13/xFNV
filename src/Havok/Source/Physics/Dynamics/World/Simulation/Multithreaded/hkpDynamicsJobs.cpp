@@ -47,16 +47,14 @@ hkpBroadPhaseJob::popJobTask(hkArray<hkpSimulationIsland*, hkContainerHeapAlloca
         m_taskHeader->m_newSplitIslands.m_capacityAndFlags = hkArrayBase<hkpSimulationIsland*>::DONT_DEALLOCATE_FLAG;
         return hkJobQueue::DO_NOT_POP_QUEUE_ENTRY;
     }
-    else {
-        uint16_t m_numIslands = this->m_numIslands;
-        if (m_numIslands <= 1u) {
-            return hkJobQueue::POP_QUEUE_ENTRY;
-        }
-        else {
-            ++m_islandIndex;
-            this->m_numIslands = m_numIslands - 1;
-            out.m_numIslands = 1;
-            return hkJobQueue::DO_NOT_POP_QUEUE_ENTRY;
-        }
+
+    uint16_t m_numIslands = this->m_numIslands;
+    if (m_numIslands <= 1u) {
+        return hkJobQueue::POP_QUEUE_ENTRY;
     }
+
+    ++m_islandIndex;
+    this->m_numIslands = m_numIslands - 1;
+    out.m_numIslands = 1;
+    return hkJobQueue::DO_NOT_POP_QUEUE_ENTRY;
 }

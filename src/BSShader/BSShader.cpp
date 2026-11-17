@@ -134,14 +134,13 @@ void BSShader::SetupGeometryRenderStates(const NiPropertyState* apState, bool ab
         bSetDrawMode = 1;
     }
     uint8_t bAlphaTest = 0;
-    if (abFirstPass) {
-        if (apState) {
-            pAlphaProp = static_cast<NiAlphaProperty*>(apState->m_aspProps[0].m_pObject);
-            if (pAlphaProp) {
-                bAlphaTest = (uint8_t)((pAlphaProp->m_uFlags & 512) != 0);
-            }
+    if ((abFirstPass) && (apState)) {
+        pAlphaProp = static_cast<NiAlphaProperty*>(apState->m_aspProps[0].m_pObject);
+        if (pAlphaProp) {
+            bAlphaTest = (uint8_t)((pAlphaProp->m_uFlags & 512) != 0);
         }
     }
+
     BSRenderState::SetCullMode(static_cast<NiStencilProperty::DrawMode>((2 * bSetDrawMode) + 1), BSRS_NOLOCK);
     BSRenderState::SetAlphaTestEnable(bAlphaTest, BSRS_NOLOCK);
 }
@@ -185,10 +184,8 @@ void BSShader::ApplyTextureStages() {
         if (!pStage) {
             break;
         }
-        if (pStage->bApply) {
-            if (pStage->m_spTexture) {
-                pStage->ConfigureStage(false);
-            }
+        if ((pStage->bApply) && (pStage->m_spTexture)) {
+            pStage->ConfigureStage(false);
         }
     }
 }
@@ -751,20 +748,16 @@ void BSShader::CreateShaderPath(
     const char* apCacheName,
     const char* apExtension
 ) {
-    if (apResult) {
-        if (apFilename) {
-            if (apCacheName) {
-                char* v4 = BSShaderManager::pShaderCachePath;
-                if (!BSShaderManager::pShaderCachePath[0]) {
-                    v4 = BSShaderManager::pShaderPath;
-                }
-                strcpy_s(apResult, 260, v4);
-                if (BSShaderManager::bHDR) {
-                    strcat_s(apResult, 260, "HDR.");
-                }
-                strcat_s(apResult, 260, apCacheName);
-            }
+    if ((apResult) && (apFilename) && (apCacheName)) {
+        char* v4 = BSShaderManager::pShaderCachePath;
+        if (!BSShaderManager::pShaderCachePath[0]) {
+            v4 = BSShaderManager::pShaderPath;
         }
+        strcpy_s(apResult, 260, v4);
+        if (BSShaderManager::bHDR) {
+            strcat_s(apResult, 260, "HDR.");
+        }
+        strcat_s(apResult, 260, apCacheName);
     }
 }
 

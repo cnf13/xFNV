@@ -196,12 +196,11 @@ NiFloatKey* NiUVController::GetUOffsetData(uint32_t& uiNumKeys, NiAnimationKey::
         ucSize = m_pObject->m_ucUOffsetSize;
         return m_pObject->m_pkUOffsetKeys;
     }
-    else {
-        uiNumKeys = 0;
-        eType = NiAnimationKey::NOINTERP;
-        ucSize = 0;
-        return nullptr;
-    }
+
+    uiNumKeys = 0;
+    eType = NiAnimationKey::NOINTERP;
+    ucSize = 0;
+    return nullptr;
 }
 
 NiFloatKey* NiUVController::GetVOffsetData(uint32_t& uiNumKeys, NiAnimationKey::KeyType& eType, uint8_t& ucSize) const {
@@ -212,12 +211,11 @@ NiFloatKey* NiUVController::GetVOffsetData(uint32_t& uiNumKeys, NiAnimationKey::
         ucSize = m_pObject->m_ucVOffsetSize;
         return m_pObject->m_pkVOffsetKeys;
     }
-    else {
-        uiNumKeys = 0;
-        eType = NiAnimationKey::NOINTERP;
-        ucSize = 0;
-        return nullptr;
-    }
+
+    uiNumKeys = 0;
+    eType = NiAnimationKey::NOINTERP;
+    ucSize = 0;
+    return nullptr;
 }
 
 NiFloatKey* NiUVController::GetUTilingData(uint32_t& uiNumKeys, NiAnimationKey::KeyType& eType, uint8_t& ucSize) const {
@@ -228,12 +226,11 @@ NiFloatKey* NiUVController::GetUTilingData(uint32_t& uiNumKeys, NiAnimationKey::
         ucSize = m_pObject->m_ucUTilingSize;
         return m_pObject->m_pkUTilingKeys;
     }
-    else {
-        uiNumKeys = 0;
-        eType = NiAnimationKey::NOINTERP;
-        ucSize = 0;
-        return nullptr;
-    }
+
+    uiNumKeys = 0;
+    eType = NiAnimationKey::NOINTERP;
+    ucSize = 0;
+    return nullptr;
 }
 
 NiFloatKey* NiUVController::GetVTilingData(uint32_t& uiNumKeys, NiAnimationKey::KeyType& eType, uint8_t& ucSize) const {
@@ -244,12 +241,11 @@ NiFloatKey* NiUVController::GetVTilingData(uint32_t& uiNumKeys, NiAnimationKey::
         ucSize = m_pObject->m_ucVTilingSize;
         return m_pObject->m_pkVTilingKeys;
     }
-    else {
-        uiNumKeys = 0;
-        eType = NiAnimationKey::NOINTERP;
-        ucSize = 0;
-        return nullptr;
-    }
+
+    uiNumKeys = 0;
+    eType = NiAnimationKey::NOINTERP;
+    ucSize = 0;
+    return nullptr;
 }
 
 // The key time range over the four channels' first and last keys. The first channel's keys are compared with the

@@ -164,10 +164,8 @@ void Controls::ForceUserAction(Controls::USERACTIONS aeAction) {
             }
             uint8_t v8 = ucKeyBinds[1][aeAction];
             if (v8 || !bSwapLeftRightMouseButtons) {
-                if (v8 == 1) {
-                    if (bSwapLeftRightMouseButtons) {
-                        v8 = 0;
-                    }
+                if ((v8 == 1) && (bSwapLeftRightMouseButtons)) {
+                    v8 = 0;
                 }
             }
             else {
@@ -214,20 +212,19 @@ bool Controls::SetAction(int32_t action) {
         bUpdated = true;
         return true;
     }
-    else {
-        for (int32_t buttonNumber = 1; buttonNumber <= 3; ++buttonNumber) {
-            if (GetMouseButton(buttonNumber, 1)) {
-                nextKeystroke = buttonNumber;
-                SetActionMapping(eActionToSet, 1u, buttonNumber);
-                bSettingAControl = false;
-                bUpdated = true;
-                return true;
-            }
+
+    for (int32_t buttonNumber = 1; buttonNumber <= 3; ++buttonNumber) {
+        if (GetMouseButton(buttonNumber, 1)) {
+            nextKeystroke = buttonNumber;
+            SetActionMapping(eActionToSet, 1u, buttonNumber);
+            bSettingAControl = false;
+            bUpdated = true;
+            return true;
         }
-        bUpdated = false;
-        bSettingAControl = true;
-        return false;
     }
+    bUpdated = false;
+    bSettingAControl = true;
+    return false;
 }
 
 void Controls::KillRumble() {
