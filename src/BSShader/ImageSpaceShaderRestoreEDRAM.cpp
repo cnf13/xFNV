@@ -7,7 +7,7 @@
 #include "Gamebryo2.2/CoreLibs/NiMain/NiTArray.h"
 
 ImageSpaceShaderRestoreEDRAM::ImageSpaceShaderRestoreEDRAM() {
-	pTextures.SetSize(3u);
+    pTextures.SetSize(3u);
 }
 
 ImageSpaceShaderRestoreEDRAM::~ImageSpaceShaderRestoreEDRAM() {}

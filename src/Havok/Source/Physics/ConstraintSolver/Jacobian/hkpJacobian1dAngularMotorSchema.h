@@ -6,7 +6,7 @@
 // An angular motor about one axis (hkpconstraintsolver.pdb; the SDK ships no header).
 class hkpJacobian1dAngularMotorSchema {
 public:
-	hkp2AngJacobian m_jac;
-	hkp1dMotorSolverInfo m_motorSolverInfo;
-	float m_padding[3];
+    hkp2AngJacobian m_jac;
+    hkp1dMotorSolverInfo m_motorSolverInfo;
+    float m_padding[3];
 };

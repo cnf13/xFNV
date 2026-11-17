@@ -4,8 +4,8 @@
 
 class ImageSpaceShaderRefraction : public ImageSpaceShader {
 public:
-	ImageSpaceShaderRefraction();
-	~ImageSpaceShaderRefraction() override;
+    ImageSpaceShaderRefraction();
+    ~ImageSpaceShaderRefraction() override;
 
-	void ReloadShaders() override;
+    void ReloadShaders() override;
 };

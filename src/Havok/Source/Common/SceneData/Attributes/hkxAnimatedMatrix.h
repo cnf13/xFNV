@@ -10,15 +10,15 @@
 // Animated matrix attribute values and their transform-interpretation hint.
 class hkxAnimatedMatrix : public hkReferencedObject {
 public:
-	hkxAnimatedMatrix() = default;
-	hkxAnimatedMatrix(hkFinishLoadedObjectFlag aFlag) : hkReferencedObject(aFlag), m_matrices(aFlag) {}
-	~hkxAnimatedMatrix() override;
+    hkxAnimatedMatrix() = default;
+    hkxAnimatedMatrix(hkFinishLoadedObjectFlag aFlag) : hkReferencedObject(aFlag), m_matrices(aFlag) {}
+    ~hkxAnimatedMatrix() override;
 
-	// The reflection class hkxAnimatedMatrixClass.
-	static const hkClass& staticClass();
+    // The reflection class hkxAnimatedMatrixClass.
+    static const hkClass& staticClass();
 
-	hkArray<hkMatrix4> m_matrices;
-	hkEnum<hkxAttribute::Hint, uint8_t> m_hint;
+    hkArray<hkMatrix4> m_matrices;
+    hkEnum<hkxAttribute::Hint, uint8_t> m_hint;
 };
 
 extern hkClass hkxAnimatedMatrixClass;

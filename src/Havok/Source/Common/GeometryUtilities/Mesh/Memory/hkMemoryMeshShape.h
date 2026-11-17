@@ -73,29 +73,29 @@ int32_t calculateNumPrimitives(int32_t primitiveType, int32_t numIndices);
 // A mesh shape whose sections and indices are stored in the object.
 class hkMemoryMeshShape : public hkMeshShape {
 public:
-	hkMemoryMeshShape(const hkMeshSectionCinfo* sections, int32_t numSections);
+    hkMemoryMeshShape(const hkMeshSectionCinfo* sections, int32_t numSections);
 
-	// The SDK's finish constructor of a loaded object; assumes hkMeshShape's (the SDK's).
-	hkMemoryMeshShape(hkFinishLoadedObjectFlag aFlag)
-		: hkMeshShape(aFlag), m_sections(aFlag), m_indices16(aFlag), m_indices32(aFlag), m_name(aFlag) {}
+    // The SDK's finish constructor of a loaded object; assumes hkMeshShape's (the SDK's).
+    hkMemoryMeshShape(hkFinishLoadedObjectFlag aFlag)
+      : hkMeshShape(aFlag), m_sections(aFlag), m_indices16(aFlag), m_indices32(aFlag), m_name(aFlag) {}
 
-	~hkMemoryMeshShape() override;
+    ~hkMemoryMeshShape() override;
 
-	const hkClass* getClassType() const override;
-	void calcContentStatistics(hkStatisticsCollector* apCollector, const hkClass* cls) const override;
-	// The number of sections, m_sections' size.
-	int32_t getNumSections() const override;
-	void lockSection(int32_t sectionIndex, uint8_t accessFlags, hkMeshSection& sectionOut) const override;
-	void unlockSection(const hkMeshSection& section) const override;
-	// The name without the string pointer's ownership flag.
-	const char* getName() const override;
+    const hkClass* getClassType() const override;
+    void calcContentStatistics(hkStatisticsCollector* apCollector, const hkClass* cls) const override;
+    // The number of sections, m_sections' size.
+    int32_t getNumSections() const override;
+    void lockSection(int32_t sectionIndex, uint8_t accessFlags, hkMeshSection& sectionOut) const override;
+    void unlockSection(const hkMeshSection& section) const override;
+    // The name without the string pointer's ownership flag.
+    const char* getName() const override;
 
-	static const hkClass& staticClass();
+    static const hkClass& staticClass();
 
-	hkArray<hkMeshSectionCinfo> m_sections;
-	hkArray<uint16_t> m_indices16;
-	hkArray<uint32_t> m_indices32;
-	hkStringPtr m_name;
+    hkArray<hkMeshSectionCinfo> m_sections;
+    hkArray<uint16_t> m_indices16;
+    hkArray<uint32_t> m_indices32;
+    hkStringPtr m_name;
 };
 
 extern hkClass hkMemoryMeshShapeClass;

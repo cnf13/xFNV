@@ -16,60 +16,60 @@ class NiCloningProcess;
 // restitution, friction, radius, material).
 class bhkRagdollTemplateData : public NiObject {
 public:
-	bhkRagdollTemplateData();
-	~bhkRagdollTemplateData() override;
+    bhkRagdollTemplateData();
+    ~bhkRagdollTemplateData() override;
 
-	const NiRTTI* GetRTTI() const override;
-	void LoadBinary(NiStream& arStream) override;
-	void LinkObject(NiStream& arStream) override;
-	bool RegisterStreamables(NiStream& arStream) override;
-	void SaveBinary(NiStream& arStream) override;
-	bool IsEqual(NiObject* apObject) override;
+    const NiRTTI* GetRTTI() const override;
+    void LoadBinary(NiStream& arStream) override;
+    void LinkObject(NiStream& arStream) override;
+    bool RegisterStreamables(NiStream& arStream) override;
+    void SaveBinary(NiStream& arStream) override;
+    bool IsEqual(NiObject* apObject) override;
 
-	// Gives apObj this template's rigid body settings, a new capsule shape and new constraints at afScale.
-	void ReplaceRagdollData(NiAVObject* apObj, float afScale);
-	const NiFixedString& GetName() const;
+    // Gives apObj this template's rigid body settings, a new capsule shape and new constraints at afScale.
+    void ReplaceRagdollData(NiAVObject* apObj, float afScale);
+    const NiFixedString& GetName() const;
 
-	// The stream's create function for this class.
-	static NiObject* CreateObject();
+    // The stream's create function for this class.
+    static NiObject* CreateObject();
 
-	NiFixedString ObjectName;
-	BSSimpleArray<hkConstraintCinfo*, 1024> ConstraintsA;
-	BSSimpleArray<hkpConstraintData::ConstraintType, 1024> ConstraintTypeA;
-	float fRBMass;
-	float fRBRestitution;
-	float fRBFriction;
-	float fRBRadius;
-	uint32_t uiRBMaterial;
+    NiFixedString ObjectName;
+    BSSimpleArray<hkConstraintCinfo*, 1024> ConstraintsA;
+    BSSimpleArray<hkpConstraintData::ConstraintType, 1024> ConstraintTypeA;
+    float fRBMass;
+    float fRBRestitution;
+    float fRBFriction;
+    float fRBRadius;
+    uint32_t uiRBMaterial;
 
-	static NiRTTI ms_RTTI;
+    static NiRTTI ms_RTTI;
 };
 
 // Extra data on a skeleton node: the ragdoll templates (bhkRagdollTemplateData) the model offers.
 class bhkRagdollTemplate : public NiExtraData {
 public:
-	bhkRagdollTemplate();
-	~bhkRagdollTemplate() override;
+    bhkRagdollTemplate();
+    ~bhkRagdollTemplate() override;
 
-	const NiRTTI* GetRTTI() const override;
-	void LoadBinary(NiStream& arStream) override;
-	void LinkObject(NiStream& arStream) override;
-	bool RegisterStreamables(NiStream& arStream) override;
-	void SaveBinary(NiStream& arStream) override;
-	bool IsEqual(NiObject* apObject) override;
-	virtual void CopyMembers(bhkRagdollTemplate* pDest, NiCloningProcess& arCloneData);
+    const NiRTTI* GetRTTI() const override;
+    void LoadBinary(NiStream& arStream) override;
+    void LinkObject(NiStream& arStream) override;
+    bool RegisterStreamables(NiStream& arStream) override;
+    void SaveBinary(NiStream& arStream) override;
+    bool IsEqual(NiObject* apObject) override;
+    virtual void CopyMembers(bhkRagdollTemplate* pDest, NiCloningProcess& arCloneData);
 
-	using NiExtraData::CopyMembers;
+    using NiExtraData::CopyMembers;
 
-	// The template data at aiIndex.
-	bhkRagdollTemplateData* GetRagdollTemplateData(uint32_t aiIndex);
-	// The number of templates.
-	uint32_t QNumTemplates();
+    // The template data at aiIndex.
+    bhkRagdollTemplateData* GetRagdollTemplateData(uint32_t aiIndex);
+    // The number of templates.
+    uint32_t QNumTemplates();
 
-	// The stream's create function for this class.
-	static NiObject* CreateObject();
+    // The stream's create function for this class.
+    static NiObject* CreateObject();
 
-	BSSimpleArray<NiPointer<bhkRagdollTemplateData>, 1024> RagdollTemplateA;
+    BSSimpleArray<NiPointer<bhkRagdollTemplateData>, 1024> RagdollTemplateA;
 
-	static NiRTTI ms_RTTI;
+    static NiRTTI ms_RTTI;
 };

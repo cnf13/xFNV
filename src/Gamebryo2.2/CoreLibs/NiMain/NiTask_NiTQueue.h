@@ -10,8 +10,8 @@ class NiTask;
 // -1 while the queue is empty.
 class NiTask_NiTQueue : public NiMemObject {
 public:
-	NiTask* m_pBase;
-	uint32_t m_uiAlloced;
-	uint32_t m_uiHead;
-	uint32_t m_uiTail;
+    NiTask* m_pBase;
+    uint32_t m_uiAlloced;
+    uint32_t m_uiHead;
+    uint32_t m_uiTail;
 };

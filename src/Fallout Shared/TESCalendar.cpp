@@ -43,12 +43,14 @@ static SettingT<GameSettingCollection> sSeasonFall("sSeasonFall", "Fall");
 static SettingT<GameSettingCollection> sSeasonWinter("sSeasonWinter", "Winter");
 
 // The tables of the names above, by month, day of the week, holiday and season.
-pGSMonth_t pGSMonth{&sMonthJanuary, &sMonthFebruary, &sMonthMarch, &sMonthApril, &sMonthMay, &sMonthJune, &sMonthJuly,
-	&sMonthAugust, &sMonthSeptember, &sMonthOctober, &sMonthNovember, &sMonthDecember};
-DayOfWeekSettingTable pGSDay{&sDaySunday, &sDayMonday, &sDayTuesday, &sDayWednesday, &sDayThursday, &sDayFriday,
-	&sDaySaturday};
-pGSHoliday_t pGSHoliday{&sHolidayNewLifeFestival, &sHolidaySouthWindsPrayer, &sHolidayFirstPlanting,
-	&sHolidayJestersDay, &sHolidaySecondPlanting, &sHolidayMidYearCelebration, &sHolidayMerchantsFestival,
-	&sHolidaySunsRest, &sHolidayHarvestsEnd, &sHolidayTalesAndTallows, &sHolidayWitchesFestival,
-	&sHolidayEmperorsBirthday, &sHolidayWarriorsFestival, &sHolidayNorthWindsPrayer, &sHolidayOldLifeFestival};
+pGSMonth_t pGSMonth{&sMonthJanuary,   &sMonthFebruary, &sMonthMarch,    &sMonthApril,
+                    &sMonthMay,       &sMonthJune,     &sMonthJuly,     &sMonthAugust,
+                    &sMonthSeptember, &sMonthOctober,  &sMonthNovember, &sMonthDecember};
+DayOfWeekSettingTable pGSDay{&sDaySunday,   &sDayMonday, &sDayTuesday, &sDayWednesday,
+                             &sDayThursday, &sDayFriday, &sDaySaturday};
+pGSHoliday_t pGSHoliday{&sHolidayNewLifeFestival,   &sHolidaySouthWindsPrayer, &sHolidayFirstPlanting,
+                        &sHolidayJestersDay,        &sHolidaySecondPlanting,   &sHolidayMidYearCelebration,
+                        &sHolidayMerchantsFestival, &sHolidaySunsRest,         &sHolidayHarvestsEnd,
+                        &sHolidayTalesAndTallows,   &sHolidayWitchesFestival,  &sHolidayEmperorsBirthday,
+                        &sHolidayWarriorsFestival,  &sHolidayNorthWindsPrayer, &sHolidayOldLifeFestival};
 pGSSeason_t pGSSeason{&sSeasonSpring, &sSeasonSummer, &sSeasonFall, &sSeasonWinter};

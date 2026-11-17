@@ -4,8 +4,8 @@
 
 class ImageSpaceShaderDS16LightAdapt : public ImageSpaceShader {
 public:
-	ImageSpaceShaderDS16LightAdapt();
-	~ImageSpaceShaderDS16LightAdapt() override;
+    ImageSpaceShaderDS16LightAdapt();
+    ~ImageSpaceShaderDS16LightAdapt() override;
 
-	void ReloadShaders() override;
+    void ReloadShaders() override;
 };

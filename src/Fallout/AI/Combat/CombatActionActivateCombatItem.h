@@ -6,8 +6,8 @@
 // GetDebugText.
 class CombatActionActivateCombatItem : public CombatAction {
 public:
-	CombatActionActivateCombatItem(CombatAction::COMBAT_ACTION aeType);
+    CombatActionActivateCombatItem(CombatAction::COMBAT_ACTION aeType);
 
-	void Execute(CombatController* apCombatController, int32_t aiActionValue) override;
-	void GetDebugText(char* apDebugText, uint32_t aiMaxLength, int32_t aiActionValue) override;
+    void Execute(CombatController* apCombatController, int32_t aiActionValue) override;
+    void GetDebugText(char* apDebugText, uint32_t aiMaxLength, int32_t aiActionValue) override;
 };

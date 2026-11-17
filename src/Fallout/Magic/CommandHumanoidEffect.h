@@ -5,11 +5,11 @@
 // The Command Humanoid magic effect: the CommandEffect that accepts humanoid targets. It adds no fields.
 class CommandHumanoidEffect : public CommandEffect {
 public:
-	CommandHumanoidEffect(MagicCaster* apCaster, MagicItem* apItem, EffectItem* apEffect);
-	~CommandHumanoidEffect() override;
+    CommandHumanoidEffect(MagicCaster* apCaster, MagicItem* apItem, EffectItem* apEffect);
+    ~CommandHumanoidEffect() override;
 
-	ActiveEffect* Copy() override;
-	bool CheckTarget(MagicTarget* apTarget) override;
+    ActiveEffect* Copy() override;
+    bool CheckTarget(MagicTarget* apTarget) override;
 
-	static ActiveEffect* Instantiate(MagicCaster* apCaster, MagicItem* apSpell, EffectItem* apEffect);
+    static ActiveEffect* Instantiate(MagicCaster* apCaster, MagicItem* apSpell, EffectItem* apEffect);
 };

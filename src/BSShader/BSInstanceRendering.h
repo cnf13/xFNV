@@ -5,8 +5,8 @@ class NiTexture;
 // Keeps the previous texture bindings for the instance renderer's texture stages.
 class BSInstanceRendering {
 public:
-	BSInstanceRendering();
-	~BSInstanceRendering();
+    BSInstanceRendering();
+    ~BSInstanceRendering();
 
-	NiTexture** pPrevTextures;
+    NiTexture** pPrevTextures;
 };

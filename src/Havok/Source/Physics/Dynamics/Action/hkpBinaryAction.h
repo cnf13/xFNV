@@ -8,24 +8,28 @@ class hkpEntity;
 // supplies applyAction, getPhantoms and clone.
 class hkpBinaryAction : public hkpAction {
 public:
-	hkpBinaryAction(hkpEntity* entityA, hkpEntity* entityB, hkUlong userData);
-	// The SDK's finish constructor of a loaded object (the derived actions' finish constructors call it).
-	hkpBinaryAction(hkFinishLoadedObjectFlag flag) : hkpAction(flag) {}
-	~hkpBinaryAction() override;
+    hkpBinaryAction(hkpEntity* entityA, hkpEntity* entityB, hkUlong userData);
+    // The SDK's finish constructor of a loaded object (the derived actions' finish constructors call it).
+    hkpBinaryAction(hkFinishLoadedObjectFlag flag) : hkpAction(flag) {}
+    ~hkpBinaryAction() override;
 
-	const hkClass* getClassType() const override;
-	void getEntities(hkArray<hkpEntity*>& entitiesOut) override;
-	void entityRemovedCallback(hkpEntity* entity) override;
-	void applyAction(const hkStepInfo& stepInfo) override = 0;
+    const hkClass* getClassType() const override;
+    void getEntities(hkArray<hkpEntity*>& entitiesOut) override;
+    void entityRemovedCallback(hkpEntity* entity) override;
+    void applyAction(const hkStepInfo& stepInfo) override = 0;
 
-	// Replaces entity A, moving the action's world registration over.
-	void setEntityA(hkpEntity* entityA);
-	// Replaces entity B, moving the action's world registration over.
-	void setEntityB(hkpEntity* entityB);
-	hkpEntity* getEntityA() { return m_entityA; }
-	hkpEntity* getEntityB() { return m_entityB; }
-	void _referenceBodies();
+    // Replaces entity A, moving the action's world registration over.
+    void setEntityA(hkpEntity* entityA);
+    // Replaces entity B, moving the action's world registration over.
+    void setEntityB(hkpEntity* entityB);
+    hkpEntity* getEntityA() {
+        return m_entityA;
+    }
+    hkpEntity* getEntityB() {
+        return m_entityB;
+    }
+    void _referenceBodies();
 
-	hkpEntity* m_entityA;
-	hkpEntity* m_entityB;
+    hkpEntity* m_entityA;
+    hkpEntity* m_entityB;
 };

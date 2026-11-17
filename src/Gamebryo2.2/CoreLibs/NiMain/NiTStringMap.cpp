@@ -31,17 +31,17 @@
 #include <stdint.h>
 
 using NiTStringTemplateMapBuildStorage =
-	NiTStringTemplateMap<NiTPointerMap<const char*, Tile::BuildStorage*>, Tile::BuildStorage*>;
+    NiTStringTemplateMap<NiTPointerMap<const char*, Tile::BuildStorage*>, Tile::BuildStorage*>;
 // NiTStringTemplateMap<NiTPointerMap<const char*, XMLStorage*>, XMLStorage*>::KeyToHashIndex and the int
 // instantiation's (and their NiTStringPointerMap slots):
 
 // The other pointer string maps (NiControllerSequence*, NiShader*, the create functions, ...) share the optimised
 // body; the controller sequence map is their owner by name order.
 using NiTStringTemplateMapControllerSequence =
-	NiTStringTemplateMap<NiTPointerMap<const char*, NiControllerSequence*>, NiControllerSequence*>;
+    NiTStringTemplateMap<NiTPointerMap<const char*, NiControllerSequence*>, NiControllerSequence*>;
 
 // The string map of strings (NiTStringMap<char*>, built on NiTMap) has its own copy of the debug-compiled body.
 using NiTStringTemplateMapString = NiTStringTemplateMap<NiTMap<const char*, char*>, char*>;
 
 using NiTStringTemplateMap_lNiTPointerMap_lconst_schar_p_cunsigned_sshort_g_cunsigned_sshort =
-	NiTStringTemplateMap<NiTPointerMap<const char*, uint16_t>, uint16_t>;
+    NiTStringTemplateMap<NiTPointerMap<const char*, uint16_t>, uint16_t>;

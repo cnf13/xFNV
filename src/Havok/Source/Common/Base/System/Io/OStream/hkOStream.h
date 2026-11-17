@@ -18,51 +18,53 @@ void writeString(hkStreamWriter* sb, const char* s);
 // char* and float ones.
 class hkOstream : public hkReferencedObject {
 public:
-	// The member table hkOstreamClass describes the stream with.
-	using MemberArray = const hkClassMember[1];
+    // The member table hkOstreamClass describes the stream with.
+    using MemberArray = const hkClassMember[1];
 
-	// A stream with no writer: the error macros declare their hkErrStream local, then construct it again in place after
-	// running ~hkOstream, which releases m_writer when set, so the writer starts null.
-	hkOstream() : m_writer(nullptr) {}
-	hkOstream(const char* apFileName);
-	hkOstream(hkStreamWriter* apWriter);
-	hkOstream(hkArray<char>& arBuf);
-	hkOstream(hkMemoryTrack* apTrack);
-	// The finish constructor: the base's default constructor (a reference count of 1); m_writer stays as loaded.
-	hkOstream(hkFinishLoadedObjectFlag) {}
-	hkOstream(void* a1, int32_t a2, bool a3);
-	~hkOstream() override;
+    // A stream with no writer: the error macros declare their hkErrStream local, then construct it again in place after
+    // running ~hkOstream, which releases m_writer when set, so the writer starts null.
+    hkOstream() : m_writer(nullptr) {}
+    hkOstream(const char* apFileName);
+    hkOstream(hkStreamWriter* apWriter);
+    hkOstream(hkArray<char>& arBuf);
+    hkOstream(hkMemoryTrack* apTrack);
+    // The finish constructor: the base's default constructor (a reference count of 1); m_writer stays as loaded.
+    hkOstream(hkFinishLoadedObjectFlag) {}
+    hkOstream(void* a1, int32_t a2, bool a3);
+    ~hkOstream() override;
 
-	// Overrides of the base's two slots, so they add none.
-	void calcContentStatistics(hkStatisticsCollector* collector, const hkClass* cls) const override;
-	const hkClass* getClassType() const override;
+    // Overrides of the base's two slots, so they add none.
+    void calcContentStatistics(hkStatisticsCollector* collector, const hkClass* cls) const override;
+    const hkClass* getClassType() const override;
 
-	hkBool* isOk(hkBool* arResult) const;
-	hkOstream& operator<<(const void* apPointer);
-	hkOstream& operator<<(hkBool abValue);
-	hkOstream& operator<<(char acValue);
-	hkOstream& operator<<(const char* apString);
-	hkOstream& operator<<(int16_t asValue);
-	hkOstream& operator<<(uint16_t ausValue);
-	hkOstream& operator<<(int32_t aiValue);
-	hkOstream& operator<<(uint32_t auiValue);
-	hkOstream& operator<<(float afValue);
-	hkOstream& operator<<(int64_t aiValue);
-	hkOstream& operator<<(uint64_t auiValue);
-	hkOstream& operator<<(const hkStringPtr& arString);
-	hkOstream& operator<<(const hkStringBuf& arString);
-	// Writes the bytes to the writer; returns how many were written.
-	int32_t write(const char* buf, int32_t nbytes);
-	void printf(const char* fmt, ...);
-	void flush();
-	hkStreamWriter* getStreamWriter() { return m_writer; }
-	void setStreamWriter(hkStreamWriter* newWriter);
+    hkBool* isOk(hkBool* arResult) const;
+    hkOstream& operator<<(const void* apPointer);
+    hkOstream& operator<<(hkBool abValue);
+    hkOstream& operator<<(char acValue);
+    hkOstream& operator<<(const char* apString);
+    hkOstream& operator<<(int16_t asValue);
+    hkOstream& operator<<(uint16_t ausValue);
+    hkOstream& operator<<(int32_t aiValue);
+    hkOstream& operator<<(uint32_t auiValue);
+    hkOstream& operator<<(float afValue);
+    hkOstream& operator<<(int64_t aiValue);
+    hkOstream& operator<<(uint64_t auiValue);
+    hkOstream& operator<<(const hkStringPtr& arString);
+    hkOstream& operator<<(const hkStringBuf& arString);
+    // Writes the bytes to the writer; returns how many were written.
+    int32_t write(const char* buf, int32_t nbytes);
+    void printf(const char* fmt, ...);
+    void flush();
+    hkStreamWriter* getStreamWriter() {
+        return m_writer;
+    }
+    void setStreamWriter(hkStreamWriter* newWriter);
 
-	static const hkClass& staticClass();
+    static const hkClass& staticClass();
 
-	hkStreamWriter* m_writer;
+    hkStreamWriter* m_writer;
 
-	static MemberArray Members;
+    static MemberArray Members;
 };
 
 // hkOstream is spelled hkOfstream when it writes to a file.

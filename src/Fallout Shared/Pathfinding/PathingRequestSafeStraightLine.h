@@ -9,19 +9,19 @@ class TESObjectREFR;
 // save.
 class PathingRequestSafeStraightLine : public PathingRequestClosePoint {
 public:
-	PathingRequestSafeStraightLine();
-	// From Construct_006E6010.
-	PathingRequestSafeStraightLine(const PathingRequestSafeStraightLine& aRequest);
-	~PathingRequestSafeStraightLine() override;
+    PathingRequestSafeStraightLine();
+    // From Construct_006E6010.
+    PathingRequestSafeStraightLine(const PathingRequestSafeStraightLine& aRequest);
+    ~PathingRequestSafeStraightLine() override;
 
-	void CopyTo(PathingRequest* apDest) const override;
-	uint32_t GetType() const override;
-	void SaveGame(BGSSaveFormBuffer* apSaveGameBuffer) override;
-	void LoadGame(BGSLoadFormBuffer* apLoadGameBuffer) override;
-	void InitLoadGame(BGSLoadFormBuffer* apLoadGameBuffer) override;
+    void CopyTo(PathingRequest* apDest) const override;
+    uint32_t GetType() const override;
+    void SaveGame(BGSSaveFormBuffer* apSaveGameBuffer) override;
+    void LoadGame(BGSLoadFormBuffer* apLoadGameBuffer) override;
+    void InitLoadGame(BGSLoadFormBuffer* apLoadGameBuffer) override;
 
-	// Meant to set pTarget to apTarget, but copies pTarget onto itself and ignores apTarget, as the game does.
-	void SetTarget(TESObjectREFR* apTarget);
+    // Meant to set pTarget to apTarget, but copies pTarget onto itself and ignores apTarget, as the game does.
+    void SetTarget(TESObjectREFR* apTarget);
 
-	TESObjectREFR* pTarget;
+    TESObjectREFR* pTarget;
 };

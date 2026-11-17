@@ -13,78 +13,81 @@
 NiRTTI NiColorExtraData::ms_RTTI("NiColorExtraData", &NiExtraData::ms_RTTI);
 
 NiColorExtraData::NiColorExtraData() {
-	m_kColorA = NiColorA_BLACK;
+    m_kColorA = NiColorA_BLACK;
 }
 
 NiColorExtraData::~NiColorExtraData() {}
 
 const NiRTTI* NiColorExtraData::GetRTTI() const {
-	return &ms_RTTI;
+    return &ms_RTTI;
 }
 
 NiObject* NiColorExtraData::CreateClone(NiCloningProcess& kCloning) {
-	NiColorExtraData* pkObject_2 = static_cast<NiColorExtraData*>(NiMemObject::operator new(sizeof(NiColorExtraData)));
-	if (pkObject_2) {
-		::new (pkObject_2) NiColorExtraData;
-	} else {
-		pkObject_2 = 0;
-	}
-	CopyMembers(pkObject_2, kCloning);
-	pkObject_2->m_kColorA = m_kColorA;
-	return pkObject_2;
+    NiColorExtraData* pkObject_2 = static_cast<NiColorExtraData*>(NiMemObject::operator new(sizeof(NiColorExtraData)));
+    if (pkObject_2) {
+        ::new (pkObject_2) NiColorExtraData;
+    }
+    else {
+        pkObject_2 = 0;
+    }
+    CopyMembers(pkObject_2, kCloning);
+    pkObject_2->m_kColorA = m_kColorA;
+    return pkObject_2;
 }
 
 // Files before 5.0.0.14 store an opaque colour without alpha; it is read through NiPoint3::LoadBinary (the same
 // three 4-byte reads as NiColor's).
 void NiColorExtraData::LoadBinary(NiStream& kStream) {
-	NiExtraData::LoadBinary(kStream);
-	if (kStream.GetFileVersion() < NiStream::GetVersion(5, 0, 0, 14)) {
-		NiPoint3 kColor;
-		kColor.x = 0.0f;
-		kColor.y = 0.0f;
-		kColor.z = 0.0f;
-		kColor.LoadBinary(kStream);
-		m_kColorA = NiColorA(kColor.x, kColor.y, kColor.z, 1.0f);
-	} else {
-		m_kColorA.LoadBinary(kStream);
-	}
+    NiExtraData::LoadBinary(kStream);
+    if (kStream.GetFileVersion() < NiStream::GetVersion(5, 0, 0, 14)) {
+        NiPoint3 kColor;
+        kColor.x = 0.0f;
+        kColor.y = 0.0f;
+        kColor.z = 0.0f;
+        kColor.LoadBinary(kStream);
+        m_kColorA = NiColorA(kColor.x, kColor.y, kColor.z, 1.0f);
+    }
+    else {
+        m_kColorA.LoadBinary(kStream);
+    }
 }
 
 void NiColorExtraData::LinkObject(NiStream& kStream) {
-	NiExtraData::LinkObject(kStream);
+    NiExtraData::LinkObject(kStream);
 }
 
 bool NiColorExtraData::RegisterStreamables(NiStream& kStream) {
-	return NiExtraData::RegisterStreamables(kStream);
+    return NiExtraData::RegisterStreamables(kStream);
 }
 
 void NiColorExtraData::SaveBinary(NiStream& kStream) {
-	NiExtraData::SaveBinary(kStream);
-	m_kColorA.SaveBinary(kStream);
+    NiExtraData::SaveBinary(kStream);
+    m_kColorA.SaveBinary(kStream);
 }
 
 // Only the colours are compared: neither the class nor the name is checked.
 bool NiColorExtraData::IsEqual(NiObject* pObject) {
-	if (!pObject)
-		return false;
+    if (!pObject) {
+        return false;
+    }
 
-	return !(m_kColorA != static_cast<NiColorExtraData*>(pObject)->m_kColorA);
+    return !(m_kColorA != static_cast<NiColorExtraData*>(pObject)->m_kColorA);
 }
 
 void NiColorExtraData::GetViewerStrings(NiTPrimitiveArray<char*>* pStrings) {
-	NiExtraData::GetViewerStrings(pStrings);
-	pStrings->Add(NiGetViewerString(ms_RTTI.GetName()));
-	pStrings->Add(m_kColorA.GetViewerString("Color = "));
+    NiExtraData::GetViewerStrings(pStrings);
+    pStrings->Add(NiGetViewerString(ms_RTTI.GetName()));
+    pStrings->Add(m_kColorA.GetViewerString("Color = "));
 }
 
 void NiColorExtraData::SetValue(NiColorA akColorA) {
-	m_kColorA = akColorA;
+    m_kColorA = akColorA;
 }
 
 NiObject* NiColorExtraData::CreateObject() {
-	NiColorExtraData* pkObject = static_cast<NiColorExtraData*>(NiMemObject::operator new(sizeof(NiColorExtraData)));
-	if (!pkObject) {
-		return 0;
-	}
-	return ::new (pkObject) NiColorExtraData;
+    NiColorExtraData* pkObject = static_cast<NiColorExtraData*>(NiMemObject::operator new(sizeof(NiColorExtraData)));
+    if (!pkObject) {
+        return 0;
+    }
+    return ::new (pkObject) NiColorExtraData;
 }

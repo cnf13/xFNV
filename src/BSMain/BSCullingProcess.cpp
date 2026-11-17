@@ -15,114 +15,114 @@
 NiRTTI BSCullingProcess::ms_RTTI("BSCullingProcess", &NiCullingProcess::ms_RTTI);
 
 BSCullingProcess::BSCullingProcess(NiVisibleArray* apVisibleSet)
-	: NiCullingProcess(apVisibleSet), kCullMode(BSCP_CULL_NORMAL), iCTStackIndex(0), pCompoundFrustum(nullptr),
-	  spAccumulator(nullptr) {}
+  : NiCullingProcess(apVisibleSet), kCullMode(BSCP_CULL_NORMAL), iCTStackIndex(0), pCompoundFrustum(nullptr),
+    spAccumulator(nullptr) {}
 
 BSCullingProcess::~BSCullingProcess() {}
 
 void BSCullingProcess::Process(NiAVObject* pkObject) {
-	if (kCullMode == BSCullingProcess::BSCP_CULL_ALLFAIL || kCullMode == BSCullingProcess::BSCP_CULL_ALLPASS) {
-		if (kCullMode != BSCullingProcess::BSCP_CULL_ALLPASS) {
-			return;
-		}
-		goto LABEL_23;
-	}
-	if ((pkObject->m_uFlags & NiAVObject::PREPROCESSED_NODE) != 0) {
-		if ((pkObject->m_uFlags & NiAVObject::NOT_VISIBLE) == 0) {
-			pkObject->OnVisible(*this);
-		}
-		return;
-	}
-	if (!pCompoundFrustum ||
-		(!pCompoundFrustum->iFreeOp || kCullMode == BSCullingProcess::BSCP_CULL_IGNOREMULTIBOUNDS)) {
-		if ((pkObject->m_uFlags & NiAVObject::ALWAYS_DRAW) == 0 && m_kPlanes.GetActivePlaneState()) {
-			DoCulling(pkObject);
-			return;
-		}
-		goto LABEL_23;
-	}
-	if ((pkObject->m_uFlags & NiAVObject::ALWAYS_DRAW) != 0 ||
-		((!pCompoundFrustum || !pCompoundFrustum->iFreeOp) && !m_kPlanes.GetActivePlaneState())) {
-	LABEL_23:;
-		pkObject->OnVisible(*this);
-		return;
-	}
-	int32_t* planeCount = pCompoundFrustum->GetActivePlaneState();
-	if (pCompoundFrustum->Process(pkObject)) {
-		pkObject->OnVisible(*this);
-	}
-	pCompoundFrustum->SetActivePlaneState(planeCount);
+    if (kCullMode == BSCullingProcess::BSCP_CULL_ALLFAIL || kCullMode == BSCullingProcess::BSCP_CULL_ALLPASS) {
+        if (kCullMode != BSCullingProcess::BSCP_CULL_ALLPASS) {
+            return;
+        }
+        goto LABEL_23;
+    }
+    if ((pkObject->m_uFlags & NiAVObject::PREPROCESSED_NODE) != 0) {
+        if ((pkObject->m_uFlags & NiAVObject::NOT_VISIBLE) == 0) {
+            pkObject->OnVisible(*this);
+        }
+        return;
+    }
+    if (!pCompoundFrustum ||
+        (!pCompoundFrustum->iFreeOp || kCullMode == BSCullingProcess::BSCP_CULL_IGNOREMULTIBOUNDS)) {
+        if ((pkObject->m_uFlags & NiAVObject::ALWAYS_DRAW) == 0 && m_kPlanes.GetActivePlaneState()) {
+            DoCulling(pkObject);
+            return;
+        }
+        goto LABEL_23;
+    }
+    if ((pkObject->m_uFlags & NiAVObject::ALWAYS_DRAW) != 0 ||
+        ((!pCompoundFrustum || !pCompoundFrustum->iFreeOp) && !m_kPlanes.GetActivePlaneState())) {
+    LABEL_23:;
+        pkObject->OnVisible(*this);
+        return;
+    }
+    int32_t* planeCount = pCompoundFrustum->GetActivePlaneState();
+    if (pCompoundFrustum->Process(pkObject)) {
+        pkObject->OnVisible(*this);
+    }
+    pCompoundFrustum->SetActivePlaneState(planeCount);
 }
 
 void BSCullingProcess::Process(const NiCamera* pkCamera, NiAVObject* pkScene, NiVisibleArray* pkVisibleSet) {
-	if (pkCamera) {
-		if (pkScene) {
-			// m_pkCamera is declared NiCamera* rather than const NiCamera* (its users span many files), so the const is
-			// cast away here, as in NiCullingProcess::Process.
-			m_pkCamera = const_cast<NiCamera*>(pkCamera);
-			SetFrustum(m_pkCamera->m_kViewFrustum);
-			NiVisibleArray* pOrgVisibleSet = 0;
-			if (pkVisibleSet) {
-				pOrgVisibleSet = m_pkVisibleSet;
-				m_pkVisibleSet = pkVisibleSet;
-			}
-			NiPointer<NiAccumulator> spSorter;
-			if (!m_pkVisibleSet) {
-				spSorter.SetPointer_(&spAccumulator);
-				if (!spSorter.m_pObject) {
-					spSorter.operator=(NiRenderer::ms_pkRenderer->m_spAccum.m_pObject);
-				}
-				if (spSorter.m_pObject) {
-					spSorter.m_pObject->StartAccumulating(pkCamera);
-				}
-			}
-			pkScene->Cull(*this);
-			if (pkVisibleSet) {
-				m_pkVisibleSet = pOrgVisibleSet;
-			}
-		}
-	}
+    if (pkCamera) {
+        if (pkScene) {
+            // m_pkCamera is declared NiCamera* rather than const NiCamera* (its users span many files), so the const is
+            // cast away here, as in NiCullingProcess::Process.
+            m_pkCamera = const_cast<NiCamera*>(pkCamera);
+            SetFrustum(m_pkCamera->m_kViewFrustum);
+            NiVisibleArray* pOrgVisibleSet = 0;
+            if (pkVisibleSet) {
+                pOrgVisibleSet = m_pkVisibleSet;
+                m_pkVisibleSet = pkVisibleSet;
+            }
+            NiPointer<NiAccumulator> spSorter;
+            if (!m_pkVisibleSet) {
+                spSorter.SetPointer_(&spAccumulator);
+                if (!spSorter.m_pObject) {
+                    spSorter.operator=(NiRenderer::ms_pkRenderer->m_spAccum.m_pObject);
+                }
+                if (spSorter.m_pObject) {
+                    spSorter.m_pObject->StartAccumulating(pkCamera);
+                }
+            }
+            pkScene->Cull(*this);
+            if (pkVisibleSet) {
+                m_pkVisibleSet = pOrgVisibleSet;
+            }
+        }
+    }
 }
 
 void BSCullingProcess::AppendVirtual(NiGeometry& kVisible) {
-	bool bRegistered = 0;
-	if (spAccumulator.m_pObject) {
-		bRegistered = spAccumulator.m_pObject->RegisterObject(&kVisible);
-	}
-	if (!bRegistered) {
-		const char* m_kHandle = kVisible.m_kName.GetHandle();
-		if (m_kHandle) {
-			m_kHandle = kVisible.m_kName.GetHandle();
-		}
-	}
+    bool bRegistered = 0;
+    if (spAccumulator.m_pObject) {
+        bRegistered = spAccumulator.m_pObject->RegisterObject(&kVisible);
+    }
+    if (!bRegistered) {
+        const char* m_kHandle = kVisible.m_kName.GetHandle();
+        if (m_kHandle) {
+            m_kHandle = kVisible.m_kName.GetHandle();
+        }
+    }
 }
 
 void BSCullingProcess::SetAccumulator(NiAccumulator* apAccumulator) {
-	spAccumulator = apAccumulator;
+    spAccumulator = apAccumulator;
 }
 
 BSShaderAccumulator* BSCullingProcess::GetAccumulator() const {
-	return static_cast<BSShaderAccumulator*>(static_cast<NiAccumulator*>(spAccumulator));
+    return static_cast<BSShaderAccumulator*>(static_cast<NiAccumulator*>(spAccumulator));
 }
 
 void BSCullingProcess::SetCullMode(BSCPCullingType abTF) {
-	kCullMode = abTF;
+    kCullMode = abTF;
 }
 
 void BSCullingProcess::PushCullMode(BSCPCullingType aeType) {
-	eTypeStackA[iCTStackIndex++] = kCullMode;
-	kCullMode = aeType;
+    eTypeStackA[iCTStackIndex++] = kCullMode;
+    kCullMode = aeType;
 }
 
 void BSCullingProcess::PopCullMode() {
-	kCullMode = eTypeStackA[--iCTStackIndex];
+    kCullMode = eTypeStackA[--iCTStackIndex];
 }
 
 void BSCullingProcess::ClearSharedMap() {
-	// made without a null check
-	spAccumulator.m_pObject->ClearSharedMap();
+    // made without a null check
+    spAccumulator.m_pObject->ClearSharedMap();
 }
 
 bool BSCullingProcess::AddShared(NiAVObject* apObject) {
-	return (bool)((uint8_t)spAccumulator.m_pObject->AddShared(apObject));
+    return (bool)((uint8_t)spAccumulator.m_pObject->AddShared(apObject));
 }

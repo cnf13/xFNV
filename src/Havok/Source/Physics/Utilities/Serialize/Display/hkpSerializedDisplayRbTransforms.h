@@ -13,22 +13,22 @@ const void* getVtablehkpSerializedDisplayRbTransforms();
 // Owns the serialized display transforms associated with rigid bodies.
 class hkpSerializedDisplayRbTransforms : public hkReferencedObject {
 public:
-	// A rigid body and the transform from its local space to its display's.
-	struct DisplayTransformPair {
-		// The reflection class hkpSerializedDisplayRbTransformsDisplayTransformPairClass.
-		static const hkClass& staticClass();
+    // A rigid body and the transform from its local space to its display's.
+    struct DisplayTransformPair {
+        // The reflection class hkpSerializedDisplayRbTransformsDisplayTransformPairClass.
+        static const hkClass& staticClass();
 
-		hkpRigidBody* m_rb;
-		hkTransform m_localToDisplay;
-	};
+        hkpRigidBody* m_rb;
+        hkTransform m_localToDisplay;
+    };
 
-	hkpSerializedDisplayRbTransforms(hkFinishLoadedObjectFlag aFlag) : hkReferencedObject(aFlag), m_transforms(aFlag) {}
-	~hkpSerializedDisplayRbTransforms() override;
+    hkpSerializedDisplayRbTransforms(hkFinishLoadedObjectFlag aFlag) : hkReferencedObject(aFlag), m_transforms(aFlag) {}
+    ~hkpSerializedDisplayRbTransforms() override;
 
-	// The reflection class hkpSerializedDisplayRbTransformsClass.
-	static const hkClass& staticClass();
+    // The reflection class hkpSerializedDisplayRbTransformsClass.
+    static const hkClass& staticClass();
 
-	hkArray<DisplayTransformPair, hkContainerHeapAllocator> m_transforms;
+    hkArray<DisplayTransformPair, hkContainerHeapAllocator> m_transforms;
 };
 
 // The hkTypeInfo records of the reflected types declared here (constant data, the SDK's <Class>Class.cpp).

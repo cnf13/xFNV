@@ -11,28 +11,46 @@ float hypotf_3(float X, float Y);
 // has no members.
 class MagicFormulas {
 public:
-	// The damage the sun does to a target.
-	static float CalcSunDamage(float afMagnitude, float afTimeOfDay, float afSunrise, float afSunset, bool abSunVisible,
-		float afWeatherScale, bool abUnderWater);
-	// The cost of an effect from its base cost, area, duration, magnitude and range.
-	static float GetMagicEffectCost(float afBaseEffectCost, int32_t aiArea, int32_t aiDuration, int32_t aiMagnitude,
-		bool abIsRangeTarget);
-	// A spell cost scaled by the caster's school skill. The callers pass the caster's luck too; the function never
-	// reads it.
-	static float AdjustMagicSpellCost(float afSpellCost, int32_t aiCasterSkill, int32_t aiCasterLuck);
-	// The multiplier a target's magic-type and effect resistances (in percent) leave of an effect; 0 when either is at
-	// least 100.
-	static float GetMagicTargetResistance(float afTargetMagicTypeResistance, float afTargetEffectResistance);
-	static bool CheckTargetLevelMagnitude(int32_t aiTargetLevel, float afMagnitude);
-	// The explosion power from the spell cost, the area in feet, the distance and the target's agility. The luck and
-	// the fatigue percentage the callers pass are not read.
-	static float CheckExplosionStrength(int32_t aiCost, int32_t aiArea, float afDistance, int32_t aiAgility,
-		int32_t aiLuck, float afFatiguePercentage);
-	// The medicine effectiveness multiplier from the actor's medicine skill.
-	static float CalcMedicineEffectivenessMult(ActorValueOwner* apActor);
-	// The survival effectiveness multiplier from the actor's survival skill.
-	static float CalcSurvivalEffectivenessMult(ActorValueOwner* apActor);
-	static SkillLevel::Value GetMagicSpellLevel(float afSpellCost);
+    // The damage the sun does to a target.
+    static float CalcSunDamage(
+        float afMagnitude,
+        float afTimeOfDay,
+        float afSunrise,
+        float afSunset,
+        bool abSunVisible,
+        float afWeatherScale,
+        bool abUnderWater
+    );
+    // The cost of an effect from its base cost, area, duration, magnitude and range.
+    static float GetMagicEffectCost(
+        float afBaseEffectCost,
+        int32_t aiArea,
+        int32_t aiDuration,
+        int32_t aiMagnitude,
+        bool abIsRangeTarget
+    );
+    // A spell cost scaled by the caster's school skill. The callers pass the caster's luck too; the function never
+    // reads it.
+    static float AdjustMagicSpellCost(float afSpellCost, int32_t aiCasterSkill, int32_t aiCasterLuck);
+    // The multiplier a target's magic-type and effect resistances (in percent) leave of an effect; 0 when either is at
+    // least 100.
+    static float GetMagicTargetResistance(float afTargetMagicTypeResistance, float afTargetEffectResistance);
+    static bool CheckTargetLevelMagnitude(int32_t aiTargetLevel, float afMagnitude);
+    // The explosion power from the spell cost, the area in feet, the distance and the target's agility. The luck and
+    // the fatigue percentage the callers pass are not read.
+    static float CheckExplosionStrength(
+        int32_t aiCost,
+        int32_t aiArea,
+        float afDistance,
+        int32_t aiAgility,
+        int32_t aiLuck,
+        float afFatiguePercentage
+    );
+    // The medicine effectiveness multiplier from the actor's medicine skill.
+    static float CalcMedicineEffectivenessMult(ActorValueOwner* apActor);
+    // The survival effectiveness multiplier from the actor's survival skill.
+    static float CalcSurvivalEffectivenessMult(ActorValueOwner* apActor);
+    static SkillLevel::Value GetMagicSpellLevel(float afSpellCost);
 };
 
 // The game settings MagicFormulas.cpp defines.

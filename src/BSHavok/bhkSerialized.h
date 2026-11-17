@@ -17,16 +17,17 @@ using bhkSerializedPointer = uint32_t;
 // arrays that do not own their storage (capacity word DONT_DEALLOCATE_FLAG); the elements, when there are any, follow
 // in the stream on their own.
 struct bhkSerializedArray {
-	// The native array: no storage (the file's address is dropped), the file's size and capacity word.
-	template <class T> void ToNative(hkArray<T>& arArray) const {
-		arArray.m_data = nullptr;
-		arArray.m_size = m_size;
-		arArray.m_capacityAndFlags = m_capacityAndFlags;
-	}
+    // The native array: no storage (the file's address is dropped), the file's size and capacity word.
+    template <class T>
+    void ToNative(hkArray<T>& arArray) const {
+        arArray.m_data = nullptr;
+        arArray.m_size = m_size;
+        arArray.m_capacityAndFlags = m_capacityAndFlags;
+    }
 
-	bhkSerializedPointer m_data;
-	int32_t m_size;
-	int32_t m_capacityAndFlags;
+    bhkSerializedPointer m_data;
+    int32_t m_size;
+    int32_t m_capacityAndFlags;
 };
 
 static_assert(sizeof(bhkSerializedArray) == 0xC);

@@ -6,45 +6,45 @@
 
 // A form ID as three bytes: the file index and the form's number in it.
 struct BGSNumericIDIndex {
-	BGSNumericIDIndex();
+    BGSNumericIDIndex();
 
-	bool IsZero();
-	uint32_t GetNumericID();
-	void SetNumericID(uint32_t aiNumericID);
+    bool IsZero();
+    uint32_t GetNumericID();
+    void SetNumericID(uint32_t aiNumericID);
 
-	uint8_t cData1;
-	uint8_t cData2;
-	uint8_t cData3;
+    uint8_t cData1;
+    uint8_t cData2;
+    uint8_t cData3;
 };
 
 // The form type and the size type of a saved form, in one byte.
 class BGSSaveLoadFormInfo {
 public:
-	BGSSaveLoadFormInfo();
+    BGSSaveLoadFormInfo();
 
-	ENUM_FORM_ID GetFormType();
-	void SetFormType(ENUM_FORM_ID aeFormType);
-	// The size type held in the top two bits. The loaders call it on a header's FormInfo, the unloaded buffer on its
-	// first byte.
-	SIZE_TYPE GetSizeType();
-	// Sets the size type held in the top two bits.
-	void SetSizeType(SIZE_TYPE aeSizeType);
+    ENUM_FORM_ID GetFormType();
+    void SetFormType(ENUM_FORM_ID aeFormType);
+    // The size type held in the top two bits. The loaders call it on a header's FormInfo, the unloaded buffer on its
+    // first byte.
+    SIZE_TYPE GetSizeType();
+    // Sets the size type held in the top two bits.
+    void SetSizeType(SIZE_TYPE aeSizeType);
 
-	// Fills the form-type-to-save-index table from cSaveGameFormTypes.
-	static void InitSaveGameFormTypes();
+    // Fills the form-type-to-save-index table from cSaveGameFormTypes.
+    static void InitSaveGameFormTypes();
 
-	uint8_t cData;
+    uint8_t cData;
 };
 
 // The header of a saved form, packed to byte alignment (9 bytes): the form ID, the change flags, the form's type and
 // size type and the save version.
 #pragma pack(push, 1)
 struct BGSSaveLoadFormHeader {
-	BGSSaveLoadFormHeader();
+    BGSSaveLoadFormHeader();
 
-	BGSNumericIDIndex FormIDIndex;
-	BGSChangeFlags iChangeFlags;
-	BGSSaveLoadFormInfo FormInfo;
-	uint8_t cVersion;
+    BGSNumericIDIndex FormIDIndex;
+    BGSChangeFlags iChangeFlags;
+    BGSSaveLoadFormInfo FormInfo;
+    uint8_t cVersion;
 };
 #pragma pack(pop)

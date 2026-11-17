@@ -6,12 +6,12 @@
 // The character state used while airborne.
 class bhkCharacterStateInAir : public bhkCharacterState {
 public:
-	// The constructor, run on apMemory.
-	bhkCharacterStateInAir();
+    // The constructor, run on apMemory.
+    bhkCharacterStateInAir();
 
-	hkpCharacterStateType getType() const override;
-	void Update(bhkCharacterController& arInput) override;
+    hkpCharacterStateType getType() const override;
+    void Update(bhkCharacterController& arInput) override;
 
-	// The largest velocity change the state applies; the constructor stores 2000.0f here.
-	float fMaxVelocityDelta;
+    // The largest velocity change the state applies; the constructor stores 2000.0f here.
+    float fMaxVelocityDelta;
 };

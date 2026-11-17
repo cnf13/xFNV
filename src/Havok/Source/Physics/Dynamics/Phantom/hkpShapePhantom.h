@@ -15,28 +15,36 @@ void sub_C9E3E0();
 // hits, and asked which bodies it touches or penetrates.
 class hkpShapePhantom : public hkpPhantom {
 public:
-	hkpShapePhantom(hkpShape* a1, hkTransform* a2);
-	hkpShapePhantom(hkFinishLoadedObjectFlag flag) : hkpPhantom(flag) {}
+    hkpShapePhantom(hkpShape* a1, hkTransform* a2);
+    hkpShapePhantom(hkFinishLoadedObjectFlag flag) : hkpPhantom(flag) {}
 
-	hkWorldOperation::Result setShape(const hkpShape* shape) override;
-	hkMotionState* getMotionState() override;
-	void calcAabb(hkAabb& aAabb) override;
-	void deallocateInternalArrays() override;
-	virtual void setPositionAndLinearCast(const hkVector4&, const hkpLinearCastInput&, hkpCdPointCollector&,
-		hkpCdPointCollector*) = 0;
-	virtual void setTransformAndLinearCast(const hkTransform&, const hkpLinearCastInput&, hkpCdPointCollector&,
-		hkpCdPointCollector*) = 0;
-	virtual void getClosestPoints(hkpCdPointCollector&, const hkpCollisionInput*) = 0;
-	virtual void getPenetrations(hkpCdBodyPairCollector&, const hkpCollisionInput*) = 0;
+    hkWorldOperation::Result setShape(const hkpShape* shape) override;
+    hkMotionState* getMotionState() override;
+    void calcAabb(hkAabb& aAabb) override;
+    void deallocateInternalArrays() override;
+    virtual void setPositionAndLinearCast(
+        const hkVector4&,
+        const hkpLinearCastInput&,
+        hkpCdPointCollector&,
+        hkpCdPointCollector*
+    ) = 0;
+    virtual void setTransformAndLinearCast(
+        const hkTransform&,
+        const hkpLinearCastInput&,
+        hkpCdPointCollector&,
+        hkpCdPointCollector*
+    ) = 0;
+    virtual void getClosestPoints(hkpCdPointCollector&, const hkpCollisionInput*) = 0;
+    virtual void getPenetrations(hkpCdBodyPairCollector&, const hkpCollisionInput*) = 0;
 
-	// Moves the phantom to aPosition; extraTolerance widens its AABB.
-	void setPosition(const hkVector4& position, float extraTolerance);
-	// Moves the phantom to transform.
-	void setTransform(const hkTransform& transform);
-	void firePhantomShapeSet();
+    // Moves the phantom to aPosition; extraTolerance widens its AABB.
+    void setPosition(const hkVector4& position, float extraTolerance);
+    // Moves the phantom to transform.
+    void setTransform(const hkTransform& transform);
+    void firePhantomShapeSet();
 
-	// m_motionState is 16-byte aligned, so the bytes after the base class are the compiler's alignment padding.
-	alignas(16) hkMotionState m_motionState;
+    // m_motionState is 16-byte aligned, so the bytes after the base class are the compiler's alignment padding.
+    alignas(16) hkMotionState m_motionState;
 };
 
 // The class's reflection record.

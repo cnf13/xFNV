@@ -4,8 +4,8 @@
 
 class ImageSpaceShaderRadialBlurHigh : public ImageSpaceShader {
 public:
-	ImageSpaceShaderRadialBlurHigh();
-	~ImageSpaceShaderRadialBlurHigh() override;
+    ImageSpaceShaderRadialBlurHigh();
+    ~ImageSpaceShaderRadialBlurHigh() override;
 
-	void ReloadShaders() override;
+    void ReloadShaders() override;
 };

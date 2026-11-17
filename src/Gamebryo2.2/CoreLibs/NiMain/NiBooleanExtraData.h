@@ -5,21 +5,21 @@
 // Extra data holding one boolean.
 class NiBooleanExtraData : public NiExtraData {
 public:
-	NiBooleanExtraData();
-	~NiBooleanExtraData() override;
+    NiBooleanExtraData();
+    ~NiBooleanExtraData() override;
 
-	const NiRTTI* GetRTTI() const override;
-	NiObject* CreateClone(NiCloningProcess& kCloning) override;
-	void LoadBinary(NiStream& kStream) override;
-	void LinkObject(NiStream& kStream) override;
-	bool RegisterStreamables(NiStream& kStream) override;
-	void SaveBinary(NiStream& kStream) override;
-	bool IsEqual(NiObject* pObject) override;
-	void GetViewerStrings(NiTPrimitiveArray<char*>* pStrings) override;
+    const NiRTTI* GetRTTI() const override;
+    NiObject* CreateClone(NiCloningProcess& kCloning) override;
+    void LoadBinary(NiStream& kStream) override;
+    void LinkObject(NiStream& kStream) override;
+    bool RegisterStreamables(NiStream& kStream) override;
+    void SaveBinary(NiStream& kStream) override;
+    bool IsEqual(NiObject* pObject) override;
+    void GetViewerStrings(NiTPrimitiveArray<char*>* pStrings) override;
 
-	static NiObject* CreateObject();
+    static NiObject* CreateObject();
 
-	bool m_bValue;
+    bool m_bValue;
 
-	static NiRTTI ms_RTTI;
+    static NiRTTI ms_RTTI;
 };

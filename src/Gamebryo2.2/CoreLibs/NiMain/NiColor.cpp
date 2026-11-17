@@ -17,106 +17,113 @@ NiColor NiColor_CYAN{0.0f, 1.0f, 1.0f};
 NiColor::NiColor(float fR, float fG, float fB) : r(fR), g(fG), b(fB) {}
 
 void NiColor::Clamp() {
-	if (r > 1.0f)
-		r = 1.0f;
-	if (g > 1.0f)
-		g = 1.0f;
-	if (b > 1.0f)
-		b = 1.0f;
+    if (r > 1.0f) {
+        r = 1.0f;
+    }
+    if (g > 1.0f) {
+        g = 1.0f;
+    }
+    if (b > 1.0f) {
+        b = 1.0f;
+    }
 }
 
 float NiColor::Luminance() const {
-	return g * 0.36f + r * 0.31f + b * 0.32f;
+    return g * 0.36f + r * 0.31f + b * 0.32f;
 }
 
 bool NiColor::operator==(const NiColor& c) const {
-	return r == c.r && g == c.g && b == c.b;
+    return r == c.r && g == c.g && b == c.b;
 }
 
 bool NiColor::operator!=(const NiColor& c) const {
-	return !(r == c.r && g == c.g && b == c.b);
+    return !(r == c.r && g == c.g && b == c.b);
 }
 
 void NiColor::LoadBinary(NiStream& stream) {
-	NiStreamLoadBinary(stream, r);
-	NiStreamLoadBinary(stream, g);
-	NiStreamLoadBinary(stream, b);
+    NiStreamLoadBinary(stream, r);
+    NiStreamLoadBinary(stream, g);
+    NiStreamLoadBinary(stream, b);
 }
 
 void NiColor::SaveBinary(NiStream& stream) {
-	NiStreamSaveBinary(stream, r);
-	NiStreamSaveBinary(stream, g);
-	NiStreamSaveBinary(stream, b);
+    NiStreamSaveBinary(stream, r);
+    NiStreamSaveBinary(stream, g);
+    NiStreamSaveBinary(stream, b);
 }
 
 char* NiColor::GetViewerString(const char* pPrefix) const {
-	size_t stLength = strlen(pPrefix) + 34;
-	char* pcString = static_cast<char*>(_NiMalloc(stLength));
-	NiSprintf(pcString, stLength, "%s = (%5.3f,%5.3f,%5.3f)", pPrefix, static_cast<double>(r), static_cast<double>(g),
-		static_cast<double>(b));
-	return pcString;
+    size_t stLength = strlen(pPrefix) + 34;
+    char* pcString = static_cast<char*>(_NiMalloc(stLength));
+    NiSprintf(
+        pcString, stLength, "%s = (%5.3f,%5.3f,%5.3f)", pPrefix, static_cast<double>(r), static_cast<double>(g),
+        static_cast<double>(b)
+    );
+    return pcString;
 }
 
 NiColor& NiColor::operator+=(const NiColor& c) {
-	r += c.r;
-	g += c.g;
-	b += c.b;
-	return *this;
+    r += c.r;
+    g += c.g;
+    b += c.b;
+    return *this;
 }
 
 NiColor* NiColor::Add(NiColor* a2, NiColor* a3) {
-	NiColor v4;
-	v4.r = (float)(r + a3->r);
-	v4.g = (float)(g + a3->g);
-	v4.b = (float)(b + a3->b);
-	*a2 = v4;
-	return a2;
+    NiColor v4;
+    v4.r = (float)(r + a3->r);
+    v4.g = (float)(g + a3->g);
+    v4.b = (float)(b + a3->b);
+    *a2 = v4;
+    return a2;
 }
 
 bool NiColorA::operator==(const NiColorA& c) const {
-	return r == c.r && g == c.g && b == c.b && a == c.a;
+    return r == c.r && g == c.g && b == c.b && a == c.a;
 }
 
 bool NiColorA::operator!=(const NiColorA& c) const {
-	return !(*this == c);
+    return !(*this == c);
 }
 
 void NiColorA::LoadBinary(NiStream& stream) {
-	NiStreamLoadBinary(stream, r);
-	NiStreamLoadBinary(stream, g);
-	NiStreamLoadBinary(stream, b);
-	NiStreamLoadBinary(stream, a);
+    NiStreamLoadBinary(stream, r);
+    NiStreamLoadBinary(stream, g);
+    NiStreamLoadBinary(stream, b);
+    NiStreamLoadBinary(stream, a);
 }
 
 void NiColorA::SaveBinary(NiStream& stream) {
-	NiStreamSaveBinary(stream, r);
-	NiStreamSaveBinary(stream, g);
-	NiStreamSaveBinary(stream, b);
-	NiStreamSaveBinary(stream, a);
+    NiStreamSaveBinary(stream, r);
+    NiStreamSaveBinary(stream, g);
+    NiStreamSaveBinary(stream, b);
+    NiStreamSaveBinary(stream, a);
 }
 
 char* NiColorA::GetViewerString(const char* pPrefix) const {
-	size_t stLength = strlen(pPrefix) + 36;
-	char* pcString = static_cast<char*>(_NiMalloc(stLength));
-	NiSprintf(pcString, stLength, "%s = (%5.3f,%5.3f,%5.3f,%5.3f)", pPrefix, static_cast<double>(r),
-		static_cast<double>(g), static_cast<double>(b), static_cast<double>(a));
-	return pcString;
+    size_t stLength = strlen(pPrefix) + 36;
+    char* pcString = static_cast<char*>(_NiMalloc(stLength));
+    NiSprintf(
+        pcString, stLength, "%s = (%5.3f,%5.3f,%5.3f,%5.3f)", pPrefix, static_cast<double>(r), static_cast<double>(g),
+        static_cast<double>(b), static_cast<double>(a)
+    );
+    return pcString;
 }
 
 NiColorA& NiColorA::Scale(float afScale) {
-	r = r * afScale;
-	g = g * afScale;
-	b = b * afScale;
-	a = a * afScale;
-	return *this;
+    r = r * afScale;
+    g = g * afScale;
+    b = b * afScale;
+    a = a * afScale;
+    return *this;
 }
 
 NiColorA* NiColorA::Divide(NiColorA* a2, float a3) {
-	NiColorA v4;
-	v4.r = (float)(r / a3);
-	v4.g = (float)(g / a3);
-	v4.b = (float)(b / a3);
-	v4.a = (float)(a / a3);
-	*a2 = v4;
-	return a2;
+    NiColorA v4;
+    v4.r = (float)(r / a3);
+    v4.g = (float)(g / a3);
+    v4.b = (float)(b / a3);
+    v4.a = (float)(a / a3);
+    *a2 = v4;
+    return a2;
 }

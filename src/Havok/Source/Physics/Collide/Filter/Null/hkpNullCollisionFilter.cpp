@@ -11,15 +11,31 @@
 #include "Havok/Source/Physics/Collide/Filter/hkpShapeCollectionFilter.h"
 #include "Havok/Source/Physics/Collide/Shape/Compound/Tree/Mopp/Modifiers/hkpRemoveTerminalsMoppModifierClass.h"
 
-hkClass hkpNullCollisionFilterClass("hkpNullCollisionFilter", &hkpCollisionFilterClass, 48, nullptr, 0, nullptr, 0,
-	nullptr, 0, nullptr, nullptr, 0, 0);
-hkTypeInfo hkpNullCollisionFilterTypeInfo = {"hkpNullCollisionFilter", finishLoadedObjecthkpNullCollisionFilter,
-	cleanupLoadedObjecthkpNullCollisionFilter, getVtablehkpNullCollisionFilter(), &typeid(hkpNullCollisionFilter),
-	sizeof(hkpNullCollisionFilter)};
+hkClass hkpNullCollisionFilterClass(
+    "hkpNullCollisionFilter",
+    &hkpCollisionFilterClass,
+    48,
+    nullptr,
+    0,
+    nullptr,
+    0,
+    nullptr,
+    0,
+    nullptr,
+    nullptr,
+    0,
+    0
+);
+hkTypeInfo hkpNullCollisionFilterTypeInfo = {"hkpNullCollisionFilter",
+                                             finishLoadedObjecthkpNullCollisionFilter,
+                                             cleanupLoadedObjecthkpNullCollisionFilter,
+                                             getVtablehkpNullCollisionFilter(),
+                                             &typeid(hkpNullCollisionFilter),
+                                             sizeof(hkpNullCollisionFilter)};
 
 hkpNullCollisionFilter::~hkpNullCollisionFilter() {}
 
 // Every overload lets the pair collide; the bodies are the header's.
 const hkClass& hkpNullCollisionFilter::staticClass() {
-	return hkpNullCollisionFilterClass;
+    return hkpNullCollisionFilterClass;
 }

@@ -12,28 +12,28 @@
 NiRTTI bhkSphereRepShape::ms_RTTI("bhkSphereRepShape", &bhkShape::ms_RTTI);
 
 const NiRTTI* bhkSphereRepShape::GetRTTI() const {
-	return &bhkSphereRepShape::ms_RTTI;
+    return &bhkSphereRepShape::ms_RTTI;
 }
 
 void bhkSphereRepShape::GetViewerStrings(NiTPrimitiveArray<char*>* apStrings) {
-	TLSData* v2 = GetThreadTLSData();
-	MEM_CONTEXT eMemContext = v2->eMemContext;
-	v2->eMemContext = MEM_CONTEXT_HAVOK;
-	bhkShape::GetViewerStrings(apStrings);
-	char* ViewerString = NiGetViewerString(bhkSphereRepShape::ms_RTTI.GetName());
-	uint32_t m_usSize = apStrings->m_usSize;
-	uint32_t m_usMaxSize = apStrings->m_usMaxSize;
-	char* v8 = ViewerString;
-	if (m_usSize >= m_usMaxSize) {
-		apStrings->SetSize(m_usSize + apStrings->m_usGrowBy);
-	}
-	apStrings->SetAt(m_usSize, v8);
-	v2->eMemContext = eMemContext;
+    TLSData* v2 = GetThreadTLSData();
+    MEM_CONTEXT eMemContext = v2->eMemContext;
+    v2->eMemContext = MEM_CONTEXT_HAVOK;
+    bhkShape::GetViewerStrings(apStrings);
+    char* ViewerString = NiGetViewerString(bhkSphereRepShape::ms_RTTI.GetName());
+    uint32_t m_usSize = apStrings->m_usSize;
+    uint32_t m_usMaxSize = apStrings->m_usMaxSize;
+    char* v8 = ViewerString;
+    if (m_usSize >= m_usMaxSize) {
+        apStrings->SetSize(m_usSize + apStrings->m_usGrowBy);
+    }
+    apStrings->SetAt(m_usSize, v8);
+    v2->eMemContext = eMemContext;
 }
 
 bhkSphereRepShape::~bhkSphereRepShape() {
-	bhkSerializable::Kill();
-	--iCount;
+    bhkSerializable::Kill();
+    --iCount;
 }
 
 hkSphereRepShapeCinfo::hkSphereRepShapeCinfo() {}

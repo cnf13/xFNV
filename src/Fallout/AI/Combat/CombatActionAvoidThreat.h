@@ -6,5 +6,5 @@
 // virtual.
 class CombatActionAvoidThreat : public CombatAction {
 public:
-	CombatActionAvoidThreat(CombatAction::COMBAT_ACTION aeType);
+    CombatActionAvoidThreat(CombatAction::COMBAT_ACTION aeType);
 };

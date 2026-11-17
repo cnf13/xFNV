@@ -5,9 +5,9 @@
 // The input of a linear cast: where the shape moves to and the tolerances of the cast.
 class hkpLinearCastInput {
 public:
-	hkpLinearCastInput();
+    hkpLinearCastInput();
 
-	hkVector4 m_to;
-	float m_maxExtraPenetration;
-	float m_startPointTolerance;
+    hkVector4 m_to;
+    float m_maxExtraPenetration;
+    float m_startPointTolerance;
 };

@@ -8,32 +8,35 @@
 // the handbrake acts on.
 class hkpVehicleDefaultBrake : public hkpVehicleBrake {
 public:
-	// One wheel's braking setup.
-	struct WheelBrakingProperties {
-		// Havok SDK signature (hkpVehicle.lib, tied by target).
-		static const hkClass& staticClass();
+    // One wheel's braking setup.
+    struct WheelBrakingProperties {
+        // Havok SDK signature (hkpVehicle.lib, tied by target).
+        static const hkClass& staticClass();
 
-		float m_maxBreakingTorque;
-		float m_minPedalInputToBlock;
-		hkBool m_isConnectedToHandbrake;
-	};
+        float m_maxBreakingTorque;
+        float m_minPedalInputToBlock;
+        hkBool m_isConnectedToHandbrake;
+    };
 
-	hkpVehicleDefaultBrake();
+    hkpVehicleDefaultBrake();
 
-	// The SDK's finish constructor: the loaded brake keeps its fields.
-	hkpVehicleDefaultBrake(hkFinishLoadedObjectFlag aFlag) : hkpVehicleBrake(aFlag), m_wheelBrakingProperties(aFlag) {}
+    // The SDK's finish constructor: the loaded brake keeps its fields.
+    hkpVehicleDefaultBrake(hkFinishLoadedObjectFlag aFlag) : hkpVehicleBrake(aFlag), m_wheelBrakingProperties(aFlag) {}
 
-	~hkpVehicleDefaultBrake() override;
+    ~hkpVehicleDefaultBrake() override;
 
-	void calcBreakingInfo(float deltaTime, const hkpVehicleInstance* vehicle,
-		const hkpVehicleDriverInput::FilteredDriverInputOutput& FilteredDriverInputOutput,
-		WheelBreakingOutput& breakingInfo) override;
+    void calcBreakingInfo(
+        float deltaTime,
+        const hkpVehicleInstance* vehicle,
+        const hkpVehicleDriverInput::FilteredDriverInputOutput& FilteredDriverInputOutput,
+        WheelBreakingOutput& breakingInfo
+    ) override;
 
-	// Havok SDK signature (hkpVehicle.lib, tied by target).
-	static const hkClass& staticClass();
+    // Havok SDK signature (hkpVehicle.lib, tied by target).
+    static const hkClass& staticClass();
 
-	hkArray<WheelBrakingProperties> m_wheelBrakingProperties;
-	float m_wheelsMinTimeToBlock;
+    hkArray<WheelBrakingProperties> m_wheelBrakingProperties;
+    float m_wheelsMinTimeToBlock;
 };
 
 // The hkTypeInfo records of the reflected types declared here (constant data, the SDK's <Class>Class.cpp).

@@ -45,48 +45,48 @@
 using ItemChangeListBox = ListBox<ItemChange*>;
 
 int32_t SortByName(ItemChange* apItemA, ItemChange* apItemB) {
-	const char* fullName = apItemB->GetFullName();
-	const char* v2 = apItemA->GetFullName();
-	return _tcscmp(v2, fullName);
+    const char* fullName = apItemB->GetFullName();
+    const char* v2 = apItemA->GetFullName();
+    return _tcscmp(v2, fullName);
 }
 
 int32_t SortByCount(ItemChange* apItemA, ItemChange* apItemB) {
-	if (apItemA->iNumber < apItemB->iNumber) {
-		return -1;
-	}
-	return apItemA->iNumber > apItemB->iNumber;
+    if (apItemA->iNumber < apItemB->iNumber) {
+        return -1;
+    }
+    return apItemA->iNumber > apItemB->iNumber;
 }
 
 int32_t SortByHealth(ItemChange* apItemA, ItemChange* apItemB) {
-	TESHealthForm* pHealthA = dynamic_cast<TESHealthForm*>(apItemA->pContainerObj);
-	TESHealthForm* pHealthB = dynamic_cast<TESHealthForm*>(apItemB->pContainerObj);
-	uint32_t uiHealthA = pHealthA->GetFormHealth();
-	if (uiHealthA < pHealthB->GetFormHealth()) {
-		return -1;
-	}
-	uiHealthA = pHealthA->GetFormHealth();
-	return uiHealthA > pHealthB->GetFormHealth();
+    TESHealthForm* pHealthA = dynamic_cast<TESHealthForm*>(apItemA->pContainerObj);
+    TESHealthForm* pHealthB = dynamic_cast<TESHealthForm*>(apItemB->pContainerObj);
+    uint32_t uiHealthA = pHealthA->GetFormHealth();
+    if (uiHealthA < pHealthB->GetFormHealth()) {
+        return -1;
+    }
+    uiHealthA = pHealthA->GetFormHealth();
+    return uiHealthA > pHealthB->GetFormHealth();
 }
 
 bool IsWeapon(ItemChange* apItem) {
-	return apItem && apItem->pContainerObj->GetFormType() == WEAP_ID;
+    return apItem && apItem->pContainerObj->GetFormType() == WEAP_ID;
 }
 
 bool IsApparel(ItemChange* apItem) {
-	if (!apItem) {
-		return false;
-	}
-	return apItem->pContainerObj->GetFormType() == CLOT_ID || apItem->pContainerObj->GetFormType() == ARMO_ID;
+    if (!apItem) {
+        return false;
+    }
+    return apItem->pContainerObj->GetFormType() == CLOT_ID || apItem->pContainerObj->GetFormType() == ARMO_ID;
 }
 
 bool IsMiscItem(ItemChange* apItem) {
-	if (!apItem) {
-		return false;
-	}
-	return apItem->pContainerObj->GetFormType() == MISC_ID || apItem->pContainerObj->GetFormType() == AMMO_ID ||
-		apItem->pContainerObj->GetFormType() == IMOD_ID || apItem->pContainerObj->GetFormType() == COBJ_ID ||
-		apItem->pContainerObj->GetFormType() == CHIP_ID || apItem->pContainerObj->GetFormType() == CMNY_ID ||
-		apItem->pContainerObj->GetFormType() == CCRD_ID;
+    if (!apItem) {
+        return false;
+    }
+    return apItem->pContainerObj->GetFormType() == MISC_ID || apItem->pContainerObj->GetFormType() == AMMO_ID ||
+        apItem->pContainerObj->GetFormType() == IMOD_ID || apItem->pContainerObj->GetFormType() == COBJ_ID ||
+        apItem->pContainerObj->GetFormType() == CHIP_ID || apItem->pContainerObj->GetFormType() == CMNY_ID ||
+        apItem->pContainerObj->GetFormType() == CCRD_ID;
 }
 
 // The standalone build's one instantiation of every list's generic members.
@@ -112,76 +112,84 @@ template class ListBox<BGSSaveLoadFileEntry*>;
 
 // RemoveItemGroup and BuildFromContainer work on ItemChange data: defined after the instantiations above, so that only
 // ListBox<ItemChange*> instantiates them.
-template <class T> void ListBox<T>::RemoveItemGroup(TESBoundObject* apRemoveObj) {
-	BSSimpleList<ListBoxItem<T>*> kRemoveList;
-	for (ListBoxItem<T>*& rpItem : static_cast<BSSimpleList<ListBoxItem<T>*>*>(this)->ItemsUntilNull()) {
-		if (rpItem->data && rpItem->data->pContainerObj == apRemoveObj) {
-			kRemoveList.AddHead(rpItem);
-		}
-	}
-	for (ListBoxItem<T>*& rpItem : kRemoveList.ItemsUntilNull()) {
-		RemoveItem(rpItem->pTile);
-	}
-	kRemoveList.RemoveAll();
+template <class T>
+void ListBox<T>::RemoveItemGroup(TESBoundObject* apRemoveObj) {
+    BSSimpleList<ListBoxItem<T>*> kRemoveList;
+    for (ListBoxItem<T>*& rpItem : static_cast<BSSimpleList<ListBoxItem<T>*>*>(this)->ItemsUntilNull()) {
+        if (rpItem->data && rpItem->data->pContainerObj == apRemoveObj) {
+            kRemoveList.AddHead(rpItem);
+        }
+    }
+    for (ListBoxItem<T>*& rpItem : kRemoveList.ItemsUntilNull()) {
+        RemoveItem(rpItem->pTile);
+    }
+    kRemoveList.RemoveAll();
 }
 
 // The data is the inventory's ItemChange objects.
 template <class T>
-void ListBox<T>::BuildFromContainer(TESObjectREFR* apContainer, bool (*apFilterFn)(T),
-	int32_t (*apCompareFn)(ListBoxItem<T>*, ListBoxItem<T>*), void (*apInitFn)(Tile*, T), bool abNoStack,
-	bool abBarter) {
-	if (!apContainer || !pContainerRect || !pTemplateName) {
-		return;
-	}
-	RemoveAll();
-	SetFlag(LBF_FROM_CONTAINER, true);
-	bool bSaveSetting = GetFlag(LBF_AUTO_UPDATE);
-	SetFlag(LBF_AUTO_UPDATE, false);
-	InventoryChanges::IterData* pIterator;
-	InventoryChanges* pChanges;
-	apContainer->GetInventoryIterator(abBarter, &pIterator, &pChanges);
-	if (pIterator && pChanges) {
-		for (ItemChange* pItem = pChanges->Iterate(pIterator); pItem; pItem = pChanges->Iterate(pIterator)) {
-			if (apFilterFn && apFilterFn(pItem)) {
-				continue;
-			}
-			// Without stacking, one item per unit: the first keeps the change (its count set to 1), the others
-			// get a copy of it.
-			int32_t iPerItemCount = 0;
-			int32_t iCount = pItem->iNumber;
-			do {
-				char acName[128];
-				TESFullName* pFullName = dynamic_cast<TESFullName*>(pItem->pContainerObj);
-				uint32_t uiLength = BSstrlen(pFullName->GetFullName());
-				BSstrcpy(acName, uiLength + 1, pFullName->GetFullName());
-				if (pItem->GetModSlots()) {
-					BSstrcat(acName, uiLength + 2, "+");
-				}
-				if (abNoStack) {
-					if (iPerItemCount <= 0) {
-						if (iCount > 1) {
-							pItem->iNumber = 1;
-						}
-					} else {
-						ItemChange* pCopy = new ItemChange();
-						pCopy->Copy(pItem);
-						pItem = pCopy;
-						pCopy->iNumber = 1;
-					}
-					++iPerItemCount;
-				}
-				Tile* pTile = AddItem(pItem, acName, apCompareFn, nullptr);
-				if (apInitFn) {
-					apInitFn(pTile, pItem);
-				}
-			} while (abNoStack && iPerItemCount < iCount);
-		}
-		delete pIterator;
-	}
-	if (apCompareFn) {
-		Synchronize();
-	}
-	SetFlag(LBF_AUTO_UPDATE, bSaveSetting);
+void ListBox<T>::BuildFromContainer(
+    TESObjectREFR* apContainer,
+    bool (*apFilterFn)(T),
+    int32_t (*apCompareFn)(ListBoxItem<T>*, ListBoxItem<T>*),
+    void (*apInitFn)(Tile*, T),
+    bool abNoStack,
+    bool abBarter
+) {
+    if (!apContainer || !pContainerRect || !pTemplateName) {
+        return;
+    }
+    RemoveAll();
+    SetFlag(LBF_FROM_CONTAINER, true);
+    bool bSaveSetting = GetFlag(LBF_AUTO_UPDATE);
+    SetFlag(LBF_AUTO_UPDATE, false);
+    InventoryChanges::IterData* pIterator;
+    InventoryChanges* pChanges;
+    apContainer->GetInventoryIterator(abBarter, &pIterator, &pChanges);
+    if (pIterator && pChanges) {
+        for (ItemChange* pItem = pChanges->Iterate(pIterator); pItem; pItem = pChanges->Iterate(pIterator)) {
+            if (apFilterFn && apFilterFn(pItem)) {
+                continue;
+            }
+            // Without stacking, one item per unit: the first keeps the change (its count set to 1), the others
+            // get a copy of it.
+            int32_t iPerItemCount = 0;
+            int32_t iCount = pItem->iNumber;
+            do {
+                char acName[128];
+                TESFullName* pFullName = dynamic_cast<TESFullName*>(pItem->pContainerObj);
+                uint32_t uiLength = BSstrlen(pFullName->GetFullName());
+                BSstrcpy(acName, uiLength + 1, pFullName->GetFullName());
+                if (pItem->GetModSlots()) {
+                    BSstrcat(acName, uiLength + 2, "+");
+                }
+                if (abNoStack) {
+                    if (iPerItemCount <= 0) {
+                        if (iCount > 1) {
+                            pItem->iNumber = 1;
+                        }
+                    }
+                    else {
+                        ItemChange* pCopy = new ItemChange();
+                        pCopy->Copy(pItem);
+                        pItem = pCopy;
+                        pCopy->iNumber = 1;
+                    }
+                    ++iPerItemCount;
+                }
+                Tile* pTile = AddItem(pItem, acName, apCompareFn, nullptr);
+                if (apInitFn) {
+                    apInitFn(pTile, pItem);
+                }
+            }
+            while (abNoStack && iPerItemCount < iCount);
+        }
+        delete pIterator;
+    }
+    if (apCompareFn) {
+        Synchronize();
+    }
+    SetFlag(LBF_AUTO_UPDATE, bSaveSetting);
 }
 
 template class ListBox<ItemChange*>;

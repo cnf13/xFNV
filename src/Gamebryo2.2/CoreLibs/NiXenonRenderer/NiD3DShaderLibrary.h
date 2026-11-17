@@ -11,16 +11,16 @@ class NiShaderLibraryDesc;
 // constructors, destructor, operator= and five protected statics are not declared.
 class NiD3DShaderLibrary : public NiShaderLibrary {
 public:
-	// The description virtuals sit between ReleaseShader and SetRenderer. The class is never instantiated; only
-	// SetRenderer is called.
-	virtual NiShaderLibraryDesc* GetShaderLibraryDesc();
-	virtual void SetShaderLibraryDesc(NiShaderLibraryDesc* apDesc);
-	virtual void SetRenderer(NiDX9Renderer* apRenderer);
+    // The description virtuals sit between ReleaseShader and SetRenderer. The class is never instantiated; only
+    // SetRenderer is called.
+    virtual NiShaderLibraryDesc* GetShaderLibraryDesc();
+    virtual void SetShaderLibraryDesc(NiShaderLibraryDesc* apDesc);
+    virtual void SetRenderer(NiDX9Renderer* apRenderer);
 
-	NiDX9Renderer* GetRenderer();
+    NiDX9Renderer* GetRenderer();
 
-	NiDX9Renderer* m_pkD3DRenderer;
-	// The SDK's HMODULE: a pointer to an opaque struct.
-	HINSTANCE__* m_hLibrary;
-	NiPointer<NiShaderLibraryDesc> m_spShaderLibraryDesc;
+    NiDX9Renderer* m_pkD3DRenderer;
+    // The SDK's HMODULE: a pointer to an opaque struct.
+    HINSTANCE__* m_hLibrary;
+    NiPointer<NiShaderLibraryDesc> m_spShaderLibraryDesc;
 };

@@ -18,57 +18,61 @@ NiDitherProperty::NiDitherProperty() : m_uFlags(0) {}
 NiDitherProperty::~NiDitherProperty() {}
 
 NiObject* NiDitherProperty::CreateClone(NiCloningProcess& kCloning) {
-	NiDitherProperty* pkObject = static_cast<NiDitherProperty*>(NiMemObject::operator new(sizeof(NiDitherProperty)));
-	NiDitherProperty* pkObject_2 = pkObject;
-	if (pkObject) {
-		pkObject_2 = ::new (pkObject) NiDitherProperty;
-	} else {
-		pkObject_2 = 0;
-	}
-	CopyMembers(pkObject_2, kCloning);
-	pkObject_2->m_uFlags = m_uFlags;
-	return pkObject_2;
+    NiDitherProperty* pkObject = static_cast<NiDitherProperty*>(NiMemObject::operator new(sizeof(NiDitherProperty)));
+    NiDitherProperty* pkObject_2 = pkObject;
+    if (pkObject) {
+        pkObject_2 = ::new (pkObject) NiDitherProperty;
+    }
+    else {
+        pkObject_2 = 0;
+    }
+    CopyMembers(pkObject_2, kCloning);
+    pkObject_2->m_uFlags = m_uFlags;
+    return pkObject_2;
 }
 
 // Shared with NiShadeProperty and NiSpecularProperty (flags at +0x18 in all).
 void NiDitherProperty::LoadBinary(NiStream& kStream) {
-	NiProperty::LoadBinary(kStream);
-	if (kStream.m_uiNifFileVersion < 0x0A000102)
-		m_uFlags = kStream.m_usNiPropertyFlags & 1;
-	else
-		NiStreamLoadBinary(kStream, m_uFlags);
+    NiProperty::LoadBinary(kStream);
+    if (kStream.m_uiNifFileVersion < 0x0A000102) {
+        m_uFlags = kStream.m_usNiPropertyFlags & 1;
+    }
+    else {
+        NiStreamLoadBinary(kStream, m_uFlags);
+    }
 }
 
 void NiDitherProperty::LinkObject(NiStream& kStream) {
-	NiProperty::LinkObject(kStream);
+    NiProperty::LinkObject(kStream);
 }
 
 bool NiDitherProperty::RegisterStreamables(NiStream& kStream) {
-	return NiProperty::RegisterStreamables(kStream);
+    return NiProperty::RegisterStreamables(kStream);
 }
 
 void NiDitherProperty::SaveBinary(NiStream& kStream) {
-	NiProperty::SaveBinary(kStream);
-	NiStreamSaveBinary(kStream, m_uFlags);
+    NiProperty::SaveBinary(kStream);
+    NiStreamSaveBinary(kStream, m_uFlags);
 }
 
 bool NiDitherProperty::IsEqual(NiObject* pkObject) {
-	if (!NiProperty::IsEqual(pkObject))
-		return false;
+    if (!NiProperty::IsEqual(pkObject)) {
+        return false;
+    }
 
-	return (m_uFlags & 1) == (static_cast<NiDitherProperty*>(pkObject)->m_uFlags & 1);
+    return (m_uFlags & 1) == (static_cast<NiDitherProperty*>(pkObject)->m_uFlags & 1);
 }
 
 void NiDitherProperty::GetViewerStrings(NiTPrimitiveArray<char*>* pkStrings) {
-	NiProperty::GetViewerStrings(pkStrings);
-	pkStrings->Add(NiGetViewerString(ms_RTTI.GetName()));
-	pkStrings->Add(NiGetViewerString("m_bDither", (m_uFlags & 1) != 0));
+    NiProperty::GetViewerStrings(pkStrings);
+    pkStrings->Add(NiGetViewerString(ms_RTTI.GetName()));
+    pkStrings->Add(NiGetViewerString("m_bDither", (m_uFlags & 1) != 0));
 }
 
 NiObject* NiDitherProperty::CreateObject() {
-	NiDitherProperty* pkObject = static_cast<NiDitherProperty*>(NiMemObject::operator new(sizeof(NiDitherProperty)));
-	if (!pkObject) {
-		return 0;
-	}
-	return ::new (pkObject) NiDitherProperty;
+    NiDitherProperty* pkObject = static_cast<NiDitherProperty*>(NiMemObject::operator new(sizeof(NiDitherProperty)));
+    if (!pkObject) {
+        return 0;
+    }
+    return ::new (pkObject) NiDitherProperty;
 }

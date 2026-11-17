@@ -12,11 +12,11 @@ class hkpConstraintInstance;
 // 18 (CONSTRAINT_TYPE_HINGE_LIMITS).
 class hkpHingeLimitsDrawer : public hkpConstraintDrawer {
 public:
-	hkpHingeLimitsDrawer();
+    hkpHingeLimitsDrawer();
 
-	// Havok SDK signature (hkpUtilities.lib, tied by reloc).
-	void drawConstraint(hkpConstraintInstance* constraint, hkDebugDisplayHandler* displayHandler, int32_t id,
-		int32_t tag);
+    // Havok SDK signature (hkpUtilities.lib, tied by reloc).
+    void
+    drawConstraint(hkpConstraintInstance* constraint, hkDebugDisplayHandler* displayHandler, int32_t id, int32_t tag);
 
-	hkDisplaySemiCircle m_angularLimit;
+    hkDisplaySemiCircle m_angularLimit;
 };

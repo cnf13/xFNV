@@ -5,8 +5,8 @@
 // A water image-space shader.
 class WaterSmoothHeightmap : public ImageSpaceShader {
 public:
-	WaterSmoothHeightmap();
-	~WaterSmoothHeightmap() override;
+    WaterSmoothHeightmap();
+    ~WaterSmoothHeightmap() override;
 
-	void ReloadShaders() override;
+    void ReloadShaders() override;
 };

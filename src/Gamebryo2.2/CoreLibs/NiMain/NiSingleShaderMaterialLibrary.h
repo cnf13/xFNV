@@ -9,20 +9,20 @@ class NiSingleShaderMaterialLibrary;
 // sizeof: NiSingleShaderMaterialLibrary::_SDMInit allocates 0x14 bytes.
 class NiSingleShaderMaterialLibrary : public NiMaterialLibrary {
 public:
-	NiSingleShaderMaterialLibrary();
-	~NiSingleShaderMaterialLibrary() override;
+    NiSingleShaderMaterialLibrary();
+    ~NiSingleShaderMaterialLibrary() override;
 
-	NiMaterial* GetMaterial(const NiFixedString& kName) override;
-	const char* GetMaterialName(uint32_t uiMaterial) override;
-	uint32_t GetMaterialCount() const override;
-	NiShaderDesc* GetFirstMaterialDesc() override;
-	NiShaderDesc* GetNextMaterialDesc() override;
+    NiMaterial* GetMaterial(const NiFixedString& kName) override;
+    const char* GetMaterialName(uint32_t uiMaterial) override;
+    uint32_t GetMaterialCount() const override;
+    NiShaderDesc* GetFirstMaterialDesc() override;
+    NiShaderDesc* GetNextMaterialDesc() override;
 
-	static void _SDMInit();
-	static void _SDMShutdown();
+    static void _SDMInit();
+    static void _SDMShutdown();
 
-	NiShaderLibrary* m_pkLastLibrary;
-	uint32_t m_uiLastDesc;
+    NiShaderLibrary* m_pkLastLibrary;
+    uint32_t m_uiLastDesc;
 
-	static inline NiSingleShaderMaterialLibrary* ms_pkThis;
+    static inline NiSingleShaderMaterialLibrary* ms_pkThis;
 };

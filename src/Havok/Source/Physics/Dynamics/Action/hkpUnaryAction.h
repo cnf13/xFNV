@@ -9,19 +9,19 @@ class hkpEntity;
 // supplies applyAction, getPhantoms and clone.
 class hkpUnaryAction : public hkpAction {
 public:
-	hkpUnaryAction(hkpEntity* apEntity, hkUlong auiUserData);
-	hkpUnaryAction(int32_t aiFinishing);
-	~hkpUnaryAction() override;
+    hkpUnaryAction(hkpEntity* apEntity, hkUlong auiUserData);
+    hkpUnaryAction(int32_t aiFinishing);
+    ~hkpUnaryAction() override;
 
-	const hkClass* getClassType() const override;
-	void getEntities(hkArray<hkpEntity*>& entitiesOut) override;
-	void entityRemovedCallback(hkpEntity* entity) override;
+    const hkClass* getClassType() const override;
+    void getEntities(hkArray<hkpEntity*>& entitiesOut) override;
+    void entityRemovedCallback(hkpEntity* entity) override;
 
-	// Releases the current entity (taking it off the world's action lists first), then holds entity and puts it
-	// there.
-	void setEntity(hkpEntity* entity);
+    // Releases the current entity (taking it off the world's action lists first), then holds entity and puts it
+    // there.
+    void setEntity(hkpEntity* entity);
 
-	hkpEntity* m_entity;
+    hkpEntity* m_entity;
 };
 
 // The class's reflection record.

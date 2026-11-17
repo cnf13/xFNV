@@ -13,16 +13,15 @@ T fr2AddSaturated(T val1, T val2);
 
 // The exact sum (in double, which holds every integer sum), clamped to T's range.
 template <typename T>
-T fr2AddSaturated(T val1, T val2)
-{
-	double dSum = static_cast<double>(val1) + static_cast<double>(val2);
-	if (dSum < static_cast<double>(std::numeric_limits<T>::lowest())) {
-		return std::numeric_limits<T>::lowest();
-	}
-	if (dSum > static_cast<double>(std::numeric_limits<T>::max())) {
-		return std::numeric_limits<T>::max();
-	}
-	return static_cast<T>(dSum);
+T fr2AddSaturated(T val1, T val2) {
+    double dSum = static_cast<double>(val1) + static_cast<double>(val2);
+    if (dSum < static_cast<double>(std::numeric_limits<T>::lowest())) {
+        return std::numeric_limits<T>::lowest();
+    }
+    if (dSum > static_cast<double>(std::numeric_limits<T>::max())) {
+        return std::numeric_limits<T>::max();
+    }
+    return static_cast<T>(dSum);
 }
 
 // The float instance reports a NaN argument and saturates an infinite or NaN sum by its sign; the short
@@ -41,8 +40,8 @@ bool fr2CheckFileExists(const std::string& fname);
 
 // outRoot + "." + ext, or the first outRoot + N + "." + ext (N counting from 1) whose file under path does not exist,
 // built at _Result, which it returns (cdecl, the hidden result first).
-std::string* futComposeNewFname(std::string* _Result, const std::string& path,
-	const std::string& outRoot, const std::string& ext);
+std::string*
+futComposeNewFname(std::string* _Result, const std::string& path, const std::string& outRoot, const std::string& ext);
 
 // ceil(log2(a)), through fr2Log2Floor.
 uint32_t fr2Log2Ceil(uint32_t a);

@@ -5,5 +5,5 @@
 // A model used as a texture.
 class BGSTextureModel : public TESModel {
 public:
-	~BGSTextureModel() override;
+    ~BGSTextureModel() override;
 };

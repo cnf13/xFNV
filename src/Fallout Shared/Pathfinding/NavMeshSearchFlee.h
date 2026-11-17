@@ -12,25 +12,30 @@ class PathingRequestFlee;
 // and how far to go from it.
 class NavMeshSearchFlee : public AStarSearch<NavMeshSearchNode, NavMeshSearchLink> {
 public:
-	NavMeshSearchFlee();
-	~NavMeshSearchFlee() override;
+    NavMeshSearchFlee();
+    ~NavMeshSearchFlee() override;
 
-	bool GetNodeConnections(const AStarNode<NavMeshSearchNode, NavMeshSearchLink>* apNode,
-		BSSimpleArray<AStarNode<NavMeshSearchNode, NavMeshSearchLink>*, 1024>* apRetNodes) override;
-	bool IsGoalNode(const AStarNode<NavMeshSearchNode, NavMeshSearchLink>* apNode) override;
+    bool GetNodeConnections(
+        const AStarNode<NavMeshSearchNode, NavMeshSearchLink>* apNode,
+        BSSimpleArray<AStarNode<NavMeshSearchNode, NavMeshSearchLink>*, 1024>* apRetNodes
+    ) override;
+    bool IsGoalNode(const AStarNode<NavMeshSearchNode, NavMeshSearchLink>* apNode) override;
 
-	bool BuildNodePath(const PathingRequestFlee* apRequest, const NavMeshSearchNode& aStartNode,
-		BSSimpleArray<NavMeshSearchNode, 1024>* apReturnNodeArray,
-		BSSimpleArray<NavMeshSearchLink, 1024>* apReturnLinkArray);
-	void SetNodeData(AStarNode<NavMeshSearchNode, NavMeshSearchLink>* apNode, NavMesh* apNavMesh, uint16_t aiTriangle);
-	uint32_t GetKeyForNode(NavMesh* apNavMesh, uint16_t aiTri);
+    bool BuildNodePath(
+        const PathingRequestFlee* apRequest,
+        const NavMeshSearchNode& aStartNode,
+        BSSimpleArray<NavMeshSearchNode, 1024>* apReturnNodeArray,
+        BSSimpleArray<NavMeshSearchLink, 1024>* apReturnLinkArray
+    );
+    void SetNodeData(AStarNode<NavMeshSearchNode, NavMeshSearchLink>* apNode, NavMesh* apNavMesh, uint16_t aiTriangle);
+    uint32_t GetKeyForNode(NavMesh* apNavMesh, uint16_t aiTri);
 
-	static void operator delete(void* apMemory);
+    static void operator delete(void* apMemory);
 
-	const PathingRequestFlee* pCurrentRequest;
-	NavMeshSearchNode StartNode;
-	NiPoint3 AvoidNodeCenter;
-	float fDistanceUpperBound;
-	bool bFavorGoingTowardsGoal;
-	NiPoint3 GoalLocation;
+    const PathingRequestFlee* pCurrentRequest;
+    NavMeshSearchNode StartNode;
+    NiPoint3 AvoidNodeCenter;
+    float fDistanceUpperBound;
+    bool bFavorGoingTowardsGoal;
+    NiPoint3 GoalLocation;
 };

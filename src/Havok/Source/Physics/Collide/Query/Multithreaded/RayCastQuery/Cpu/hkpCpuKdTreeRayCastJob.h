@@ -12,22 +12,22 @@ struct hkpWorldRayCastInput;
 // the command's results.
 class hkKdTreeCpuBroadphaseBundleCastCollector : public hkKdTreeBundleCastCollector {
 public:
-	hkKdTreeCpuBroadphaseBundleCastCollector();
-	~hkKdTreeCpuBroadphaseBundleCastCollector() override;
+    hkKdTreeCpuBroadphaseBundleCastCollector();
+    ~hkKdTreeCpuBroadphaseBundleCastCollector() override;
 
-	// Slot 1.
-	void addMidPhaseHit(hkPrimitiveId primId, const hkVector4Comparison& mask) override;
-	// Slot 2.
-	void getHitFractions(hkVector4& hitFractions) const override;
+    // Slot 1.
+    void addMidPhaseHit(hkPrimitiveId primId, const hkVector4Comparison& mask) override;
+    // Slot 2.
+    void getHitFractions(hkVector4& hitFractions) const override;
 
-	// DeletingDestruct's free (the thread's Havok heap, blockFree with the object's size).
-	static void operator delete(void* apMemory);
+    // DeletingDestruct's free (the thread's Havok heap, blockFree with the object's size).
+    static void operator delete(void* apMemory);
 
-	const hkpCollisionFilter* m_filter;
-	// The four rays, one hkpWorldRayCastInput each.
-	const hkpWorldRayCastInput* m_originalInput;
-	hkKdTreeRayCastBundleCommand* m_command;
-	hkpShapeRayBundleCastInput m_workInput;
-	// Per ray, whether it has a hit yet.
-	int32_t m_numHits[4];
+    const hkpCollisionFilter* m_filter;
+    // The four rays, one hkpWorldRayCastInput each.
+    const hkpWorldRayCastInput* m_originalInput;
+    hkKdTreeRayCastBundleCommand* m_command;
+    hkpShapeRayBundleCastInput m_workInput;
+    // Per ray, whether it has a hit yet.
+    int32_t m_numHits[4];
 };

@@ -6,17 +6,17 @@
 // start-up and removes them at shut-down. Everything in it is static.
 class NiParticleSDM {
 public:
-	NiParticleSDM();
+    NiParticleSDM();
 
-	// Registers the stream loaders of the particle classes once.
-	static void Init();
-	// Unregisters the stream loaders Init registered.
-	static void Shutdown();
+    // Registers the stream loaders of the particle classes once.
+    static void Init();
+    // Unregisters the stream loaders Init registered.
+    static void Shutdown();
 
-	// Whether the loaders are registered.
-	static inline bool ms_bInitialized;
-	// How many NiParticleSDM objects were constructed.
-	static inline uint32_t siCounter;
+    // Whether the loaders are registered.
+    static inline bool ms_bInitialized;
+    // How many NiParticleSDM objects were constructed.
+    static inline uint32_t siCounter;
 };
 
 // The library's static object: one per file that includes this header; its constructor runs NiParticleSDM's Init the

@@ -11,30 +11,30 @@ BSSearchPath::~BSSearchPath() {}
 
 // The engine has one search directory: the file path, returned once.
 bool BSSearchPath::GetNextSearchPath(char* apPath, uint32_t uiStringLen) {
-	if (m_uiNextPath) {
-		return false;
-	}
-	strcpy_s(apPath, 260, m_acFilePath);
-	++m_uiNextPath;
-	return true;
+    if (m_uiNextPath) {
+        return false;
+    }
+    strcpy_s(apPath, 260, m_acFilePath);
+    ++m_uiNextPath;
+    return true;
 }
 
 bool BSSearchPath::Access(char* apFile) {
-	return 1;
+    return 1;
 }
 
 void BSSearchPath::InitCallback() {
-	NiSearchPath::SetSearchPathCreateCallback(&BSSearchPath::GetBSSearchPath);
+    NiSearchPath::SetSearchPathCreateCallback(&BSSearchPath::GetBSSearchPath);
 }
 
 void BSSearchPath::operator delete(void* apMemory) {
-	MemoryManager_Singleton.Deallocate(apMemory);
+    MemoryManager_Singleton.Deallocate(apMemory);
 }
 
 NiSearchPath* BSSearchPath::GetBSSearchPath() {
-	void* pMemory = MemoryManager_Singleton.Allocate(sizeof(BSSearchPath));
-	if (!pMemory) {
-		return nullptr;
-	}
-	return ::new (pMemory) BSSearchPath;
+    void* pMemory = MemoryManager_Singleton.Allocate(sizeof(BSSearchPath));
+    if (!pMemory) {
+        return nullptr;
+    }
+    return ::new (pMemory) BSSearchPath;
 }

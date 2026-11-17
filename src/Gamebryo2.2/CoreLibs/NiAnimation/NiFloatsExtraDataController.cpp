@@ -29,128 +29,138 @@ NiFloatsExtraDataController::NiFloatsExtraDataController() : m_iFloatsExtraDataI
 NiFloatsExtraDataController::~NiFloatsExtraDataController() {}
 
 const NiRTTI* NiFloatsExtraDataController::GetRTTI() const {
-	return &ms_RTTI;
+    return &ms_RTTI;
 }
 
 NiObject* NiFloatsExtraDataController::CreateClone(NiCloningProcess& kCloning) {
-	void* pkObject = NiMemObject::operator new(sizeof(NiFloatsExtraDataController));
-	NiFloatsExtraDataController* pkObject_2 = 0;
-	if (pkObject) {
-		pkObject_2 = ::new (pkObject) NiFloatsExtraDataController;
-	}
-	CopyMembers(pkObject_2, kCloning);
-	pkObject_2->m_iFloatsExtraDataIndex = m_iFloatsExtraDataIndex;
-	return pkObject_2;
+    void* pkObject = NiMemObject::operator new(sizeof(NiFloatsExtraDataController));
+    NiFloatsExtraDataController* pkObject_2 = 0;
+    if (pkObject) {
+        pkObject_2 = ::new (pkObject) NiFloatsExtraDataController;
+    }
+    CopyMembers(pkObject_2, kCloning);
+    pkObject_2->m_iFloatsExtraDataIndex = m_iFloatsExtraDataIndex;
+    return pkObject_2;
 }
 
 // Files before 10.1.0.104 also store the link to an old-style float data, which LinkObject resolves.
 void NiFloatsExtraDataController::LoadBinary(NiStream& kStream) {
-	NiExtraDataController::LoadBinary(kStream);
-	NiStreamLoadBinary(kStream, m_iFloatsExtraDataIndex);
-	if (kStream.GetFileVersion() < NiStream::GetVersion(10, 1, 0, 104))
-		kStream.ReadLinkID();
+    NiExtraDataController::LoadBinary(kStream);
+    NiStreamLoadBinary(kStream, m_iFloatsExtraDataIndex);
+    if (kStream.GetFileVersion() < NiStream::GetVersion(10, 1, 0, 104)) {
+        kStream.ReadLinkID();
+    }
 }
 
 // Files older than 10.1.0.104 carry a link to old-style float data; it becomes a float interpolator, collapsed.
 void NiFloatsExtraDataController::LinkObject(NiStream& kStream) {
-	NiExtraDataController::LinkObject(kStream);
-	if (kStream.GetFileVersion() < NiStream::GetVersion(10, 1, 0, 104)) {
-		NiFloatData* pkData = static_cast<NiFloatData*>(kStream.GetObjectFromLinkID());
-		void* pvMem = NiMemObject::operator new(sizeof(NiFloatInterpolator));
-		NiFloatInterpolator* pkInterp = pvMem ? ::new (pvMem) NiFloatInterpolator(pkData) : nullptr;
-		m_spInterpolator = pkInterp;
-		m_spInterpolator->Collapse();
-	}
+    NiExtraDataController::LinkObject(kStream);
+    if (kStream.GetFileVersion() < NiStream::GetVersion(10, 1, 0, 104)) {
+        NiFloatData* pkData = static_cast<NiFloatData*>(kStream.GetObjectFromLinkID());
+        void* pvMem = NiMemObject::operator new(sizeof(NiFloatInterpolator));
+        NiFloatInterpolator* pkInterp = pvMem ? ::new (pvMem) NiFloatInterpolator(pkData) : nullptr;
+        m_spInterpolator = pkInterp;
+        m_spInterpolator->Collapse();
+    }
 }
 
 bool NiFloatsExtraDataController::RegisterStreamables(NiStream& kStream) {
-	return NiExtraDataController::RegisterStreamables(kStream);
+    return NiExtraDataController::RegisterStreamables(kStream);
 }
 
 void NiFloatsExtraDataController::SaveBinary(NiStream& kStream) {
-	NiExtraDataController::SaveBinary(kStream);
-	NiStreamSaveBinary(kStream, m_iFloatsExtraDataIndex);
+    NiExtraDataController::SaveBinary(kStream);
+    NiStreamSaveBinary(kStream, m_iFloatsExtraDataIndex);
 }
 
 bool NiFloatsExtraDataController::IsEqual(NiObject* pkObject) {
-	if (!NiExtraDataController::IsEqual(pkObject))
-		return false;
+    if (!NiExtraDataController::IsEqual(pkObject)) {
+        return false;
+    }
 
-	return m_iFloatsExtraDataIndex == static_cast<NiFloatsExtraDataController*>(pkObject)->m_iFloatsExtraDataIndex;
+    return m_iFloatsExtraDataIndex == static_cast<NiFloatsExtraDataController*>(pkObject)->m_iFloatsExtraDataIndex;
 }
 
 void NiFloatsExtraDataController::GetViewerStrings(NiTPrimitiveArray<char*>* pkStrings) {
-	NiExtraDataController::GetViewerStrings(pkStrings);
-	pkStrings->Add(NiGetViewerString(ms_RTTI.GetName()));
-	pkStrings->Add(NiGetViewerString("m_iFloatsExtraDataIndex", m_iFloatsExtraDataIndex));
+    NiExtraDataController::GetViewerStrings(pkStrings);
+    pkStrings->Add(NiGetViewerString(ms_RTTI.GetName()));
+    pkStrings->Add(NiGetViewerString("m_iFloatsExtraDataIndex", m_iFloatsExtraDataIndex));
 }
 
 // A manager-controlled controller always samples its interpolator, at the invalid time (-FLT_MAX).
 void NiFloatsExtraDataController::Update(NiUpdateData& UpdateData) {
-	if (m_usFlags & MANAGERCONTROLLED_MASK)
-		m_fScaledTime = -FLT_MAX;
-	else if (DontDoUpdate(UpdateData.fTime) && (!m_spInterpolator || !m_spInterpolator->AlwaysUpdate()))
-		return;
+    if (m_usFlags & MANAGERCONTROLLED_MASK) {
+        m_fScaledTime = -FLT_MAX;
+    }
+    else if (DontDoUpdate(UpdateData.fTime) && (!m_spInterpolator || !m_spInterpolator->AlwaysUpdate())) {
+        return;
+    }
 
-	if (!m_spInterpolator)
-		return;
+    if (!m_spInterpolator) {
+        return;
+    }
 
-	float fValue;
-	if (m_spInterpolator->Update(m_fScaledTime, m_pkTarget, fValue) && m_spExtraData) {
-		static_cast<NiFloatsExtraData*>(static_cast<NiExtraData*>(m_spExtraData))
-			->SetValue(m_iFloatsExtraDataIndex, fValue);
-	}
+    float fValue;
+    if (m_spInterpolator->Update(m_fScaledTime, m_pkTarget, fValue) && m_spExtraData) {
+        static_cast<NiFloatsExtraData*>(static_cast<NiExtraData*>(m_spExtraData))
+            ->SetValue(m_iFloatsExtraDataIndex, fValue);
+    }
 }
 
 const char* NiFloatsExtraDataController::GetCtlrID() {
-	if (m_kCtlrID.GetHandle() == NiGlobalStringTable::NULL_STRING) {
-		m_kCtlrID = static_cast<const char*>(nullptr);
-		const char* pcName = m_kExtraDataName;
-		if (pcName) {
-			size_t stLen = strlen(pcName) + 15;
-			char* pcID = static_cast<char*>(_NiMalloc(stLen));
-			NiSprintf(pcID, stLen, "%s[%d]", pcName, m_iFloatsExtraDataIndex);
-			m_kCtlrID = static_cast<const char*>(pcID);
-			_NiFree(pcID);
-		}
-	}
-	return m_kCtlrID;
+    if (m_kCtlrID.GetHandle() == NiGlobalStringTable::NULL_STRING) {
+        m_kCtlrID = static_cast<const char*>(nullptr);
+        const char* pcName = m_kExtraDataName;
+        if (pcName) {
+            size_t stLen = strlen(pcName) + 15;
+            char* pcID = static_cast<char*>(_NiMalloc(stLen));
+            NiSprintf(pcID, stLen, "%s[%d]", pcName, m_iFloatsExtraDataIndex);
+            m_kCtlrID = static_cast<const char*>(pcID);
+            _NiFree(pcID);
+        }
+    }
+    return m_kCtlrID;
 }
 
 NiInterpolator* NiFloatsExtraDataController::CreatePoseInterpolator(uint16_t usIndex) {
-	void* v3 = NiMemObject::operator new(sizeof(NiFloatInterpolator));
-	if (!v3) {
-		return nullptr;
-	}
-	float v5 = static_cast<NiFloatsExtraData*>(m_spExtraData.m_pObject)->GetValue(m_iFloatsExtraDataIndex);
-	return ::new (v3) NiFloatInterpolator(v5);
+    void* v3 = NiMemObject::operator new(sizeof(NiFloatInterpolator));
+    if (!v3) {
+        return nullptr;
+    }
+    float v5 = static_cast<NiFloatsExtraData*>(m_spExtraData.m_pObject)->GetValue(m_iFloatsExtraDataIndex);
+    return ::new (v3) NiFloatInterpolator(v5);
 }
 
 // apInterp must be a NiFloatInterpolator; the extra data is not null-checked.
 void NiFloatsExtraDataController::SynchronizePoseInterpolator(NiInterpolator* apInterp, uint16_t) {
-	NiFloatInterpolator* pkInterp = apInterp
-		? static_cast<NiFloatInterpolator*>(apInterp->DynamicCastMember(&NiFloatInterpolator::ms_RTTI))
-		: nullptr;
-	NiFloatsExtraData* pkData = static_cast<NiFloatsExtraData*>(static_cast<NiExtraData*>(m_spExtraData));
-	pkInterp->SetPoseValue(pkData->GetValue(m_iFloatsExtraDataIndex));
+    NiFloatInterpolator* pkInterp = apInterp
+        ? static_cast<NiFloatInterpolator*>(apInterp->DynamicCastMember(&NiFloatInterpolator::ms_RTTI))
+        : nullptr;
+    NiFloatsExtraData* pkData = static_cast<NiFloatsExtraData*>(static_cast<NiExtraData*>(m_spExtraData));
+    pkInterp->SetPoseValue(pkData->GetValue(m_iFloatsExtraDataIndex));
 }
 
 // A new blend interpolator for the animated float, which the controller then feeds its sources. bManagerControlled and
 // ucArraySize are passed on to the constructor as the caller's whole int32_t arguments.
-NiBlendInterpolator* NiFloatsExtraDataController::CreateBlendInterpolator(uint16_t, int32_t bManagerControlled, bool,
-	float fWeightThreshold, int32_t ucArraySize) const {
-	void* pvMem = NiMemObject::operator new(sizeof(NiBlendFloatInterpolator));
-	return pvMem ? ::new (pvMem) NiBlendFloatInterpolator(bManagerControlled, fWeightThreshold, ucArraySize) : nullptr;
+NiBlendInterpolator* NiFloatsExtraDataController::CreateBlendInterpolator(
+    uint16_t,
+    int32_t bManagerControlled,
+    bool,
+    float fWeightThreshold,
+    int32_t ucArraySize
+) const {
+    void* pvMem = NiMemObject::operator new(sizeof(NiBlendFloatInterpolator));
+    return pvMem ? ::new (pvMem) NiBlendFloatInterpolator(bManagerControlled, fWeightThreshold, ucArraySize) : nullptr;
 }
 
 bool NiFloatsExtraDataController::InterpolatorIsCorrectType(NiInterpolator* pkInterpolator, uint16_t) const {
-	return pkInterpolator->IsFloatValueSupported();
+    return pkInterpolator->IsFloatValueSupported();
 }
 
 NiObject* NiFloatsExtraDataController::CreateObject() {
-	void* pkObject = NiMemObject::operator new(sizeof(NiFloatsExtraDataController));
-	if (!pkObject) {
-		return 0;
-	}
-	return ::new (pkObject) NiFloatsExtraDataController;
+    void* pkObject = NiMemObject::operator new(sizeof(NiFloatsExtraDataController));
+    if (!pkObject) {
+        return 0;
+    }
+    return ::new (pkObject) NiFloatsExtraDataController;
 }

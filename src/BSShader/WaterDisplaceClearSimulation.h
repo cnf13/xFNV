@@ -5,8 +5,8 @@
 // A water image-space shader.
 class WaterDisplaceClearSimulation : public ImageSpaceShader {
 public:
-	WaterDisplaceClearSimulation();
-	~WaterDisplaceClearSimulation() override;
+    WaterDisplaceClearSimulation();
+    ~WaterDisplaceClearSimulation() override;
 
-	void ReloadShaders() override;
+    void ReloadShaders() override;
 };

@@ -5,5 +5,5 @@
 NiAllocator::~NiAllocator() {}
 
 void NiAllocator::operator delete(void* apMemory) {
-	MemoryManager_Singleton.Deallocate(apMemory);
+    MemoryManager_Singleton.Deallocate(apMemory);
 }

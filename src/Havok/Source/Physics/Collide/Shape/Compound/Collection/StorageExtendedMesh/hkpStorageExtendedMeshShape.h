@@ -21,64 +21,64 @@ int32_t calcNumIndices(int32_t numTriangles, int32_t indicesPerTriangle);
 // of its vertices, indices and materials. The base is 16-byte aligned.
 class hkpStorageExtendedMeshShape : public hkpExtendedMeshShape {
 public:
-	struct Material : public hkpMeshMaterial {
-		static const hkClass& staticClass();
+    struct Material : public hkpMeshMaterial {
+        static const hkClass& staticClass();
 
-		hkHalf m_restitution;
-		hkHalf m_friction;
-		hkUlong m_userData;
-	};
+        hkHalf m_restitution;
+        hkHalf m_friction;
+        hkUlong m_userData;
+    };
 
-	// The copies of one triangles subpart's data.
-	class MeshSubpartStorage : public hkReferencedObject {
-	public:
-		MeshSubpartStorage();
-		MeshSubpartStorage(hkFinishLoadedObjectFlag flag);
-		~MeshSubpartStorage() override;
+    // The copies of one triangles subpart's data.
+    class MeshSubpartStorage : public hkReferencedObject {
+    public:
+        MeshSubpartStorage();
+        MeshSubpartStorage(hkFinishLoadedObjectFlag flag);
+        ~MeshSubpartStorage() override;
 
-		static const hkClass& staticClass();
+        static const hkClass& staticClass();
 
-		hkArray<hkVector4> m_vertices;
-		hkArray<uint8_t> m_indices8;
-		hkArray<uint16_t> m_indices16;
-		hkArray<uint32_t> m_indices32;
-		hkArray<uint8_t> m_materialIndices;
-		hkArray<Material> m_materials;
-		hkArray<hkpNamedMeshMaterial> m_namedMaterials;
-		hkArray<uint16_t> m_materialIndices16;
-	};
+        hkArray<hkVector4> m_vertices;
+        hkArray<uint8_t> m_indices8;
+        hkArray<uint16_t> m_indices16;
+        hkArray<uint32_t> m_indices32;
+        hkArray<uint8_t> m_materialIndices;
+        hkArray<Material> m_materials;
+        hkArray<hkpNamedMeshMaterial> m_namedMaterials;
+        hkArray<uint16_t> m_materialIndices16;
+    };
 
-	// The copies of one shapes subpart's data.
-	class ShapeSubpartStorage : public hkReferencedObject {
-	public:
-		ShapeSubpartStorage();
-		ShapeSubpartStorage(hkFinishLoadedObjectFlag flag);
-		~ShapeSubpartStorage() override;
+    // The copies of one shapes subpart's data.
+    class ShapeSubpartStorage : public hkReferencedObject {
+    public:
+        ShapeSubpartStorage();
+        ShapeSubpartStorage(hkFinishLoadedObjectFlag flag);
+        ~ShapeSubpartStorage() override;
 
-		static const hkClass& staticClass();
+        static const hkClass& staticClass();
 
-		hkArray<uint8_t> m_materialIndices;
-		hkArray<Material> m_materials;
-		hkArray<uint16_t> m_materialIndices16;
-	};
+        hkArray<uint8_t> m_materialIndices;
+        hkArray<Material> m_materials;
+        hkArray<uint16_t> m_materialIndices16;
+    };
 
-	// hkpStorageExtendedMeshShape::Members: the member table hkpStorageExtendedMeshShapeClass describes the class with.
-	using MembersArray = const hkClassMember[2];
+    // hkpStorageExtendedMeshShape::Members: the member table hkpStorageExtendedMeshShapeClass describes the class with.
+    using MembersArray = const hkClassMember[2];
 
-	hkpStorageExtendedMeshShape(hkFinishLoadedObjectFlag flag);
-	hkpStorageExtendedMeshShape(float a1, int32_t a2);
-	hkpStorageExtendedMeshShape(const hkpExtendedMeshShape* mesh);
-	~hkpStorageExtendedMeshShape() override;
+    hkpStorageExtendedMeshShape(hkFinishLoadedObjectFlag flag);
+    hkpStorageExtendedMeshShape(float a1, int32_t a2);
+    hkpStorageExtendedMeshShape(const hkpExtendedMeshShape* mesh);
+    ~hkpStorageExtendedMeshShape() override;
 
-	void addTrianglesSubpart(const TrianglesSubpart& partIn) override;
-	int32_t addShapesSubpart(const ShapesSubpart& partIn) override;
+    void addTrianglesSubpart(const TrianglesSubpart& partIn) override;
+    int32_t addShapesSubpart(const ShapesSubpart& partIn) override;
 
-	static const hkClass& staticClass();
+    static const hkClass& staticClass();
 
-	hkArray<MeshSubpartStorage*> m_meshstorage;
-	hkArray<ShapeSubpartStorage*> m_shapestorage;
+    hkArray<MeshSubpartStorage*> m_meshstorage;
+    hkArray<ShapeSubpartStorage*> m_shapestorage;
 
-	static MembersArray Members;
+    static MembersArray Members;
 };
 
 extern hkClass hkpStorageExtendedMeshShapeMaterialClass;

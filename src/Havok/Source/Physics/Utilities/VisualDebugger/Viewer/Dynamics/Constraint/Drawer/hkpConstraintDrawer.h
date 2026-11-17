@@ -13,41 +13,44 @@ class hkTransform;
 // the pivots and m_primitiveDrawer.
 class hkpConstraintDrawer {
 public:
-	hkpConstraintDrawer();
+    hkpConstraintDrawer();
 
-	// Scales the sizes the drawer draws with.
-	void setScale(float scale);
+    // Scales the sizes the drawer draws with.
+    void setScale(float scale);
 
 protected:
-	// Draws the two bodies' frames: arrows along the columns of m_RA at m_bodyAWPos and of m_RB at m_bodyBWPos.
-	void drawBodyFrames(int32_t id, int32_t tag);
-	// Draws the two pivots.
-	void drawPivots(int32_t id, int32_t tag);
-	// Reads the bodies' transforms into refLocalToWorld and attLocalToWorld and sets the body positions and
-	// rotations from them.
-	void updateCommonParameters(const hkpConstraintInstance* constraint, hkTransform& refLocalToWorld,
-		hkTransform& attLocalToWorld);
+    // Draws the two bodies' frames: arrows along the columns of m_RA at m_bodyAWPos and of m_RB at m_bodyBWPos.
+    void drawBodyFrames(int32_t id, int32_t tag);
+    // Draws the two pivots.
+    void drawPivots(int32_t id, int32_t tag);
+    // Reads the bodies' transforms into refLocalToWorld and attLocalToWorld and sets the body positions and
+    // rotations from them.
+    void updateCommonParameters(
+        const hkpConstraintInstance* constraint,
+        hkTransform& refLocalToWorld,
+        hkTransform& attLocalToWorld
+    );
 
 public:
-	void setLineLength(float lineLength);
-	void setArcRadius(float arcRadius);
-	void setNumArcSegments(int32_t numSegments);
-	void setPivotSize(float size);
-	void setArrowSize(float arrrowSize);
+    void setLineLength(float lineLength);
+    void setArcRadius(float arcRadius);
+    void setNumArcSegments(int32_t numSegments);
+    void setPivotSize(float size);
+    void setArrowSize(float arrrowSize);
 
-	float m_lineLength;
-	float m_arcRadius;
-	float m_pivotSize;
-	float m_arrowSize;
-	float m_coneSize;
-	float m_planeSize;
-	int32_t m_numArcSegments;
-	float m_scale;
-	hkVector4 m_bodyAWPos;
-	hkVector4 m_bodyBWPos;
-	hkVector4 m_bodyAWPivot;
-	hkVector4 m_bodyBWPivot;
-	hkRotation m_RA;
-	hkRotation m_RB;
-	hkpPrimitiveDrawer m_primitiveDrawer;
+    float m_lineLength;
+    float m_arcRadius;
+    float m_pivotSize;
+    float m_arrowSize;
+    float m_coneSize;
+    float m_planeSize;
+    int32_t m_numArcSegments;
+    float m_scale;
+    hkVector4 m_bodyAWPos;
+    hkVector4 m_bodyBWPos;
+    hkVector4 m_bodyAWPivot;
+    hkVector4 m_bodyBWPivot;
+    hkRotation m_RA;
+    hkRotation m_RB;
+    hkpPrimitiveDrawer m_primitiveDrawer;
 };

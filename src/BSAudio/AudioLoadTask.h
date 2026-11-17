@@ -10,20 +10,20 @@ class BSGameSound;
 // include cycle back to BSGameSound.h.
 class AudioLoadTask : public QueuedFileEntry {
 public:
-	AudioLoadTask(BSGameSound* apSound);
-	~AudioLoadTask() override;
+    AudioLoadTask(BSGameSound* apSound);
+    ~AudioLoadTask() override;
 
-	void Run() override;
-	void Finish() override;
-	void Cancel(BS_TASK_STATE aePreviousState, void* apTaskOwner) override;
-	bool GetDescription(char* apDescription, uint32_t aiBufferSize) override;
-	uint8_t GetFileIndex() override;
+    void Run() override;
+    void Finish() override;
+    void Cancel(BS_TASK_STATE aePreviousState, void* apTaskOwner) override;
+    bool GetDescription(char* apDescription, uint32_t aiBufferSize) override;
+    uint8_t GetFileIndex() override;
 
-	static void operator delete(void* apMemory);
+    static void operator delete(void* apMemory);
 
-	BSGameSound* pSound;
-	uint8_t padding34[4];
+    BSGameSound* pSound;
+    uint8_t padding34[4];
 
-	static inline int32_t uiLastID;
-	static inline int32_t uiLastTime;
+    static inline int32_t uiLastID;
+    static inline int32_t uiLastTime;
 };

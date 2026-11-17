@@ -25,84 +25,150 @@ void BSClampUInt32(uint32_t* a1, uint32_t a2, uint32_t a3);
 // The combat formulas: armor, damage and weapon scoring.
 class CombatFormulas {
 public:
-	// The condition damage a shot does to apActor's weapon: fDamageToWeaponValue through the condition ammo effects of
-	// the weapon's ammo.
-	static float CalcDamageToWeapon(Actor* apActor);
-	// The arm condition for the weapon type: per type, GetBodyPartCondition of one arm actor value or the average of
-	// two.
-	static float GetArmCondition(ActorValueOwner* apActor, WEAPON_TYPE aeWeaponType);
-	// The VATS chance to hit apTarget (a limb, a held weapon or the whole target) as a fraction, capped at
-	// fVATSMaxChance.
-	static float GetVATSChanceToHit(ActorValueOwner* apActor, TESObjectREFR* apTarget, TESObjectWEAP* apWeapon,
-		float afWeaponCondition, float afReach, float afGunSkill, BGSBodyPart* apTargetedLimb,
-		TESObjectWEAP* apTargetedWeapon, float afScreenPercentage, float afTargetRange, float afTargetSize,
-		IDebugText* apDebugText);
-	// The weapon's spread with the actor's drift afDrift.
-	static float GetGunSpread(Actor* apActor, TESObjectWEAP* apWeapon, float afDrift, bool abIronSights,
-		bool abCrouching, bool abWalking, bool abRunning);
-	// The arrow's gravity factor from its power, the marksman skill and luck.
-	static float GetArrowGravity(float afArrowPower, float afMarksmanSkill, int32_t aiLuck);
-	// The armor rating scaled by the item's condition.
-	static float CalcArmorRating(uint16_t asArmorRating, float afcondition);
-	// The weapon's damage shown in the menus at condition afCondition.
-	static float CalcWeaponDamageForDisplay(TESObjectWEAP* apWeapon, float afCondition, ItemChange* apItem,
-		TESAmmo* apLoadedAmmo);
-	// The combat score of the weapon held by the actor or actor base.
-	static float CalcCombatWeaponDPS(TESForm* apActorForm, TESObjectWEAP* apWeapon, float afCondition,
-		TESCombatStyle* apCombatStyle, ItemChange* apItem, TESAmmo* apAmmo);
-	// The damage of the weapon (null: hand to hand) the actor holds.
-	static float CalcWeaponDamage(ActorValueOwner* apActor, TESObjectWEAP* apWeapon, float afCondition,
-		float afDamageMultiplier, bool abIgnoreFatigue, bool abIgnoreExplosion, ItemChange* apItem,
-		bool abUseCurrentAmmo);
-	// The hand to hand damage; the fatigue damage is half of it unless the opponent is knocked out.
-	static void CalcHandToHandDamage(ActorValueOwner* apActor, bool abOpponentKnockedOut, float& afHealthDamage,
-		float& afFatigueDamage);
-	// The damage multiplier of a power attack: fDamagePowerAttackBonus, whatever the skill and the power attack group.
-	static float GetPowerAttackDamageMultiplier(int32_t aiWeaponSkill, ANIM_GROUP_ENUM aePowerAttackGroup);
-	// A weapon score scaled by the melee or hand-to-hand game setting.
-	static float ChooseMeleeWeapon(float afWeaponDamage, int32_t aiArmorRating, bool abHandToHand);
-	// Returns the scaled reach.
-	static float CalcWeaponReach(float afReachMultiplier);
-	static float CalcExplosionPowerDistance(float afExplosionRadius, float afPower);
-	static float CalcCreatureDamage(float afFatiguePercent, int32_t aiBaseDamage);
-	// The force a killing blow of afDamage applies, scaled between the force settings (ranged or melee).
-	static float GetDeathForce(float afDamage, bool abRanged);
-	static float CalcExplosionPower(float afExplosionRadius, float afDistance);
-	static float CalcExplosionDamageDistance(float afExplosionRadius, float afBaseExplosionDamage,
-		float afActualDamage);
-	static float CalcDamageToArmor(float afHealthDamage, float afArmorRatingPercent);
-	// The number of blood splatters on the screen for a hit of fDamage (at least 0).
-	static int32_t GetScreenSplatterCount(float fDamage);
-	// The condition of a limb actor value: 1 outside the limb conditions, else the actor value capped at 100, and
-	// when abRaw is false, 1 when that is positive and 0 otherwise.
-	static float GetBodyPartCondition(ActorValueOwner* apActor, ActorValue::Index aiWhich, bool abRaw);
-	static float GetKnockbackSpeed(ActorValueOwner* apActor, int32_t aiDamage);
-	static float CalcBlock(int32_t aiSkill);
-	// A random value between afMin and afMax in either order; the bound itself when they are equal.
-	static float GetRandomBetween(float afMin, float afMax);
-	static float ChooseAttack(TESCombatStyle* apCombatStyle, int32_t aiSkill, int32_t aiLuck, bool abTargetAttacking,
-		bool abHandToHand, bool abTargetRecoiling, bool abTargetUnconscious, bool abTargetBlocking);
-	static float ChooseBlock(TESCombatStyle* apCombatStyle, int32_t aiSkill, int32_t aiLuck, bool abHasShield,
-		bool abTargetAttacking);
-	static float ChooseDodge(TESCombatStyle* apCombatStyle, int32_t aiWalkSpeed, float afFatiguePercent,
-		bool abTargetAttacking);
-	static float GetWeaponConditionReloadJamMult(int32_t aiCondition);
-	static float ApplyArmorConditionScaling(float fArmorHealthPercent);
-	static float CalcTargetedLimbDamage(ActorValueOwner* apTarget, BGSBodyPart* apBodyPart, float afHealthDamage);
-	static float GetCriticalChance(ActorValueOwner* apActor, TESObjectWEAP* apWeapon);
-	static bool ChoosePowerAttack(TESCombatStyle* apCombatStyle, float afFatiguePercent, bool abTargetRecoiling,
-		bool abTargetUnconscious, bool abEncumbered);
-	static uint16_t SelectDodgeDirection(TESCombatStyle* apCombatStyle, bool abDodgerAttacking, bool abTargetAttacking,
-		float fTargetDistance, float fWeaponReach, bool abFavorLeftRight, bool abTargetUsingRanged,
-		uint16_t asMovementRestrictions);
-	static float GetWeaponRateOfFire(ActorValueOwner* apActor, TESObjectWEAP* apWeapon, ItemChange* apItem);
-	static float ApplyWeaponConditionScaling(float fWeapHealthPercent);
-	static void CheckDismemberOrExplode(ActorValueOwner* apAttacker, TESObjectWEAP* apWeapon, int32_t aiExplodeChance,
-		int32_t aiDismemberBonus, int32_t aiExplodeBonus, bool abExplodeChanceAbsolute, bool& abDismember,
-		bool& abExplode);
-	static float GetWeaponStrengthRequirementModifier(uint32_t aiSTRReq, uint32_t aiSTR, uint32_t aiSTRMod);
-	static float GetWeaponSkillRequirementModifier(uint32_t aiSkillReq, uint32_t aiSkill, uint32_t aiSTRMod);
-	static double CalcExplosionDamage(BGSExplosion* apActorBase);
+    // The condition damage a shot does to apActor's weapon: fDamageToWeaponValue through the condition ammo effects of
+    // the weapon's ammo.
+    static float CalcDamageToWeapon(Actor* apActor);
+    // The arm condition for the weapon type: per type, GetBodyPartCondition of one arm actor value or the average of
+    // two.
+    static float GetArmCondition(ActorValueOwner* apActor, WEAPON_TYPE aeWeaponType);
+    // The VATS chance to hit apTarget (a limb, a held weapon or the whole target) as a fraction, capped at
+    // fVATSMaxChance.
+    static float GetVATSChanceToHit(
+        ActorValueOwner* apActor,
+        TESObjectREFR* apTarget,
+        TESObjectWEAP* apWeapon,
+        float afWeaponCondition,
+        float afReach,
+        float afGunSkill,
+        BGSBodyPart* apTargetedLimb,
+        TESObjectWEAP* apTargetedWeapon,
+        float afScreenPercentage,
+        float afTargetRange,
+        float afTargetSize,
+        IDebugText* apDebugText
+    );
+    // The weapon's spread with the actor's drift afDrift.
+    static float GetGunSpread(
+        Actor* apActor,
+        TESObjectWEAP* apWeapon,
+        float afDrift,
+        bool abIronSights,
+        bool abCrouching,
+        bool abWalking,
+        bool abRunning
+    );
+    // The arrow's gravity factor from its power, the marksman skill and luck.
+    static float GetArrowGravity(float afArrowPower, float afMarksmanSkill, int32_t aiLuck);
+    // The armor rating scaled by the item's condition.
+    static float CalcArmorRating(uint16_t asArmorRating, float afcondition);
+    // The weapon's damage shown in the menus at condition afCondition.
+    static float
+    CalcWeaponDamageForDisplay(TESObjectWEAP* apWeapon, float afCondition, ItemChange* apItem, TESAmmo* apLoadedAmmo);
+    // The combat score of the weapon held by the actor or actor base.
+    static float CalcCombatWeaponDPS(
+        TESForm* apActorForm,
+        TESObjectWEAP* apWeapon,
+        float afCondition,
+        TESCombatStyle* apCombatStyle,
+        ItemChange* apItem,
+        TESAmmo* apAmmo
+    );
+    // The damage of the weapon (null: hand to hand) the actor holds.
+    static float CalcWeaponDamage(
+        ActorValueOwner* apActor,
+        TESObjectWEAP* apWeapon,
+        float afCondition,
+        float afDamageMultiplier,
+        bool abIgnoreFatigue,
+        bool abIgnoreExplosion,
+        ItemChange* apItem,
+        bool abUseCurrentAmmo
+    );
+    // The hand to hand damage; the fatigue damage is half of it unless the opponent is knocked out.
+    static void CalcHandToHandDamage(
+        ActorValueOwner* apActor,
+        bool abOpponentKnockedOut,
+        float& afHealthDamage,
+        float& afFatigueDamage
+    );
+    // The damage multiplier of a power attack: fDamagePowerAttackBonus, whatever the skill and the power attack group.
+    static float GetPowerAttackDamageMultiplier(int32_t aiWeaponSkill, ANIM_GROUP_ENUM aePowerAttackGroup);
+    // A weapon score scaled by the melee or hand-to-hand game setting.
+    static float ChooseMeleeWeapon(float afWeaponDamage, int32_t aiArmorRating, bool abHandToHand);
+    // Returns the scaled reach.
+    static float CalcWeaponReach(float afReachMultiplier);
+    static float CalcExplosionPowerDistance(float afExplosionRadius, float afPower);
+    static float CalcCreatureDamage(float afFatiguePercent, int32_t aiBaseDamage);
+    // The force a killing blow of afDamage applies, scaled between the force settings (ranged or melee).
+    static float GetDeathForce(float afDamage, bool abRanged);
+    static float CalcExplosionPower(float afExplosionRadius, float afDistance);
+    static float
+    CalcExplosionDamageDistance(float afExplosionRadius, float afBaseExplosionDamage, float afActualDamage);
+    static float CalcDamageToArmor(float afHealthDamage, float afArmorRatingPercent);
+    // The number of blood splatters on the screen for a hit of fDamage (at least 0).
+    static int32_t GetScreenSplatterCount(float fDamage);
+    // The condition of a limb actor value: 1 outside the limb conditions, else the actor value capped at 100, and
+    // when abRaw is false, 1 when that is positive and 0 otherwise.
+    static float GetBodyPartCondition(ActorValueOwner* apActor, ActorValue::Index aiWhich, bool abRaw);
+    static float GetKnockbackSpeed(ActorValueOwner* apActor, int32_t aiDamage);
+    static float CalcBlock(int32_t aiSkill);
+    // A random value between afMin and afMax in either order; the bound itself when they are equal.
+    static float GetRandomBetween(float afMin, float afMax);
+    static float ChooseAttack(
+        TESCombatStyle* apCombatStyle,
+        int32_t aiSkill,
+        int32_t aiLuck,
+        bool abTargetAttacking,
+        bool abHandToHand,
+        bool abTargetRecoiling,
+        bool abTargetUnconscious,
+        bool abTargetBlocking
+    );
+    static float ChooseBlock(
+        TESCombatStyle* apCombatStyle,
+        int32_t aiSkill,
+        int32_t aiLuck,
+        bool abHasShield,
+        bool abTargetAttacking
+    );
+    static float
+    ChooseDodge(TESCombatStyle* apCombatStyle, int32_t aiWalkSpeed, float afFatiguePercent, bool abTargetAttacking);
+    static float GetWeaponConditionReloadJamMult(int32_t aiCondition);
+    static float ApplyArmorConditionScaling(float fArmorHealthPercent);
+    static float CalcTargetedLimbDamage(ActorValueOwner* apTarget, BGSBodyPart* apBodyPart, float afHealthDamage);
+    static float GetCriticalChance(ActorValueOwner* apActor, TESObjectWEAP* apWeapon);
+    static bool ChoosePowerAttack(
+        TESCombatStyle* apCombatStyle,
+        float afFatiguePercent,
+        bool abTargetRecoiling,
+        bool abTargetUnconscious,
+        bool abEncumbered
+    );
+    static uint16_t SelectDodgeDirection(
+        TESCombatStyle* apCombatStyle,
+        bool abDodgerAttacking,
+        bool abTargetAttacking,
+        float fTargetDistance,
+        float fWeaponReach,
+        bool abFavorLeftRight,
+        bool abTargetUsingRanged,
+        uint16_t asMovementRestrictions
+    );
+    static float GetWeaponRateOfFire(ActorValueOwner* apActor, TESObjectWEAP* apWeapon, ItemChange* apItem);
+    static float ApplyWeaponConditionScaling(float fWeapHealthPercent);
+    static void CheckDismemberOrExplode(
+        ActorValueOwner* apAttacker,
+        TESObjectWEAP* apWeapon,
+        int32_t aiExplodeChance,
+        int32_t aiDismemberBonus,
+        int32_t aiExplodeBonus,
+        bool abExplodeChanceAbsolute,
+        bool& abDismember,
+        bool& abExplode
+    );
+    static float GetWeaponStrengthRequirementModifier(uint32_t aiSTRReq, uint32_t aiSTR, uint32_t aiSTRMod);
+    static float GetWeaponSkillRequirementModifier(uint32_t aiSkillReq, uint32_t aiSkill, uint32_t aiSTRMod);
+    static double CalcExplosionDamage(BGSExplosion* apActorBase);
 };
 
 using WeaponConditionReloadJamSettingTable = Setting* [20];
@@ -747,12 +813,15 @@ extern SettingT<GameSettingCollection> iMessCrippledLimbExplodeBonus;
 
 using fWeaponConditionJam_t = SettingT<GameSettingCollection>* [10];
 inline fWeaponConditionJam_t fWeaponConditionJam{&fWeaponConditionJam1, &fWeaponConditionJam2, &fWeaponConditionJam3,
-	&fWeaponConditionJam4, &fWeaponConditionJam5, &fWeaponConditionJam6, &fWeaponConditionJam7, &fWeaponConditionJam8,
-	&fWeaponConditionJam9, &fWeaponConditionJam10};
+                                                 &fWeaponConditionJam4, &fWeaponConditionJam5, &fWeaponConditionJam6,
+                                                 &fWeaponConditionJam7, &fWeaponConditionJam8, &fWeaponConditionJam9,
+                                                 &fWeaponConditionJam10};
 
 // fWeaponConditionRateOfFire1 to fWeaponConditionRateOfFire10; the game never reads this array.
 using fWeaponConditionRateOfFire_t = SettingT<GameSettingCollection>* [10];
-inline fWeaponConditionRateOfFire_t fWeaponConditionRateOfFire{&fWeaponConditionRateOfFire1,
-	&fWeaponConditionRateOfFire2, &fWeaponConditionRateOfFire3, &fWeaponConditionRateOfFire4,
-	&fWeaponConditionRateOfFire5, &fWeaponConditionRateOfFire6, &fWeaponConditionRateOfFire7,
-	&fWeaponConditionRateOfFire8, &fWeaponConditionRateOfFire9, &fWeaponConditionRateOfFire10};
+inline fWeaponConditionRateOfFire_t fWeaponConditionRateOfFire{
+    &fWeaponConditionRateOfFire1, &fWeaponConditionRateOfFire2, &fWeaponConditionRateOfFire3,
+    &fWeaponConditionRateOfFire4, &fWeaponConditionRateOfFire5, &fWeaponConditionRateOfFire6,
+    &fWeaponConditionRateOfFire7, &fWeaponConditionRateOfFire8, &fWeaponConditionRateOfFire9,
+    &fWeaponConditionRateOfFire10
+};

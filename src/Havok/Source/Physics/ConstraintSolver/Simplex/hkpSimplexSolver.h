@@ -7,59 +7,59 @@
 // far the character had to be pushed off it.
 class hkpSurfaceConstraintInteraction {
 public:
-	enum hkpStatus : int32_t {
-		HK_STATUS_OK = 0x0,
-		HK_STATUS_3D_FAILURE = 0x1,
-		HK_STATUS_2D_FAILURE = 0x2,
-	};
+    enum hkpStatus : int32_t {
+        HK_STATUS_OK = 0x0,
+        HK_STATUS_3D_FAILURE = 0x1,
+        HK_STATUS_2D_FAILURE = 0x2,
+    };
 
-	uint8_t m_touched;
-	uint8_t m_stopped;
-	uint8_t padding02[2];
-	float m_surfaceTime;
-	float m_penaltyDistance;
-	hkpStatus m_status;
+    uint8_t m_touched;
+    uint8_t m_stopped;
+    uint8_t padding02[2];
+    float m_surfaceTime;
+    float m_penaltyDistance;
+    hkpStatus m_status;
 };
 
 // What a character proxy solve is given: where the character is and moves, the highest velocity a surface may carry
 // it at, the up axis, the time to cover and the surfaces that may stop it.
 struct hkpSimplexSolverInput {
-	hkVector4 m_position;
-	hkVector4 m_velocity;
-	hkVector4 m_maxSurfaceVelocity;
-	hkVector4 m_upVector;
-	float m_deltaTime;
-	float m_minDeltaTime;
-	hkpSurfaceConstraintInfo* m_constraints;
-	int32_t m_numConstraints;
+    hkVector4 m_position;
+    hkVector4 m_velocity;
+    hkVector4 m_maxSurfaceVelocity;
+    hkVector4 m_upVector;
+    float m_deltaTime;
+    float m_minDeltaTime;
+    hkpSurfaceConstraintInfo* m_constraints;
+    int32_t m_numConstraints;
 };
 
 // What the solve leaves: the position and velocity it reached, the time it took and one interaction per constraint.
 struct hkpSimplexSolverOutput {
-	hkVector4 m_position;
-	hkVector4 m_velocity;
-	float m_deltaTime;
-	hkpSurfaceConstraintInteraction* m_planeInteractions;
+    hkVector4 m_position;
+    hkVector4 m_velocity;
+    float m_deltaTime;
+    hkpSurfaceConstraintInteraction* m_planeInteractions;
 };
 
 // The solver's working set: the support planes it has chosen so far (four at most) and the query it answers.
 class hkpSimplexSolver {
 public:
-	// One chosen surface: its index in the input, the constraint and the interaction record.
-	struct SupportPlane {
-		int32_t m_index;
-		const hkpSurfaceConstraintInfo* m_constraint;
-		hkpSurfaceConstraintInteraction* m_interaction;
-	};
+    // One chosen surface: its index in the input, the constraint and the interaction record.
+    struct SupportPlane {
+        int32_t m_index;
+        const hkpSurfaceConstraintInfo* m_constraint;
+        hkpSurfaceConstraintInteraction* m_interaction;
+    };
 
-	// The solver proper: switches on the number of support planes and moves the output velocity on past them.
-	void solve();
+    // The solver proper: switches on the number of support planes and moves the output velocity on past them.
+    void solve();
 
-	SupportPlane m_supportPlanes[4];
-	int32_t m_numSupportPlanes;
-	float m_currentTime;
-	const hkpSimplexSolverInput* m_input;
-	hkpSimplexSolverOutput* m_output;
+    SupportPlane m_supportPlanes[4];
+    int32_t m_numSupportPlanes;
+    float m_currentTime;
+    const hkpSimplexSolverInput* m_input;
+    hkpSimplexSolverOutput* m_output;
 };
 
 // Runs one character proxy solve: finds the surface the character reaches first, advances it there and repeats until
@@ -67,10 +67,26 @@ public:
 void hkSimplexSolverSolve(const hkpSimplexSolverInput& input, hkpSimplexSolverOutput& output);
 int32_t sortSupportPlanes(hkpSimplexSolver* a1);
 bool* hkSimplexSolver_isOutsidePlane(bool* a1, const __m128* a2, const hkpSurfaceConstraintInfo* r_eax);
-void solveOneConstraint(const hkpSurfaceConstraintInfo* a1, hkpSimplexSolver* a2, const hkVector4* r_eax,
-	hkVector4* r_esi);
-void solve3d(hkpSimplexSolver* a1, const hkpSurfaceConstraintInfo* a2, const hkpSurfaceConstraintInfo* a3, int32_t a4,
-	const hkVector4* a5, hkVector4* a6, const hkpSurfaceConstraintInfo* r_eax);
-void solveTwoConstraints(const hkpSurfaceConstraintInfo* a1, const hkpSurfaceConstraintInfo* a2, const hkVector4* a3,
-	hkVector4* a4, hkpSimplexSolver* r_edi);
+void solveOneConstraint(
+    const hkpSurfaceConstraintInfo* a1,
+    hkpSimplexSolver* a2,
+    const hkVector4* r_eax,
+    hkVector4* r_esi
+);
+void solve3d(
+    hkpSimplexSolver* a1,
+    const hkpSurfaceConstraintInfo* a2,
+    const hkpSurfaceConstraintInfo* a3,
+    int32_t a4,
+    const hkVector4* a5,
+    hkVector4* a6,
+    const hkpSurfaceConstraintInfo* r_eax
+);
+void solveTwoConstraints(
+    const hkpSurfaceConstraintInfo* a1,
+    const hkpSurfaceConstraintInfo* a2,
+    const hkVector4* a3,
+    hkVector4* a4,
+    hkpSimplexSolver* r_edi
+);
 void sub_D24650(int32_t a1);

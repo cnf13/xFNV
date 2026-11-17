@@ -6,6 +6,6 @@
 // BIT_ARRAY_SIZE is 4).
 class NiGPUProgramDescriptor {
 public:
-	NiFixedString m_kIdentifier;
-	uint32_t m_auiBitArray[4];
+    NiFixedString m_kIdentifier;
+    uint32_t m_auiBitArray[4];
 };

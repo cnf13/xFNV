@@ -4,8 +4,8 @@
 
 class ImageSpaceShaderMenuBG : public ImageSpaceShader {
 public:
-	ImageSpaceShaderMenuBG();
-	~ImageSpaceShaderMenuBG() override;
+    ImageSpaceShaderMenuBG();
+    ~ImageSpaceShaderMenuBG() override;
 
-	void ReloadShaders() override;
+    void ReloadShaders() override;
 };

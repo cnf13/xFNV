@@ -7,12 +7,12 @@
 // hkpDefaultToiResourceMgr::beginToiAndSetupResources fills it and endToiAndFreeResources frees the scratch pad.
 // hkLs_localizedSolveToi takes it by const reference.
 struct hkpToiResources {
-	hkpConstraintInstance::ConstraintPriority m_minPriorityToProcess;
-	int32_t m_maxNumEntities;
-	int32_t m_maxNumActiveEntities;
-	int32_t m_maxNumConstraints;
-	int32_t m_numToiSolverIterations;
-	int32_t m_numForcedToiFinalSolverIterations;
-	char* m_scratchpad;
-	int32_t m_scratchpadSize;
+    hkpConstraintInstance::ConstraintPriority m_minPriorityToProcess;
+    int32_t m_maxNumEntities;
+    int32_t m_maxNumActiveEntities;
+    int32_t m_maxNumConstraints;
+    int32_t m_numToiSolverIterations;
+    int32_t m_numForcedToiFinalSolverIterations;
+    char* m_scratchpad;
+    int32_t m_scratchpadSize;
 };

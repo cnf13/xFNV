@@ -12,56 +12,58 @@ NiRTTI NiStringPalette::ms_RTTI("NiStringPalette", &NiObject::ms_RTTI);
 NiStringPalette::NiStringPalette() : NiObject(), m_pcBuffer(nullptr), m_uiAllocatedSize(0), m_uiEndOfBuffer(0) {}
 
 NiStringPalette::~NiStringPalette() {
-	_NiFree(m_pcBuffer);
+    _NiFree(m_pcBuffer);
 }
 
 const NiRTTI* NiStringPalette::GetRTTI() const {
-	return &ms_RTTI;
+    return &ms_RTTI;
 }
 
 void NiStringPalette::LoadBinary(NiStream& kStream) {
-	NiObject::LoadBinary(kStream);
-	NiStreamLoadBinary(kStream, m_uiAllocatedSize);
-	if (m_uiAllocatedSize) {
-		m_pcBuffer = static_cast<char*>(_NiMalloc(m_uiAllocatedSize));
-		NiStreamLoadBinary(kStream, m_pcBuffer, m_uiAllocatedSize);
-	}
+    NiObject::LoadBinary(kStream);
+    NiStreamLoadBinary(kStream, m_uiAllocatedSize);
+    if (m_uiAllocatedSize) {
+        m_pcBuffer = static_cast<char*>(_NiMalloc(m_uiAllocatedSize));
+        NiStreamLoadBinary(kStream, m_pcBuffer, m_uiAllocatedSize);
+    }
 
-	NiStreamLoadBinary(kStream, m_uiEndOfBuffer);
+    NiStreamLoadBinary(kStream, m_uiEndOfBuffer);
 }
 
 void NiStringPalette::LinkObject(NiStream& kStream) {
-	NiObject::LinkObject(kStream);
+    NiObject::LinkObject(kStream);
 }
 
 bool NiStringPalette::RegisterStreamables(NiStream& kStream) {
-	return NiObject::RegisterStreamables(kStream);
+    return NiObject::RegisterStreamables(kStream);
 }
 
 // Only the used part of the buffer is written; its size goes out as both the allocated and the used size.
 void NiStringPalette::SaveBinary(NiStream& kStream) {
-	NiObject::SaveBinary(kStream);
-	uint32_t uiSize = m_uiEndOfBuffer;
-	NiStreamSaveBinary(kStream, uiSize);
-	if (m_uiEndOfBuffer)
-		NiStreamSaveBinary(kStream, m_pcBuffer, m_uiEndOfBuffer);
+    NiObject::SaveBinary(kStream);
+    uint32_t uiSize = m_uiEndOfBuffer;
+    NiStreamSaveBinary(kStream, uiSize);
+    if (m_uiEndOfBuffer) {
+        NiStreamSaveBinary(kStream, m_pcBuffer, m_uiEndOfBuffer);
+    }
 
-	NiStreamSaveBinary(kStream, m_uiEndOfBuffer);
+    NiStreamSaveBinary(kStream, m_uiEndOfBuffer);
 }
 
 bool NiStringPalette::IsEqual(NiObject* pkObject) {
-	if (!NiObject::IsEqual(pkObject))
-		return false;
+    if (!NiObject::IsEqual(pkObject)) {
+        return false;
+    }
 
-	NiStringPalette* pPalette = static_cast<NiStringPalette*>(pkObject);
-	return pPalette->m_uiAllocatedSize == m_uiAllocatedSize && pPalette->m_uiEndOfBuffer == m_uiEndOfBuffer &&
-		std::memcmp(m_pcBuffer, pPalette->m_pcBuffer, m_uiAllocatedSize) == 0;
+    NiStringPalette* pPalette = static_cast<NiStringPalette*>(pkObject);
+    return pPalette->m_uiAllocatedSize == m_uiAllocatedSize && pPalette->m_uiEndOfBuffer == m_uiEndOfBuffer &&
+        std::memcmp(m_pcBuffer, pPalette->m_pcBuffer, m_uiAllocatedSize) == 0;
 }
 
 NiObject* NiStringPalette::CreateObject() {
-	NiStringPalette* pkObject = static_cast<NiStringPalette*>(NiMemObject::operator new(sizeof(NiStringPalette)));
-	if (!pkObject) {
-		return 0;
-	}
-	return ::new (pkObject) NiStringPalette;
+    NiStringPalette* pkObject = static_cast<NiStringPalette*>(NiMemObject::operator new(sizeof(NiStringPalette)));
+    if (!pkObject) {
+        return 0;
+    }
+    return ::new (pkObject) NiStringPalette;
 }

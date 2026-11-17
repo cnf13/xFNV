@@ -5,8 +5,8 @@
 // The grass shader parameters and density samples for a terrain area.
 class TESGrassAreaParam {
 public:
-	TESGrassAreaParam();
+    TESGrassAreaParam();
 
-	TallGrassShaderProperty::GrassParam kGrassParam;
-	float pfDensity[9];
+    TallGrassShaderProperty::GrassParam kGrassParam;
+    float pfDensity[9];
 };

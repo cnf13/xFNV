@@ -7,8 +7,8 @@
 #include "Fallout Shared/ModelLoader.h"
 #include "Fallout Shared/TESNPC.h"
 #include "Fallout Shared/TESObject.h"
-#include "SDK/FaceGen/assert.hpp"
 #include "SDK/FaceGen/TriFileIO.h"
+#include "SDK/FaceGen/assert.hpp"
 #include "SDK/MSVC/ehvec.h"
 #include "SDK/MSVC/string.h"
 

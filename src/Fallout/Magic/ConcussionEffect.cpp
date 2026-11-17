@@ -35,104 +35,108 @@
 #include <stdint.h>
 
 static char bConcussionEffectInitialized =
-	EffectArchetypes::RegisterActiveEffect(EffectArchetypes::CONCUSSION, &ConcussionEffect::Instantiate);
+    EffectArchetypes::RegisterActiveEffect(EffectArchetypes::CONCUSSION, &ConcussionEffect::Instantiate);
 
 TESImageSpaceModifier* GetConcussionIMOD() {
-	TESForm* formByNumericID;
-	if (!g_bEnableHitAndConcussionIMODs) {
-		return nullptr;
-	}
-	if (!g_ConcussionIMOD) {
-		formByNumericID = TESForm::GetFormByNumericID(0x164u);
-		g_ConcussionIMOD = dynamic_cast<TESImageSpaceModifier*>(formByNumericID);
-	}
-	return g_ConcussionIMOD;
+    TESForm* formByNumericID;
+    if (!g_bEnableHitAndConcussionIMODs) {
+        return nullptr;
+    }
+    if (!g_ConcussionIMOD) {
+        formByNumericID = TESForm::GetFormByNumericID(0x164u);
+        g_ConcussionIMOD = dynamic_cast<TESImageSpaceModifier*>(formByNumericID);
+    }
+    return g_ConcussionIMOD;
 }
 
 ConcussionEffect::ConcussionEffect(MagicCaster* apCaster, MagicItem* apSpell, EffectItem* apEffect)
-	: ActiveEffect(apCaster, apSpell, apEffect), fTimer(0.0f) {}
+  : ActiveEffect(apCaster, apSpell, apEffect), fTimer(0.0f) {}
 
 ConcussionEffect::~ConcussionEffect() {}
 
 ActiveEffect* ConcussionEffect::Copy() {
-	ConcussionEffect* v2;
-	void* v4 = ourMalloc(sizeof(ConcussionEffect));
-	if (v4) {
-		v2 = ::new (v4) ConcussionEffect(pCaster, pSpell, pEffect);
-	} else {
-		v2 = nullptr;
-	}
-	v2->fTimer = fTimer;
-	CopyData(v2);
-	return v2;
+    ConcussionEffect* v2;
+    void* v4 = ourMalloc(sizeof(ConcussionEffect));
+    if (v4) {
+        v2 = ::new (v4) ConcussionEffect(pCaster, pSpell, pEffect);
+    }
+    else {
+        v2 = nullptr;
+    }
+    v2->fTimer = fTimer;
+    CopyData(v2);
+    return v2;
 }
 
 // The base ActiveEffect::Update(afSecondsElapsed) does nothing, so it is not called here.
 void ConcussionEffect::Update(float afSecondsElapsed) {
-	Actor* ptarget;
-	fTimer = fTimer + afSecondsElapsed;
-	if (pTarget) {
-		ptarget = pTarget->GetTargetAsActor();
-	} else {
-		ptarget = 0;
-	}
-	if (ptarget) {
-		UpdateSound(ptarget);
-	}
+    Actor* ptarget;
+    fTimer = fTimer + afSecondsElapsed;
+    if (pTarget) {
+        ptarget = pTarget->GetTargetAsActor();
+    }
+    else {
+        ptarget = 0;
+    }
+    if (ptarget) {
+        UpdateSound(ptarget);
+    }
 }
 
 bool ConcussionEffect::CheckDeletedCaster(MagicCaster* apCaster) {
-	bool bDeleted = ActiveEffect::CheckDeletedCaster(apCaster);
-	if (bDeleted) {
-		Dispel(true);
-	}
-	return bDeleted;
+    bool bDeleted = ActiveEffect::CheckDeletedCaster(apCaster);
+    if (bDeleted) {
+        Dispel(true);
+    }
+    return bDeleted;
 }
 
 bool ConcussionEffect::CheckTarget(MagicTarget* apTarget) {
-	Actor* targetAsActor;
-	if (apTarget) {
-		targetAsActor = apTarget->GetTargetAsActor();
-	} else {
-		targetAsActor = nullptr;
-	}
-	return (bool)((uint8_t)(targetAsActor && ((!targetAsActor->IsDead((bool)0)) && (!targetAsActor->IsDying()))));
+    Actor* targetAsActor;
+    if (apTarget) {
+        targetAsActor = apTarget->GetTargetAsActor();
+    }
+    else {
+        targetAsActor = nullptr;
+    }
+    return (bool)((uint8_t)(targetAsActor && ((!targetAsActor->IsDead((bool)0)) && (!targetAsActor->IsDying()))));
 }
 
 void ConcussionEffect::Start() {
-	ActiveEffect::Start();
+    ActiveEffect::Start();
 }
 
 void ConcussionEffect::Finish() {
-	ActiveEffect::Finish();
+    ActiveEffect::Finish();
 }
 
 void ConcussionEffect::UpdateSound(Actor* a2) {
-	FNVD_INLINED_LOCAL(BSSoundHandle, a1, std::nullopt, std::nullopt);
-	if (fConcussionTimer.Float() < static_cast<double>(fTimer)) {
-		fTimer = 0.0;
-		if (a2->GetPerceptionCondition() == 0.0 && !a2->GetActorValue(ActorValue::IGNORE_CRIPPLED_LIMBS)) {
-			bConcussion_11DBE50 = 1;
-			if (a2->IsPc() && !pPlayer->IsSleepingorResting()) {
-				float afStrength = fGetHitPainMult.Float();
-				TESImageSpaceModifier* ConcussionIMOD = GetConcussionIMOD();
-				ImageSpaceModifierInstanceForm::Trigger(ConcussionIMOD, afStrength, 0);
-				BSAudio* v3 = &BSAudio::QInstance();
-				BSSoundHandle* SoundHandleByName = v3->GetSoundHandleByName(&a1, "FXCrippleHead", 257u);
-				SoundHandleByName->Play(0);
-			}
-			BaseProcess* CurrentAIProcess = a2->pCurrentProcess;
-			CurrentAIProcess->SetupSpecialIdle(a2, 0, AnimIdle::PLAY_TYPE_AUTO, 1, 0, 1);
-			bConcussion_11DBE50 = 0;
-		}
-	}
+    FNVD_INLINED_LOCAL(BSSoundHandle, a1, std::nullopt, std::nullopt);
+    if (fConcussionTimer.Float() < static_cast<double>(fTimer)) {
+        fTimer = 0.0;
+        if (a2->GetPerceptionCondition() == 0.0 && !a2->GetActorValue(ActorValue::IGNORE_CRIPPLED_LIMBS)) {
+            bConcussion_11DBE50 = 1;
+            if (a2->IsPc() && !pPlayer->IsSleepingorResting()) {
+                float afStrength = fGetHitPainMult.Float();
+                TESImageSpaceModifier* ConcussionIMOD = GetConcussionIMOD();
+                ImageSpaceModifierInstanceForm::Trigger(ConcussionIMOD, afStrength, 0);
+                BSAudio* v3 = &BSAudio::QInstance();
+                BSSoundHandle* SoundHandleByName = v3->GetSoundHandleByName(&a1, "FXCrippleHead", 257u);
+                SoundHandleByName->Play(0);
+            }
+            BaseProcess* CurrentAIProcess = a2->pCurrentProcess;
+            CurrentAIProcess->SetupSpecialIdle(a2, 0, AnimIdle::PLAY_TYPE_AUTO, 1, 0, 1);
+            bConcussion_11DBE50 = 0;
+        }
+    }
 }
 
 ActiveEffect* ConcussionEffect::Instantiate(MagicCaster* apCaster, MagicItem* apSpell, EffectItem* apEffect) {
-	void* v5 = ourMalloc(sizeof(ConcussionEffect));
-	if (v5) {
-		return ::new (v5) ConcussionEffect(apCaster, apSpell, apEffect);
-	} else {
-		return nullptr;
-	}
+    void* v5 = ourMalloc(sizeof(ConcussionEffect));
+    if (v5) {
+        return ::new (v5) ConcussionEffect(apCaster, apSpell, apEffect);
+    }
+    else {
+        return nullptr;
+    }
 }

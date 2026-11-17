@@ -7,7 +7,7 @@
 #include "Gamebryo2.2/CoreLibs/NiMain/NiTArray.h"
 
 ImageSpaceShaderMenuBG::ImageSpaceShaderMenuBG() {
-	pTextures.SetSize(3u);
+    pTextures.SetSize(3u);
 }
 
 ImageSpaceShaderMenuBG::~ImageSpaceShaderMenuBG() {}

@@ -5,8 +5,8 @@
 // A water image-space shader.
 class WaterDisplacementRainRipple : public ImageSpaceShader {
 public:
-	WaterDisplacementRainRipple();
-	~WaterDisplacementRainRipple() override;
+    WaterDisplacementRainRipple();
+    ~WaterDisplacementRainRipple() override;
 
-	void ReloadShaders() override;
+    void ReloadShaders() override;
 };

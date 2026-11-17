@@ -17,20 +17,25 @@ void cleanupLoadedObjecthkpReorientAction(void* p);
 // Applies restoring torque to keep an entity's axes aligned.
 class hkpReorientAction : public hkpUnaryAction {
 public:
-	hkpReorientAction();
-	hkpReorientAction(hkpRigidBody* body, const hkVector4& rotationAxis, const hkVector4& upAxis, float strength,
-		float damping);
-	hkpReorientAction(hkFinishLoadedObjectFlag aFlag) : hkpUnaryAction(aFlag.m_finishing) {}
+    hkpReorientAction();
+    hkpReorientAction(
+        hkpRigidBody* body,
+        const hkVector4& rotationAxis,
+        const hkVector4& upAxis,
+        float strength,
+        float damping
+    );
+    hkpReorientAction(hkFinishLoadedObjectFlag aFlag) : hkpUnaryAction(aFlag.m_finishing) {}
 
-	void applyAction(const hkStepInfo& stepInfo) override;
-	hkpAction* clone(const hkArray<hkpEntity*>& newEntities, const hkArray<hkpPhantom*>& newPhantoms) const override;
+    void applyAction(const hkStepInfo& stepInfo) override;
+    hkpAction* clone(const hkArray<hkpEntity*>& newEntities, const hkArray<hkpPhantom*>& newPhantoms) const override;
 
-	static const hkClass& staticClass();
+    static const hkClass& staticClass();
 
-	hkVector4 m_rotationAxis;
-	hkVector4 m_upAxis;
-	float m_strength;
-	float m_damping;
+    hkVector4 m_rotationAxis;
+    hkVector4 m_upAxis;
+    float m_strength;
+    float m_damping;
 };
 
 extern hkClass hkpReorientActionClass;

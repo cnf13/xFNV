@@ -4,9 +4,9 @@
 
 class ImageSpaceShaderFFTHorizontalButterfly : public ImageSpaceShader {
 public:
-	ImageSpaceShaderFFTHorizontalButterfly();
-	~ImageSpaceShaderFFTHorizontalButterfly() override;
+    ImageSpaceShaderFFTHorizontalButterfly();
+    ~ImageSpaceShaderFFTHorizontalButterfly() override;
 
-	void ReloadShaders() override;
-	bool LoadStagesAndPasses() override;
+    void ReloadShaders() override;
+    bool LoadStagesAndPasses() override;
 };

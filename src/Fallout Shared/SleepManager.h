@@ -6,8 +6,8 @@
 // milliseconds) and clears the request. All static.
 class SleepManager {
 public:
-	static void RunSleep();
+    static void RunSleep();
 
-	// The milliseconds the next RunSleep sleeps; 0 for none.
-	static inline uint32_t iNextSleepTime;
+    // The milliseconds the next RunSleep sleeps; 0 for none.
+    static inline uint32_t iNextSleepTime;
 };

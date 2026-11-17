@@ -8,11 +8,11 @@ class bhkCharacterController;
 // their work in Update, which is handed the game's controller.
 class bhkCharacterState : public hkpCharacterState {
 public:
-	void update(hkpCharacterContext& arContext, const hkpCharacterInput& arInput,
-		hkpCharacterOutput& arOutput) override {}
+    void
+    update(hkpCharacterContext& arContext, const hkpCharacterInput& arInput, hkpCharacterOutput& arOutput) override {}
 
-	void change(hkpCharacterContext& arContext, const hkpCharacterInput& arInput,
-		hkpCharacterOutput& arOutput) override {}
+    void
+    change(hkpCharacterContext& arContext, const hkpCharacterInput& arInput, hkpCharacterOutput& arOutput) override {}
 
-	virtual void Update(bhkCharacterController& arController) = 0;
+    virtual void Update(bhkCharacterController& arController) = 0;
 };

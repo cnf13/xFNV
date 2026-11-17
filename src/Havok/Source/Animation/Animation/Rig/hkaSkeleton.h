@@ -14,31 +14,33 @@ void finishLoadedObjecthkaSkeleton(void* p, int32_t finishing);
 // An animation skeleton: its name, bone hierarchy, bones, reference pose, float slots and local frames.
 class hkaSkeleton : public hkReferencedObject {
 public:
-	struct LocalFrameOnBone {
-		static const hkClass& staticClass();
+    struct LocalFrameOnBone {
+        static const hkClass& staticClass();
 
-		hkRefPtr<hkLocalFrame> m_localFrame;
-		int32_t m_boneIndex;
-	};
+        hkRefPtr<hkLocalFrame> m_localFrame;
+        int32_t m_boneIndex;
+    };
 
-	hkaSkeleton() {}
+    hkaSkeleton() {}
 
-	hkaSkeleton(hkFinishLoadedObjectFlag aFlag)
-		: hkReferencedObject(aFlag), m_name(aFlag), m_parentIndices(aFlag), m_bones(aFlag), m_referencePose(aFlag),
-		  m_floatSlots(aFlag), m_localFrames(aFlag) {}
+    hkaSkeleton(hkFinishLoadedObjectFlag aFlag)
+      : hkReferencedObject(aFlag), m_name(aFlag), m_parentIndices(aFlag), m_bones(aFlag), m_referencePose(aFlag),
+        m_floatSlots(aFlag), m_localFrames(aFlag) {}
 
-	~hkaSkeleton() override;
+    ~hkaSkeleton() override;
 
-	static void operator delete(void* apMemory) { hkReferencedObject::deleteObject(apMemory); }
-	static const hkClass& staticClass();
+    static void operator delete(void* apMemory) {
+        hkReferencedObject::deleteObject(apMemory);
+    }
+    static const hkClass& staticClass();
 
-	hkStringPtr m_name;
-	// The parent bone of each bone, -1 for a root.
-	hkArray<int16_t> m_parentIndices;
-	hkArray<hkaBone> m_bones;
-	hkArray<hkQsTransform> m_referencePose;
-	hkArray<hkStringPtr> m_floatSlots;
-	hkArray<LocalFrameOnBone> m_localFrames;
+    hkStringPtr m_name;
+    // The parent bone of each bone, -1 for a root.
+    hkArray<int16_t> m_parentIndices;
+    hkArray<hkaBone> m_bones;
+    hkArray<hkQsTransform> m_referencePose;
+    hkArray<hkStringPtr> m_floatSlots;
+    hkArray<LocalFrameOnBone> m_localFrames;
 };
 
 extern hkClass hkaSkeletonLocalFrameOnBoneClass;

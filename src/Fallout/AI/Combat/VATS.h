@@ -26,142 +26,150 @@ struct VATS_COMMAND;
 // A queued VATS action.
 class VATSQueuedAction {
 public:
-	// Whether the action type is one of the two grenade/mine throws (7 and 8).
-	static bool IsActionGrenadeOrMine(ActionPoints::Action aeAction);
+    // Whether the action type is one of the two grenade/mine throws (7 and 8).
+    static bool IsActionGrenadeOrMine(ActionPoints::Action aeAction);
 };
 
 // The VATS manager: the mode, the camera shots and the target light.
 class VATS {
 public:
-	// The VATS mode; the engine's VATS_MODE_ENUM.
-	enum VATS_MODE_ENUM : int32_t {
-		VATS_MODE_NONE = 0,
-		VATS_TARGET_SELECT = 1,
-		VATS_MENU_MODE = 2,
-		VATS_SCAN_MODE = 3,
-		VATS_PLAYBACK = 4,
-		VATS_MODE_COUNT = 5,
-	};
+    // The VATS mode; the engine's VATS_MODE_ENUM.
+    enum VATS_MODE_ENUM : int32_t {
+        VATS_MODE_NONE = 0,
+        VATS_TARGET_SELECT = 1,
+        VATS_MENU_MODE = 2,
+        VATS_SCAN_MODE = 3,
+        VATS_PLAYBACK = 4,
+        VATS_MODE_COUNT = 5,
+    };
 
-	VATS();
-	~VATS();
+    VATS();
+    ~VATS();
 
-	void QueueAction(VATS_COMMAND* apCommand);
-	// The point at afPercentage along the target.
-	NiPoint3* GetTargetPercentagePos(NiPoint3* apResult, float afPercentage);
-	// The action being run: the first queued command, or null.
-	VATS_COMMAND* GetCurrentAction();
-	// The last queued command, or null.
-	VATS_COMMAND* GetLastAction();
-	// Whether apCommand, or the first queued command when apCommand is null, is a melee or unarmed attack.
-	bool IsMeleeCommand(VATS_COMMAND* apCommand);
-	// True while a VATS mode other than none is active.
-	bool IsInVats();
-	// The light that highlights the VATS target.
-	ShadowSceneLight* GetVATSLight();
-	VATS_MODE_ENUM GetMode();
-	Projectile* GetFirstProjectile() { return pFirstProjectile; }
-	Projectile* GetLastProjectile() { return pLastProjectile; }
-	// Points the camera shot's projectile-bound location and target at apProjectile's 3D, then records it as the
-	// first projectile.
-	void SetFirstProjectile(Projectile* apProjectile);
-	// Records apProjectile as the last one fired and moves the camera on to a shot for the current action.
-	void SetLastProjectile(Projectile* apProjectile);
-	// Updates the camera for apCommand.
-	void UpdateCurrentCameraAction(VATS_COMMAND* apCommand);
-	// Switches to the next camera shot.
-	bool UseNextCamera();
-	// Switches to aeMode.
-	void SetMode(VATS_MODE_ENUM aeMode, bool bForce);
-	float GetPlayerUpdateMult();
-	float GetTargetUpdateMult();
-	// Drops apRef as the VATS target.
-	void ClearTarget(TESObjectREFR* apRef);
-	// Ends the VATS playback.
-	void QuitVATSPlayback(bool abForceQuit, bool abFinishCommandPlayback);
-	// bFirstVatsAttack (the byte at +0x38).
-	bool GetFirstAttack() { return bFirstVatsAttack; }
-	// Sets bFirstVatsAttack.
-	void SetFirstAttack(bool bFirst) { bFirstVatsAttack = bFirst; }
-	TESIdleForm* GetMeleeAttack();
-	BGSCameraShot* GetCurrentCamera();
-	float GetCurrentCameraMinTimer();
-	// Frees the queued commands and releases the melee attack idle.
-	void ClearCommandList();
-	// The queued commands' list.
-	BSSimpleList<VATS_COMMAND*>* GetCommandList();
-	// Clears the command list and drops the camera shot and both imagespace modifiers.
-	void ClearData();
-	void IncrementKillCount();
-	void EvaluateCommand(VATS_COMMAND* apCommand);
-	void InitPlayerDeath();
-	void Update();
-	void FreeHeadAction();
-	void UpdateMeleeAttack(VATS_COMMAND* apCommand);
-	void UpdateVATSLight(TESObjectREFR* apVictim);
-	void RemoveLastAction(ActionPoints::Action& aeAction, bool& abIronSights);
-	void QuitVATSPlayback_0(TESBoundObject* apObject, ExtraDataList* apExtra);
-	NiPoint3* GetCamshotTargetPos(NiPoint3* a2);
-	bool GetLineOfSight(VATS_COMMAND* apCommand);
-	void SetVATSLight(NiLight* apLight, bool abRemoveOld);
-	void AppendCamTarget(TESObjectREFR* apTarget, int32_t a3);
-	uint32_t GetCount();
+    void QueueAction(VATS_COMMAND* apCommand);
+    // The point at afPercentage along the target.
+    NiPoint3* GetTargetPercentagePos(NiPoint3* apResult, float afPercentage);
+    // The action being run: the first queued command, or null.
+    VATS_COMMAND* GetCurrentAction();
+    // The last queued command, or null.
+    VATS_COMMAND* GetLastAction();
+    // Whether apCommand, or the first queued command when apCommand is null, is a melee or unarmed attack.
+    bool IsMeleeCommand(VATS_COMMAND* apCommand);
+    // True while a VATS mode other than none is active.
+    bool IsInVats();
+    // The light that highlights the VATS target.
+    ShadowSceneLight* GetVATSLight();
+    VATS_MODE_ENUM GetMode();
+    Projectile* GetFirstProjectile() {
+        return pFirstProjectile;
+    }
+    Projectile* GetLastProjectile() {
+        return pLastProjectile;
+    }
+    // Points the camera shot's projectile-bound location and target at apProjectile's 3D, then records it as the
+    // first projectile.
+    void SetFirstProjectile(Projectile* apProjectile);
+    // Records apProjectile as the last one fired and moves the camera on to a shot for the current action.
+    void SetLastProjectile(Projectile* apProjectile);
+    // Updates the camera for apCommand.
+    void UpdateCurrentCameraAction(VATS_COMMAND* apCommand);
+    // Switches to the next camera shot.
+    bool UseNextCamera();
+    // Switches to aeMode.
+    void SetMode(VATS_MODE_ENUM aeMode, bool bForce);
+    float GetPlayerUpdateMult();
+    float GetTargetUpdateMult();
+    // Drops apRef as the VATS target.
+    void ClearTarget(TESObjectREFR* apRef);
+    // Ends the VATS playback.
+    void QuitVATSPlayback(bool abForceQuit, bool abFinishCommandPlayback);
+    // bFirstVatsAttack (the byte at +0x38).
+    bool GetFirstAttack() {
+        return bFirstVatsAttack;
+    }
+    // Sets bFirstVatsAttack.
+    void SetFirstAttack(bool bFirst) {
+        bFirstVatsAttack = bFirst;
+    }
+    TESIdleForm* GetMeleeAttack();
+    BGSCameraShot* GetCurrentCamera();
+    float GetCurrentCameraMinTimer();
+    // Frees the queued commands and releases the melee attack idle.
+    void ClearCommandList();
+    // The queued commands' list.
+    BSSimpleList<VATS_COMMAND*>* GetCommandList();
+    // Clears the command list and drops the camera shot and both imagespace modifiers.
+    void ClearData();
+    void IncrementKillCount();
+    void EvaluateCommand(VATS_COMMAND* apCommand);
+    void InitPlayerDeath();
+    void Update();
+    void FreeHeadAction();
+    void UpdateMeleeAttack(VATS_COMMAND* apCommand);
+    void UpdateVATSLight(TESObjectREFR* apVictim);
+    void RemoveLastAction(ActionPoints::Action& aeAction, bool& abIronSights);
+    void QuitVATSPlayback_0(TESBoundObject* apObject, ExtraDataList* apExtra);
+    NiPoint3* GetCamshotTargetPos(NiPoint3* a2);
+    bool GetLineOfSight(VATS_COMMAND* apCommand);
+    void SetVATSLight(NiLight* apLight, bool abRemoveOld);
+    void AppendCamTarget(TESObjectREFR* apTarget, int32_t a3);
+    uint32_t GetCount();
 
-	// The queued VATS commands.
-	BSSimpleList<VATS_COMMAND*> commandList;
-	VATS_MODE_ENUM eMode;
-	// The camera shots to pick from (a camera path's ShotList).
-	BSSimpleList<BGSCameraShot*>* pCameraList;
-	BGSCameraShot* pCamera;
-	// How long the camera shot has run and its minimum time.
-	float fCameraTimer;
-	float fCameraMinTimer;
-	Projectile* pFirstProjectile;
-	Projectile* pLastProjectile;
-	TESIdleForm* pMeleeAttack;
-	ImageSpaceModifierInstanceForm* pImagespaceMod;
-	ImageSpaceModifierInstanceRB* pTransitionImagespaceMod;
-	bool bAiming;
-	uint8_t padding31[0x3];
-	NiPointer<ShadowSceneLight> spVATSLight;
-	bool bFirstVatsAttack;
-	uint8_t padding39[0x3];
-	int32_t iKillCount;
-	// The weapon VATS unequipped and its extra data.
-	TESBoundObject* pUnEquipWeapon;
-	ExtraDataList* pUnEquipExtra;
+    // The queued VATS commands.
+    BSSimpleList<VATS_COMMAND*> commandList;
+    VATS_MODE_ENUM eMode;
+    // The camera shots to pick from (a camera path's ShotList).
+    BSSimpleList<BGSCameraShot*>* pCameraList;
+    BGSCameraShot* pCamera;
+    // How long the camera shot has run and its minimum time.
+    float fCameraTimer;
+    float fCameraMinTimer;
+    Projectile* pFirstProjectile;
+    Projectile* pLastProjectile;
+    TESIdleForm* pMeleeAttack;
+    ImageSpaceModifierInstanceForm* pImagespaceMod;
+    ImageSpaceModifierInstanceRB* pTransitionImagespaceMod;
+    bool bAiming;
+    uint8_t padding31[0x3];
+    NiPointer<ShadowSceneLight> spVATSLight;
+    bool bFirstVatsAttack;
+    uint8_t padding39[0x3];
+    int32_t iKillCount;
+    // The weapon VATS unequipped and its extra data.
+    TESBoundObject* pUnEquipWeapon;
+    ExtraDataList* pUnEquipExtra;
 
-	// The Mysterious Stranger actor while his VATS kill runs.
-	static inline Actor* pStranger;
-	// The Miss Fortune actor while her VATS effect runs.
-	static inline Actor* pMissFortune;
+    // The Mysterious Stranger actor while his VATS kill runs.
+    static inline Actor* pStranger;
+    // The Miss Fortune actor while her VATS effect runs.
+    static inline Actor* pMissFortune;
 };
 
 // One queued VATS action: what the action is, the target and limb, and its outcome and damage.
 struct VATS_COMMAND {
-	VATS_COMMAND();
-	~VATS_COMMAND();
+    VATS_COMMAND();
+    ~VATS_COMMAND();
 
-	void Initialize();
+    void Initialize();
 
-	static void operator delete(void* apMemory);
+    static void operator delete(void* apMemory);
 
-	ActionPoints::Action eAction;
-	bool bSuccess;
-	bool bIronSights;
-	bool bStranger;
-	bool bParalyzingPalm;
-	uint8_t cFireShots;
-	uint8_t cFakeFireShots;
-	uint8_t padding0A[2];
-	TESObjectREFR* pTarget;
-	ActorValue::Index eLimb;
-	HitData* pHitData;
-	float fTotalDamage;
-	float fCumulativeDamage;
-	float fActionPoints;
-	bool bMissFortune;
-	uint8_t padding25[3];
+    ActionPoints::Action eAction;
+    bool bSuccess;
+    bool bIronSights;
+    bool bStranger;
+    bool bParalyzingPalm;
+    uint8_t cFireShots;
+    uint8_t cFakeFireShots;
+    uint8_t padding0A[2];
+    TESObjectREFR* pTarget;
+    ActorValue::Index eLimb;
+    HitData* pHitData;
+    float fTotalDamage;
+    float fCumulativeDamage;
+    float fActionPoints;
+    bool bMissFortune;
+    uint8_t padding25[3];
 };
 
 // The actor whose VATS attack is running.

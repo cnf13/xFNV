@@ -10,87 +10,149 @@ class TESObjectWEAP;
 // The gameplay formulas: experience, barter, health and movement values derived from game settings.
 class GamePlayFormulas {
 public:
-	// Whether hardcore mode is on.
-	enum HardcoreSetting : int32_t {
-		HARDCORE_OFF = 0,
-		HARDCORE_ON = 1,
-	};
+    // Whether hardcore mode is on.
+    enum HardcoreSetting : int32_t {
+        HARDCORE_OFF = 0,
+        HARDCORE_ON = 1,
+    };
 
-	// The game's difficulty; LOW and HIGH name the ends.
-	enum DifficultyLevel : int32_t {
-		DIFFICULTY_VERY_EASY = 0,
-		DIFFICULTY_LOW = 0,
-		DIFFICULTY_EASY = 1,
-		DIFFICULTY_NORMAL = 2,
-		DIFFICULTY_HARD = 3,
-		DIFFICULTY_VERY_HARD = 4,
-		DIFFICULTY_HIGH = 4,
-	};
+    // The game's difficulty; LOW and HIGH name the ends.
+    enum DifficultyLevel : int32_t {
+        DIFFICULTY_VERY_EASY = 0,
+        DIFFICULTY_LOW = 0,
+        DIFFICULTY_EASY = 1,
+        DIFFICULTY_NORMAL = 2,
+        DIFFICULTY_HARD = 3,
+        DIFFICULTY_VERY_HARD = 4,
+        DIFFICULTY_HIGH = 4,
+    };
 
-	// The movement speed multiplier of an actor.
-	static float GetActorWalkSpeed(ActorValueOwner* apActor, TESObjectWEAP* pWeap, TESObjectARMO* pArmor,
-		bool abSneaking, bool abNoWeapon, bool abIsNpc, bool abOverEncumbered);
-	// The skill points gained per level for aiIntelligence; an odd intelligence earns one
-	// more on even levels.
-	static int32_t GetLevelUpSkillPoints(int32_t aiIntelligence, int32_t aiLevel);
-	// The difficulty multiplier aiWhich (16 hit points, 24 experience; 1 otherwise) for aeDifficulty, the hit point one
-	// to or by the player per abToPC.
-	static float GetDifficultyMultiplier(GamePlayFormulas::DifficultyLevel aeDifficulty, ActorValue::Index aiWhich,
-		bool abToPC);
-	// afXP scaled by the experience multiplier of aeDifficulty.
-	static float AdjustExperiencePoints(float afXP, GamePlayFormulas::DifficultyLevel aeDifficulty);
-	// The experience points needed to reach the level; 0 for level 1 and below.
-	static int32_t GetRequiredExperiencePoints(int32_t aiWhichLevel);
-	// The run speed of apActor with the given weapon and armor and movement state.
-	static float GetActorRunSpeed(ActorValueOwner* apActor, TESObjectWEAP* pWeap, TESObjectARMO* pArmor,
-		bool abNoWeapon, bool abIsNpc, bool abIsSneaking, bool abOverEncumbered);
-	static float GetActorClothingDesirability(uint32_t aiClothingValue);
-	static float PainChangePerSecond(float afDamagePercent);
-	// afRadiation scaled by how deep afDistance lies inside afRadius, clamped to [0, 1].
-	static float GetRadiationLevel(float afRadiation, float afRadius, float afDistance);
-	// The value of an item worth afItemValue at afItemHealthPercent health.
-	static float CalcItemHealthValue(float afItemValue, float afItemHealthPercent);
-	// The condition (times 10) repairing one item with another reaches at aiRepairSkill; when the result does not beat
-	// the better condition, *apiMinSkillNeeded gets the skill needed to improve it.
-	static float GetRepairedCondition(int32_t aiRepairSkill, float afCondition1, float afCondition2,
-		int32_t* apiMinSkillNeeded);
-	// The caps a vendor with aiVendorRepairSkill charges to repair an item of afValue at afCondition.
-	static int32_t GetRepairCost(int32_t aiVendorRepairSkill, float afCondition, float afValue);
-	static float SwimBreathTime(int32_t aiEndurance);
-	// The health afHealingRate (per hour) returns per second; sleeping adds the sleeping base rate and scales the
-	// waking rate by the sleeping multiplier.
-	static float GetHealingRate(float afHealingRate, bool abIsSleeping);
-	// The magnitude and duration of a potion effect of afEffectCost at afPotionStrength, raised by the alchemy
-	// equipment aiEquipment of the given qualities.
-	static void CalculatePotionDurationMagnitude(float& aiMagnitude, float& aiDuration, float afEffectCost,
-		float afPotionStrength, int32_t aiEquipment, bool bhostile, float afRetortQuality, float afAlembicQuality,
-		float afCalcinatorQuality, bool abPoison);
-	// The duration alone of a potion effect, as CalculatePotionDurationMagnitude.
-	static void CalculatePotionDuration(float& aiDuration, float afEffectCost, float afPotionStrength,
-		int32_t aiEquipment, bool bhostile, float afRetortQuality, float afAlembicQuality, float afCalcinatorQuality,
-		bool abPoison);
-	// The magnitude alone of a potion effect, as CalculatePotionDurationMagnitude.
-	static void CalculatePotionMagnitude(float& aiMagnitude, float afEffectCost, float afPotionStrength,
-		int32_t aiEquipment, bool bhostile, float afRetortQuality, float afAlembicQuality, float afCalcinatorQuality,
-		bool abPoison);
-	// The chance in percent, clamped to [0, 100], to force a lock of aiLockLevelMax with aiPlayerSkill.
-	static int32_t GetForceLockChance(int32_t aiPlayerSkill, int32_t aiLockLevelMax);
-	static float SwimBreathDamage(int32_t aiMaxHealth);
-	static void CalculateToolResistance(float& afResistanceTime, float& afMagnitude, float& afMouseScalar,
-		float afInjuryPercent, float afPainPercent, int32_t aiMedicineSkill);
-	static float GetPainCausedByWound(float afLimbWoundPercent);
-	static void GetSurgeryAutoAttemptPercentages(float& afLimbHealPercent, float& afHealthDamagePercent,
-		int32_t aiMedicineSkill, bool abMorphineUsed, float afWoundPercent);
-	static float CalcImpactShaderAmount(float afDistance);
-	static int32_t GetSpeechChallengeChance(float afPlayerSpeech, float afTargetDisposition, int32_t aiTopicDifficulty);
-	static float GetActorSwimWalkSpeed(ActorValueOwner* apActor, TESObjectWEAP* pWeap, TESObjectARMO* pArmor,
-		bool abNoWeapon, bool abIsNpc, bool abOverEncumbered);
-	static float GetActorSwimRunSpeed(ActorValueOwner* apActor, TESObjectWEAP* pWeap, TESObjectARMO* pArmor,
-		bool abNoWeapon, bool abIsNpc, bool abOverEncumbered);
-	static double CalcFatigueReturn(float aiEndurance);
-	static int32_t GetLevelUpSkillPoints_0(ActorValueOwner* a1);
-	static float GetSpeechFailPenalty(int32_t aiSuccessChance);
-	static float* GetBarterMultipliers(int32_t a1, float* a2, float* a3);
+    // The movement speed multiplier of an actor.
+    static float GetActorWalkSpeed(
+        ActorValueOwner* apActor,
+        TESObjectWEAP* pWeap,
+        TESObjectARMO* pArmor,
+        bool abSneaking,
+        bool abNoWeapon,
+        bool abIsNpc,
+        bool abOverEncumbered
+    );
+    // The skill points gained per level for aiIntelligence; an odd intelligence earns one
+    // more on even levels.
+    static int32_t GetLevelUpSkillPoints(int32_t aiIntelligence, int32_t aiLevel);
+    // The difficulty multiplier aiWhich (16 hit points, 24 experience; 1 otherwise) for aeDifficulty, the hit point one
+    // to or by the player per abToPC.
+    static float
+    GetDifficultyMultiplier(GamePlayFormulas::DifficultyLevel aeDifficulty, ActorValue::Index aiWhich, bool abToPC);
+    // afXP scaled by the experience multiplier of aeDifficulty.
+    static float AdjustExperiencePoints(float afXP, GamePlayFormulas::DifficultyLevel aeDifficulty);
+    // The experience points needed to reach the level; 0 for level 1 and below.
+    static int32_t GetRequiredExperiencePoints(int32_t aiWhichLevel);
+    // The run speed of apActor with the given weapon and armor and movement state.
+    static float GetActorRunSpeed(
+        ActorValueOwner* apActor,
+        TESObjectWEAP* pWeap,
+        TESObjectARMO* pArmor,
+        bool abNoWeapon,
+        bool abIsNpc,
+        bool abIsSneaking,
+        bool abOverEncumbered
+    );
+    static float GetActorClothingDesirability(uint32_t aiClothingValue);
+    static float PainChangePerSecond(float afDamagePercent);
+    // afRadiation scaled by how deep afDistance lies inside afRadius, clamped to [0, 1].
+    static float GetRadiationLevel(float afRadiation, float afRadius, float afDistance);
+    // The value of an item worth afItemValue at afItemHealthPercent health.
+    static float CalcItemHealthValue(float afItemValue, float afItemHealthPercent);
+    // The condition (times 10) repairing one item with another reaches at aiRepairSkill; when the result does not beat
+    // the better condition, *apiMinSkillNeeded gets the skill needed to improve it.
+    static float
+    GetRepairedCondition(int32_t aiRepairSkill, float afCondition1, float afCondition2, int32_t* apiMinSkillNeeded);
+    // The caps a vendor with aiVendorRepairSkill charges to repair an item of afValue at afCondition.
+    static int32_t GetRepairCost(int32_t aiVendorRepairSkill, float afCondition, float afValue);
+    static float SwimBreathTime(int32_t aiEndurance);
+    // The health afHealingRate (per hour) returns per second; sleeping adds the sleeping base rate and scales the
+    // waking rate by the sleeping multiplier.
+    static float GetHealingRate(float afHealingRate, bool abIsSleeping);
+    // The magnitude and duration of a potion effect of afEffectCost at afPotionStrength, raised by the alchemy
+    // equipment aiEquipment of the given qualities.
+    static void CalculatePotionDurationMagnitude(
+        float& aiMagnitude,
+        float& aiDuration,
+        float afEffectCost,
+        float afPotionStrength,
+        int32_t aiEquipment,
+        bool bhostile,
+        float afRetortQuality,
+        float afAlembicQuality,
+        float afCalcinatorQuality,
+        bool abPoison
+    );
+    // The duration alone of a potion effect, as CalculatePotionDurationMagnitude.
+    static void CalculatePotionDuration(
+        float& aiDuration,
+        float afEffectCost,
+        float afPotionStrength,
+        int32_t aiEquipment,
+        bool bhostile,
+        float afRetortQuality,
+        float afAlembicQuality,
+        float afCalcinatorQuality,
+        bool abPoison
+    );
+    // The magnitude alone of a potion effect, as CalculatePotionDurationMagnitude.
+    static void CalculatePotionMagnitude(
+        float& aiMagnitude,
+        float afEffectCost,
+        float afPotionStrength,
+        int32_t aiEquipment,
+        bool bhostile,
+        float afRetortQuality,
+        float afAlembicQuality,
+        float afCalcinatorQuality,
+        bool abPoison
+    );
+    // The chance in percent, clamped to [0, 100], to force a lock of aiLockLevelMax with aiPlayerSkill.
+    static int32_t GetForceLockChance(int32_t aiPlayerSkill, int32_t aiLockLevelMax);
+    static float SwimBreathDamage(int32_t aiMaxHealth);
+    static void CalculateToolResistance(
+        float& afResistanceTime,
+        float& afMagnitude,
+        float& afMouseScalar,
+        float afInjuryPercent,
+        float afPainPercent,
+        int32_t aiMedicineSkill
+    );
+    static float GetPainCausedByWound(float afLimbWoundPercent);
+    static void GetSurgeryAutoAttemptPercentages(
+        float& afLimbHealPercent,
+        float& afHealthDamagePercent,
+        int32_t aiMedicineSkill,
+        bool abMorphineUsed,
+        float afWoundPercent
+    );
+    static float CalcImpactShaderAmount(float afDistance);
+    static int32_t GetSpeechChallengeChance(float afPlayerSpeech, float afTargetDisposition, int32_t aiTopicDifficulty);
+    static float GetActorSwimWalkSpeed(
+        ActorValueOwner* apActor,
+        TESObjectWEAP* pWeap,
+        TESObjectARMO* pArmor,
+        bool abNoWeapon,
+        bool abIsNpc,
+        bool abOverEncumbered
+    );
+    static float GetActorSwimRunSpeed(
+        ActorValueOwner* apActor,
+        TESObjectWEAP* pWeap,
+        TESObjectARMO* pArmor,
+        bool abNoWeapon,
+        bool abIsNpc,
+        bool abOverEncumbered
+    );
+    static double CalcFatigueReturn(float aiEndurance);
+    static int32_t GetLevelUpSkillPoints_0(ActorValueOwner* a1);
+    static float GetSpeechFailPenalty(int32_t aiSuccessChance);
+    static float* GetBarterMultipliers(int32_t a1, float* a2, float* a3);
 };
 
 // The game settings GamePlayFormulas.cpp defines.

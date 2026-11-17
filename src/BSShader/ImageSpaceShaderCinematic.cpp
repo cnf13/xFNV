@@ -7,7 +7,7 @@
 #include "Gamebryo2.2/CoreLibs/NiMain/NiTArray.h"
 
 ImageSpaceShaderCinematic::ImageSpaceShaderCinematic() {
-	pTextures.SetSize(2u);
+    pTextures.SetSize(2u);
 }
 
 ImageSpaceShaderCinematic::~ImageSpaceShaderCinematic() {}

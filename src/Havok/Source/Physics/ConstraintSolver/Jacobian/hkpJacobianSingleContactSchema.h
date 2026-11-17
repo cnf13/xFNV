@@ -5,5 +5,5 @@
 // One contact point (hkpconstraintsolver.pdb; the SDK ships no header).
 class hkpJacobianSingleContactSchema {
 public:
-	hkp1Lin2AngJacobian m_jac;
+    hkp1Lin2AngJacobian m_jac;
 };

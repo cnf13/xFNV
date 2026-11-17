@@ -29,53 +29,60 @@ class TESGlobal;
 class TESObjectCELL;
 class TESObjectREFR;
 
-template <class T, uint32_t uiGrowStep> class BSSimpleArray;
+template <class T, uint32_t uiGrowStep>
+class BSSimpleArray;
 
 void* AllocateVertexDistMapItem();
 void* au_re_FormHeap_Allocate_27();
 
 // Hash map whose items are separate heap blocks.
-template <class TKEY, class TVAL> class NiTMap : public NiTMapBase<DFALL<NiTMapItem<TKEY, TVAL>>, TKEY, TVAL> {
+template <class TKEY, class TVAL>
+class NiTMap : public NiTMapBase<DFALL<NiTMapItem<TKEY, TVAL>>, TKEY, TVAL> {
 public:
-	// uiHashSize cleared buckets, no items (Gamebryo's default 37 buckets).
-	NiTMap(uint32_t uiHashSize = 37) : NiTMapBase<DFALL<NiTMapItem<TKEY, TVAL>>, TKEY, TVAL>(uiHashSize) {}
-	~NiTMap() override;
+    // uiHashSize cleared buckets, no items (Gamebryo's default 37 buckets).
+    NiTMap(uint32_t uiHashSize = 37) : NiTMapBase<DFALL<NiTMapItem<TKEY, TVAL>>, TKEY, TVAL>(uiHashSize) {}
+    ~NiTMap() override;
 
-	NiTMapItem<TKEY, TVAL>* NewItem() override;
-	void DeleteItem(NiTMapItem<TKEY, TVAL>* pkItem) override;
+    NiTMapItem<TKEY, TVAL>* NewItem() override;
+    void DeleteItem(NiTMapItem<TKEY, TVAL>* pkItem) override;
 
-	// RemoveAt for NiTMap<long, long> (TallGrassShaderProperty::CachedGrass's pLowTerrainChunkMap). Only per-instance
-	// definitions exist.
-	bool RemoveAt_00E91FD0(TKEY key);
-	// Sets up the bucket table, then stores the map's vtable; returns this. Only
-	// per-instantiation definitions exist.
-	NiTMap* Init(uint32_t auiHashSize);
+    // RemoveAt for NiTMap<long, long> (TallGrassShaderProperty::CachedGrass's pLowTerrainChunkMap). Only per-instance
+    // definitions exist.
+    bool RemoveAt_00E91FD0(TKEY key);
+    // Sets up the bucket table, then stores the map's vtable; returns this. Only
+    // per-instantiation definitions exist.
+    NiTMap* Init(uint32_t auiHashSize);
 };
 
 // Empties the map while its own DeleteItem is in place; NiTMapBase's destructor frees the buckets.
-template <class TKEY, class TVAL> NiTMap<TKEY, TVAL>::~NiTMap() {
-	this->RemoveAll();
+template <class TKEY, class TVAL>
+NiTMap<TKEY, TVAL>::~NiTMap() {
+    this->RemoveAll();
 }
 
 // The item comes from the node allocator.
-template <class TKEY, class TVAL> NiTMapItem<TKEY, TVAL>* NiTMap<TKEY, TVAL>::NewItem() {
-	return static_cast<NiTMapItem<TKEY, TVAL>*>(this->m_kAllocator.Allocate());
+template <class TKEY, class TVAL>
+NiTMapItem<TKEY, TVAL>* NiTMap<TKEY, TVAL>::NewItem() {
+    return static_cast<NiTMapItem<TKEY, TVAL>*>(this->m_kAllocator.Allocate());
 }
 
 // Clears the value, so that a smart pointer drops its reference, and frees the item.
-template <class TKEY, class TVAL> void NiTMap<TKEY, TVAL>::DeleteItem(NiTMapItem<TKEY, TVAL>* pkItem) {
-	pkItem->m_val = 0;
-	this->m_kAllocator.Deallocate(pkItem);
+template <class TKEY, class TVAL>
+void NiTMap<TKEY, TVAL>::DeleteItem(NiTMapItem<TKEY, TVAL>* pkItem) {
+    pkItem->m_val = 0;
+    this->m_kAllocator.Deallocate(pkItem);
 }
 
 // Sets up the bucket table; returns this.
-template <class TKEY, class TVAL> NiTMap<TKEY, TVAL>* NiTMap<TKEY, TVAL>::Init(uint32_t auiHashSize) {
-	NiTMapBase<DFALL<NiTMapItem<TKEY, TVAL>>, TKEY, TVAL>::Init(auiHashSize);
-	return this;
+template <class TKEY, class TVAL>
+NiTMap<TKEY, TVAL>* NiTMap<TKEY, TVAL>::Init(uint32_t auiHashSize) {
+    NiTMapBase<DFALL<NiTMapItem<TKEY, TVAL>>, TKEY, TVAL>::Init(auiHashSize);
+    return this;
 }
 
-template <class TKEY, class TVAL> bool NiTMap<TKEY, TVAL>::RemoveAt_00E91FD0(TKEY key) {
-	return this->RemoveAt(key);
+template <class TKEY, class TVAL>
+bool NiTMap<TKEY, TVAL>::RemoveAt_00E91FD0(TKEY key) {
+    return this->RemoveAt(key);
 }
 
 using NiTMapREFRBound = NiTMap<TESObjectREFR*, NiPointer<BSMultiBoundNode>>;
@@ -100,8 +107,10 @@ using NiTMapStringSetting = NiTMap<const char*, Setting*>;
 using NiTMapStringIdleRoot = NiTMap<const char*, IDLE_ANIM_ROOT*>;
 // The map from a target object to the list of liquid actions following it (bhkLiquidAction::LiquidListMap). Defined in
 // bhkLiquidAction.cpp.
-using NiTMapBaseAVObjectLiquidActionList = NiTMapBase<DFALL<NiTMapItem<NiAVObject*, BSSimpleList<bhkLiquidAction*>*>>,
-	NiAVObject*, BSSimpleList<bhkLiquidAction*>*>;
+using NiTMapBaseAVObjectLiquidActionList = NiTMapBase<
+    DFALL<NiTMapItem<NiAVObject*, BSSimpleList<bhkLiquidAction*>*>>,
+    NiAVObject*,
+    BSSimpleList<bhkLiquidAction*>*>;
 using NiTMapAVObjectLiquidActionList = NiTMap<NiAVObject*, BSSimpleList<bhkLiquidAction*>*>;
 
 // The map of Fallout Shared/Pathfinding/NavMeshObstacleManager.cpp; its constructor and destructor are defined there.

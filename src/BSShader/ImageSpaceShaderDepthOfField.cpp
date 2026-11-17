@@ -7,7 +7,7 @@
 #include "Gamebryo2.2/CoreLibs/NiMain/NiTArray.h"
 
 ImageSpaceShaderDepthOfField::ImageSpaceShaderDepthOfField() {
-	pTextures.SetSize(4u);
+    pTextures.SetSize(4u);
 }
 
 ImageSpaceShaderDepthOfField::~ImageSpaceShaderDepthOfField() {}

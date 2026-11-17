@@ -8,25 +8,27 @@
 // on the heap.
 class hkpAllCdPointCollector : public hkpCdPointCollector {
 public:
-	hkpAllCdPointCollector();
-	~hkpAllCdPointCollector() override;
+    hkpAllCdPointCollector();
+    ~hkpAllCdPointCollector() override;
 
-	void addCdPoint(const hkpCdPoint& event) override;
-	void reset() override;
-	virtual void addRootCdPoint(const hkpRootCdPoint&);
+    void addCdPoint(const hkpCdPoint& event) override;
+    void reset() override;
+    virtual void addRootCdPoint(const hkpRootCdPoint&);
 
-	const hkArray<hkpRootCdPoint>& getHits() const { return m_hits; }
+    const hkArray<hkpRootCdPoint>& getHits() const {
+        return m_hits;
+    }
 
-	// Whether the collector holds any hit; the result hkBool is written through apResult, which is also returned.
-	hkBool* hasHit(hkBool* apResult);
-	// Sorts the collected hits by their hit fraction.
-	void sortHits();
+    // Whether the collector holds any hit; the result hkBool is written through apResult, which is also returned.
+    hkBool* hasHit(hkBool* apResult);
+    // Sorts the collected hits by their hit fraction.
+    void sortHits();
 
-	// Frees the block to the calling thread's router heap allocator (blockFree) with the object's size; nothing for
-	// null. The deleting destructor calls it.
-	static void operator delete(void* p);
+    // Frees the block to the calling thread's router heap allocator (blockFree) with the object's size; nothing for
+    // null. The deleting destructor calls it.
+    static void operator delete(void* p);
 
-	hkInplaceArray<hkpRootCdPoint, 8> m_hits;
+    hkInplaceArray<hkpRootCdPoint, 8> m_hits;
 };
 
 inline constexpr fnvd::Vtable hkpAllCdPointCollector_vftable{};

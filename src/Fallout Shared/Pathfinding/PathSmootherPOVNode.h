@@ -8,7 +8,7 @@ class PathSmootherPOV;
 // goes around it and the radius it was actually passed at.
 class PathSmootherPOVNode {
 public:
-	PathSmootherPOV* pPOV;
-	ANGLE_DIRECTION Direction;
-	float fActualRadius;
+    PathSmootherPOV* pPOV;
+    ANGLE_DIRECTION Direction;
+    float fActualRadius;
 };

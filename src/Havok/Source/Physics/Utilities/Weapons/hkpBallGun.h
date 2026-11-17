@@ -18,34 +18,34 @@ void cleanupLoadedObjecthkpBallGun(void* p);
 // removed once m_maxBulletsInWorld are out. It overrides the destructor, fireGun and reset.
 class hkpBallGun : public hkpFirstPersonGun {
 public:
-	hkpBallGun(hkFinishLoadedObjectFlag flag);
-	hkpBallGun(int32_t numBullets);
-	// Slot 0.
-	~hkpBallGun() override;
+    hkpBallGun(hkFinishLoadedObjectFlag flag);
+    hkpBallGun(int32_t numBullets);
+    // Slot 0.
+    ~hkpBallGun() override;
 
-	// Slot 4.
-	void fireGun(hkpWorld* world, const hkTransform& viewTransform) override;
-	// Slot 8: removes every bullet still queued, telling the listeners first and taking each out
-	// of world when it is in it.
-	void reset(hkpWorld* world) override;
+    // Slot 4.
+    void fireGun(hkpWorld* world, const hkTransform& viewTransform) override;
+    // Slot 8: removes every bullet still queued, telling the listeners first and taking each out
+    // of world when it is in it.
+    void reset(hkpWorld* world) override;
 
 protected:
-	// Computes the volume mass properties of apShape at mass afMass, then sets arInfo's inertia tensor, centre of mass
-	// and mass from them.
-	static hkpRigidBodyCinfo* computeMassProperties(const hkpShape* apShape, float afMass, hkpRigidBodyCinfo& arInfo);
+    // Computes the volume mass properties of apShape at mass afMass, then sets arInfo's inertia tensor, centre of mass
+    // and mass from them.
+    static hkpRigidBodyCinfo* computeMassProperties(const hkpShape* apShape, float afMass, hkpRigidBodyCinfo& arInfo);
 
 public:
-	// Havok SDK signature (hkpUtilities.lib, tied by target).
-	static const hkClass& staticClass();
+    // Havok SDK signature (hkpUtilities.lib, tied by target).
+    static const hkClass& staticClass();
 
-	float m_bulletRadius;
-	float m_bulletVelocity;
-	float m_bulletMass;
-	float m_damageMultiplier;
-	int32_t m_maxBulletsInWorld;
-	hkVector4 m_bulletOffsetFromCenter;
-	// The bullets in the world, oldest first.
-	hkQueue<hkpRigidBody*>* m_addedBodies;
+    float m_bulletRadius;
+    float m_bulletVelocity;
+    float m_bulletMass;
+    float m_damageMultiplier;
+    int32_t m_maxBulletsInWorld;
+    hkVector4 m_bulletOffsetFromCenter;
+    // The bullets in the world, oldest first.
+    hkQueue<hkpRigidBody*>* m_addedBodies;
 };
 
 // The class's reflection record.

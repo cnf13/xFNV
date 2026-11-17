@@ -20,77 +20,87 @@ NiPSysModifierFloatCtlr::NiPSysModifierFloatCtlr() {}
 NiPSysModifierFloatCtlr::~NiPSysModifierFloatCtlr() {}
 
 void NiPSysModifierFloatCtlr::LoadBinary(NiStream& kStream) {
-	NiPSysModifierCtlr::LoadBinary(kStream);
-	if (kStream.GetFileVersion() < NiStream::GetVersion(10, 1, 0, 104))
-		kStream.ReadLinkID();
+    NiPSysModifierCtlr::LoadBinary(kStream);
+    if (kStream.GetFileVersion() < NiStream::GetVersion(10, 1, 0, 104)) {
+        kStream.ReadLinkID();
+    }
 }
 
 // Files older than 10.1.0.104 carry a link to old-style float data; it becomes a float interpolator.
 void NiPSysModifierFloatCtlr::LinkObject(NiStream& kStream) {
-	NiPSysModifierCtlr::LinkObject(kStream);
-	if (kStream.GetFileVersion() < NiStream::GetVersion(10, 1, 0, 104)) {
-		NiFloatData* pkData = static_cast<NiFloatData*>(kStream.GetObjectFromLinkID());
-		void* pvMem = NiMemObject::operator new(sizeof(NiFloatInterpolator));
-		NiFloatInterpolator* pkInterp = pvMem ? ::new (pvMem) NiFloatInterpolator(pkData) : nullptr;
-		m_spInterpolator = pkInterp;
-	}
+    NiPSysModifierCtlr::LinkObject(kStream);
+    if (kStream.GetFileVersion() < NiStream::GetVersion(10, 1, 0, 104)) {
+        NiFloatData* pkData = static_cast<NiFloatData*>(kStream.GetObjectFromLinkID());
+        void* pvMem = NiMemObject::operator new(sizeof(NiFloatInterpolator));
+        NiFloatInterpolator* pkInterp = pvMem ? ::new (pvMem) NiFloatInterpolator(pkData) : nullptr;
+        m_spInterpolator = pkInterp;
+    }
 }
 
 bool NiPSysModifierFloatCtlr::RegisterStreamables(NiStream& kStream) {
-	return NiPSysModifierCtlr::RegisterStreamables(kStream);
+    return NiPSysModifierCtlr::RegisterStreamables(kStream);
 }
 
 void NiPSysModifierFloatCtlr::SaveBinary(NiStream& kStream) {
-	NiPSysModifierCtlr::SaveBinary(kStream);
+    NiPSysModifierCtlr::SaveBinary(kStream);
 }
 
 bool NiPSysModifierFloatCtlr::IsEqual(NiObject* pkObject) {
-	return NiPSysModifierCtlr::IsEqual(pkObject);
+    return NiPSysModifierCtlr::IsEqual(pkObject);
 }
 
 void NiPSysModifierFloatCtlr::GetViewerStrings(NiTPrimitiveArray<char*>* pkStrings) {
-	NiPSysModifierCtlr::GetViewerStrings(pkStrings);
-	pkStrings->Add(NiGetViewerString(ms_RTTI.GetName()));
+    NiPSysModifierCtlr::GetViewerStrings(pkStrings);
+    pkStrings->Add(NiGetViewerString(ms_RTTI.GetName()));
 }
 
 void NiPSysModifierFloatCtlr::Update(NiUpdateData& UpdateData) {
-	if (m_usFlags & MANAGERCONTROLLED_MASK)
-		m_fScaledTime = -FLT_MAX;
-	else if (DontDoUpdate(UpdateData.fTime) && (!m_spInterpolator || !m_spInterpolator->AlwaysUpdate()))
-		return;
+    if (m_usFlags & MANAGERCONTROLLED_MASK) {
+        m_fScaledTime = -FLT_MAX;
+    }
+    else if (DontDoUpdate(UpdateData.fTime) && (!m_spInterpolator || !m_spInterpolator->AlwaysUpdate())) {
+        return;
+    }
 
-	if (!m_spInterpolator)
-		return;
+    if (!m_spInterpolator) {
+        return;
+    }
 
-	float fValue;
-	if (m_spInterpolator->Update(m_fScaledTime, m_pkTarget, fValue))
-		SetTargetFloatValue(fValue);
+    float fValue;
+    if (m_spInterpolator->Update(m_fScaledTime, m_pkTarget, fValue)) {
+        SetTargetFloatValue(fValue);
+    }
 }
 
 NiInterpolator* NiPSysModifierFloatCtlr::CreatePoseInterpolator(uint16_t) {
-	float fValue;
-	GetTargetFloatValue(fValue);
-	void* pvMem = NiMemObject::operator new(sizeof(NiFloatInterpolator));
-	return pvMem ? ::new (pvMem) NiFloatInterpolator(fValue) : nullptr;
+    float fValue;
+    GetTargetFloatValue(fValue);
+    void* pvMem = NiMemObject::operator new(sizeof(NiFloatInterpolator));
+    return pvMem ? ::new (pvMem) NiFloatInterpolator(fValue) : nullptr;
 }
 
 // Sets the pose of apInterp, which must be a NiFloatInterpolator, to the target's current value.
 void NiPSysModifierFloatCtlr::SynchronizePoseInterpolator(NiInterpolator* apInterp, uint16_t) {
-	NiFloatInterpolator* pkInterp = apInterp
-		? static_cast<NiFloatInterpolator*>(apInterp->DynamicCastMember(&NiFloatInterpolator::ms_RTTI))
-		: nullptr;
-	float fValue;
-	GetTargetFloatValue(fValue);
-	pkInterp->SetPoseValue(fValue);
+    NiFloatInterpolator* pkInterp = apInterp
+        ? static_cast<NiFloatInterpolator*>(apInterp->DynamicCastMember(&NiFloatInterpolator::ms_RTTI))
+        : nullptr;
+    float fValue;
+    GetTargetFloatValue(fValue);
+    pkInterp->SetPoseValue(fValue);
 }
 
 // NiFloatInterpController and NiGeomMorpherController use the same function.
-NiBlendInterpolator* NiPSysModifierFloatCtlr::CreateBlendInterpolator(uint16_t, int32_t bManagerControlled, bool,
-	float fWeightThreshold, int32_t ucArraySize) const {
-	void* pvMem = NiMemObject::operator new(sizeof(NiBlendFloatInterpolator));
-	return pvMem ? ::new (pvMem) NiBlendFloatInterpolator(bManagerControlled, fWeightThreshold, ucArraySize) : nullptr;
+NiBlendInterpolator* NiPSysModifierFloatCtlr::CreateBlendInterpolator(
+    uint16_t,
+    int32_t bManagerControlled,
+    bool,
+    float fWeightThreshold,
+    int32_t ucArraySize
+) const {
+    void* pvMem = NiMemObject::operator new(sizeof(NiBlendFloatInterpolator));
+    return pvMem ? ::new (pvMem) NiBlendFloatInterpolator(bManagerControlled, fWeightThreshold, ucArraySize) : nullptr;
 }
 
 bool NiPSysModifierFloatCtlr::InterpolatorIsCorrectType(NiInterpolator* pkInterpolator, uint16_t) const {
-	return pkInterpolator->IsFloatValueSupported();
+    return pkInterpolator->IsFloatValueSupported();
 }

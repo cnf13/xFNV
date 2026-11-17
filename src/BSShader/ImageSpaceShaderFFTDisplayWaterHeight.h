@@ -4,8 +4,8 @@
 
 class ImageSpaceShaderFFTDisplayWaterHeight : public ImageSpaceShader {
 public:
-	ImageSpaceShaderFFTDisplayWaterHeight();
-	~ImageSpaceShaderFFTDisplayWaterHeight() override;
+    ImageSpaceShaderFFTDisplayWaterHeight();
+    ~ImageSpaceShaderFFTDisplayWaterHeight() override;
 
-	void ReloadShaders() override;
+    void ReloadShaders() override;
 };

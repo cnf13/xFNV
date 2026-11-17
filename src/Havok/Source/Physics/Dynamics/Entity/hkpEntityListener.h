@@ -7,15 +7,15 @@ class hkpEntity;
 // friends).
 class hkpEntityListener {
 public:
-	hkpEntityListener();
-	virtual ~hkpEntityListener();
+    hkpEntityListener();
+    virtual ~hkpEntityListener();
 
-	virtual void entityAddedCallback(hkpEntity*) {}
-	virtual void entityRemovedCallback(hkpEntity*) {}
-	virtual void entityShapeSetCallback(hkpEntity* entity);
-	virtual void entitySetMotionTypeCallback(hkpEntity*) {}
-	virtual void entityDeletedCallback(hkpEntity*) {}
+    virtual void entityAddedCallback(hkpEntity*) {}
+    virtual void entityRemovedCallback(hkpEntity*) {}
+    virtual void entityShapeSetCallback(hkpEntity* entity);
+    virtual void entitySetMotionTypeCallback(hkpEntity*) {}
+    virtual void entityDeletedCallback(hkpEntity*) {}
 
-	// DeletingDestruct's free (ourFree).
-	static void operator delete(void* apMemory);
+    // DeletingDestruct's free (ourFree).
+    static void operator delete(void* apMemory);
 };

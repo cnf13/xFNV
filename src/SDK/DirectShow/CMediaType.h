@@ -5,15 +5,15 @@
 
 // SDK media format descriptor; CopyFrom copies 0x48 bytes before duplicating pbFormat and AddRef'ing pUnk.
 struct AM_MEDIA_TYPE {
-	GUID majortype;
-	GUID subtype;
-	int32_t bFixedSizeSamples;
-	int32_t bTemporalCompression;
-	uint32_t lSampleSize;
-	GUID formattype;
-	IUnknown* pUnk;
-	uint32_t cbFormat;
-	uint8_t* pbFormat;
+    GUID majortype;
+    GUID subtype;
+    int32_t bFixedSizeSamples;
+    int32_t bTemporalCompression;
+    uint32_t lSampleSize;
+    GUID formattype;
+    IUnknown* pUnk;
+    uint32_t cbFormat;
+    uint8_t* pbFormat;
 };
 
 // Not named in the PDB or IDA (IDA calls it AM_MEDIA_TYPE::~AM_MEDIA_TYPE); the DirectShow base classes' name
@@ -35,6 +35,7 @@ class CMediaType : public AM_MEDIA_TYPE {
 public:
     CMediaType();
     ~CMediaType();
+
 public:
     // Copies the AM_MEDIA_TYPE a1 into this one through Set.
     uint32_t* CopyFrom(const AM_MEDIA_TYPE* a1);
@@ -43,6 +44,7 @@ public:
     // (thiscall, ret 0, 0x9F9A30; eax keeps the 1, which no caller reads). The constructor and
     // CBasePin::ConnectionMediaType call it.
     void InitMediaType();
+
 public:
     int32_t IsPartiallySpecified();
     // Not named in the PDB or IDA; the DirectShow base classes' name (mtype.cpp). TRUE when every GUID ppartial

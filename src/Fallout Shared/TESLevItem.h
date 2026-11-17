@@ -7,21 +7,21 @@
 // sits at +0x30, right after the bound object.
 class TESLevItem : public TESBoundObject, public TESLeveledList {
 public:
-	TESLevItem();
-	~TESLevItem() override;
+    TESLevItem();
+    ~TESLevItem() override;
 
-	bool Load(TESFile* apFile) override;
-	void Save() override;
-	void SaveGame(BGSSaveFormBuffer* apSaveGameBuffer) override;
-	void LoadGame(BGSLoadFormBuffer* apLoadGameBuffer) override;
-	void Revert(BGSLoadFormBuffer* apLoadGameBuffer) override;
-	void InitItem() override;
-	void Copy(TESForm* apCopy) override;
-	bool Compare(TESForm* apCompare) override;
+    bool Load(TESFile* apFile) override;
+    void Save() override;
+    void SaveGame(BGSSaveFormBuffer* apSaveGameBuffer) override;
+    void LoadGame(BGSLoadFormBuffer* apLoadGameBuffer) override;
+    void Revert(BGSLoadFormBuffer* apLoadGameBuffer) override;
+    void InitItem() override;
+    void Copy(TESForm* apCopy) override;
+    bool Compare(TESForm* apCompare) override;
 
-	int32_t GetMaxLevelDifference() override;
-	using TESForm::LoadGame;
-	using TESForm::Revert;
-	using TESForm::Save;
-	using TESForm::SaveGame;
+    int32_t GetMaxLevelDifference() override;
+    using TESForm::LoadGame;
+    using TESForm::Revert;
+    using TESForm::Save;
+    using TESForm::SaveGame;
 };

@@ -9,6 +9,6 @@ class hkStreamWriter;
 // Interface for writing reflected objects and unstructured bytes.
 class hkObjectWriter : public hkReferencedObject {
 public:
-	virtual hkResult writeObject(hkStreamWriter*, const void*, const hkClass&, hkRelocationInfo&) = 0;
-	virtual hkResult writeRaw(hkStreamWriter*, const void*, int32_t) = 0;
+    virtual hkResult writeObject(hkStreamWriter*, const void*, const hkClass&, hkRelocationInfo&) = 0;
+    virtual hkResult writeRaw(hkStreamWriter*, const void*, int32_t) = 0;
 };

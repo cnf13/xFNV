@@ -20,36 +20,39 @@ NiRTTI NiExtraData::ms_RTTI("NiExtraData", &NiObject::ms_RTTI);
 NiExtraData::NiExtraData() {}
 
 NiExtraData::NiExtraData(const NiFixedString& kName) {
-	m_kName = kName;
+    m_kName = kName;
 }
 
 // m_kName's own destructor drops the name's reference.
 NiExtraData::~NiExtraData() {}
 
 void NiExtraData::LoadBinary(NiStream& kStream) {
-	NiObject::LoadBinary(kStream);
+    NiObject::LoadBinary(kStream);
 
-	if (kStream.GetFileVersion() < NiStream::GetVersion(5, 0, 0, 11)) {
-		// Older files: a link to the name (resolved in LinkObject), then an unnamed blob. A plain NiExtraData with a
-		// blob is replaced by an NiBinaryExtraData holding it.
-		kStream.ReadLinkID();
-		uint32_t uiSize;
-		NiStreamLoadBinary(kStream, uiSize);
-		if (uiSize > 0 && GetRTTI() == &NiExtraData::ms_RTTI) {
-			char* pcData = static_cast<char*>(_NiMalloc(uiSize));
-			NiStreamLoadBinary(kStream, pcData, uiSize);
-			void* pvMemory = NiMemObject::operator new(sizeof(NiBinaryExtraData));
-			if (pvMemory) {
-				NiBinaryExtraData* pkBinaryData = ::new (pvMemory) NiBinaryExtraData(uiSize, pcData);
-				if (pkBinaryData)
-					kStream.ChangeObject(pkBinaryData);
-			}
-		}
-	} else if (kStream.GetFileVersion() < NiStream::GetVersion(20, 1, 0, 1)) {
-		kStream.LoadCStringAsFixedString(m_kName);
-	} else {
-		kStream.LoadFixedString(m_kName);
-	}
+    if (kStream.GetFileVersion() < NiStream::GetVersion(5, 0, 0, 11)) {
+        // Older files: a link to the name (resolved in LinkObject), then an unnamed blob. A plain NiExtraData with a
+        // blob is replaced by an NiBinaryExtraData holding it.
+        kStream.ReadLinkID();
+        uint32_t uiSize;
+        NiStreamLoadBinary(kStream, uiSize);
+        if (uiSize > 0 && GetRTTI() == &NiExtraData::ms_RTTI) {
+            char* pcData = static_cast<char*>(_NiMalloc(uiSize));
+            NiStreamLoadBinary(kStream, pcData, uiSize);
+            void* pvMemory = NiMemObject::operator new(sizeof(NiBinaryExtraData));
+            if (pvMemory) {
+                NiBinaryExtraData* pkBinaryData = ::new (pvMemory) NiBinaryExtraData(uiSize, pcData);
+                if (pkBinaryData) {
+                    kStream.ChangeObject(pkBinaryData);
+                }
+            }
+        }
+    }
+    else if (kStream.GetFileVersion() < NiStream::GetVersion(20, 1, 0, 1)) {
+        kStream.LoadCStringAsFixedString(m_kName);
+    }
+    else {
+        kStream.LoadFixedString(m_kName);
+    }
 }
 
 // KEEP: niread: before 5.0.0.11 the exe reads the blob size into the stream argument's own slot (0xA7B4DA), so a
@@ -57,67 +60,69 @@ void NiExtraData::LoadBinary(NiStream& kStream) {
 // an unwritten local and src cannot express the slot's reuse. porting.md's unwritten-slot exception covers
 // GetChunkData only.
 void NiExtraData::LinkObject(NiStream& kStream) {
-	if (kStream.GetFileVersion() < NiStream::GetVersion(5, 0, 0, 11)) {
-		// The linked object's pointer is stored into the name's handle as is, with no string reference taken;
-		// NiFixedString offers no such assignment, so the raw store is spelled out. The old handle is deliberately
-		// dropped unreleased, as the game does; only NIFs older than 5.0.0.11 reach this.
-		NiObject* pkObject = kStream.GetObjectFromLinkID();
-		std::memcpy(static_cast<void*>(&m_kName), &pkObject, sizeof(pkObject));
-	}
+    if (kStream.GetFileVersion() < NiStream::GetVersion(5, 0, 0, 11)) {
+        // The linked object's pointer is stored into the name's handle as is, with no string reference taken;
+        // NiFixedString offers no such assignment, so the raw store is spelled out. The old handle is deliberately
+        // dropped unreleased, as the game does; only NIFs older than 5.0.0.11 reach this.
+        NiObject* pkObject = kStream.GetObjectFromLinkID();
+        std::memcpy(static_cast<void*>(&m_kName), &pkObject, sizeof(pkObject));
+    }
 }
 
 bool NiExtraData::RegisterStreamables(NiStream& kStream) {
-	if (!NiObject::RegisterStreamables(kStream))
-		return false;
+    if (!NiObject::RegisterStreamables(kStream)) {
+        return false;
+    }
 
-	return kStream.RegisterFixedString(m_kName);
+    return kStream.RegisterFixedString(m_kName);
 }
 
 void NiExtraData::SaveBinary(NiStream& kStream) {
-	NiObject::SaveBinary(kStream);
-	kStream.SaveFixedString(m_kName);
+    NiObject::SaveBinary(kStream);
+    kStream.SaveFixedString(m_kName);
 }
 
 bool NiExtraData::IsEqual(NiObject* pObject) {
-	if (!NiObject::IsEqual(pObject))
-		return false;
+    if (!NiObject::IsEqual(pObject)) {
+        return false;
+    }
 
-	return m_kName == static_cast<NiExtraData*>(pObject)->m_kName;
+    return m_kName == static_cast<NiExtraData*>(pObject)->m_kName;
 }
 
 // Unlike most classes, the lines start with this class' heading: NiObject's lines are not added.
 void NiExtraData::GetViewerStrings(NiTPrimitiveArray<char*>* pkStrings) {
-	pkStrings->Add(NiGetViewerString(NiExtraData::ms_RTTI.GetName()));
-	pkStrings->Add(NiGetViewerString("m_pcName", static_cast<const char*>(m_kName)));
+    pkStrings->Add(NiGetViewerString(NiExtraData::ms_RTTI.GetName()));
+    pkStrings->Add(NiGetViewerString("m_pcName", static_cast<const char*>(m_kName)));
 }
 
 void NiExtraData::CopyMembers(NiExtraData* pDest, NiCloningProcess& kCloning) {
-	NiObject::CopyMembers(pDest, kCloning);
-	pDest->m_kName = m_kName;
+    NiObject::CopyMembers(pDest, kCloning);
+    pDest->m_kName = m_kName;
 }
 
 const NiFixedString& NiExtraData::GetName() const {
-	return m_kName;
+    return m_kName;
 }
 
 void NiExtraData::SetName(const NiFixedString& kName) {
-	NiGlobalStringTable::GlobalStringHandle kHandle = kName.GetHandle();
-	if (m_kName.GetHandle() != kHandle) {
-		// EXE-INLINED 0x43BA10
-		NiGlobalStringTable::AcquireHandle(kHandle);
-		NiGlobalStringTable::ReleaseHandle(m_kName.GetHandle());
-		m_kName.SetHandle(kHandle);
-	}
+    NiGlobalStringTable::GlobalStringHandle kHandle = kName.GetHandle();
+    if (m_kName.GetHandle() != kHandle) {
+        // EXE-INLINED 0x43BA10
+        NiGlobalStringTable::AcquireHandle(kHandle);
+        NiGlobalStringTable::ReleaseHandle(m_kName.GetHandle());
+        m_kName.SetHandle(kHandle);
+    }
 }
 
 void NiExtraData::ClearName() {
-	m_kName.SetHandle(nullptr);
+    m_kName.SetHandle(nullptr);
 }
 
 NiObject* NiExtraData::CreateObject() {
-	NiExtraData* pkObject = static_cast<NiExtraData*>(NiMemObject::operator new(sizeof(NiExtraData)));
-	if (!pkObject) {
-		return 0;
-	}
-	return ::new (pkObject) NiExtraData;
+    NiExtraData* pkObject = static_cast<NiExtraData*>(NiMemObject::operator new(sizeof(NiExtraData)));
+    if (!pkObject) {
+        return 0;
+    }
+    return ::new (pkObject) NiExtraData;
 }

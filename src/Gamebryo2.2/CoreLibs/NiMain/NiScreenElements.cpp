@@ -22,71 +22,72 @@ NiScreenElements::NiScreenElements(NiScreenElementsData* pkModelData) : NiTriSha
 NiScreenElements::~NiScreenElements() {}
 
 const NiRTTI* NiScreenElements::GetRTTI() const {
-	return &ms_RTTI;
+    return &ms_RTTI;
 }
 
 // CopyMembers is called on this object through BSResizableTriShape::CopyMembers, a class it does not derive from; that
 // body only calls NiTriShape::CopyMembers. It is deliberately called with a null clone when the allocation fails, as
 // the game does.
 NiObject* NiScreenElements::CreateClone(NiCloningProcess& kCloning) {
-	NiScreenElements* pkClone = static_cast<NiScreenElements*>(NiMemObject::operator new(sizeof(NiScreenElements)));
-	if (pkClone) {
-		::new (pkClone) NiScreenElements;
-	}
-	static_cast<BSResizableTriShape*>(static_cast<NiTriShape*>(this))
-		->CopyMembers(static_cast<BSResizableTriShape*>(static_cast<NiTriShape*>(pkClone)), kCloning);
-	return pkClone;
+    NiScreenElements* pkClone = static_cast<NiScreenElements*>(NiMemObject::operator new(sizeof(NiScreenElements)));
+    if (pkClone) {
+        ::new (pkClone) NiScreenElements;
+    }
+    static_cast<BSResizableTriShape*>(static_cast<NiTriShape*>(this))
+        ->CopyMembers(static_cast<BSResizableTriShape*>(static_cast<NiTriShape*>(pkClone)), kCloning);
+    return pkClone;
 }
 
 void NiScreenElements::LoadBinary(NiStream& kStream) {
-	NiTriShape::LoadBinary(kStream);
+    NiTriShape::LoadBinary(kStream);
 }
 
 void NiScreenElements::LinkObject(NiStream& kStream) {
-	NiTriShape::LinkObject(kStream);
+    NiTriShape::LinkObject(kStream);
 }
 
 bool NiScreenElements::RegisterStreamables(NiStream& kStream) {
-	return NiTriShape::RegisterStreamables(kStream);
+    return NiTriShape::RegisterStreamables(kStream);
 }
 
 void NiScreenElements::SaveBinary(NiStream& kStream) {
-	NiTriShape::SaveBinary(kStream);
+    NiTriShape::SaveBinary(kStream);
 }
 
 bool NiScreenElements::IsEqual(NiObject* pkObject) {
-	return NiTriShape::IsEqual(pkObject);
+    return NiTriShape::IsEqual(pkObject);
 }
 
 void NiScreenElements::GetViewerStrings(NiTPrimitiveArray<char*>* pkStrings) {
-	NiTriShape::GetViewerStrings(pkStrings);
-	pkStrings->Add(NiGetViewerString(ms_RTTI.GetName()));
+    NiTriShape::GetViewerStrings(pkStrings);
+    pkStrings->Add(NiGetViewerString(ms_RTTI.GetName()));
 }
 
 int32_t NiScreenElements::Insert(uint16_t usNumVertices, uint16_t usNumTriangles, const uint16_t* ausTriList) {
-	NiGeometryData* modelData = NiGeometry::GetModelData();
-	return static_cast<NiScreenElementsData*>(modelData)->Insert(usNumVertices, usNumTriangles, ausTriList);
+    NiGeometryData* modelData = NiGeometry::GetModelData();
+    return static_cast<NiScreenElementsData*>(modelData)->Insert(usNumVertices, usNumTriangles, ausTriList);
 }
 
 bool NiScreenElements::SetRectangle(int32_t iPolygon, float fLeft, float fTop, float fWidth, float fHeight) {
-	NiGeometryData* modelData = NiGeometry::GetModelData();
-	return (bool)((uint8_t)static_cast<NiScreenElementsData*>(modelData)->SetRectangle(iPolygon, fLeft, fTop, fWidth,
-		fHeight));
+    NiGeometryData* modelData = NiGeometry::GetModelData();
+    return (bool)((uint8_t)static_cast<NiScreenElementsData*>(modelData)->SetRectangle(
+        iPolygon, fLeft, fTop, fWidth, fHeight
+    ));
 }
 
 void NiScreenElements::UpdateBound() {
-	NiGeometryData* modelData = NiGeometry::GetModelData();
-	static_cast<NiScreenElementsData*>(modelData)->UpdateBound();
+    NiGeometryData* modelData = NiGeometry::GetModelData();
+    static_cast<NiScreenElementsData*>(modelData)->UpdateBound();
 }
 
 void NiScreenElements::Draw(NiRenderer* pkRenderer) {
-	RenderImmediate(pkRenderer);
+    RenderImmediate(pkRenderer);
 }
 
 NiObject* NiScreenElements::CreateObject() {
-	void* v0 = NiMemObject::operator new(sizeof(NiScreenElements));
-	if (!v0) {
-		return 0;
-	}
-	return ::new (v0) NiScreenElements;
+    void* v0 = NiMemObject::operator new(sizeof(NiScreenElements));
+    if (!v0) {
+        return 0;
+    }
+    return ::new (v0) NiScreenElements;
 }

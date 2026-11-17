@@ -41,8 +41,8 @@
 #include "Fallout Shared/BGSRagdoll.h"
 #include "Fallout Shared/BGSSceneInfo.h"
 #include "Fallout Shared/BGSTalkingActivator.h"
-#include "Fallout Shared/BipedAnim.h"
 #include "Fallout Shared/BSAnimGroupSequence.h"
+#include "Fallout Shared/BipedAnim.h"
 #include "Fallout Shared/CombatFormulas.h"
 #include "Fallout Shared/Distant Terrain System/BGSDistantTreeBlock.h"
 #include "Fallout Shared/Distant Terrain System/BGSTerrainManager.h"
@@ -62,8 +62,8 @@
 #include "Fallout Shared/NiTreeCtrl.h"
 #include "Fallout Shared/Package.h"
 #include "Fallout Shared/PackageEventAction.h"
-#include "Fallout Shared/Pathfinding/AngleSinCos.h"
 #include "Fallout Shared/Pathfinding/AStarNode.h"
+#include "Fallout Shared/Pathfinding/AngleSinCos.h"
 #include "Fallout Shared/Pathfinding/FastNavMeshEdgeLocationProxy.h"
 #include "Fallout Shared/Pathfinding/FastNavMeshHandles.h"
 #include "Fallout Shared/Pathfinding/FastNavMeshLocation.h"
@@ -84,23 +84,23 @@
 #include "Fallout Shared/Pathfinding/NavMeshSearch.h"
 #include "Fallout Shared/Pathfinding/NavMeshStaticAvoidNode.h"
 #include "Fallout Shared/Pathfinding/NavMeshTriangle.h"
-#include "Fallout Shared/Pathfinding/NavmeshTriFan.h"
 #include "Fallout Shared/Pathfinding/NavMeshVertex.h"
+#include "Fallout Shared/Pathfinding/NavmeshTriFan.h"
 #include "Fallout Shared/Pathfinding/ObstacleTaskNavMeshOperation.h"
 #include "Fallout Shared/Pathfinding/PathBuilder.h"
-#include "Fallout Shared/Pathfinding/Pathfind.h"
-#include "Fallout Shared/Pathfinding/PathingAvoidNode.h"
-#include "Fallout Shared/Pathfinding/PathingCoverLocation.h"
-#include "Fallout Shared/Pathfinding/PathingLocation.h"
-#include "Fallout Shared/Pathfinding/PathingLOSGridCell.h"
-#include "Fallout Shared/Pathfinding/PathingNode.h"
-#include "Fallout Shared/Pathfinding/PathingRequest.h"
 #include "Fallout Shared/Pathfinding/PathManager.h"
 #include "Fallout Shared/Pathfinding/PathSmoother.h"
 #include "Fallout Shared/Pathfinding/PathSmootherPOV.h"
 #include "Fallout Shared/Pathfinding/PathSmootherPOVLink.h"
 #include "Fallout Shared/Pathfinding/PathSmootherPOVNode.h"
 #include "Fallout Shared/Pathfinding/PathSmootherPOVSearch.h"
+#include "Fallout Shared/Pathfinding/Pathfind.h"
+#include "Fallout Shared/Pathfinding/PathingAvoidNode.h"
+#include "Fallout Shared/Pathfinding/PathingCoverLocation.h"
+#include "Fallout Shared/Pathfinding/PathingLOSGridCell.h"
+#include "Fallout Shared/Pathfinding/PathingLocation.h"
+#include "Fallout Shared/Pathfinding/PathingNode.h"
+#include "Fallout Shared/Pathfinding/PathingRequest.h"
 #include "Fallout Shared/Pathfinding/RemoveIndex.h"
 #include "Fallout Shared/Pathfinding/TeleportPath.h"
 #include "Fallout Shared/Pathfinding/VirtualPathingNode.h"
@@ -110,7 +110,6 @@
 #include "Fallout Shared/Script.h"
 #include "Fallout Shared/Sky/Sky.h"
 #include "Fallout Shared/SpeedTree/BSTreeManager.h"
-#include "Fallout Shared/TempEffects/BSTempEffectSimpleDecal.h"
 #include "Fallout Shared/TES.h"
 #include "Fallout Shared/TESActorBaseData.h"
 #include "Fallout Shared/TESAmmo.h"
@@ -143,6 +142,7 @@
 #include "Fallout Shared/TESTopic.h"
 #include "Fallout Shared/TESWaterSystem.h"
 #include "Fallout Shared/TESWorldSpace.h"
+#include "Fallout Shared/TempEffects/BSTempEffectSimpleDecal.h"
 #include "Fallout/AI/Actor.h"
 #include "Fallout/AI/BaseProcess.h"
 #include "Fallout/AI/CharacterProgression.h"
@@ -176,9 +176,9 @@
 #include "Fallout/Audio/ImpactMixer.h"
 #include "Fallout/Debug/DebugTextManager.h"
 #include "Fallout/Dialogue/DialogueResponse.h"
-#include "Fallout/Interface/FaderManager.h"
 #include "Fallout/Interface/FOPipboyManager.h"
 #include "Fallout/Interface/FORenderedMenuRaceSex.h"
+#include "Fallout/Interface/FaderManager.h"
 #include "Fallout/Interface/Interface.h"
 #include "Fallout/Interface/InterfaceManager.h"
 #include "Fallout/Interface/Menus/CaravanMenu.h"
@@ -211,10 +211,10 @@
 #include "Gamebryo2.2/CoreLibs/NiMain/NiTArray.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiTCollection.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiTDefaultAllocator.h"
-#include "Gamebryo2.2/CoreLibs/NiMain/NiTexture.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiTMap.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiTMapBase.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiTPointerListBase.h"
+#include "Gamebryo2.2/CoreLibs/NiMain/NiTexture.h"
 #include "Gamebryo2.2/CoreLibs/NiSystem/NiMemoryDefines.h"
 #include "Havok/Source/Common/Base/Container/Array/hkArray.h"
 #include "Havok/Source/Physics/Collide/Agent/Collidable/hkpCollidable.h"
@@ -256,45 +256,46 @@ using PathSmootherPOVLinkArray = BSSimpleArray<PathSmootherPOVLink>;
 
 template <>
 void BSSimpleArray<bhkUtilFunctions::AVLevel, 1024>::SetAt(uint32_t aiIndex, const bhkUtilFunctions::AVLevel& aValue) {
-	Insert(aiIndex, aValue);
+    Insert(aiIndex, aValue);
 }
 
 void _DestroyItems(PathingCoverLocation* apItems, uint32_t auiCount) {
-	for (uint32_t i = 0; i < auiCount; ++i) {
-		apItems[i].~PathingCoverLocation();
-	}
+    for (uint32_t i = 0; i < auiCount; ++i) {
+        apItems[i].~PathingCoverLocation();
+    }
 }
 
 bool apFunc(const uint16_t* a1, const uint32_t* a2) {
-	return *a1 == *a2;
+    return *a1 == *a2;
 }
 
 void MoveItems_0(uint16_t* a1, uint16_t* a2, uint32_t a3) {
-	if (a3) {
-		if (a1 >= a2) {
-			if (a1 > a2) {
-				for (int32_t i = a3 - 1; i >= 0; --i) {
-					std::memmove(&a1[i], &a2[i], sizeof(a1[i]));
-				}
-			}
-		} else {
-			for (uint32_t j = 0; j < a3; ++j) {
-				std::memmove(&a1[j], &a2[j], sizeof(a1[j]));
-			}
-		}
-	}
+    if (a3) {
+        if (a1 >= a2) {
+            if (a1 > a2) {
+                for (int32_t i = a3 - 1; i >= 0; --i) {
+                    std::memmove(&a1[i], &a2[i], sizeof(a1[i]));
+                }
+            }
+        }
+        else {
+            for (uint32_t j = 0; j < a3; ++j) {
+                std::memmove(&a1[j], &a2[j], sizeof(a1[j]));
+            }
+        }
+    }
 }
 
 bool return_equals(const uint16_t* a1, const uint16_t* a2) {
-	return (bool)((uint8_t)((*a1) == (*a2)));
+    return (bool)((uint8_t)((*a1) == (*a2)));
 }
 
 void DestroyStringRange(BSStringT<char>* apItems, uint32_t auiCount) {
-	for (uint32_t i = 0; i < auiCount; ++i) {
-		apItems[i].~BSStringT<char>();
-	}
+    for (uint32_t i = 0; i < auiCount; ++i) {
+        apItems[i].~BSStringT<char>();
+    }
 }
 
 bool DefaultEqualFunction(const FastNavMeshVertHandle* apItem, const FastNavMeshVertHandle* apValue) {
-	return *apItem == *apValue;
+    return *apItem == *apValue;
 }

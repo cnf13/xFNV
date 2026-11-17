@@ -8,57 +8,57 @@
 // functions.
 class ahkpMalleableConstraintData : public hkpMalleableConstraintData {
 public:
-	ahkpMalleableConstraintData();
+    ahkpMalleableConstraintData();
 
-	void SetChild(hkpConstraintData* a1);
+    void SetChild(hkpConstraintData* a1);
 };
 
 // The creation info of a malleable constraint: hkConstraintCinfo's four members and its own overrides of the five
 // serialization functions (the destructor is the base's).
 class hkMalleableConstraintCinfo : public hkConstraintCinfo {
 public:
-	hkMalleableConstraintCinfo();
+    hkMalleableConstraintCinfo();
 
-	void CloneData(hkpConstraintData* apData, NiCloningProcess& arCloneData) override;
-	void LoadBinary(NiStream& arStream) override;
-	void SaveBinary(NiStream& arStream) override;
-	// Creates the creation info's malleable constraint data when it has none, under the Havok heap context, and
-	// returns the data's size.
-	uint32_t CreateData() override;
-	void GetViewerStrings(NiTPrimitiveArray<char*>* apStrings) override;
+    void CloneData(hkpConstraintData* apData, NiCloningProcess& arCloneData) override;
+    void LoadBinary(NiStream& arStream) override;
+    void SaveBinary(NiStream& arStream) override;
+    // Creates the creation info's malleable constraint data when it has none, under the Havok heap context, and
+    // returns the data's size.
+    uint32_t CreateData() override;
+    void GetViewerStrings(NiTPrimitiveArray<char*>* apStrings) override;
 
-	void CA9E50(hkpConstraintData* a2);
-	// Stores afStrength in the malleable data when there is data.
-	void SetStrength(float afStrength);
+    void CA9E50(hkpConstraintData* a2);
+    // Stores afStrength in the malleable data when there is data.
+    void SetStrength(float afStrength);
 
-	// Scales the data apInfo's malleable data wraps by afScale.
-	static void ApplyScale(float afScale, hkpConstraintData* apInfo);
+    // Scales the data apInfo's malleable data wraps by afScale.
+    static void ApplyScale(float afScale, hkpConstraintData* apInfo);
 };
 
 // The wrapper of an hkpMalleableConstraintData, a constraint whose strength is scaled. Only its RTTI and the
 // virtuals it overrides are modelled.
 class bhkMalleableConstraint : public bhkConstraint {
 public:
-	// The constructor from a creation info.
-	bhkMalleableConstraint();
-	bhkMalleableConstraint(const hkMalleableConstraintCinfo& arInfo);
-	~bhkMalleableConstraint() override;
+    // The constructor from a creation info.
+    bhkMalleableConstraint();
+    bhkMalleableConstraint(const hkMalleableConstraintCinfo& arInfo);
+    ~bhkMalleableConstraint() override;
 
-	const NiRTTI* GetRTTI() const override;
-	NiObject* CreateClone(NiCloningProcess& arCloneData) override;
-	void LoadBinary(NiStream& arStream) override;
-	void LinkObject(NiStream& arStream) override;
-	void KillCinfo(bool abCreated) override;
-	uint32_t QCinfoSize() const override;
-	hkSerializableCinfo& CreateCinfo(bool& arCreated) override;
+    const NiRTTI* GetRTTI() const override;
+    NiObject* CreateClone(NiCloningProcess& arCloneData) override;
+    void LoadBinary(NiStream& arStream) override;
+    void LinkObject(NiStream& arStream) override;
+    void KillCinfo(bool abCreated) override;
+    uint32_t QCinfoSize() const override;
+    hkSerializableCinfo& CreateCinfo(bool& arCreated) override;
 
-	// The constraint's creation info.
-	hkMalleableConstraintCinfo& GetCinfo();
+    // The constraint's creation info.
+    hkMalleableConstraintCinfo& GetCinfo();
 
-	// Creates an uninitialised instance for the stream's factory.
-	static NiObject* CreateObject();
+    // Creates an uninitialised instance for the stream's factory.
+    static NiObject* CreateObject();
 
-	static NiRTTI ms_RTTI;
-	// Number of live instances; the constructors count them.
-	static inline uint32_t iCount;
+    static NiRTTI ms_RTTI;
+    // Number of live instances; the constructors count them.
+    static inline uint32_t iCount;
 };

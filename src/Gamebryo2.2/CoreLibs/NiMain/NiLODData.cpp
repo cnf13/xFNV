@@ -12,23 +12,23 @@ NiLODData::NiLODData() {}
 NiLODData::~NiLODData() {}
 
 void NiLODData::LoadBinary(NiStream& kStream) {
-	NiObject::LoadBinary(kStream);
+    NiObject::LoadBinary(kStream);
 }
 
 void NiLODData::LinkObject(NiStream& kStream) {
-	NiObject::LinkObject(kStream);
+    NiObject::LinkObject(kStream);
 }
 
 bool NiLODData::RegisterStreamables(NiStream& kStream) {
-	return NiObject::RegisterStreamables(kStream);
+    return NiObject::RegisterStreamables(kStream);
 }
 
 void NiLODData::SaveBinary(NiStream& kStream) {
-	NiObject::SaveBinary(kStream);
+    NiObject::SaveBinary(kStream);
 }
 
 // Any two LOD data objects compare equal here: the base comparison is not run, the derived classes compare their
 // own members.
 bool NiLODData::IsEqual(NiObject*) {
-	return true;
+    return true;
 }

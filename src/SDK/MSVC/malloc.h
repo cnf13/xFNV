@@ -10,9 +10,8 @@
 
 // _msize, 0xECD31F: the size of a C heap block. glibc's malloc_usable_size is the block's usable size, which can
 // exceed the size asked for; VC9's is the size asked for (HeapSize).
-inline size_t _msize(void* apMemory)
-{
-	return ::malloc_usable_size(apMemory);
+inline size_t _msize(void* apMemory) {
+    return ::malloc_usable_size(apMemory);
 }
 
 #endif

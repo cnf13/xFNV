@@ -7,7 +7,7 @@
 #include "Gamebryo2.2/CoreLibs/NiMain/NiTArray.h"
 
 ImageSpaceShaderBlur::ImageSpaceShaderBlur() {
-	pTextures.SetSize(2u);
+    pTextures.SetSize(2u);
 }
 
 ImageSpaceShaderBlur::~ImageSpaceShaderBlur() {}

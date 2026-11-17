@@ -7,11 +7,11 @@
 // Sparse integer samples with their enum-name mapping.
 class hkxSparselyAnimatedEnum : public hkxSparselyAnimatedInt {
 public:
-	hkxSparselyAnimatedEnum() = default;
-	hkxSparselyAnimatedEnum(hkFinishLoadedObjectFlag aFlag) : hkxSparselyAnimatedInt(aFlag), m_enum(aFlag) {}
-	~hkxSparselyAnimatedEnum() override;
+    hkxSparselyAnimatedEnum() = default;
+    hkxSparselyAnimatedEnum(hkFinishLoadedObjectFlag aFlag) : hkxSparselyAnimatedInt(aFlag), m_enum(aFlag) {}
+    ~hkxSparselyAnimatedEnum() override;
 
-	static const hkClass& staticClass();
+    static const hkClass& staticClass();
 
-	hkRefPtr<hkxEnum> m_enum;
+    hkRefPtr<hkxEnum> m_enum;
 };

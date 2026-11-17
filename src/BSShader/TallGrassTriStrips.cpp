@@ -17,56 +17,58 @@ TallGrassTriStrips::TallGrassTriStrips(NiTriStripsData* usVertices) : NiTriStrip
 TallGrassTriStrips::~TallGrassTriStrips() {}
 
 const NiRTTI* TallGrassTriStrips::GetRTTI() const {
-	return &ms_RTTI;
+    return &ms_RTTI;
 }
 
 NiObject* TallGrassTriStrips::CreateClone(NiCloningProcess& arCloneData) {
-	return NiTriStrips::CreateClone(arCloneData);
+    return NiTriStrips::CreateClone(arCloneData);
 }
 
 void TallGrassTriStrips::GetViewerStrings(NiTPrimitiveArray<char*>* apStrings) {
-	NiTriStrips::GetViewerStrings(apStrings);
-	apStrings->Add(pLocalBound.GetViewerString("pLocalBound"));
-	apStrings->Add(NiGetViewerString("instance count", iInstanceCount));
+    NiTriStrips::GetViewerStrings(apStrings);
+    apStrings->Add(pLocalBound.GetViewerString("pLocalBound"));
+    apStrings->Add(NiGetViewerString("instance count", iInstanceCount));
 }
 
 // Draws with the local bound as the world bound, and only when there are instances.
 void TallGrassTriStrips::RenderImmediate(NiDX9Renderer* apRenderer) {
-	*m_kWorldBound = pLocalBound;
-	if (iInstanceCount)
-		NiTriStrips::RenderImmediate(apRenderer);
+    *m_kWorldBound = pLocalBound;
+    if (iInstanceCount) {
+        NiTriStrips::RenderImmediate(apRenderer);
+    }
 }
 
 void TallGrassTriStrips::OnlyRenderImmediate(NiDX9Renderer* apRenderer) {
-	*m_kWorldBound = pLocalBound;
-	if (iInstanceCount)
-		NiTriStrips::OnlyRenderImmediate(apRenderer);
+    *m_kWorldBound = pLocalBound;
+    if (iInstanceCount) {
+        NiTriStrips::OnlyRenderImmediate(apRenderer);
+    }
 }
 
 // Sets the local bound and copies it to the world bound, creating that first if there is none.
 void TallGrassTriStrips::SetLocalBound(NiBound apBound) {
-	pLocalBound = apBound;
-	if (!m_kWorldBound) {
-		SetBound(static_cast<BSNiBound*>(MemoryManager_Singleton.Allocate(sizeof(BSNiBound))));
-		m_kWorldBound->m_kCenter = NiPoint3_ZERO;
-		m_kWorldBound->m_fRadius = 0.0f;
-	}
-	*m_kWorldBound = apBound;
+    pLocalBound = apBound;
+    if (!m_kWorldBound) {
+        SetBound(static_cast<BSNiBound*>(MemoryManager_Singleton.Allocate(sizeof(BSNiBound))));
+        m_kWorldBound->m_kCenter = NiPoint3_ZERO;
+        m_kWorldBound->m_fRadius = 0.0f;
+    }
+    *m_kWorldBound = apBound;
 }
 
 void TallGrassTriStrips::SetInstanceCount(uint16_t aiCount) {
-	iInstanceCount = aiCount;
+    iInstanceCount = aiCount;
 }
 
 NiBound* TallGrassTriStrips::GetWorldBound() {
-	return &pLocalBound;
+    return &pLocalBound;
 }
 
 void TallGrassTriStrips::UpdateWorldBound() {
-	if (!m_kWorldBound) {
-		SetBound(static_cast<BSNiBound*>(MemoryManager_Singleton.Allocate(sizeof(BSNiBound))));
-		m_kWorldBound->m_kCenter = NiPoint3_ZERO;
-		m_kWorldBound->m_fRadius = 0.0f;
-	}
-	m_kWorldBound->Update(pLocalBound, m_kWorld);
+    if (!m_kWorldBound) {
+        SetBound(static_cast<BSNiBound*>(MemoryManager_Singleton.Allocate(sizeof(BSNiBound))));
+        m_kWorldBound->m_kCenter = NiPoint3_ZERO;
+        m_kWorldBound->m_fRadius = 0.0f;
+    }
+    m_kWorldBound->Update(pLocalBound, m_kWorld);
 }

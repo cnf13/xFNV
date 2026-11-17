@@ -4,8 +4,8 @@
 
 class ImageSpaceShaderFFTDisplayHighW : public ImageSpaceShader {
 public:
-	ImageSpaceShaderFFTDisplayHighW();
-	~ImageSpaceShaderFFTDisplayHighW() override;
+    ImageSpaceShaderFFTDisplayHighW();
+    ~ImageSpaceShaderFFTDisplayHighW() override;
 
-	void ReloadShaders() override;
+    void ReloadShaders() override;
 };

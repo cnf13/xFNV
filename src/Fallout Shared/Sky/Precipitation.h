@@ -15,28 +15,28 @@ int32_t Rand();
 // from one to the other.
 class Precipitation {
 public:
-	Precipitation();
-	// The class has a vtable on PC; only the destructor slot is declared here.
-	virtual ~Precipitation();
+    Precipitation();
+    // The class has a vtable on PC; only the destructor slot is declared here.
+    virtual ~Precipitation();
 
-	// Loads the precipitation model apFilename.
-	void Load(const char* apFilename);
-	// Attaches the precipitation systems under the weather root node.
-	void Initialize();
-	// Detaches and releases both particle roots.
-	void FlushAll();
-	// Advances the particle systems by afSecondsPassed.
-	void Update(float afSecondsPassed);
-	void Load_0(TESModel* a1);
-	NiGeometry* CreateShaderGeometry(NiParticleSystem* apParticleSystem, const NiTransform& akWorldTransform,
-		bool abSnow);
+    // Loads the precipitation model apFilename.
+    void Load(const char* apFilename);
+    // Attaches the precipitation systems under the weather root node.
+    void Initialize();
+    // Detaches and releases both particle roots.
+    void FlushAll();
+    // Advances the particle systems by afSecondsPassed.
+    void Update(float afSecondsPassed);
+    void Load_0(TESModel* a1);
+    NiGeometry*
+    CreateShaderGeometry(NiParticleSystem* apParticleSystem, const NiTransform& akWorldTransform, bool abSnow);
 
-	// The deleting destructor frees with ourFree.
-	static void operator delete(void* apMemory);
+    // The deleting destructor frees with ourFree.
+    static void operator delete(void* apMemory);
 
-	NiPointer<NiNode> spCurrentPrecipRoot;
-	NiPointer<NiNode> spLastPrecipRoot;
-	NiNode* pParent;
-	float fBirthRate;
-	TESModel* pQueuedModel;
+    NiPointer<NiNode> spCurrentPrecipRoot;
+    NiPointer<NiNode> spLastPrecipRoot;
+    NiNode* pParent;
+    float fBirthRate;
+    TESModel* pQueuedModel;
 };

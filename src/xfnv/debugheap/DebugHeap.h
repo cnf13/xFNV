@@ -12,13 +12,13 @@
 
 namespace fnvd::debugheap {
 
-// aAlign: a power of two.
-void* Allocate(size_t aSize, size_t aAlign);
-// Null is ignored; a pointer this heap did not hand out goes to the C runtime's free.
-void Free(void* apMem);
-// The size asked for.
-size_t Size(const void* apMem);
-// A new block, the old contents copied up to the smaller size, the old block freed.
-void* Reallocate(void* apMem, size_t aSize, size_t aAlign);
+    // aAlign: a power of two.
+    void* Allocate(size_t aSize, size_t aAlign);
+    // Null is ignored; a pointer this heap did not hand out goes to the C runtime's free.
+    void Free(void* apMem);
+    // The size asked for.
+    size_t Size(const void* apMem);
+    // A new block, the old contents copied up to the smaller size, the old block freed.
+    void* Reallocate(void* apMem, size_t aSize, size_t aAlign);
 
-}  // namespace fnvd::debugheap
+} // namespace fnvd::debugheap

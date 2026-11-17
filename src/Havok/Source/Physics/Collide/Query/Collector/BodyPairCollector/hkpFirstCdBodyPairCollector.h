@@ -9,11 +9,11 @@ class hkpCdBody;
 // m_earlyOut).
 class hkpFirstCdBodyPairCollector : public hkpCdBodyPairCollector {
 public:
-	~hkpFirstCdBodyPairCollector() override;
+    ~hkpFirstCdBodyPairCollector() override;
 
 protected:
-	void addCdBodyPair(const hkpCdBody& bodyA, const hkpCdBody& bodyB) override;
+    void addCdBodyPair(const hkpCdBody& bodyA, const hkpCdBody& bodyB) override;
 
 public:
-	hkpRootCdBodyPair m_cdBodyPair;
+    hkpRootCdBodyPair m_cdBodyPair;
 };

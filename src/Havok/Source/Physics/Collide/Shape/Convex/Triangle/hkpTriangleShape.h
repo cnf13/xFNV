@@ -18,53 +18,67 @@ __m128* calcTriangleNormal(const __m128* a1, const __m128* a2, __m128* a3, const
 // For the four rays of a bundle: the triple product of the triangle normal a3 with (a1 - p) and (a2 - p), p each ray's
 // hit point, into *a4 (one lane per ray); returns a3. r_eax holds the four hit points transposed: their x, y and z in
 // r_eax[0], r_eax[1] and r_eax[2].
-const hkVector4* calcEdgeSides(const hkVector4* a1, const hkVector4* a2, const hkVector4* a3, hkVector4* a4,
-	const hkVector4* r_eax);
+const hkVector4*
+calcEdgeSides(const hkVector4* a1, const hkVector4* a2, const hkVector4* a3, hkVector4* a4, const hkVector4* r_eax);
 
 // A triangle given by its three vertices, optionally extruded along a vector, with the edge welding information the
 // contact welding uses.
 class hkpTriangleShape : public hkpConvexShape {
 public:
-	hkpTriangleShape(const hkVector4& v0, const hkVector4& v1, const hkVector4& v2, float radius);
-	// Assumes hkpConvexShape's finish constructor (the SDK's).
-	hkpTriangleShape(hkFinishLoadedObjectFlag aFlag) : hkpConvexShape(aFlag) { m_type.m_storage = HK_SHAPE_TRIANGLE; }
+    hkpTriangleShape(const hkVector4& v0, const hkVector4& v1, const hkVector4& v2, float radius);
+    // Assumes hkpConvexShape's finish constructor (the SDK's).
+    hkpTriangleShape(hkFinishLoadedObjectFlag aFlag) : hkpConvexShape(aFlag) {
+        m_type.m_storage = HK_SHAPE_TRIANGLE;
+    }
 
-	// Assumes hkpConvexShape's constructor from the shape type and the radius (the SDK's).
-	hkpTriangleShape(float radius, uint16_t weldingInfo, hkpWeldingUtility::WeldingType type)
-		: hkpConvexShape(HK_SHAPE_TRIANGLE, radius), m_weldingInfo(weldingInfo), m_isExtruded(0) {
-		m_weldingType = type;
-		m_extrusion.setZero4();
-	}
+    // Assumes hkpConvexShape's constructor from the shape type and the radius (the SDK's).
+    hkpTriangleShape(float radius, uint16_t weldingInfo, hkpWeldingUtility::WeldingType type)
+      : hkpConvexShape(HK_SHAPE_TRIANGLE, radius), m_weldingInfo(weldingInfo), m_isExtruded(0) {
+        m_weldingType = type;
+        m_extrusion.setZero4();
+    }
 
-	void calcContentStatistics(hkStatisticsCollector* collector, const hkClass* cls) const override;
-	int32_t calcSizeForSpu(const CalcSizeForSpuInput&, int32_t) const override;
-	void getAabbImpl(const hkTransform& localToWorld, float tolerance, hkAabb& out) const override;
-	hkBool castRayImpl(const hkpShapeRayCastInput& input, hkpShapeRayCastOutput& results) const override;
-	hkVector4Comparison* castRayBundleImpl(hkVector4Comparison* apResult, const hkpShapeRayBundleCastInput& input,
-		hkpShapeRayBundleCastOutput& output, const hkVector4Comparison& mask) const override;
-	int32_t getNumCollisionSpheresImpl() const override;
-	const hkSphere* getCollisionSpheresImpl(hkSphere* sphereBuffer) const override;
-	void getFirstVertex(hkVector4& v) const override;
-	void getSupportingVertexImpl(const hkVector4& aDirection, hkpCdVertex& supportingVertexOut) const override;
-	void convertVertexIdsToVerticesImpl(const uint16_t* ids, int32_t numIds, hkpCdVertex* verticesOut) const override;
-	// Havok SDK signature (hkpCollide.lib, tied by vtable).
-	int32_t weldContactPointImpl(uint16_t* featurePoints, uint8_t& numFeaturePoints, hkVector4& contactPointWs,
-		const hkTransform* thisObjTransform, const hkpConvexShape* collidingShape,
-		const hkTransform* collidingTransform, hkVector4& separatingNormalInOut) const override;
-	void getCentreImpl(hkVector4& centreOut) const override;
+    void calcContentStatistics(hkStatisticsCollector* collector, const hkClass* cls) const override;
+    int32_t calcSizeForSpu(const CalcSizeForSpuInput&, int32_t) const override;
+    void getAabbImpl(const hkTransform& localToWorld, float tolerance, hkAabb& out) const override;
+    hkBool castRayImpl(const hkpShapeRayCastInput& input, hkpShapeRayCastOutput& results) const override;
+    hkVector4Comparison* castRayBundleImpl(
+        hkVector4Comparison* apResult,
+        const hkpShapeRayBundleCastInput& input,
+        hkpShapeRayBundleCastOutput& output,
+        const hkVector4Comparison& mask
+    ) const override;
+    int32_t getNumCollisionSpheresImpl() const override;
+    const hkSphere* getCollisionSpheresImpl(hkSphere* sphereBuffer) const override;
+    void getFirstVertex(hkVector4& v) const override;
+    void getSupportingVertexImpl(const hkVector4& aDirection, hkpCdVertex& supportingVertexOut) const override;
+    void convertVertexIdsToVerticesImpl(const uint16_t* ids, int32_t numIds, hkpCdVertex* verticesOut) const override;
+    // Havok SDK signature (hkpCollide.lib, tied by vtable).
+    int32_t weldContactPointImpl(
+        uint16_t* featurePoints,
+        uint8_t& numFeaturePoints,
+        hkVector4& contactPointWs,
+        const hkTransform* thisObjTransform,
+        const hkpConvexShape* collidingShape,
+        const hkTransform* collidingTransform,
+        hkVector4& separatingNormalInOut
+    ) const override;
+    void getCentreImpl(hkVector4& centreOut) const override;
 
-	// The SDK's inline getVertex: the three vertices are consecutive.
-	const hkVector4& getVertex(int32_t i) const { return (&m_vertexA)[i]; }
+    // The SDK's inline getVertex: the three vertices are consecutive.
+    const hkVector4& getVertex(int32_t i) const {
+        return (&m_vertexA)[i];
+    }
 
-	static const hkClass& staticClass();
+    static const hkClass& staticClass();
 
-	uint16_t m_weldingInfo;
-	hkEnum<hkpWeldingUtility::WeldingType, uint8_t> m_weldingType;
-	uint8_t m_isExtruded;
-	hkVector4 m_vertexA;
-	hkVector4 m_vertexB;
-	hkVector4 m_vertexC;
-	hkVector4 m_extrusion;
+    uint16_t m_weldingInfo;
+    hkEnum<hkpWeldingUtility::WeldingType, uint8_t> m_weldingType;
+    uint8_t m_isExtruded;
+    hkVector4 m_vertexA;
+    hkVector4 m_vertexB;
+    hkVector4 m_vertexC;
+    hkVector4 m_extrusion;
 };
 
 extern hkClass hkpTriangleShapeClass;

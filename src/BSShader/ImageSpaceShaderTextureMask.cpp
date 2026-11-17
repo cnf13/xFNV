@@ -12,8 +12,8 @@
 #include "Gamebryo2.2/CoreLibs/NiMain/NiTCollection.h"
 
 ImageSpaceShaderTextureMask::ImageSpaceShaderTextureMask() : pWindowTexture(nullptr) {
-	pTextures.SetSize(2u);
-	pWindowTexture = static_cast<NiSourceTexture*>(BSShaderManager::spWindowEnvironmentMap01.m_pObject);
+    pTextures.SetSize(2u);
+    pWindowTexture = static_cast<NiSourceTexture*>(BSShaderManager::spWindowEnvironmentMap01.m_pObject);
 }
 
 // The pWindowTexture member's destructor releases the window texture.

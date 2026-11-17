@@ -19,37 +19,37 @@ const void* getVtablehkxNode();
 // An attributed scene graph node with animated transforms and annotations.
 class hkxNode : public hkxAttributeHolder {
 public:
-	struct AnnotationData {
-		static const hkClass& staticClass();
+    struct AnnotationData {
+        static const hkClass& staticClass();
 
-		float m_time;
-		hkStringPtr m_description;
-	};
+        float m_time;
+        hkStringPtr m_description;
+    };
 
-	hkxNode() = default;
+    hkxNode() = default;
 
-	hkxNode(hkFinishLoadedObjectFlag aFlag)
-		: hkxAttributeHolder(aFlag), m_name(aFlag), m_object(aFlag), m_keyFrames(aFlag), m_children(aFlag),
-		  m_annotations(aFlag), m_userProperties(aFlag) {}
+    hkxNode(hkFinishLoadedObjectFlag aFlag)
+      : hkxAttributeHolder(aFlag), m_name(aFlag), m_object(aFlag), m_keyFrames(aFlag), m_children(aFlag),
+        m_annotations(aFlag), m_userProperties(aFlag) {}
 
-	~hkxNode() override;
+    ~hkxNode() override;
 
-	hkxNode* findChildByName(const char* childName) const;
-	hkxNode* findDescendantByName(const char* name) const;
-	void replaceAllObjects(const hkReferencedObject* oldObject, const hkReferencedObject* newObject);
-	int32_t getNumDescendants() const;
-	hkRefVariant findVariantByObject(const hkReferencedObject* object) const;
-	hkResult getPathToNode(const hkxNode* theNode, hkArray<const hkxNode*, hkContainerHeapAllocator>& pathOut);
+    hkxNode* findChildByName(const char* childName) const;
+    hkxNode* findDescendantByName(const char* name) const;
+    void replaceAllObjects(const hkReferencedObject* oldObject, const hkReferencedObject* newObject);
+    int32_t getNumDescendants() const;
+    hkRefVariant findVariantByObject(const hkReferencedObject* object) const;
+    hkResult getPathToNode(const hkxNode* theNode, hkArray<const hkxNode*, hkContainerHeapAllocator>& pathOut);
 
-	static const hkClass& staticClass();
+    static const hkClass& staticClass();
 
-	hkStringPtr m_name;
-	hkRefVariant m_object;
-	hkArray<hkMatrix4> m_keyFrames;
-	hkArray<hkRefPtr<hkxNode>> m_children;
-	hkArray<AnnotationData> m_annotations;
-	hkStringPtr m_userProperties;
-	hkBool m_selected;
+    hkStringPtr m_name;
+    hkRefVariant m_object;
+    hkArray<hkMatrix4> m_keyFrames;
+    hkArray<hkRefPtr<hkxNode>> m_children;
+    hkArray<AnnotationData> m_annotations;
+    hkStringPtr m_userProperties;
+    hkBool m_selected;
 };
 
 extern hkClass hkxNodeAnnotationDataClass;

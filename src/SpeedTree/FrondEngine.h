@@ -16,51 +16,51 @@ class CVec;
 
 // One vertex along a frond guide.
 struct SFrondVertex {
-	SFrondVertex();
+    SFrondVertex();
 
-	CVec3 m_cPos;
-	CRotTransform m_cTrans;
-	float m_fCrossSectionWeight;
-	int32_t m_nWindGroup;
+    CVec3 m_cPos;
+    CRotTransform m_cTrans;
+    float m_fCrossSectionWeight;
+    int32_t m_nWindGroup;
 };
 
 // A frond's spine: its vertices and the geometry bookkeeping.
 struct SFrondGuide {
-	SFrondGuide();
-	SFrondGuide(const SFrondGuide& arOther);
-	~SFrondGuide();
+    SFrondGuide();
+    SFrondGuide(const SFrondGuide& arOther);
+    ~SFrondGuide();
 
-	// operator=(const SFrondGuide&): the vertex vector assigned, then the other fields.
-	// Not operator=: the guide stays trivially copyable. The guide vector's fill loops
-	// call it.
-	static SFrondGuide* Assign(SFrondGuide* apThis, const SFrondGuide& arOther);
+    // operator=(const SFrondGuide&): the vertex vector assigned, then the other fields.
+    // Not operator=: the guide stays trivially copyable. The guide vector's fill loops
+    // call it.
+    static SFrondGuide* Assign(SFrondGuide* apThis, const SFrondGuide& arOther);
 
-	std::vector<SFrondVertex, std::allocator<SFrondVertex>> m_vVertices;
-	float m_fLength;
-	float m_fRadius;
-	uint8_t m_chFrondMapIndex;
-	float m_fOffsetAngle;
-	float m_fSurfaceArea;
-	float m_fFuzzySurfaceArea;
-	uint32_t m_nVertexStartIndex;
-	uint32_t m_nVerticesPerGuideVertex;
+    std::vector<SFrondVertex, std::allocator<SFrondVertex>> m_vVertices;
+    float m_fLength;
+    float m_fRadius;
+    uint8_t m_chFrondMapIndex;
+    float m_fOffsetAngle;
+    float m_fSurfaceArea;
+    float m_fFuzzySurfaceArea;
+    uint32_t m_nVertexStartIndex;
+    uint32_t m_nVerticesPerGuideVertex;
 };
 
 // A frond texture: file and the size/angle variation.
 struct SFrondTexture {
-	SFrondTexture() = default;
-	SFrondTexture(const SFrondTexture& arOther);
-	~SFrondTexture();
+    SFrondTexture() = default;
+    SFrondTexture(const SFrondTexture& arOther);
+    ~SFrondTexture();
 
-	// operator=(const SFrondTexture&): the file name assigned, then the other fields.
-	// Not operator=: the texture stays trivially copyable. The texture vector's fill loops call it.
-	static SFrondTexture* Assign(SFrondTexture* apThis, const SFrondTexture& arOther);
+    // operator=(const SFrondTexture&): the file name assigned, then the other fields.
+    // Not operator=: the texture stays trivially copyable. The texture vector's fill loops call it.
+    static SFrondTexture* Assign(SFrondTexture* apThis, const SFrondTexture& arOther);
 
-	CIdvFilename m_strFilename;
-	float m_fAspectRatio;
-	float m_fSizeScale;
-	float m_fMinAngleOffset;
-	float m_fMaxAngleOffset;
+    CIdvFilename m_strFilename;
+    float m_fAspectRatio;
+    float m_fSizeScale;
+    float m_fMinAngleOffset;
+    float m_fMaxAngleOffset;
 };
 
 // The string szFormat formats with the arguments (vsprintf into a 1024-byte buffer).
@@ -108,79 +108,83 @@ void _Pop_heap(SFrondGuide* _First, SFrondGuide* _Last, uint8_t _Pred, SFrondGui
 // Orders guides by descending fuzzy surface area (FrondEngine.cpp's sort predicate; stateless).
 class CGuideSorter {
 public:
-	bool operator()(const SFrondGuide& cLeft, const SFrondGuide& cRight) const {
-		return cLeft.m_fFuzzySurfaceArea > cRight.m_fFuzzySurfaceArea;
-	}
+    bool operator()(const SFrondGuide& cLeft, const SFrondGuide& cRight) const {
+        return cLeft.m_fFuzzySurfaceArea > cRight.m_fFuzzySurfaceArea;
+    }
 
-	// The empty functor's one byte, modelled as a field so that the functor's instances pass it on by value.
-	uint8_t unk0;
+    // The empty functor's one byte, modelled as a field so that the functor's instances pass it on by value.
+    uint8_t unk0;
 };
 
 class CFrondEngine {
 public:
-	enum EFrondType : int32_t {
-		FROND_BLADES = 0,
-		FROND_EXTRUSION = 1,
-		NUM_FROND_TYPES = 2,
-	};
+    enum EFrondType : int32_t {
+        FROND_BLADES = 0,
+        FROND_EXTRUSION = 1,
+        NUM_FROND_TYPES = 2,
+    };
 
-	CFrondEngine();
-	~CFrondEngine();
+    CFrondEngine();
+    ~CFrondEngine();
 
-	// Appends a vertex to the last guide.
-	void AddGuideVertex(CVec3 cPos, CRotTransform cTrans, float fCrossSectionWeight, int32_t nWindGroup);
-	// Appends an empty guide.
-	void StartGuide();
-	// Finishes the last guide; fLodSizeScalar sizes its LOD reduction.
-	void EndGuide(float fLodSizeScalar);
+    // Appends a vertex to the last guide.
+    void AddGuideVertex(CVec3 cPos, CRotTransform cTrans, float fCrossSectionWeight, int32_t nWindGroup);
+    // Appends an empty guide.
+    void StartGuide();
+    // Finishes the last guide; fLodSizeScalar sizes its LOD reduction.
+    void EndGuide(float fLodSizeScalar);
 
-	// Replaces the profile spline, deleting the one held before unless it is the same.
-	void SetProfile(CIdvBezierSpline* pProfile);
-	// The branch level the fronds grow on.
-	int32_t GetLevel() const;
-	// Reads the frond block from cFile.
-	void Parse(class CTreeFileAccess& cFile);
-	bool Enabled() const;
-	// Copies the eight texture coordinates pTexCoords (the odd ones negated when bFlip) to every vertex of
-	// pGeometry's frond map nFrondMapIndex.
-	void SetTextureCoords(CIndexedGeometry* pGeometry, uint32_t nFrondMapIndex, const float* pTexCoords, bool bFlip);
-	// Builds the fronds into pGeometry, lit by pLightingEngine.
-	void Compute(CIndexedGeometry* pGeometry, CLightingEngine* pLightingEngine);
-	// Adds the two vertices of each guide vertex for each of the m_nNumBlades blades of sGuide, then gives the inner
-	// vertices texture coordinates along the blade's side lengths.
-	void BuildBladeVertices(SFrondGuide& sGuide);
-	// The extrusion profile of sGuide (mirrored about the spine) into vProfile and its normals into vNormals.
-	void BuildProfileVectors(SFrondGuide& sGuide, std::vector<CVec3, std::allocator<CVec3>>& vProfile,
-		std::vector<CVec3, std::allocator<CVec3>>& vNormals);
-	// The file name of the frond texture nIndex.
-	const char* GetTextureFilename(uint32_t nIndex) const;
-	// Adds one triangle strip per blade of sGuide to m_pGeometry's LOD nLod, its indices from nStart.
-	void ComputeBlade(uint32_t nLod, uint32_t nStart, SFrondGuide& sGuide);
-	// Extrudes the profile along sGuide's vertices into m_pGeometry; it builds the profile vectors of sGuide first.
-	void BuildExtrusionVertices(SFrondGuide& sGuide);
-	void BuildGuideLods();
-	// Adds sGuide's extrusion strip to m_pGeometry's LOD nLod, its indices from nStart, reduced for the LOD.
-	void ComputeExtrusion(uint32_t nLod, uint32_t nStart, SFrondGuide& sGuide);
+    // Replaces the profile spline, deleting the one held before unless it is the same.
+    void SetProfile(CIdvBezierSpline* pProfile);
+    // The branch level the fronds grow on.
+    int32_t GetLevel() const;
+    // Reads the frond block from cFile.
+    void Parse(class CTreeFileAccess& cFile);
+    bool Enabled() const;
+    // Copies the eight texture coordinates pTexCoords (the odd ones negated when bFlip) to every vertex of
+    // pGeometry's frond map nFrondMapIndex.
+    void SetTextureCoords(CIndexedGeometry* pGeometry, uint32_t nFrondMapIndex, const float* pTexCoords, bool bFlip);
+    // Builds the fronds into pGeometry, lit by pLightingEngine.
+    void Compute(CIndexedGeometry* pGeometry, CLightingEngine* pLightingEngine);
+    // Adds the two vertices of each guide vertex for each of the m_nNumBlades blades of sGuide, then gives the inner
+    // vertices texture coordinates along the blade's side lengths.
+    void BuildBladeVertices(SFrondGuide& sGuide);
+    // The extrusion profile of sGuide (mirrored about the spine) into vProfile and its normals into vNormals.
+    void BuildProfileVectors(
+        SFrondGuide& sGuide,
+        std::vector<CVec3, std::allocator<CVec3>>& vProfile,
+        std::vector<CVec3, std::allocator<CVec3>>& vNormals
+    );
+    // The file name of the frond texture nIndex.
+    const char* GetTextureFilename(uint32_t nIndex) const;
+    // Adds one triangle strip per blade of sGuide to m_pGeometry's LOD nLod, its indices from nStart.
+    void ComputeBlade(uint32_t nLod, uint32_t nStart, SFrondGuide& sGuide);
+    // Extrudes the profile along sGuide's vertices into m_pGeometry; it builds the profile vectors of sGuide first.
+    void BuildExtrusionVertices(SFrondGuide& sGuide);
+    void BuildGuideLods();
+    // Adds sGuide's extrusion strip to m_pGeometry's LOD nLod, its indices from nStart, reduced for the LOD.
+    void ComputeExtrusion(uint32_t nLod, uint32_t nStart, SFrondGuide& sGuide);
 
-	CIndexedGeometry* m_pGeometry;
-	CLightingEngine* m_pLightingEngine;
-	std::vector<SFrondGuide, std::allocator<SFrondGuide>> m_vGuides;
-	std::vector<std::vector<SFrondGuide, std::allocator<SFrondGuide>>,
-		std::allocator<std::vector<SFrondGuide, std::allocator<SFrondGuide>>>>
-		m_vGuideLods;
-	EFrondType m_eFrondType;
-	uint32_t m_nNumBlades;
-	CIdvBezierSpline* m_pProfile;
-	uint32_t m_nProfileSegments;
-	uint32_t m_nLevel;
-	bool m_bEnabled;
-	uint8_t padding4D[3];
-	std::vector<SFrondTexture, std::allocator<SFrondTexture>> m_vTextures;
-	uint32_t m_nNumLodLevels;
-	float m_fMaxSurfaceAreaPercent;
-	float m_fMinSurfaceAreaPercent;
-	float m_fReductionFuzziness;
-	float m_fLargeRetentionPercent;
-	uint32_t m_nMinLengthSegments;
-	uint32_t m_nMinCrossSegments;
+    CIndexedGeometry* m_pGeometry;
+    CLightingEngine* m_pLightingEngine;
+    std::vector<SFrondGuide, std::allocator<SFrondGuide>> m_vGuides;
+    std::vector<
+        std::vector<SFrondGuide, std::allocator<SFrondGuide>>,
+        std::allocator<std::vector<SFrondGuide, std::allocator<SFrondGuide>>>>
+        m_vGuideLods;
+    EFrondType m_eFrondType;
+    uint32_t m_nNumBlades;
+    CIdvBezierSpline* m_pProfile;
+    uint32_t m_nProfileSegments;
+    uint32_t m_nLevel;
+    bool m_bEnabled;
+    uint8_t padding4D[3];
+    std::vector<SFrondTexture, std::allocator<SFrondTexture>> m_vTextures;
+    uint32_t m_nNumLodLevels;
+    float m_fMaxSurfaceAreaPercent;
+    float m_fMinSurfaceAreaPercent;
+    float m_fReductionFuzziness;
+    float m_fLargeRetentionPercent;
+    uint32_t m_nMinLengthSegments;
+    uint32_t m_nMinCrossSegments;
 };

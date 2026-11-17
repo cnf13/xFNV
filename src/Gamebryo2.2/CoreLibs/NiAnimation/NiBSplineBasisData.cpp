@@ -16,62 +16,62 @@ NiBSplineBasisData::NiBSplineBasisData() : NiObject() {}
 NiBSplineBasisData::~NiBSplineBasisData() {}
 
 const NiRTTI* NiBSplineBasisData::GetRTTI() const {
-	return &ms_RTTI;
+    return &ms_RTTI;
 }
 
 // The clone gets the whole basis, cached values included.
 NiObject* NiBSplineBasisData::CreateClone(NiCloningProcess& kCloning) {
-	NiBSplineBasisData* pkClone =
-		static_cast<NiBSplineBasisData*>(NiMemObject::operator new(sizeof(NiBSplineBasisData)));
-	if (pkClone) {
-		::new (pkClone) NiBSplineBasisData;
-	}
-	NiObject::CopyMembers(pkClone, kCloning);
-	pkClone->m_kBasisDegree3 = m_kBasisDegree3;
-	return pkClone;
+    NiBSplineBasisData* pkClone =
+        static_cast<NiBSplineBasisData*>(NiMemObject::operator new(sizeof(NiBSplineBasisData)));
+    if (pkClone) {
+        ::new (pkClone) NiBSplineBasisData;
+    }
+    NiObject::CopyMembers(pkClone, kCloning);
+    pkClone->m_kBasisDegree3 = m_kBasisDegree3;
+    return pkClone;
 }
 
 // Only the quantity of control points is streamed; the values are computed on use.
 void NiBSplineBasisData::LoadBinary(NiStream& kStream) {
-	NiObject::LoadBinary(kStream);
-	NiStreamLoadBinary(kStream, m_kBasisDegree3.m_iQuantity);
+    NiObject::LoadBinary(kStream);
+    NiStreamLoadBinary(kStream, m_kBasisDegree3.m_iQuantity);
 }
 
 void NiBSplineBasisData::LinkObject(NiStream& stream) {
-	NiObject::LinkObject(stream);
+    NiObject::LinkObject(stream);
 }
 
 bool NiBSplineBasisData::RegisterStreamables(NiStream& stream) {
-	return NiObject::RegisterStreamables(stream);
+    return NiObject::RegisterStreamables(stream);
 }
 
 void NiBSplineBasisData::SaveBinary(NiStream& kStream) {
-	NiObject::SaveBinary(kStream);
-	NiStreamSaveBinary(kStream, m_kBasisDegree3.m_iQuantity);
+    NiObject::SaveBinary(kStream);
+    NiStreamSaveBinary(kStream, m_kBasisDegree3.m_iQuantity);
 }
 
 bool NiBSplineBasisData::IsEqual(NiObject* pkObject) {
-	if (!NiObject::IsEqual(pkObject)) {
-		return false;
-	}
+    if (!NiObject::IsEqual(pkObject)) {
+        return false;
+    }
 
-	return m_kBasisDegree3.IsEqual(&static_cast<NiBSplineBasisData*>(pkObject)->m_kBasisDegree3);
+    return m_kBasisDegree3.IsEqual(&static_cast<NiBSplineBasisData*>(pkObject)->m_kBasisDegree3);
 }
 
 void NiBSplineBasisData::GetViewerStrings(NiTPrimitiveArray<char*>* pStrings) {
-	NiObject::GetViewerStrings(pStrings);
-	pStrings->Add(NiGetViewerString(ms_RTTI.GetName()));
+    NiObject::GetViewerStrings(pStrings);
+    pStrings->Add(NiGetViewerString(ms_RTTI.GetName()));
 }
 
 NiBSplineBasis<float, 3>& NiBSplineBasisData::GetDegree3Basis() {
-	return m_kBasisDegree3;
+    return m_kBasisDegree3;
 }
 
 NiObject* NiBSplineBasisData::CreateObject() {
-	NiBSplineBasisData* pkObject =
-		static_cast<NiBSplineBasisData*>(NiMemObject::operator new(sizeof(NiBSplineBasisData)));
-	if (!pkObject) {
-		return nullptr;
-	}
-	return ::new (pkObject) NiBSplineBasisData;
+    NiBSplineBasisData* pkObject =
+        static_cast<NiBSplineBasisData*>(NiMemObject::operator new(sizeof(NiBSplineBasisData)));
+    if (!pkObject) {
+        return nullptr;
+    }
+    return ::new (pkObject) NiBSplineBasisData;
 }

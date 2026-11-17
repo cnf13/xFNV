@@ -6,15 +6,15 @@
 // sensitive, 1 compare the path, 2 compare the extension, 3 skip leading spaces). No instances.
 class WildCard {
 public:
-	// Whether apString matches apPattern: copies both through MakeString, then RecMatch.
-	static bool Match(const char* apString, const char* apPattern);
-	// The recursive matcher over the already normalised strings: 1 for a match, 0 for none, 2
-	// when no later start can match either.
-	static int32_t RecMatch(const char* apString, const char* apPattern);
-	// Copies apSrc to apDest (260 bytes) with the leading spaces skipped and the path and extension kept or dropped
-	// according to the flags.
-	static void MakeString(char* apDest, const char* apSrc);
-	static bool IsWild(const char* apPattern);
+    // Whether apString matches apPattern: copies both through MakeString, then RecMatch.
+    static bool Match(const char* apString, const char* apPattern);
+    // The recursive matcher over the already normalised strings: 1 for a match, 0 for none, 2
+    // when no later start can match either.
+    static int32_t RecMatch(const char* apString, const char* apPattern);
+    // Copies apSrc to apDest (260 bytes) with the leading spaces skipped and the path and extension kept or dropped
+    // according to the flags.
+    static void MakeString(char* apDest, const char* apSrc);
+    static bool IsWild(const char* apPattern);
 
-	static inline int32_t iFlags;
+    static inline int32_t iFlags;
 };

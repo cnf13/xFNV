@@ -7,17 +7,17 @@
 // velocities and temporaries (hkpPoweredChainSolverUtil).
 class hkVector8 {
 public:
-	hkVector4 m_lin;
-	hkVector4 m_ang;
+    hkVector4 m_lin;
+    hkVector4 m_ang;
 };
 
 // A six by six matrix stored as four three by three blocks, m_m[rowBlock][columnBlock].
 class hkMatrix6 {
 public:
-	// Sets this to the inverse of in, block by block.
-	void setInvert(const hkMatrix6& tmpIn);
+    // Sets this to the inverse of in, block by block.
+    void setInvert(const hkMatrix6& tmpIn);
 
-	hkMatrix3 m_m[2][2];
+    hkMatrix3 m_m[2][2];
 };
 
 // Sets out to in's inverse; a wrapper around hkMatrix6::setInvert.

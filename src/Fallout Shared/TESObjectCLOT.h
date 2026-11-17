@@ -12,30 +12,30 @@
 
 // A clothing base form. Its members are not declared yet.
 class TESObjectCLOT : public TESBoundObject,
-					  public TESFullName,
-					  public TESScriptableForm,
-					  public TESEnchantableForm,
-					  public TESValueForm,
-					  public TESWeightForm,
-					  public TESBipedModelForm,
-					  public BGSDestructibleObjectForm,
-					  public BGSEquipType {
+                      public TESFullName,
+                      public TESScriptableForm,
+                      public TESEnchantableForm,
+                      public TESValueForm,
+                      public TESWeightForm,
+                      public TESBipedModelForm,
+                      public BGSDestructibleObjectForm,
+                      public BGSEquipType {
 public:
-	TESObjectCLOT();
-	~TESObjectCLOT() override;
+    TESObjectCLOT();
+    ~TESObjectCLOT() override;
 
-	void InitializeData() override;
-	bool Load(TESFile* apFile) override;
-	void Save() override;
-	// also override TESValueForm's slots of the same signatures
-	uint16_t GetSaveSize(uint32_t aiFlags) override;
-	void SaveGame(uint32_t aiFlags) override;
-	void SaveGame(BGSSaveFormBuffer* apSaveGameBuffer) override;
-	void LoadGame(uint32_t aiFlags, uint32_t aiCurrentFlags) override;
-	void LoadGame(BGSLoadFormBuffer* apLoadGameBuffer) override;
-	void InitItem() override;
-	void Copy(TESForm* apCopy) override;
-	bool Compare(TESForm* apCompare) override;
+    void InitializeData() override;
+    bool Load(TESFile* apFile) override;
+    void Save() override;
+    // also override TESValueForm's slots of the same signatures
+    uint16_t GetSaveSize(uint32_t aiFlags) override;
+    void SaveGame(uint32_t aiFlags) override;
+    void SaveGame(BGSSaveFormBuffer* apSaveGameBuffer) override;
+    void LoadGame(uint32_t aiFlags, uint32_t aiCurrentFlags) override;
+    void LoadGame(BGSLoadFormBuffer* apLoadGameBuffer) override;
+    void InitItem() override;
+    void Copy(TESForm* apCopy) override;
+    bool Compare(TESForm* apCompare) override;
 
-	using TESForm::Save;
+    using TESForm::Save;
 };

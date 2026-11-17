@@ -35,8 +35,8 @@
 #include "Fallout Shared/BGSRagdoll.h"
 #include "Fallout Shared/BGSTalkingActivator.h"
 #include "Fallout Shared/BGSWorldLocation.h"
-#include "Fallout Shared/BipedAnim.h"
 #include "Fallout Shared/BSAnimGroupSequence.h"
+#include "Fallout Shared/BipedAnim.h"
 #include "Fallout Shared/CombatFormulas.h"
 #include "Fallout Shared/ContainerItemExtra.h"
 #include "Fallout Shared/Distant Terrain System/BGSTerrainManager.h"
@@ -55,17 +55,17 @@
 #include "Fallout Shared/PackageEventAction.h"
 #include "Fallout Shared/Pathfinding/FastNavMeshHandles.h"
 #include "Fallout Shared/Pathfinding/NavMesh.h"
-#include "Fallout Shared/Pathfinding/NavMesh_Util.h"
 #include "Fallout Shared/Pathfinding/NavMeshBounds.h"
 #include "Fallout Shared/Pathfinding/NavMeshHandles.h"
 #include "Fallout Shared/Pathfinding/NavMeshInfo.h"
 #include "Fallout Shared/Pathfinding/NavMeshObstacleManager.h"
 #include "Fallout Shared/Pathfinding/NavMeshObstacleTask.h"
 #include "Fallout Shared/Pathfinding/NavMeshRender.h"
+#include "Fallout Shared/Pathfinding/NavMesh_Util.h"
 #include "Fallout Shared/Pathfinding/PathBuilder.h"
+#include "Fallout Shared/Pathfinding/PathManager.h"
 #include "Fallout Shared/Pathfinding/PathingLOSGrid.h"
 #include "Fallout Shared/Pathfinding/PathingRequest.h"
-#include "Fallout Shared/Pathfinding/PathManager.h"
 #include "Fallout Shared/Region System/TESRegion.h"
 #include "Fallout Shared/Region System/TESRegionList.h"
 #include "Fallout Shared/Renderer.h"
@@ -131,9 +131,9 @@
 #include "Fallout/Debug/DebugTextManager.h"
 #include "Fallout/Debug/DebugTextPages/IDebugTextPage.h"
 #include "Fallout/Dialogue/DialogueResponse.h"
-#include "Fallout/Interface/FaderManager.h"
 #include "Fallout/Interface/FOPipboyManager.h"
 #include "Fallout/Interface/FORenderedMenuRaceSex.h"
+#include "Fallout/Interface/FaderManager.h"
 #include "Fallout/Interface/Interface.h"
 #include "Fallout/Interface/InterfaceManager.h"
 #include "Fallout/Interface/Menus/LoadingMenu.h"
@@ -159,8 +159,8 @@
 #include "Gamebryo2.2/CoreLibs/NiMain/NiTArray.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiTCollection.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiTDefaultAllocator.h"
-#include "Gamebryo2.2/CoreLibs/NiMain/NiTexture.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiTMapBase.h"
+#include "Gamebryo2.2/CoreLibs/NiMain/NiTexture.h"
 #include "Gamebryo2.2/CoreLibs/NiSystem/NiMemoryDefines.h"
 #include "Havok/Source/Common/Base/Container/Array/hkArray.h"
 #include "Havok/Source/Physics/Dynamics/Entity/hkpRigidBody.h"
@@ -168,9 +168,9 @@
 #include <stdint.h>
 
 void* AllocateVertexDistMapItem() {
-	return ourMalloc(sizeof(NiTMapItem<uint32_t, VertexDist>));
+    return ourMalloc(sizeof(NiTMapItem<uint32_t, VertexDist>));
 }
 
 void* au_re_FormHeap_Allocate_27() {
-	return ourMalloc(sizeof(NiTMapItem<Actor*, int64_t>));
+    return ourMalloc(sizeof(NiTMapItem<Actor*, int64_t>));
 }

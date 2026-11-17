@@ -7,34 +7,34 @@
 // a light that shines from a point with distance attenuation
 class NiPointLight : public NiLight {
 public:
-	NiPointLight();
-	~NiPointLight() override;
+    NiPointLight();
+    ~NiPointLight() override;
 
-	const NiRTTI* GetRTTI() const override;
-	NiObject* CreateClone(NiCloningProcess& kCloning) override;
-	void LoadBinary(NiStream& stream) override;
-	void LinkObject(NiStream& stream) override;
-	bool RegisterStreamables(NiStream& stream) override;
-	void SaveBinary(NiStream& stream) override;
-	bool IsEqual(NiObject* pObject) override;
-	void GetViewerStrings(NiTPrimitiveArray<char*>* pStrings) override;
-	void UpdateWorldData(NiUpdateData& UpdateData) override;
+    const NiRTTI* GetRTTI() const override;
+    NiObject* CreateClone(NiCloningProcess& kCloning) override;
+    void LoadBinary(NiStream& stream) override;
+    void LinkObject(NiStream& stream) override;
+    bool RegisterStreamables(NiStream& stream) override;
+    void SaveBinary(NiStream& stream) override;
+    bool IsEqual(NiObject* pObject) override;
+    void GetViewerStrings(NiTPrimitiveArray<char*>* pStrings) override;
+    void UpdateWorldData(NiUpdateData& UpdateData) override;
 
-	void SetConstantAttenuation(float fC);
-	void SetLinearAttenuation(float fL);
-	void SetQuadraticAttenuation(float fQ);
+    void SetConstantAttenuation(float fC);
+    void SetLinearAttenuation(float fL);
+    void SetQuadraticAttenuation(float fQ);
 
 protected:
-	void CopyMembers(NiPointLight* pDest, NiCloningProcess& kCloning);
+    void CopyMembers(NiPointLight* pDest, NiCloningProcess& kCloning);
 
 public:
-	static NiObject* CreateObject();
+    static NiObject* CreateObject();
 
-	float m_fAtten0;
-	float m_fAtten1;
-	float m_fAtten2;
+    float m_fAtten0;
+    float m_fAtten1;
+    float m_fAtten2;
 
-	static NiRTTI ms_RTTI;
+    static NiRTTI ms_RTTI;
 };
 
 NiSmartPointer(NiPointLight);

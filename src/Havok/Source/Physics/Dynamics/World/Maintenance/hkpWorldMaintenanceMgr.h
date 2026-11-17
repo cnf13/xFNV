@@ -9,7 +9,7 @@ struct hkStepInfo;
 // hkpDefaultWorldMaintenanceMgr implements it.
 class hkpWorldMaintenanceMgr : public hkReferencedObject {
 public:
-	virtual void init(hkpWorld* world) = 0;
-	virtual void performMaintenance(hkpWorld* world, hkStepInfo& stepInfo) = 0;
-	virtual void performMaintenanceNoSplit(hkpWorld* world, hkStepInfo& stepInfo) = 0;
+    virtual void init(hkpWorld* world) = 0;
+    virtual void performMaintenance(hkpWorld* world, hkStepInfo& stepInfo) = 0;
+    virtual void performMaintenanceNoSplit(hkpWorld* world, hkStepInfo& stepInfo) = 0;
 };

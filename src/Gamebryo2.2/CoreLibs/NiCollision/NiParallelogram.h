@@ -6,7 +6,7 @@
 // t in [0, 1].
 class NiParallelogram {
 public:
-	NiPoint3 m_kOrigin;
-	NiPoint3 m_kEdge0;
-	NiPoint3 m_kEdge1;
+    NiPoint3 m_kOrigin;
+    NiPoint3 m_kEdge0;
+    NiPoint3 m_kEdge1;
 };

@@ -6,5 +6,5 @@
 // log through it.
 class hkOstreamLogger : public hkLogger {
 public:
-	~hkOstreamLogger() override;
+    ~hkOstreamLogger() override;
 };

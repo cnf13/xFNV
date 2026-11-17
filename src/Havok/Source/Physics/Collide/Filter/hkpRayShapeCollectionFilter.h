@@ -10,12 +10,16 @@ struct hkpShapeRayCastInput;
 // The interface that decides whether a ray may hit a child of a shape collection.
 class hkpRayShapeCollectionFilter {
 public:
-	virtual hkBool isCollisionEnabled(const hkpShapeRayCastInput& aInput, const hkpShape& bShape,
-		const hkpShapeContainer& bContainer, uint32_t bKey) const = 0;
-	virtual ~hkpRayShapeCollectionFilter();
+    virtual hkBool isCollisionEnabled(
+        const hkpShapeRayCastInput& aInput,
+        const hkpShape& bShape,
+        const hkpShapeContainer& bContainer,
+        uint32_t bKey
+    ) const = 0;
+    virtual ~hkpRayShapeCollectionFilter();
 
-	// DeletingDestruct's free (MemoryManager::Deallocate).
-	static void operator delete(void* apMemory);
+    // DeletingDestruct's free (MemoryManager::Deallocate).
+    static void operator delete(void* apMemory);
 };
 
 // The class's reflection record.

@@ -28,8 +28,9 @@ int32_t BSmemmove(void* apDest, int32_t aiDestSize, void* apSrc, int32_t aiCount
 
 // vsnprintf into a buffer of aiSize bytes; returns vsnprintf's count. The template forwards calls with format arguments
 // to the variadic BSsprintf: the arguments after the format get the `...` promotions.
-template <class... A> int32_t BSsprintf(char* apString1, int32_t aiSize, const char* apFormat, A... vList) {
-	// The C-variadic overload by pointer: a plain call would pick this template again.
-	int32_t (*pVariadic)(char*, int32_t, const char*, ...) = BSsprintf;
-	return pVariadic(apString1, aiSize, apFormat, vList...);
+template <class... A>
+int32_t BSsprintf(char* apString1, int32_t aiSize, const char* apFormat, A... vList) {
+    // The C-variadic overload by pointer: a plain call would pick this template again.
+    int32_t (*pVariadic)(char*, int32_t, const char*, ...) = BSsprintf;
+    return pVariadic(apString1, aiSize, apFormat, vList...);
 }

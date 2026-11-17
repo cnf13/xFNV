@@ -4,10 +4,10 @@
 // out one byte apart.
 class BSPerformanceTimer {
 public:
-	BSPerformanceTimer() = default;
-	BSPerformanceTimer(const char* apSystem, const char* apName, bool abDisplayPerFrame, bool abGlobalReset);
+    BSPerformanceTimer() = default;
+    BSPerformanceTimer(const char* apSystem, const char* apName, bool abDisplayPerFrame, bool abGlobalReset);
 
-	// Compiled out like the rest: both are empty.
-	void Start();
-	void Stop();
+    // Compiled out like the rest: both are empty.
+    void Start();
+    void Stop();
 };

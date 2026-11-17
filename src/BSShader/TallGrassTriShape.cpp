@@ -16,46 +16,48 @@ TallGrassTriShape::TallGrassTriShape(NiTriShapeData* usVertices) : NiTriShape(us
 TallGrassTriShape::~TallGrassTriShape() {}
 
 const NiRTTI* TallGrassTriShape::GetRTTI() const {
-	return &ms_RTTI;
+    return &ms_RTTI;
 }
 
 NiObject* TallGrassTriShape::CreateClone(NiCloningProcess& arCloneData) {
-	return NiTriShape::CreateClone(arCloneData);
+    return NiTriShape::CreateClone(arCloneData);
 }
 
 void TallGrassTriShape::GetViewerStrings(NiTPrimitiveArray<char*>* apStrings) {
-	NiTriShape::GetViewerStrings(apStrings);
-	apStrings->Add(pLocalBound.GetViewerString("pLocalBound"));
-	apStrings->Add(NiGetViewerString("instance count", iInstanceCount));
+    NiTriShape::GetViewerStrings(apStrings);
+    apStrings->Add(pLocalBound.GetViewerString("pLocalBound"));
+    apStrings->Add(NiGetViewerString("instance count", iInstanceCount));
 }
 
 // Draws with the local bound as the world bound, and only when there are instances.
 void TallGrassTriShape::RenderImmediate(NiDX9Renderer* apRenderer) {
-	*m_kWorldBound = pLocalBound;
-	if (iInstanceCount)
-		NiTriShape::RenderImmediate(apRenderer);
+    *m_kWorldBound = pLocalBound;
+    if (iInstanceCount) {
+        NiTriShape::RenderImmediate(apRenderer);
+    }
 }
 
 void TallGrassTriShape::OnlyRenderImmediate(NiDX9Renderer* apRenderer) {
-	*m_kWorldBound = pLocalBound;
-	if (iInstanceCount)
-		NiTriShape::OnlyRenderImmediate(apRenderer);
+    *m_kWorldBound = pLocalBound;
+    if (iInstanceCount) {
+        NiTriShape::OnlyRenderImmediate(apRenderer);
+    }
 }
 
 void TallGrassTriShape::SetLocalBound(NiBound apBound) {
-	pLocalBound = apBound;
-	*m_kWorldBound = apBound;
+    pLocalBound = apBound;
+    *m_kWorldBound = apBound;
 }
 
 // TallGrassTriStrips uses the same function.
 void TallGrassTriShape::SetInstanceCount(uint16_t aiCount) {
-	iInstanceCount = aiCount;
+    iInstanceCount = aiCount;
 }
 
 NiBound* TallGrassTriShape::GetWorldBound() {
-	return &pLocalBound;
+    return &pLocalBound;
 }
 
 void TallGrassTriShape::UpdateWorldBound() {
-	m_kWorldBound->Update(pLocalBound, m_kWorld);
+    m_kWorldBound->Update(pLocalBound, m_kWorld);
 }

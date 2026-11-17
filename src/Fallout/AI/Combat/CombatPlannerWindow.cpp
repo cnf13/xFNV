@@ -15,12 +15,23 @@
 #include "Gamebryo2.2/CoreLibs/NiSystem/NiSystem.h"
 
 // A tree window under the main window, at the default position (CW_USEDEFAULT), 800 by 600, filled at once.
-CombatPlannerWindow::CombatPlannerWindow(CombatPlanner* apPlanner, CombatPlan* apPlan,
-	BSScrapArray<CombatPlanNode*, 1024>* arCombatNodes)
-	: NiTreeCtrl(appMain->hInstance, appMain->hWnd, nullptr, "Combat Plan", static_cast<int32_t>(0x80000000u),
-		  static_cast<int32_t>(0x80000000u), 800, 600),
-	  pPlanner(apPlanner), pCombatPlan(apPlan), pNodeArray(arCombatNodes) {
-	Display();
+CombatPlannerWindow::CombatPlannerWindow(
+    CombatPlanner* apPlanner,
+    CombatPlan* apPlan,
+    BSScrapArray<CombatPlanNode*, 1024>* arCombatNodes
+)
+  : NiTreeCtrl(
+        appMain->hInstance,
+        appMain->hWnd,
+        nullptr,
+        "Combat Plan",
+        static_cast<int32_t>(0x80000000u),
+        static_cast<int32_t>(0x80000000u),
+        800,
+        600
+    ),
+    pPlanner(apPlanner), pCombatPlan(apPlan), pNodeArray(arCombatNodes) {
+    Display();
 }
 
 // The game fills the tree here with the planner's world states, the plan's actions, then the planner's nodes. There is

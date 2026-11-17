@@ -12,24 +12,26 @@ class ShadowSceneLight;
 // through it.
 class BSPortalSharedNode : public NiNode {
 public:
-	BSPortalSharedNode(BSPortal* apPortal);
+    BSPortalSharedNode(BSPortal* apPortal);
 
-	const NiRTTI* GetRTTI() const override { return &BSPortalSharedNode::ms_RTTI; }
-	NiObject* CreateClone(NiCloningProcess& arCloneData) override;
-	void OnVisible(NiCullingProcess& kCuller) override;
-	~BSPortalSharedNode() override;
+    const NiRTTI* GetRTTI() const override {
+        return &BSPortalSharedNode::ms_RTTI;
+    }
+    NiObject* CreateClone(NiCloningProcess& arCloneData) override;
+    void OnVisible(NiCullingProcess& kCuller) override;
+    ~BSPortalSharedNode() override;
 
-	BSCompoundFrustum* QCompoundFrustum();
+    BSCompoundFrustum* QCompoundFrustum();
 
 protected:
-	void CopyMembers(BSPortalSharedNode* pDest, NiCloningProcess& arCloneData);
+    void CopyMembers(BSPortalSharedNode* pDest, NiCloningProcess& arCloneData);
 
 public:
-	BSCompoundFrustum* pCompoundFrustum;
-	BSSimpleArray<ShadowSceneLight*, 1024> kLights;
-	BSPortal* pPortal;
+    BSCompoundFrustum* pCompoundFrustum;
+    BSSimpleArray<ShadowSceneLight*, 1024> kLights;
+    BSPortal* pPortal;
 
-	static NiRTTI ms_RTTI;
+    static NiRTTI ms_RTTI;
 };
 
 NiSmartPointer(BSPortalSharedNode);

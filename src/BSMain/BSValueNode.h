@@ -9,31 +9,31 @@ class NiCloningProcess;
 // A scene graph node that carries an integer value.
 class BSValueNode : public BSNiNode {
 public:
-	BSValueNode();
-	BSValueNode(NiBillboardNode* a2);
-	~BSValueNode() override;
+    BSValueNode();
+    BSValueNode(NiBillboardNode* a2);
+    ~BSValueNode() override;
 
-	const NiRTTI* GetRTTI() const override;
-	NiObject* CreateClone(NiCloningProcess& arCloneData) override;
-	void LoadBinary(NiStream& arStream) override;
-	void LinkObject(NiStream& arStream) override;
-	bool RegisterStreamables(NiStream& arStream) override;
-	void SaveBinary(NiStream& arStream) override;
-	bool IsEqual(NiObject* apObject) override;
-	void GetViewerStrings(NiTPrimitiveArray<char*>* apStrings) override;
-	void UpdateWorldData(NiUpdateData& UpdateData) override;
-	virtual bool ParseNameForValue();
+    const NiRTTI* GetRTTI() const override;
+    NiObject* CreateClone(NiCloningProcess& arCloneData) override;
+    void LoadBinary(NiStream& arStream) override;
+    void LinkObject(NiStream& arStream) override;
+    bool RegisterStreamables(NiStream& arStream) override;
+    void SaveBinary(NiStream& arStream) override;
+    bool IsEqual(NiObject* apObject) override;
+    void GetViewerStrings(NiTPrimitiveArray<char*>* apStrings) override;
+    void UpdateWorldData(NiUpdateData& UpdateData) override;
+    virtual bool ParseNameForValue();
 
-	void CopyMembers(BSValueNode* pDest, NiCloningProcess& arCloneData);
-	// Returns the node's value (iValue).
-	int32_t QValue();
+    void CopyMembers(BSValueNode* pDest, NiCloningProcess& arCloneData);
+    // Returns the node's value (iValue).
+    int32_t QValue();
 
-	static NiObject* CreateObject();
+    static NiObject* CreateObject();
 
-	uint8_t m_uFlags;
-	uint8_t padding0AD[3];
-	int32_t iValue;
-	NiObject* spReservedObject;
+    uint8_t m_uFlags;
+    uint8_t padding0AD[3];
+    int32_t iValue;
+    NiObject* spReservedObject;
 
-	static NiRTTI ms_RTTI;
+    static NiRTTI ms_RTTI;
 };

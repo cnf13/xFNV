@@ -9,11 +9,11 @@ struct FffModeGS;
 
 // The basis key and the two basis-mode vectors loaded from a FaceGen .egm file.
 struct EGMData {
-	EGMData(char* apFileName);
-	~EGMData();
+    EGMData(char* apFileName);
+    ~EGMData();
 
-	static void operator delete(void* apMemory);
+    static void operator delete(void* apMemory);
 
-	uint32_t lEGMBasisKey;
-	std::vector<FffModeGS, std::allocator<FffModeGS>> EGMBasis[2];
+    uint32_t lEGMBasisKey;
+    std::vector<FffModeGS, std::allocator<FffModeGS>> EGMBasis[2];
 };

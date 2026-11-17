@@ -18,89 +18,91 @@ NiShadeProperty::NiShadeProperty() : m_uFlags(1), iShaderPropertyType(-1) {}
 NiShadeProperty::~NiShadeProperty() {}
 
 NiObject* NiShadeProperty::CreateClone(NiCloningProcess& kCloning) {
-	NiShadeProperty* pkObject_2 = static_cast<NiShadeProperty*>(NiMemObject::operator new(sizeof(NiShadeProperty)));
-	if (pkObject_2) {
-		::new (pkObject_2) NiShadeProperty;
-	} else {
-		pkObject_2 = 0;
-	}
-	NiProperty::CopyMembers(pkObject_2, kCloning);
-	pkObject_2->m_uFlags = m_uFlags;
-	return pkObject_2;
+    NiShadeProperty* pkObject_2 = static_cast<NiShadeProperty*>(NiMemObject::operator new(sizeof(NiShadeProperty)));
+    if (pkObject_2) {
+        ::new (pkObject_2) NiShadeProperty;
+    }
+    else {
+        pkObject_2 = 0;
+    }
+    NiProperty::CopyMembers(pkObject_2, kCloning);
+    pkObject_2->m_uFlags = m_uFlags;
+    return pkObject_2;
 }
 
 void NiShadeProperty::LoadBinary(NiStream& kStream) {
-	NiProperty::LoadBinary(kStream);
-	if (kStream.m_uiNifFileVersion < 0x0A000102) {
-		m_uFlags = kStream.m_usNiPropertyFlags & 1;
-	} else {
-		NiStreamLoadBinary(kStream, m_uFlags);
-	}
+    NiProperty::LoadBinary(kStream);
+    if (kStream.m_uiNifFileVersion < 0x0A000102) {
+        m_uFlags = kStream.m_usNiPropertyFlags & 1;
+    }
+    else {
+        NiStreamLoadBinary(kStream, m_uFlags);
+    }
 }
 
 void NiShadeProperty::LinkObject(NiStream& kStream) {
-	NiProperty::LinkObject(kStream);
+    NiProperty::LinkObject(kStream);
 }
 
 bool NiShadeProperty::RegisterStreamables(NiStream& kStream) {
-	return NiProperty::RegisterStreamables(kStream);
+    return NiProperty::RegisterStreamables(kStream);
 }
 
 void NiShadeProperty::SaveBinary(NiStream& kStream) {
-	NiProperty::SaveBinary(kStream);
-	NiStreamSaveBinary(kStream, m_uFlags);
+    NiProperty::SaveBinary(kStream);
+    NiStreamSaveBinary(kStream, m_uFlags);
 }
 
 bool NiShadeProperty::IsEqual(NiObject* pkObject) {
-	if (!NiProperty::IsEqual(pkObject)) {
-		return false;
-	}
-	return (m_uFlags & 1) == (static_cast<NiShadeProperty*>(pkObject)->m_uFlags & 1);
+    if (!NiProperty::IsEqual(pkObject)) {
+        return false;
+    }
+    return (m_uFlags & 1) == (static_cast<NiShadeProperty*>(pkObject)->m_uFlags & 1);
 }
 
 void NiShadeProperty::GetViewerStrings(NiTPrimitiveArray<char*>* pkStrings) {
-	NiProperty::GetViewerStrings(pkStrings);
-	pkStrings->Add(NiGetViewerString(ms_RTTI.GetName()));
-	pkStrings->Add(NiGetViewerString("m_bSmooth", (m_uFlags & 1) != 0));
+    NiProperty::GetViewerStrings(pkStrings);
+    pkStrings->Add(NiGetViewerString(ms_RTTI.GetName()));
+    pkStrings->Add(NiGetViewerString("m_bSmooth", (m_uFlags & 1) != 0));
 }
 
 int32_t NiShadeProperty::Type() const {
-	return SHADE;
+    return SHADE;
 }
 
 int32_t NiShadeProperty::GetShaderPropertyType() const {
-	return iShaderPropertyType;
+    return iShaderPropertyType;
 }
 
 void NiShadeProperty::CopyMembers(NiShadeProperty* pDest, NiCloningProcess& kCloning) {
-	NiProperty::CopyMembers(pDest, kCloning);
-	pDest->m_uFlags = m_uFlags;
+    NiProperty::CopyMembers(pDest, kCloning);
+    pDest->m_uFlags = m_uFlags;
 }
 
 int32_t NiShadeProperty::GetType() {
-	return 3;
+    return 3;
 }
 
 // The default property: shader property type -1 (none) and the smooth-shading flag.
 void NiShadeProperty::_SDMInit() {
-	NiShadeProperty* pkDefault = static_cast<NiShadeProperty*>(NiMemObject::operator new(sizeof(NiShadeProperty)));
-	if (pkDefault) {
-		::new (pkDefault) NiShadeProperty;
-	}
-	// SWEEP-INLINE 0xA81552
-	ms_spDefault = pkDefault;
+    NiShadeProperty* pkDefault = static_cast<NiShadeProperty*>(NiMemObject::operator new(sizeof(NiShadeProperty)));
+    if (pkDefault) {
+        ::new (pkDefault) NiShadeProperty;
+    }
+    // SWEEP-INLINE 0xA81552
+    ms_spDefault = pkDefault;
 }
 
 // Releases ms_spDefault through the pointer's assignment.
 void NiShadeProperty::_SDMShutdown() {
-	// SWEEP-INLINE 0xA81590
-	ms_spDefault = nullptr;
+    // SWEEP-INLINE 0xA81590
+    ms_spDefault = nullptr;
 }
 
 NiObject* NiShadeProperty::CreateObject() {
-	void* pkObject = NiMemObject::operator new(sizeof(NiShadeProperty));
-	if (!pkObject) {
-		return 0;
-	}
-	return ::new (pkObject) NiShadeProperty;
+    void* pkObject = NiMemObject::operator new(sizeof(NiShadeProperty));
+    if (!pkObject) {
+        return 0;
+    }
+    return ::new (pkObject) NiShadeProperty;
 }

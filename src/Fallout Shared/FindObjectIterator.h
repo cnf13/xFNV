@@ -11,24 +11,24 @@ class TESObjectREFR;
 // them, looking for a form.
 class FindObjectIterator {
 public:
-	FindObjectIterator() = default;
-	FindObjectIterator(ENUM_FORM_ID aeFormType, TESObjectREFR* apActivatingRef);
-	FindObjectIterator(TESForm* apForm, TESObjectREFR* apRef);
-	~FindObjectIterator();
+    FindObjectIterator() = default;
+    FindObjectIterator(ENUM_FORM_ID aeFormType, TESObjectREFR* apActivatingRef);
+    FindObjectIterator(TESForm* apForm, TESObjectREFR* apRef);
+    ~FindObjectIterator();
 
-	void Reset();
+    void Reset();
 
-	ENUM_FORM_ID eFormType;
-	// The form searched for; null when searching by type only.
-	TESBoundObject* pBoundObject;
-	// The reference the search is made for (the activating actor).
-	TESObjectREFR* pActivatingRef;
-	// The collection's map of the loaded references of eFormType.
-	LoadedReferenceMap* pCurrentMap;
-	TESObjectREFR* pCurrentRef;
-	InventoryChanges* pCurrentInventory;
-	// Points at pCurrentMap's items.
-	NiTMapItem<uint32_t, TESObjectREFR*>* MapIterator;
-	InventoryIterator InvIterator;
-	uint8_t cMapIndex;
+    ENUM_FORM_ID eFormType;
+    // The form searched for; null when searching by type only.
+    TESBoundObject* pBoundObject;
+    // The reference the search is made for (the activating actor).
+    TESObjectREFR* pActivatingRef;
+    // The collection's map of the loaded references of eFormType.
+    LoadedReferenceMap* pCurrentMap;
+    TESObjectREFR* pCurrentRef;
+    InventoryChanges* pCurrentInventory;
+    // Points at pCurrentMap's items.
+    NiTMapItem<uint32_t, TESObjectREFR*>* MapIterator;
+    InventoryIterator InvIterator;
+    uint8_t cMapIndex;
 };

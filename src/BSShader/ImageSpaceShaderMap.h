@@ -4,8 +4,8 @@
 
 class ImageSpaceShaderMap : public ImageSpaceShader {
 public:
-	ImageSpaceShaderMap();
-	~ImageSpaceShaderMap() override;
+    ImageSpaceShaderMap();
+    ~ImageSpaceShaderMap() override;
 
-	void ReloadShaders() override;
+    void ReloadShaders() override;
 };

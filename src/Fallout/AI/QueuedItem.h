@@ -13,28 +13,28 @@ class TESBoundObject;
 // MiddleHighProcess::pListItemstoEquipUnequip, which AddQueuedItem fills and ResolveEquipmentQueue runs.
 class QueuedItem {
 public:
-	QueuedItem();
-	~QueuedItem();
+    QueuedItem();
+    ~QueuedItem();
 
-	// Saves the item into apSaveGameBuffer.
-	void SaveGame(BGSSaveFormBuffer* apSaveGameBuffer);
-	// Loads the item from the form buffer.
-	void LoadGame(BGSLoadFormBuffer* apLoadGameBuffer);
-	// Queues the files the item needs before it can be equipped.
-	bool QueueFiles(Actor* apActor);
-	void InitLoadGame(BGSLoadFormBuffer* apLoadGameBuffer);
+    // Saves the item into apSaveGameBuffer.
+    void SaveGame(BGSSaveFormBuffer* apSaveGameBuffer);
+    // Loads the item from the form buffer.
+    void LoadGame(BGSLoadFormBuffer* apLoadGameBuffer);
+    // Queues the files the item needs before it can be equipped.
+    bool QueueFiles(Actor* apActor);
+    void InitLoadGame(BGSLoadFormBuffer* apLoadGameBuffer);
 
-	static void operator delete(void* apMemory);
+    static void operator delete(void* apMemory);
 
-	TESBoundObject* pObject;
-	ExtraDataList* pExtra;
-	int32_t iNumber;
-	bool bEquip;
-	bool bNow;
-	bool bForceEquip;
-	bool bPlayPickUpSounds;
-	bool bForceUnequip;
-	bool bEquipCalling;
-	uint8_t padding12[2];
-	NiPointer<QueuedFile> spQueuedFiles;
+    TESBoundObject* pObject;
+    ExtraDataList* pExtra;
+    int32_t iNumber;
+    bool bEquip;
+    bool bNow;
+    bool bForceEquip;
+    bool bPlayPickUpSounds;
+    bool bForceUnequip;
+    bool bEquipCalling;
+    uint8_t padding12[2];
+    NiPointer<QueuedFile> spQueuedFiles;
 };

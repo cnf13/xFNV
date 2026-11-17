@@ -5,21 +5,23 @@
 // Extra data holding one string.
 class NiStringExtraData : public NiExtraData {
 public:
-	NiStringExtraData();
-	~NiStringExtraData() override;
+    NiStringExtraData();
+    ~NiStringExtraData() override;
 
-	const NiRTTI* GetRTTI() const override { return &ms_RTTI; }
-	NiObject* CreateClone(NiCloningProcess& kCloning) override;
-	void LoadBinary(NiStream& stream) override;
-	void LinkObject(NiStream& stream) override;
-	bool RegisterStreamables(NiStream& stream) override;
-	void SaveBinary(NiStream& stream) override;
-	bool IsEqual(NiObject* pObject) override;
-	void GetViewerStrings(NiTPrimitiveArray<char*>* pStrings) override;
+    const NiRTTI* GetRTTI() const override {
+        return &ms_RTTI;
+    }
+    NiObject* CreateClone(NiCloningProcess& kCloning) override;
+    void LoadBinary(NiStream& stream) override;
+    void LinkObject(NiStream& stream) override;
+    bool RegisterStreamables(NiStream& stream) override;
+    void SaveBinary(NiStream& stream) override;
+    bool IsEqual(NiObject* pObject) override;
+    void GetViewerStrings(NiTPrimitiveArray<char*>* pStrings) override;
 
-	static NiObject* CreateObject();
+    static NiObject* CreateObject();
 
-	NiFixedString m_kString;
+    NiFixedString m_kString;
 
-	static NiRTTI ms_RTTI;
+    static NiRTTI ms_RTTI;
 };

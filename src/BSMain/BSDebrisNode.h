@@ -6,23 +6,23 @@
 // a range node for debris
 class BSDebrisNode : public BSRangeNode {
 public:
-	BSDebrisNode();
+    BSDebrisNode();
 
-	const NiRTTI* GetRTTI() const override;
-	NiObject* CreateClone(NiCloningProcess& arCloneData) override;
-	void LoadBinary(NiStream& arStream) override;
-	void LinkObject(NiStream& arStream) override;
-	bool RegisterStreamables(NiStream& arStream) override;
-	void SaveBinary(NiStream& arStream) override;
-	bool IsEqual(NiObject* apObject) override;
-	void GetViewerStrings(NiTPrimitiveArray<char*>* apStrings) override;
+    const NiRTTI* GetRTTI() const override;
+    NiObject* CreateClone(NiCloningProcess& arCloneData) override;
+    void LoadBinary(NiStream& arStream) override;
+    void LinkObject(NiStream& arStream) override;
+    bool RegisterStreamables(NiStream& arStream) override;
+    void SaveBinary(NiStream& arStream) override;
+    bool IsEqual(NiObject* apObject) override;
+    void GetViewerStrings(NiTPrimitiveArray<char*>* apStrings) override;
 
 protected:
-	void CopyMembers(BSDebrisNode* pDest, NiCloningProcess& arCloneData);
+    void CopyMembers(BSDebrisNode* pDest, NiCloningProcess& arCloneData);
 
 public:
-	// The class loader's factory: a new debris node, or null when the allocation fails.
-	static NiObject* CreateObject();
+    // The class loader's factory: a new debris node, or null when the allocation fails.
+    static NiObject* CreateObject();
 
-	static NiRTTI ms_RTTI;
+    static NiRTTI ms_RTTI;
 };

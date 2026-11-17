@@ -17,131 +17,137 @@ BGSLoadFormBuffer::BGSLoadFormBuffer() : iFormID(0), iSize(0), pForm(nullptr), i
 BGSLoadFormBuffer::~BGSLoadFormBuffer() {}
 
 uint8_t BGSLoadFormBuffer::GetVersion() {
-	return Header.cVersion;
+    return Header.cVersion;
 }
 
 TESForm* BGSLoadFormBuffer::GetForm() {
-	if (!pForm && GetFormPending()) {
-		pForm = TESForm::GetFormByNumericID(iFormID);
-	}
-	return pForm;
+    if (!pForm && GetFormPending()) {
+        pForm = TESForm::GetFormByNumericID(iFormID);
+    }
+    return pForm;
 }
 
 TESObjectREFR* BGSLoadFormBuffer::GetReference() {
-	TESForm* v2 = GetForm();
-	if (v2 && v2->IsReference()) {
-		return static_cast<TESObjectREFR*>(v2);
-	} else {
-		return nullptr;
-	}
+    TESForm* v2 = GetForm();
+    if (v2 && v2->IsReference()) {
+        return static_cast<TESObjectREFR*>(v2);
+    }
+    else {
+        return nullptr;
+    }
 }
 
 Actor* BGSLoadFormBuffer::GetActor() {
-	Actor* v2 = static_cast<Actor*>(GetReference());
-	if (v2 && v2->IsActor()) {
-		return v2;
-	} else {
-		return nullptr;
-	}
+    Actor* v2 = static_cast<Actor*>(GetReference());
+    if (v2 && v2->IsActor()) {
+        return v2;
+    }
+    else {
+        return nullptr;
+    }
 }
 
 void BGSLoadFormBuffer::SetReconstructedForm(bool abValue) {
-	uint32_t v2;
-	if (abValue) {
-		v2 = iFlags | 8;
-	} else {
-		v2 = iFlags & 0xFFFFFFF7u;
-	}
-	iFlags = v2;
+    uint32_t v2;
+    if (abValue) {
+        v2 = iFlags | 8;
+    }
+    else {
+        v2 = iFlags & 0xFFFFFFF7u;
+    }
+    iFlags = v2;
 }
 
 bool BGSLoadFormBuffer::GetRevertOnly() {
-	return ((iFlags & 4) != 0);
+    return ((iFlags & 4) != 0);
 }
 
 void BGSLoadFormBuffer::SetRevertOnly(bool abValue) {
-	uint32_t v2;
-	if (abValue) {
-		v2 = iFlags | 4;
-	} else {
-		v2 = iFlags & 0xFFFFFFFBu;
-	}
-	iFlags = v2;
+    uint32_t v2;
+    if (abValue) {
+        v2 = iFlags | 4;
+    }
+    else {
+        v2 = iFlags & 0xFFFFFFFBu;
+    }
+    iFlags = v2;
 }
 
 bool BGSLoadFormBuffer::GetCellChanged() {
-	return ((iFlags & 16) != 0);
+    return ((iFlags & 16) != 0);
 }
 
 void BGSLoadFormBuffer::SetFormPending(bool abValue) {
-	uint32_t v2;
-	if (abValue) {
-		v2 = iFlags | 2;
-	} else {
-		v2 = iFlags & (~2u);
-	}
-	iFlags = v2;
+    uint32_t v2;
+    if (abValue) {
+        v2 = iFlags | 2;
+    }
+    else {
+        v2 = iFlags & (~2u);
+    }
+    iFlags = v2;
 }
 
 bool BGSLoadFormBuffer::GetFormPending() {
-	return ((iFlags & 2) != 0);
+    return ((iFlags & 2) != 0);
 }
 
 void BGSLoadFormBuffer::SetChangeFlags(BGSChangeFlags aiChangeFlags) {
-	Header.iChangeFlags = aiChangeFlags;
+    Header.iChangeFlags = aiChangeFlags;
 }
 
 void BGSLoadFormBuffer::ClearBuffer() {
-	ourFree(pBuffer);
-	pBuffer = nullptr;
-	iBufferSize = (uint32_t)0;
-	iBufferPosition = (uint32_t)0;
+    ourFree(pBuffer);
+    pBuffer = nullptr;
+    iBufferSize = (uint32_t)0;
+    iBufferPosition = (uint32_t)0;
 }
 
 ENUM_FORM_ID BGSLoadFormBuffer::GetFormType() {
-	return static_cast<ENUM_FORM_ID>((&Header.FormInfo)->GetFormType());
+    return static_cast<ENUM_FORM_ID>((&Header.FormInfo)->GetFormType());
 }
 
 uint32_t BGSLoadFormBuffer::LoadDataFromFile(BGSSaveLoadFile* apFile) {
-	uint32_t uiRead = Load(apFile, iSize);
-	if (uiRead != iSize) {
-		return (uint32_t)-1;
-	}
-	return uiRead;
+    uint32_t uiRead = Load(apFile, iSize);
+    if (uiRead != iSize) {
+        return (uint32_t)-1;
+    }
+    return uiRead;
 }
 
 void BGSLoadFormBuffer::SkipData(BGSSaveLoadFile* apFile, uint32_t aiAlreadyLoadedAmount) {
-	if (iSize != (uint32_t)aiAlreadyLoadedAmount) {
-		apFile->SeekCurrent(iSize - aiAlreadyLoadedAmount);
-	}
+    if (iSize != (uint32_t)aiAlreadyLoadedAmount) {
+        apFile->SeekCurrent(iSize - aiAlreadyLoadedAmount);
+    }
 }
 
 void BGSLoadFormBuffer::SetCellChanged(bool abValue) {
-	uint32_t v2;
-	if (abValue) {
-		v2 = iFlags | 16;
-	} else {
-		v2 = iFlags & 0xFFFFFFEFu;
-	}
-	iFlags = v2;
+    uint32_t v2;
+    if (abValue) {
+        v2 = iFlags | 16;
+    }
+    else {
+        v2 = iFlags & 0xFFFFFFEFu;
+    }
+    iFlags = v2;
 }
 
 void BGSLoadFormBuffer::LoadHeader(BGSSaveLoadFile* apFile) {
-	apFile->Read(&Header, 9u);
-	iFormID = Header.FormIDIndex.GetNumericID();
-	SIZE_TYPE esizeType = Header.FormInfo.GetSizeType();
-	LoadGameSizeFromFile(apFile, iSize, esizeType);
-	iSize;
+    apFile->Read(&Header, 9u);
+    iFormID = Header.FormIDIndex.GetNumericID();
+    SIZE_TYPE esizeType = Header.FormInfo.GetSizeType();
+    LoadGameSizeFromFile(apFile, iSize, esizeType);
+    iSize;
 }
 
 void BGSLoadFormBuffer::operator delete(void* apMemory) {
-	ourFree(apMemory);
+    ourFree(apMemory);
 }
 
 BGSSaveLoadFormInfo::BGSSaveLoadFormInfo() : cData(0) {}
 
 SIZE_TYPE BGSSaveLoadFormInfo::GetSizeType() {
-	return static_cast<SIZE_TYPE>(static_cast<int32_t>(cData) >> 6);
+    return static_cast<SIZE_TYPE>(static_cast<int32_t>(cData) >> 6);
 }
 
 BGSSaveLoadFormHeader::BGSSaveLoadFormHeader() : FormIDIndex(), iChangeFlags(), FormInfo(), cVersion(0) {}

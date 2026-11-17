@@ -12,15 +12,19 @@
 NonActorMagicTarget::NonActorMagicTarget() : BSExtraData(0x33u), MagicTarget(), pTargetObject(nullptr) {}
 
 NonActorMagicTarget::NonActorMagicTarget(TESObjectREFR* apTargetObject)
-	: BSExtraData(0x33u), MagicTarget(), pTargetObject(apTargetObject) {}
+  : BSExtraData(0x33u), MagicTarget(), pTargetObject(apTargetObject) {}
 
 NonActorMagicTarget::~NonActorMagicTarget() {}
 
-bool NonActorMagicTarget::AddTarget(MagicCaster* apCaster, MagicItem* apSpell, ActiveEffect* apActiveEffect,
-	bool abAreaTarget) {
-	bool v7 = MagicTarget::AddTarget(apCaster, apSpell, apActiveEffect, abAreaTarget);
-	if (v7) {
-		UpdateTarget(1.0);
-	}
-	return v7;
+bool NonActorMagicTarget::AddTarget(
+    MagicCaster* apCaster,
+    MagicItem* apSpell,
+    ActiveEffect* apActiveEffect,
+    bool abAreaTarget
+) {
+    bool v7 = MagicTarget::AddTarget(apCaster, apSpell, apActiveEffect, abAreaTarget);
+    if (v7) {
+        UpdateTarget(1.0);
+    }
+    return v7;
 }

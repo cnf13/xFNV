@@ -7,16 +7,14 @@
 
 extern "C" {
 
-bool SteamAPI_Init()
-{
-	return false;
+bool SteamAPI_Init() {
+    return false;
 }
 
 void SteamAPI_Shutdown() {}
 
-bool SteamAPI_IsSteamRunning()
-{
-	return false;
+bool SteamAPI_IsSteamRunning() {
+    return false;
 }
 
 void SteamAPI_RunCallbacks() {}
@@ -25,29 +23,23 @@ void SteamAPI_RegisterCallback(void*, int32_t) {}
 
 void SteamAPI_UnregisterCallback(void*) {}
 
-void* SteamApps()
-{
-	return nullptr;
+void* SteamApps() {
+    return nullptr;
 }
 
-void* SteamFriends()
-{
-	return nullptr;
+void* SteamFriends() {
+    return nullptr;
 }
 
-void* SteamUser()
-{
-	return nullptr;
+void* SteamUser() {
+    return nullptr;
 }
 
-void* SteamUserStats()
-{
-	return nullptr;
+void* SteamUserStats() {
+    return nullptr;
 }
 
-void* SteamUtils()
-{
-	return nullptr;
+void* SteamUtils() {
+    return nullptr;
 }
-
 }

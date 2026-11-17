@@ -5,5 +5,5 @@ class TESForm;
 // An empty base: references of a base form deriving from it can be the target of magic.
 class TESMagicTargetForm {
 public:
-	static bool CanBeMagicTarget(TESForm* apForm);
+    static bool CanBeMagicTarget(TESForm* apForm);
 };

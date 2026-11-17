@@ -5,5 +5,5 @@
 // The combat planner goal AvoidThreats. It adds no fields to CombatGoal and overrides no virtual.
 class CombatGoalAvoidThreats : public CombatGoal {
 public:
-	CombatGoalAvoidThreats(CombatGoal::COMBAT_GOAL aeType);
+    CombatGoalAvoidThreats(CombatGoal::COMBAT_GOAL aeType);
 };

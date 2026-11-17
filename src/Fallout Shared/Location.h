@@ -7,12 +7,12 @@ class TESObjectCELL;
 
 // A point and the cell it is in.
 struct PosAndCell {
-	NiPoint3 pos;
-	TESObjectCELL* cell;
+    NiPoint3 pos;
+    TESObjectCELL* cell;
 };
 
 // A point in a cell and the rotation it faces.
 struct Location {
-	PosAndCell posAndCell;
-	NiVector3 rotation;
+    PosAndCell posAndCell;
+    NiVector3 rotation;
 };

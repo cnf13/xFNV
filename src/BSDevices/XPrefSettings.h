@@ -8,8 +8,8 @@
 // The INI setting collection of the preference settings; it adds no data to the INI collection.
 class INIPrefSettingCollection : public INISettingCollection {
 public:
-	INIPrefSettingCollection();
-	~INIPrefSettingCollection() override;
+    INIPrefSettingCollection();
+    ~INIPrefSettingCollection() override;
 };
 
 // SettingT<INIPrefSettingCollection>::pCollection, the template's per-collection static, which SettingT does not model.

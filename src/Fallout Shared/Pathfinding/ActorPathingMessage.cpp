@@ -10,11 +10,11 @@
 ActorPathingMessage::ActorPathingMessage() : msgType(PMT_UNDEF), spSolution(nullptr) {}
 
 ActorPathingMessage::ActorPathingMessage(uint32_t aType, const NiPointer<PathingSolution>& aspSolution)
-	: msgType(static_cast<PATHING_MESSAGE_TYPE>(aType)), spSolution(aspSolution) {}
+  : msgType(static_cast<PATHING_MESSAGE_TYPE>(aType)), spSolution(aspSolution) {}
 
 ActorPathingMessage::ActorPathingMessage(const ActorPathingMessage& aMsg)
-	: msgType(aMsg.msgType), spSolution(aMsg.spSolution) {}
+  : msgType(aMsg.msgType), spSolution(aMsg.spSolution) {}
 
 void ActorPathingMessage::operator delete(void* apMemory) {
-	ourFree(apMemory);
+    ourFree(apMemory);
 }

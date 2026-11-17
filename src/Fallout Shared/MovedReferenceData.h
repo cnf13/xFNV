@@ -5,9 +5,9 @@
 // A reference's original placement followed by its saved replacement placement.
 class MovedReferenceData {
 public:
-	MovedReferenceData();
+    MovedReferenceData();
 
-	uint32_t iOriginalLocationID;
-	NiPoint3 OriginalLoc;
-	ReferenceData RefData;
+    uint32_t iOriginalLocationID;
+    NiPoint3 OriginalLoc;
+    ReferenceData RefData;
 };

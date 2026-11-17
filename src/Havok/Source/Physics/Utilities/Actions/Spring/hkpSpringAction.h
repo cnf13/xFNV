@@ -18,26 +18,26 @@ void cleanupLoadedObjecthkpSpringAction(void* p);
 // A damped spring between two body-space attachment points.
 class hkpSpringAction : public hkpBinaryAction {
 public:
-	hkpSpringAction(hkpRigidBody* entityA, hkpRigidBody* entityB, hkUlong userData);
-	hkpSpringAction(hkFinishLoadedObjectFlag aFlag) : hkpBinaryAction(aFlag) {}
-	~hkpSpringAction() override;
+    hkpSpringAction(hkpRigidBody* entityA, hkpRigidBody* entityB, hkUlong userData);
+    hkpSpringAction(hkFinishLoadedObjectFlag aFlag) : hkpBinaryAction(aFlag) {}
+    ~hkpSpringAction() override;
 
-	void applyAction(const hkStepInfo& stepInfo) override;
-	hkpAction* clone(const hkArray<hkpEntity*>& newEntities, const hkArray<hkpPhantom*>& newPhantoms) const override;
+    void applyAction(const hkStepInfo& stepInfo) override;
+    hkpAction* clone(const hkArray<hkpEntity*>& newEntities, const hkArray<hkpPhantom*>& newPhantoms) const override;
 
-	void setPositionsInWorldSpace(const hkVector4& pivotA, const hkVector4& pivotB);
-	void setPositionsInBodySpace(const hkVector4& pivotA, const hkVector4& pivotB);
+    void setPositionsInWorldSpace(const hkVector4& pivotA, const hkVector4& pivotB);
+    void setPositionsInBodySpace(const hkVector4& pivotA, const hkVector4& pivotB);
 
-	static const hkClass& staticClass();
+    static const hkClass& staticClass();
 
-	hkVector4 m_lastForce;
-	hkVector4 m_positionAinA;
-	hkVector4 m_positionBinB;
-	float m_restLength;
-	float m_strength;
-	float m_damping;
-	hkBool m_onCompression;
-	hkBool m_onExtension;
+    hkVector4 m_lastForce;
+    hkVector4 m_positionAinA;
+    hkVector4 m_positionBinB;
+    float m_restLength;
+    float m_strength;
+    float m_damping;
+    hkBool m_onCompression;
+    hkBool m_onExtension;
 };
 
 extern hkClass hkpBinaryActionClass;

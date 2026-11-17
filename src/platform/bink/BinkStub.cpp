@@ -7,44 +7,48 @@
 
 extern "C" {
 
-int32_t WINAPI BinkSetSoundSystem(BinkOpenDirectSound_t, uintptr_t)
-{
-	return 1;
+int32_t WINAPI BinkSetSoundSystem(BinkOpenDirectSound_t, uintptr_t) {
+    return 1;
 }
 
-BinkSoundOpen_t WINAPI BinkOpenDirectSound(uintptr_t)
-{
-	return nullptr;
+BinkSoundOpen_t WINAPI BinkOpenDirectSound(uintptr_t) {
+    return nullptr;
 }
 
-BINK* WINAPI BinkOpen(const char*, uint32_t)
-{
-	return nullptr;
+BINK* WINAPI BinkOpen(const char*, uint32_t) {
+    return nullptr;
 }
 
 void WINAPI BinkClose(BINK*) {}
 
 void WINAPI BinkNextFrame(BINK*) {}
 
-int32_t WINAPI BinkWait(BINK*)
-{
-	return 0;
+int32_t WINAPI BinkWait(BINK*) {
+    return 0;
 }
 
-int32_t WINAPI BinkPause(BINK*, int32_t pause)
-{
-	return pause;
+int32_t WINAPI BinkPause(BINK*, int32_t pause) {
+    return pause;
 }
 
-int32_t WINAPI BinkDoFrame(BINK*)
-{
-	return 0;
+int32_t WINAPI BinkDoFrame(BINK*) {
+    return 0;
 }
 
-int32_t WINAPI BinkCopyToBufferRect(BINK*, void*, int32_t, uint32_t, uint32_t, uint32_t, uint32_t, uint32_t,
-	uint32_t, uint32_t, uint32_t)
-{
-	return 0;
+int32_t WINAPI BinkCopyToBufferRect(
+    BINK*,
+    void*,
+    int32_t,
+    uint32_t,
+    uint32_t,
+    uint32_t,
+    uint32_t,
+    uint32_t,
+    uint32_t,
+    uint32_t,
+    uint32_t
+) {
+    return 0;
 }
 
-}  // extern "C"
+} // extern "C"

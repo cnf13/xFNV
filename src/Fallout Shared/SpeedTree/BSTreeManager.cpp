@@ -51,9 +51,9 @@
 #include "Gamebryo2.2/CoreLibs/NiMain/NiPointer.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiRefObject.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiSourceTexture.h"
+#include "Gamebryo2.2/CoreLibs/NiMain/NiTPointerMap.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiTexture.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiTexturingProperty.h"
-#include "Gamebryo2.2/CoreLibs/NiMain/NiTPointerMap.h"
 #include "Gamebryo2.2/CoreLibs/NiSystem/NiMemoryDefines.h"
 #include "Reconstruction.hpp"
 #include "SDK/MSVC/ehvec.h"
@@ -87,566 +87,593 @@ BSCriticalSection BSTreeManager::kModelCriticalSection;
 
 // Releases the named texture, if it is not still in use.
 bool TES_FreeTexture(TES* apTES, const char* apPath, uint32_t aiUser) {
-	NiPointer<NiTexture> spTexture(nullptr);
-	BSTexturePalette::GetTexture(apPath, spTexture);
-	if (spTexture.m_pObject && spTexture.m_pObject->m_uiRefCount <= aiUser + 2) {
-		BSTexturePalette::RemoveTexture(spTexture.m_pObject);
-		return 1;
-	} else {
-		return 0;
-	}
+    NiPointer<NiTexture> spTexture(nullptr);
+    BSTexturePalette::GetTexture(apPath, spTexture);
+    if (spTexture.m_pObject && spTexture.m_pObject->m_uiRefCount <= aiUser + 2) {
+        BSTexturePalette::RemoveTexture(spTexture.m_pObject);
+        return 1;
+    }
+    else {
+        return 0;
+    }
 }
 
 char sub_BB2FC0(uint32_t a1, float Yaw, float Pitch) {
-	D3DXMATRIX pOut;
-	if (a1 >= 4) {
-		return 0;
-	}
-	pOut._43 = 0.0f;
-	pOut._42 = 0.0f;
-	pOut._41 = 0.0f;
-	pOut._34 = 0.0f;
-	pOut._32 = 0.0f;
-	pOut._31 = 0.0f;
-	pOut._24 = 0.0f;
-	pOut._23 = 0.0f;
-	pOut._21 = 0.0f;
-	pOut._14 = 0.0f;
-	pOut._13 = 0.0f;
-	pOut._12 = 0.0f;
-	pOut._44 = 1.0f;
-	pOut._33 = 1.0f;
-	pOut._22 = 1.0f;
-	pOut._11 = 1.0f;
-	D3DXMatrixRotationYawPitchRoll_Thunk(&pOut, Yaw, Pitch, 0.0f);
-	D3DXMatrixTranspose_Thunk(&pOut, &pOut);
-	SpeedTreeShader_pWindMatrices[a1] = pOut;
-	return 1;
+    D3DXMATRIX pOut;
+    if (a1 >= 4) {
+        return 0;
+    }
+    pOut._43 = 0.0f;
+    pOut._42 = 0.0f;
+    pOut._41 = 0.0f;
+    pOut._34 = 0.0f;
+    pOut._32 = 0.0f;
+    pOut._31 = 0.0f;
+    pOut._24 = 0.0f;
+    pOut._23 = 0.0f;
+    pOut._21 = 0.0f;
+    pOut._14 = 0.0f;
+    pOut._13 = 0.0f;
+    pOut._12 = 0.0f;
+    pOut._44 = 1.0f;
+    pOut._33 = 1.0f;
+    pOut._22 = 1.0f;
+    pOut._11 = 1.0f;
+    D3DXMatrixRotationYawPitchRoll_Thunk(&pOut, Yaw, Pitch, 0.0f);
+    D3DXMatrixTranspose_Thunk(&pOut, &pOut);
+    SpeedTreeShader_pWindMatrices[a1] = pOut;
+    return 1;
 }
 
 BSTreeManager::BSTreeManager()
-	: pModelMap(nullptr), spCanopyShadow(nullptr), spBillboardMatProp(nullptr), spDistantAlphaProp(nullptr),
-	  spHavokFlags(nullptr), fWindSpeed(0.0f), bShowTrees(true), bShowLeaves(true), bForceCompute(false),
-	  m_bForceFullLOD(bForceFullLOD.Bool()) {
-	spBillboardMatProp = new NiMaterialProperty();
-	spBillboardMatProp->SetEmittance(NiColor(1.0f, 1.0f, 1.0f));
-	spDistantAlphaProp = new NiAlphaProperty();
-	spDistantAlphaProp->SetAlphaTesting(true);
-	spDistantAlphaProp->SetTestMode(NiAlphaProperty::TEST_GREATER);
-	spDistantAlphaProp->SetTestRef(84);
-	spDistantAlphaProp->SetAlphaBlending(false);
-	spHavokFlags = new BSXFlags(3);
-	CSpeedTreeRT::SetNumWindMatrices(4);
-	CSpeedTreeRT::SetDropToBillboard(true);
-	CSpeedTreeRT::SetTextureFlip(true);
-	ShadowLightShader::SetProjectedShadowScale(static_cast<uint32_t>(gs_iCanopyShadowScale_SpeedTree.Int()));
-	pBackgroundLoadedTreeMap = new LockFreeMap<TESObjectREFR*, BSTreeNode*>(2u, 37u, 12u);
+  : pModelMap(nullptr), spCanopyShadow(nullptr), spBillboardMatProp(nullptr), spDistantAlphaProp(nullptr),
+    spHavokFlags(nullptr), fWindSpeed(0.0f), bShowTrees(true), bShowLeaves(true), bForceCompute(false),
+    m_bForceFullLOD(bForceFullLOD.Bool()) {
+    spBillboardMatProp = new NiMaterialProperty();
+    spBillboardMatProp->SetEmittance(NiColor(1.0f, 1.0f, 1.0f));
+    spDistantAlphaProp = new NiAlphaProperty();
+    spDistantAlphaProp->SetAlphaTesting(true);
+    spDistantAlphaProp->SetTestMode(NiAlphaProperty::TEST_GREATER);
+    spDistantAlphaProp->SetTestRef(84);
+    spDistantAlphaProp->SetAlphaBlending(false);
+    spHavokFlags = new BSXFlags(3);
+    CSpeedTreeRT::SetNumWindMatrices(4);
+    CSpeedTreeRT::SetDropToBillboard(true);
+    CSpeedTreeRT::SetTextureFlip(true);
+    ShadowLightShader::SetProjectedShadowScale(static_cast<uint32_t>(gs_iCanopyShadowScale_SpeedTree.Int()));
+    pBackgroundLoadedTreeMap = new LockFreeMap<TESObjectREFR*, BSTreeNode*>(2u, 37u, 12u);
 }
 
 BSTreeManager::~BSTreeManager() {
-	ClearModelCache(false);
-	BSShaderManager::SetProjectedShadowTexture(nullptr);
-	BSShaderManager::SetProjectedShadowMaskTexture(nullptr);
-	GridCellArray::SetRecreateCanopyShadowMaskTexture(true);
-	ClearCanopyShadow_004F3310();
-	delete pBackgroundLoadedTreeMap;
+    ClearModelCache(false);
+    BSShaderManager::SetProjectedShadowTexture(nullptr);
+    BSShaderManager::SetProjectedShadowMaskTexture(nullptr);
+    GridCellArray::SetRecreateCanopyShadowMaskTexture(true);
+    ClearCanopyShadow_004F3310();
+    delete pBackgroundLoadedTreeMap;
 }
 
 void BSTreeManager::RemoveBackgroundLoadedTree(TESObjectREFR* apRef) {
-	BSTreeNode* a1 = 0;
-	if (pBackgroundLoadedTreeMap->GetAt(apRef, a1)) {
-		pBackgroundLoadedTreeMap->RemoveAt(apRef);
-		if (a1) {
-			NiObjectGarbage::Add(a1);
-		}
-	}
+    BSTreeNode* a1 = 0;
+    if (pBackgroundLoadedTreeMap->GetAt(apRef, a1)) {
+        pBackgroundLoadedTreeMap->RemoveAt(apRef);
+        if (a1) {
+            NiObjectGarbage::Add(a1);
+        }
+    }
 }
 
 BSTreeNode* BSTreeManager::CreateTreeForReference(TESObjectREFR* apTreeRefr, TESObjectTREE* apTreeObj) {
-	FNVD_INLINED_LOCAL(NiPointer<BSTreeModel>, spbasemodel, std::nullopt, std::nullopt);
-	AutoMemContext tempMemContext(MEM_CONTEXT_TREEART, 1,
-		"D:\\_Fallout3\\Platforms\\Common\\Code\\Fallout Shared\\SpeedTree\\BSTreeManager.cpp", 462);
-	::new (&spbasemodel) NiPointer<ActorPathingMessageQueue>(static_cast<ActorPathingMessageQueue*>(0));
-	BSTreeModel* pmodel = 0;
-	if (!SpeedTree::bEnableTrees::Get() ||
-		(!apTreeObj ||
-			(!apTreeObj->GetModel() ||
-				(!apTreeObj->GetModelLength() || (apTreeRefr && apTreeRefr->GetObjectReference() != apTreeObj))))) {
-		spbasemodel.~NiPointer<BSTreeModel>();
-		return 0;
-	}
-	BSTreeNode* ptreeNode = 0;
-	if (pBackgroundLoadedTreeMap->GetAt(apTreeRefr, ptreeNode)) {
-		pBackgroundLoadedTreeMap->RemoveAt(apTreeRefr);
-		BSTreeNode* v15 = ptreeNode;
-		spbasemodel.~NiPointer<BSTreeModel>();
-		return v15;
-	}
-	uint32_t iseed = 1;
-	if (apTreeRefr) {
-		iseed = apTreeRefr->GetSeed();
-	}
-	BSTreeManager* Singleton = BSTreeManager::GetInstance(1);
-	Singleton->GetModel(apTreeObj, iseed, spbasemodel);
-	if (!spbasemodel.m_pObject) {
-		goto LABEL_23;
-	}
-	if (spbasemodel.m_pObject->m_uiRefCount <= 2) {
-		if (!spbasemodel.m_pObject->InitFromBase(apTreeObj, iseed)) {
-		LABEL_23:;
-			spbasemodel.~NiPointer<BSTreeModel>();
-			return 0;
-		}
-		pmodel = spbasemodel.m_pObject;
-	} else {
-		BSTreeModel* pmodel_2;
-		BSTreeModel* v13 = static_cast<BSTreeModel*>(NiMemObject::operator new(sizeof(BSTreeModel)));
-		if (v13) {
-			pmodel_2 = ::new (v13) BSTreeModel;
-		} else {
-			pmodel_2 = 0;
-		}
-		pmodel = pmodel_2;
-		if (!pmodel_2->InitAsInstance(spbasemodel.m_pObject)) {
-			if (pmodel) {
-				delete pmodel;
-			}
-			goto LABEL_23;
-		}
-	}
-	float fscale = 1.0f;
-	if (apTreeRefr) {
-		fscale = apTreeRefr->GetScale();
-	}
-	BSTreeNode* pretnode = pmodel->CreateArt(fscale);
-	if (pretnode) {
-		const char* v5 = apTreeObj->GetModel();
-		NiFixedString apString(v5);
-		NiFixedString* a2 = &apString;
-		pretnode->SetName(*a2);
-	}
-	pmodel->SetInitialized(1);
-	spbasemodel.~NiPointer<BSTreeModel>();
-	return pretnode;
+    FNVD_INLINED_LOCAL(NiPointer<BSTreeModel>, spbasemodel, std::nullopt, std::nullopt);
+    AutoMemContext tempMemContext(
+        MEM_CONTEXT_TREEART, 1, "D:\\_Fallout3\\Platforms\\Common\\Code\\Fallout Shared\\SpeedTree\\BSTreeManager.cpp",
+        462
+    );
+    ::new (&spbasemodel) NiPointer<ActorPathingMessageQueue>(static_cast<ActorPathingMessageQueue*>(0));
+    BSTreeModel* pmodel = 0;
+    if (!SpeedTree::bEnableTrees::Get() ||
+        (!apTreeObj ||
+         (!apTreeObj->GetModel() ||
+          (!apTreeObj->GetModelLength() || (apTreeRefr && apTreeRefr->GetObjectReference() != apTreeObj))))) {
+        spbasemodel.~NiPointer<BSTreeModel>();
+        return 0;
+    }
+    BSTreeNode* ptreeNode = 0;
+    if (pBackgroundLoadedTreeMap->GetAt(apTreeRefr, ptreeNode)) {
+        pBackgroundLoadedTreeMap->RemoveAt(apTreeRefr);
+        BSTreeNode* v15 = ptreeNode;
+        spbasemodel.~NiPointer<BSTreeModel>();
+        return v15;
+    }
+    uint32_t iseed = 1;
+    if (apTreeRefr) {
+        iseed = apTreeRefr->GetSeed();
+    }
+    BSTreeManager* Singleton = BSTreeManager::GetInstance(1);
+    Singleton->GetModel(apTreeObj, iseed, spbasemodel);
+    if (!spbasemodel.m_pObject) {
+        goto LABEL_23;
+    }
+    if (spbasemodel.m_pObject->m_uiRefCount <= 2) {
+        if (!spbasemodel.m_pObject->InitFromBase(apTreeObj, iseed)) {
+        LABEL_23:;
+            spbasemodel.~NiPointer<BSTreeModel>();
+            return 0;
+        }
+        pmodel = spbasemodel.m_pObject;
+    }
+    else {
+        BSTreeModel* pmodel_2;
+        BSTreeModel* v13 = static_cast<BSTreeModel*>(NiMemObject::operator new(sizeof(BSTreeModel)));
+        if (v13) {
+            pmodel_2 = ::new (v13) BSTreeModel;
+        }
+        else {
+            pmodel_2 = 0;
+        }
+        pmodel = pmodel_2;
+        if (!pmodel_2->InitAsInstance(spbasemodel.m_pObject)) {
+            if (pmodel) {
+                delete pmodel;
+            }
+            goto LABEL_23;
+        }
+    }
+    float fscale = 1.0f;
+    if (apTreeRefr) {
+        fscale = apTreeRefr->GetScale();
+    }
+    BSTreeNode* pretnode = pmodel->CreateArt(fscale);
+    if (pretnode) {
+        const char* v5 = apTreeObj->GetModel();
+        NiFixedString apString(v5);
+        NiFixedString* a2 = &apString;
+        pretnode->SetName(*a2);
+    }
+    pmodel->SetInitialized(1);
+    spbasemodel.~NiPointer<BSTreeModel>();
+    return pretnode;
 }
 
 void BSTreeManager::AddBackgroundLoadedTree(TESObjectREFR* apRef, BSTreeNode* apTreeNode) {
-	if (!pBackgroundLoadedTreeMap->SetAt(apRef, apTreeNode, static_cast<bool>(0))) {
-		if (apTreeNode) {
-			delete apTreeNode;
-		}
-	}
+    if (!pBackgroundLoadedTreeMap->SetAt(apRef, apTreeNode, static_cast<bool>(0))) {
+        if (apTreeNode) {
+            delete apTreeNode;
+        }
+    }
 }
 
 NiPointer<BSTreeModel>* BSTreeManager::GetModelArray(TESObjectTREE* apTree) {
-	AutoMemContext tempMemContext(MEM_CONTEXT_TREEART, 1,
-		"D:\\_Fallout3\\Platforms\\Common\\Code\\Fallout Shared\\SpeedTree\\BSTreeManager.cpp", 216);
-	NiPointer<BSTreeModel>* pretval = 0;
-	if (apTree) {
-		if (!pModelMap) {
-			NiTPointerMap<TESObjectTREE*, NiPointer<BSTreeModel>*>* v4;
-			NiTPointerMap<TESObjectTREE*, NiPointer<BSTreeModel>*>* v9 =
-				static_cast<NiTPointerMap<TESObjectTREE*, NiPointer<BSTreeModel>*>*>(ourMalloc(sizeof(NiTPointerMap<
-					TESObjectTREE*, NiPointer<BSTreeModel>*>)));
-			if (v9) {
-				v4 = ::new (v9) NiTPointerMap<TESObjectTREE*, NiPointer<BSTreeModel>*>(37u);
-			} else {
-				v4 = 0;
-			}
-			pModelMap = v4;
-		}
-		if (pModelMap->GetAt(apTree, pretval)) {
-			NiPointer<BSTreeModel>* v8 = pretval;
-			return v8;
-		} else {
-			NiPointer<BSTreeModel>* pretval_2 = new NiPointer<BSTreeModel>[1];
-			pretval = pretval_2;
-			pModelMap->SetAt(apTree, pretval_2);
-			NiPointer<BSTreeModel>* v6 = pretval;
-			return v6;
-		}
-	} else {
-		return 0;
-	}
+    AutoMemContext tempMemContext(
+        MEM_CONTEXT_TREEART, 1, "D:\\_Fallout3\\Platforms\\Common\\Code\\Fallout Shared\\SpeedTree\\BSTreeManager.cpp",
+        216
+    );
+    NiPointer<BSTreeModel>* pretval = 0;
+    if (apTree) {
+        if (!pModelMap) {
+            NiTPointerMap<TESObjectTREE*, NiPointer<BSTreeModel>*>* v4;
+            NiTPointerMap<TESObjectTREE*, NiPointer<BSTreeModel>*>* v9 =
+                static_cast<NiTPointerMap<TESObjectTREE*, NiPointer<BSTreeModel>*>*>(
+                    ourMalloc(sizeof(NiTPointerMap<TESObjectTREE*, NiPointer<BSTreeModel>*>))
+                );
+            if (v9) {
+                v4 = ::new (v9) NiTPointerMap<TESObjectTREE*, NiPointer<BSTreeModel>*>(37u);
+            }
+            else {
+                v4 = 0;
+            }
+            pModelMap = v4;
+        }
+        if (pModelMap->GetAt(apTree, pretval)) {
+            NiPointer<BSTreeModel>* v8 = pretval;
+            return v8;
+        }
+        else {
+            NiPointer<BSTreeModel>* pretval_2 = new NiPointer<BSTreeModel>[1];
+            pretval = pretval_2;
+            pModelMap->SetAt(apTree, pretval_2);
+            NiPointer<BSTreeModel>* v6 = pretval;
+            return v6;
+        }
+    }
+    else {
+        return 0;
+    }
 }
 
 void BSTreeManager::GetModel(TESObjectTREE* apTree, uint32_t aiSeed, NiPointer<BSTreeModel>& aspBSTreeModel) {
-	FNVD_INLINED_LOCAL(NiPointer<BSTreeModel>, sprettree, std::nullopt, std::nullopt);
-	BSTreeManager::kModelCriticalSection.Enter(0);
-	::new (&sprettree) NiPointer<ActorPathingMessageQueue>(static_cast<ActorPathingMessageQueue*>(0));
-	if (apTree) {
-		NiPointer<BSTreeModel>* pmodelarray = GetModelArray(apTree);
-		int32_t iemptyslot = -1;
-		bool bfound = 0;
-		for (int32_t i = 0; i < 1; ++i) {
-			BSTreeModel* ptree = pmodelarray[i].m_pObject;
-			if (ptree) {
-				if (ptree->iSeed == aiSeed) {
-					sprettree.operator=(ptree);
-					bfound = 1;
-					break;
-				}
-			} else {
-				if (iemptyslot == -1) {
-					iemptyslot = i;
-				}
-			}
-		}
-		if (!bfound || !sprettree.m_pObject) {
-			if (iemptyslot >= 0) {
-				BSTreeModel* v4;
-				BSTreeModel* apMemory = static_cast<BSTreeModel*>(NiMemObject::operator new(sizeof(BSTreeModel)));
-				if (apMemory) {
-					v4 = ::new (apMemory) BSTreeModel;
-				} else {
-					v4 = 0;
-				}
-				sprettree.operator=(v4);
-				pmodelarray[iemptyslot].operator=(sprettree);
-			} else {
-				sprettree.operator=(*pmodelarray);
-			}
-		}
-	}
-	BSTreeManager::kModelCriticalSection.Leave();
-	aspBSTreeModel.operator=(sprettree);
-	sprettree.~NiPointer<BSTreeModel>();
+    FNVD_INLINED_LOCAL(NiPointer<BSTreeModel>, sprettree, std::nullopt, std::nullopt);
+    BSTreeManager::kModelCriticalSection.Enter(0);
+    ::new (&sprettree) NiPointer<ActorPathingMessageQueue>(static_cast<ActorPathingMessageQueue*>(0));
+    if (apTree) {
+        NiPointer<BSTreeModel>* pmodelarray = GetModelArray(apTree);
+        int32_t iemptyslot = -1;
+        bool bfound = 0;
+        for (int32_t i = 0; i < 1; ++i) {
+            BSTreeModel* ptree = pmodelarray[i].m_pObject;
+            if (ptree) {
+                if (ptree->iSeed == aiSeed) {
+                    sprettree.operator=(ptree);
+                    bfound = 1;
+                    break;
+                }
+            }
+            else {
+                if (iemptyslot == -1) {
+                    iemptyslot = i;
+                }
+            }
+        }
+        if (!bfound || !sprettree.m_pObject) {
+            if (iemptyslot >= 0) {
+                BSTreeModel* v4;
+                BSTreeModel* apMemory = static_cast<BSTreeModel*>(NiMemObject::operator new(sizeof(BSTreeModel)));
+                if (apMemory) {
+                    v4 = ::new (apMemory) BSTreeModel;
+                }
+                else {
+                    v4 = 0;
+                }
+                sprettree.operator=(v4);
+                pmodelarray[iemptyslot].operator=(sprettree);
+            }
+            else {
+                sprettree.operator=(*pmodelarray);
+            }
+        }
+    }
+    BSTreeManager::kModelCriticalSection.Leave();
+    aspBSTreeModel.operator=(sprettree);
+    sprettree.~NiPointer<BSTreeModel>();
 }
 
 void BSTreeManager::UpdateWindMatrices() {
-	static LeafSwayBaseTable ffrequencies{0.15f, 0.17f, 0.25f, 0.15f, 0.19f, 0.05f, 0.15f, 0.22f};
-	static LeafSwayPhaseTable fmatrixTimes{};
-	static float foldStrength = fWindSpeed;
-	float fbaseAngle = fWindSpeed * 0.6100000143051147;
-	float v19 = 0.0f;
-	for (int32_t i = 0; i < 4; ++i) {
-		fmatrixTimes[i] = appTimer.fDelta + fmatrixTimes[i];
-		if (fWindSpeed != 0.0) {
-			fmatrixTimes[i] = fmatrixTimes[i] * foldStrength / fWindSpeed;
-		}
-		float fbaseFreq = fWindSpeed * 20.0;
-		float v14 = fbaseFreq * ffrequencies[2 * i] * fmatrixTimes[i];
-		float fxPercent = NiSinQ(v14);
-		float v13 = fbaseFreq * ffrequencies[2 * i + 1] * fmatrixTimes[i];
-		float fyPercent = NiCosQ(v13);
-		if (i == 2) {
-			float v20 = std::fabs(fxPercent) + v19;
-			v19 = std::fabs(fyPercent) + v20;
-		}
-		float Pitch = fbaseAngle * fyPercent;
-		float Yaw = fbaseAngle * fxPercent;
-		sub_BB2FC0(i, Yaw, Pitch);
-	}
-	double fLeafRockAmountSwayInfluence = 1.0 - gs_fLeafRockAmountSwayInfluence.Float();
-	float frockAmountSway = gs_fLeafRockAmountSwayInfluence.Float() * v19 / 2.0 + fLeafRockAmountSwayInfluence;
-	double fLeafRustleAmountSwayInfluence = 1.0 - gs_fLeafRustleAmountSwayInfluence.Float();
-	float frustleAmountSway = gs_fLeafRustleAmountSwayInfluence.Float() * v19 / 2.0 + fLeafRustleAmountSwayInfluence;
-	double v8 = 1.0 - gs_fLeafRockSpeedSwayInfluence.Float();
-	float frockSpeedSway = gs_fLeafRockSpeedSwayInfluence.Float() * v19 / 2.0 + v8;
-	double v7 = 1.0 - gs_fLeafRustleSpeedSwayInfluence.Float();
-	float frustleSpeedSway = gs_fLeafRustleSpeedSwayInfluence.Float() * v19 / 2.0 + v7;
-	double Seconds = appTimer.fDelta;
-	float v5 = gs_fLeafRustleTimeScale.Float() * Seconds * frustleSpeedSway;
-	double secondsPassed = appTimer.fDelta;
-	float rockTimeScale = BSTreeManager::fLeafRockTimeScale.Float() * secondsPassed * frockSpeedSway;
-	float a2 = fWindSpeed * frustleAmountSway;
-	float v1 = fWindSpeed * frockAmountSway;
-	SpeedTreeLeafShader::UpdateWindTimers(v1, a2, rockTimeScale, v5);
-	foldStrength = fWindSpeed;
+    static LeafSwayBaseTable ffrequencies{0.15f, 0.17f, 0.25f, 0.15f, 0.19f, 0.05f, 0.15f, 0.22f};
+    static LeafSwayPhaseTable fmatrixTimes{};
+    static float foldStrength = fWindSpeed;
+    float fbaseAngle = fWindSpeed * 0.6100000143051147;
+    float v19 = 0.0f;
+    for (int32_t i = 0; i < 4; ++i) {
+        fmatrixTimes[i] = appTimer.fDelta + fmatrixTimes[i];
+        if (fWindSpeed != 0.0) {
+            fmatrixTimes[i] = fmatrixTimes[i] * foldStrength / fWindSpeed;
+        }
+        float fbaseFreq = fWindSpeed * 20.0;
+        float v14 = fbaseFreq * ffrequencies[2 * i] * fmatrixTimes[i];
+        float fxPercent = NiSinQ(v14);
+        float v13 = fbaseFreq * ffrequencies[2 * i + 1] * fmatrixTimes[i];
+        float fyPercent = NiCosQ(v13);
+        if (i == 2) {
+            float v20 = std::fabs(fxPercent) + v19;
+            v19 = std::fabs(fyPercent) + v20;
+        }
+        float Pitch = fbaseAngle * fyPercent;
+        float Yaw = fbaseAngle * fxPercent;
+        sub_BB2FC0(i, Yaw, Pitch);
+    }
+    double fLeafRockAmountSwayInfluence = 1.0 - gs_fLeafRockAmountSwayInfluence.Float();
+    float frockAmountSway = gs_fLeafRockAmountSwayInfluence.Float() * v19 / 2.0 + fLeafRockAmountSwayInfluence;
+    double fLeafRustleAmountSwayInfluence = 1.0 - gs_fLeafRustleAmountSwayInfluence.Float();
+    float frustleAmountSway = gs_fLeafRustleAmountSwayInfluence.Float() * v19 / 2.0 + fLeafRustleAmountSwayInfluence;
+    double v8 = 1.0 - gs_fLeafRockSpeedSwayInfluence.Float();
+    float frockSpeedSway = gs_fLeafRockSpeedSwayInfluence.Float() * v19 / 2.0 + v8;
+    double v7 = 1.0 - gs_fLeafRustleSpeedSwayInfluence.Float();
+    float frustleSpeedSway = gs_fLeafRustleSpeedSwayInfluence.Float() * v19 / 2.0 + v7;
+    double Seconds = appTimer.fDelta;
+    float v5 = gs_fLeafRustleTimeScale.Float() * Seconds * frustleSpeedSway;
+    double secondsPassed = appTimer.fDelta;
+    float rockTimeScale = BSTreeManager::fLeafRockTimeScale.Float() * secondsPassed * frockSpeedSway;
+    float a2 = fWindSpeed * frustleAmountSway;
+    float v1 = fWindSpeed * frockAmountSway;
+    SpeedTreeLeafShader::UpdateWindTimers(v1, a2, rockTimeScale, v5);
+    foldStrength = fWindSpeed;
 }
 
 void BSTreeManager::SetCamera(NiCamera* apCamera) {
-	pWorldCamera = apCamera;
+    pWorldCamera = apCamera;
 }
 
 NiCamera* BSTreeManager::GetCamera() {
-	return BSTreeManager::pWorldCamera;
+    return BSTreeManager::pWorldCamera;
 }
 
 BSTreeManager* BSTreeManager::GetInstance(bool abCreate) {
-	if (pTreeManager == nullptr && abCreate) {
-		Create(false);
-	}
-	return pTreeManager;
+    if (pTreeManager == nullptr && abCreate) {
+        Create(false);
+    }
+    return pTreeManager;
 }
 
 void BSTreeManager::Create(bool abRecreateIfFound) {
-	BSTreeManager* v1;
-	AutoMemContext apMemory(MEM_CONTEXT_TREESYSTEM, 1,
-		"D:\\_Fallout3\\Platforms\\Common\\Code\\Fallout Shared\\SpeedTree\\BSTreeManager.cpp", 177);
-	if (pTreeManager) {
-		if (!abRecreateIfFound) {
-			return;
-		}
-		BSTreeManager::Destroy();
-	}
-	BSTreeManager* v2 = static_cast<BSTreeManager*>(ourMalloc(sizeof(BSTreeManager)));
-	if (v2) {
-		v1 = ::new (v2) BSTreeManager;
-	} else {
-		v1 = 0;
-	}
-	pTreeManager = v1;
+    BSTreeManager* v1;
+    AutoMemContext apMemory(
+        MEM_CONTEXT_TREESYSTEM, 1,
+        "D:\\_Fallout3\\Platforms\\Common\\Code\\Fallout Shared\\SpeedTree\\BSTreeManager.cpp", 177
+    );
+    if (pTreeManager) {
+        if (!abRecreateIfFound) {
+            return;
+        }
+        BSTreeManager::Destroy();
+    }
+    BSTreeManager* v2 = static_cast<BSTreeManager*>(ourMalloc(sizeof(BSTreeManager)));
+    if (v2) {
+        v1 = ::new (v2) BSTreeManager;
+    }
+    else {
+        v1 = 0;
+    }
+    pTreeManager = v1;
 }
 
 void BSTreeManager::ClearCanopyShadow() {
-	// GetInstance is called again for the release and the assignment goes through that result, as the game does.
-	if (GetInstance(true)->spCanopyShadow.m_pObject != nullptr) {
-		GetInstance(true)->spCanopyShadow = nullptr;
-		BSShaderManager::SetProjectedShadowTexture(nullptr);
-		TES_FreeTexture(TES::pInstance, "Data\\Textures\\Trees\\CanopyShadow.dds", 0);
-	}
+    // GetInstance is called again for the release and the assignment goes through that result, as the game does.
+    if (GetInstance(true)->spCanopyShadow.m_pObject != nullptr) {
+        GetInstance(true)->spCanopyShadow = nullptr;
+        BSShaderManager::SetProjectedShadowTexture(nullptr);
+        TES_FreeTexture(TES::pInstance, "Data\\Textures\\Trees\\CanopyShadow.dds", 0);
+    }
 }
 
 // Calls GetInstance again before each use of the model map, as the game does.
 void BSTreeManager::ClearModelCache(bool abClearManagerOnlyHeldOnly) {
-	if (BSTreeManager::GetInstance(1)->pModelMap) {
-		BSTreeManager::kModelCriticalSection.Enter(0);
-		if (abClearManagerOnlyHeldOnly) {
-			NiTMapItem<TESObjectTREE*, NiPointer<BSTreeModel>*>* pPos =
-				BSTreeManager::GetInstance(1)->pModelMap->GetFirstPos();
-			while (pPos) {
-				TESObjectTREE* pKey;
-				NiPointer<BSTreeModel>* pModelArray;
-				BSTreeManager::GetInstance(1)->pModelMap->GetNext(pPos, pKey, pModelArray);
-				if (pModelArray) {
-					// Only models no one but the manager holds are released.
-					bool bOnlyHeldHere = true;
-					for (int32_t i = 0; i < 1; ++i) {
-						if (pModelArray[i].m_pObject) {
-							if (pModelArray[i].m_pObject->m_uiRefCount > 1) {
-								bOnlyHeldHere = false;
-							} else {
-								pModelArray[i].operator=(static_cast<BSTreeModel*>(0));
-							}
-						}
-					}
-					if (bOnlyHeldHere) {
-						if (pModelArray) {
-							delete[] pModelArray;
-						}
-						pModelArray = 0;
-						BSTreeManager::GetInstance(1)->pModelMap->RemoveAt(pKey);
-						pPos = BSTreeManager::GetInstance(1)->pModelMap->GetFirstPos();
-					}
-				}
-			}
-			if (BSTreeManager::GetInstance(1)->pModelMap->IsEmpty()) {
-				BSTreeManager::GetInstance(1)->pModelMap->RemoveAll();
-				NiTPointerMap<TESObjectTREE*, NiPointer<BSTreeModel>*>* pModelMap =
-					BSTreeManager::GetInstance(1)->pModelMap;
-				if (pModelMap) {
-					delete pModelMap;
-				}
-				BSTreeManager::GetInstance(1)->pModelMap = 0;
-			}
-		} else {
-			NiTMapItem<TESObjectTREE*, NiPointer<BSTreeModel>*>* pPos =
-				BSTreeManager::GetInstance(1)->pModelMap->GetFirstPos();
-			while (pPos) {
-				TESObjectTREE* pKey;
-				NiPointer<BSTreeModel>* pModelArray;
-				BSTreeManager::GetInstance(1)->pModelMap->GetNext(pPos, pKey, pModelArray);
-				if (pModelArray) {
-					delete[] pModelArray;
-				}
-			}
-			BSTreeManager::GetInstance(1)->pModelMap->RemoveAll();
-			NiTPointerMap<TESObjectTREE*, NiPointer<BSTreeModel>*>* pModelMap =
-				BSTreeManager::GetInstance(1)->pModelMap;
-			if (pModelMap) {
-				delete pModelMap;
-			}
-			BSTreeManager::GetInstance(1)->pModelMap = 0;
-		}
-		BSTreeManager::kModelCriticalSection.Leave();
-	}
+    if (BSTreeManager::GetInstance(1)->pModelMap) {
+        BSTreeManager::kModelCriticalSection.Enter(0);
+        if (abClearManagerOnlyHeldOnly) {
+            NiTMapItem<TESObjectTREE*, NiPointer<BSTreeModel>*>* pPos =
+                BSTreeManager::GetInstance(1)->pModelMap->GetFirstPos();
+            while (pPos) {
+                TESObjectTREE* pKey;
+                NiPointer<BSTreeModel>* pModelArray;
+                BSTreeManager::GetInstance(1)->pModelMap->GetNext(pPos, pKey, pModelArray);
+                if (pModelArray) {
+                    // Only models no one but the manager holds are released.
+                    bool bOnlyHeldHere = true;
+                    for (int32_t i = 0; i < 1; ++i) {
+                        if (pModelArray[i].m_pObject) {
+                            if (pModelArray[i].m_pObject->m_uiRefCount > 1) {
+                                bOnlyHeldHere = false;
+                            }
+                            else {
+                                pModelArray[i].operator=(static_cast<BSTreeModel*>(0));
+                            }
+                        }
+                    }
+                    if (bOnlyHeldHere) {
+                        if (pModelArray) {
+                            delete[] pModelArray;
+                        }
+                        pModelArray = 0;
+                        BSTreeManager::GetInstance(1)->pModelMap->RemoveAt(pKey);
+                        pPos = BSTreeManager::GetInstance(1)->pModelMap->GetFirstPos();
+                    }
+                }
+            }
+            if (BSTreeManager::GetInstance(1)->pModelMap->IsEmpty()) {
+                BSTreeManager::GetInstance(1)->pModelMap->RemoveAll();
+                NiTPointerMap<TESObjectTREE*, NiPointer<BSTreeModel>*>* pModelMap =
+                    BSTreeManager::GetInstance(1)->pModelMap;
+                if (pModelMap) {
+                    delete pModelMap;
+                }
+                BSTreeManager::GetInstance(1)->pModelMap = 0;
+            }
+        }
+        else {
+            NiTMapItem<TESObjectTREE*, NiPointer<BSTreeModel>*>* pPos =
+                BSTreeManager::GetInstance(1)->pModelMap->GetFirstPos();
+            while (pPos) {
+                TESObjectTREE* pKey;
+                NiPointer<BSTreeModel>* pModelArray;
+                BSTreeManager::GetInstance(1)->pModelMap->GetNext(pPos, pKey, pModelArray);
+                if (pModelArray) {
+                    delete[] pModelArray;
+                }
+            }
+            BSTreeManager::GetInstance(1)->pModelMap->RemoveAll();
+            NiTPointerMap<TESObjectTREE*, NiPointer<BSTreeModel>*>* pModelMap =
+                BSTreeManager::GetInstance(1)->pModelMap;
+            if (pModelMap) {
+                delete pModelMap;
+            }
+            BSTreeManager::GetInstance(1)->pModelMap = 0;
+        }
+        BSTreeManager::kModelCriticalSection.Leave();
+    }
 }
 
 // Tests the flag's whole byte, so the byte is read as an integer.
 bool BSTreeManager::GetTreesEnabled() {
-	return SpeedTree::bEnableTrees::Get() && reinterpret_cast<const uint8_t&>(GetInstance(true)->bShowTrees) != 0;
+    return SpeedTree::bEnableTrees::Get() && reinterpret_cast<const uint8_t&>(GetInstance(true)->bShowTrees) != 0;
 }
 
 // Tests the flag's whole byte, so the byte is read as an integer.
 bool BSTreeManager::AreLeavesVisible() {
-	return GetTreesEnabled() && reinterpret_cast<const uint8_t&>(GetInstance(true)->bShowLeaves) != 0;
+    return GetTreesEnabled() && reinterpret_cast<const uint8_t&>(GetInstance(true)->bShowLeaves) != 0;
 }
 
 // Keeps the base distance as a double and rounds the product to a float.
 float BSTreeManager::GetNearDistance() {
-	double fBase = GameSetting::fTreeNearDistanceBase::Get();
-	return (float)(gs_fLODMultTrees_LOD.Float() * fBase);
+    double fBase = GameSetting::fTreeNearDistanceBase::Get();
+    return (float)(gs_fLODMultTrees_LOD.Float() * fBase);
 }
 
 // Keeps the base distance as a double and rounds the product to a float.
 float BSTreeManager::GetFarDistance() {
-	double fBase = GameSetting::fTreeFarDistanceBase::Get();
-	return (float)(gs_fLODMultTrees_LOD.Float() * fBase);
+    double fBase = GameSetting::fTreeFarDistanceBase::Get();
+    return (float)(gs_fLODMultTrees_LOD.Float() * fBase);
 }
 
 NiTexture* BSTreeManager::GetCanopyShadow() {
-	FNVD_INLINED_LOCAL(NiFixedString, apString, std::nullopt, std::nullopt);
-	AutoMemContext tempMemContext(MEM_CONTEXT_TREEART, 1,
-		"D:\\_Fallout3\\Platforms\\Common\\Code\\Fallout Shared\\SpeedTree\\BSTreeManager.cpp", 629);
-	if (!BSTreeManager::GetInstance(1)->spCanopyShadow.m_pObject) {
-		if (TES::pInstance) {
-			BSTreeManager* Singleton = BSTreeManager::GetInstance(1);
-			TES::pInstance->CreateTextureImage("Data\\Textures\\Trees\\CanopyShadow.dds", Singleton->spCanopyShadow, 1,
-				0);
-		} else {
-			BSTreeManager::GetInstance(1)->spCanopyShadow.operator=(static_cast<NiSourceTexture*>(0));
-		}
-		BSTreeManager* v1 = BSTreeManager::GetInstance(1);
-		BSShaderManager::SetProjectedShadowTexture(v1->spCanopyShadow.m_pObject);
-	}
-	if (!BSTreeManager::GetInstance(1)->spCanopyShadow.m_pObject) {
-		NiPixelData* ppixeldata;
-		NiPixelData* v10 = static_cast<NiPixelData*>(NiMemObject::operator new(sizeof(NiPixelData)));
-		if (v10) {
-			ppixeldata = ::new (v10) NiPixelData(16u, 16u, NiPixelFormat_RGB24, 1u, 1u);
-		} else {
-			ppixeldata = 0;
-		}
-		uint8_t* ppixels = ppixeldata->GetPixels(0u, 0u);
-		for (uint32_t iy = 0; iy < 16; ++iy) {
-			for (uint32_t ix = 0; ix < 16; ++ix) {
-				ppixels[48 * iy + 3 * ix] = -1;
-				ppixels[48 * iy + 1 + 3 * ix] = -1;
-				ppixels[48 * iy + 2 + 3 * ix] = -1;
-			}
-		}
-		ppixeldata->MarkAsChanged();
-		NiFixedString* v6 = ::new (static_cast<void*>(&apString)) NiFixedString("CanopyShadowTexture");
-		const char* HandleString = v6->GetHandleString();
-		NiSourceTexture* v5 = NiSourceTexture::Create(ppixeldata, HandleString, NiSourceTexture::ms_kDefaultPrefs);
-		BSTreeManager::GetInstance(1)->spCanopyShadow.operator=(v5);
-		apString.~NiFixedString();
-		BSTreeManager* v3 = BSTreeManager::GetInstance(1);
-		BSShaderManager::SetProjectedShadowTexture(v3->spCanopyShadow.m_pObject);
-	}
-	NiTexture* v8 = BSTreeManager::GetInstance(1)->spCanopyShadow.m_pObject;
-	return v8;
+    FNVD_INLINED_LOCAL(NiFixedString, apString, std::nullopt, std::nullopt);
+    AutoMemContext tempMemContext(
+        MEM_CONTEXT_TREEART, 1, "D:\\_Fallout3\\Platforms\\Common\\Code\\Fallout Shared\\SpeedTree\\BSTreeManager.cpp",
+        629
+    );
+    if (!BSTreeManager::GetInstance(1)->spCanopyShadow.m_pObject) {
+        if (TES::pInstance) {
+            BSTreeManager* Singleton = BSTreeManager::GetInstance(1);
+            TES::pInstance->CreateTextureImage(
+                "Data\\Textures\\Trees\\CanopyShadow.dds", Singleton->spCanopyShadow, 1, 0
+            );
+        }
+        else {
+            BSTreeManager::GetInstance(1)->spCanopyShadow.operator=(static_cast<NiSourceTexture*>(0));
+        }
+        BSTreeManager* v1 = BSTreeManager::GetInstance(1);
+        BSShaderManager::SetProjectedShadowTexture(v1->spCanopyShadow.m_pObject);
+    }
+    if (!BSTreeManager::GetInstance(1)->spCanopyShadow.m_pObject) {
+        NiPixelData* ppixeldata;
+        NiPixelData* v10 = static_cast<NiPixelData*>(NiMemObject::operator new(sizeof(NiPixelData)));
+        if (v10) {
+            ppixeldata = ::new (v10) NiPixelData(16u, 16u, NiPixelFormat_RGB24, 1u, 1u);
+        }
+        else {
+            ppixeldata = 0;
+        }
+        uint8_t* ppixels = ppixeldata->GetPixels(0u, 0u);
+        for (uint32_t iy = 0; iy < 16; ++iy) {
+            for (uint32_t ix = 0; ix < 16; ++ix) {
+                ppixels[48 * iy + 3 * ix] = -1;
+                ppixels[48 * iy + 1 + 3 * ix] = -1;
+                ppixels[48 * iy + 2 + 3 * ix] = -1;
+            }
+        }
+        ppixeldata->MarkAsChanged();
+        NiFixedString* v6 = ::new (static_cast<void*>(&apString)) NiFixedString("CanopyShadowTexture");
+        const char* HandleString = v6->GetHandleString();
+        NiSourceTexture* v5 = NiSourceTexture::Create(ppixeldata, HandleString, NiSourceTexture::ms_kDefaultPrefs);
+        BSTreeManager::GetInstance(1)->spCanopyShadow.operator=(v5);
+        apString.~NiFixedString();
+        BSTreeManager* v3 = BSTreeManager::GetInstance(1);
+        BSShaderManager::SetProjectedShadowTexture(v3->spCanopyShadow.m_pObject);
+    }
+    NiTexture* v8 = BSTreeManager::GetInstance(1)->spCanopyShadow.m_pObject;
+    return v8;
 }
 
 void BSTreeManager::Update(NiCamera* apCamera, bool abMenuMode) {
-	static float fTreeTime;
-	if (!abMenuMode) {
-		fTreeTime = appTimer.fDelta + fTreeTime;
-		CSpeedTreeRT::SetTime(fTreeTime);
-	}
-	if (apCamera) {
-		float fcamDir[3];
-		float fcamLoc[3];
-		fcamLoc[0] = (&apCamera->GetWorldTranslate())->x;
-		fcamLoc[1] = (&apCamera->GetWorldTranslate())->y;
-		fcamLoc[2] = (&apCamera->GetWorldTranslate())->z;
-		NiPoint3 pt3temp = -1.0f * apCamera->GetWorldDirection();
-		fcamDir[0] = pt3temp.x;
-		fcamDir[1] = pt3temp.y;
-		fcamDir[2] = pt3temp.z;
-		CSpeedTreeRT::SetCamera(fcamLoc, fcamDir);
-	}
-	if (!abMenuMode) {
-		if (TES::pInstance) {
-			if (TES::pInstance->pSky) {
-				if (TES::pInstance->pInteriorCell) {
-					BSTreeManager::GetInstance(1)->fWindSpeed = 0.0f;
-				} else {
-					float windSpeed = TES::pInstance->pSky->fWindSpeed;
-					BSTreeManager::GetInstance(1)->fWindSpeed = windSpeed;
-				}
-				if (BSTreeManager::GetInstance(1)->spBillboardMatProp.m_pObject) {
-					if (TES::pInstance->pSky->GetFog()) {
-						NiColor col = *&TES::pInstance->pSky->GetFog()->m_kColor;
-						BSTreeManager* Singleton = BSTreeManager::GetInstance(1);
-						BSTreeManager* v4 = BSTreeManager::GetInstance(1);
-						BSTreeManager* v5 = BSTreeManager::GetInstance(1);
-						v5->spBillboardMatProp.m_pObject->SetEmittance(col);
-					}
-				}
-			}
-		}
-		BSTreeManager* v6 = BSTreeManager::GetInstance(1);
-		v6->UpdateWindMatrices();
-	}
-	// SetProjectedShadowScale takes an unsigned int.
-	ShadowLightShader::SetProjectedShadowScale(static_cast<uint32_t>(gs_iCanopyShadowScale_SpeedTree.Int()));
-	float* v7 = &gs_fCanopyShadowGrassMult_SpeedTree.Float();
-	SpeedTree::fCanopyShadowGrassMult::Set(*v7);
+    static float fTreeTime;
+    if (!abMenuMode) {
+        fTreeTime = appTimer.fDelta + fTreeTime;
+        CSpeedTreeRT::SetTime(fTreeTime);
+    }
+    if (apCamera) {
+        float fcamDir[3];
+        float fcamLoc[3];
+        fcamLoc[0] = (&apCamera->GetWorldTranslate())->x;
+        fcamLoc[1] = (&apCamera->GetWorldTranslate())->y;
+        fcamLoc[2] = (&apCamera->GetWorldTranslate())->z;
+        NiPoint3 pt3temp = -1.0f * apCamera->GetWorldDirection();
+        fcamDir[0] = pt3temp.x;
+        fcamDir[1] = pt3temp.y;
+        fcamDir[2] = pt3temp.z;
+        CSpeedTreeRT::SetCamera(fcamLoc, fcamDir);
+    }
+    if (!abMenuMode) {
+        if (TES::pInstance) {
+            if (TES::pInstance->pSky) {
+                if (TES::pInstance->pInteriorCell) {
+                    BSTreeManager::GetInstance(1)->fWindSpeed = 0.0f;
+                }
+                else {
+                    float windSpeed = TES::pInstance->pSky->fWindSpeed;
+                    BSTreeManager::GetInstance(1)->fWindSpeed = windSpeed;
+                }
+                if (BSTreeManager::GetInstance(1)->spBillboardMatProp.m_pObject) {
+                    if (TES::pInstance->pSky->GetFog()) {
+                        NiColor col = *&TES::pInstance->pSky->GetFog()->m_kColor;
+                        BSTreeManager* Singleton = BSTreeManager::GetInstance(1);
+                        BSTreeManager* v4 = BSTreeManager::GetInstance(1);
+                        BSTreeManager* v5 = BSTreeManager::GetInstance(1);
+                        v5->spBillboardMatProp.m_pObject->SetEmittance(col);
+                    }
+                }
+            }
+        }
+        BSTreeManager* v6 = BSTreeManager::GetInstance(1);
+        v6->UpdateWindMatrices();
+    }
+    // SetProjectedShadowScale takes an unsigned int.
+    ShadowLightShader::SetProjectedShadowScale(static_cast<uint32_t>(gs_iCanopyShadowScale_SpeedTree.Int()));
+    float* v7 = &gs_fCanopyShadowGrassMult_SpeedTree.Float();
+    SpeedTree::fCanopyShadowGrassMult::Set(*v7);
 }
 
 void BSTreeManager::SetForceFullLOD(bool abForce) {
-	BSTreeManager::GetInstance(1)->m_bForceFullLOD = (bool)((uint8_t)abForce);
+    BSTreeManager::GetInstance(1)->m_bForceFullLOD = (bool)((uint8_t)abForce);
 }
 
 bool BSTreeManager::GetForceFullLOD() {
-	return (bool)((uint8_t)BSTreeManager::GetInstance(1)->m_bForceFullLOD);
+    return (bool)((uint8_t)BSTreeManager::GetInstance(1)->m_bForceFullLOD);
 }
 
 void BSTreeManager::SetTreesEnabled(bool a1) {
-	BSTreeManager::GetInstance(1)->bShowTrees = (bool)((uint8_t)a1);
+    BSTreeManager::GetInstance(1)->bShowTrees = (bool)((uint8_t)a1);
 }
 
 BSXFlags* BSTreeManager::GetHavokFlags() {
-	BSTreeManager* singleton = BSTreeManager::GetInstance(1);
-	return singleton->spHavokFlags;
+    BSTreeManager* singleton = BSTreeManager::GetInstance(1);
+    return singleton->spHavokFlags;
 }
 
 NiAlphaProperty* BSTreeManager::GetDistantBillboardAlphaProperty() {
-	BSTreeManager* singleton = BSTreeManager::GetInstance(1);
-	return singleton->spDistantAlphaProp;
+    BSTreeManager* singleton = BSTreeManager::GetInstance(1);
+    return singleton->spDistantAlphaProp;
 }
 
 void BSTreeManager::SetLeavesVisible(bool abShowLeaves) {
-	BSTreeManager::GetInstance(1)->bShowLeaves = (bool)((uint8_t)abShowLeaves);
+    BSTreeManager::GetInstance(1)->bShowLeaves = (bool)((uint8_t)abShowLeaves);
 }
 
 void BSTreeManager::operator delete(void* apMemory) {
-	ourFree(apMemory);
+    ourFree(apMemory);
 }
 
 void BSTreeManager::ClearCanopyShadow_004F3310() {
-	TESRegionDataLandscape::spDefaultFullMaskTextureProp.operator=(static_cast<NiTexturingProperty*>(0));
-	TESRegionDataLandscape::spDefaultEmptyMaskTextureProp.operator=(static_cast<NiTexturingProperty*>(0));
+    TESRegionDataLandscape::spDefaultFullMaskTextureProp.operator=(static_cast<NiTexturingProperty*>(0));
+    TESRegionDataLandscape::spDefaultEmptyMaskTextureProp.operator=(static_cast<NiTexturingProperty*>(0));
 }
 
 void BSTreeManager::Destroy() {
-	if (pTreeManager) {
-		delete pTreeManager;
-		pTreeManager = 0;
-	}
+    if (pTreeManager) {
+        delete pTreeManager;
+        pTreeManager = 0;
+    }
 }
 
 // NaN is sent to 0, as the game does.
 void SpeedTree::fCanopyShadowGrassMult::Set(float afValue) {
-	float fValue;
-	if (!(afValue >= 0.0)) {
-		fValue = 0.0f;
-	} else {
-		float fClamped;
-		if (afValue > 1.0) {
-			fClamped = 1.0f;
-		} else {
-			fClamped = afValue;
-		}
-		fValue = fClamped;
-	}
-	TallGrassShader::fProjShadowMult = fValue;
+    float fValue;
+    if (!(afValue >= 0.0)) {
+        fValue = 0.0f;
+    }
+    else {
+        float fClamped;
+        if (afValue > 1.0) {
+            fClamped = 1.0f;
+        }
+        else {
+            fClamped = afValue;
+        }
+        fValue = fClamped;
+    }
+    TallGrassShader::fProjShadowMult = fValue;
 }
 
 float GameSetting::fTreeNearDistanceBase::Get() {
-	return gs_fTreeNearDistanceBase.Float();
+    return gs_fTreeNearDistanceBase.Float();
 }
 
 float GameSetting::fTreeFarDistanceBase::Get() {
-	return gs_fTreeFarDistanceBase.Float();
+    return gs_fTreeFarDistanceBase.Float();
 }
 
 float GameSetting::fTreeSizeConversion::Get() {
-	return gs_fTreeSizeConversion.Float();
+    return gs_fTreeSizeConversion.Float();
 }
 
 void BSShaderManager::SetProjectedShadowTexture(NiTexture* apTexture) {
-	pProjectedShadowTexture = apTexture;
+    pProjectedShadowTexture = apTexture;
 }

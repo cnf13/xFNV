@@ -7,5 +7,5 @@
 #include "Gamebryo2.2/CoreLibs/NiMain/NiTPointerListBase.h"
 
 void UIntPointerList_RemoveAll(NiTPointerList<uint32_t>* apList) {
-	apList->RemoveAll();
+    apList->RemoveAll();
 }

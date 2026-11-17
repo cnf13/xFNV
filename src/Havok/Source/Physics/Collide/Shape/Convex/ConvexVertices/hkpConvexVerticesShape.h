@@ -17,65 +17,71 @@ class hkpConvexVerticesConnectivity;
 // its cached AABB; it can also stand for a convex piece of a compressed mesh.
 class hkpConvexVerticesShape : public hkpConvexShape {
 public:
-	// Four vertices transposed: their x, y and z components each in one vector.
-	struct FourVectors {
-		// Havok SDK signature (hkpCollide.lib, tied by target).
-		static const hkClass& staticClass();
+    // Four vertices transposed: their x, y and z components each in one vector.
+    struct FourVectors {
+        // Havok SDK signature (hkpCollide.lib, tied by target).
+        static const hkClass& staticClass();
 
-		hkVector4 m_x;
-		hkVector4 m_y;
-		hkVector4 m_z;
-	};
+        hkVector4 m_x;
+        hkVector4 m_y;
+        hkVector4 m_z;
+    };
 
-	// How the shape is built from a point cloud: connectivity, shrinking by the convex radius and its limits, the
-	// vertex budget and the bevel planes' angle.
-	struct BuildConfig {
-		hkBool m_createConnectivity;
-		hkBool m_shrinkByConvexRadius;
-		float m_convexRadius;
-		int32_t m_maxVertices;
-		float m_maxRelativeShrink;
-		float m_maxShrinkingVerticesDisplacement;
-		float m_maxCosAngleForBevelPlanes;
-	};
+    // How the shape is built from a point cloud: connectivity, shrinking by the convex radius and its limits, the
+    // vertex budget and the bevel planes' angle.
+    struct BuildConfig {
+        hkBool m_createConnectivity;
+        hkBool m_shrinkByConvexRadius;
+        float m_convexRadius;
+        int32_t m_maxVertices;
+        float m_maxRelativeShrink;
+        float m_maxShrinkingVerticesDisplacement;
+        float m_maxCosAngleForBevelPlanes;
+    };
 
-	hkpConvexVerticesShape(const hkStridedVertices& vertsIn, const hkArray<hkVector4>& planeEquations, float radius);
-	hkpConvexVerticesShape(float afRadius);
-	hkpConvexVerticesShape(hkFinishLoadedObjectFlag flag);
-	hkpConvexVerticesShape(FourVectors* rotatedVertices, int32_t numVertices, hkVector4* planes, int32_t numPlanes,
-		const hkAabb& aabb, float radius);
-	~hkpConvexVerticesShape() override;
+    hkpConvexVerticesShape(const hkStridedVertices& vertsIn, const hkArray<hkVector4>& planeEquations, float radius);
+    hkpConvexVerticesShape(float afRadius);
+    hkpConvexVerticesShape(hkFinishLoadedObjectFlag flag);
+    hkpConvexVerticesShape(
+        FourVectors* rotatedVertices,
+        int32_t numVertices,
+        hkVector4* planes,
+        int32_t numPlanes,
+        const hkAabb& aabb,
+        float radius
+    );
+    ~hkpConvexVerticesShape() override;
 
-	// Havok SDK signature (hkpCollide.lib, tied by vtable).
-	int32_t calcSizeForSpu(const hkpShape::CalcSizeForSpuInput& input, int32_t spuBufferSizeLeft) const override;
-	void getAabbImpl(const hkTransform& localToWorld, float tolerance, hkAabb& out) const override;
-	hkBool castRayImpl(const hkpShapeRayCastInput& input, hkpShapeRayCastOutput& results) const override;
-	int32_t getNumCollisionSpheresImpl() const override;
-	const hkSphere* getCollisionSpheresImpl(hkSphere* sphereBuffer) const override;
-	void getFirstVertex(hkVector4& v) const override;
-	void getSupportingVertexImpl(const hkVector4& direction, hkpCdVertex& supportingVertexOut) const override;
-	void convertVertexIdsToVerticesImpl(const uint16_t* ids, int32_t numIds, hkpCdVertex* verticesOut) const override;
-	void getCentreImpl(hkVector4& centreOut) const override;
+    // Havok SDK signature (hkpCollide.lib, tied by vtable).
+    int32_t calcSizeForSpu(const hkpShape::CalcSizeForSpuInput& input, int32_t spuBufferSizeLeft) const override;
+    void getAabbImpl(const hkTransform& localToWorld, float tolerance, hkAabb& out) const override;
+    hkBool castRayImpl(const hkpShapeRayCastInput& input, hkpShapeRayCastOutput& results) const override;
+    int32_t getNumCollisionSpheresImpl() const override;
+    const hkSphere* getCollisionSpheresImpl(hkSphere* sphereBuffer) const override;
+    void getFirstVertex(hkVector4& v) const override;
+    void getSupportingVertexImpl(const hkVector4& direction, hkpCdVertex& supportingVertexOut) const override;
+    void convertVertexIdsToVerticesImpl(const uint16_t* ids, int32_t numIds, hkpCdVertex* verticesOut) const override;
+    void getCentreImpl(hkVector4& centreOut) const override;
 
-	void transformVerticesAndPlaneEquations(const hkTransform& t);
-	void setConnectivity(const hkpConvexVerticesConnectivity* connect, bool sort);
-	void setPlaneEquations(const hkArray<hkVector4, hkContainerHeapAllocator>& planes);
-	// The vertices stored transposed four to a FourVectors, the last one repeated up to a multiple of four, and the
-	// AABB's centre and half extents.
-	void copyVertexData(const float* vertexIn, int32_t byteStriding, int32_t numVertices);
-	// The vertices back out of their transposed blocks into vertices, w 0.
-	void getOriginalVertices(hkArray<hkVector4>& vertices) const;
-	// Havok SDK signature (hkpCollide.lib, tied by reloc).
-	void sortPlanes();
+    void transformVerticesAndPlaneEquations(const hkTransform& t);
+    void setConnectivity(const hkpConvexVerticesConnectivity* connect, bool sort);
+    void setPlaneEquations(const hkArray<hkVector4, hkContainerHeapAllocator>& planes);
+    // The vertices stored transposed four to a FourVectors, the last one repeated up to a multiple of four, and the
+    // AABB's centre and half extents.
+    void copyVertexData(const float* vertexIn, int32_t byteStriding, int32_t numVertices);
+    // The vertices back out of their transposed blocks into vertices, w 0.
+    void getOriginalVertices(hkArray<hkVector4>& vertices) const;
+    // Havok SDK signature (hkpCollide.lib, tied by reloc).
+    void sortPlanes();
 
-	hkVector4 m_aabbHalfExtents;
-	hkVector4 m_aabbCenter;
-	hkArray<FourVectors> m_rotatedVertices;
-	int32_t m_numVertices;
-	const hkpCompressedMeshShape::ConvexPiece* m_convexPiece;
-	// Mutable as in the SDK header: castRayImpl (const) builds the planes on first use.
-	mutable hkArray<hkVector4> m_planeEquations;
-	const hkpConvexVerticesConnectivity* m_connectivity;
+    hkVector4 m_aabbHalfExtents;
+    hkVector4 m_aabbCenter;
+    hkArray<FourVectors> m_rotatedVertices;
+    int32_t m_numVertices;
+    const hkpCompressedMeshShape::ConvexPiece* m_convexPiece;
+    // Mutable as in the SDK header: castRayImpl (const) builds the planes on first use.
+    mutable hkArray<hkVector4> m_planeEquations;
+    const hkpConvexVerticesConnectivity* m_connectivity;
 };
 
 // Defined in hkxAttributeGroupClass.cpp; hkpConvexVerticesShapeTypeInfo holds it.

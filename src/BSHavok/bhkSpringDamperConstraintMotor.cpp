@@ -16,98 +16,98 @@ bhkSpringDamperConstraintMotor::bhkSpringDamperConstraintMotor() {}
 bhkSpringDamperConstraintMotor::~bhkSpringDamperConstraintMotor() {}
 
 const NiRTTI* bhkSpringDamperConstraintMotor::GetRTTI() const {
-	return &bhkSpringDamperConstraintMotor::ms_RTTI;
+    return &bhkSpringDamperConstraintMotor::ms_RTTI;
 }
 
 NiNode* bhkSpringDamperConstraintMotor::IsNode() {
-	return nullptr;
+    return nullptr;
 }
 
 BSFadeNode* bhkSpringDamperConstraintMotor::IsFadeNode() {
-	return nullptr;
+    return nullptr;
 }
 
 BSMultiBoundNode* bhkSpringDamperConstraintMotor::IsMultiBoundNode() {
-	return nullptr;
+    return nullptr;
 }
 
 NiGeometry* bhkSpringDamperConstraintMotor::IsGeometry() {
-	return nullptr;
+    return nullptr;
 }
 
 NiTriBasedGeom* bhkSpringDamperConstraintMotor::IsTriBasedGeom() {
-	return nullptr;
+    return nullptr;
 }
 
 NiTriStrips* bhkSpringDamperConstraintMotor::IsTriStrips() {
-	return nullptr;
+    return nullptr;
 }
 
 NiTriShape* bhkSpringDamperConstraintMotor::IsTriShape() {
-	return nullptr;
+    return nullptr;
 }
 
 BSSegmentedTriShape* bhkSpringDamperConstraintMotor::IsSegmentedTriShape() {
-	return nullptr;
+    return nullptr;
 }
 
 BSResizableTriShape* bhkSpringDamperConstraintMotor::IsResizableTriShape() {
-	return nullptr;
+    return nullptr;
 }
 
 NiParticles* bhkSpringDamperConstraintMotor::IsParticlesGeom() {
-	return nullptr;
+    return nullptr;
 }
 
 NiLines* bhkSpringDamperConstraintMotor::IsLinesGeom() {
-	return nullptr;
+    return nullptr;
 }
 
 bhkNiCollisionObject* bhkSpringDamperConstraintMotor::IsBhkNiCollisionObject() {
-	return nullptr;
+    return nullptr;
 }
 
 bhkBlendCollisionObject* bhkSpringDamperConstraintMotor::IsBhkBlendCollisionObject() {
-	return nullptr;
+    return nullptr;
 }
 
 bhkRigidBody* bhkSpringDamperConstraintMotor::IsBhkRigidBody() {
-	return nullptr;
+    return nullptr;
 }
 
 bhkLimitedHingeConstraint* bhkSpringDamperConstraintMotor::IsBhkLimitedHingeConstraint() {
-	return nullptr;
+    return nullptr;
 }
 
 // Appends the class name's viewer string, in Havok's heap context; the base's GetViewerStrings is not called.
 void bhkSpringDamperConstraintMotor::GetViewerStrings(NiTPrimitiveArray<char*>* pkStrings) {
-	TLSData* pTLSData = GetThreadTLSData();
-	MEM_CONTEXT eMemContext = pTLSData->eMemContext;
-	pTLSData->eMemContext = MEM_CONTEXT_HAVOK;
-	char* pViewerString = NiGetViewerString(bhkSpringDamperConstraintMotor::ms_RTTI.GetName());
-	pkStrings->Add(pViewerString);
-	pTLSData->eMemContext = eMemContext;
+    TLSData* pTLSData = GetThreadTLSData();
+    MEM_CONTEXT eMemContext = pTLSData->eMemContext;
+    pTLSData->eMemContext = MEM_CONTEXT_HAVOK;
+    char* pViewerString = NiGetViewerString(bhkSpringDamperConstraintMotor::ms_RTTI.GetName());
+    pkStrings->Add(pViewerString);
+    pTLSData->eMemContext = eMemContext;
 }
 
 void bhkSpringDamperConstraintMotor::LoadBinary(NiStream& arStream) {
-	uint32_t v8;
-	NiStream* v2 = &arStream;
-	bhkLimitedForceConstraintMotor::LoadBinary(arStream, *this);
-	NiBinaryStream* m_pkIstr = v2->Istr();
-	uint32_t (*m_pfnRead)(NiBinaryStream*, void*, uint32_t, uint32_t*, uint32_t) = m_pkIstr->m_pfnRead;
-	v8 = 4;
-	m_pkIstr->m_uiAbsoluteCurrentPos += m_pfnRead(m_pkIstr, &m_springConstant, 4, &v8, 1);
-	NiBinaryStream* v6 = v2->Istr();
-	uint32_t (*v7)(NiBinaryStream*, void*, uint32_t, uint32_t*, uint32_t) = v6->m_pfnRead;
-	v8 = 4;
-	v6->m_uiAbsoluteCurrentPos += v7(v6, &m_springDamping, 4, &v8, 1);
+    uint32_t v8;
+    NiStream* v2 = &arStream;
+    bhkLimitedForceConstraintMotor::LoadBinary(arStream, *this);
+    NiBinaryStream* m_pkIstr = v2->Istr();
+    uint32_t (*m_pfnRead)(NiBinaryStream*, void*, uint32_t, uint32_t*, uint32_t) = m_pkIstr->m_pfnRead;
+    v8 = 4;
+    m_pkIstr->m_uiAbsoluteCurrentPos += m_pfnRead(m_pkIstr, &m_springConstant, 4, &v8, 1);
+    NiBinaryStream* v6 = v2->Istr();
+    uint32_t (*v7)(NiBinaryStream*, void*, uint32_t, uint32_t*, uint32_t) = v6->m_pfnRead;
+    v8 = 4;
+    v6->m_uiAbsoluteCurrentPos += v7(v6, &m_springDamping, 4, &v8, 1);
 }
 
 // The base's force limits, then the spring constant and damping, each one 4-byte component.
 void bhkSpringDamperConstraintMotor::SaveBinary(NiStream& arStream) {
-	bhkLimitedForceConstraintMotor::SaveBinary(arStream, *this);
-	uint32_t uiComponentSize = 4;
-	arStream.m_pkOstr->BinaryWrite(&m_springConstant, 4, &uiComponentSize, 1);
-	uiComponentSize = 4;
-	arStream.m_pkOstr->BinaryWrite(&m_springDamping, 4, &uiComponentSize, 1);
+    bhkLimitedForceConstraintMotor::SaveBinary(arStream, *this);
+    uint32_t uiComponentSize = 4;
+    arStream.m_pkOstr->BinaryWrite(&m_springConstant, 4, &uiComponentSize, 1);
+    uiComponentSize = 4;
+    arStream.m_pkOstr->BinaryWrite(&m_springDamping, 4, &uiComponentSize, 1);
 }

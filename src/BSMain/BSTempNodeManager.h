@@ -8,21 +8,21 @@ struct NiUpdateData;
 // The node the temporary effects hang under: each update first removes the children whose time is up.
 class BSTempNodeManager : public NiNode {
 public:
-	BSTempNodeManager();
+    BSTempNodeManager();
 
-	~BSTempNodeManager() override;
+    ~BSTempNodeManager() override;
 
-	const NiRTTI* GetRTTI() const override;
-	void UpdateDownwardPass(NiUpdateData& UpdateData, uint32_t uFlags) override;
-	void UpdateSelectedDownwardPass(NiUpdateData& UpdateData, uint32_t uFlags) override;
-	void UpdateRigidDownwardPass(NiUpdateData& UpdateData, uint32_t uFlags) override;
+    const NiRTTI* GetRTTI() const override;
+    void UpdateDownwardPass(NiUpdateData& UpdateData, uint32_t uFlags) override;
+    void UpdateSelectedDownwardPass(NiUpdateData& UpdateData, uint32_t uFlags) override;
+    void UpdateRigidDownwardPass(NiUpdateData& UpdateData, uint32_t uFlags) override;
 
 protected:
-	// Removes the children that expired by afTime.
-	void RemoveExpired(float afTime);
+    // Removes the children that expired by afTime.
+    void RemoveExpired(float afTime);
 
 public:
-	float fPrevTime;
+    float fPrevTime;
 
-	static NiRTTI ms_RTTI;
+    static NiRTTI ms_RTTI;
 };

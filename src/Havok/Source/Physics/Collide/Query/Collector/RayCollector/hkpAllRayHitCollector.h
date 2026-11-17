@@ -7,17 +7,17 @@
 // A ray hit collector that keeps every hit, in an inplace array of eight world ray cast outputs.
 class hkpAllRayHitCollector : public hkpRayHitCollector {
 public:
-	hkpAllRayHitCollector();
+    hkpAllRayHitCollector();
 
-	void addRayHit(const hkpCdBody& cdBody, const hkpShapeRayCastCollectorOutput& hitInfo) override;
-	~hkpAllRayHitCollector() override;
+    void addRayHit(const hkpCdBody& cdBody, const hkpShapeRayCastCollectorOutput& hitInfo) override;
+    ~hkpAllRayHitCollector() override;
 
-	// Empties the hits and resets the early-out fraction.
-	void reset();
-	// Sorts the hits with hkAlgorithm::quickSortRecursive when there are two or more.
-	void sortHits();
-	// m_hits.
-	const hkArray<hkpWorldRayCastOutput>& getHits() const;
+    // Empties the hits and resets the early-out fraction.
+    void reset();
+    // Sorts the hits with hkAlgorithm::quickSortRecursive when there are two or more.
+    void sortHits();
+    // m_hits.
+    const hkArray<hkpWorldRayCastOutput>& getHits() const;
 
-	hkInplaceArray<hkpWorldRayCastOutput, 8> m_hits;
+    hkInplaceArray<hkpWorldRayCastOutput, 8> m_hits;
 };

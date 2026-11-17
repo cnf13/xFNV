@@ -6,9 +6,9 @@ class NiAllocator;
 // declared.
 class NiMemManager {
 public:
-	static void _SDMInit();
+    static void _SDMInit();
 
-	NiAllocator* m_pkAllocator;
+    NiAllocator* m_pkAllocator;
 
-	static inline NiMemManager* ms_pkMemManager;
+    static inline NiMemManager* ms_pkMemManager;
 };

@@ -7,7 +7,7 @@ struct hkStepInfo;
 // hkpWorldCallbackUtil::firePostCollideCallback calls postCollideCallback with the world and the step.
 class hkpWorldPostCollideListener {
 public:
-	virtual ~hkpWorldPostCollideListener();
+    virtual ~hkpWorldPostCollideListener();
 
-	virtual void postCollideCallback(hkpWorld* world, const hkStepInfo& stepInfo) = 0;
+    virtual void postCollideCallback(hkpWorld* world, const hkStepInfo& stepInfo) = 0;
 };

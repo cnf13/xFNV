@@ -4,9 +4,9 @@
 
 class ImageSpaceShaderFFTVerticalButterfly : public ImageSpaceShader {
 public:
-	ImageSpaceShaderFFTVerticalButterfly();
-	~ImageSpaceShaderFFTVerticalButterfly() override;
+    ImageSpaceShaderFFTVerticalButterfly();
+    ~ImageSpaceShaderFFTVerticalButterfly() override;
 
-	void ReloadShaders() override;
-	bool LoadStagesAndPasses() override;
+    void ReloadShaders() override;
+    bool LoadStagesAndPasses() override;
 };

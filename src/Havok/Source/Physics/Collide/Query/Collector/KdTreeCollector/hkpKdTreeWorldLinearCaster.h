@@ -20,21 +20,28 @@ __m128 hkGetOneOver65K_D98620();
 // Performs world linear casts using the KD-tree candidate collector.
 class hkpKdTreeWorldLinearCaster : public hkKdTreeCastCollector {
 public:
-	hkBool* addMidPhaseHit(hkBool* arResult, hkPrimitiveId primitiveId) override;
-	hkBool* hasHit(hkBool* arResult) override;
-	float getHitFraction() override;
+    hkBool* addMidPhaseHit(hkBool* arResult, hkPrimitiveId primitiveId) override;
+    hkBool* hasHit(hkBool* arResult) override;
+    float getHitFraction() override;
 
-	void linearCast(const hkKdTree* tree, const hkpCollidable* collA, const hkpLinearCastInput& input,
-		const hkpCollidableCollidableFilter* filter, const hkpCollisionInput& collInput,
-		hkpCollisionAgentConfig* config, hkpCdPointCollector& castCollector, hkpCdPointCollector* startPointCollector);
+    void linearCast(
+        const hkKdTree* tree,
+        const hkpCollidable* collA,
+        const hkpLinearCastInput& input,
+        const hkpCollidableCollidableFilter* filter,
+        const hkpCollisionInput& collInput,
+        hkpCollisionAgentConfig* config,
+        hkpCdPointCollector& castCollector,
+        hkpCdPointCollector* startPointCollector
+    );
 
-	const hkpLinearCastInput* m_input;
-	const hkpCollidableCollidableFilter* m_filter;
-	hkpCdPointCollector* m_castCollector;
-	hkpCdPointCollector* m_startPointCollector;
-	const hkpCollidable* m_collidableA;
-	hkEnum<hkpShapeType, int32_t> m_typeA;
-	// 4 bytes of padding: m_shapeInput is 16-byte aligned (its hkVector4 members), so it starts at 0x20.
-	hkpLinearCastCollisionInput m_shapeInput;
+    const hkpLinearCastInput* m_input;
+    const hkpCollidableCollidableFilter* m_filter;
+    hkpCdPointCollector* m_castCollector;
+    hkpCdPointCollector* m_startPointCollector;
+    const hkpCollidable* m_collidableA;
+    hkEnum<hkpShapeType, int32_t> m_typeA;
+    // 4 bytes of padding: m_shapeInput is 16-byte aligned (its hkVector4 members), so it starts at 0x20.
+    hkpLinearCastCollisionInput m_shapeInput;
 };
 inline constexpr fnvd::Vtable hkpKdTreeWorldLinearCaster_vftable{};

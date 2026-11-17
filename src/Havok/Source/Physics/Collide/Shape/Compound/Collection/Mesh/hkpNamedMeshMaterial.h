@@ -10,10 +10,10 @@ void cleanupLoadedObjecthkpNamedMeshMaterial(void* p);
 // A mesh material with a name, as the storage mesh shapes keep per subpart. It has no vtable.
 class hkpNamedMeshMaterial : public hkpMeshMaterial {
 public:
-	// The class's reflection record, hkpNamedMeshMaterialClass.
-	static const hkClass& staticClass();
+    // The class's reflection record, hkpNamedMeshMaterialClass.
+    static const hkClass& staticClass();
 
-	hkStringPtr m_name;
+    hkStringPtr m_name;
 };
 
 // The class's reflection record.

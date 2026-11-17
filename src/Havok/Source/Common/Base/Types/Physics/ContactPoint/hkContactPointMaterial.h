@@ -10,28 +10,28 @@ class hkTypeInfo;
 // and the largest impulse per step, packed into bytes, and flags.
 class hkContactPointMaterial {
 public:
-	enum FlagEnum : int32_t {
-		CONTACT_IS_NEW = 0x1,
-		CONTACT_USES_SOLVER_PATH2 = 0x2,
-		CONTACT_BREAKOFF_OBJECT_ID = 0x4,
-		CONTACT_IS_DISABLED = 0x8,
-	};
+    enum FlagEnum : int32_t {
+        CONTACT_IS_NEW = 0x1,
+        CONTACT_USES_SOLVER_PATH2 = 0x2,
+        CONTACT_BREAKOFF_OBJECT_ID = 0x4,
+        CONTACT_IS_DISABLED = 0x8,
+    };
 
-	using MembersArray = const hkClassMember[5];
+    using MembersArray = const hkClassMember[5];
 
-	// The friction, unpacked.
-	float getFriction() const;
+    // The friction, unpacked.
+    float getFriction() const;
 
-	// Havok SDK signature (hkBase.lib, tied by target).
-	static const hkClass& staticClass();
+    // Havok SDK signature (hkBase.lib, tied by target).
+    static const hkClass& staticClass();
 
-	hkUlong m_userData;
-	hkUFloat8 m_friction;
-	uint8_t m_restitution;
-	hkUFloat8 m_maxImpulse;
-	uint8_t m_flags;
+    hkUlong m_userData;
+    hkUFloat8 m_friction;
+    uint8_t m_restitution;
+    hkUFloat8 m_maxImpulse;
+    uint8_t m_flags;
 
-	static MembersArray Members;
+    static MembersArray Members;
 };
 
 // The class's reflection record.

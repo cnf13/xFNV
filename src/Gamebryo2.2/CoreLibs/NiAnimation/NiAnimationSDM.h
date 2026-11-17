@@ -10,6 +10,16 @@
 #include "Gamebryo2.2/CoreLibs/NiAnimation/BSRotAccumTransfInterpolator.h"
 #include "Gamebryo2.2/CoreLibs/NiAnimation/BSTreadTransfInterpolator.h"
 #include "Gamebryo2.2/CoreLibs/NiAnimation/NiAlphaController.h"
+#include "Gamebryo2.2/CoreLibs/NiAnimation/NiBSplineBasisData.h"
+#include "Gamebryo2.2/CoreLibs/NiAnimation/NiBSplineColorInterpolator.h"
+#include "Gamebryo2.2/CoreLibs/NiAnimation/NiBSplineCompColorInterpolator.h"
+#include "Gamebryo2.2/CoreLibs/NiAnimation/NiBSplineCompFloatInterpolator.h"
+#include "Gamebryo2.2/CoreLibs/NiAnimation/NiBSplineCompPoint3Interpolator.h"
+#include "Gamebryo2.2/CoreLibs/NiAnimation/NiBSplineCompTransformInterpolator.h"
+#include "Gamebryo2.2/CoreLibs/NiAnimation/NiBSplineData.h"
+#include "Gamebryo2.2/CoreLibs/NiAnimation/NiBSplineFloatInterpolator.h"
+#include "Gamebryo2.2/CoreLibs/NiAnimation/NiBSplinePoint3Interpolator.h"
+#include "Gamebryo2.2/CoreLibs/NiAnimation/NiBSplineTransformInterpolator.h"
 #include "Gamebryo2.2/CoreLibs/NiAnimation/NiBlendAccumTransformInterpolator.h"
 #include "Gamebryo2.2/CoreLibs/NiAnimation/NiBlendBoolInterpolator.h"
 #include "Gamebryo2.2/CoreLibs/NiAnimation/NiBlendColorInterpolator.h"
@@ -21,16 +31,6 @@
 #include "Gamebryo2.2/CoreLibs/NiAnimation/NiBoolData.h"
 #include "Gamebryo2.2/CoreLibs/NiAnimation/NiBoolInterpolator.h"
 #include "Gamebryo2.2/CoreLibs/NiAnimation/NiBoolTimelineInterpolator.h"
-#include "Gamebryo2.2/CoreLibs/NiAnimation/NiBSplineBasisData.h"
-#include "Gamebryo2.2/CoreLibs/NiAnimation/NiBSplineColorInterpolator.h"
-#include "Gamebryo2.2/CoreLibs/NiAnimation/NiBSplineCompColorInterpolator.h"
-#include "Gamebryo2.2/CoreLibs/NiAnimation/NiBSplineCompFloatInterpolator.h"
-#include "Gamebryo2.2/CoreLibs/NiAnimation/NiBSplineCompPoint3Interpolator.h"
-#include "Gamebryo2.2/CoreLibs/NiAnimation/NiBSplineCompTransformInterpolator.h"
-#include "Gamebryo2.2/CoreLibs/NiAnimation/NiBSplineData.h"
-#include "Gamebryo2.2/CoreLibs/NiAnimation/NiBSplineFloatInterpolator.h"
-#include "Gamebryo2.2/CoreLibs/NiAnimation/NiBSplinePoint3Interpolator.h"
-#include "Gamebryo2.2/CoreLibs/NiAnimation/NiBSplineTransformInterpolator.h"
 #include "Gamebryo2.2/CoreLibs/NiAnimation/NiColorData.h"
 #include "Gamebryo2.2/CoreLibs/NiAnimation/NiColorExtraDataController.h"
 #include "Gamebryo2.2/CoreLibs/NiAnimation/NiColorInterpolator.h"
@@ -79,13 +79,13 @@ void ShutdownTimelineDataPool();
 // The animation library's static initialization and shutdown interface; it has no instance data.
 class NiAnimationSDM {
 public:
-	NiAnimationSDM();
+    NiAnimationSDM();
 
-	static void Init();
-	static void Shutdown();
+    static void Init();
+    static void Shutdown();
 
-	static inline bool ms_bInitialized;
-	static inline int32_t siCounter;
+    static inline bool ms_bInitialized;
+    static inline int32_t siCounter;
 };
 
 // NiActorManager::_SDMInit's "start": its NiFixedString assignment compares the handle with this address.

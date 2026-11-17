@@ -8,12 +8,12 @@ class hkpCollidable;
 // The interface that decides whether two collidables may collide.
 class hkpCollidableCollidableFilter {
 public:
-	virtual ~hkpCollidableCollidableFilter();
+    virtual ~hkpCollidableCollidableFilter();
 
-	virtual hkBool isCollisionEnabled(const hkpCollidable&, const hkpCollidable&) const = 0;
+    virtual hkBool isCollisionEnabled(const hkpCollidable&, const hkpCollidable&) const = 0;
 
-	// DeletingDestruct's free (MemoryManager::Deallocate).
-	static void operator delete(void* apMemory);
+    // DeletingDestruct's free (MemoryManager::Deallocate).
+    static void operator delete(void* apMemory);
 };
 
 // The class's reflection record.

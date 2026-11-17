@@ -10,31 +10,38 @@ class NiTransform;
 // emits particles inside a cylinder.
 class NiPSysCylinderEmitter : public NiPSysVolumeEmitter {
 public:
-	NiPSysCylinderEmitter();
-	~NiPSysCylinderEmitter() override;
+    NiPSysCylinderEmitter();
+    ~NiPSysCylinderEmitter() override;
 
-	const NiRTTI* GetRTTI() const override { return &ms_RTTI; }
-	NiObject* CreateClone(NiCloningProcess& kCloning) override;
-	void LoadBinary(NiStream& kStream) override;
-	void LinkObject(NiStream& kStream) override;
-	bool RegisterStreamables(NiStream& kStream) override;
-	void SaveBinary(NiStream& kStream) override;
-	bool IsEqual(NiObject* pkObject) override;
-	void GetViewerStrings(NiTPrimitiveArray<char*>* pkStrings) override;
-	void ProcessClone(NiCloningProcess& kCloning) override;
+    const NiRTTI* GetRTTI() const override {
+        return &ms_RTTI;
+    }
+    NiObject* CreateClone(NiCloningProcess& kCloning) override;
+    void LoadBinary(NiStream& kStream) override;
+    void LinkObject(NiStream& kStream) override;
+    bool RegisterStreamables(NiStream& kStream) override;
+    void SaveBinary(NiStream& kStream) override;
+    bool IsEqual(NiObject* pkObject) override;
+    void GetViewerStrings(NiTPrimitiveArray<char*>* pkStrings) override;
+    void ProcessClone(NiCloningProcess& kCloning) override;
 
 protected:
-	void ComputeVolumeInitialPositionAndVelocity(NiTransform& kEmitterToPSys, NiPoint3& kPosition,
-		NiPoint3& kVelocity) override;
+    void ComputeVolumeInitialPositionAndVelocity(
+        NiTransform& kEmitterToPSys,
+        NiPoint3& kPosition,
+        NiPoint3& kVelocity
+    ) override;
 
 public:
-	float GetEmitterHeight() const { return m_fEmitterHeight; }
-	void SetEmitterHeight(float fEmitterHeight);
+    float GetEmitterHeight() const {
+        return m_fEmitterHeight;
+    }
+    void SetEmitterHeight(float fEmitterHeight);
 
-	static NiObject* CreateObject();
+    static NiObject* CreateObject();
 
-	float m_fEmitterRadius;
-	float m_fEmitterHeight;
+    float m_fEmitterRadius;
+    float m_fEmitterHeight;
 
-	static NiRTTI ms_RTTI;
+    static NiRTTI ms_RTTI;
 };

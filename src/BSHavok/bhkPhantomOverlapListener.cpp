@@ -6,5 +6,5 @@
 hkpPhantomOverlapListener::~hkpPhantomOverlapListener() {}
 
 void hkpPhantomOverlapListener::operator delete(void* apMemory) {
-	MemoryManager_Singleton.Deallocate(apMemory);
+    MemoryManager_Singleton.Deallocate(apMemory);
 }

@@ -40,17 +40,17 @@ static const float NI_INFINITY = FLT_MAX;
 
 // A random value in [0, 1], rounded to float.
 inline float NiUnitRandom() {
-	return static_cast<float>(rt::rand() / 32767.0);
+    return static_cast<float>(rt::rand() / 32767.0);
 }
 
 // A random value in [-1, 1], rounded to float.
 inline float NiSymmetricRandom() {
-	return static_cast<float>(2.0 * rt::rand() / 32767.0 - 1.0);
+    return static_cast<float>(2.0 * rt::rand() / 32767.0 - 1.0);
 }
 
 // Rounds in the FPU's current rounding mode, not by truncation.
 inline int32_t NiFastFloatToInt(float afValue) {
-	int32_t iValue;
-	__asm__("flds %1\n\tfistpl %0" : "=m"(iValue) : "m"(afValue));
-	return iValue;
+    int32_t iValue;
+    __asm__("flds %1\n\tfistpl %0" : "=m"(iValue) : "m"(afValue));
+    return iValue;
 }

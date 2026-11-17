@@ -6,9 +6,12 @@
 
 // One previous-texture slot per texture blend stage, from the engine's heap.
 BSInstanceRendering::BSInstanceRendering()
-	: pPrevTextures(static_cast<NiTexture**>(MemoryManager_Singleton.Allocate(sizeof(NiTexture*) *
-		  NiD3DPass::ms_uiMaxTextureBlendStages))) {}
+  : pPrevTextures(
+        static_cast<NiTexture**>(
+            MemoryManager_Singleton.Allocate(sizeof(NiTexture*) * NiD3DPass::ms_uiMaxTextureBlendStages)
+        )
+    ) {}
 
 BSInstanceRendering::~BSInstanceRendering() {
-	MemoryManager_Singleton.Deallocate(pPrevTextures);
+    MemoryManager_Singleton.Deallocate(pPrevTextures);
 }

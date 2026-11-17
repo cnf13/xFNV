@@ -9,17 +9,17 @@ class VATSBodyPart;
 // from the player.
 class VATSTarget {
 public:
-	VATSTarget();
-	~VATSTarget();
+    VATSTarget();
+    ~VATSTarget();
 
-	static void operator delete(void* apMemory);
+    static void operator delete(void* apMemory);
 
-	TESObjectREFR* pTargetRef;
-	uint32_t eType;
-	BSSimpleList<VATSBodyPart*> kBodyParts;
-	bool bChancesCalculated;
-	float unk14;
-	float fAngle;
-	float fDistance;
-	bool bHostile;
+    TESObjectREFR* pTargetRef;
+    uint32_t eType;
+    BSSimpleList<VATSBodyPart*> kBodyParts;
+    bool bChancesCalculated;
+    float unk14;
+    float fAngle;
+    float fDistance;
+    bool bHostile;
 };

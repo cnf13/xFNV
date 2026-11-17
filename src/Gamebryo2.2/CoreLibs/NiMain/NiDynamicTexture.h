@@ -6,9 +6,11 @@
 // declared.
 class NiDynamicTexture : public NiTexture {
 public:
-	bool GetTiled() const { return m_bTiled; }
+    bool GetTiled() const {
+        return m_bTiled;
+    }
 
-	uint32_t m_uiWidth;
-	uint32_t m_uiHeight;
-	bool m_bTiled;
+    uint32_t m_uiWidth;
+    uint32_t m_uiHeight;
+    bool m_bTiled;
 };

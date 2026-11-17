@@ -15,15 +15,26 @@ class hkStreamWriter;
 // initDeprecated.
 class hkSerializeDeprecated : public hkReferencedObject, public hkSingleton<hkSerializeDeprecated> {
 public:
-	~hkSerializeDeprecated() override;
+    ~hkSerializeDeprecated() override;
 
-	virtual hkResult saveXmlPackfile(const void* object, const hkClass& klass, hkStreamWriter* writer,
-		const hkPackfileWriter::Options& options, hkPackfileWriter::AddObjectListener* userListener);
-	virtual int32_t isLoadable(const hkSerializeUtil::FormatDetails& details);
-	virtual hkResource* loadOldPackfile(hkStreamReader& sr, const hkSerializeUtil::FormatDetails& details,
-		hkSerializeUtil::ErrorDetails* errorOut);
-	virtual hkObjectResource* loadOldPackfileOnHeap(hkStreamReader& sr, const hkSerializeUtil::FormatDetails& details,
-		hkSerializeUtil::ErrorDetails* errorOut);
+    virtual hkResult saveXmlPackfile(
+        const void* object,
+        const hkClass& klass,
+        hkStreamWriter* writer,
+        const hkPackfileWriter::Options& options,
+        hkPackfileWriter::AddObjectListener* userListener
+    );
+    virtual int32_t isLoadable(const hkSerializeUtil::FormatDetails& details);
+    virtual hkResource* loadOldPackfile(
+        hkStreamReader& sr,
+        const hkSerializeUtil::FormatDetails& details,
+        hkSerializeUtil::ErrorDetails* errorOut
+    );
+    virtual hkObjectResource* loadOldPackfileOnHeap(
+        hkStreamReader& sr,
+        const hkSerializeUtil::FormatDetails& details,
+        hkSerializeUtil::ErrorDetails* errorOut
+    );
 
-	static inline hkSerializeDeprecated* s_instance;
+    static inline hkSerializeDeprecated* s_instance;
 };

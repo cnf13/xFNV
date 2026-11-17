@@ -14,30 +14,47 @@ void finishLoadedObjecthkpConstrainedSystemFilter(void* p, int32_t finishing);
 // constructor takes the other filter.
 class hkpConstrainedSystemFilter : public hkpCollisionFilter, public hkpConstraintListener {
 public:
-	hkpConstrainedSystemFilter(hkFinishLoadedObjectFlag aFlag);
-	hkpConstrainedSystemFilter(const hkpCollisionFilter* otherFilter);
-	~hkpConstrainedSystemFilter() override;
+    hkpConstrainedSystemFilter(hkFinishLoadedObjectFlag aFlag);
+    hkpConstrainedSystemFilter(const hkpCollisionFilter* otherFilter);
+    ~hkpConstrainedSystemFilter() override;
 
-	hkBool isCollisionEnabled(const hkpCollidable& a, const hkpCollidable& b) const override;
-	hkBool isCollisionEnabled(const hkpCollisionInput& input, const hkpCdBody& a, const hkpCdBody& b,
-		const hkpShapeContainer& bContainer, uint32_t bKey) const override;
-	hkBool isCollisionEnabled(const hkpCollisionInput& input, const hkpCdBody& collectionBodyA,
-		const hkpCdBody& collectionBodyB, const hkpShapeContainer& containerShapeA,
-		const hkpShapeContainer& containerShapeB, uint32_t keyA, uint32_t keyB) const override;
-	hkBool isCollisionEnabled(const hkpShapeRayCastInput& aInput, const hkpShape& bShape,
-		const hkpShapeContainer& bContainer, uint32_t bKey) const override;
-	hkBool isCollisionEnabled(const hkpWorldRayCastInput& a, const hkpCollidable& collidableB) const override;
-	void constraintAddedCallback(hkpConstraintInstance* constraint) override;
-	void constraintRemovedCallback(hkpConstraintInstance* constraint) override;
-	const hkClass* getClassType() const override;
+    hkBool isCollisionEnabled(const hkpCollidable& a, const hkpCollidable& b) const override;
+    hkBool isCollisionEnabled(
+        const hkpCollisionInput& input,
+        const hkpCdBody& a,
+        const hkpCdBody& b,
+        const hkpShapeContainer& bContainer,
+        uint32_t bKey
+    ) const override;
+    hkBool isCollisionEnabled(
+        const hkpCollisionInput& input,
+        const hkpCdBody& collectionBodyA,
+        const hkpCdBody& collectionBodyB,
+        const hkpShapeContainer& containerShapeA,
+        const hkpShapeContainer& containerShapeB,
+        uint32_t keyA,
+        uint32_t keyB
+    ) const override;
+    hkBool isCollisionEnabled(
+        const hkpShapeRayCastInput& aInput,
+        const hkpShape& bShape,
+        const hkpShapeContainer& bContainer,
+        uint32_t bKey
+    ) const override;
+    hkBool isCollisionEnabled(const hkpWorldRayCastInput& a, const hkpCollidable& collidableB) const override;
+    void constraintAddedCallback(hkpConstraintInstance* constraint) override;
+    void constraintRemovedCallback(hkpConstraintInstance* constraint) override;
+    const hkClass* getClassType() const override;
 
-	// DeletingDestruct's free (the thread's Havok heap): names one of the two bases' operator deletes.
-	static void operator delete(void* apMemory) { hkReferencedObject::deleteObject(apMemory); }
-	// The reflection class hkpConstrainedSystemFilterClass.
-	static const hkClass& staticClass();
+    // DeletingDestruct's free (the thread's Havok heap): names one of the two bases' operator deletes.
+    static void operator delete(void* apMemory) {
+        hkReferencedObject::deleteObject(apMemory);
+    }
+    // The reflection class hkpConstrainedSystemFilterClass.
+    static const hkClass& staticClass();
 
-	// The filter the pairs no constraint decides go to (private in the SDK).
-	const hkpCollisionFilter* m_otherFilter;
+    // The filter the pairs no constraint decides go to (private in the SDK).
+    const hkpCollisionFilter* m_otherFilter;
 };
 
 extern hkClass hkpConstrainedSystemFilterClass;

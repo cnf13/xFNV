@@ -6,20 +6,20 @@
 // EnterCriticalSection; there are no owner or lock-count fields.
 class BSCriticalSection {
 public:
-	BSCriticalSection();
-	~BSCriticalSection();
+    BSCriticalSection();
+    ~BSCriticalSection();
 
-	// Takes the lock through Lock; apName (a debug name) is passed on.
-	void Enter(const char* apName);
-	// Releases the lock through Unlock.
-	void Leave();
-	// Enters the section; apName is unused on PC.
-	void Lock(const char* apName);
-	void Lock();
-	void Unlock();
-	// Takes the lock when it is free; true when taken.
-	bool TryLock();
+    // Takes the lock through Lock; apName (a debug name) is passed on.
+    void Enter(const char* apName);
+    // Releases the lock through Unlock.
+    void Leave();
+    // Enters the section; apName is unused on PC.
+    void Lock(const char* apName);
+    void Lock();
+    void Unlock();
+    // Takes the lock when it is free; true when taken.
+    bool TryLock();
 
-	// The Win32 section (0x18 bytes on x86), handed to the critical-section imports as is.
-	_RTL_CRITICAL_SECTION CriticalSection;
+    // The Win32 section (0x18 bytes on x86), handed to the critical-section imports as is.
+    _RTL_CRITICAL_SECTION CriticalSection;
 };

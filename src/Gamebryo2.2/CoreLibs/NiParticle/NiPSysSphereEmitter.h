@@ -10,27 +10,32 @@ class NiTransform;
 // emits particles inside a sphere.
 class NiPSysSphereEmitter : public NiPSysVolumeEmitter {
 public:
-	NiPSysSphereEmitter();
-	~NiPSysSphereEmitter() override;
+    NiPSysSphereEmitter();
+    ~NiPSysSphereEmitter() override;
 
-	const NiRTTI* GetRTTI() const override { return &ms_RTTI; }
-	NiObject* CreateClone(NiCloningProcess& kCloning) override;
-	void LoadBinary(NiStream& kStream) override;
-	void LinkObject(NiStream& kStream) override;
-	bool RegisterStreamables(NiStream& kStream) override;
-	void SaveBinary(NiStream& kStream) override;
-	bool IsEqual(NiObject* pkObject) override;
-	void GetViewerStrings(NiTPrimitiveArray<char*>* pkStrings) override;
-	void ProcessClone(NiCloningProcess& kCloning) override;
+    const NiRTTI* GetRTTI() const override {
+        return &ms_RTTI;
+    }
+    NiObject* CreateClone(NiCloningProcess& kCloning) override;
+    void LoadBinary(NiStream& kStream) override;
+    void LinkObject(NiStream& kStream) override;
+    bool RegisterStreamables(NiStream& kStream) override;
+    void SaveBinary(NiStream& kStream) override;
+    bool IsEqual(NiObject* pkObject) override;
+    void GetViewerStrings(NiTPrimitiveArray<char*>* pkStrings) override;
+    void ProcessClone(NiCloningProcess& kCloning) override;
 
 protected:
-	void ComputeVolumeInitialPositionAndVelocity(NiTransform& kEmitterToPSys, NiPoint3& kPosition,
-		NiPoint3& kVelocity) override;
+    void ComputeVolumeInitialPositionAndVelocity(
+        NiTransform& kEmitterToPSys,
+        NiPoint3& kPosition,
+        NiPoint3& kVelocity
+    ) override;
 
 public:
-	static NiObject* CreateObject();
+    static NiObject* CreateObject();
 
-	float m_fEmitterRadius;
+    float m_fEmitterRadius;
 
-	static NiRTTI ms_RTTI;
+    static NiRTTI ms_RTTI;
 };

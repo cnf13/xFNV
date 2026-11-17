@@ -65,15 +65,15 @@ BlendSettingCollection::~BlendSettingCollection() {}
 
 // The read and the close go through the virtual ReadSettings and Close.
 bool SettingCollection::ReadSettingsFromFile(const char* apFileName) {
-	alignas(AutoMemContext) uint8_t aucContext[sizeof(AutoMemContext)];
-	AutoMemContext* pContext = reinterpret_cast<AutoMemContext*>(aucContext);
-	::new (aucContext)
-		AutoMemContext(MEM_CONTEXT_GAMESETTING, true, "d:\\_fallout3\\platforms\\common\\code\\bsmain\\Setting.h", 413);
-	bool bOpened = OpenPath(apFileName, false);
-	if (bOpened) {
-		ReadSettings();
-		Close();
-	}
-	pContext->~AutoMemContext();
-	return bOpened;
+    alignas(AutoMemContext) uint8_t aucContext[sizeof(AutoMemContext)];
+    AutoMemContext* pContext = reinterpret_cast<AutoMemContext*>(aucContext);
+    ::new (aucContext)
+        AutoMemContext(MEM_CONTEXT_GAMESETTING, true, "d:\\_fallout3\\platforms\\common\\code\\bsmain\\Setting.h", 413);
+    bool bOpened = OpenPath(apFileName, false);
+    if (bOpened) {
+        ReadSettings();
+        Close();
+    }
+    pContext->~AutoMemContext();
+    return bOpened;
 }

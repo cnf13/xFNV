@@ -4,23 +4,23 @@
 #include "SDK/MSVC/stdlib.h"
 
 BSGameDataSystemUtility::BSGameDataSystemUtility()
-	: bIsActive(false), bNewGameData(false), eGameDataStatus_(GAMEDATA_STATUS_NOT_READY), iFreeSpaceKB_(0) {}
+  : bIsActive(false), bNewGameData(false), eGameDataStatus_(GAMEDATA_STATUS_NOT_READY), iFreeSpaceKB_(0) {}
 
 BSGameDataSystemUtility::~BSGameDataSystemUtility() {}
 
 void BSGameDataSystemUtility::Initialize() {
-	Destroy();
+    Destroy();
 }
 
 void BSGameDataSystemUtility::Destroy() {
-	;
+    ;
 }
 
 void BSGameDataSystemUtility::operator delete(void* apMemory) {
-	MemoryManager_Singleton.Deallocate(apMemory);
+    MemoryManager_Singleton.Deallocate(apMemory);
 }
 
 BSGameDataSystemUtility* BSGameDataSystemUtility::GetSingleton() {
-	static BSGameDataSystemUtility stGameDataSystemUtility;
-	return &stGameDataSystemUtility;
+    static BSGameDataSystemUtility stGameDataSystemUtility;
+    return &stGameDataSystemUtility;
 }

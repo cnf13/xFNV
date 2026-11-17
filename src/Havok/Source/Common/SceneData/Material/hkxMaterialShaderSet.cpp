@@ -17,14 +17,30 @@
 
 // The reflected members of hkxMaterialShaderSet.
 using hkxMaterialShaderSetClass_MembersArray = const hkClassMember[1];
-static hkxMaterialShaderSetClass_MembersArray hkxMaterialShaderSetClass_Members{{"shaders", &hkxMaterialShaderClass,
-	nullptr, hkClassMember::TYPE_ARRAY, hkClassMember::TYPE_POINTER, 0, 0, 0x8, nullptr}};
+static hkxMaterialShaderSetClass_MembersArray hkxMaterialShaderSetClass_Members{
+    {"shaders", &hkxMaterialShaderClass, nullptr, hkClassMember::TYPE_ARRAY, hkClassMember::TYPE_POINTER, 0, 0, 0x8,
+     nullptr}
+};
 
-hkClass hkxMaterialShaderSetClass("hkxMaterialShaderSet", &hkReferencedObjectClass, 0x14, nullptr, 0, nullptr, 0,
-	hkxMaterialShaderSetClass_Members, 1, nullptr, nullptr, 0, 1);
-hkTypeInfo hkxMaterialShaderSetTypeInfo = {"hkxMaterialShaderSet", finishLoadedObjecthkxMaterialShaderSet,
-	cleanupLoadedObjecthkxMaterialShaderSet, getVtablehkxMaterialShaderSet(), &typeid(hkxMaterialShaderSet),
-	sizeof(hkxMaterialShaderSet)};
+hkClass hkxMaterialShaderSetClass(
+    "hkxMaterialShaderSet",
+    &hkReferencedObjectClass,
+    0x14,
+    nullptr,
+    0,
+    nullptr,
+    0,
+    hkxMaterialShaderSetClass_Members,
+    1,
+    nullptr,
+    nullptr,
+    0,
+    1
+);
+hkTypeInfo hkxMaterialShaderSetTypeInfo = {
+    "hkxMaterialShaderSet",          finishLoadedObjecthkxMaterialShaderSet, cleanupLoadedObjecthkxMaterialShaderSet,
+    getVtablehkxMaterialShaderSet(), &typeid(hkxMaterialShaderSet),          sizeof(hkxMaterialShaderSet)
+};
 
 // The member's constructor leaves the shader array empty.
 hkxMaterialShaderSet::hkxMaterialShaderSet() {}

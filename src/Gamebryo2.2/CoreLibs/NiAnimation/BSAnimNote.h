@@ -8,39 +8,39 @@ class NiTextKey;
 // A note an animation sequence carries for one of its text keys; the subclasses drive IK while the sequence plays.
 class BSAnimNote : public NiObject {
 public:
-	// The kind of note.
-	enum AnimNoteType {
-		BS_ANT_INVALID,
-		BS_ANT_GRABIK,
-		BS_ANT_LOOKIK,
-	};
+    // The kind of note.
+    enum AnimNoteType {
+        BS_ANT_INVALID,
+        BS_ANT_GRABIK,
+        BS_ANT_LOOKIK,
+    };
 
 protected:
-	// The base construction used by the subclasses' constructors (BSGrabIKNote, BSLookIKNote): the note's type and
-	// time.
-	BSAnimNote(AnimNoteType aeType, float afTime) : eType(aeType), fTime(afTime) {}
+    // The base construction used by the subclasses' constructors (BSGrabIKNote, BSLookIKNote): the note's type and
+    // time.
+    BSAnimNote(AnimNoteType aeType, float afTime) : eType(aeType), fTime(afTime) {}
 
 public:
-	~BSAnimNote() override = 0;
+    ~BSAnimNote() override = 0;
 
-	const NiRTTI* GetRTTI() const override;
-	void LoadBinary(NiStream& arStream) override;
-	void LinkObject(NiStream& arStream) override;
-	bool RegisterStreamables(NiStream& arStream) override;
-	void SaveBinary(NiStream& arStream) override;
-	bool IsEqual(NiObject* apObject) override;
-	void GetViewerStrings(NiTPrimitiveArray<char*>* apStrings) override;
-	// Reads the note's settings from its text key; the base takes the key's time.
-	virtual bool ParseTextKey(const NiTextKey* apTextKey);
+    const NiRTTI* GetRTTI() const override;
+    void LoadBinary(NiStream& arStream) override;
+    void LinkObject(NiStream& arStream) override;
+    bool RegisterStreamables(NiStream& arStream) override;
+    void SaveBinary(NiStream& arStream) override;
+    bool IsEqual(NiObject* apObject) override;
+    void GetViewerStrings(NiTPrimitiveArray<char*>* apStrings) override;
+    // Reads the note's settings from its text key; the base takes the key's time.
+    virtual bool ParseTextKey(const NiTextKey* apTextKey);
 
 protected:
-	void CopyMembers(BSAnimNote* pDest, NiCloningProcess& arCloneData);
+    void CopyMembers(BSAnimNote* pDest, NiCloningProcess& arCloneData);
 
 public:
-	AnimNoteType eType;
-	float fTime;
+    AnimNoteType eType;
+    float fTime;
 
-	static NiRTTI ms_RTTI;
+    static NiRTTI ms_RTTI;
 };
 
 NiSmartPointer(BSAnimNote);
@@ -48,22 +48,22 @@ NiSmartPointer(BSAnimNote);
 // The notes of an animation sequence; it owns them and destroys them with itself.
 class BSAnimNotes : public NiObject {
 public:
-	BSAnimNotes();
-	~BSAnimNotes() override;
+    BSAnimNotes();
+    ~BSAnimNotes() override;
 
-	const NiRTTI* GetRTTI() const override;
-	void LoadBinary(NiStream& arStream) override;
-	void LinkObject(NiStream& arStream) override;
-	bool RegisterStreamables(NiStream& arStream) override;
-	void SaveBinary(NiStream& arStream) override;
-	// IsEqual and GetViewerStrings only defer to the NiObject bodies.
-	bool IsEqual(NiObject* apObject) override;
-	void GetViewerStrings(NiTPrimitiveArray<char*>* apStrings) override;
+    const NiRTTI* GetRTTI() const override;
+    void LoadBinary(NiStream& arStream) override;
+    void LinkObject(NiStream& arStream) override;
+    bool RegisterStreamables(NiStream& arStream) override;
+    void SaveBinary(NiStream& arStream) override;
+    // IsEqual and GetViewerStrings only defer to the NiObject bodies.
+    bool IsEqual(NiObject* apObject) override;
+    void GetViewerStrings(NiTPrimitiveArray<char*>* apStrings) override;
 
-	static NiObject* CreateObject();
+    static NiObject* CreateObject();
 
-	BSAnimNote** NoteA;
-	uint16_t usNumNotes;
+    BSAnimNote** NoteA;
+    uint16_t usNumNotes;
 
-	static NiRTTI ms_RTTI;
+    static NiRTTI ms_RTTI;
 };

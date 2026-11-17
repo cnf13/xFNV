@@ -26,8 +26,12 @@ bool Cmd_IsOwner_Eval(TESObjectREFR* apRefObject, void* apParam1, void* apParam2
 bool Cmd_IsCellOwner(TESObjectREFR* apRefObject, void* apParam1, TESForm* apParam2, double& afReturnValue);
 bool Cmd_GetPCMiscStat(TESObjectREFR* apRefObject, void* apParam1, void* apParam2, double& afReturnValue);
 bool Cmd_Exists(TESObjectREFR* apRefObject, void* apParam1, void* apParam2, double& afReturnValue);
-bool Cmd_GetIsAlignment(TESObjectREFR* apRefObject, TESActorBaseData::ALIGNMENT apParam1, void* apParam2,
-	double& afReturnValue);
+bool Cmd_GetIsAlignment(
+    TESObjectREFR* apRefObject,
+    TESActorBaseData::ALIGNMENT apParam1,
+    void* apParam2,
+    double& afReturnValue
+);
 bool Cmd_GetConcussed(TESObjectREFR* apRefObject, void* apParam1, void* apParam2, double& afReturnValue);
 char get_bConcussion_11DBE50();
 bool Cmd_GetForceHitReaction(TESObjectREFR* apRefObject, void* apParam1, void* apParam2, double& afReturnValue);
@@ -63,5 +67,5 @@ inline float fIsPlayableRace;
 
 // The names of the seven player control flags, which GetPlayerControlsDisabled prints.
 using pPlayerControls_t = const char* [7];
-inline pPlayerControls_t pPlayerControls{"Movement", "Looking", "Pipboy", "Fighting", "POV Switch", "Rollover Text",
-	"Sneaking"};
+inline pPlayerControls_t pPlayerControls{"Movement",   "Looking",       "Pipboy",  "Fighting",
+                                         "POV Switch", "Rollover Text", "Sneaking"};

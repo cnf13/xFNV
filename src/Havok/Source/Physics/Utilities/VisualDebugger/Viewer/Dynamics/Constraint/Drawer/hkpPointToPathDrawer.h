@@ -11,7 +11,7 @@ class hkpConstraintInstance;
 // constraint type 3 and calls its drawConstraint.
 class hkpPointToPathDrawer : public hkpConstraintDrawer {
 public:
-	// Havok SDK signature (hkpUtilities.lib, tied by reloc).
-	void drawConstraint(hkpConstraintInstance* constraint, hkDebugDisplayHandler* displayHandler, int32_t id,
-		int32_t tag);
+    // Havok SDK signature (hkpUtilities.lib, tied by reloc).
+    void
+    drawConstraint(hkpConstraintInstance* constraint, hkDebugDisplayHandler* displayHandler, int32_t id, int32_t tag);
 };

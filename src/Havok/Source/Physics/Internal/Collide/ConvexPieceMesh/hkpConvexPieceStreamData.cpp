@@ -23,9 +23,9 @@
 #include "Havok/Source/Physics/Dynamics/Constraint/Motor/Position/hkpPositionConstraintMotor.h"
 #include "Havok/Source/Physics/Dynamics/Constraint/Motor/SpringDamper/hkpSpringDamperConstraintMotor.h"
 #include "Havok/Source/Physics/Dynamics/Constraint/Motor/Velocity/hkpVelocityConstraintMotor.h"
-#include "Havok/Source/Physics/Dynamics/Motion/hkpMotion.h"
-#include "Havok/Source/Physics/Dynamics/Motion/Rigid/hkpSphereMotion.h"
 #include "Havok/Source/Physics/Dynamics/Motion/Rigid/ThinBoxMotion/hkpThinBoxMotion.h"
+#include "Havok/Source/Physics/Dynamics/Motion/Rigid/hkpSphereMotion.h"
+#include "Havok/Source/Physics/Dynamics/Motion/hkpMotion.h"
 #include "Havok/Source/Physics/Utilities/Actions/AngularDashpot/hkpAngularDashpotAction.h"
 #include "Havok/Source/Physics/Utilities/Actions/MouseSpring/hkpMouseSpringAction.h"
 #include "Havok/Source/Physics/Utilities/Deprecated/DisableEntity/hkpDisableEntityCollisionFilter.h"
@@ -37,37 +37,56 @@ static void cleanupLoadedObjecthkpConvexPieceStreamData(void* p);
 // The reflected members of hkpConvexPieceStreamData.
 using hkpConvexPieceStreamDataClass_MembersArray = const hkClassMember[3];
 static hkpConvexPieceStreamDataClass_MembersArray hkpConvexPieceStreamDataClass_Members{
-	{"convexPieceStream", nullptr, nullptr, hkClassMember::TYPE_ARRAY, hkClassMember::TYPE_UINT32, 0, 0, 0x8, nullptr},
-	{"convexPieceOffsets", nullptr, nullptr, hkClassMember::TYPE_ARRAY, hkClassMember::TYPE_UINT32, 0, 0, 0x14,
-		nullptr},
-	{"convexPieceSingleTriangles", nullptr, nullptr, hkClassMember::TYPE_ARRAY, hkClassMember::TYPE_UINT32, 0, 0, 0x20,
-		nullptr}};
-hkClass hkpConvexPieceStreamDataClass("hkpConvexPieceStreamData", &hkReferencedObjectClass, 44, nullptr, 0, nullptr, 0,
-	hkpConvexPieceStreamDataClass_Members, 3, nullptr, nullptr, 0, 0);
-hkTypeInfo hkpConvexPieceStreamDataTypeInfo = {"hkpConvexPieceStreamData", finishLoadedObjecthkpConvexPieceStreamData,
-	cleanupLoadedObjecthkpConvexPieceStreamData, getVtablehkpConvexPieceStreamData(), &typeid(hkpConvexPieceStreamData),
-	sizeof(hkpConvexPieceStreamData)};
+    {"convexPieceStream", nullptr, nullptr, hkClassMember::TYPE_ARRAY, hkClassMember::TYPE_UINT32, 0, 0, 0x8, nullptr},
+    {"convexPieceOffsets", nullptr, nullptr, hkClassMember::TYPE_ARRAY, hkClassMember::TYPE_UINT32, 0, 0, 0x14,
+     nullptr},
+    {"convexPieceSingleTriangles", nullptr, nullptr, hkClassMember::TYPE_ARRAY, hkClassMember::TYPE_UINT32, 0, 0, 0x20,
+     nullptr}
+};
+hkClass hkpConvexPieceStreamDataClass(
+    "hkpConvexPieceStreamData",
+    &hkReferencedObjectClass,
+    44,
+    nullptr,
+    0,
+    nullptr,
+    0,
+    hkpConvexPieceStreamDataClass_Members,
+    3,
+    nullptr,
+    nullptr,
+    0,
+    0
+);
+hkTypeInfo hkpConvexPieceStreamDataTypeInfo = {
+    "hkpConvexPieceStreamData",
+    finishLoadedObjecthkpConvexPieceStreamData,
+    cleanupLoadedObjecthkpConvexPieceStreamData,
+    getVtablehkpConvexPieceStreamData(),
+    &typeid(hkpConvexPieceStreamData),
+    sizeof(hkpConvexPieceStreamData)
+};
 
 static void cleanupLoadedObjecthkpConvexPieceStreamData(void* p) {
-	static_cast<hkpConvexPieceStreamData*>(p)->~hkpConvexPieceStreamData();
+    static_cast<hkpConvexPieceStreamData*>(p)->~hkpConvexPieceStreamData();
 }
 
 // The type info's finish-loaded-object callback for hkpConvexPieceStreamData: runs its finish constructor.
 void finishLoadedObjecthkpConvexPieceStreamData(void* p, int32_t finishing) {
-	if (p) {
-		hkFinishLoadedObjectFlag flag;
-		flag.m_finishing = finishing;
-		::new (p) hkpConvexPieceStreamData(flag);
-	}
+    if (p) {
+        hkFinishLoadedObjectFlag flag;
+        flag.m_finishing = finishing;
+        ::new (p) hkpConvexPieceStreamData(flag);
+    }
 }
 
 const void* getVtablehkpConvexPieceStreamData() {
-	return hkGetVtableOf<hkpConvexPieceStreamData>();
+    return hkGetVtableOf<hkpConvexPieceStreamData>();
 }
 
 // The three arrays free themselves.
 hkpConvexPieceStreamData::~hkpConvexPieceStreamData() {}
 
 const hkClass& hkpConvexPieceStreamData::staticClass() {
-	return hkpConvexPieceStreamDataClass;
+    return hkpConvexPieceStreamDataClass;
 }

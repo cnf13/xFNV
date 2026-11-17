@@ -4,8 +4,8 @@
 
 class ImageSpaceShaderLightAdapt : public ImageSpaceShader {
 public:
-	ImageSpaceShaderLightAdapt();
-	~ImageSpaceShaderLightAdapt() override;
+    ImageSpaceShaderLightAdapt();
+    ~ImageSpaceShaderLightAdapt() override;
 
-	void ReloadShaders() override;
+    void ReloadShaders() override;
 };

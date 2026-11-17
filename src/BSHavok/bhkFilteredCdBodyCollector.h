@@ -6,9 +6,9 @@
 // the collected pairs' root collidable B. It adds no state to hkpAllCdBodyPairCollector.
 class bhkFilteredCdBodyCollector : public hkpAllCdBodyPairCollector {
 public:
-	bhkFilteredCdBodyCollector();
+    bhkFilteredCdBodyCollector();
 
-	// Protected in the SDK.
-	void addCdBodyPair(const hkpCdBody& arBodyA, const hkpCdBody& arBodyB) override;
-	~bhkFilteredCdBodyCollector() override;
+    // Protected in the SDK.
+    void addCdBodyPair(const hkpCdBody& arBodyA, const hkpCdBody& arBodyB) override;
+    ~bhkFilteredCdBodyCollector() override;
 };

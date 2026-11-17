@@ -17,102 +17,102 @@ bhkVelocityConstraintMotor::bhkVelocityConstraintMotor() {}
 bhkVelocityConstraintMotor::~bhkVelocityConstraintMotor() {}
 
 const NiRTTI* bhkVelocityConstraintMotor::GetRTTI() const {
-	return &bhkVelocityConstraintMotor::ms_RTTI;
+    return &bhkVelocityConstraintMotor::ms_RTTI;
 }
 
 // The motor is none of the Gamebryo types the queries below ask for.
 NiNode* bhkVelocityConstraintMotor::IsNode() {
-	return nullptr;
+    return nullptr;
 }
 
 BSFadeNode* bhkVelocityConstraintMotor::IsFadeNode() {
-	return nullptr;
+    return nullptr;
 }
 
 BSMultiBoundNode* bhkVelocityConstraintMotor::IsMultiBoundNode() {
-	return nullptr;
+    return nullptr;
 }
 
 NiGeometry* bhkVelocityConstraintMotor::IsGeometry() {
-	return nullptr;
+    return nullptr;
 }
 
 NiTriBasedGeom* bhkVelocityConstraintMotor::IsTriBasedGeom() {
-	return nullptr;
+    return nullptr;
 }
 
 NiTriStrips* bhkVelocityConstraintMotor::IsTriStrips() {
-	return nullptr;
+    return nullptr;
 }
 
 NiTriShape* bhkVelocityConstraintMotor::IsTriShape() {
-	return nullptr;
+    return nullptr;
 }
 
 BSSegmentedTriShape* bhkVelocityConstraintMotor::IsSegmentedTriShape() {
-	return nullptr;
+    return nullptr;
 }
 
 BSResizableTriShape* bhkVelocityConstraintMotor::IsResizableTriShape() {
-	return nullptr;
+    return nullptr;
 }
 
 NiParticles* bhkVelocityConstraintMotor::IsParticlesGeom() {
-	return nullptr;
+    return nullptr;
 }
 
 NiLines* bhkVelocityConstraintMotor::IsLinesGeom() {
-	return nullptr;
+    return nullptr;
 }
 
 bhkNiCollisionObject* bhkVelocityConstraintMotor::IsBhkNiCollisionObject() {
-	return nullptr;
+    return nullptr;
 }
 
 bhkBlendCollisionObject* bhkVelocityConstraintMotor::IsBhkBlendCollisionObject() {
-	return nullptr;
+    return nullptr;
 }
 
 bhkRigidBody* bhkVelocityConstraintMotor::IsBhkRigidBody() {
-	return nullptr;
+    return nullptr;
 }
 
 bhkLimitedHingeConstraint* bhkVelocityConstraintMotor::IsBhkLimitedHingeConstraint() {
-	return nullptr;
+    return nullptr;
 }
 
 // The class name as one viewer line; the base's lines are not added. The scope is charged to the Havok context.
 void bhkVelocityConstraintMotor::GetViewerStrings(NiTPrimitiveArray<char*>* pkStrings) {
-	AutoMemContext kMemContext(MEM_CONTEXT_HAVOK);
-	char* pcString = NiGetViewerString(ms_RTTI.GetName());
-	pkStrings->Add(pcString);
+    AutoMemContext kMemContext(MEM_CONTEXT_HAVOK);
+    char* pcString = NiGetViewerString(ms_RTTI.GetName());
+    pkStrings->Add(pcString);
 }
 
 void bhkVelocityConstraintMotor::LoadBinary(NiStream& arStream) {
-	uint32_t v10;
-	NiStream* v2 = &arStream;
-	bhkLimitedForceConstraintMotor::LoadBinary(arStream, *this);
-	NiBinaryStream* m_pkIstr = v2->Istr();
-	uint32_t (*m_pfnRead)(NiBinaryStream*, void*, uint32_t, uint32_t*, uint32_t) = m_pkIstr->m_pfnRead;
-	v10 = 4;
-	m_pkIstr->m_uiAbsoluteCurrentPos += m_pfnRead(m_pkIstr, &m_tau, 4, &v10, 1);
-	NiBinaryStream* v6 = v2->Istr();
-	uint32_t (*v7)(NiBinaryStream*, void*, uint32_t, uint32_t*, uint32_t) = v6->m_pfnRead;
-	v10 = 4;
-	v6->m_uiAbsoluteCurrentPos += v7(v6, &m_velocityTarget, 4, &v10, 1);
-	NiBinaryStream* v8 = v2->Istr();
-	uint32_t (*v9)(NiBinaryStream*, void*, uint32_t, uint32_t*, uint32_t) = v8->m_pfnRead;
-	v10 = 1;
-	v8->m_uiAbsoluteCurrentPos += v9(v8, &m_useVelocityTargetFromConstraintTargets, 1, &v10, 1);
+    uint32_t v10;
+    NiStream* v2 = &arStream;
+    bhkLimitedForceConstraintMotor::LoadBinary(arStream, *this);
+    NiBinaryStream* m_pkIstr = v2->Istr();
+    uint32_t (*m_pfnRead)(NiBinaryStream*, void*, uint32_t, uint32_t*, uint32_t) = m_pkIstr->m_pfnRead;
+    v10 = 4;
+    m_pkIstr->m_uiAbsoluteCurrentPos += m_pfnRead(m_pkIstr, &m_tau, 4, &v10, 1);
+    NiBinaryStream* v6 = v2->Istr();
+    uint32_t (*v7)(NiBinaryStream*, void*, uint32_t, uint32_t*, uint32_t) = v6->m_pfnRead;
+    v10 = 4;
+    v6->m_uiAbsoluteCurrentPos += v7(v6, &m_velocityTarget, 4, &v10, 1);
+    NiBinaryStream* v8 = v2->Istr();
+    uint32_t (*v9)(NiBinaryStream*, void*, uint32_t, uint32_t*, uint32_t) = v8->m_pfnRead;
+    v10 = 1;
+    v8->m_uiAbsoluteCurrentPos += v9(v8, &m_useVelocityTargetFromConstraintTargets, 1, &v10, 1);
 }
 
 // The base's force limits, then tau and the velocity target (4-byte components) and the 1-byte flag.
 void bhkVelocityConstraintMotor::SaveBinary(NiStream& arStream) {
-	bhkLimitedForceConstraintMotor::SaveBinary(arStream, *this);
-	uint32_t uiComponentSize = 4;
-	arStream.m_pkOstr->BinaryWrite(&m_tau, 4, &uiComponentSize, 1);
-	uiComponentSize = 4;
-	arStream.m_pkOstr->BinaryWrite(&m_velocityTarget, 4, &uiComponentSize, 1);
-	uiComponentSize = 1;
-	arStream.m_pkOstr->BinaryWrite(&m_useVelocityTargetFromConstraintTargets, 1, &uiComponentSize, 1);
+    bhkLimitedForceConstraintMotor::SaveBinary(arStream, *this);
+    uint32_t uiComponentSize = 4;
+    arStream.m_pkOstr->BinaryWrite(&m_tau, 4, &uiComponentSize, 1);
+    uiComponentSize = 4;
+    arStream.m_pkOstr->BinaryWrite(&m_velocityTarget, 4, &uiComponentSize, 1);
+    uiComponentSize = 1;
+    arStream.m_pkOstr->BinaryWrite(&m_useVelocityTargetFromConstraintTargets, 1, &uiComponentSize, 1);
 }

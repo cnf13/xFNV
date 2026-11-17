@@ -6,10 +6,10 @@
 #include <stdint.h>
 
 struct NavMeshVertex {
-	NavMeshVertex();
+    NavMeshVertex();
 
-	// Byte swaps the three coordinates.
-	void Endian();
+    // Byte swaps the three coordinates.
+    void Endian();
 
-	NiPoint3 Location;
+    NiPoint3 Location;
 };

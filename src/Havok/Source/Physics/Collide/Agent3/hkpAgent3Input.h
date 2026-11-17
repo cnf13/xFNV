@@ -11,10 +11,10 @@ class hkpProcessCollisionInput;
 // PC. m_aTb is 16-byte aligned.
 class hkpAgent3Input {
 public:
-	const hkpCdBody* m_bodyA;
-	const hkpCdBody* m_bodyB;
-	const hkpCdBody* m_overrideBodyA;
-	const hkpProcessCollisionInput* m_input;
-	hkpContactMgr* m_contactMgr;
-	hkTransform m_aTb;
+    const hkpCdBody* m_bodyA;
+    const hkpCdBody* m_bodyB;
+    const hkpCdBody* m_overrideBodyA;
+    const hkpProcessCollisionInput* m_input;
+    hkpContactMgr* m_contactMgr;
+    hkTransform m_aTb;
 };

@@ -8,25 +8,27 @@ class BGSCameraPath;
 // Owns the camera path forms.
 class BGSCameraPathManager {
 public:
-	BGSCameraPathManager();
+    BGSCameraPathManager();
 
-	// Links the camera paths loaded from the data files.
-	void InitLoadedPaths();
-	// Creates the default camera path.
-	void CreateDefaultPath();
-	// Appends apPath to the loaded paths.
-	void AddLoadedPath(BGSCameraPath* apPath);
-	BGSCameraPath* GetCameraPathToPlay(TESObjectREFR* apActionRef, TESObjectREFR* apTargetRef);
-	void DestroyRootPathArrayForms();
+    // Links the camera paths loaded from the data files.
+    void InitLoadedPaths();
+    // Creates the default camera path.
+    void CreateDefaultPath();
+    // Appends apPath to the loaded paths.
+    void AddLoadedPath(BGSCameraPath* apPath);
+    BGSCameraPath* GetCameraPathToPlay(TESObjectREFR* apActionRef, TESObjectREFR* apTargetRef);
+    void DestroyRootPathArrayForms();
 
-	static BGSCameraPath* GetDefaultPath();
-	static void operator delete(void* apMemory) { ourFree(apMemory); }
+    static BGSCameraPath* GetDefaultPath();
+    static void operator delete(void* apMemory) {
+        ourFree(apMemory);
+    }
 
-	NiFormArray PathArray;
-	// The paths loaded from the data files.
-	NiTPrimitiveArray<BGSCameraPath*> LoadedPathArray;
+    NiFormArray PathArray;
+    // The paths loaded from the data files.
+    NiTPrimitiveArray<BGSCameraPath*> LoadedPathArray;
 
-	static inline BGSCameraPath* pDefaultPath;
+    static inline BGSCameraPath* pDefaultPath;
 };
 
 // The engine's camera path manager.

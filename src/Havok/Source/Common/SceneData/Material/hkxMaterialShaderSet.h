@@ -9,12 +9,12 @@ class hkxMaterialShader;
 // Holds the shaders associated with a scene material.
 class hkxMaterialShaderSet : public hkReferencedObject {
 public:
-	hkxMaterialShaderSet();
-	hkxMaterialShaderSet(hkFinishLoadedObjectFlag flag);
-	~hkxMaterialShaderSet() override;
+    hkxMaterialShaderSet();
+    hkxMaterialShaderSet(hkFinishLoadedObjectFlag flag);
+    ~hkxMaterialShaderSet() override;
 
-	// The reflection class hkxMaterialShaderSetClass.
-	static const hkClass& staticClass();
+    // The reflection class hkxMaterialShaderSetClass.
+    static const hkClass& staticClass();
 
-	hkArray<hkRefPtr<hkxMaterialShader>, hkContainerHeapAllocator> m_shaders;
+    hkArray<hkRefPtr<hkxMaterialShader>, hkContainerHeapAllocator> m_shaders;
 };

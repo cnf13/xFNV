@@ -7,39 +7,40 @@
 // The semaphore held in the HANDLE slot: the count stays within the maximum given at creation, and a release that would
 // pass it adds nothing, as ReleaseSemaphore does.
 struct hkSemaphoreHandle {
-	hkSemaphoreHandle(int32_t aiCount, int32_t aiMaxCount)
-		: kSemaphore(aiCount), iCount(aiCount), iMaxCount(aiMaxCount) {}
+    hkSemaphoreHandle(int32_t aiCount, int32_t aiMaxCount)
+      : kSemaphore(aiCount), iCount(aiCount), iMaxCount(aiMaxCount) {}
 
-	std::counting_semaphore<INT_MAX> kSemaphore;
-	std::atomic<int32_t> iCount;
-	const int32_t iMaxCount;
+    std::counting_semaphore<INT_MAX> kSemaphore;
+    std::atomic<int32_t> iCount;
+    const int32_t iMaxCount;
 };
 
 hkSemaphore::hkSemaphore(int32_t a1, int32_t a2) : m_semaphore(new hkSemaphoreHandle(a1, a2)) {}
 
 hkSemaphore::~hkSemaphore() {
-	delete m_semaphore;
+    delete m_semaphore;
 }
 
 void hkSemaphore::acquire() {
-	m_semaphore->kSemaphore.acquire();
-	--m_semaphore->iCount;
+    m_semaphore->kSemaphore.acquire();
+    --m_semaphore->iCount;
 }
 
 void hkSemaphore::release(int32_t lReleaseCount) {
-	int32_t iOld = m_semaphore->iCount.load();
-	do {
-		if (lReleaseCount <= 0 || lReleaseCount > m_semaphore->iMaxCount - iOld) {
-			return;
-		}
-	} while (!m_semaphore->iCount.compare_exchange_weak(iOld, iOld + lReleaseCount));
-	m_semaphore->kSemaphore.release(lReleaseCount);
+    int32_t iOld = m_semaphore->iCount.load();
+    do {
+        if (lReleaseCount <= 0 || lReleaseCount > m_semaphore->iMaxCount - iOld) {
+            return;
+        }
+    }
+    while (!m_semaphore->iCount.compare_exchange_weak(iOld, iOld + lReleaseCount));
+    m_semaphore->kSemaphore.release(lReleaseCount);
 }
 
 void hkSemaphore::release(hkSemaphore* semaphore, int32_t count) {
-	semaphore->release(count);
+    semaphore->release(count);
 }
 
 void hkSemaphore::acquire(hkSemaphore* semaphore) {
-	semaphore->acquire();
+    semaphore->acquire();
 }

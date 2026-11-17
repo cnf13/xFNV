@@ -9,7 +9,7 @@
 NiRTTI NiInterpController::ms_RTTI("NiInterpController", &NiTimeController::ms_RTTI);
 
 NiInterpController::NiInterpController() {
-	SetManagerControlled(false);
+    SetManagerControlled(false);
 }
 
 NiInterpController::~NiInterpController() {}
@@ -20,51 +20,52 @@ NiInterpController::~NiInterpController() {}
 // a short read leaves the pointer's low byte there and the exe tests that; src cannot share the slot with the
 // argument (checker: frame bytes passed to the stream's Read differ at +0).
 void NiInterpController::LoadBinary(NiStream& kStream) {
-	NiTimeController::LoadBinary(kStream);
+    NiTimeController::LoadBinary(kStream);
 
-	if (kStream.GetFileVersion() >= NiStream::GetVersion(10, 1, 0, 104) &&
-		kStream.GetFileVersion() < NiStream::GetVersion(10, 1, 0, 109)) {
-		bool bManagerControlled;
-		NiStreamLoadBinary(kStream, bManagerControlled);
-		// EXE-INLINED 0x47AA60
-		if (bManagerControlled) {
-			m_usFlags |= MANAGERCONTROLLED_MASK;
-		} else {
-			m_usFlags &= ~MANAGERCONTROLLED_MASK;
-		}
-	}
+    if (kStream.GetFileVersion() >= NiStream::GetVersion(10, 1, 0, 104) &&
+        kStream.GetFileVersion() < NiStream::GetVersion(10, 1, 0, 109)) {
+        bool bManagerControlled;
+        NiStreamLoadBinary(kStream, bManagerControlled);
+        // EXE-INLINED 0x47AA60
+        if (bManagerControlled) {
+            m_usFlags |= MANAGERCONTROLLED_MASK;
+        }
+        else {
+            m_usFlags &= ~MANAGERCONTROLLED_MASK;
+        }
+    }
 }
 
 void NiInterpController::LinkObject(NiStream& kStream) {
-	NiTimeController::LinkObject(kStream);
+    NiTimeController::LinkObject(kStream);
 }
 
 bool NiInterpController::RegisterStreamables(NiStream& kStream) {
-	return NiTimeController::RegisterStreamables(kStream);
+    return NiTimeController::RegisterStreamables(kStream);
 }
 
 void NiInterpController::SaveBinary(NiStream& kStream) {
-	NiTimeController::SaveBinary(kStream);
+    NiTimeController::SaveBinary(kStream);
 }
 
 bool NiInterpController::IsEqual(NiObject* pkObject) {
-	return NiTimeController::IsEqual(pkObject);
+    return NiTimeController::IsEqual(pkObject);
 }
 
 void NiInterpController::GetViewerStrings(NiTPrimitiveArray<char*>* pkStrings) {
-	NiTimeController::GetViewerStrings(pkStrings);
-	pkStrings->Add(NiGetViewerString(NiInterpController::ms_RTTI.GetName()));
-	pkStrings->Add(NiGetViewerString("IsManagerControlled", GetManagerControlled()));
+    NiTimeController::GetViewerStrings(pkStrings);
+    pkStrings->Add(NiGetViewerString(NiInterpController::ms_RTTI.GetName()));
+    pkStrings->Add(NiGetViewerString("IsManagerControlled", GetManagerControlled()));
 }
 
 // The key range of a manager-controlled controller belongs to its sequences and is left alone.
 void NiInterpController::ResetTimeExtrema() {
-	if (!GetManagerControlled()) {
-		m_fLoKeyTime = 0.0f;
-		m_fHiKeyTime = 0.0f;
-	}
+    if (!GetManagerControlled()) {
+        m_fLoKeyTime = 0.0f;
+        m_fHiKeyTime = 0.0f;
+    }
 }
 
 void NiInterpController::CopyMembers(NiInterpController* pkDest, NiCloningProcess& kCloning) {
-	NiTimeController::CopyMembers(pkDest, kCloning);
+    NiTimeController::CopyMembers(pkDest, kCloning);
 }

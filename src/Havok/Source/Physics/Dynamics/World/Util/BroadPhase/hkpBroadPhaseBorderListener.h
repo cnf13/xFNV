@@ -8,13 +8,15 @@
 // Receives the broadphase collision pairs associated with the world's border.
 class hkpBroadPhaseBorderListener : public hkReferencedObject, public hkpBroadPhaseListener {
 public:
-	~hkpBroadPhaseBorderListener() override;
+    ~hkpBroadPhaseBorderListener() override;
 
-	// hkpBroadPhaseListener's vtable at +0x8.
-	void addCollisionPair(hkpTypedBroadPhaseHandlePair& pair) override;
-	// hkpBroadPhaseListener's vtable at +0x8.
-	void removeCollisionPair(hkpTypedBroadPhaseHandlePair& pair) override;
+    // hkpBroadPhaseListener's vtable at +0x8.
+    void addCollisionPair(hkpTypedBroadPhaseHandlePair& pair) override;
+    // hkpBroadPhaseListener's vtable at +0x8.
+    void removeCollisionPair(hkpTypedBroadPhaseHandlePair& pair) override;
 
-	// Both bases declare one: DeletingDestruct's free, the Havok heap's block of m_memSizeAndFlags.
-	static void operator delete(void* apMemory) { hkReferencedObject::deleteObject(apMemory); }
+    // Both bases declare one: DeletingDestruct's free, the Havok heap's block of m_memSizeAndFlags.
+    static void operator delete(void* apMemory) {
+        hkReferencedObject::deleteObject(apMemory);
+    }
 };

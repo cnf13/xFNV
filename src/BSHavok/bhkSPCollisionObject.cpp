@@ -23,97 +23,97 @@ bhkSPCollisionObject::bhkSPCollisionObject(NiNode* apObject) : bhkPCollisionObje
 
 // The clone's allocation is charged to the Havok heap context, restored after the copy.
 NiObject* bhkSPCollisionObject::CreateClone(NiCloningProcess& arCloneData) {
-	int32_t iOldMemContext = GetThreadMemContext();
-	GetThreadMemContext() = MEM_CONTEXT_HAVOK;
-	bhkSPCollisionObject* pClone =
-		static_cast<bhkSPCollisionObject*>(NiMemObject::operator new(sizeof(bhkSPCollisionObject)));
-	if (pClone) {
-		::new (pClone) bhkSPCollisionObject;
-	}
-	// Copies even into a null clone, as the game does.
-	CopyMembers(pClone, arCloneData);
-	GetThreadMemContext() = iOldMemContext;
-	return pClone;
+    int32_t iOldMemContext = GetThreadMemContext();
+    GetThreadMemContext() = MEM_CONTEXT_HAVOK;
+    bhkSPCollisionObject* pClone =
+        static_cast<bhkSPCollisionObject*>(NiMemObject::operator new(sizeof(bhkSPCollisionObject)));
+    if (pClone) {
+        ::new (pClone) bhkSPCollisionObject;
+    }
+    // Copies even into a null clone, as the game does.
+    CopyMembers(pClone, arCloneData);
+    GetThreadMemContext() = iOldMemContext;
+    return pClone;
 }
 
 void bhkSPCollisionObject::LoadBinary(NiStream& arStream) {
-	bhkPCollisionObject::LoadBinary(arStream);
+    bhkPCollisionObject::LoadBinary(arStream);
 }
 
 void bhkSPCollisionObject::LinkObject(NiStream& arStream) {
-	bhkPCollisionObject::LinkObject(arStream);
+    bhkPCollisionObject::LinkObject(arStream);
 }
 
 bool bhkSPCollisionObject::RegisterStreamables(NiStream& arStream) {
-	return bhkPCollisionObject::RegisterStreamables(arStream);
+    return bhkPCollisionObject::RegisterStreamables(arStream);
 }
 
 void bhkSPCollisionObject::SaveBinary(NiStream& arStream) {
-	bhkPCollisionObject::SaveBinary(arStream);
+    bhkPCollisionObject::SaveBinary(arStream);
 }
 
 bool bhkSPCollisionObject::IsEqual(NiObject* apObject) {
-	return bhkPCollisionObject::IsEqual(apObject);
+    return bhkPCollisionObject::IsEqual(apObject);
 }
 
 void bhkSPCollisionObject::AddViewerStrings(NiTPrimitiveArray<char*>* apStrings) {
-	TLSData* v2 = GetThreadTLSData();
-	MEM_CONTEXT eMemContext = v2->eMemContext;
-	v2->eMemContext = MEM_CONTEXT_HAVOK;
-	bhkPCollisionObject::AddViewerStrings(apStrings);
-	char* ViewerString = NiGetViewerString(bhkSPCollisionObject::ms_RTTI.GetName());
-	uint32_t m_usSize = apStrings->m_usSize;
-	uint32_t m_usMaxSize = apStrings->m_usMaxSize;
-	char* v8 = ViewerString;
-	if (m_usSize >= m_usMaxSize) {
-		apStrings->SetSize(m_usSize + apStrings->m_usGrowBy);
-	}
-	apStrings->SetAt(m_usSize, v8);
-	v2->eMemContext = eMemContext;
+    TLSData* v2 = GetThreadTLSData();
+    MEM_CONTEXT eMemContext = v2->eMemContext;
+    v2->eMemContext = MEM_CONTEXT_HAVOK;
+    bhkPCollisionObject::AddViewerStrings(apStrings);
+    char* ViewerString = NiGetViewerString(bhkSPCollisionObject::ms_RTTI.GetName());
+    uint32_t m_usSize = apStrings->m_usSize;
+    uint32_t m_usMaxSize = apStrings->m_usMaxSize;
+    char* v8 = ViewerString;
+    if (m_usSize >= m_usMaxSize) {
+        apStrings->SetSize(m_usSize + apStrings->m_usGrowBy);
+    }
+    apStrings->SetAt(m_usSize, v8);
+    v2->eMemContext = eMemContext;
 }
 
 // The phantom's Havok transform, converted to game units, becomes the scene object's (through the vtable).
 void bhkSPCollisionObject::hktoNiTransform() {
-	// spWorldObject is a NiPointer<bhkWorldObject>; this collision object's world object is a phantom.
-	bhkShapePhantom* psp = static_cast<bhkShapePhantom*>(static_cast<bhkWorldObject*>(spWorldObject));
-	if (psp) {
-		if (psp->phkObject) {
-			NiTransform kTransform;
-			psp->GetTransform(kTransform);
-			SetTransform(kTransform);
-		}
-	}
+    // spWorldObject is a NiPointer<bhkWorldObject>; this collision object's world object is a phantom.
+    bhkShapePhantom* psp = static_cast<bhkShapePhantom*>(static_cast<bhkWorldObject*>(spWorldObject));
+    if (psp) {
+        if (psp->phkObject) {
+            NiTransform kTransform;
+            psp->GetTransform(kTransform);
+            SetTransform(kTransform);
+        }
+    }
 }
 
 void bhkSPCollisionObject::NitohkTransform() {
-	NiTransform nit;
-	// spWorldObject is a NiPointer<bhkWorldObject>; this collision object's world object is a phantom.
-	bhkShapePhantom* psp = static_cast<bhkShapePhantom*>(static_cast<bhkWorldObject*>(spWorldObject));
-	NiAVObject* m_pkSceneObject = this->m_pkSceneObject;
-	if (m_pkSceneObject) {
-		this->m_pkSceneObject->UpdateWorldLoc();
-		if (psp) {
-			if (psp->phkObject) {
-				nit = m_pkSceneObject->m_kWorld;
-				bhkNiCollisionObject::kKeyframeLock.Lock(0);
-				psp->SetTransform(nit);
-				if (!--bhkNiCollisionObject::kKeyframeLock.uiLockCount) {
-					bhkNiCollisionObject::kKeyframeLock.uiOwningThread = 0;
-				}
-			}
-		}
-	}
+    NiTransform nit;
+    // spWorldObject is a NiPointer<bhkWorldObject>; this collision object's world object is a phantom.
+    bhkShapePhantom* psp = static_cast<bhkShapePhantom*>(static_cast<bhkWorldObject*>(spWorldObject));
+    NiAVObject* m_pkSceneObject = this->m_pkSceneObject;
+    if (m_pkSceneObject) {
+        this->m_pkSceneObject->UpdateWorldLoc();
+        if (psp) {
+            if (psp->phkObject) {
+                nit = m_pkSceneObject->m_kWorld;
+                bhkNiCollisionObject::kKeyframeLock.Lock(0);
+                psp->SetTransform(nit);
+                if (!--bhkNiCollisionObject::kKeyframeLock.uiLockCount) {
+                    bhkNiCollisionObject::kKeyframeLock.uiOwningThread = 0;
+                }
+            }
+        }
+    }
 }
 
 void bhkSPCollisionObject::CopyMembers(bhkSPCollisionObject* apDest, NiCloningProcess& arCloneData) {
-	bhkPCollisionObject::CopyMembers(apDest, arCloneData);
+    bhkPCollisionObject::CopyMembers(apDest, arCloneData);
 }
 
 NiObject* bhkSPCollisionObject::CreateObject() {
-	bhkSPCollisionObject* pObject =
-		static_cast<bhkSPCollisionObject*>(NiMemObject::operator new(sizeof(bhkSPCollisionObject)));
-	if (pObject) {
-		return ::new (pObject) bhkSPCollisionObject;
-	}
-	return nullptr;
+    bhkSPCollisionObject* pObject =
+        static_cast<bhkSPCollisionObject*>(NiMemObject::operator new(sizeof(bhkSPCollisionObject)));
+    if (pObject) {
+        return ::new (pObject) bhkSPCollisionObject;
+    }
+    return nullptr;
 }

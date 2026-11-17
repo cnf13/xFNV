@@ -11,18 +11,18 @@ class hkpCdPointCollector;
 // follows the collector's.
 class hkHeightFieldRayForwardingCollector : public hkpRayHitCollector {
 public:
-	hkHeightFieldRayForwardingCollector(const hkVector4& path, const hkpCdBody& csBody, hkpCdPointCollector& collector)
-		: m_path(path), m_csBody(csBody), m_collector(collector) {
-		m_earlyOutHitFraction = 1.0f;
-	}
+    hkHeightFieldRayForwardingCollector(const hkVector4& path, const hkpCdBody& csBody, hkpCdPointCollector& collector)
+      : m_path(path), m_csBody(csBody), m_collector(collector) {
+        m_earlyOutHitFraction = 1.0f;
+    }
 
-	void addRayHit(const hkpCdBody& cdBody, const hkpShapeRayCastCollectorOutput& hitInfo) override;
-	// Slot 1.
-	~hkHeightFieldRayForwardingCollector() override;
+    void addRayHit(const hkpCdBody& cdBody, const hkpShapeRayCastCollectorOutput& hitInfo) override;
+    // Slot 1.
+    ~hkHeightFieldRayForwardingCollector() override;
 
-	hkVector4 m_currentFrom;
-	float m_currentRadius;
-	hkVector4 m_path;
-	const hkpCdBody& m_csBody;
-	hkpCdPointCollector& m_collector;
+    hkVector4 m_currentFrom;
+    float m_currentRadius;
+    hkVector4 m_path;
+    const hkpCdBody& m_csBody;
+    hkpCdPointCollector& m_collector;
 };

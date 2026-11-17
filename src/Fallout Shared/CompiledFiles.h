@@ -6,6 +6,6 @@ class TESFile;
 
 class CompiledFiles {
 public:
-	uint32_t uiCompiledFileCount;
-	TESFile* pFileArray[255];
+    uint32_t uiCompiledFileCount;
+    TESFile* pFileArray[255];
 };

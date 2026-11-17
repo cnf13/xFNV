@@ -17,197 +17,203 @@
 #include "Fallout/Interface/Menus/HUDMainMenu.h"
 
 BGSQuestObjective::BGSQuestObjective() {
-	InitializeData();
+    InitializeData();
 }
 
 BGSQuestObjective::~BGSQuestObjective() {
-	ClearData();
+    ClearData();
 }
 
 bool BGSQuestObjective::GetCompleted() {
-	return (bool)((uint8_t)(((int32_t)eState) > 1));
+    return (bool)((uint8_t)(((int32_t)eState) > 1));
 }
 
 // The display text's characters.
 const char* BGSQuestObjective::GetDisplayText() {
-	if ((&cDisplayText)->pString) {
-		return (&cDisplayText)->pString;
-	} else {
-		return "";
-	}
+    if ((&cDisplayText)->pString) {
+        return (&cDisplayText)->pString;
+    }
+    else {
+        return "";
+    }
 }
 
 bool BGSQuestObjective::GetDisplayed() {
-	return (bool)(((int32_t)eState) & 1);
+    return (bool)(((int32_t)eState) & 1);
 }
 
 TESQuest* BGSQuestObjective::GetOwner() {
-	return pOwnerQuest;
+    return pOwnerQuest;
 }
 
 uint32_t BGSQuestObjective::GetIndex() {
-	return iIndex;
+    return iIndex;
 }
 
 void BGSQuestObjective::ClearTargetList() {
-	for (BSSimpleList<TESQuestTarget*>* pIter = GetTargetList(); pIter && !pIter->IsEmpty(); pIter->RemoveHead()) {
-		TESQuestTarget* pTarget = pIter->GetItem();
-		if (pTarget)
-			delete pTarget;
-	}
+    for (BSSimpleList<TESQuestTarget*>* pIter = GetTargetList(); pIter && !pIter->IsEmpty(); pIter->RemoveHead()) {
+        TESQuestTarget* pTarget = pIter->GetItem();
+        if (pTarget) {
+            delete pTarget;
+        }
+    }
 }
 
 void BGSQuestObjective::ClearData() {
-	ClearTargetList();
+    ClearTargetList();
 }
 
 // Loads the objective's index and display text from apFile's chunks.
 void BGSQuestObjective::Load(TESFile* apFile) {
-	do {
-		uint32_t uiTESChunk = apFile->GetTESChunk();
-		if (uiTESChunk == NO_CHUNK) {
-			break;
-		}
-		if (uiTESChunk == QOBJ_ID) {
-			apFile->GetChunkData<uint32_t>(iIndex);
-		} else if (uiTESChunk == NNAM_ID) {
-			if (apFile->GetChunkSize()) {
-				char* pcText = static_cast<char*>(__builtin_alloca(apFile->GetChunkSize()));
-				apFile->GetChunkData(pcText, 0);
-				SetDisplayText(pcText);
-			} else {
-				SetDisplayText(nullptr);
-			}
-			return;
-		}
-	} while (apFile->NextChunk());
+    do {
+        uint32_t uiTESChunk = apFile->GetTESChunk();
+        if (uiTESChunk == NO_CHUNK) {
+            break;
+        }
+        if (uiTESChunk == QOBJ_ID) {
+            apFile->GetChunkData<uint32_t>(iIndex);
+        }
+        else if (uiTESChunk == NNAM_ID) {
+            if (apFile->GetChunkSize()) {
+                char* pcText = static_cast<char*>(__builtin_alloca(apFile->GetChunkSize()));
+                apFile->GetChunkData(pcText, 0);
+                SetDisplayText(pcText);
+            }
+            else {
+                SetDisplayText(nullptr);
+            }
+            return;
+        }
+    }
+    while (apFile->NextChunk());
 }
 
 void BGSQuestObjective::InitItem(TESQuest* apUser) {
-	if (bInitialized)
-		return;
-	pOwnerQuest = apUser;
-	for (BSSimpleList<TESQuestTarget*>* pIter = GetTargetList(); pIter && !pIter->IsEmpty(); pIter = pIter->GetNext())
-		pIter->GetItem()->InitItem(apUser);
-	bInitialized = true;
+    if (bInitialized) {
+        return;
+    }
+    pOwnerQuest = apUser;
+    for (BSSimpleList<TESQuestTarget*>* pIter = GetTargetList(); pIter && !pIter->IsEmpty(); pIter = pIter->GetNext()) {
+        pIter->GetItem()->InitItem(apUser);
+    }
+    bInitialized = true;
 }
 
 void BGSQuestObjective::SetDisplayText(const char* apDisplayText) {
-	(&cDisplayText)->Set(apDisplayText, (uint32_t)0);
+    (&cDisplayText)->Set(apDisplayText, (uint32_t)0);
 }
 
 // Sets the objective's state: a started objective enables its quest, shows the update text and, the first time, the
 // quest's name; a completed one shows the completion text. The player's objective list follows every change.
 void BGSQuestObjective::SetState(QUEST_OBJECTIVE_STATE aeNewState) {
-	TESQuest* pOwnerQuest = GetOwner();
-	pOwnerQuest->AddChange(0x20000000u);
-	if (aeNewState == 1 || eState == 0) {
-		if (aeNewState == 1) {
-			if (!pOwnerQuest->GetCompleted()) {
-				pOwnerQuest->SetEnabled(true);
-				if (!pPlayer->GetActiveQuest()) {
-					pPlayer->SetActiveQuest(pOwnerQuest);
-				}
-			}
-			HUDMainMenu::ShowQuestObjective(GetDisplayText(), false, false);
-			if (!(uint8_t)pOwnerQuest->GetHasShownQuestUpdate()) {
-				HUDMainMenu::ShowQuestName(pOwnerQuest);
-				pOwnerQuest->SetDisplayedQuestStarted(true);
-			}
-		}
-		pPlayer->AddQuestObjective(this);
-	}
-	if (aeNewState == 3 && eState == 1 && !pOwnerQuest->GetCompleted()) {
-		HUDMainMenu::ShowQuestObjective(GetDisplayText(), true, false);
-	}
-	eState = static_cast<QUEST_OBJECTIVE_STATE>(aeNewState);
+    TESQuest* pOwnerQuest = GetOwner();
+    pOwnerQuest->AddChange(0x20000000u);
+    if (aeNewState == 1 || eState == 0) {
+        if (aeNewState == 1) {
+            if (!pOwnerQuest->GetCompleted()) {
+                pOwnerQuest->SetEnabled(true);
+                if (!pPlayer->GetActiveQuest()) {
+                    pPlayer->SetActiveQuest(pOwnerQuest);
+                }
+            }
+            HUDMainMenu::ShowQuestObjective(GetDisplayText(), false, false);
+            if (!(uint8_t)pOwnerQuest->GetHasShownQuestUpdate()) {
+                HUDMainMenu::ShowQuestName(pOwnerQuest);
+                pOwnerQuest->SetDisplayedQuestStarted(true);
+            }
+        }
+        pPlayer->AddQuestObjective(this);
+    }
+    if (aeNewState == 3 && eState == 1 && !pOwnerQuest->GetCompleted()) {
+        HUDMainMenu::ShowQuestObjective(GetDisplayText(), true, false);
+    }
+    eState = static_cast<QUEST_OBJECTIVE_STATE>(aeNewState);
 }
 
 bool BGSQuestObjective::GetStatus(int32_t a2) {
-	return (((int32_t)(a2 & eState)) != 0);
+    return (((int32_t)(a2 & eState)) != 0);
 }
 
 void BGSQuestObjective::InitializeData() {
-	iIndex = (uint32_t)0;
-	(&cDisplayText)->operator=("");
-	bInitialized = (bool)0;
-	eState = QOS_DORMANT;
-	pOwnerQuest = nullptr;
+    iIndex = (uint32_t)0;
+    (&cDisplayText)->operator=("");
+    bInitialized = (bool)0;
+    eState = QOS_DORMANT;
+    pOwnerQuest = nullptr;
 }
 
 void BGSQuestObjective::UpdateCurrentTargetList(BSSimpleList<TESQuestTarget*>* apListToFill) {
-	if (eState == QOS_DISPLAYED) {
-		BSSimpleList<TESQuestTarget*>* pMasterList = &ListTargets;
-		void* pQuestTarget = 0;
-		while (pMasterList && pMasterList->m_item) {
-			TESQuestTarget* pTarget = pMasterList->m_item;
-			pMasterList = pMasterList->m_pkNext;
-			TESObjectREFR* Reference = pTarget->GetReference(0);
-			if ((&pTarget->objConditions)->IsTrue(Reference, 0)) {
-				bool IgnoreLocks = pTarget->GetIgnoreLocks();
-				TeleportPath* v4 = pTarget->QTargetPath();
-				TESObjectREFR* v3 = pTarget->GetReference(1);
-				pPlayer->BuildPathToTarget(v3, v4, IgnoreLocks);
-				apListToFill->AddTail(pTarget);
-			}
-		}
-	}
+    if (eState == QOS_DISPLAYED) {
+        BSSimpleList<TESQuestTarget*>* pMasterList = &ListTargets;
+        void* pQuestTarget = 0;
+        while (pMasterList && pMasterList->m_item) {
+            TESQuestTarget* pTarget = pMasterList->m_item;
+            pMasterList = pMasterList->m_pkNext;
+            TESObjectREFR* Reference = pTarget->GetReference(0);
+            if ((&pTarget->objConditions)->IsTrue(Reference, 0)) {
+                bool IgnoreLocks = pTarget->GetIgnoreLocks();
+                TeleportPath* v4 = pTarget->QTargetPath();
+                TESObjectREFR* v3 = pTarget->GetReference(1);
+                pPlayer->BuildPathToTarget(v3, v4, IgnoreLocks);
+                apListToFill->AddTail(pTarget);
+            }
+        }
+    }
 }
 
 uint32_t BGSQuestObjective::GetDisplayTextLength() {
-	return cDisplayText.GetLength();
+    return cDisplayText.GetLength();
 }
 
 void BGSQuestObjective::Save() {
-	TESForm::AddChunk(QOBJ_ID, iIndex);
-	uint32_t v2 = GetDisplayTextLength() + 1;
-	const char* DisplayText = GetDisplayText();
-	TESForm::AddChunkArray(NNAM_ID, DisplayText, v2);
-	for (BSSimpleList<TESQuestTarget*>* pTargetList = &ListTargets; pTargetList && !pTargetList->IsEmpty();
-		pTargetList = pTargetList->m_pkNext) {
-	}
+    TESForm::AddChunk(QOBJ_ID, iIndex);
+    uint32_t v2 = GetDisplayTextLength() + 1;
+    const char* DisplayText = GetDisplayText();
+    TESForm::AddChunkArray(NNAM_ID, DisplayText, v2);
+    for (BSSimpleList<TESQuestTarget*>* pTargetList = &ListTargets; pTargetList && !pTargetList->IsEmpty();
+         pTargetList = pTargetList->m_pkNext) {}
 }
 
 TeleportPath* TESQuestTarget::QTargetPath() {
-	return &m_TargetPath;
+    return &m_TargetPath;
 }
 
 void PlayerCharacter::AddQuestObjective(BGSQuestObjective* apObj) {
-	BSSimpleList<BGSQuestObjective*>* plist = GetQuestObjectiveList();
-	TESQuest* pquest = apObj->pOwnerQuest;
-	bool v6 = 0;
-	char v7 = 0;
-	while (plist && plist->m_item) {
-		BGSQuestObjective* m_item = plist->m_item;
-		if (apObj == m_item) {
-			v7 = 1;
-			break;
-		}
-		if (!v6) {
-			v6 = m_item->pOwnerQuest == pquest;
-		}
-		plist = plist->m_pkNext;
-	}
-	if (apObj->pOwnerQuest->GetObjectiveList() && !apObj->pOwnerQuest->GetObjectiveList()->IsEmpty() && !v7) {
-		GetQuestObjectiveList()->AddHead(apObj);
-	}
-	if (apObj->pOwnerQuest == pActiveQuest) {
-		apObj->UpdateCurrentTargetList(&listQuestTargets);
-	}
+    BSSimpleList<BGSQuestObjective*>* plist = GetQuestObjectiveList();
+    TESQuest* pquest = apObj->pOwnerQuest;
+    bool v6 = 0;
+    char v7 = 0;
+    while (plist && plist->m_item) {
+        BGSQuestObjective* m_item = plist->m_item;
+        if (apObj == m_item) {
+            v7 = 1;
+            break;
+        }
+        if (!v6) {
+            v6 = m_item->pOwnerQuest == pquest;
+        }
+        plist = plist->m_pkNext;
+    }
+    if (apObj->pOwnerQuest->GetObjectiveList() && !apObj->pOwnerQuest->GetObjectiveList()->IsEmpty() && !v7) {
+        GetQuestObjectiveList()->AddHead(apObj);
+    }
+    if (apObj->pOwnerQuest == pActiveQuest) {
+        apObj->UpdateCurrentTargetList(&listQuestTargets);
+    }
 }
 
 void HUDMainMenu::ShowQuestObjective(const char* apText, bool abCompleted, bool abFailed) {
-	if (HUDMainMenu::pme) {
-		if (apText) {
-			HUDMainMenu::HUDShowQuestObjectivsCritSect.Enter(0);
-			uiMessageDelayTime = appTimer.iLastTime;
-			HUDMainMenu::QueuedQuestText* a2 =
-				static_cast<HUDMainMenu::QueuedQuestText*>(ourMalloc(sizeof(HUDMainMenu::QueuedQuestText)));
-			BSstrcpy(a2->msg, 260, apText);
-			a2->byte104 = abCompleted;
-			a2->byte105 = abFailed;
-			HUDMainMenu::pme->xQuestObjectives.AddHead(a2);
-			HUDMainMenu::HUDShowQuestObjectivsCritSect.Leave();
-		}
-	}
+    if (HUDMainMenu::pme) {
+        if (apText) {
+            HUDMainMenu::HUDShowQuestObjectivsCritSect.Enter(0);
+            uiMessageDelayTime = appTimer.iLastTime;
+            HUDMainMenu::QueuedQuestText* a2 =
+                static_cast<HUDMainMenu::QueuedQuestText*>(ourMalloc(sizeof(HUDMainMenu::QueuedQuestText)));
+            BSstrcpy(a2->msg, 260, apText);
+            a2->byte104 = abCompleted;
+            a2->byte105 = abFailed;
+            HUDMainMenu::pme->xQuestObjectives.AddHead(a2);
+            HUDMainMenu::HUDShowQuestObjectivsCritSect.Leave();
+        }
+    }
 }

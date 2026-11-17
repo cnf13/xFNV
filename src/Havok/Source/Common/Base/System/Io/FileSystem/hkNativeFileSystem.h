@@ -20,48 +20,51 @@ using listDirectoryFunc_t = hkResult (*)(const char* apBasePath, hkFileSystem::D
 // Implements Havok file access through the host filesystem.
 class hkNativeFileSystem : public hkFileSystem {
 public:
-	~hkNativeFileSystem() override;
+    ~hkNativeFileSystem() override;
 
-	// Opens the file through the platform's path, behind a buffered reader when the file reader cannot mark.
-	hkStreamReader* openReader(const char* name) override {
-		// Raw storage: the body frees the string itself, so no C++ destructor may free it again.
-		FNVD_INLINED_LOCAL(hkStringBuf, buffer, std::nullopt, std::nullopt);
-		::new (&buffer) hkStringBuf;
-		hkStdioStreamReader* pFile = static_cast<hkStdioStreamReader*>(hkMemoryRouter::getInstance()
-				.m_heap->blockAlloc(sizeof(hkStdioStreamReader)));
-		pFile->m_memSizeAndFlags = sizeof(hkStdioStreamReader);
-		hkStreamReader* s = ::new (pFile) hkStdioStreamReader(s_havokToPlatformConvert(name, buffer));
-		hkStreamReader* pResult = s;
-		hkBool bMarkSupported;
-		if (!s->markSupported(&bMarkSupported)->m_bool) {
-			hkBufferedStreamReader* pBuffered = static_cast<hkBufferedStreamReader*>(hkMemoryRouter::getInstance()
-					.m_heap->blockAlloc(sizeof(hkBufferedStreamReader)));
-			pBuffered->m_memSizeAndFlags = sizeof(hkBufferedStreamReader);
-			pResult = ::new (pBuffered) hkBufferedStreamReader(s, 0x1000);
-			s->removeReference();
-		}
-		// EXE-INLINED 0xCBBD40
-		hkMemoryAllocator* pTemp = hkMemoryRouter::getInstance().m_temp;
-		buffer.m_string.m_size = 0;
-		if (buffer.m_string.getCapacityAndFlags() >= 0) {
-			pTemp->bufFree(buffer.m_string.begin(),
-				buffer.m_string.getCapacityAndFlags() & hkArrayBase<char>::CAPACITY_MASK);
-		}
-		return pResult;
-	}
+    // Opens the file through the platform's path, behind a buffered reader when the file reader cannot mark.
+    hkStreamReader* openReader(const char* name) override {
+        // Raw storage: the body frees the string itself, so no C++ destructor may free it again.
+        FNVD_INLINED_LOCAL(hkStringBuf, buffer, std::nullopt, std::nullopt);
+        ::new (&buffer) hkStringBuf;
+        hkStdioStreamReader* pFile = static_cast<hkStdioStreamReader*>(
+            hkMemoryRouter::getInstance().m_heap->blockAlloc(sizeof(hkStdioStreamReader))
+        );
+        pFile->m_memSizeAndFlags = sizeof(hkStdioStreamReader);
+        hkStreamReader* s = ::new (pFile) hkStdioStreamReader(s_havokToPlatformConvert(name, buffer));
+        hkStreamReader* pResult = s;
+        hkBool bMarkSupported;
+        if (!s->markSupported(&bMarkSupported)->m_bool) {
+            hkBufferedStreamReader* pBuffered = static_cast<hkBufferedStreamReader*>(
+                hkMemoryRouter::getInstance().m_heap->blockAlloc(sizeof(hkBufferedStreamReader))
+            );
+            pBuffered->m_memSizeAndFlags = sizeof(hkBufferedStreamReader);
+            pResult = ::new (pBuffered) hkBufferedStreamReader(s, 0x1000);
+            s->removeReference();
+        }
+        // EXE-INLINED 0xCBBD40
+        hkMemoryAllocator* pTemp = hkMemoryRouter::getInstance().m_temp;
+        buffer.m_string.m_size = 0;
+        if (buffer.m_string.getCapacityAndFlags() >= 0) {
+            pTemp->bufFree(
+                buffer.m_string.begin(), buffer.m_string.getCapacityAndFlags() & hkArrayBase<char>::CAPACITY_MASK
+            );
+        }
+        return pResult;
+    }
 
-	hkStreamWriter* openWriter(const char* name) override;
+    hkStreamWriter* openWriter(const char* name) override;
 
-	hkResult listDirectory(const char* basePath, hkFileSystem::DirectoryListing& listingOut) override {
-		return s_listDirectory(basePath, listingOut);
-	}
+    hkResult listDirectory(const char* basePath, hkFileSystem::DirectoryListing& listingOut) override {
+        return s_listDirectory(basePath, listingOut);
+    }
 
-	// Stores the path in the buffer, rewrites its separators as backslashes and returns the buffer's characters.
-	static const char* nativeHavokToPlatformConvertPath(const char* pathIn, hkStringBuf& buffer);
-	// Copies the path into the buffer, makes its separators slashes, collapses "/./" and drops a leading "./", then
-	// returns the buffer's characters.
-	static const char* nativePlatformToHavokConvertPath(const char* pathIn, hkStringBuf& buffer);
+    // Stores the path in the buffer, rewrites its separators as backslashes and returns the buffer's characters.
+    static const char* nativeHavokToPlatformConvertPath(const char* pathIn, hkStringBuf& buffer);
+    // Copies the path into the buffer, makes its separators slashes, collapses "/./" and drops a leading "./", then
+    // returns the buffer's characters.
+    static const char* nativePlatformToHavokConvertPath(const char* pathIn, hkStringBuf& buffer);
 
-	// The platform's directory listing, installed at startup.
-	static listDirectoryFunc_t s_listDirectory;
+    // The platform's directory listing, installed at startup.
+    static listDirectoryFunc_t s_listDirectory;
 };

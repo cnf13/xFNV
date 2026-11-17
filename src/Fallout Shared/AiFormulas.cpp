@@ -20,16 +20,18 @@
 
 #include <cmath>
 
-SandboxSettingTable fSandboxDurationMultProc{&fSandboxDurationMultFurniture, &fSandboxDurationMultFurniture,
-	&fSandboxDurationMultEating, &fSandboxDurationMultWandering, &fSandboxDurationMultIdleMarker,
-	&fSandboxDurationMultWandering};
-SandboxSettingTable fSandboxEnergyMultProc{&fSandboxEnergyMultFurniture, &fSandboxEnergyMultFurniture,
-	&fSandboxEnergyMultEating, &fSandboxEnergyMultWandering, &fSandboxEnergyMultIdleMarker,
-	&fSandboxEnergyMultWandering};
-SettingPointerArray14 fAVDSkillBaseValues{&fAVDSkillBarterBase, &fAVDSkillBigGunsBase, &fAVDSkillEnergyWeaponsBase,
-	&fAVDSkillExplosivesBase, &fAVDSkillLockpickBase, &fAVDSkillMedicineBase, &fAVDSkillMeleeWeaponsBase,
-	&fAVDSkillRepairBase, &fAVDSkillScienceBase, &fAVDSkillSmallGunsBase, &fAVDSkillSneakBase, &fAVDSkillSpeechBase,
-	&fAVDSkillSurvivalBase, &fAVDSkillUnarmedBase};
+SandboxSettingTable fSandboxDurationMultProc{&fSandboxDurationMultFurniture,  &fSandboxDurationMultFurniture,
+                                             &fSandboxDurationMultEating,     &fSandboxDurationMultWandering,
+                                             &fSandboxDurationMultIdleMarker, &fSandboxDurationMultWandering};
+SandboxSettingTable fSandboxEnergyMultProc{&fSandboxEnergyMultFurniture,  &fSandboxEnergyMultFurniture,
+                                           &fSandboxEnergyMultEating,     &fSandboxEnergyMultWandering,
+                                           &fSandboxEnergyMultIdleMarker, &fSandboxEnergyMultWandering};
+SettingPointerArray14 fAVDSkillBaseValues{
+    &fAVDSkillBarterBase,   &fAVDSkillBigGunsBase,   &fAVDSkillEnergyWeaponsBase, &fAVDSkillExplosivesBase,
+    &fAVDSkillLockpickBase, &fAVDSkillMedicineBase,  &fAVDSkillMeleeWeaponsBase,  &fAVDSkillRepairBase,
+    &fAVDSkillScienceBase,  &fAVDSkillSmallGunsBase, &fAVDSkillSneakBase,         &fAVDSkillSpeechBase,
+    &fAVDSkillSurvivalBase, &fAVDSkillUnarmedBase
+};
 
 // The game settings this file defines, with the game's IDs and values, in the game's initialization order.
 SettingT<GameSettingCollection> fSneakBaseValue("fSneakBaseValue", -25.0f);
@@ -113,7 +115,7 @@ SettingT<GameSettingCollection> fAIAcquireObjectDistance("fAIAcquireObjectDistan
 SettingT<GameSettingCollection> fAIFindBedChairsDistance("fAIFindBedChairsDistance", 8000.0f);
 SettingT<GameSettingCollection> fAISocialRadiusToTriggerConversation("fAISocialRadiusToTriggerConversation", 2000.0f);
 SettingT<GameSettingCollection>
-	fAISocialRadiusToTriggerConversationInterior("fAISocialRadiusToTriggerConversationInterior", 500.0f);
+    fAISocialRadiusToTriggerConversationInterior("fAISocialRadiusToTriggerConversationInterior", 500.0f);
 SettingT<GameSettingCollection> fAISocialchanceForConversation("fAISocialchanceForConversation", 60.0f);
 SettingT<GameSettingCollection> fAISocialchanceForConversationInterior("fAISocialchanceForConversationInterior", 25.0f);
 SettingT<GameSettingCollection> fAISocialTimerForConversationsMax("fAISocialTimerForConversationsMax", 30.0f);
@@ -275,8 +277,8 @@ SettingT<GameSettingCollection> fTakeBackTimerSetting("fTakeBackTimerSetting", 2
 SettingT<GameSettingCollection> iCoolDownTimerSetting("iCoolDownTimerSetting", 3);
 SettingT<GameSettingCollection> fPerceptionMult("fPerceptionMult", 400.0f);
 SettingT<GameSettingCollection> fGuardPackageAttackRadiusMult("fGuardPackageAttackRadiusMult", 0.25f);
-SettingT<GameSettingCollection> fAmbushOverRideRadiusforPlayerDetection("fAmbushOverRideRadiusforPlayerDetection",
-	1000.0f);
+SettingT<GameSettingCollection>
+    fAmbushOverRideRadiusforPlayerDetection("fAmbushOverRideRadiusforPlayerDetection", 1000.0f);
 SettingT<GameSettingCollection> fSandBoxSearchRadius("fSandBoxSearchRadius", 6000.0f);
 SettingT<GameSettingCollection> fSandBoxExtraDialogueRange("fSandBoxExtraDialogueRange", 384.0f);
 SettingT<GameSettingCollection> iSandBoxPreventRepeatedActionTime("iSandBoxPreventRepeatedActionTime", 30);
@@ -329,10 +331,10 @@ SettingT<GameSettingCollection> fFollowExtraCatchUpSpeedMult("fFollowExtraCatchU
 SettingT<GameSettingCollection> fFollowSpaceBetweenFollowers("fFollowSpaceBetweenFollowers", 100.0f);
 SettingT<GameSettingCollection> fRadiationAvoidThreshold("fRadiationAvoidThreshold", 50.0f);
 SandboxActivitySettingsArray SandboxActivitySettings = {
-	{fSandboxSleepStartMin, fSandboxSleepStartMax, fSandboxSleepDurationMin, fSandboxSleepDurationMax},
-	{fSandboxBreakfastMin, fSandboxBreakfastMax, fSandboxMealDurationMin, fSandboxMealDurationMax},
-	{fSandboxLunchMin, fSandboxLunchMax, fSandboxMealDurationMin, fSandboxMealDurationMax},
-	{fSandboxDinnerMin, fSandboxDinnerMax, fSandboxMealDurationMin, fSandboxMealDurationMax},
+    {fSandboxSleepStartMin, fSandboxSleepStartMax, fSandboxSleepDurationMin, fSandboxSleepDurationMax},
+    {fSandboxBreakfastMin, fSandboxBreakfastMax, fSandboxMealDurationMin, fSandboxMealDurationMax},
+    {fSandboxLunchMin, fSandboxLunchMax, fSandboxMealDurationMin, fSandboxMealDurationMax},
+    {fSandboxDinnerMin, fSandboxDinnerMax, fSandboxMealDurationMin, fSandboxMealDurationMax},
 };
 SettingT<GameSettingCollection> fDetectionLargeActorThreshold("fDetectionLargeActorThreshold", 135.0f);
 SettingT<GameSettingCollection> iSneakLevelBonus("iSneakLevelBonus", 5);
@@ -390,574 +392,643 @@ SettingT<GameSettingCollection> fAVDUnarmedDamageMult("fAVDUnarmedDamageMult", 0
 SettingT<GameSettingCollection> fAVDUnarmedDamageBase("fAVDUnarmedDamageBase", 2.0f);
 
 int32_t CompareFollowerDist(const void* a1, const void* a2) {
-	if (static_cast<const FollowerDist*>(a1)->operator>(*static_cast<const FollowerDist*>(a2))) {
-		return 1;
-	}
-	if (static_cast<const FollowerDist*>(a2)->operator>(*static_cast<const FollowerDist*>(a1))) {
-		return -1;
-	}
-	return 0;
+    if (static_cast<const FollowerDist*>(a1)->operator>(*static_cast<const FollowerDist*>(a2))) {
+        return 1;
+    }
+    if (static_cast<const FollowerDist*>(a2)->operator>(*static_cast<const FollowerDist*>(a1))) {
+        return -1;
+    }
+    return 0;
 }
 
 bool FollowerDist::operator>(const FollowerDist& aFollowerDist) const {
-	if (aFollowerDist.fPackDesiredDist == fPackDesiredDist) {
-		return aFollowerDist.fActualDistSqr < static_cast<double>(fActualDistSqr);
-	} else {
-		return aFollowerDist.fPackDesiredDist < static_cast<double>(fPackDesiredDist);
-	}
+    if (aFollowerDist.fPackDesiredDist == fPackDesiredDist) {
+        return aFollowerDist.fActualDistSqr < static_cast<double>(fActualDistSqr);
+    }
+    else {
+        return aFollowerDist.fPackDesiredDist < static_cast<double>(fPackDesiredDist);
+    }
 }
 
-PerActivitySettings::PerActivitySettings(SettingT<GameSettingCollection>& apStartMin,
-	SettingT<GameSettingCollection>& apStartMax, SettingT<GameSettingCollection>& apDurMin,
-	SettingT<GameSettingCollection>& apDurMax)
-	: StartMin(&apStartMin), StartMax(&apStartMax), DurMin(&apDurMin), DurMax(&apDurMax) {}
+PerActivitySettings::PerActivitySettings(
+    SettingT<GameSettingCollection>& apStartMin,
+    SettingT<GameSettingCollection>& apStartMax,
+    SettingT<GameSettingCollection>& apDurMin,
+    SettingT<GameSettingCollection>& apDurMax
+)
+  : StartMin(&apStartMin), StartMax(&apStartMax), DurMin(&apDurMin), DurMax(&apDurMax) {}
 
-float AiFormulas::AVDeriveBodyPartCondition([[maybe_unused]] ActorValueOwner* apActor,
-	[[maybe_unused]] ActorValue::Index aiWhich) {
-	return fAVDDefaultBodyPartCondition.Float();
+float AiFormulas::AVDeriveBodyPartCondition(
+    [[maybe_unused]] ActorValueOwner* apActor,
+    [[maybe_unused]] ActorValue::Index aiWhich
+) {
+    return fAVDDefaultBodyPartCondition.Float();
 }
 
-void AiFormulas::AVGetDerivedSkillPrimaryAttributeAndBase(ActorValue::Index aiSkill,
-	ActorValue::Index& aiPrimaryAttribute, float& afBase) {
-	aiPrimaryAttribute = SkillToSpecial[aiSkill - ActorValue::BARTER];
-	afBase = fAVDSkillBaseValues[aiSkill - ActorValue::BARTER]->Float();
+void AiFormulas::AVGetDerivedSkillPrimaryAttributeAndBase(
+    ActorValue::Index aiSkill,
+    ActorValue::Index& aiPrimaryAttribute,
+    float& afBase
+) {
+    aiPrimaryAttribute = SkillToSpecial[aiSkill - ActorValue::BARTER];
+    afBase = fAVDSkillBaseValues[aiSkill - ActorValue::BARTER]->Float();
 }
 
 float AiFormulas::AVDeriveCriticalChance(ActorValueOwner* apActor, [[maybe_unused]] ActorValue::Index aiWhich) {
-	const float* pBase = &fAVDCritLuckBase.Float();
-	double dLuck = apActor->GetClampedActorFloatValue(ActorValue::LUCK);
-	return static_cast<float>(fAVDCritLuckMult.Float() * dLuck + *pBase);
+    const float* pBase = &fAVDCritLuckBase.Float();
+    double dLuck = apActor->GetClampedActorFloatValue(ActorValue::LUCK);
+    return static_cast<float>(fAVDCritLuckMult.Float() * dLuck + *pBase);
 }
 
 float AiFormulas::AVDeriveActionPoints(ActorValueOwner* apActor, [[maybe_unused]] ActorValue::Index aiWhich) {
-	double dAgility = apActor->GetClampedActorFloatValue(ActorValue::AGILITY);
-	double dScaled = fAVDActionPointsMult.Float() * dAgility;
-	return static_cast<float>(fAVDActionPointsBase.Float() + dScaled);
+    double dAgility = apActor->GetClampedActorFloatValue(ActorValue::AGILITY);
+    double dScaled = fAVDActionPointsMult.Float() * dAgility;
+    return static_cast<float>(fAVDActionPointsBase.Float() + dScaled);
 }
 
 float AiFormulas::AVDeriveHealth(ActorValueOwner* apActor, [[maybe_unused]] ActorValue::Index aiWhich) {
-	float fEndurance = apActor->GetPermanentActorFloatValue(ActorValue::ENDURANCE);
-	float fClamped = ActorValue::ClampActorValue(ActorValue::ENDURANCE, fEndurance);
-	return CalculateDerivedHealth(apActor, fClamped);
+    float fEndurance = apActor->GetPermanentActorFloatValue(ActorValue::ENDURANCE);
+    float fClamped = ActorValue::ClampActorValue(ActorValue::ENDURANCE, fEndurance);
+    return CalculateDerivedHealth(apActor, fClamped);
 }
 
 float AiFormulas::AVDeriveFatigue(ActorValueOwner* apActor, [[maybe_unused]] ActorValue::Index aiWhich) {
-	float fEndurance = apActor->GetPermanentActorFloatValue(ActorValue::ENDURANCE);
-	float fClamped = ActorValue::ClampActorValue(ActorValue::ENDURANCE, fEndurance);
-	return CalculateDerivedFatigue(apActor, fClamped);
+    float fEndurance = apActor->GetPermanentActorFloatValue(ActorValue::ENDURANCE);
+    float fClamped = ActorValue::ClampActorValue(ActorValue::ENDURANCE, fEndurance);
+    return CalculateDerivedFatigue(apActor, fClamped);
 }
 
 float AiFormulas::AVDeriveSkill_0(ActorValueOwner* apOwner, ActorValue::Index aiSkill) {
-	return AVDeriveSkill(apOwner, aiSkill, 0);
+    return AVDeriveSkill(apOwner, aiSkill, 0);
 }
 
 float AiFormulas::CalculateDerivedSkillValue(float afSkillBase, float afPrimaryAttribute, float afLuck) {
-	float fPrimaryBonus = afPrimaryAttribute * fAVDSkillPrimaryBonusMult.Float();
-	float fValue = std::floorf(fPrimaryBonus) + afSkillBase;
-	float fLuckBonus = afLuck * fAVDSkillLuckBonusMult.Float();
-	return std::ceilf(fLuckBonus) + fValue;
+    float fPrimaryBonus = afPrimaryAttribute * fAVDSkillPrimaryBonusMult.Float();
+    float fValue = std::floorf(fPrimaryBonus) + afSkillBase;
+    float fLuckBonus = afLuck * fAVDSkillLuckBonusMult.Float();
+    return std::ceilf(fLuckBonus) + fValue;
 }
 
 float AiFormulas::AVDeriveResistance(ActorValueOwner* apActor, ActorValue::Index aiWhich) {
-	float fResistance = 0.0f;
-	if (aiWhich == ActorValue::POISON_RESISTANCE) {
-		double dEndurance = apActor->GetClampedActorFloatValue(ActorValue::ENDURANCE);
-		double dOffset = fAVDPoisonResistEnduranceOffset.Float() + dEndurance;
-		fResistance = static_cast<float>(fAVDPoisonResistEnduranceMult.Float() * dOffset);
-	} else if (aiWhich == ActorValue::RADIATION_RESISTANCE) {
-		double dEndurance = apActor->GetClampedActorFloatValue(ActorValue::ENDURANCE);
-		double dOffset = fAVDRadResistEnduranceOffset.Float() + dEndurance;
-		fResistance = static_cast<float>(fAVDRadResistEnduranceMult.Float() * dOffset);
-	}
-	return fResistance;
+    float fResistance = 0.0f;
+    if (aiWhich == ActorValue::POISON_RESISTANCE) {
+        double dEndurance = apActor->GetClampedActorFloatValue(ActorValue::ENDURANCE);
+        double dOffset = fAVDPoisonResistEnduranceOffset.Float() + dEndurance;
+        fResistance = static_cast<float>(fAVDPoisonResistEnduranceMult.Float() * dOffset);
+    }
+    else if (aiWhich == ActorValue::RADIATION_RESISTANCE) {
+        double dEndurance = apActor->GetClampedActorFloatValue(ActorValue::ENDURANCE);
+        double dOffset = fAVDRadResistEnduranceOffset.Float() + dEndurance;
+        fResistance = static_cast<float>(fAVDRadResistEnduranceMult.Float() * dOffset);
+    }
+    return fResistance;
 }
 
 float AiFormulas::CalculateDerivedHealth(ActorValueOwner* apActor, float afEndurance) {
-	Actor* pactor;
-	float fresult = 0.0f;
-	if (apActor) {
-		pactor = static_cast<Actor*>(apActor);
-	} else {
-		pactor = 0;
-	}
-	bool bnpc = pactor->IsNpc();
-	bool bpc = pactor->IsPc();
-	if (bpc) {
-		double v6 = afEndurance + fAVDHealthEnduranceOffset.Float();
-		fresult = fAVDHealthEnduranceMult.Float() * v6;
-	} else {
-		if (bnpc) {
-			double v5 = afEndurance + fAVDNPCHealthEnduranceOffset.Float();
-			fresult = fAVDNPCHealthEnduranceMult.Float() * v5;
-		}
-	}
-	if (pactor->IsAutoCalc() && (bnpc && !bpc)) {
-		// The result is converted to float as unsigned.
-		fresult = static_cast<float>(static_cast<uint32_t>(pactor->GetActorBase()->CalculateHealth(0)));
-	} else {
-		if (bpc) {
-			if (pactor->GetActorLevel()) {
-				double v4 = static_cast<double>(pactor->GetActorLevel() - 1);
-				fresult = fAVDHealthLevelMult.Float() * v4 + fresult;
-			}
-		}
-	}
-	return fresult;
+    Actor* pactor;
+    float fresult = 0.0f;
+    if (apActor) {
+        pactor = static_cast<Actor*>(apActor);
+    }
+    else {
+        pactor = 0;
+    }
+    bool bnpc = pactor->IsNpc();
+    bool bpc = pactor->IsPc();
+    if (bpc) {
+        double v6 = afEndurance + fAVDHealthEnduranceOffset.Float();
+        fresult = fAVDHealthEnduranceMult.Float() * v6;
+    }
+    else {
+        if (bnpc) {
+            double v5 = afEndurance + fAVDNPCHealthEnduranceOffset.Float();
+            fresult = fAVDNPCHealthEnduranceMult.Float() * v5;
+        }
+    }
+    if (pactor->IsAutoCalc() && (bnpc && !bpc)) {
+        // The result is converted to float as unsigned.
+        fresult = static_cast<float>(static_cast<uint32_t>(pactor->GetActorBase()->CalculateHealth(0)));
+    }
+    else {
+        if (bpc) {
+            if (pactor->GetActorLevel()) {
+                double v4 = static_cast<double>(pactor->GetActorLevel() - 1);
+                fresult = fAVDHealthLevelMult.Float() * v4 + fresult;
+            }
+        }
+    }
+    return fresult;
 }
 
 float AiFormulas::RandomHour(float afMin, float afMax) {
-	double v5;
-	if (!(afMax < static_cast<double>(afMin))) {
-		v5 = afMax;
-	} else {
-		v5 = afMax + 24.0;
-	}
-	float v7 = v5;
-	float v6 = RandomFloat(afMin, v7);
-	float v8 = v6 - 24.0;
-	if (!(v8 >= 0.0)) {
-		return v6;
-	} else {
-		return v6 - 24.0;
-	}
+    double v5;
+    if (!(afMax < static_cast<double>(afMin))) {
+        v5 = afMax;
+    }
+    else {
+        v5 = afMax + 24.0;
+    }
+    float v7 = v5;
+    float v6 = RandomFloat(afMin, v7);
+    float v8 = v6 - 24.0;
+    if (!(v8 >= 0.0)) {
+        return v6;
+    }
+    else {
+        return v6 - 24.0;
+    }
 }
 
 float AiFormulas::CalculateDerivedFatigue(ActorValueOwner* apActor, float afEndurance) {
-	Actor* pactor;
-	float fresult = 0.0f;
-	if (apActor) {
-		pactor = static_cast<Actor*>(apActor);
-	} else {
-		pactor = 0;
-	}
-	bool bnpc = pactor->IsNpc();
-	bool bpc = pactor->IsPc();
-	if (bpc) {
-		float* v2 = &fAVDFatigueBase.Float();
-		fresult = afEndurance * fAVDFatigueEnduranceMult.Float() + *v2;
-	} else {
-		if (bnpc) {
-			float* v3 = &fAVDNPCFatigueBase.Float();
-			fresult = afEndurance * fAVDNPCFatigueEnduranceMult.Float() + *v3;
-		}
-	}
-	if (pactor->IsAutoCalc() && (bnpc && !bpc)) {
-		// The result is converted to float as unsigned.
-		fresult = static_cast<float>(static_cast<TESNPC*>(pactor->GetActorBase())->GetFormFatigueLeveled(true));
-	} else {
-		if (bpc) {
-			if (pactor->GetActorLevel()) {
-				double v6 = static_cast<double>(pactor->GetActorLevel() - 1);
-				fresult = fAVDFatigueLevelMult.Float() * v6 + fresult;
-			}
-		}
-	}
-	return fresult;
+    Actor* pactor;
+    float fresult = 0.0f;
+    if (apActor) {
+        pactor = static_cast<Actor*>(apActor);
+    }
+    else {
+        pactor = 0;
+    }
+    bool bnpc = pactor->IsNpc();
+    bool bpc = pactor->IsPc();
+    if (bpc) {
+        float* v2 = &fAVDFatigueBase.Float();
+        fresult = afEndurance * fAVDFatigueEnduranceMult.Float() + *v2;
+    }
+    else {
+        if (bnpc) {
+            float* v3 = &fAVDNPCFatigueBase.Float();
+            fresult = afEndurance * fAVDNPCFatigueEnduranceMult.Float() + *v3;
+        }
+    }
+    if (pactor->IsAutoCalc() && (bnpc && !bpc)) {
+        // The result is converted to float as unsigned.
+        fresult = static_cast<float>(static_cast<TESNPC*>(pactor->GetActorBase())->GetFormFatigueLeveled(true));
+    }
+    else {
+        if (bpc) {
+            if (pactor->GetActorLevel()) {
+                double v6 = static_cast<double>(pactor->GetActorLevel() - 1);
+                fresult = fAVDFatigueLevelMult.Float() * v6 + fresult;
+            }
+        }
+    }
+    return fresult;
 }
 
 // The skill's derived value: its base plus the primary attribute's and luck's share (the clamped values, or when
 // abBaseDerivation is set the base values plus the permanent modifiers, clamped), plus the tag skill bonus when the
 // owner is an actor whose class tags the skill.
 float AiFormulas::AVDeriveSkill(ActorValueOwner* apActor, ActorValue::Index aiWhich, bool abBaseDerivation) {
-	float fValue = 0.0f;
-	if (!ActorValue::IsSkill(static_cast<ActorValue::Index>(aiWhich))) {
-		return fValue;
-	}
-	ActorValue::Index ePrimary = static_cast<ActorValue::Index>(-1);
-	AVGetDerivedSkillPrimaryAttributeAndBase(aiWhich, ePrimary, fValue);
-	if (ePrimary != static_cast<ActorValue::Index>(-1)) {
-		if (!static_cast<uint8_t>(abBaseDerivation)) {
-			float fLuck = apActor->GetClampedActorFloatValue(ActorValue::LUCK);
-			float fPrimary = apActor->GetClampedActorFloatValue(ePrimary);
-			fValue = CalculateDerivedSkillValue(fValue, fPrimary, fLuck);
-		} else {
-			float fLuckBase = apActor->GetBaseActorFloatValue(ActorValue::LUCK);
-			float fLuckSum = apActor->GetPermanentModifier(ActorValue::LUCK) + fLuckBase;
-			float fLuck = ActorValue::ClampActorValue(ActorValue::LUCK, fLuckSum);
-			float fPrimaryBase = apActor->GetBaseActorFloatValue(ePrimary);
-			float fPrimarySum = apActor->GetPermanentModifier(ePrimary) + fPrimaryBase;
-			float fPrimary = ActorValue::ClampActorValue(ePrimary, fPrimarySum);
-			fValue = CalculateDerivedSkillValue(fValue, fPrimary, fLuck);
-		}
-	}
-	TESForm* pForm = apActor->GetAsForm();
-	if (pForm && pForm->IsReference()) {
-		if (pForm->IsActor()) {
-			Actor* pActor = static_cast<Actor*>(pForm);
-			if (pActor->GetClass() && pActor->GetClass()->IsTagSkill(static_cast<ActorValue::Index>(aiWhich))) {
-				fValue = fValue + fAVDTagSkillBonus.Float();
-			}
-		}
-	}
-	return fValue;
+    float fValue = 0.0f;
+    if (!ActorValue::IsSkill(static_cast<ActorValue::Index>(aiWhich))) {
+        return fValue;
+    }
+    ActorValue::Index ePrimary = static_cast<ActorValue::Index>(-1);
+    AVGetDerivedSkillPrimaryAttributeAndBase(aiWhich, ePrimary, fValue);
+    if (ePrimary != static_cast<ActorValue::Index>(-1)) {
+        if (!static_cast<uint8_t>(abBaseDerivation)) {
+            float fLuck = apActor->GetClampedActorFloatValue(ActorValue::LUCK);
+            float fPrimary = apActor->GetClampedActorFloatValue(ePrimary);
+            fValue = CalculateDerivedSkillValue(fValue, fPrimary, fLuck);
+        }
+        else {
+            float fLuckBase = apActor->GetBaseActorFloatValue(ActorValue::LUCK);
+            float fLuckSum = apActor->GetPermanentModifier(ActorValue::LUCK) + fLuckBase;
+            float fLuck = ActorValue::ClampActorValue(ActorValue::LUCK, fLuckSum);
+            float fPrimaryBase = apActor->GetBaseActorFloatValue(ePrimary);
+            float fPrimarySum = apActor->GetPermanentModifier(ePrimary) + fPrimaryBase;
+            float fPrimary = ActorValue::ClampActorValue(ePrimary, fPrimarySum);
+            fValue = CalculateDerivedSkillValue(fValue, fPrimary, fLuck);
+        }
+    }
+    TESForm* pForm = apActor->GetAsForm();
+    if (pForm && pForm->IsReference()) {
+        if (pForm->IsActor()) {
+            Actor* pActor = static_cast<Actor*>(pForm);
+            if (pActor->GetClass() && pActor->GetClass()->IsTagSkill(static_cast<ActorValue::Index>(aiWhich))) {
+                fValue = fValue + fAVDTagSkillBonus.Float();
+            }
+        }
+    }
+    return fValue;
 }
 
 int32_t AiFormulas::GetActorDetectionSize(float afHeightOrLength) {
-	int32_t v2 = 1;
-	if (((&::fDetectionLargeActorThreshold)->Float()) < ((double)afHeightOrLength)) {
-		return (int32_t)(afHeightOrLength / ((&::fDetectionLargeActorThreshold)->Float()));
-	}
-	return v2;
+    int32_t v2 = 1;
+    if (((&::fDetectionLargeActorThreshold)->Float()) < ((double)afHeightOrLength)) {
+        return (int32_t)(afHeightOrLength / ((&::fDetectionLargeActorThreshold)->Float()));
+    }
+    return v2;
 }
 
-int32_t AiFormulas::GetActorDetectedTarget(int32_t aiPercepA, int32_t aiSneakB, int32_t aiLineofSite, int32_t aiVisual,
-	float afDistance, int32_t aiLightLevelB, int32_t aiBlindess, bool abInvisibilityB, int32_t aiBootweightB,
-	bool abMovingB, bool abSneakingB, bool abRunning, bool absleeping, bool abAlert, int32_t aiActionSound,
-	int32_t aiTargetSize, bool bExterior, bool abInCombat, int32_t aiAmbushValue, float& afSoundSubtotal,
-	float& afVisualSubtotal, float& afSkillSubtotal, const int32_t iLevelA, const int32_t iLevelB,
-	const int32_t iArmorB) {
-	double v32;
-	double fmaxDistance;
-	float fcalvalue = fSneakBaseValue.Float();
-	int32_t iSneakStart = iSneakStartBonus.Int();
-	int32_t iLevelModifiedSneaka = aiSneakB + iSneakLevelBonus.Int() * (iLevelB - iLevelA);
-	int32_t iLevelModifiedSneak =
-		iLevelModifiedSneaka + BSMAX(iSneakStart - iSneakStartBonusLevelPenatly.Int() * iLevelB, 0) - iArmorB;
-	float afAmbushMod = 0.0f;
-	if (aiAmbushValue == 1) {
-		afAmbushMod = fSneakAmbushTargetMod.Float();
-	} else {
-		if (static_cast<double>(aiAmbushValue) == 2.0) {
-			afAmbushMod = fSneakAmbushNonTargetMod.Float();
-		}
-	}
-	float* v25 = &fSneakPerceptionSkillMin.Float();
-	float* v26 = &fSneakPerceptionSkillMax.Float();
-	float v40 = (*v26 - fSneakPerceptionSkillMin.Float()) * (static_cast<double>(aiPercepA) / 10.0) + *v25;
-	double v39 = fSneakAlertMod.Float() * static_cast<double>(abAlert) + 1.0;
-	double v38 = gs_fSneakSleepBonus.Float() * static_cast<double>(absleeping) + v39;
-	float v41 = (fSneakCombatMod.Float() * static_cast<double>(abInCombat) + v38 + afAmbushMod) * v40;
-	if (abInvisibilityB) {
-		aiVisual = 0;
-	}
-	int32_t v56 = abMovingB;
-	if (bExterior) {
-		float* v27 = &fSneakExteriorDistanceMult.Float();
-		fmaxDistance = *v27 * fSneakMaxDistance.Float();
-	} else {
-		fmaxDistance = fSneakMaxDistance.Float();
-	}
-	float v64 = fmaxDistance;
-	float v36 = (v64 - afDistance) / v64;
-	float fDistanceAttenuation = BSMAX(v36, 0.0f);
-	float* v28 = &fSneakDistanceAttenuationExponent.Float();
-	float v58 = std::pow(static_cast<double>(fDistanceAttenuation), static_cast<double>(*v28));
-	float v42 = v58;
-	if (aiLineofSite <= 0 && aiAmbushValue != 1) {
-		v42 = v58 * fSneakSoundLosMult.Float();
-	}
-	float* v29 = &fSneakBootWeightBase.Float();
-	float v52 = (static_cast<double>(aiBootweightB) * fSneakBootWeightMult.Float() + *v29) * static_cast<double>(v56);
-	float frunmult = 1.0f;
-	if (abRunning) {
-		frunmult = fSneakRunningMult.Float();
-	}
-	float v53 = v52 * frunmult;
-	int32_t v45 = aiActionSound * static_cast<int32_t>(fSneakActionMult.Float());
-	float v35 = v42 * fSneakSoundsMult.Float() * (static_cast<double>(v45) + v53);
-	float fSounds = BSMAX(v35, 0.0f);
-	afSoundSubtotal = fSounds;
-	double v34 = fSneakLightMoveMult.Float() * static_cast<double>(v56) + 1.0;
-	float v44 = fSneakLightRunMult.Float() * static_cast<double>(abRunning) + v34;
-	double v33 = static_cast<double>(aiLightLevelB) + fDetectionSneakLightMod.Float();
-	float v67 = fSneakLightMult.Float() * v33;
-	if (aiTargetSize > 1) {
-		v32 = fDetectionLargeActorSizeMult.Float() * (static_cast<double>(aiTargetSize) - 1.0) + 1.0;
-	} else {
-		v32 = 1.0;
-	}
-	float fsize = v32;
-	float fblind = static_cast<float>((100 - aiBlindess) / 100);
-	float v31 = static_cast<double>(aiVisual) * v58 * v44 * v67 * fblind * fsize;
-	float fvisual = BSMAX(v31, 0.0f);
-	if (abInvisibilityB) {
-		fvisual = fvisual * fSneakStealthBoyMult.Float();
-	}
-	afVisualSubtotal = fvisual;
-	float v66 = static_cast<float>(abSneakingB * iLevelModifiedSneak);
-	float fSkill = v41 * v58;
-	float fSkillscore = (fSkill - v66) * fSneakSkillMult.Float();
-	afSkillSubtotal = fSkillscore;
-	float fcalvalue_2 = fcalvalue + fSounds + fvisual + fSkillscore;
-	if (!(fcalvalue_2 < 1.0) || !(fcalvalue_2 > 0.0)) {
-		return static_cast<int32_t>(fcalvalue_2);
-	} else {
-		return 1;
-	}
+int32_t AiFormulas::GetActorDetectedTarget(
+    int32_t aiPercepA,
+    int32_t aiSneakB,
+    int32_t aiLineofSite,
+    int32_t aiVisual,
+    float afDistance,
+    int32_t aiLightLevelB,
+    int32_t aiBlindess,
+    bool abInvisibilityB,
+    int32_t aiBootweightB,
+    bool abMovingB,
+    bool abSneakingB,
+    bool abRunning,
+    bool absleeping,
+    bool abAlert,
+    int32_t aiActionSound,
+    int32_t aiTargetSize,
+    bool bExterior,
+    bool abInCombat,
+    int32_t aiAmbushValue,
+    float& afSoundSubtotal,
+    float& afVisualSubtotal,
+    float& afSkillSubtotal,
+    const int32_t iLevelA,
+    const int32_t iLevelB,
+    const int32_t iArmorB
+) {
+    double v32;
+    double fmaxDistance;
+    float fcalvalue = fSneakBaseValue.Float();
+    int32_t iSneakStart = iSneakStartBonus.Int();
+    int32_t iLevelModifiedSneaka = aiSneakB + iSneakLevelBonus.Int() * (iLevelB - iLevelA);
+    int32_t iLevelModifiedSneak =
+        iLevelModifiedSneaka + BSMAX(iSneakStart - iSneakStartBonusLevelPenatly.Int() * iLevelB, 0) - iArmorB;
+    float afAmbushMod = 0.0f;
+    if (aiAmbushValue == 1) {
+        afAmbushMod = fSneakAmbushTargetMod.Float();
+    }
+    else {
+        if (static_cast<double>(aiAmbushValue) == 2.0) {
+            afAmbushMod = fSneakAmbushNonTargetMod.Float();
+        }
+    }
+    float* v25 = &fSneakPerceptionSkillMin.Float();
+    float* v26 = &fSneakPerceptionSkillMax.Float();
+    float v40 = (*v26 - fSneakPerceptionSkillMin.Float()) * (static_cast<double>(aiPercepA) / 10.0) + *v25;
+    double v39 = fSneakAlertMod.Float() * static_cast<double>(abAlert) + 1.0;
+    double v38 = gs_fSneakSleepBonus.Float() * static_cast<double>(absleeping) + v39;
+    float v41 = (fSneakCombatMod.Float() * static_cast<double>(abInCombat) + v38 + afAmbushMod) * v40;
+    if (abInvisibilityB) {
+        aiVisual = 0;
+    }
+    int32_t v56 = abMovingB;
+    if (bExterior) {
+        float* v27 = &fSneakExteriorDistanceMult.Float();
+        fmaxDistance = *v27 * fSneakMaxDistance.Float();
+    }
+    else {
+        fmaxDistance = fSneakMaxDistance.Float();
+    }
+    float v64 = fmaxDistance;
+    float v36 = (v64 - afDistance) / v64;
+    float fDistanceAttenuation = BSMAX(v36, 0.0f);
+    float* v28 = &fSneakDistanceAttenuationExponent.Float();
+    float v58 = std::pow(static_cast<double>(fDistanceAttenuation), static_cast<double>(*v28));
+    float v42 = v58;
+    if (aiLineofSite <= 0 && aiAmbushValue != 1) {
+        v42 = v58 * fSneakSoundLosMult.Float();
+    }
+    float* v29 = &fSneakBootWeightBase.Float();
+    float v52 = (static_cast<double>(aiBootweightB) * fSneakBootWeightMult.Float() + *v29) * static_cast<double>(v56);
+    float frunmult = 1.0f;
+    if (abRunning) {
+        frunmult = fSneakRunningMult.Float();
+    }
+    float v53 = v52 * frunmult;
+    int32_t v45 = aiActionSound * static_cast<int32_t>(fSneakActionMult.Float());
+    float v35 = v42 * fSneakSoundsMult.Float() * (static_cast<double>(v45) + v53);
+    float fSounds = BSMAX(v35, 0.0f);
+    afSoundSubtotal = fSounds;
+    double v34 = fSneakLightMoveMult.Float() * static_cast<double>(v56) + 1.0;
+    float v44 = fSneakLightRunMult.Float() * static_cast<double>(abRunning) + v34;
+    double v33 = static_cast<double>(aiLightLevelB) + fDetectionSneakLightMod.Float();
+    float v67 = fSneakLightMult.Float() * v33;
+    if (aiTargetSize > 1) {
+        v32 = fDetectionLargeActorSizeMult.Float() * (static_cast<double>(aiTargetSize) - 1.0) + 1.0;
+    }
+    else {
+        v32 = 1.0;
+    }
+    float fsize = v32;
+    float fblind = static_cast<float>((100 - aiBlindess) / 100);
+    float v31 = static_cast<double>(aiVisual) * v58 * v44 * v67 * fblind * fsize;
+    float fvisual = BSMAX(v31, 0.0f);
+    if (abInvisibilityB) {
+        fvisual = fvisual * fSneakStealthBoyMult.Float();
+    }
+    afVisualSubtotal = fvisual;
+    float v66 = static_cast<float>(abSneakingB * iLevelModifiedSneak);
+    float fSkill = v41 * v58;
+    float fSkillscore = (fSkill - v66) * fSneakSkillMult.Float();
+    afSkillSubtotal = fSkillscore;
+    float fcalvalue_2 = fcalvalue + fSounds + fvisual + fSkillscore;
+    if (!(fcalvalue_2 < 1.0) || !(fcalvalue_2 > 0.0)) {
+        return static_cast<int32_t>(fcalvalue_2);
+    }
+    else {
+        return 1;
+    }
 }
 
-int32_t AiFormulas::GetActorDispositiontoTarget(int32_t aiActorBaseDisp, int32_t aiCharismaTarget,
-	int32_t aiResponActor, int32_t aiKarmaTarget, int32_t aiRaceReactionTarget, int32_t aiFactionReactionTarget,
-	int32_t aiFactionRankTarget, int32_t aiWeaponStatusTarget, int32_t aiDiseaseStatusTarget, int32_t aiTargetMod,
-	bool abcreature) {
-	float* fCharBase = &fDispTargetCharBase.Float();
-	float* fCharMult = &fDispTargetCharMult.Float();
-	int32_t fCharVal =
-		static_cast<int32_t>((static_cast<double>(aiCharismaTarget) - fDispTargetCharOffset.Float()) * *fCharMult +
-			*fCharBase);
-	int32_t iResponsibility = 0;
-	if (!abcreature) {
-		double fKarma = static_cast<double>(aiKarmaTarget) * fDispTargetKarmaMult.Float();
-		float* v13 = &fDispActorRespBase.Float();
-		iResponsibility =
-			static_cast<int32_t>((static_cast<double>(aiResponActor) * fDispActorRespMult.Float() + *v13) * fKarma);
-	}
-	int32_t iRace = aiRaceReactionTarget * static_cast<int32_t>(fDispTargetRaceMult.Float());
-	double iFactionModifier = fDispTargetFactionMult.Float() * static_cast<double>(aiFactionReactionTarget);
-	float* iRankBase = &fDispTargetFactionRankBase.Float();
-	int32_t iFaction =
-		static_cast<int32_t>((fDispTargetFactionMult.Float() * static_cast<double>(aiFactionRankTarget) + *iRankBase) *
-			iFactionModifier);
-	int32_t iWeapon = 0;
-	if (!abcreature) {
-		iWeapon = aiWeaponStatusTarget * static_cast<int32_t>(fDispTargetWeaponBase.Float());
-	}
-	return aiTargetMod +
-		(aiDiseaseStatusTarget * static_cast<int32_t>(fDispTargetDiseaseBase.Float()) +
-			(iWeapon + (iFaction + (iRace + (iResponsibility + (fCharVal + aiActorBaseDisp))))));
+int32_t AiFormulas::GetActorDispositiontoTarget(
+    int32_t aiActorBaseDisp,
+    int32_t aiCharismaTarget,
+    int32_t aiResponActor,
+    int32_t aiKarmaTarget,
+    int32_t aiRaceReactionTarget,
+    int32_t aiFactionReactionTarget,
+    int32_t aiFactionRankTarget,
+    int32_t aiWeaponStatusTarget,
+    int32_t aiDiseaseStatusTarget,
+    int32_t aiTargetMod,
+    bool abcreature
+) {
+    float* fCharBase = &fDispTargetCharBase.Float();
+    float* fCharMult = &fDispTargetCharMult.Float();
+    int32_t fCharVal = static_cast<int32_t>(
+        (static_cast<double>(aiCharismaTarget) - fDispTargetCharOffset.Float()) * *fCharMult + *fCharBase
+    );
+    int32_t iResponsibility = 0;
+    if (!abcreature) {
+        double fKarma = static_cast<double>(aiKarmaTarget) * fDispTargetKarmaMult.Float();
+        float* v13 = &fDispActorRespBase.Float();
+        iResponsibility =
+            static_cast<int32_t>((static_cast<double>(aiResponActor) * fDispActorRespMult.Float() + *v13) * fKarma);
+    }
+    int32_t iRace = aiRaceReactionTarget * static_cast<int32_t>(fDispTargetRaceMult.Float());
+    double iFactionModifier = fDispTargetFactionMult.Float() * static_cast<double>(aiFactionReactionTarget);
+    float* iRankBase = &fDispTargetFactionRankBase.Float();
+    int32_t iFaction = static_cast<int32_t>(
+        (fDispTargetFactionMult.Float() * static_cast<double>(aiFactionRankTarget) + *iRankBase) * iFactionModifier
+    );
+    int32_t iWeapon = 0;
+    if (!abcreature) {
+        iWeapon = aiWeaponStatusTarget * static_cast<int32_t>(fDispTargetWeaponBase.Float());
+    }
+    return aiTargetMod +
+        (aiDiseaseStatusTarget * static_cast<int32_t>(fDispTargetDiseaseBase.Float()) +
+         (iWeapon + (iFaction + (iRace + (iResponsibility + (fCharVal + aiActorBaseDisp))))));
 }
 
-int32_t AiFormulas::GetDetectedEvent(int32_t aiPercep, int32_t aiLineofSite, float afDistance, int32_t aiBlindess,
-	int32_t aiLightLevel, bool absleeping, bool abAlert, bool abInCombat, int32_t aiActionSound, int32_t aiVisual,
-	bool abExterior) {
-	double fmaxDistance;
-	float fcalvalue = fSneakBaseValue.Float();
-	float* v11 = &fSneakPerceptionSkillMin.Float();
-	float* v12 = &fSneakPerceptionSkillMax.Float();
-	float v23 = (*v12 - fSneakPerceptionSkillMin.Float()) * (static_cast<double>(aiPercep) / 10.0) + *v11;
-	double v22 = fSneakAlertMod.Float() * static_cast<double>(abAlert) + 1.0;
-	double v21 = gs_fSneakSleepBonus.Float() * static_cast<double>(absleeping) + v22;
-	float v24 = (fSneakCombatMod.Float() * static_cast<double>(abInCombat) + v21) * v23;
-	if (abExterior) {
-		float* v13 = &fSneakExteriorDistanceMult.Float();
-		fmaxDistance = *v13 * fSneakMaxDistance.Float();
-	} else {
-		fmaxDistance = fSneakMaxDistance.Float();
-	}
-	float v34 = fmaxDistance;
-	float v19 = (v34 - afDistance) / v34;
-	float fDistanceAttenuation = BSMAX(v19, 0.0f);
-	float* v14 = &fSneakDistanceAttenuationExponent.Float();
-	float v31 = std::pow(static_cast<double>(fDistanceAttenuation), static_cast<double>(*v14));
-	float v25 = v31;
-	if (aiLineofSite <= 0) {
-		v25 = v31 * fSneakSoundLosMult.Float();
-	}
-	int32_t v26 = aiActionSound * static_cast<int32_t>(fSneakActionMult.Float());
-	float v18 = v25 * fSneakSoundsMult.Float() * static_cast<double>(v26);
-	float fSounds = BSMAX(v18, 0.0f);
-	double v17 = static_cast<double>(aiLightLevel) + fDetectionSneakLightMod.Float();
-	float v36 = fSneakLightMult.Float() * v17;
-	float fblind = static_cast<float>((100 - aiBlindess) / 100);
-	float v16 = static_cast<double>(aiVisual) * v31 * v36 * fblind;
-	float fvisual = BSMAX(v16, 0.0f);
-	float fcalvalue_2 = fcalvalue + fSounds + fvisual;
-	if (!(fcalvalue_2 < 1.0) || !(fcalvalue_2 > 0.0)) {
-		return static_cast<int32_t>(fcalvalue_2);
-	} else {
-		return 1;
-	}
+int32_t AiFormulas::GetDetectedEvent(
+    int32_t aiPercep,
+    int32_t aiLineofSite,
+    float afDistance,
+    int32_t aiBlindess,
+    int32_t aiLightLevel,
+    bool absleeping,
+    bool abAlert,
+    bool abInCombat,
+    int32_t aiActionSound,
+    int32_t aiVisual,
+    bool abExterior
+) {
+    double fmaxDistance;
+    float fcalvalue = fSneakBaseValue.Float();
+    float* v11 = &fSneakPerceptionSkillMin.Float();
+    float* v12 = &fSneakPerceptionSkillMax.Float();
+    float v23 = (*v12 - fSneakPerceptionSkillMin.Float()) * (static_cast<double>(aiPercep) / 10.0) + *v11;
+    double v22 = fSneakAlertMod.Float() * static_cast<double>(abAlert) + 1.0;
+    double v21 = gs_fSneakSleepBonus.Float() * static_cast<double>(absleeping) + v22;
+    float v24 = (fSneakCombatMod.Float() * static_cast<double>(abInCombat) + v21) * v23;
+    if (abExterior) {
+        float* v13 = &fSneakExteriorDistanceMult.Float();
+        fmaxDistance = *v13 * fSneakMaxDistance.Float();
+    }
+    else {
+        fmaxDistance = fSneakMaxDistance.Float();
+    }
+    float v34 = fmaxDistance;
+    float v19 = (v34 - afDistance) / v34;
+    float fDistanceAttenuation = BSMAX(v19, 0.0f);
+    float* v14 = &fSneakDistanceAttenuationExponent.Float();
+    float v31 = std::pow(static_cast<double>(fDistanceAttenuation), static_cast<double>(*v14));
+    float v25 = v31;
+    if (aiLineofSite <= 0) {
+        v25 = v31 * fSneakSoundLosMult.Float();
+    }
+    int32_t v26 = aiActionSound * static_cast<int32_t>(fSneakActionMult.Float());
+    float v18 = v25 * fSneakSoundsMult.Float() * static_cast<double>(v26);
+    float fSounds = BSMAX(v18, 0.0f);
+    double v17 = static_cast<double>(aiLightLevel) + fDetectionSneakLightMod.Float();
+    float v36 = fSneakLightMult.Float() * v17;
+    float fblind = static_cast<float>((100 - aiBlindess) / 100);
+    float v16 = static_cast<double>(aiVisual) * v31 * v36 * fblind;
+    float fvisual = BSMAX(v16, 0.0f);
+    float fcalvalue_2 = fcalvalue + fSounds + fvisual;
+    if (!(fcalvalue_2 < 1.0) || !(fcalvalue_2 > 0.0)) {
+        return static_cast<int32_t>(fcalvalue_2);
+    }
+    else {
+        return 1;
+    }
 }
 
 float AiFormulas::GetFollowRadiusStop(float afbasePackRadius) {
-	float fSlowdown = afbasePackRadius - fFollowSlowdownZoneWidth.Float();
-	float fStop = afbasePackRadius * ::fFollowStopZoneMinMult.Float();
-	return BSMAX(fStop, fSlowdown);
+    float fSlowdown = afbasePackRadius - fFollowSlowdownZoneWidth.Float();
+    float fStop = afbasePackRadius * ::fFollowStopZoneMinMult.Float();
+    return BSMAX(fStop, fSlowdown);
 }
 
 float AiFormulas::GetFollowRadiusSlow(float afbasePackRadius) {
-	return afbasePackRadius;
+    return afbasePackRadius;
 }
 
 float AiFormulas::AVDeriveCarryWeight(ActorValueOwner* apActor, [[maybe_unused]] ActorValue::Index aiWhich) {
-	double clampedActorFloatValue = (double)apActor->GetClampedActorFloatValue(static_cast<ActorValue::Index>(5));
-	double v3 = ((&::fAVDCarryWeightMult)->Float()) * clampedActorFloatValue;
-	return (float)(((&gs_fAVDCarryWeightsBase)->Float()) + v3);
+    double clampedActorFloatValue = (double)apActor->GetClampedActorFloatValue(static_cast<ActorValue::Index>(5));
+    double v3 = ((&::fAVDCarryWeightMult)->Float()) * clampedActorFloatValue;
+    return (float)(((&gs_fAVDCarryWeightsBase)->Float()) + v3);
 }
 
 float AiFormulas::AVDeriveFromPrimary(ActorValueOwner* apActor, ActorValue::Index aiWhich) {
-	float x_4;
-	double v5;
-	double clampedActorValueF;
-	float v7;
-	float v8 = (float)0.0;
-	if (((int32_t)aiWhich) == 17) {
-		clampedActorValueF = (double)apActor->GetClampedActorFloatValue(static_cast<ActorValue::Index>(5));
-		v5 = ((&fAVDMeleeDamageStrengthOffset)->Float()) + clampedActorValueF;
-		x_4 = (float)(((&::fAVDMeleeDamageStrengthMult)->Float()) * v5);
-		v7 = (float)std::floorf(x_4);
-		if (v7 > 0.0) {
-			return (float)(v8 + v7);
-		}
-	}
-	return (float)(v8);
+    float x_4;
+    double v5;
+    double clampedActorValueF;
+    float v7;
+    float v8 = (float)0.0;
+    if (((int32_t)aiWhich) == 17) {
+        clampedActorValueF = (double)apActor->GetClampedActorFloatValue(static_cast<ActorValue::Index>(5));
+        v5 = ((&fAVDMeleeDamageStrengthOffset)->Float()) + clampedActorValueF;
+        x_4 = (float)(((&::fAVDMeleeDamageStrengthMult)->Float()) * v5);
+        v7 = (float)std::floorf(x_4);
+        if (v7 > 0.0) {
+            return (float)(v8 + v7);
+        }
+    }
+    return (float)(v8);
 }
 
 float AiFormulas::GetFollowRadiusWalk(float afbasePackRadius) {
-	return (float)(afbasePackRadius * ((&fFollowWalkZoneMult)->Float()));
+    return (float)(afbasePackRadius * ((&fFollowWalkZoneMult)->Float()));
 }
 
 float AiFormulas::GetFollowRadiusStartMoving(float afbasePackRadius) {
-	return (float)((((&fFollowMatchSpeedZoneWidth)->Float()) * 0.5) + afbasePackRadius);
+    return (float)((((&fFollowMatchSpeedZoneWidth)->Float()) * 0.5) + afbasePackRadius);
 }
 
 float AiFormulas::GetFollowRadiusMatchSpeed(float afbasePackRadius) {
-	return (float)(afbasePackRadius + ((&fFollowMatchSpeedZoneWidth)->Float()));
+    return (float)(afbasePackRadius + ((&fFollowMatchSpeedZoneWidth)->Float()));
 }
 
-int32_t AiFormulas::ComputePickpocketSuccess(int32_t aiSneakSkillModed, int32_t aiTargetSneakModed,
-	float fAmountofItem) {
-	float* v3 = &(&fPickPocketActorSkillBase)->Float();
-	float v7 = (float)((((double)aiSneakSkillModed) * ((&::fPickPocketActorSkillMult)->Float())) + (*v3));
-	float* v4 = &(&::fPickPocketTargetSkillBase)->Float();
-	float v9 = (float)((((double)aiTargetSneakModed) * ((&::fPickPocketTargetSkillMult)->Float())) + (*v4));
-	float* v5 = &(&::fPickPocketAmountBase)->Float();
-	float v10 = (((&::fPickPocketAmountMult)->Float()) * fAmountofItem) + (*v5);
-	int32_t v8 = (int32_t)((v7 + v9) + v10);
-	if (((&::fPickPocketMinChance)->Float()) > ((double)v8)) {
-		return (int32_t)((&::fPickPocketMinChance)->Float());
-	}
-	if (((&::fPickPocketMaxChance)->Float()) < ((double)v8)) {
-		return (int32_t)((&::fPickPocketMaxChance)->Float());
-	}
-	return v8;
+int32_t
+AiFormulas::ComputePickpocketSuccess(int32_t aiSneakSkillModed, int32_t aiTargetSneakModed, float fAmountofItem) {
+    float* v3 = &(&fPickPocketActorSkillBase)->Float();
+    float v7 = (float)((((double)aiSneakSkillModed) * ((&::fPickPocketActorSkillMult)->Float())) + (*v3));
+    float* v4 = &(&::fPickPocketTargetSkillBase)->Float();
+    float v9 = (float)((((double)aiTargetSneakModed) * ((&::fPickPocketTargetSkillMult)->Float())) + (*v4));
+    float* v5 = &(&::fPickPocketAmountBase)->Float();
+    float v10 = (((&::fPickPocketAmountMult)->Float()) * fAmountofItem) + (*v5);
+    int32_t v8 = (int32_t)((v7 + v9) + v10);
+    if (((&::fPickPocketMinChance)->Float()) > ((double)v8)) {
+        return (int32_t)((&::fPickPocketMinChance)->Float());
+    }
+    if (((&::fPickPocketMaxChance)->Float()) < ((double)v8)) {
+        return (int32_t)((&::fPickPocketMaxChance)->Float());
+    }
+    return v8;
 }
 
-void AiFormulas::ComputeRandomSandboxActivityStartAndDuration(int32_t aiActivity, float& afStartOut,
-	float& afDurationOut) {
-	PerActivitySettings* v7 = &SandboxActivitySettings[aiActivity];
-	float f = v7->StartMax->Float();
-	float* v3 = &v7->StartMin->Float();
-	afStartOut = AiFormulas::RandomHour(*v3, f);
-	float a2a = v7->DurMax->Float();
-	float* v4 = &v7->DurMin->Float();
-	afDurationOut = RandomFloat(*v4, a2a);
+void AiFormulas::ComputeRandomSandboxActivityStartAndDuration(
+    int32_t aiActivity,
+    float& afStartOut,
+    float& afDurationOut
+) {
+    PerActivitySettings* v7 = &SandboxActivitySettings[aiActivity];
+    float f = v7->StartMax->Float();
+    float* v3 = &v7->StartMin->Float();
+    afStartOut = AiFormulas::RandomHour(*v3, f);
+    float a2a = v7->DurMax->Float();
+    float* v4 = &v7->DurMin->Float();
+    afDurationOut = RandomFloat(*v4, a2a);
 }
 
 float AiFormulas::GetFollowRadiusFudgeForMultipleFollowers(Actor* apActor, Actor* apFollowTarget) {
-	ExtraFollower* pfollowerExtra;
-	using followerDists_t = BSSimpleArray<FollowerDist, 1024>;
-	float ffudge = 0.0f;
-	if (apFollowTarget) {
-		pfollowerExtra = (&apFollowTarget->m_Extra)->GetFollowerExtra();
-	} else {
-		pfollowerExtra = 0;
-	}
-	if (pfollowerExtra) {
-		uint32_t inumActualFollowers = 0;
-		if (!pfollowerExtra->pActorlist->IsEmpty()) {
-			for (Actor* pfollower : *pfollowerExtra->pActorlist) {
-				TESPackage* ppack = pfollower->GetCurrentPackage();
-				if (ppack) {
-					if (ppack->GetPackType() == PACKAGE_TYPE_FOLLOW) {
-						++inumActualFollowers;
-					}
-				}
-			}
-		}
-		if (inumActualFollowers) {
-			followerDists_t followerDists(inumActualFollowers);
-			uint32_t i = 0;
-			for (Actor* pfollower_2 : *pfollowerExtra->pActorlist) {
-				TESPackage* ppack_2 = pfollower_2->GetCurrentPackage();
-				if (ppack_2) {
-					if (ppack_2->GetPackType() == PACKAGE_TYPE_FOLLOW) {
-						FollowerDist* followerInfo = &followerDists.GetAt(static_cast<int32_t>(i));
-						followerInfo->pActor = pfollower_2;
-						const NiPoint3* a2 = &pfollower_2->GetLocationOnReference();
-						const NiPoint3* v2 = &apFollowTarget->GetLocationOnReference();
-						double v4 = (*v2 - *a2).SqrLength();
-						followerInfo->fActualDistSqr = v4;
-						double v5 = static_cast<double>(iAIDistanceRadiusMinLocation.Int());
-						followerInfo->fPackDesiredDist = v5;
-						double Radius = pfollower_2->GetRadius();
-						followerInfo->fActorRadius = Radius;
-						double PackageRadiusActorToRefTarget = ppack_2->GetPackageRadiusActorToRefTarget(apActor, 0);
-						followerInfo->fPackDesiredDist = PackageRadiusActorToRefTarget;
-						++i;
-					}
-				}
-			}
-			followerDists.Sort(&CompareFollowerDist);
-			float fminFollowDist = 0.0f;
-			for (i = 0;; ++i) {
-				uint32_t uiSize = followerDists.iSize;
-				if (i >= uiSize) {
-					break;
-				}
-				FollowerDist* followerInfo_2 = &followerDists.GetAt(static_cast<int32_t>(i));
-				if (i) {
-					FollowerDist* v9 = &followerDists.GetAt(static_cast<int32_t>(i - 1));
-					double v15 = v9->fActorRadius + followerInfo_2->fActorRadius;
-					float* v10 = &fFollowSpaceBetweenFollowers.Float();
-					fminFollowDist = *v10 + v15 + fminFollowDist;
-				}
-				fminFollowDist = BSMAX(fminFollowDist, followerInfo_2->fPackDesiredDist);
-				if (followerDists.GetAt(static_cast<int32_t>(i)).pActor == apActor) {
-					FollowerDist* v11 = &followerDists.GetAt(static_cast<int32_t>(i));
-					ffudge = fminFollowDist - v11->fPackDesiredDist;
-					break;
-				}
-			}
-		}
-	}
-	return ffudge;
+    ExtraFollower* pfollowerExtra;
+    using followerDists_t = BSSimpleArray<FollowerDist, 1024>;
+    float ffudge = 0.0f;
+    if (apFollowTarget) {
+        pfollowerExtra = (&apFollowTarget->m_Extra)->GetFollowerExtra();
+    }
+    else {
+        pfollowerExtra = 0;
+    }
+    if (pfollowerExtra) {
+        uint32_t inumActualFollowers = 0;
+        if (!pfollowerExtra->pActorlist->IsEmpty()) {
+            for (Actor* pfollower : *pfollowerExtra->pActorlist) {
+                TESPackage* ppack = pfollower->GetCurrentPackage();
+                if (ppack) {
+                    if (ppack->GetPackType() == PACKAGE_TYPE_FOLLOW) {
+                        ++inumActualFollowers;
+                    }
+                }
+            }
+        }
+        if (inumActualFollowers) {
+            followerDists_t followerDists(inumActualFollowers);
+            uint32_t i = 0;
+            for (Actor* pfollower_2 : *pfollowerExtra->pActorlist) {
+                TESPackage* ppack_2 = pfollower_2->GetCurrentPackage();
+                if (ppack_2) {
+                    if (ppack_2->GetPackType() == PACKAGE_TYPE_FOLLOW) {
+                        FollowerDist* followerInfo = &followerDists.GetAt(static_cast<int32_t>(i));
+                        followerInfo->pActor = pfollower_2;
+                        const NiPoint3* a2 = &pfollower_2->GetLocationOnReference();
+                        const NiPoint3* v2 = &apFollowTarget->GetLocationOnReference();
+                        double v4 = (*v2 - *a2).SqrLength();
+                        followerInfo->fActualDistSqr = v4;
+                        double v5 = static_cast<double>(iAIDistanceRadiusMinLocation.Int());
+                        followerInfo->fPackDesiredDist = v5;
+                        double Radius = pfollower_2->GetRadius();
+                        followerInfo->fActorRadius = Radius;
+                        double PackageRadiusActorToRefTarget = ppack_2->GetPackageRadiusActorToRefTarget(apActor, 0);
+                        followerInfo->fPackDesiredDist = PackageRadiusActorToRefTarget;
+                        ++i;
+                    }
+                }
+            }
+            followerDists.Sort(&CompareFollowerDist);
+            float fminFollowDist = 0.0f;
+            for (i = 0;; ++i) {
+                uint32_t uiSize = followerDists.iSize;
+                if (i >= uiSize) {
+                    break;
+                }
+                FollowerDist* followerInfo_2 = &followerDists.GetAt(static_cast<int32_t>(i));
+                if (i) {
+                    FollowerDist* v9 = &followerDists.GetAt(static_cast<int32_t>(i - 1));
+                    double v15 = v9->fActorRadius + followerInfo_2->fActorRadius;
+                    float* v10 = &fFollowSpaceBetweenFollowers.Float();
+                    fminFollowDist = *v10 + v15 + fminFollowDist;
+                }
+                fminFollowDist = BSMAX(fminFollowDist, followerInfo_2->fPackDesiredDist);
+                if (followerDists.GetAt(static_cast<int32_t>(i)).pActor == apActor) {
+                    FollowerDist* v11 = &followerDists.GetAt(static_cast<int32_t>(i));
+                    ffudge = fminFollowDist - v11->fPackDesiredDist;
+                    break;
+                }
+            }
+        }
+    }
+    return ffudge;
 }
 
 float AiFormulas::ComputeRandomSandboxSubProcessDuration(int32_t aiEngergyLevel, int32_t aiProcIndex) {
-	float fEngergyLevel = static_cast<float>(aiEngergyLevel);
-	float* fBase = &fSandboxDurationBase.Float();
-	float fDurationVal = *fBase * fSandboxDurationMultProc[aiProcIndex]->Float();
-	float* fEnergyMult = &fSandboxEnergyMult.Float();
-	float fEnergyVal = *fEnergyMult * fSandboxEnergyMultProc[aiProcIndex]->Float();
-	float fFinalValue = (fEngergyLevel * fEnergyVal + 1.0) * fDurationVal;
-	float fMin = (1.0 - fSandboxDurationRangeMult.Float()) * fFinalValue;
-	float fMax = (fSandboxDurationRangeMult.Float() + 1.0) * fFinalValue;
-	return RandomFloat(fMin, fMax);
+    float fEngergyLevel = static_cast<float>(aiEngergyLevel);
+    float* fBase = &fSandboxDurationBase.Float();
+    float fDurationVal = *fBase * fSandboxDurationMultProc[aiProcIndex]->Float();
+    float* fEnergyMult = &fSandboxEnergyMult.Float();
+    float fEnergyVal = *fEnergyMult * fSandboxEnergyMultProc[aiProcIndex]->Float();
+    float fFinalValue = (fEngergyLevel * fEnergyVal + 1.0) * fDurationVal;
+    float fMin = (1.0 - fSandboxDurationRangeMult.Float()) * fFinalValue;
+    float fMax = (fSandboxDurationRangeMult.Float() + 1.0) * fFinalValue;
+    return RandomFloat(fMin, fMax);
 }
 
 float AiFormulas::AVDeriveHealingRate(ActorValueOwner* apActor, ActorValue::Index aiWhich) {
-	float v4 = 0.0;
-	switch (apActor->GetClampedActorValue(ActorValue::ENDURANCE)) {
-	case 6: {
-		v4 = fAVDHealRateEndurance6Bonus.Float();
-		break;
-	}
-	case 7: {
-		v4 = fAVDHealRateEndurance7Bonus.Float();
-		break;
-	}
-	case 8: {
-		v4 = fAVDHealRateEndurance8Bonus.Float();
-		break;
-	}
-	case 9: {
-		v4 = fAVDHealRateEndurance9Bonus.Float();
-		break;
-	}
-	case 10: {
-		v4 = fAVDHealRateEndurance10Bonus.Float();
-		break;
-	}
-	default: {
-		return v4;
-	}
-	}
-	return v4;
+    float v4 = 0.0;
+    switch (apActor->GetClampedActorValue(ActorValue::ENDURANCE)) {
+        case 6: {
+            v4 = fAVDHealRateEndurance6Bonus.Float();
+            break;
+        }
+        case 7: {
+            v4 = fAVDHealRateEndurance7Bonus.Float();
+            break;
+        }
+        case 8: {
+            v4 = fAVDHealRateEndurance8Bonus.Float();
+            break;
+        }
+        case 9: {
+            v4 = fAVDHealRateEndurance9Bonus.Float();
+            break;
+        }
+        case 10: {
+            v4 = fAVDHealRateEndurance10Bonus.Float();
+            break;
+        }
+        default: {
+            return v4;
+        }
+    }
+    return v4;
 }
 
 float AiFormulas::AVDeriveUnarmedDamage(ActorValueOwner* apActor, ActorValue::Index aiWhich) {
-	float v6 = 0.0;
-	if (aiWhich == ActorValue::UNARMED_DAMAGE) {
-		float* v2 = &fAVDUnarmedDamageMult.Float();
-		double v5 = apActor->GetActorFloatValue(ActorValue::UNARMED) * *v2;
-		return fAVDUnarmedDamageBase.Float() + v5;
-	}
-	return v6;
+    float v6 = 0.0;
+    if (aiWhich == ActorValue::UNARMED_DAMAGE) {
+        float* v2 = &fAVDUnarmedDamageMult.Float();
+        double v5 = apActor->GetActorFloatValue(ActorValue::UNARMED) * *v2;
+        return fAVDUnarmedDamageBase.Float() + v5;
+    }
+    return v6;
 }
 
 double AiFormulas::ComputeTimeTillNextWander(int32_t a1) {
-	float* v1 = &fAIEnergyLevelBase.Float();
-	float v3 = static_cast<double>(a1) * gs_fAIEngergyLevelMult.Float() + *v1;
-	return static_cast<float>((fAIMaxWanderTime.Float() - v3) / 2.0);
+    float* v1 = &fAIEnergyLevelBase.Float();
+    float v3 = static_cast<double>(a1) * gs_fAIEngergyLevelMult.Float() + *v1;
+    return static_cast<float>((fAIMaxWanderTime.Float() - v3) / 2.0);
 }

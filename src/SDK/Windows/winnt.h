@@ -20,11 +20,11 @@ typedef void* HANDLE;
 
 // The SDK's LARGE_INTEGER (8 bytes): a 64-bit value and its two halves.
 typedef union _LARGE_INTEGER {
-	struct {
-		uint32_t LowPart;
-		int32_t HighPart;
-	} u;
-	int64_t QuadPart;
+    struct {
+        uint32_t LowPart;
+        int32_t HighPart;
+    } u;
+    int64_t QuadPart;
 } LARGE_INTEGER;
 
 // LAYOUT DEVIATION: the exe's CRITICAL_SECTION is Win32's structure, 0x18 bytes: void* DebugInfo, int32_t LockCount,
@@ -35,12 +35,12 @@ typedef union _LARGE_INTEGER {
 // (allocated raw or constructed by hand), so the structure's own constructor and destructor leave the mutex alone: a
 // section is usable only between those two calls, as on Windows. Not copyable. No game code reads the SDK's fields.
 struct _RTL_CRITICAL_SECTION {
-	constexpr _RTL_CRITICAL_SECTION() {}
-	~_RTL_CRITICAL_SECTION() {}
-	_RTL_CRITICAL_SECTION(const _RTL_CRITICAL_SECTION&) = delete;
-	_RTL_CRITICAL_SECTION& operator=(const _RTL_CRITICAL_SECTION&) = delete;
+    constexpr _RTL_CRITICAL_SECTION() {}
+    ~_RTL_CRITICAL_SECTION() {}
+    _RTL_CRITICAL_SECTION(const _RTL_CRITICAL_SECTION&) = delete;
+    _RTL_CRITICAL_SECTION& operator=(const _RTL_CRITICAL_SECTION&) = delete;
 
-	union {
-		std::recursive_mutex kMutex;
-	};
+    union {
+        std::recursive_mutex kMutex;
+    };
 };

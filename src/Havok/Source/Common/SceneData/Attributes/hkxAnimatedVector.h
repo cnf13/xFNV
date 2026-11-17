@@ -10,15 +10,15 @@
 // Stores sampled vector values for an animated scene attribute and how to interpret them. m_hint needs no freeing.
 class hkxAnimatedVector : public hkReferencedObject {
 public:
-	hkxAnimatedVector() = default;
-	hkxAnimatedVector(hkFinishLoadedObjectFlag aFlag) : hkReferencedObject(aFlag), m_vectors(aFlag) {}
-	~hkxAnimatedVector() override;
+    hkxAnimatedVector() = default;
+    hkxAnimatedVector(hkFinishLoadedObjectFlag aFlag) : hkReferencedObject(aFlag), m_vectors(aFlag) {}
+    ~hkxAnimatedVector() override;
 
-	// The reflection class hkxAnimatedVectorClass.
-	static const hkClass& staticClass();
+    // The reflection class hkxAnimatedVectorClass.
+    static const hkClass& staticClass();
 
-	hkArray<hkVector4, hkContainerHeapAllocator> m_vectors;
-	hkEnum<hkxAttribute::Hint, uint8_t> m_hint;
+    hkArray<hkVector4, hkContainerHeapAllocator> m_vectors;
+    hkEnum<hkxAttribute::Hint, uint8_t> m_hint;
 };
 
 extern hkClass hkxAnimatedVectorClass;

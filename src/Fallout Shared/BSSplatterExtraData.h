@@ -6,18 +6,20 @@
 // The splatter an object carries for the screen splatter.
 class BSSplatterExtraData : public NiExtraData {
 public:
-	BSSplatterExtraData(const BSSplatterData& aSplatterData);
-	~BSSplatterExtraData() override;
+    BSSplatterExtraData(const BSSplatterData& aSplatterData);
+    ~BSSplatterExtraData() override;
 
-	const NiRTTI* GetRTTI() const override { return &ms_RTTI; }
+    const NiRTTI* GetRTTI() const override {
+        return &ms_RTTI;
+    }
 
-	static NiFixedString* GetTag();
-	// Creates the "SPD" tag string stored in pTag.
-	static void InitTag();
-	static void KillSDM();
+    static NiFixedString* GetTag();
+    // Creates the "SPD" tag string stored in pTag.
+    static void InitTag();
+    static void KillSDM();
 
-	BSSplatterData SplatterData;
+    BSSplatterData SplatterData;
 
-	static inline NiFixedString* pTag;
-	static NiRTTI ms_RTTI;
+    static inline NiFixedString* pTag;
+    static NiRTTI ms_RTTI;
 };

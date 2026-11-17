@@ -14,37 +14,40 @@ void cleanupLoadedObjecthkpMultiRayShape(void* p);
 // A shape made of rays (start and end points), with the distance a ray may penetrate.
 class hkpMultiRayShape : public hkpShape {
 public:
-	// One ray of the shape.
-	struct Ray {
-		static const hkClass& staticClass();
+    // One ray of the shape.
+    struct Ray {
+        static const hkClass& staticClass();
 
-		hkVector4 m_start;
-		hkVector4 m_end;
-	};
+        hkVector4 m_start;
+        hkVector4 m_end;
+    };
 
-	// The reflection's member table.
-	using MembersArray = const hkClassMember[2];
+    // The reflection's member table.
+    using MembersArray = const hkClassMember[2];
 
-	hkpMultiRayShape(const hkpMultiRayShape::Ray* Rays, int32_t nRays, float rayPenetrationDistance);
+    hkpMultiRayShape(const hkpMultiRayShape::Ray* Rays, int32_t nRays, float rayPenetrationDistance);
 
-	hkpMultiRayShape(hkFinishLoadedObjectFlag aFlag) : hkpShape(aFlag), m_rays(aFlag) {
-		m_type.m_storage = HK_SHAPE_MULTI_RAY;
-	}
+    hkpMultiRayShape(hkFinishLoadedObjectFlag aFlag) : hkpShape(aFlag), m_rays(aFlag) {
+        m_type.m_storage = HK_SHAPE_MULTI_RAY;
+    }
 
-	~hkpMultiRayShape() override;
+    ~hkpMultiRayShape() override;
 
-	void calcContentStatistics(hkStatisticsCollector* collector, const hkClass* cls) const override;
-	void getAabbImpl(const hkTransform& localToWorld, float tolerance, hkAabb& out) const override;
-	hkBool castRayImpl(const hkpShapeRayCastInput& input, hkpShapeRayCastOutput& results) const override;
-	void castRayWithCollectorImpl(const hkpShapeRayCastInput& input, const hkpCdBody& cdBody,
-		hkpRayHitCollector& collector) const override;
+    void calcContentStatistics(hkStatisticsCollector* collector, const hkClass* cls) const override;
+    void getAabbImpl(const hkTransform& localToWorld, float tolerance, hkAabb& out) const override;
+    hkBool castRayImpl(const hkpShapeRayCastInput& input, hkpShapeRayCastOutput& results) const override;
+    void castRayWithCollectorImpl(
+        const hkpShapeRayCastInput& input,
+        const hkpCdBody& cdBody,
+        hkpRayHitCollector& collector
+    ) const override;
 
-	static const hkClass& staticClass();
+    static const hkClass& staticClass();
 
-	hkArray<Ray> m_rays;
-	float m_rayPenetrationDistance;
+    hkArray<Ray> m_rays;
+    float m_rayPenetrationDistance;
 
-	static MembersArray Members;
+    static MembersArray Members;
 };
 
 extern hkClass hkpMultiRayShapeRayClass;

@@ -8,7 +8,7 @@ struct hkStepInfo;
 // postCollideCallback on each with the island and the step. It holds no state.
 class hkpIslandPostCollideListener {
 public:
-	virtual ~hkpIslandPostCollideListener();
+    virtual ~hkpIslandPostCollideListener();
 
-	virtual void postCollideCallback(hkpSimulationIsland* island, const hkStepInfo& stepInfo) = 0;
+    virtual void postCollideCallback(hkpSimulationIsland* island, const hkStepInfo& stepInfo) = 0;
 };

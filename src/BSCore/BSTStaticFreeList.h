@@ -5,10 +5,13 @@
 #include "SDK/MSVC/ehvec.h"
 
 // A free list that owns its N elements inline.
-template <class T, uint32_t uiSize> class BSTStaticFreeList : public BSTFreeList<T> {
+template <class T, uint32_t uiSize>
+class BSTStaticFreeList : public BSTFreeList<T> {
 public:
-	BSTStaticFreeList() { this->Init(uiSize, Elems); }
-	~BSTStaticFreeList() override {}
+    BSTStaticFreeList() {
+        this->Init(uiSize, Elems);
+    }
+    ~BSTStaticFreeList() override {}
 
-	BSTFreeListElem<T> Elems[uiSize];
+    BSTFreeListElem<T> Elems[uiSize];
 };

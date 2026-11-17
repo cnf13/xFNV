@@ -30,105 +30,105 @@ long tell_func(void* datasource);
 // A sound played through DirectSound: the sound buffer, its 3D and reverb buffers and the effects on them.
 class BSWin32GameSound : public BSGameSound {
 public:
-	// The playback state of a sound whose data is played in three pieces: the head, the middle and the tail buffer.
-	struct EnvelopeBuffer {
-		uint32_t uiState;
-		uint32_t uiSize;
-		uint32_t uiHeadBytes;
-		uint32_t uiMiddleSize;
-		uint32_t uiTailSize;
-		uint32_t uiPlayCursor;
-		uint8_t* pHeadBuf;
-		uint8_t* pMidBuf;
-		uint8_t* pTailBuf;
-	};
+    // The playback state of a sound whose data is played in three pieces: the head, the middle and the tail buffer.
+    struct EnvelopeBuffer {
+        uint32_t uiState;
+        uint32_t uiSize;
+        uint32_t uiHeadBytes;
+        uint32_t uiMiddleSize;
+        uint32_t uiTailSize;
+        uint32_t uiPlayCursor;
+        uint8_t* pHeadBuf;
+        uint8_t* pMidBuf;
+        uint8_t* pTailBuf;
+    };
 
-	// An Ogg Vorbis stream being decoded: the library's decoder state (see OggVorbis_File) and the file, sample count
-	// and stream info the game keeps with it. Its size and members' offsets follow OggVorbis_File's (the LAYOUT
-	// DEVIATION above).
-	struct OggVorbisFile : public OggVorbis_File {
-		OggVorbisFile();
+    // An Ogg Vorbis stream being decoded: the library's decoder state (see OggVorbis_File) and the file, sample count
+    // and stream info the game keeps with it. Its size and members' offsets follow OggVorbis_File's (the LAYOUT
+    // DEVIATION above).
+    struct OggVorbisFile : public OggVorbis_File {
+        OggVorbisFile();
 
-		// Opens apPath through FileFinder, handing it to libvorbisfile's ov_open_callbacks; false when the file is
-		// missing or not a Vorbis stream.
-		bool OpenFile(const char* apPath);
-		uint32_t Read(uint8_t* apBuffer, uint32_t auiSize);
-		void Destroy();
+        // Opens apPath through FileFinder, handing it to libvorbisfile's ov_open_callbacks; false when the file is
+        // missing or not a Vorbis stream.
+        bool OpenFile(const char* apPath);
+        uint32_t Read(uint8_t* apBuffer, uint32_t auiSize);
+        void Destroy();
 
-		BSFile* pFile;
-		int32_t iSampleCount;
-		vorbis_info* pInfo;
-		bool bLoaded;
-	};
+        BSFile* pFile;
+        int32_t iSampleCount;
+        vorbis_info* pInfo;
+        bool bLoaded;
+    };
 
-	BSWin32GameSound();
-	BSWin32GameSound(const char* apPath);
-	~BSWin32GameSound() override;
+    BSWin32GameSound();
+    BSWin32GameSound(const char* apPath);
+    ~BSWin32GameSound() override;
 
-	void SetInaudible(bool abIn) override;
-	bool Open() override;
-	bool Prepare() override;
-	void Copy(BSGameSound* apToCopy, bool abPlayable) override;
-	bool Play(bool abLoopPlayback) override;
-	bool Pause() override;
-	bool Stop() override;
-	bool SetVolume(float afNewVolume) override;
-	void UpdateEmitterPosition() override;
-	bool Update(uint32_t adwTimeDelta) override;
-	bool ProcessDataRequest(int32_t aiRequestNum) override;
-	bool SetEmitterPosition(NiPoint3 vin) override;
-	bool SetEmitterPosition(float afX, float afY, float afZ) override;
-	NiPoint3 GetEmitterPosition() override;
-	void SetEmitterOrientation(float afX, float afY, float afZ) override;
-	void SetMinMax(float afMin, float afMax) override;
-	void SetAttenuationCurve(uint16_t aiPt1, uint16_t aiPt2, uint16_t aiPt3, uint16_t aiPt4, uint16_t aiPt5) override;
-	bool SetFrequency(float afNewFrequency) override;
-	float GetFrequency() override;
-	void Seek(uint32_t uiMilliseconds) override;
+    void SetInaudible(bool abIn) override;
+    bool Open() override;
+    bool Prepare() override;
+    void Copy(BSGameSound* apToCopy, bool abPlayable) override;
+    bool Play(bool abLoopPlayback) override;
+    bool Pause() override;
+    bool Stop() override;
+    bool SetVolume(float afNewVolume) override;
+    void UpdateEmitterPosition() override;
+    bool Update(uint32_t adwTimeDelta) override;
+    bool ProcessDataRequest(int32_t aiRequestNum) override;
+    bool SetEmitterPosition(NiPoint3 vin) override;
+    bool SetEmitterPosition(float afX, float afY, float afZ) override;
+    NiPoint3 GetEmitterPosition() override;
+    void SetEmitterOrientation(float afX, float afY, float afZ) override;
+    void SetMinMax(float afMin, float afMax) override;
+    void SetAttenuationCurve(uint16_t aiPt1, uint16_t aiPt2, uint16_t aiPt3, uint16_t aiPt4, uint16_t aiPt5) override;
+    bool SetFrequency(float afNewFrequency) override;
+    float GetFrequency() override;
+    void Seek(uint32_t uiMilliseconds) override;
 
-	// Takes the audio instance's DirectSound device when the sound has none; false when
-	// neither has one.
-	bool SetDirectSound();
-	// Opens the sound as an Ogg Vorbis stream; false when it cannot.
-	bool OpenOgg();
-	bool PrepareReverb();
-	void RemoveEffects();
-	// Copies auiSize bytes of apData + auiPosition (zeros when apData is null) into the sound buffer at auiOffset.
-	// auiOffset and auiSize are passed to Lock's unsigned dwOffset and dwBytes, and auiSize to memcpy. Returns false
-	// when the Lock fails, else true.
-	bool Write(uint32_t auiPosition, uint32_t auiOffset, uint32_t auiSize, char* apData);
+    // Takes the audio instance's DirectSound device when the sound has none; false when
+    // neither has one.
+    bool SetDirectSound();
+    // Opens the sound as an Ogg Vorbis stream; false when it cannot.
+    bool OpenOgg();
+    bool PrepareReverb();
+    void RemoveEffects();
+    // Copies auiSize bytes of apData + auiPosition (zeros when apData is null) into the sound buffer at auiOffset.
+    // auiOffset and auiSize are passed to Lock's unsigned dwOffset and dwBytes, and auiSize to memcpy. Returns false
+    // when the Lock fails, else true.
+    bool Write(uint32_t auiPosition, uint32_t auiOffset, uint32_t auiSize, char* apData);
 
-	IDirectSound8* pDirectSound8;
-	IDirectSoundBuffer8* pSoundBuffer;
-	IDirectSoundBuffer8* pReverbBuffer;
-	DSBUFFERDESC kBufferDesc;
-	uint8_t* pRawBuffer;
-	IDirectSoundBuffer* pTempSoundBuffer;
-	// Holds a plain sound buffer: BSWin32GameSound::PrepareReverb passes it to CreateSoundBuffer's ppDSBuffer and asks
-	// it for IDirectSoundBuffer8.
-	IDirectSoundBuffer* pTempReverbBuffer;
-	IDirectSound3DBuffer* p3DSoundBuffer;
-	IDirectSound3DBuffer* p3DReverbBuffer;
-	uint32_t uiBufferBytes;
-	IDirectSoundFXI3DL2Reverb* pReverbEffect;
-	DSFXParamEq kEqualizerData;
-	DSFXDistortion kDistortionData;
-	// The parametric equaliser effect of the sound buffer, as pDistortionEffect is the distortion's (kEqualizerData
-	// holds its parameters); it is only cleared, in the constructors.
-	IDirectSoundFXParamEq* pEqualizerEffect;
-	IDirectSoundFXDistortion* pDistortionEffect;
-	uint16_t usAttenuationCurve[5];
-	uint8_t padding216[2];
-	NiPoint3 kPosition;
-	// This byte is the bool bPositionChanged.
-	uint8_t padding224;
-	uint8_t padding225[3];
-	EnvelopeBuffer* pEnvelope;
-	OggVorbisFile* pOggFile;
+    IDirectSound8* pDirectSound8;
+    IDirectSoundBuffer8* pSoundBuffer;
+    IDirectSoundBuffer8* pReverbBuffer;
+    DSBUFFERDESC kBufferDesc;
+    uint8_t* pRawBuffer;
+    IDirectSoundBuffer* pTempSoundBuffer;
+    // Holds a plain sound buffer: BSWin32GameSound::PrepareReverb passes it to CreateSoundBuffer's ppDSBuffer and asks
+    // it for IDirectSoundBuffer8.
+    IDirectSoundBuffer* pTempReverbBuffer;
+    IDirectSound3DBuffer* p3DSoundBuffer;
+    IDirectSound3DBuffer* p3DReverbBuffer;
+    uint32_t uiBufferBytes;
+    IDirectSoundFXI3DL2Reverb* pReverbEffect;
+    DSFXParamEq kEqualizerData;
+    DSFXDistortion kDistortionData;
+    // The parametric equaliser effect of the sound buffer, as pDistortionEffect is the distortion's (kEqualizerData
+    // holds its parameters); it is only cleared, in the constructors.
+    IDirectSoundFXParamEq* pEqualizerEffect;
+    IDirectSoundFXDistortion* pDistortionEffect;
+    uint16_t usAttenuationCurve[5];
+    uint8_t padding216[2];
+    NiPoint3 kPosition;
+    // This byte is the bool bPositionChanged.
+    uint8_t padding224;
+    uint8_t padding225[3];
+    EnvelopeBuffer* pEnvelope;
+    OggVorbisFile* pOggFile;
 
-	static inline int32_t uiEffectCount;
-	// A SettingT<INISettingCollection>: its initialiser stores that vtable.
-	static SettingT<INISettingCollection> iMaxFX;
+    static inline int32_t uiEffectCount;
+    // A SettingT<INISettingCollection>: its initialiser stores that vtable.
+    static SettingT<INISettingCollection> iMaxFX;
 };
 
 inline GUID CLSID_IDirectSoundBuffer8{0x6825A449, 29988, 19842, {146, 15, 80, 227, 106, 179, 171, 30}};

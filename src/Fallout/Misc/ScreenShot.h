@@ -9,29 +9,29 @@ class NiPixelData;
 // 0x36-byte write.
 #pragma pack(push, 1)
 struct BMPHeader {
-	uint16_t bhType;
-	uint32_t bhSize;
-	uint16_t bhReserved1;
-	uint16_t bhReserved2;
-	uint32_t bhOffset;
-	uint32_t biSize;
-	int32_t biWidth;
-	int32_t biHeight;
-	uint16_t biPlanes;
-	uint16_t biBitCount;
-	uint32_t biCompression;
-	uint32_t biSizeImage;
-	int32_t biXPelsPerMeter;
-	int32_t biYPelsPerMeter;
-	uint32_t biClrUsed;
-	uint32_t biClrImportant;
+    uint16_t bhType;
+    uint32_t bhSize;
+    uint16_t bhReserved1;
+    uint16_t bhReserved2;
+    uint32_t bhOffset;
+    uint32_t biSize;
+    int32_t biWidth;
+    int32_t biHeight;
+    uint16_t biPlanes;
+    uint16_t biBitCount;
+    uint32_t biCompression;
+    uint32_t biSizeImage;
+    int32_t biXPelsPerMeter;
+    int32_t biYPelsPerMeter;
+    uint32_t biClrUsed;
+    uint32_t biClrImportant;
 };
 #pragma pack(pop)
 
 class ScreenShot {
 public:
-	static NiPixelData* TakeSaveGameScreenShot(int32_t& aiWidth, int32_t& aiHeight, const char* apScreenshotFileName);
-	static void TakeScreenShot(char* apName);
+    static NiPixelData* TakeSaveGameScreenShot(int32_t& aiWidth, int32_t& aiHeight, const char* apScreenshotFileName);
+    static void TakeScreenShot(char* apName);
 };
 
 extern SettingT<INISettingCollection> g_sScreenShotBaseName_Display;

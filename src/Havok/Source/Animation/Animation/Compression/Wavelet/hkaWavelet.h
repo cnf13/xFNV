@@ -15,7 +15,11 @@ void hkWaveletTransform(float* data, uint32_t nValues);
 // Zeroes the n coefficients of data whose magnitude is below the threshold: with sorted, those at or below the
 // magnitude at the threshold's fraction of n; else, per level from the finest, those below a threshold lowered by each
 // level's largest zeroed magnitude.
-void hkZeroSmallWaveletCoefficients(float* waveletData, uint32_t nValues, float tolerance,
-	hkBool useTruncationFraction);
+void hkZeroSmallWaveletCoefficients(
+    float* waveletData,
+    uint32_t nValues,
+    float tolerance,
+    hkBool useTruncationFraction
+);
 // Inverts hkWaveletTransform on the nValues floats of data.
 void hkInverseWaveletTransform(float* data, uint32_t nValues);

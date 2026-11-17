@@ -10,31 +10,37 @@ class TESObjectREFR;
 // The loaded references sorted into per-kind maps (items, weapons, actors, teleport doors, ...).
 class BGSLoadedReferenceCollection {
 public:
-	BGSLoadedReferenceCollection();
-	~BGSLoadedReferenceCollection();
+    BGSLoadedReferenceCollection();
+    ~BGSLoadedReferenceCollection();
 
-	// The map of the references of form type aeFormType.
-	LoadedReferenceMap* GetFormTypeMap(ENUM_FORM_ID aeFormType);
-	// Files apRef in the maps of its kind.
-	void AddReference(TESObjectREFR* apRef);
-	// Drops apRef from the maps.
-	void RemoveReference(TESObjectREFR* apRef);
-	bool GetNextObject(FindObjectIterator& arIterator, TESObjectREFR*& arpRef, ItemChange*& arpItemChange,
-		uint32_t aiFindFlags);
+    // The map of the references of form type aeFormType.
+    LoadedReferenceMap* GetFormTypeMap(ENUM_FORM_ID aeFormType);
+    // Files apRef in the maps of its kind.
+    void AddReference(TESObjectREFR* apRef);
+    // Drops apRef from the maps.
+    void RemoveReference(TESObjectREFR* apRef);
+    bool GetNextObject(
+        FindObjectIterator& arIterator,
+        TESObjectREFR*& arpRef,
+        ItemChange*& arpItemChange,
+        uint32_t aiFindFlags
+    );
 
-	static void operator delete(void* apMemory) { ourFree(apMemory); }
-	// Deletes the game's collection and clears the pointer.
-	static void Destroy();
-	static void Create();
+    static void operator delete(void* apMemory) {
+        ourFree(apMemory);
+    }
+    // Deletes the game's collection and clears the pointer.
+    static void Destroy();
+    static void Create();
 
-	LoadedReferenceMap DynamicReferenceMap;
-	LoadedReferenceMap ItemsMap;
-	LoadedReferenceMap WeaponsMap;
-	LoadedReferenceMap AmmoMap;
-	LoadedReferenceMap ContainersMap;
-	LoadedReferenceMap ActorsMap;
-	LoadedReferenceMap RadiationMap;
-	LoadedReferenceMap TeleportDoorMap;
+    LoadedReferenceMap DynamicReferenceMap;
+    LoadedReferenceMap ItemsMap;
+    LoadedReferenceMap WeaponsMap;
+    LoadedReferenceMap AmmoMap;
+    LoadedReferenceMap ContainersMap;
+    LoadedReferenceMap ActorsMap;
+    LoadedReferenceMap RadiationMap;
+    LoadedReferenceMap TeleportDoorMap;
 };
 
 // The game's collection, set by Create.

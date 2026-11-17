@@ -6,5 +6,5 @@
 IConvexOverlapImpl::~IConvexOverlapImpl() {}
 
 void IConvexOverlapImpl::operator delete(void* apMemory) {
-	ourFree(apMemory);
+    ourFree(apMemory);
 }

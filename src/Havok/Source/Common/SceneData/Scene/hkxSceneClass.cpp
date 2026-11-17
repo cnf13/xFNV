@@ -14,12 +14,12 @@
 #include "Havok/Source/Common/SceneData/Selection/hkxNodeSelectionSet.h"
 
 namespace {
-// Each member's offset in this struct (-1: no default), then appliedTransform's default, the identity (_hkMatrix3,
-// twelve floats: no 16-byte alignment here).
-struct hkxScene_DefaultStruct {
-	int32_t s_defaultOffsets[13];
-	float m_appliedTransform[12];
-};
+    // Each member's offset in this struct (-1: no default), then appliedTransform's default, the identity (_hkMatrix3,
+    // twelve floats: no 16-byte alignment here).
+    struct hkxScene_DefaultStruct {
+        int32_t s_defaultOffsets[13];
+        float m_appliedTransform[12];
+    };
 } // namespace
 
 // KEEP: getVtablehkxScene (0xE01C60, cdecl) is not written. It placement-constructs an hkxScene in a 16-byte aligned
@@ -31,46 +31,132 @@ struct hkxScene_DefaultStruct {
 // The reflection's member table.
 using hkxSceneClass_MembersArray = const hkClassMember[13];
 static hkxSceneClass_MembersArray hkxSceneClass_Members{
-	{"modeller", nullptr, nullptr, {hkClassMember::TYPE_STRINGPTR}, {hkClassMember::TYPE_VOID}, 0, {0}, 0x8, nullptr},
-	{"asset", nullptr, nullptr, {hkClassMember::TYPE_STRINGPTR}, {hkClassMember::TYPE_VOID}, 0, {0}, 0xC, nullptr},
-	{"sceneLength", nullptr, nullptr, {hkClassMember::TYPE_REAL}, {hkClassMember::TYPE_VOID}, 0, {0}, 0x10, nullptr},
-	{"rootNode", &hkxNodeClass, nullptr, {hkClassMember::TYPE_POINTER}, {hkClassMember::TYPE_STRUCT}, 0, {0}, 0x14,
-		nullptr},
-	{"selectionSets", &hkxNodeSelectionSetClass, nullptr, {hkClassMember::TYPE_ARRAY}, {hkClassMember::TYPE_POINTER}, 0,
-		{0}, 0x18, nullptr},
-	{"cameras", &hkxCameraClass, nullptr, {hkClassMember::TYPE_ARRAY}, {hkClassMember::TYPE_POINTER}, 0, {0}, 0x24,
-		nullptr},
-	{"lights", &hkxLightClass, nullptr, {hkClassMember::TYPE_ARRAY}, {hkClassMember::TYPE_POINTER}, 0, {0}, 0x30,
-		nullptr},
-	{"meshes", &hkxMeshClass, nullptr, {hkClassMember::TYPE_ARRAY}, {hkClassMember::TYPE_POINTER}, 0, {0}, 0x3C,
-		nullptr},
-	{"materials", &hkxMaterialClass, nullptr, {hkClassMember::TYPE_ARRAY}, {hkClassMember::TYPE_POINTER}, 0, {0}, 0x48,
-		nullptr},
-	{"inplaceTextures", &hkxTextureInplaceClass, nullptr, {hkClassMember::TYPE_ARRAY}, {hkClassMember::TYPE_POINTER}, 0,
-		{0}, 0x54, nullptr},
-	{"externalTextures", &hkxTextureFileClass, nullptr, {hkClassMember::TYPE_ARRAY}, {hkClassMember::TYPE_POINTER}, 0,
-		{0}, 0x60, nullptr},
-	{"skinBindings", &hkxSkinBindingClass, nullptr, {hkClassMember::TYPE_ARRAY}, {hkClassMember::TYPE_POINTER}, 0, {0},
-		0x6C, nullptr},
-	{"appliedTransform", nullptr, nullptr, {hkClassMember::TYPE_MATRIX3}, {hkClassMember::TYPE_VOID}, 0, {0}, 0x80,
-		nullptr}};
+    {"modeller", nullptr, nullptr, {hkClassMember::TYPE_STRINGPTR}, {hkClassMember::TYPE_VOID}, 0, {0}, 0x8, nullptr},
+    {"asset", nullptr, nullptr, {hkClassMember::TYPE_STRINGPTR}, {hkClassMember::TYPE_VOID}, 0, {0}, 0xC, nullptr},
+    {"sceneLength", nullptr, nullptr, {hkClassMember::TYPE_REAL}, {hkClassMember::TYPE_VOID}, 0, {0}, 0x10, nullptr},
+    {"rootNode",
+     &hkxNodeClass,
+     nullptr,
+     {hkClassMember::TYPE_POINTER},
+     {hkClassMember::TYPE_STRUCT},
+     0,
+     {0},
+     0x14,
+     nullptr},
+    {"selectionSets",
+     &hkxNodeSelectionSetClass,
+     nullptr,
+     {hkClassMember::TYPE_ARRAY},
+     {hkClassMember::TYPE_POINTER},
+     0,
+     {0},
+     0x18,
+     nullptr},
+    {"cameras",
+     &hkxCameraClass,
+     nullptr,
+     {hkClassMember::TYPE_ARRAY},
+     {hkClassMember::TYPE_POINTER},
+     0,
+     {0},
+     0x24,
+     nullptr},
+    {"lights",
+     &hkxLightClass,
+     nullptr,
+     {hkClassMember::TYPE_ARRAY},
+     {hkClassMember::TYPE_POINTER},
+     0,
+     {0},
+     0x30,
+     nullptr},
+    {"meshes",
+     &hkxMeshClass,
+     nullptr,
+     {hkClassMember::TYPE_ARRAY},
+     {hkClassMember::TYPE_POINTER},
+     0,
+     {0},
+     0x3C,
+     nullptr},
+    {"materials",
+     &hkxMaterialClass,
+     nullptr,
+     {hkClassMember::TYPE_ARRAY},
+     {hkClassMember::TYPE_POINTER},
+     0,
+     {0},
+     0x48,
+     nullptr},
+    {"inplaceTextures",
+     &hkxTextureInplaceClass,
+     nullptr,
+     {hkClassMember::TYPE_ARRAY},
+     {hkClassMember::TYPE_POINTER},
+     0,
+     {0},
+     0x54,
+     nullptr},
+    {"externalTextures",
+     &hkxTextureFileClass,
+     nullptr,
+     {hkClassMember::TYPE_ARRAY},
+     {hkClassMember::TYPE_POINTER},
+     0,
+     {0},
+     0x60,
+     nullptr},
+    {"skinBindings",
+     &hkxSkinBindingClass,
+     nullptr,
+     {hkClassMember::TYPE_ARRAY},
+     {hkClassMember::TYPE_POINTER},
+     0,
+     {0},
+     0x6C,
+     nullptr},
+    {"appliedTransform",
+     nullptr,
+     nullptr,
+     {hkClassMember::TYPE_MATRIX3},
+     {hkClassMember::TYPE_VOID},
+     0,
+     {0},
+     0x80,
+     nullptr}
+};
 
 // The defaults the class record names.
-static const hkxScene_DefaultStruct hkxScene_Default{{-1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 0x34},
-	{1.0f, 0.0f, 0.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f, 0.0f, 0.0f, 1.0f, 0.0f}};
-hkClass hkxSceneClass("hkxScene", &hkReferencedObjectClass, 0xB0, nullptr, 0, nullptr, 0, hkxSceneClass_Members, 13,
-	&hkxScene_Default, nullptr, 0, 1);
-hkTypeInfo hkxSceneTypeInfo{"hkxScene", finishLoadedObjecthkxScene, cleanupLoadedObjecthkxScene, getVtablehkxScene(),
-	&typeid(hkxScene), sizeof(hkxScene)};
+static const hkxScene_DefaultStruct hkxScene_Default{
+    {-1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 0x34},
+    {1.0f, 0.0f, 0.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f, 0.0f, 0.0f, 1.0f, 0.0f}
+};
+hkClass hkxSceneClass(
+    "hkxScene",
+    &hkReferencedObjectClass,
+    0xB0,
+    nullptr,
+    0,
+    nullptr,
+    0,
+    hkxSceneClass_Members,
+    13,
+    &hkxScene_Default,
+    nullptr,
+    0,
+    1
+);
+hkTypeInfo hkxSceneTypeInfo{"hkxScene",          finishLoadedObjecthkxScene, cleanupLoadedObjecthkxScene,
+                            getVtablehkxScene(), &typeid(hkxScene),          sizeof(hkxScene)};
 
 const void* getVtablehkxScene() {
-	return hkGetVtableOf<hkxScene>();
+    return hkGetVtableOf<hkxScene>();
 }
 
 void cleanupLoadedObjecthkxScene(void* p) {
-	static_cast<hkxScene*>(p)->~hkxScene();
+    static_cast<hkxScene*>(p)->~hkxScene();
 }
 
 const hkClass& hkxScene::staticClass() {
-	return hkxSceneClass;
+    return hkxSceneClass;
 }

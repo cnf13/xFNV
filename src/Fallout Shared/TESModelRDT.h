@@ -5,6 +5,6 @@
 // A model whose ragdoll constraint data a biped model form uses.
 class TESModelRDT : public TESModel {
 public:
-	TESModelRDT();
-	~TESModelRDT() override;
+    TESModelRDT();
+    ~TESModelRDT() override;
 };

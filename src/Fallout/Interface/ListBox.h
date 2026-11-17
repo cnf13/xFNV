@@ -40,164 +40,181 @@ bool IsApparel(ItemChange* apItem);
 bool IsMiscItem(ItemChange* apItem);
 
 // One entry of a list box: the tile showing it, the data it stands for and whether a filter hides it.
-template <class T> struct ListBoxItem {
-	ListBoxItem(Tile* apTile, const T* apData) : pTile(apTile), data(*apData), bFiltered(false) {}
+template <class T>
+struct ListBoxItem {
+    ListBoxItem(Tile* apTile, const T* apData) : pTile(apTile), data(*apData), bFiltered(false) {}
 
-	Tile* pTile;
-	T data;
-	bool bFiltered;
+    Tile* pTile;
+    T data;
+    bool bFiltered;
 };
 
 // A menu list whose entries are tiles built from one template, each tied to a data value. The instantiations that are
 // used are specialised next to the caller.
-template <class T> class ListBox : public ListBoxBase, public BSSimpleList<ListBoxItem<T>*> {
+template <class T>
+class ListBox : public ListBoxBase, public BSSimpleList<ListBoxItem<T>*> {
 public:
-	// The list's behaviour flags (bit indices into usFlags).
-	enum Flag : int32_t {
-		LBF_AUTO_UPDATE = 0,
-		LBF_FROM_CONTAINER = 1,
-	};
+    // The list's behaviour flags (bit indices into usFlags).
+    enum Flag : int32_t {
+        LBF_AUTO_UPDATE = 0,
+        LBF_FROM_CONTAINER = 1,
+    };
 
-	// How SetSelection changes an item's _selected trait: set it, clear it or flip it.
-	enum SelectMode : int32_t {
-		LBSM_ON = 0,
-		LBSM_OFF = 1,
-		LBSM_TOGGLE = 2,
-	};
+    // How SetSelection changes an item's _selected trait: set it, clear it or flip it.
+    enum SelectMode : int32_t {
+        LBSM_ON = 0,
+        LBSM_OFF = 1,
+        LBSM_TOGGLE = 2,
+    };
 
-	// Filter's test: whether the item with this data stays unfiltered.
-	using FilterFunction = bool (*)(T aData);
+    // Filter's test: whether the item with this data stays unfiltered.
+    using FilterFunction = bool (*)(T aData);
 
-	// Creates an empty list with LBF_AUTO_UPDATE set and appends it to the open list boxes.
-	ListBox();
+    // Creates an empty list with LBF_AUTO_UPDATE set and appends it to the open list boxes.
+    ListBox();
 
-	bool Highlight(Tile* apHighlightItem) override;
-	// The highlighted item's tile.
-	void* GetHighlightedItem() override { return pHighlightedItem; }
-	Tile* GetHighlightTarget(int32_t aeButton) override;
-	bool BelongsTo(Menu* apMenu) override;
-	// Scrolls the list so the highlighted item shows.
-	void ScrollToHighlight() override;
-	// The tile of GetAt(aiIndex, abLiteral), or null.
-	Tile* GetTileAt(uint32_t aiIndex, bool abLiteral) override;
-	virtual ~ListBox();
-	// Frees every item and its tile.
-	virtual void RemoveAll();
-	// Orders the items with the comparison function.
-	virtual void Sort(int32_t (*apCompareFn)(ListBoxItem<T>*, ListBoxItem<T>*));
+    bool Highlight(Tile* apHighlightItem) override;
+    // The highlighted item's tile.
+    void* GetHighlightedItem() override {
+        return pHighlightedItem;
+    }
+    Tile* GetHighlightTarget(int32_t aeButton) override;
+    bool BelongsTo(Menu* apMenu) override;
+    // Scrolls the list so the highlighted item shows.
+    void ScrollToHighlight() override;
+    // The tile of GetAt(aiIndex, abLiteral), or null.
+    Tile* GetTileAt(uint32_t aiIndex, bool abLiteral) override;
+    virtual ~ListBox();
+    // Frees every item and its tile.
+    virtual void RemoveAll();
+    // Orders the items with the comparison function.
+    virtual void Sort(int32_t (*apCompareFn)(ListBoxItem<T>*, ListBoxItem<T>*));
 
-	// Takes the container tile and the template name (kept as given, not copied) and finds the scroll bar, the
-	// container's child(lb_scrollbar).
-	void Initialize(Tile* apContainerRect, const char* apTemplateName);
-	// Adds an item for aAssociatedData built from the template (the list's own when apcTemplateName is null) and
-	// returns its tile; apCompareFn, when given, keeps the list sorted.
-	Tile* AddItem(T aAssociatedData, const char* apcItemString,
-		int32_t (*apCompareFn)(ListBoxItem<T>*, ListBoxItem<T>*), const char* apcTemplateName);
-	// The number of items, filtered ones included. Unsigned, as BarterMenu::DoGamepad compares it unsigned.
-	uint32_t NumItems() { return BSSimpleList<ListBoxItem<T>*>::ItemsInList(); }
-	// Renumbers the unfiltered items, recomputes the list height and refreshes the scroll bar and highlight.
-	void Synchronize();
-	// The tile of the item holding aData, or null.
-	Tile* GetTileFor(const T& aData);
-	// The number of items no filter hides: the item count less the container's _num_filtered trait.
-	uint32_t NumUnfiltered();
-	// The data of the item at auiIndex (counting the filtered items too when abIncludeFiltered), or a null T.
-	T GetDataAt(uint32_t aiIndex, bool abLiteral);
-	// Calls apTraversalFn with the tile and data of each item whose list index is in [aiStart, aiEnd); the walk
-	// stops at the first empty node or the first index at or past aiEnd.
-	void Traverse(void (*apTraversalFn)(Tile*, T), int32_t aiStart, int32_t aiEnd);
-	// The data of the highlighted item, or a null T.
-	T GetHighlightedData() const;
-	// True when apTile is the tile of one of the items.
-	bool IsListItem(Tile* apTile) const;
-	// The data of the item whose tile is apTile; the instantiations that are called are specialised next to the caller.
-	T GetDataFor(Tile* apTile) const;
-	// Marks every item apFilterFn rejects as filtered; specialised next to the caller.
-	void Filter(FilterFunction apFilterFn);
-	// Removes the items whose data belongs to apRemoveObj.
-	void RemoveItemGroup(TESBoundObject* apRemoveObj);
-	// Fills the list from apContainer's inventory.
-	void BuildFromContainer(TESObjectREFR* apContainer, bool (*apFilterFn)(T),
-		int32_t (*apCompareFn)(ListBoxItem<T>*, ListBoxItem<T>*), void (*apInitFn)(Tile*, T), bool abNoStack,
-		bool abBarter);
-	// Enables or disables the list's container and items.
-	void SetEnabled(bool abVal);
-	// Clears the selection of every item (only the unfiltered ones when abUnfilteredOnly).
-	void DeselectAll(bool abUnfilteredOnly);
-	// True when the container exists and its _enabled trait is set.
-	bool IsEnabled();
-	// True when the container exists and is visible.
-	bool IsVisible();
-	// The number of items the container shows at once, from its trait (0 without a container).
-	uint32_t NumVisible();
-	// The list's scroll bar tile.
-	Tile* GetScrollBar();
-	// Sets or clears the LBF_AUTO_UPDATE flag (the engine's SetFlag(LBF_AUTO_UPDATE, abVal)).
-	void SetAutoUpdate(bool abVal);
-	// Sets or clears aeFlag in usFlags.
-	void SetFlag(Flag aeFlag, bool abOn);
-	// True when aeFlag is set in usFlags.
-	bool GetFlag(Flag aeFlag);
-	// Sets the tile's _y to the list height so far, measures the tile (its height trait, else its first text child's
-	// string) and adds it to fTotalListHeight. AddItem calls it with the new item's tile when appending with
-	// LBF_AUTO_UPDATE set.
-	void CalculateTileHeight(Tile* apTile);
-	// Remembers the highlighted index and the scroll bar position in fSavedHighlightIndex and fSavedScrollbarValue.
-	void SaveListState();
-	// Puts the scroll bar back to the position SaveListState saved.
-	void RestoreListState(bool abPlayFocusSound);
-	// Stores the highlight index and scroll bar value RestoreListState applies, then restores the list state.
-	void SetListState(float afNewHighlightIndex, float afNewScrollbarValue);
-	// True when apSelectItem exists and its _selected trait is set.
-	bool IsSelected(Tile* apSelectItem);
-	// The item at aiIndex: the aiIndex-th node when abLiteral, else the item whose tile's list index is aiIndex; null
-	// when there is none.
-	ListBoxItem<T>* GetAt(uint32_t aiIndex, bool abLiteral);
-	// The first item's tile (GetTileAt(0, false)).
-	Tile* GetFirstItem();
-	// The last unfiltered item's tile (GetTileAt(NumUnfiltered() - 1, false)).
-	Tile* GetLastItem();
-	// True when the list holds no item.
-	bool IsEmpty();
-	// The number of items whose tile is selected.
-	uint32_t NumSelected();
-	// Unlinks and frees the item of node pkFirst, whose predecessor is pkSecond: moves the highlight off its tile,
-	// counts it out of _num_filtered, deletes the tile (and the data when LBF_FROM_CONTAINER), then synchronizes
-	// when LBF_AUTO_UPDATE is set; false when pkFirst is null.
-	bool Remove(BSSimpleList<ListBoxItem<T>*>* pkFirst, BSSimpleList<ListBoxItem<T>*>* pkSecond);
-	// Removes the item GetAt(aiIndex, abLiteral) finds.
-	bool RemoveAt(uint32_t aiIndex, bool abLiteral);
-	// Removes the item whose tile is apItem; false when there is none.
-	bool RemoveItem(Tile* apItem);
-	// SetSelection(apSelectItem, LBSM_ON).
-	bool Select(Tile* apSelectItem);
-	// SetSelection(apSelectItem, LBSM_OFF).
-	bool Deselect(Tile* apSelectItem);
-	// SetSelection(apSelectItem, LBSM_TOGGLE).
-	bool ToggleSelection(Tile* apSelectItem);
-	// Sets, clears or flips apSelectItem's _selected trait when the list is enabled and apSelectItem is one of its
-	// items; true when the trait changed.
-	bool SetSelection(Tile* apSelectItem, SelectMode aeMode);
-	// Sets the container's _scroll_delta from the total list height and the visible height, and the scroll bar's
-	// _number_of_items.
-	void SetTotalListHeight();
-	// Points the container's _highlight_y and _selected_height at the highlighted tile and gives the highlight box
-	// and its edges the tile's speech challenge failure state; without a highlight, resets both traits.
-	void UpdateHighlightBoxPos();
-	// Shows or hides the container: its _visible trait (4003) set to abVal.
-	void SetVisible(bool abVal);
+    // Takes the container tile and the template name (kept as given, not copied) and finds the scroll bar, the
+    // container's child(lb_scrollbar).
+    void Initialize(Tile* apContainerRect, const char* apTemplateName);
+    // Adds an item for aAssociatedData built from the template (the list's own when apcTemplateName is null) and
+    // returns its tile; apCompareFn, when given, keeps the list sorted.
+    Tile* AddItem(
+        T aAssociatedData,
+        const char* apcItemString,
+        int32_t (*apCompareFn)(ListBoxItem<T>*, ListBoxItem<T>*),
+        const char* apcTemplateName
+    );
+    // The number of items, filtered ones included. Unsigned, as BarterMenu::DoGamepad compares it unsigned.
+    uint32_t NumItems() {
+        return BSSimpleList<ListBoxItem<T>*>::ItemsInList();
+    }
+    // Renumbers the unfiltered items, recomputes the list height and refreshes the scroll bar and highlight.
+    void Synchronize();
+    // The tile of the item holding aData, or null.
+    Tile* GetTileFor(const T& aData);
+    // The number of items no filter hides: the item count less the container's _num_filtered trait.
+    uint32_t NumUnfiltered();
+    // The data of the item at auiIndex (counting the filtered items too when abIncludeFiltered), or a null T.
+    T GetDataAt(uint32_t aiIndex, bool abLiteral);
+    // Calls apTraversalFn with the tile and data of each item whose list index is in [aiStart, aiEnd); the walk
+    // stops at the first empty node or the first index at or past aiEnd.
+    void Traverse(void (*apTraversalFn)(Tile*, T), int32_t aiStart, int32_t aiEnd);
+    // The data of the highlighted item, or a null T.
+    T GetHighlightedData() const;
+    // True when apTile is the tile of one of the items.
+    bool IsListItem(Tile* apTile) const;
+    // The data of the item whose tile is apTile; the instantiations that are called are specialised next to the caller.
+    T GetDataFor(Tile* apTile) const;
+    // Marks every item apFilterFn rejects as filtered; specialised next to the caller.
+    void Filter(FilterFunction apFilterFn);
+    // Removes the items whose data belongs to apRemoveObj.
+    void RemoveItemGroup(TESBoundObject* apRemoveObj);
+    // Fills the list from apContainer's inventory.
+    void BuildFromContainer(
+        TESObjectREFR* apContainer,
+        bool (*apFilterFn)(T),
+        int32_t (*apCompareFn)(ListBoxItem<T>*, ListBoxItem<T>*),
+        void (*apInitFn)(Tile*, T),
+        bool abNoStack,
+        bool abBarter
+    );
+    // Enables or disables the list's container and items.
+    void SetEnabled(bool abVal);
+    // Clears the selection of every item (only the unfiltered ones when abUnfilteredOnly).
+    void DeselectAll(bool abUnfilteredOnly);
+    // True when the container exists and its _enabled trait is set.
+    bool IsEnabled();
+    // True when the container exists and is visible.
+    bool IsVisible();
+    // The number of items the container shows at once, from its trait (0 without a container).
+    uint32_t NumVisible();
+    // The list's scroll bar tile.
+    Tile* GetScrollBar();
+    // Sets or clears the LBF_AUTO_UPDATE flag (the engine's SetFlag(LBF_AUTO_UPDATE, abVal)).
+    void SetAutoUpdate(bool abVal);
+    // Sets or clears aeFlag in usFlags.
+    void SetFlag(Flag aeFlag, bool abOn);
+    // True when aeFlag is set in usFlags.
+    bool GetFlag(Flag aeFlag);
+    // Sets the tile's _y to the list height so far, measures the tile (its height trait, else its first text child's
+    // string) and adds it to fTotalListHeight. AddItem calls it with the new item's tile when appending with
+    // LBF_AUTO_UPDATE set.
+    void CalculateTileHeight(Tile* apTile);
+    // Remembers the highlighted index and the scroll bar position in fSavedHighlightIndex and fSavedScrollbarValue.
+    void SaveListState();
+    // Puts the scroll bar back to the position SaveListState saved.
+    void RestoreListState(bool abPlayFocusSound);
+    // Stores the highlight index and scroll bar value RestoreListState applies, then restores the list state.
+    void SetListState(float afNewHighlightIndex, float afNewScrollbarValue);
+    // True when apSelectItem exists and its _selected trait is set.
+    bool IsSelected(Tile* apSelectItem);
+    // The item at aiIndex: the aiIndex-th node when abLiteral, else the item whose tile's list index is aiIndex; null
+    // when there is none.
+    ListBoxItem<T>* GetAt(uint32_t aiIndex, bool abLiteral);
+    // The first item's tile (GetTileAt(0, false)).
+    Tile* GetFirstItem();
+    // The last unfiltered item's tile (GetTileAt(NumUnfiltered() - 1, false)).
+    Tile* GetLastItem();
+    // True when the list holds no item.
+    bool IsEmpty();
+    // The number of items whose tile is selected.
+    uint32_t NumSelected();
+    // Unlinks and frees the item of node pkFirst, whose predecessor is pkSecond: moves the highlight off its tile,
+    // counts it out of _num_filtered, deletes the tile (and the data when LBF_FROM_CONTAINER), then synchronizes
+    // when LBF_AUTO_UPDATE is set; false when pkFirst is null.
+    bool Remove(BSSimpleList<ListBoxItem<T>*>* pkFirst, BSSimpleList<ListBoxItem<T>*>* pkSecond);
+    // Removes the item GetAt(aiIndex, abLiteral) finds.
+    bool RemoveAt(uint32_t aiIndex, bool abLiteral);
+    // Removes the item whose tile is apItem; false when there is none.
+    bool RemoveItem(Tile* apItem);
+    // SetSelection(apSelectItem, LBSM_ON).
+    bool Select(Tile* apSelectItem);
+    // SetSelection(apSelectItem, LBSM_OFF).
+    bool Deselect(Tile* apSelectItem);
+    // SetSelection(apSelectItem, LBSM_TOGGLE).
+    bool ToggleSelection(Tile* apSelectItem);
+    // Sets, clears or flips apSelectItem's _selected trait when the list is enabled and apSelectItem is one of its
+    // items; true when the trait changed.
+    bool SetSelection(Tile* apSelectItem, SelectMode aeMode);
+    // Sets the container's _scroll_delta from the total list height and the visible height, and the scroll bar's
+    // _number_of_items.
+    void SetTotalListHeight();
+    // Points the container's _highlight_y and _selected_height at the highlighted tile and gives the highlight box
+    // and its edges the tile's speech challenge failure state; without a highlight, resets both traits.
+    void UpdateHighlightBoxPos();
+    // Shows or hides the container: its _visible trait (4003) set to abVal.
+    void SetVisible(bool abVal);
 
-	static void operator delete(void* apMemory) { ourFree(apMemory); }
+    static void operator delete(void* apMemory) {
+        ourFree(apMemory);
+    }
 
-	Tile* pContainerRect;
-	Tile* pHighlightedItem;
-	Tile* pScrollBar;
-	const char* pTemplateName;
-	uint16_t usNextIndex;
-	float fTotalListHeight;
-	float fSavedHighlightIndex;
-	float fSavedScrollbarValue;
-	uint16_t usFlags;
+    Tile* pContainerRect;
+    Tile* pHighlightedItem;
+    Tile* pScrollBar;
+    const char* pTemplateName;
+    uint16_t usNextIndex;
+    float fTotalListHeight;
+    float fSavedHighlightIndex;
+    float fSavedScrollbarValue;
+    uint16_t usFlags;
 };
 
 inline int32_t trait_selected_height_0;
@@ -287,16 +304,17 @@ inline int32_t BGSNoteListBox_Filter_iUT_num_filtered;
 
 template <class T>
 ListBox<T>::ListBox()
-	: ListBoxBase(), BSSimpleList<ListBoxItem<T>*>(), pContainerRect(nullptr), pHighlightedItem(nullptr),
-	  pScrollBar(nullptr), pTemplateName(nullptr), usNextIndex(0), fTotalListHeight(0.0f), fSavedHighlightIndex(0.0f),
-	  fSavedScrollbarValue(0.0f), usFlags(0) {
-	SetFlag(LBF_AUTO_UPDATE, true);
-	ListBoxBase::Append(this);
+  : ListBoxBase(), BSSimpleList<ListBoxItem<T>*>(), pContainerRect(nullptr), pHighlightedItem(nullptr),
+    pScrollBar(nullptr), pTemplateName(nullptr), usNextIndex(0), fTotalListHeight(0.0f), fSavedHighlightIndex(0.0f),
+    fSavedScrollbarValue(0.0f), usFlags(0) {
+    SetFlag(LBF_AUTO_UPDATE, true);
+    ListBoxBase::Append(this);
 }
 
-template <class T> ListBox<T>::~ListBox() {
-	ListBox<T>::RemoveAll();
-	ListBoxBase::Remove(this);
+template <class T>
+ListBox<T>::~ListBox() {
+    ListBox<T>::RemoveAll();
+    ListBoxBase::Remove(this);
 }
 
 // The generic members are defined in ListBox.inl and instantiated in ListBox.cpp only. The lists whose data type is

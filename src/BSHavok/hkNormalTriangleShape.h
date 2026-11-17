@@ -9,9 +9,9 @@ struct hkpShapeRayCastInput;
 // Bethesda's triangle shape that also keeps the triangle's normal. Its one virtual function of its own is castRay.
 class hkNormalTriangleShape : public hkpTriangleShape {
 public:
-	hkNormalTriangleShape(float afRadius);
+    hkNormalTriangleShape(float afRadius);
 
-	virtual hkBool castRay(const hkpShapeRayCastInput& arInput, hkpShapeRayCastOutput& arResults) const;
+    virtual hkBool castRay(const hkpShapeRayCastInput& arInput, hkpShapeRayCastOutput& arResults) const;
 
-	hkVector4 Normal;
+    hkVector4 Normal;
 };

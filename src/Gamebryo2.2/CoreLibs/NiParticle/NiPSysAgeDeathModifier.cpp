@@ -20,129 +20,133 @@ NiPSysAgeDeathModifier::NiPSysAgeDeathModifier() : m_bSpawnOnDeath(false), m_pkS
 NiPSysAgeDeathModifier::~NiPSysAgeDeathModifier() {}
 
 NiObject* NiPSysAgeDeathModifier::CreateClone(NiCloningProcess& kCloning) {
-	NiPSysAgeDeathModifier* pkObject =
-		static_cast<NiPSysAgeDeathModifier*>(NiMemObject::operator new(sizeof(NiPSysAgeDeathModifier)));
-	NiPSysAgeDeathModifier* pkObject_2 = pkObject;
-	if (pkObject) {
-		::new (pkObject) NiPSysAgeDeathModifier;
-	} else {
-		pkObject_2 = 0;
-	}
-	CopyMembers(pkObject_2, kCloning);
-	pkObject_2->m_bSpawnOnDeath = m_bSpawnOnDeath;
-	return pkObject_2;
+    NiPSysAgeDeathModifier* pkObject =
+        static_cast<NiPSysAgeDeathModifier*>(NiMemObject::operator new(sizeof(NiPSysAgeDeathModifier)));
+    NiPSysAgeDeathModifier* pkObject_2 = pkObject;
+    if (pkObject) {
+        ::new (pkObject) NiPSysAgeDeathModifier;
+    }
+    else {
+        pkObject_2 = 0;
+    }
+    CopyMembers(pkObject_2, kCloning);
+    pkObject_2->m_bSpawnOnDeath = m_bSpawnOnDeath;
+    return pkObject_2;
 }
 
 // A short read leaves ucSpawnOnDeath unwritten and it is stored anyway: an uninitialised read, kept deliberately as the
 // game does.
 void NiPSysAgeDeathModifier::LoadBinary(NiStream& kStream) {
-	NiPSysModifier::LoadBinary(kStream);
+    NiPSysModifier::LoadBinary(kStream);
 
-	uint8_t ucSpawnOnDeath;
-	NiStreamLoadBinary(kStream, ucSpawnOnDeath);
-	m_bSpawnOnDeath = ucSpawnOnDeath != 0;
-	kStream.ReadLinkID();
+    uint8_t ucSpawnOnDeath;
+    NiStreamLoadBinary(kStream, ucSpawnOnDeath);
+    m_bSpawnOnDeath = ucSpawnOnDeath != 0;
+    kStream.ReadLinkID();
 }
 
 // The link is taken as is, without a type check.
 void NiPSysAgeDeathModifier::LinkObject(NiStream& kStream) {
-	NiPSysModifier::LinkObject(kStream);
-	m_pkSpawnModifier = static_cast<NiPSysSpawnModifier*>(kStream.GetObjectFromLinkID());
+    NiPSysModifier::LinkObject(kStream);
+    m_pkSpawnModifier = static_cast<NiPSysSpawnModifier*>(kStream.GetObjectFromLinkID());
 }
 
 bool NiPSysAgeDeathModifier::RegisterStreamables(NiStream& kStream) {
-	return NiPSysModifier::RegisterStreamables(kStream);
+    return NiPSysModifier::RegisterStreamables(kStream);
 }
 
 void NiPSysAgeDeathModifier::SaveBinary(NiStream& kStream) {
-	NiPSysModifier::SaveBinary(kStream);
+    NiPSysModifier::SaveBinary(kStream);
 
-	uint8_t ucSpawnOnDeath = m_bSpawnOnDeath;
-	NiStreamSaveBinary(kStream, ucSpawnOnDeath);
-	kStream.SaveLinkID(m_pkSpawnModifier);
+    uint8_t ucSpawnOnDeath = m_bSpawnOnDeath;
+    NiStreamSaveBinary(kStream, ucSpawnOnDeath);
+    kStream.SaveLinkID(m_pkSpawnModifier);
 }
 
 // Spawn modifiers compare by value, the other's asked first.
 bool NiPSysAgeDeathModifier::IsEqual(NiObject* pkObject) {
-	if (!NiPSysModifier::IsEqual(pkObject)) {
-		return false;
-	}
+    if (!NiPSysModifier::IsEqual(pkObject)) {
+        return false;
+    }
 
-	NiPSysAgeDeathModifier* pkOther = static_cast<NiPSysAgeDeathModifier*>(pkObject);
-	if (pkOther->m_bSpawnOnDeath != m_bSpawnOnDeath) {
-		return false;
-	}
-	if ((pkOther->m_pkSpawnModifier && !m_pkSpawnModifier) || (!pkOther->m_pkSpawnModifier && m_pkSpawnModifier)) {
-		return false;
-	}
-	if (pkOther->m_pkSpawnModifier && m_pkSpawnModifier && !pkOther->m_pkSpawnModifier->IsEqual(m_pkSpawnModifier)) {
-		return false;
-	}
-	return true;
+    NiPSysAgeDeathModifier* pkOther = static_cast<NiPSysAgeDeathModifier*>(pkObject);
+    if (pkOther->m_bSpawnOnDeath != m_bSpawnOnDeath) {
+        return false;
+    }
+    if ((pkOther->m_pkSpawnModifier && !m_pkSpawnModifier) || (!pkOther->m_pkSpawnModifier && m_pkSpawnModifier)) {
+        return false;
+    }
+    if (pkOther->m_pkSpawnModifier && m_pkSpawnModifier && !pkOther->m_pkSpawnModifier->IsEqual(m_pkSpawnModifier)) {
+        return false;
+    }
+    return true;
 }
 
 void NiPSysAgeDeathModifier::GetViewerStrings(NiTPrimitiveArray<char*>* pkStrings) {
-	NiPSysModifier::GetViewerStrings(pkStrings);
+    NiPSysModifier::GetViewerStrings(pkStrings);
 
-	pkStrings->Add(NiGetViewerString(NiPSysAgeDeathModifier::ms_RTTI.GetName()));
-	pkStrings->Add(NiGetViewerString("Spawn on Death", m_bSpawnOnDeath));
-	pkStrings->Add(NiGetViewerString("Spawn Modifier",
-		m_pkSpawnModifier ? static_cast<const char*>(m_pkSpawnModifier->m_kName) : "None"));
+    pkStrings->Add(NiGetViewerString(NiPSysAgeDeathModifier::ms_RTTI.GetName()));
+    pkStrings->Add(NiGetViewerString("Spawn on Death", m_bSpawnOnDeath));
+    pkStrings->Add(NiGetViewerString(
+        "Spawn Modifier", m_pkSpawnModifier ? static_cast<const char*>(m_pkSpawnModifier->m_kName) : "None"
+    ));
 }
 
 // The clone points at the clone of the spawn modifier, or at the original when that was not cloned.
 void NiPSysAgeDeathModifier::ProcessClone(NiCloningProcess& kCloning) {
-	NiPSysModifier::ProcessClone(kCloning);
+    NiPSysModifier::ProcessClone(kCloning);
 
-	NiObject* pkObject = nullptr;
-	kCloning.m_pkCloneMap->GetAt(this, pkObject);
-	NiPSysAgeDeathModifier* pkClone = static_cast<NiPSysAgeDeathModifier*>(pkObject);
-	if (m_pkSpawnModifier) {
-		if (kCloning.m_pkCloneMap->GetAt(m_pkSpawnModifier, pkObject)) {
-			pkClone->m_pkSpawnModifier = static_cast<NiPSysSpawnModifier*>(pkObject);
-		} else {
-			pkClone->m_pkSpawnModifier = m_pkSpawnModifier;
-		}
-	}
+    NiObject* pkObject = nullptr;
+    kCloning.m_pkCloneMap->GetAt(this, pkObject);
+    NiPSysAgeDeathModifier* pkClone = static_cast<NiPSysAgeDeathModifier*>(pkObject);
+    if (m_pkSpawnModifier) {
+        if (kCloning.m_pkCloneMap->GetAt(m_pkSpawnModifier, pkObject)) {
+            pkClone->m_pkSpawnModifier = static_cast<NiPSysSpawnModifier*>(pkObject);
+        }
+        else {
+            pkClone->m_pkSpawnModifier = m_pkSpawnModifier;
+        }
+    }
 }
 
 // Ages every active particle, last first, and removes those past their life span. With spawning on, each dying particle
 // first spawns at the moment it died.
 void NiPSysAgeDeathModifier::Update(float fTime, NiPSysData* pkData) {
-	if (m_bSpawnOnDeath && m_pkSpawnModifier) {
-		uint16_t i = pkData->m_usActive;
-		uint32_t uiIndex = static_cast<uint16_t>(i - 1);
-		for (; i > 0; i--, uiIndex += 0xFFFF) {
-			uint16_t usIndex = static_cast<uint16_t>(uiIndex);
-			NiParticleInfo* pkInfo = &pkData->m_pkParticleInfo[usIndex];
-			float fAge = fTime - pkInfo->m_fLastUpdate + pkInfo->m_fAge;
-			pkInfo->m_fAge = fAge;
-			if (pkInfo->m_fLifeSpan < fAge) {
-				float fSpawnTime = pkInfo->m_fLifeSpan + fTime - fAge;
-				m_pkSpawnModifier->SpawnParticles(fTime, fSpawnTime, static_cast<int32_t>(uiIndex), m_pkTarget);
-				pkData->RemoveParticle(static_cast<int32_t>(uiIndex));
-			}
-		}
-	} else {
-		uint16_t i = pkData->m_usActive;
-		uint32_t uiIndex = static_cast<uint16_t>(i - 1);
-		for (; i > 0; i--, uiIndex += 0xFFFF) {
-			uint16_t usIndex = static_cast<uint16_t>(uiIndex);
-			NiParticleInfo* pkInfo = &pkData->m_pkParticleInfo[usIndex];
-			float fAge = fTime - pkInfo->m_fLastUpdate + pkInfo->m_fAge;
-			pkInfo->m_fAge = fAge;
-			if (pkInfo->m_fLifeSpan < fAge) {
-				pkData->RemoveParticle(static_cast<int32_t>(uiIndex));
-			}
-		}
-	}
+    if (m_bSpawnOnDeath && m_pkSpawnModifier) {
+        uint16_t i = pkData->m_usActive;
+        uint32_t uiIndex = static_cast<uint16_t>(i - 1);
+        for (; i > 0; i--, uiIndex += 0xFFFF) {
+            uint16_t usIndex = static_cast<uint16_t>(uiIndex);
+            NiParticleInfo* pkInfo = &pkData->m_pkParticleInfo[usIndex];
+            float fAge = fTime - pkInfo->m_fLastUpdate + pkInfo->m_fAge;
+            pkInfo->m_fAge = fAge;
+            if (pkInfo->m_fLifeSpan < fAge) {
+                float fSpawnTime = pkInfo->m_fLifeSpan + fTime - fAge;
+                m_pkSpawnModifier->SpawnParticles(fTime, fSpawnTime, static_cast<int32_t>(uiIndex), m_pkTarget);
+                pkData->RemoveParticle(static_cast<int32_t>(uiIndex));
+            }
+        }
+    }
+    else {
+        uint16_t i = pkData->m_usActive;
+        uint32_t uiIndex = static_cast<uint16_t>(i - 1);
+        for (; i > 0; i--, uiIndex += 0xFFFF) {
+            uint16_t usIndex = static_cast<uint16_t>(uiIndex);
+            NiParticleInfo* pkInfo = &pkData->m_pkParticleInfo[usIndex];
+            float fAge = fTime - pkInfo->m_fLastUpdate + pkInfo->m_fAge;
+            pkInfo->m_fAge = fAge;
+            if (pkInfo->m_fLifeSpan < fAge) {
+                pkData->RemoveParticle(static_cast<int32_t>(uiIndex));
+            }
+        }
+    }
 }
 
 NiObject* NiPSysAgeDeathModifier::CreateObject() {
-	NiPSysAgeDeathModifier* pkObject =
-		static_cast<NiPSysAgeDeathModifier*>(NiMemObject::operator new(sizeof(NiPSysAgeDeathModifier)));
-	if (!pkObject) {
-		return 0;
-	}
-	return ::new (pkObject) NiPSysAgeDeathModifier;
+    NiPSysAgeDeathModifier* pkObject =
+        static_cast<NiPSysAgeDeathModifier*>(NiMemObject::operator new(sizeof(NiPSysAgeDeathModifier)));
+    if (!pkObject) {
+        return 0;
+    }
+    return ::new (pkObject) NiPSysAgeDeathModifier;
 }

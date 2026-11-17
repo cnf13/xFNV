@@ -6,14 +6,14 @@
 // Constraint atom that holds the constraint's frame in each body's local space.
 class hkpSetLocalTransformsConstraintAtom : public hkpConstraintAtom {
 public:
-	// Copy assignment: copies the atom's type and the two transforms.
-	hkpSetLocalTransformsConstraintAtom& operator=(const hkpSetLocalTransformsConstraintAtom& other);
+    // Copy assignment: copies the atom's type and the two transforms.
+    hkpSetLocalTransformsConstraintAtom& operator=(const hkpSetLocalTransformsConstraintAtom& other);
 
-	// Havok SDK signature (hkpDynamics.lib, tied by target).
-	static const hkClass& staticClass();
+    // Havok SDK signature (hkpDynamics.lib, tied by target).
+    static const hkClass& staticClass();
 
-	hkTransform m_transformA;
-	hkTransform m_transformB;
+    hkTransform m_transformA;
+    hkTransform m_transformB;
 };
 
 // The hkTypeInfo records of the reflected types declared here (constant data, the SDK's <Class>Class.cpp).

@@ -40,19 +40,19 @@ size_t fread_s(void* buffer, size_t bufferSize, size_t elementSize, size_t count
 // (platform::NativePath: the game's paths are Windows paths, relative to the game's folder). Defined in stdio.cpp.
 namespace rt {
 
-// fopen, 0xEC9A47: the C library's fopen of the game path's native path.
-FILE* fopen(const char* apFilename, const char* apMode);
+    // fopen, 0xEC9A47: the C library's fopen of the game path's native path.
+    FILE* fopen(const char* apFilename, const char* apMode);
 
-// fopen_s, 0xEC9A5E: opens apFilename into *appFile (null on failure); 0 or the errno. VC9 opens with _SH_SECURE
-// (no other writer while it writes); the standard fopen shares the file.
-int32_t fopen_s(FILE** appFile, const char* apFilename, const char* apMode);
+    // fopen_s, 0xEC9A5E: opens apFilename into *appFile (null on failure); 0 or the errno. VC9 opens with _SH_SECURE
+    // (no other writer while it writes); the standard fopen shares the file.
+    int32_t fopen_s(FILE** appFile, const char* apFilename, const char* apMode);
 
-// fgets of a stream opened in text mode (no `b` in its mode), as the Windows C runtime reads one: a CR LF line end
-// reads as LF, and Ctrl-Z ends the file. glibc's streams have no text mode and would keep the CR; on Windows this is
-// the C library's fgets.
-char* fgets(char* apBuffer, int32_t aiCount, FILE* apStream);
+    // fgets of a stream opened in text mode (no `b` in its mode), as the Windows C runtime reads one: a CR LF line end
+    // reads as LF, and Ctrl-Z ends the file. glibc's streams have no text mode and would keep the CR; on Windows this
+    // is the C library's fgets.
+    char* fgets(char* apBuffer, int32_t aiCount, FILE* apStream);
 
-// rename, 0xEC862C: 0 on success. The files are the game paths' native paths.
-int32_t rename(const char* apOldName, const char* apNewName);
+    // rename, 0xEC862C: 0 on success. The files are the game paths' native paths.
+    int32_t rename(const char* apOldName, const char* apNewName);
 
 } // namespace rt

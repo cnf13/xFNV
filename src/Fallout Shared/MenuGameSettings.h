@@ -6,9 +6,13 @@
 // A namespace-like class: its members are only static functions and it has no data.
 class MenuGameSettings {
 public:
-	// Writes the message for a body part the player crippled into apBuffer.
-	static void GetDamagedByPlayerBodyPartMessage(ActorValue::Index aiWhich, char* apBodyPartName, char* apBuffer,
-		int32_t aiMaxBufferSize);
+    // Writes the message for a body part the player crippled into apBuffer.
+    static void GetDamagedByPlayerBodyPartMessage(
+        ActorValue::Index aiWhich,
+        char* apBodyPartName,
+        char* apBuffer,
+        int32_t aiMaxBufferSize
+    );
 };
 
 // The game settings MenuGamesettings.cpp defines.

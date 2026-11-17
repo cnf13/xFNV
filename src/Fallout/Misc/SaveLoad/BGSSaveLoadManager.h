@@ -11,7 +11,8 @@ class BGSSaveLoadFile;
 class BGSSaveLoadFileEntry;
 class BSSaveDataSystemUtilityFile;
 
-template <class T> class BSSimpleList;
+template <class T>
+class BSSimpleList;
 
 // Prints the formatted text through the CRT's vprintf.
 int32_t BSprintf(const char* apFormat, ...);
@@ -23,139 +24,143 @@ void LoadGameMissingContentCallBack();
 // Lists, writes and loads the save games.
 class BGSSaveLoadManager {
 public:
-	// What a save file is opened for: OpenSaveFile gives a load a 2 MB buffer, the others 64 KB.
-	enum SAVEFILE_TYPE : int32_t {
-		SAVEFILE_SCREENSHOT = 0x0,
-		SAVEFILE_LOAD = 0x1,
-		SAVEFILE_SAVE = 0x2,
-	};
+    // What a save file is opened for: OpenSaveFile gives a load a 2 MB buffer, the others 64 KB.
+    enum SAVEFILE_TYPE : int32_t {
+        SAVEFILE_SCREENSHOT = 0x0,
+        SAVEFILE_LOAD = 0x1,
+        SAVEFILE_SAVE = 0x2,
+    };
 
-	BGSSaveLoadManager();
-	~BGSSaveLoadManager();
+    BGSSaveLoadManager();
+    ~BGSSaveLoadManager();
 
-	// Runs the queued saves.
-	void UpdateQueuedSaves();
-	// Loads the most recent save game when there is one.
-	bool LoadMostRecentSaveGame();
-	// Writes the autosave.
-	void Autosave();
-	// Writes the system save.
-	int8_t SystemSave();
-	// Cleans apFileName of characters a file name cannot hold; returns its length.
-	void ScrubFileName(char* apFileName);
-	// Whether apSaveFileName names a quick save.
-	bool IsSaveFileNameQuicksave(const char* apSaveFileName);
-	// Writes the player's play time into apPlayTimeString (260 bytes) as hours.minutes.seconds, the hours three
-	// digits wide when abDisplayOnly.
-	void GetPlayTimeString(char* apPlayTimeString, bool abDisplayOnly);
-	// Whether apSaveFileName names a full save.
-	bool IsSaveFileNameGenerated(const char* apSaveFileName);
-	// Opens the save file apFileName for reading, or for writing when abWrite, with a buffer sized for aeType.
-	BGSSaveLoadFile* OpenSaveFile(const char* apFileName, bool abWrite, SAVEFILE_TYPE aeBufferType, int32_t aiDeviceID);
-	// Closes and frees apFile; when written, rotates the .bak backups and renames the written file into place.
-	void CloseSaveFile(BGSSaveLoadFile* apFile, bool abWrite);
-	// Whether apSaveFileName names an autosave.
-	bool IsSaveFileNameAutosave(const char* apSaveFileName);
-	bool IsSaveFileNameSystemSave(const char* apSaveFileName);
-	// Whether a most recent save game is known.
-	bool HasMostRecentSaveGame();
-	// Writes a save game to apFileName (a new numbered save when null) on device aiDeviceID; true on success.
-	bool SaveGame(const char* apFileName, int32_t aiDeviceID, bool abOutputStats);
-	// Writes the save directory into apDirectoryPath.
-	void GetSaveDirectoryPath(char* apDirectoryPath);
-	// True when the game may be saved now.
-	bool IsSavingAllowed(bool abAutosave);
-	// Sets pSysUtilSaveCompleteCallback.
-	void SetSystemUtilitySaveCompleteCallback(void (*apCallback)(BSSaveDataSystemUtility::RESULT,
-		BSSaveDataSystemUtilityFile*&));
-	void SetSystemUtilityLoadCompleteCallback(void (*apCallback)(BSSaveDataSystemUtility::RESULT,
-		BSSaveDataSystemUtilityFile*&));
-	// The save format's version, 48.
-	int32_t GetMajorVersion();
-	int32_t GetMinorVersion();
-	// Writes the full path of the save apFileName to apFullFileName.
-	void GetFullFileName(const char* apFileName, char* apFullFileName);
-	// Writes the game's version text, at most aiSize bytes, to apVersionInfo.
-	void GetVersionInfo(char* apVersionInfo, uint32_t aiSize);
-	// Readies the manager for a load.
-	void StartLoadGame();
-	// Shows the quick save message and saves to "quicksave"; true on success.
-	void Quicksave();
-	// Shows the quick load message and loads "quicksave"; true on success.
-	bool Quickload();
-	// Loads the save game apFileName from device aiDeviceID; true on success.
-	bool LoadGame(const char* apFileName, int32_t aiDeviceID, bool abOutputStats, bool abIgnoreMissingContent);
-	bool IsLoadingGame();
-	void SetAutoSaveTimerTo1();
-	void SetForceSaveTimer();
-	void SetShouldSystemSave();
-	// Whether a save can go to device aiDeviceID; always returns true.
-	bool CanSave(int32_t aiDeviceID);
-	bool IsSaveFileNameCustom(const char* apSaveFileName);
-	// Deletes the save file apFileName on device aiDeviceID; nonzero on success.
-	void DeleteSaveFile(const char* apFileName, int32_t aiDeviceID);
-	// Removes apFileEntry from the save game list and deletes it.
-	void RemoveSaveGame(BGSSaveLoadFileEntry* apFileEntry);
-	bool GetSimulatedMode();
-	// Deletes the save game list and every entry.
-	void DeleteSaveGameList();
-	void SetMostRecentSaveGame(const char* apSaveFileName, int32_t aiDeviceID);
-	void GetFullPath(const char* apFileName, char* apFullPath, bool abWrite);
-	bool LoadGameHeader(BGSSaveLoadFile* apFile);
-	// Rebuilds the save game list from the save directory.
-	void SetupSavesList();
-	void AddSaveGame(const char* apFileName, int32_t aiDeviceID, uint32_t aiSaveGameNumber);
-	void GenerateSaveFileName(char* apSaveFileName, bool abDisplayOnly, bool abAutosave);
+    // Runs the queued saves.
+    void UpdateQueuedSaves();
+    // Loads the most recent save game when there is one.
+    bool LoadMostRecentSaveGame();
+    // Writes the autosave.
+    void Autosave();
+    // Writes the system save.
+    int8_t SystemSave();
+    // Cleans apFileName of characters a file name cannot hold; returns its length.
+    void ScrubFileName(char* apFileName);
+    // Whether apSaveFileName names a quick save.
+    bool IsSaveFileNameQuicksave(const char* apSaveFileName);
+    // Writes the player's play time into apPlayTimeString (260 bytes) as hours.minutes.seconds, the hours three
+    // digits wide when abDisplayOnly.
+    void GetPlayTimeString(char* apPlayTimeString, bool abDisplayOnly);
+    // Whether apSaveFileName names a full save.
+    bool IsSaveFileNameGenerated(const char* apSaveFileName);
+    // Opens the save file apFileName for reading, or for writing when abWrite, with a buffer sized for aeType.
+    BGSSaveLoadFile* OpenSaveFile(const char* apFileName, bool abWrite, SAVEFILE_TYPE aeBufferType, int32_t aiDeviceID);
+    // Closes and frees apFile; when written, rotates the .bak backups and renames the written file into place.
+    void CloseSaveFile(BGSSaveLoadFile* apFile, bool abWrite);
+    // Whether apSaveFileName names an autosave.
+    bool IsSaveFileNameAutosave(const char* apSaveFileName);
+    bool IsSaveFileNameSystemSave(const char* apSaveFileName);
+    // Whether a most recent save game is known.
+    bool HasMostRecentSaveGame();
+    // Writes a save game to apFileName (a new numbered save when null) on device aiDeviceID; true on success.
+    bool SaveGame(const char* apFileName, int32_t aiDeviceID, bool abOutputStats);
+    // Writes the save directory into apDirectoryPath.
+    void GetSaveDirectoryPath(char* apDirectoryPath);
+    // True when the game may be saved now.
+    bool IsSavingAllowed(bool abAutosave);
+    // Sets pSysUtilSaveCompleteCallback.
+    void SetSystemUtilitySaveCompleteCallback(
+        void (*apCallback)(BSSaveDataSystemUtility::RESULT, BSSaveDataSystemUtilityFile*&)
+    );
+    void SetSystemUtilityLoadCompleteCallback(
+        void (*apCallback)(BSSaveDataSystemUtility::RESULT, BSSaveDataSystemUtilityFile*&)
+    );
+    // The save format's version, 48.
+    int32_t GetMajorVersion();
+    int32_t GetMinorVersion();
+    // Writes the full path of the save apFileName to apFullFileName.
+    void GetFullFileName(const char* apFileName, char* apFullFileName);
+    // Writes the game's version text, at most aiSize bytes, to apVersionInfo.
+    void GetVersionInfo(char* apVersionInfo, uint32_t aiSize);
+    // Readies the manager for a load.
+    void StartLoadGame();
+    // Shows the quick save message and saves to "quicksave"; true on success.
+    void Quicksave();
+    // Shows the quick load message and loads "quicksave"; true on success.
+    bool Quickload();
+    // Loads the save game apFileName from device aiDeviceID; true on success.
+    bool LoadGame(const char* apFileName, int32_t aiDeviceID, bool abOutputStats, bool abIgnoreMissingContent);
+    bool IsLoadingGame();
+    void SetAutoSaveTimerTo1();
+    void SetForceSaveTimer();
+    void SetShouldSystemSave();
+    // Whether a save can go to device aiDeviceID; always returns true.
+    bool CanSave(int32_t aiDeviceID);
+    bool IsSaveFileNameCustom(const char* apSaveFileName);
+    // Deletes the save file apFileName on device aiDeviceID; nonzero on success.
+    void DeleteSaveFile(const char* apFileName, int32_t aiDeviceID);
+    // Removes apFileEntry from the save game list and deletes it.
+    void RemoveSaveGame(BGSSaveLoadFileEntry* apFileEntry);
+    bool GetSimulatedMode();
+    // Deletes the save game list and every entry.
+    void DeleteSaveGameList();
+    void SetMostRecentSaveGame(const char* apSaveFileName, int32_t aiDeviceID);
+    void GetFullPath(const char* apFileName, char* apFullPath, bool abWrite);
+    bool LoadGameHeader(BGSSaveLoadFile* apFile);
+    // Rebuilds the save game list from the save directory.
+    void SetupSavesList();
+    void AddSaveGame(const char* apFileName, int32_t aiDeviceID, uint32_t aiSaveGameNumber);
+    void GenerateSaveFileName(char* apSaveFileName, bool abDisplayOnly, bool abAutosave);
 
 protected:
-	void StartSaveGame();
-	void EndSaveGame();
-	void SaveGameHeader(BGSSaveLoadFile* apFile);
+    void StartSaveGame();
+    void EndSaveGame();
+    void SaveGameHeader(BGSSaveLoadFile* apFile);
 
 public:
-	void EndLoadGame();
-	void CopySaveGames(bool bFromMemoryStick);
-	void GetPlayerLocationName(char* apLocationName);
+    void EndLoadGame();
+    void CopySaveGames(bool bFromMemoryStick);
+    void GetPlayerLocationName(char* apLocationName);
 
-	// Deletes pSaveLoadManager and clears it.
-	static void Destroy();
-	// Writes the system save name to apDest.
-	static void CreateSystemSaveName(char* apDest);
-	static void operator delete(void* apMemory) { ourFree(apMemory); }
-	static void Create();
-	static void SysUtilSaveCompleteCallback(BSSaveDataSystemUtility::RESULT aeResult,
-		BSSaveDataSystemUtilityFile*& apSaveDataFile);
-	static void SysUtilDeleteCompleteCallback(BSSaveDataSystemUtility::RESULT aeResult);
+    // Deletes pSaveLoadManager and clears it.
+    static void Destroy();
+    // Writes the system save name to apDest.
+    static void CreateSystemSaveName(char* apDest);
+    static void operator delete(void* apMemory) {
+        ourFree(apMemory);
+    }
+    static void Create();
+    static void
+    SysUtilSaveCompleteCallback(BSSaveDataSystemUtility::RESULT aeResult, BSSaveDataSystemUtilityFile*& apSaveDataFile);
+    static void SysUtilDeleteCompleteCallback(BSSaveDataSystemUtility::RESULT aeResult);
 
-	// The save game list: AddSaveGame adds an entry to it, DeleteSaveGameList deletes it and every entry.
-	BSSimpleList<BGSSaveLoadFileEntry*>* pSaveGameList;
-	uint32_t iSaveGameCount;
-	uint32_t iCurrentSaveGameNumber;
-	// Whether the game runs in simulated mode.
-	bool bSimulatedMode;
-	// Whether autosaves are turned off because there is no disk space for them.
-	bool bAutosaveDisabledForDiskspace;
-	bool bhandledCorrupt;
-	uint8_t cQueuedAutosave;
-	uint8_t cQueuedForceSave;
-	uint8_t cSystemSaveTimer;
-	uint8_t padding12[0x2];
-	char* pMostRecentSaveGame;
-	int32_t iMostRecentSaveGameDeviceID;
-	bool bSysUtilHasSaveData;
-	uint8_t padding1D[3];
-	// The save file being written or read.
-	BGSSaveLoadFile* pSaveLoadFile;
-	bool bReturnedFromSysUtil;
-	// Whether the system utility has finished handing the loaded save data over.
-	bool bSysUtilLoadDataComplete;
-	bool bStartMenuLoading;
-	uint8_t padding27[1];
-	// Called with the result and the save data file when the system utility finishes a save or a load.
-	void (*pSysUtilSaveCompleteCallback)(BSSaveDataSystemUtility::RESULT, BSSaveDataSystemUtilityFile*&);
-	void (*pSysUtilLoadCompleteCallback)(BSSaveDataSystemUtility::RESULT, BSSaveDataSystemUtilityFile*&);
-	// endGame_MSGBox matches its text against the saves' player names; the destructor destroys it.
-	BSStringT<char> pSaveName;
+    // The save game list: AddSaveGame adds an entry to it, DeleteSaveGameList deletes it and every entry.
+    BSSimpleList<BGSSaveLoadFileEntry*>* pSaveGameList;
+    uint32_t iSaveGameCount;
+    uint32_t iCurrentSaveGameNumber;
+    // Whether the game runs in simulated mode.
+    bool bSimulatedMode;
+    // Whether autosaves are turned off because there is no disk space for them.
+    bool bAutosaveDisabledForDiskspace;
+    bool bhandledCorrupt;
+    uint8_t cQueuedAutosave;
+    uint8_t cQueuedForceSave;
+    uint8_t cSystemSaveTimer;
+    uint8_t padding12[0x2];
+    char* pMostRecentSaveGame;
+    int32_t iMostRecentSaveGameDeviceID;
+    bool bSysUtilHasSaveData;
+    uint8_t padding1D[3];
+    // The save file being written or read.
+    BGSSaveLoadFile* pSaveLoadFile;
+    bool bReturnedFromSysUtil;
+    // Whether the system utility has finished handing the loaded save data over.
+    bool bSysUtilLoadDataComplete;
+    bool bStartMenuLoading;
+    uint8_t padding27[1];
+    // Called with the result and the save data file when the system utility finishes a save or a load.
+    void (*pSysUtilSaveCompleteCallback)(BSSaveDataSystemUtility::RESULT, BSSaveDataSystemUtilityFile*&);
+    void (*pSysUtilLoadCompleteCallback)(BSSaveDataSystemUtility::RESULT, BSSaveDataSystemUtilityFile*&);
+    // endGame_MSGBox matches its text against the saves' player names; the destructor destroys it.
+    BSStringT<char> pSaveName;
 };
 
 // The save/load manager singleton.

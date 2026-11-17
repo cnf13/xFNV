@@ -5,6 +5,6 @@
 
 class NiPoint5 {
 public:
-	NiPoint2 kRotation;
-	NiPoint3 kPosition;
+    NiPoint2 kRotation;
+    NiPoint3 kPosition;
 };

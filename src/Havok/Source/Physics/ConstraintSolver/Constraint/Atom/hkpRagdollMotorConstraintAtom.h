@@ -10,17 +10,17 @@ class hkpConstraintMotor;
 // motor each.
 class hkpRagdollMotorConstraintAtom : public hkpConstraintAtom {
 public:
-	// Havok SDK signature (hkpDynamics.lib, tied by target).
-	static const hkClass& staticClass();
+    // Havok SDK signature (hkpDynamics.lib, tied by target).
+    static const hkClass& staticClass();
 
-	hkBool m_isEnabled;
-	uint8_t padding03;
-	int16_t m_initializedOffset;
-	int16_t m_previousTargetAnglesOffset;
-	// m_target_bRca starts on a 16-byte boundary. hkMatrix3's hkVector4 columns give it that alignment, so the 8 bytes
-	// after m_previousTargetAnglesOffset are the compiler's padding.
-	hkMatrix3 m_target_bRca;
-	hkpConstraintMotor* m_motors[3];
+    hkBool m_isEnabled;
+    uint8_t padding03;
+    int16_t m_initializedOffset;
+    int16_t m_previousTargetAnglesOffset;
+    // m_target_bRca starts on a 16-byte boundary. hkMatrix3's hkVector4 columns give it that alignment, so the 8 bytes
+    // after m_previousTargetAnglesOffset are the compiler's padding.
+    hkMatrix3 m_target_bRca;
+    hkpConstraintMotor* m_motors[3];
 };
 
 // The hkTypeInfo records of the reflected types declared here (constant data, the SDK's <Class>Class.cpp).

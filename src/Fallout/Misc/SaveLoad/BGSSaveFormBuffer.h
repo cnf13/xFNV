@@ -8,28 +8,30 @@
 // The buffer one form is saved into: the form's header and the form itself.
 class BGSSaveFormBuffer : public BGSSaveGameBuffer {
 public:
-	BGSSaveFormBuffer();
-	~BGSSaveFormBuffer();
+    BGSSaveFormBuffer();
+    ~BGSSaveFormBuffer();
 
-	TESForm* GetForm() override { return pForm; }
-	TESObjectREFR* GetReference() override;
-	Actor* GetActor() override;
+    TESForm* GetForm() override {
+        return pForm;
+    }
+    TESObjectREFR* GetReference() override;
+    Actor* GetActor() override;
 
-	// The form's type, from Header.FormInfo.
-	ENUM_FORM_ID GetFormType();
+    // The form's type, from Header.FormInfo.
+    ENUM_FORM_ID GetFormType();
 
-	// The form's change flags (Header.iChangeFlags).
-	BGSChangeFlags GetChangeFlags();
-	void SetHeader(uint32_t aiFormID, BGSChangeFlags aiChangeFlags, ENUM_FORM_ID aeFormType, uint8_t acVersion);
-	void RemoveChange(int32_t aiFlags);
-	uint32_t GetOverhead();
-	// Sets Header.iChangeFlags = aiChangeFlags.
-	void SetChangeFlags(BGSChangeFlags aiChangeFlags);
-	void SetForm(TESForm* apForm);
-	// Writes the header and the buffered data to apFile.
-	void Save(BGSSaveLoadFile* apFile);
-	void SaveMatrixAsQuaternion(NiMatrix3* a2, int32_t a3, int32_t a4);
+    // The form's change flags (Header.iChangeFlags).
+    BGSChangeFlags GetChangeFlags();
+    void SetHeader(uint32_t aiFormID, BGSChangeFlags aiChangeFlags, ENUM_FORM_ID aeFormType, uint8_t acVersion);
+    void RemoveChange(int32_t aiFlags);
+    uint32_t GetOverhead();
+    // Sets Header.iChangeFlags = aiChangeFlags.
+    void SetChangeFlags(BGSChangeFlags aiChangeFlags);
+    void SetForm(TESForm* apForm);
+    // Writes the header and the buffered data to apFile.
+    void Save(BGSSaveLoadFile* apFile);
+    void SaveMatrixAsQuaternion(NiMatrix3* a2, int32_t a3, int32_t a4);
 
-	BGSSaveLoadFormHeader Header;
-	TESForm* pForm;
+    BGSSaveLoadFormHeader Header;
+    TESForm* pForm;
 };

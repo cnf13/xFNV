@@ -7,12 +7,12 @@
 // given in m_geometry and type HK_DISPLAY_CONVEX, and adds no data.
 class hkDisplayConvex : public hkDisplayGeometry {
 public:
-	// Stores geom with type HK_DISPLAY_CONVEX and the identity transform.
-	hkDisplayConvex(hkGeometry* geom);
+    // Stores geom with type HK_DISPLAY_CONVEX and the identity transform.
+    hkDisplayConvex(hkGeometry* geom);
 
-	void getWireframeGeometry(hkArrayBase<hkVector4>& lines, hkMemoryAllocator& a) override;
-	// Empty: the geometry is given at construction.
-	void buildGeometry() override;
+    void getWireframeGeometry(hkArrayBase<hkVector4>& lines, hkMemoryAllocator& a) override;
+    // Empty: the geometry is given at construction.
+    void buildGeometry() override;
 
-	using hkDisplayGeometry::getWireframeGeometry;
+    using hkDisplayGeometry::getWireframeGeometry;
 };

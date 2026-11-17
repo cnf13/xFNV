@@ -18,36 +18,58 @@ static void cleanupLoadedObjecthkxAnimatedFloat(void* p);
 // at start-up (it holds null until then).
 using hkxAnimatedFloatClassMemberTable = hkClassMember[2];
 static hkxAnimatedFloatClassMemberTable hkxAnimatedFloatClass_Members{
-	{"floats", nullptr, nullptr, {hkClassMember::TYPE_ARRAY}, {hkClassMember::TYPE_REAL}, 0, 0, 0x8, nullptr},
-	{"hint", nullptr, hkxAttributeHintEnum, {hkClassMember::TYPE_ENUM}, {hkClassMember::TYPE_UINT8}, 0, 0, 0x14,
-		nullptr}};
-hkClass hkxAnimatedFloatClass("hkxAnimatedFloat", &hkReferencedObjectClass, 24, nullptr, 0, nullptr, 0,
-	hkxAnimatedFloatClass_Members, 2, nullptr, nullptr, 0, 1);
-hkTypeInfo hkxAnimatedFloatTypeInfo{"hkxAnimatedFloat", finishLoadedObjecthkxAnimatedFloat,
-	cleanupLoadedObjecthkxAnimatedFloat, getVtablehkxAnimatedFloat(), &typeid(hkxAnimatedFloat),
-	sizeof(hkxAnimatedFloat)};
+    {"floats", nullptr, nullptr, {hkClassMember::TYPE_ARRAY}, {hkClassMember::TYPE_REAL}, 0, 0, 0x8, nullptr},
+    {"hint",
+     nullptr,
+     hkxAttributeHintEnum,
+     {hkClassMember::TYPE_ENUM},
+     {hkClassMember::TYPE_UINT8},
+     0,
+     0,
+     0x14,
+     nullptr}
+};
+hkClass hkxAnimatedFloatClass(
+    "hkxAnimatedFloat",
+    &hkReferencedObjectClass,
+    24,
+    nullptr,
+    0,
+    nullptr,
+    0,
+    hkxAnimatedFloatClass_Members,
+    2,
+    nullptr,
+    nullptr,
+    0,
+    1
+);
+hkTypeInfo hkxAnimatedFloatTypeInfo{
+    "hkxAnimatedFloat",          finishLoadedObjecthkxAnimatedFloat, cleanupLoadedObjecthkxAnimatedFloat,
+    getVtablehkxAnimatedFloat(), &typeid(hkxAnimatedFloat),          sizeof(hkxAnimatedFloat)
+};
 
 // The type info's finish-loaded-object callback for hkxAnimatedFloat: its finish constructor, when the object is
 // not null.
 static void finishLoadedObjecthkxAnimatedFloat(void* p, int32_t finishing) {
-	if (p) {
-		hkFinishLoadedObjectFlag flag;
-		flag.m_finishing = finishing;
-		::new (p) hkxAnimatedFloat(flag);
-	}
+    if (p) {
+        hkFinishLoadedObjectFlag flag;
+        flag.m_finishing = finishing;
+        ::new (p) hkxAnimatedFloat(flag);
+    }
 }
 
 static const void* getVtablehkxAnimatedFloat() {
-	return hkGetVtableOf<hkxAnimatedFloat>();
+    return hkGetVtableOf<hkxAnimatedFloat>();
 }
 
 static void cleanupLoadedObjecthkxAnimatedFloat(void* p) {
-	static_cast<hkxAnimatedFloat*>(p)->~hkxAnimatedFloat();
+    static_cast<hkxAnimatedFloat*>(p)->~hkxAnimatedFloat();
 }
 
 // The member frees the floats.
 hkxAnimatedFloat::~hkxAnimatedFloat() {}
 
 const hkClass& hkxAnimatedFloat::staticClass() {
-	return hkxAnimatedFloatClass;
+    return hkxAnimatedFloatClass;
 }

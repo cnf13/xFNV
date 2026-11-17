@@ -4,8 +4,8 @@
 
 class ImageSpaceShaderHDRBlendCinematic : public ImageSpaceShader {
 public:
-	ImageSpaceShaderHDRBlendCinematic();
-	~ImageSpaceShaderHDRBlendCinematic() override;
+    ImageSpaceShaderHDRBlendCinematic();
+    ~ImageSpaceShaderHDRBlendCinematic() override;
 
-	void ReloadShaders() override;
+    void ReloadShaders() override;
 };

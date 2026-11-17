@@ -12,10 +12,9 @@
 #include "Fallout Shared/Animation.h"
 #include "Fallout Shared/BGSAddonNode.h"
 #include "Fallout Shared/BGSCameraPath.h"
-#include "Fallout Shared/BipedAnim.h"
 #include "Fallout Shared/BSAnimNoteReceiver.h"
+#include "Fallout Shared/BipedAnim.h"
 #include "Fallout Shared/Region System/TESRegion.h"
-#include "Fallout Shared/TempEffects/BSTempEffect.h"
 #include "Fallout Shared/TESDataHandler.h"
 #include "Fallout Shared/TESForm.h"
 #include "Fallout Shared/TESIdleForm.h"
@@ -24,6 +23,7 @@
 #include "Fallout Shared/TESObjectCELL.h"
 #include "Fallout Shared/TESObjectREFR.h"
 #include "Fallout Shared/TESTexture.h"
+#include "Fallout Shared/TempEffects/BSTempEffect.h"
 #include "Fallout/AI/Actor.h"
 #include "Fallout/AI/Combat/CombatGroup.h"
 #include "Fallout/AI/MobileObject.h"
@@ -39,8 +39,8 @@
 #include "Gamebryo2.2/CoreLibs/NiCollision/NiPick.h"
 #include "Gamebryo2.2/CoreLibs/NiDX9Renderer/NiDX9Renderer.h"
 #include "Gamebryo2.2/CoreLibs/NiDX9Renderer/NiDX9SystemDesc.h"
-#include "Gamebryo2.2/CoreLibs/NiMain/NiAdditionalGeometryData.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiAVObject.h"
+#include "Gamebryo2.2/CoreLibs/NiMain/NiAdditionalGeometryData.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiGeometry.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiMetricsOutputModule.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiNode.h"
@@ -55,9 +55,9 @@
 #include "Gamebryo2.2/CoreLibs/NiMain/NiShaderConstantMapEntry.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiStream.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiTCollection.h"
+#include "Gamebryo2.2/CoreLibs/NiMain/NiTSet.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiTexture.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiTexturingProperty.h"
-#include "Gamebryo2.2/CoreLibs/NiMain/NiTSet.h"
 #include "Gamebryo2.2/CoreLibs/NiSystem/NiMemoryDefines.h"
 #include "Gamebryo2.2/CoreLibs/NiXenonRenderer/NiD3DShaderDeclaration.h"
 #include "Gamebryo2.2/CoreLibs/NiXenonRenderer/NiD3DTextureStage.h"
@@ -69,10 +69,11 @@
 // The instantiations whose element type is nested in a class this template's header cannot include (it would include
 // NiTArray.h back): their aliases and specializations live here.
 using NiTArrayBSTextureManagerTextureType =
-	NiTArray<BSTextureManager::eTextureType, NiTMallocInterface<BSTextureManager::eTextureType>>;
+    NiTArray<BSTextureManager::eTextureType, NiTMallocInterface<BSTextureManager::eTextureType>>;
 using NiTArrayNiTexturingPropertyFilterMode =
-	NiTArray<NiTexturingProperty::FilterMode, NiTMallocInterface<NiTexturingProperty::FilterMode>>;
-using NiTArrayBSAnimNoteReceiverTypePtr = NiTArray<BSAnimNoteReceiver::BSAnimNoteReceiverType*,
-	NiTMallocInterface<BSAnimNoteReceiver::BSAnimNoteReceiverType*>>;
+    NiTArray<NiTexturingProperty::FilterMode, NiTMallocInterface<NiTexturingProperty::FilterMode>>;
+using NiTArrayBSAnimNoteReceiverTypePtr = NiTArray<
+    BSAnimNoteReceiver::BSAnimNoteReceiverType*,
+    NiTMallocInterface<BSAnimNoteReceiver::BSAnimNoteReceiverType*>>;
 
 using NiTArray_unsigned_short_NiTMallocInterface_unsigned_short = NiTArray<uint16_t, NiTMallocInterface<uint16_t>>;

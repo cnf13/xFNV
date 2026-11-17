@@ -5,8 +5,8 @@
 // A water image-space shader.
 class WaterDisplaceTexOffset : public ImageSpaceShader {
 public:
-	WaterDisplaceTexOffset();
-	~WaterDisplaceTexOffset() override;
+    WaterDisplaceTexOffset();
+    ~WaterDisplaceTexOffset() override;
 
-	void ReloadShaders() override;
+    void ReloadShaders() override;
 };

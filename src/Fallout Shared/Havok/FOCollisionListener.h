@@ -20,49 +20,54 @@ HavokMaterialType GetMaterialFromCollidable(const hkpCdBody* apCollidable, NiPoi
 // The game's base for its Havok contact listeners: it adds a destructor to hkpContactListener and no data.
 class bhkContactListener : public hkpContactListener {
 public:
-	bhkContactListener();
-	~bhkContactListener() override;
+    bhkContactListener();
+    ~bhkContactListener() override;
 
-	// The deleting destructor frees through ourFree.
-	static void operator delete(void* apMemory);
+    // The deleting destructor frees through ourFree.
+    static void operator delete(void* apMemory);
 };
 
 // The game's Havok collision listener (impact sounds, effects and damage). Only some of its members are declared. It
 // overrides the destructor and contactPointAddedCallback.
 class FOCollisionListener : public bhkContactListener {
 public:
-	// The rigid body, damage and cause of a queued collision-damage event.
-	struct ObjectDamageImpactData {
-		ObjectDamageImpactData();
-		~ObjectDamageImpactData();
+    // The rigid body, damage and cause of a queued collision-damage event.
+    struct ObjectDamageImpactData {
+        ObjectDamageImpactData();
+        ~ObjectDamageImpactData();
 
-		// The deleting destructor frees through ourFree.
-		static void operator delete(void* apMemory);
+        // The deleting destructor frees through ourFree.
+        static void operator delete(void* apMemory);
 
-		NiPointer<bhkRigidBody> spBody;
-		float fDamage;
-		NiPointer<ActorCause> spCause;
-	};
+        NiPointer<bhkRigidBody> spBody;
+        float fDamage;
+        NiPointer<ActorCause> spCause;
+    };
 
-	FOCollisionListener();
-	~FOCollisionListener() override;
+    FOCollisionListener();
+    ~FOCollisionListener() override;
 
-	// Plays the collision sound of an accepted contact point and records its damage.
-	void contactPointAddedCallback(hkpContactPointAddedEvent& arEvent) override;
-	virtual void contactPointConfirmedCallback(hkpContactPointConfirmedEvent& /*event*/) {}
+    // Plays the collision sound of an accepted contact point and records its damage.
+    void contactPointAddedCallback(hkpContactPointAddedEvent& arEvent) override;
+    virtual void contactPointConfirmedCallback(hkpContactPointConfirmedEvent& /*event*/) {}
 
-	// Applies the collision damage queued this frame.
-	void DealObjectDamage();
-	void ReportProjectileImpact(TESObjectREFR* apCollidingRef, hkpContactPointAddedEvent& arEvent);
-	void ClearDamageImpacts();
-	void StoreObjectDamage(float afProjectedVelocity, hkpRigidBody* apBodyA, hkpRigidBody* apBodyB,
-		TESObjectREFR* apRefA, TESObjectREFR* apRefB);
+    // Applies the collision damage queued this frame.
+    void DealObjectDamage();
+    void ReportProjectileImpact(TESObjectREFR* apCollidingRef, hkpContactPointAddedEvent& arEvent);
+    void ClearDamageImpacts();
+    void StoreObjectDamage(
+        float afProjectedVelocity,
+        hkpRigidBody* apBodyA,
+        hkpRigidBody* apBodyB,
+        TESObjectREFR* apRefA,
+        TESObjectREFR* apRefB
+    );
 
-	// The listener, created on first use.
-	static FOCollisionListener* Instance();
+    // The listener, created on first use.
+    static FOCollisionListener* Instance();
 
-	// The collision damage queued this frame; DealObjectDamage takes it from the head.
-	BSSimpleList<ObjectDamageImpactData*> DamageImpacts;
+    // The collision damage queued this frame; DealObjectDamage takes it from the head.
+    BSSimpleList<ObjectDamageImpactData*> DamageImpacts;
 
-	static inline FOCollisionListener* pSingleton;
+    static inline FOCollisionListener* pSingleton;
 };

@@ -7,9 +7,11 @@
 // some of the entries are declared.
 class bhkGeometryUtil {
 public:
-	// Writes the plane equations of the hull of apVerts to arPlaneEquations and the hull's
-	// rounded vertices to arOutVerts.
-	static void ComputePlanesFromVertices(const hkArray<hkVector4, hkContainerHeapAllocator>& arVerts,
-		hkArray<hkVector4, hkContainerHeapAllocator>& arPlaneEquations,
-		hkArray<hkVector4, hkContainerHeapAllocator>& arOutVerts);
+    // Writes the plane equations of the hull of apVerts to arPlaneEquations and the hull's
+    // rounded vertices to arOutVerts.
+    static void ComputePlanesFromVertices(
+        const hkArray<hkVector4, hkContainerHeapAllocator>& arVerts,
+        hkArray<hkVector4, hkContainerHeapAllocator>& arPlaneEquations,
+        hkArray<hkVector4, hkContainerHeapAllocator>& arOutVerts
+    );
 };

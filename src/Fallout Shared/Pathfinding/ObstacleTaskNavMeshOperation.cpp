@@ -12,14 +12,17 @@
 
 ObstacleTaskNavMeshOperation::ObstacleTaskNavMeshOperation() {}
 
-ObstacleTaskNavMeshOperation::ObstacleTaskNavMeshOperation(const NiPointer<ObstacleData>* a1, OBSTACLE_TASK_TYPE a2,
-	NavMeshPtr* a3)
-	: spObstacle(*a1), eType(a2), spNavMesh(*a3) {}
+ObstacleTaskNavMeshOperation::ObstacleTaskNavMeshOperation(
+    const NiPointer<ObstacleData>* a1,
+    OBSTACLE_TASK_TYPE a2,
+    NavMeshPtr* a3
+)
+  : spObstacle(*a1), eType(a2), spNavMesh(*a3) {}
 
 ObstacleTaskNavMeshOperation& ObstacleTaskNavMeshOperation::operator=(const ObstacleTaskNavMeshOperation& aOperation) {
-	spObstacle = aOperation.spObstacle;
-	eType = aOperation.eType;
-	eResult = aOperation.eResult;
-	spNavMesh = aOperation.spNavMesh;
-	return *this;
+    spObstacle = aOperation.spObstacle;
+    eType = aOperation.eType;
+    eResult = aOperation.eResult;
+    spNavMesh = aOperation.spNavMesh;
+    return *this;
 }

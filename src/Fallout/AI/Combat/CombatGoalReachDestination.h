@@ -5,5 +5,5 @@
 // The combat planner goal ReachDestination. It adds no fields to CombatGoal and overrides no virtual.
 class CombatGoalReachDestination : public CombatGoal {
 public:
-	CombatGoalReachDestination(CombatGoal::COMBAT_GOAL aeType);
+    CombatGoalReachDestination(CombatGoal::COMBAT_GOAL aeType);
 };

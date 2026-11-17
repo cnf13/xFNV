@@ -19,31 +19,53 @@ static void cleanupLoadedObjecthkxAnimatedVector(void* p);
 // at start-up.
 using hkxAnimatedVectorClassMemberArray = hkClassMember[2];
 static hkxAnimatedVectorClassMemberArray hkxAnimatedVectorClass_Members{
-	{"vectors", nullptr, nullptr, {hkClassMember::TYPE_ARRAY}, {hkClassMember::TYPE_VECTOR4}, 0, 0, 0x8, nullptr},
-	{"hint", nullptr, hkxAttributeHintEnum, {hkClassMember::TYPE_ENUM}, {hkClassMember::TYPE_UINT8}, 0, 0, 0x14,
-		nullptr}};
-hkClass hkxAnimatedVectorClass("hkxAnimatedVector", &hkReferencedObjectClass, 24, nullptr, 0, nullptr, 0,
-	hkxAnimatedVectorClass_Members, 2, nullptr, nullptr, 0, 1);
-hkTypeInfo hkxAnimatedVectorTypeInfo = {"hkxAnimatedVector", finishLoadedObjecthkxAnimatedVector,
-	cleanupLoadedObjecthkxAnimatedVector, getVtablehkxAnimatedVector(), &typeid(hkxAnimatedVector),
-	sizeof(hkxAnimatedVector)};
+    {"vectors", nullptr, nullptr, {hkClassMember::TYPE_ARRAY}, {hkClassMember::TYPE_VECTOR4}, 0, 0, 0x8, nullptr},
+    {"hint",
+     nullptr,
+     hkxAttributeHintEnum,
+     {hkClassMember::TYPE_ENUM},
+     {hkClassMember::TYPE_UINT8},
+     0,
+     0,
+     0x14,
+     nullptr}
+};
+hkClass hkxAnimatedVectorClass(
+    "hkxAnimatedVector",
+    &hkReferencedObjectClass,
+    24,
+    nullptr,
+    0,
+    nullptr,
+    0,
+    hkxAnimatedVectorClass_Members,
+    2,
+    nullptr,
+    nullptr,
+    0,
+    1
+);
+hkTypeInfo hkxAnimatedVectorTypeInfo = {
+    "hkxAnimatedVector",          finishLoadedObjecthkxAnimatedVector, cleanupLoadedObjecthkxAnimatedVector,
+    getVtablehkxAnimatedVector(), &typeid(hkxAnimatedVector),          sizeof(hkxAnimatedVector)
+};
 
 // The type info's finish-loaded-object callback for hkxAnimatedVector: its finish constructor, when the object is
 // not null.
 static void finishLoadedObjecthkxAnimatedVector(void* p, int32_t finishing) {
-	if (p) {
-		hkFinishLoadedObjectFlag flag;
-		flag.m_finishing = finishing;
-		::new (p) hkxAnimatedVector(flag);
-	}
+    if (p) {
+        hkFinishLoadedObjectFlag flag;
+        flag.m_finishing = finishing;
+        ::new (p) hkxAnimatedVector(flag);
+    }
 }
 
 static const void* getVtablehkxAnimatedVector() {
-	return hkGetVtableOf<hkxAnimatedVector>();
+    return hkGetVtableOf<hkxAnimatedVector>();
 }
 
 static void cleanupLoadedObjecthkxAnimatedVector(void* p) {
-	static_cast<hkxAnimatedVector*>(p)->~hkxAnimatedVector();
+    static_cast<hkxAnimatedVector*>(p)->~hkxAnimatedVector();
 }
 
 // hkxAnimatedVector's reflection data and objects.
@@ -52,5 +74,5 @@ static void cleanupLoadedObjecthkxAnimatedVector(void* p) {
 hkxAnimatedVector::~hkxAnimatedVector() {}
 
 const hkClass& hkxAnimatedVector::staticClass() {
-	return hkxAnimatedVectorClass;
+    return hkxAnimatedVectorClass;
 }

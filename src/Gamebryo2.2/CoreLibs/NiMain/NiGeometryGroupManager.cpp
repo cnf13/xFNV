@@ -3,9 +3,9 @@
 #include "Gamebryo2.2/CoreLibs/NiMain/NiMemObject.h"
 
 NiGeometryGroupManager::NiGeometryGroupManager() {
-	ms_pkManager = this;
+    ms_pkManager = this;
 }
 
 NiGeometryGroupManager::~NiGeometryGroupManager() {
-	ms_pkManager = nullptr;
+    ms_pkManager = nullptr;
 }

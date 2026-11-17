@@ -12,11 +12,11 @@ const void* getVtablehkpThinBoxMotion();
 // (its vtable repeats hkpBoxMotion's entries) and adds no fields.
 class hkpThinBoxMotion : public hkpBoxMotion {
 public:
-	hkpThinBoxMotion(hkFinishLoadedObjectFlag flag);
-	hkpThinBoxMotion(const hkVector4& position, const hkQuaternion& rotation);
+    hkpThinBoxMotion(hkFinishLoadedObjectFlag flag);
+    hkpThinBoxMotion(const hkVector4& position, const hkQuaternion& rotation);
 
-	// Havok SDK signature (hkpDynamics.lib, tied by target).
-	static const hkClass& staticClass();
+    // Havok SDK signature (hkpDynamics.lib, tied by target).
+    static const hkClass& staticClass();
 };
 
 extern hkClass hkpThinBoxMotionClass;

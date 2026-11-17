@@ -9,9 +9,12 @@ class hkpCollisionInput;
 // no data to hkpPhantomCallbackShape.
 class bhkAcousticSpacePhantomCallbackShape : public hkpPhantomCallbackShape {
 public:
-	bhkAcousticSpacePhantomCallbackShape();
+    bhkAcousticSpacePhantomCallbackShape();
 
-	void phantomEnterEvent(const hkpCollidable* collidableA, const hkpCollidable* collidableB,
-		const hkpCollisionInput& env) override;
-	void phantomLeaveEvent(const hkpCollidable* collidableA, const hkpCollidable* collidableB) override;
+    void phantomEnterEvent(
+        const hkpCollidable* collidableA,
+        const hkpCollidable* collidableB,
+        const hkpCollisionInput& env
+    ) override;
+    void phantomLeaveEvent(const hkpCollidable* collidableA, const hkpCollidable* collidableB) override;
 };

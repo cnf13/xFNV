@@ -12,26 +12,26 @@ class NiD3DVertexShader;
 // The shader that draws a SpeedTree model's fronds.
 class SpeedTreeFrondShader : public BSShader {
 public:
-	SpeedTreeFrondShader();
-	~SpeedTreeFrondShader() override;
+    SpeedTreeFrondShader();
+    ~SpeedTreeFrondShader() override;
 
-	const NiRTTI* GetRTTI() const override;
-	bool SetupGeometry(NiGeometry* apGeometry) override;
-	void CreateConstantMaps() override;
-	void ReloadShaders() override;
-	void ClearPassStages() override;
-	virtual void LoadShaders();
+    const NiRTTI* GetRTTI() const override;
+    bool SetupGeometry(NiGeometry* apGeometry) override;
+    void CreateConstantMaps() override;
+    void ReloadShaders() override;
+    void ClearPassStages() override;
+    virtual void LoadShaders();
 
-	void LoadStagesAndPasses();
+    void LoadStagesAndPasses();
 
-	static void RegisterRTTI();
-	static BSShader* CreateShader();
+    static void RegisterRTTI();
+    static BSShader* CreateShader();
 
-	NiPointer<NiD3DVertexShader> pVertexShader[4];
-	NiPointer<NiD3DPixelShader> pPixelShader[2];
-	NiPointer<NiD3DPass> sp1StagePass;
-	NiVector4 pLightPosition;
-	NiVector4 pLightDirection;
+    NiPointer<NiD3DVertexShader> pVertexShader[4];
+    NiPointer<NiD3DPixelShader> pPixelShader[2];
+    NiPointer<NiD3DPass> sp1StagePass;
+    NiVector4 pLightPosition;
+    NiVector4 pLightDirection;
 
-	static NiRTTI ms_RTTI;
+    static NiRTTI ms_RTTI;
 };

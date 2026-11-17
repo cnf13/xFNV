@@ -9,25 +9,25 @@
 PathingRequestFlee::PathingRequestFlee() : PathingRequest(), fMinFleeDistance(0x1p+7f) {}
 
 PathingRequestFlee::PathingRequestFlee(const PathingRequestFlee& aRequest)
-	: PathingRequest(aRequest), fMinFleeDistance(aRequest.fMinFleeDistance) {}
+  : PathingRequest(aRequest), fMinFleeDistance(aRequest.fMinFleeDistance) {}
 
 PathingRequestFlee::~PathingRequestFlee() {}
 
 void PathingRequestFlee::CopyTo(PathingRequest* apDest) const {
-	PathingRequest::CopyTo(apDest);
-	static_cast<PathingRequestFlee*>(apDest)->fMinFleeDistance = fMinFleeDistance;
+    PathingRequest::CopyTo(apDest);
+    static_cast<PathingRequestFlee*>(apDest)->fMinFleeDistance = fMinFleeDistance;
 }
 
 uint32_t PathingRequestFlee::GetType() const {
-	return PATHING_REQUEST_FLEE;
+    return PATHING_REQUEST_FLEE;
 }
 
 void PathingRequestFlee::SaveGame(BGSSaveFormBuffer* apSaveGameBuffer) {
-	PathingRequest::SaveGame(apSaveGameBuffer);
-	apSaveGameBuffer->SaveDataEndian(static_cast<char*>(static_cast<void*>(&fMinFleeDistance)), 4u, 0);
+    PathingRequest::SaveGame(apSaveGameBuffer);
+    apSaveGameBuffer->SaveDataEndian(static_cast<char*>(static_cast<void*>(&fMinFleeDistance)), 4u, 0);
 }
 
 void PathingRequestFlee::LoadGame(BGSLoadFormBuffer* apLoadGameBuffer) {
-	PathingRequest::LoadGame(apLoadGameBuffer);
-	apLoadGameBuffer->LoadData(reinterpret_cast<char*>(&fMinFleeDistance), 4u);
+    PathingRequest::LoadGame(apLoadGameBuffer);
+    apLoadGameBuffer->LoadData(reinterpret_cast<char*>(&fMinFleeDistance), 4u);
 }

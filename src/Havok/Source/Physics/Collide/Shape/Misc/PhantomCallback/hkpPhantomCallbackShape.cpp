@@ -12,28 +12,44 @@
 
 #include <xmmintrin.h>
 
-hkClass hkpPhantomCallbackShapeClass("hkpPhantomCallbackShape", &hkpShapeClass, 16, nullptr, 0, nullptr, 0, nullptr, 0,
-	nullptr, nullptr, 0, 0);
+hkClass hkpPhantomCallbackShapeClass(
+    "hkpPhantomCallbackShape",
+    &hkpShapeClass,
+    16,
+    nullptr,
+    0,
+    nullptr,
+    0,
+    nullptr,
+    0,
+    nullptr,
+    nullptr,
+    0,
+    0
+);
 
 hkpPhantomCallbackShape::~hkpPhantomCallbackShape() {}
 
 void hkpPhantomCallbackShape::calcContentStatistics(hkStatisticsCollector* collector, const hkClass* cls) const {
-	hkReferencedObject::calcContentStatistics(collector, &hkpShapeClass);
+    hkReferencedObject::calcContentStatistics(collector, &hkpShapeClass);
 }
 
 void hkpPhantomCallbackShape::getAabbImpl(const hkTransform& localToWorld, float tolerance, hkAabb& out) const {
-	out.m_min.m_quad = _mm_setzero_ps();
-	out.m_max.m_quad = _mm_setzero_ps();
+    out.m_min.m_quad = _mm_setzero_ps();
+    out.m_max.m_quad = _mm_setzero_ps();
 }
 
 // A phantom callback shape has no geometry, so a ray never hits it.
 hkBool hkpPhantomCallbackShape::castRayImpl(const hkpShapeRayCastInput& input, hkpShapeRayCastOutput& results) const {
-	hkBool result;
-	result.m_bool = false;
-	return result;
+    hkBool result;
+    result.m_bool = false;
+    return result;
 }
 
-void hkpPhantomCallbackShape::castRayWithCollectorImpl(const hkpShapeRayCastInput& input, const hkpCdBody& cdBody,
-	hkpRayHitCollector& collector) const {
-	;
+void hkpPhantomCallbackShape::castRayWithCollectorImpl(
+    const hkpShapeRayCastInput& input,
+    const hkpCdBody& cdBody,
+    hkpRayHitCollector& collector
+) const {
+    ;
 }

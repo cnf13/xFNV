@@ -5,6 +5,6 @@
 // The number of uses of a form.
 class TESUsesForm : public BaseFormComponent {
 public:
-	uint8_t iUses;
-	uint8_t padding05[3];
+    uint8_t iUses;
+    uint8_t padding05[3];
 };

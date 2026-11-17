@@ -7,7 +7,7 @@
 #include "Gamebryo2.2/CoreLibs/NiMain/NiTArray.h"
 
 ImageSpaceShaderBrightPassBlur7::ImageSpaceShaderBrightPassBlur7() {
-	pTextures.SetSize(3u);
+    pTextures.SetSize(3u);
 }
 
 ImageSpaceShaderBrightPassBlur7::~ImageSpaceShaderBrightPassBlur7() {}

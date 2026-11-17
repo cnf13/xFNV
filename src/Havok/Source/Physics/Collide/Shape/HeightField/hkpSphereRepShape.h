@@ -9,11 +9,13 @@ class hkSphere;
 // spheres.
 class hkpSphereRepShape : public hkpShape {
 public:
-	hkpSphereRepShape(hkpShapeType type) : hkpShape(type) {}
-	hkpSphereRepShape(hkFinishLoadedObjectFlag flag) : hkpShape(flag) { m_type = HK_SHAPE_SPHERE_REP; }
+    hkpSphereRepShape(hkpShapeType type) : hkpShape(type) {}
+    hkpSphereRepShape(hkFinishLoadedObjectFlag flag) : hkpShape(flag) {
+        m_type = HK_SHAPE_SPHERE_REP;
+    }
 
-	virtual int32_t getNumCollisionSpheresImpl() const = 0;
-	virtual const hkSphere* getCollisionSpheresImpl(hkSphere* aSphereBuffer) const = 0;
+    virtual int32_t getNumCollisionSpheresImpl() const = 0;
+    virtual const hkSphere* getCollisionSpheresImpl(hkSphere* aSphereBuffer) const = 0;
 };
 
 // The class's reflection record.

@@ -24,32 +24,32 @@ class NiTriStrips;
 // The game's position motor: Havok's motor with Gamebryo's RTTI and type queries appended to its vtable.
 class bhkPositionConstraintMotor : public hkpPositionConstraintMotor {
 public:
-	bhkPositionConstraintMotor();
-	~bhkPositionConstraintMotor() override;
+    bhkPositionConstraintMotor();
+    ~bhkPositionConstraintMotor() override;
 
-	virtual const NiRTTI* GetRTTI() const;
-	virtual NiNode* IsNode();
-	virtual BSFadeNode* IsFadeNode();
-	virtual BSMultiBoundNode* IsMultiBoundNode();
-	virtual NiGeometry* IsGeometry();
-	virtual NiTriBasedGeom* IsTriBasedGeom();
-	virtual NiTriStrips* IsTriStrips();
-	virtual NiTriShape* IsTriShape();
-	virtual BSSegmentedTriShape* IsSegmentedTriShape();
-	virtual BSResizableTriShape* IsResizableTriShape();
-	virtual NiParticles* IsParticlesGeom();
-	virtual NiLines* IsLinesGeom();
-	virtual bhkNiCollisionObject* IsBhkNiCollisionObject();
-	virtual bhkBlendCollisionObject* IsBhkBlendCollisionObject();
-	virtual bhkRigidBody* IsBhkRigidBody();
-	virtual bhkLimitedHingeConstraint* IsBhkLimitedHingeConstraint();
-	virtual void GetViewerStrings(NiTPrimitiveArray<char*>* pkStrings);
+    virtual const NiRTTI* GetRTTI() const;
+    virtual NiNode* IsNode();
+    virtual BSFadeNode* IsFadeNode();
+    virtual BSMultiBoundNode* IsMultiBoundNode();
+    virtual NiGeometry* IsGeometry();
+    virtual NiTriBasedGeom* IsTriBasedGeom();
+    virtual NiTriStrips* IsTriStrips();
+    virtual NiTriShape* IsTriShape();
+    virtual BSSegmentedTriShape* IsSegmentedTriShape();
+    virtual BSResizableTriShape* IsResizableTriShape();
+    virtual NiParticles* IsParticlesGeom();
+    virtual NiLines* IsLinesGeom();
+    virtual bhkNiCollisionObject* IsBhkNiCollisionObject();
+    virtual bhkBlendCollisionObject* IsBhkBlendCollisionObject();
+    virtual bhkRigidBody* IsBhkRigidBody();
+    virtual bhkLimitedHingeConstraint* IsBhkLimitedHingeConstraint();
+    virtual void GetViewerStrings(NiTPrimitiveArray<char*>* pkStrings);
 
-	// The base's force limits, then the motor's four floats. Not a vtable entry.
-	void LoadBinary(NiStream& arStream);
-	// Writes the base's force limits, then the motor's four floats; called by hkConstraintCinfo::SaveMotor. Not
-	// virtual.
-	void SaveBinary(NiStream& arStream);
+    // The base's force limits, then the motor's four floats. Not a vtable entry.
+    void LoadBinary(NiStream& arStream);
+    // Writes the base's force limits, then the motor's four floats; called by hkConstraintCinfo::SaveMotor. Not
+    // virtual.
+    void SaveBinary(NiStream& arStream);
 
-	static NiRTTI ms_RTTI;
+    static NiRTTI ms_RTTI;
 };

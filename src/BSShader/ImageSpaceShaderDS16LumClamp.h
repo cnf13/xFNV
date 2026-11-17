@@ -4,8 +4,8 @@
 
 class ImageSpaceShaderDS16LumClamp : public ImageSpaceShader {
 public:
-	ImageSpaceShaderDS16LumClamp();
-	~ImageSpaceShaderDS16LumClamp() override;
+    ImageSpaceShaderDS16LumClamp();
+    ~ImageSpaceShaderDS16LumClamp() override;
 
-	void ReloadShaders() override;
+    void ReloadShaders() override;
 };

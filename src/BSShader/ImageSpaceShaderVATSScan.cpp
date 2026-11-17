@@ -7,7 +7,7 @@
 #include "Gamebryo2.2/CoreLibs/NiMain/NiTArray.h"
 
 ImageSpaceShaderVATSScan::ImageSpaceShaderVATSScan() {
-	pTextures.SetSize(5u);
+    pTextures.SetSize(5u);
 }
 
 ImageSpaceShaderVATSScan::~ImageSpaceShaderVATSScan() {}

@@ -4,8 +4,8 @@
 
 class ImageSpaceShaderBlur5 : public ImageSpaceShader {
 public:
-	ImageSpaceShaderBlur5();
-	~ImageSpaceShaderBlur5() override;
+    ImageSpaceShaderBlur5();
+    ~ImageSpaceShaderBlur5() override;
 
-	void ReloadShaders() override;
+    void ReloadShaders() override;
 };

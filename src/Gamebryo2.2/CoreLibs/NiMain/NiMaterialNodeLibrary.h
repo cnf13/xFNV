@@ -9,10 +9,12 @@ class NiMaterialNode;
 // A versioned library of material nodes a fragment material builds its shaders from.
 class NiMaterialNodeLibrary : public NiRefObject {
 public:
-	~NiMaterialNodeLibrary() override;
+    ~NiMaterialNodeLibrary() override;
 
-	uint16_t GetVersion() const { return m_usVersion; }
+    uint16_t GetVersion() const {
+        return m_usVersion;
+    }
 
-	NiTObjectArray<NiPointer<NiMaterialNode>> m_kNodes;
-	uint16_t m_usVersion;
+    NiTObjectArray<NiPointer<NiMaterialNode>> m_kNodes;
+    uint16_t m_usVersion;
 };

@@ -4,8 +4,8 @@
 
 class ImageSpaceShaderRestoreEDRAM : public ImageSpaceShader {
 public:
-	ImageSpaceShaderRestoreEDRAM();
-	~ImageSpaceShaderRestoreEDRAM() override;
+    ImageSpaceShaderRestoreEDRAM();
+    ~ImageSpaceShaderRestoreEDRAM() override;
 
-	void ReloadShaders() override {}
+    void ReloadShaders() override {}
 };

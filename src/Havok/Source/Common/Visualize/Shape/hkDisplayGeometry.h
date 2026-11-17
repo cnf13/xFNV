@@ -12,20 +12,20 @@ class hkGeometry;
 // overrides the destructor and adds two pure virtual functions.
 class hkDisplayGeometry : public hkReferencedObject {
 public:
-	hkDisplayGeometry(hkDisplayGeometryType type);
-	~hkDisplayGeometry() override;
+    hkDisplayGeometry(hkDisplayGeometryType type);
+    ~hkDisplayGeometry() override;
 
-	virtual void getWireframeGeometry(hkArrayBase<hkVector4>& lines, hkMemoryAllocator& a) = 0;
-	virtual void buildGeometry() = 0;
+    virtual void getWireframeGeometry(hkArrayBase<hkVector4>& lines, hkMemoryAllocator& a) = 0;
+    virtual void buildGeometry() = 0;
 
-	// The SDK's inline overload that gets the array's allocator and calls the virtual one.
-	void getWireframeGeometry(hkArray<hkVector4>& lines);
-	hkGeometry* getGeometry();
-	const hkTransform& getTransform() const;
-	hkTransform& getTransform();
-	hkDisplayGeometryType getType() const;
+    // The SDK's inline overload that gets the array's allocator and calls the virtual one.
+    void getWireframeGeometry(hkArray<hkVector4>& lines);
+    hkGeometry* getGeometry();
+    const hkTransform& getTransform() const;
+    hkTransform& getTransform();
+    hkDisplayGeometryType getType() const;
 
-	hkGeometry* m_geometry;
-	hkTransform m_transform;
-	hkDisplayGeometryType m_type;
+    hkGeometry* m_geometry;
+    hkTransform m_transform;
+    hkDisplayGeometryType m_type;
 };

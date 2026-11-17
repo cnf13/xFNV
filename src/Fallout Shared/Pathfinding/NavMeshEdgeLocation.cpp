@@ -4,7 +4,7 @@
 #include "Fallout Shared/Pathfinding/NavMeshHandles.h"
 
 NavMeshEdgeLocation& NavMeshEdgeLocation::operator=(const NavMeshEdgeLocation& aTriHandle) {
-	Copy(aTriHandle);
-	Location = aTriHandle.Location;
-	return *this;
+    Copy(aTriHandle);
+    Location = aTriHandle.Location;
+    return *this;
 }

@@ -13,42 +13,42 @@ void PlayTerminalShutdownSound();
 // The rendered menu of a terminal screen (computers and hacking).
 class FORenderedTerminal : public FORenderedMenu {
 public:
-	FORenderedTerminal();
+    FORenderedTerminal();
 
-	// The menu object 3D shadow scene node, where the terminal's screen is drawn.
-	NiAVObject* GetParentNodeToRender() override;
-	float GetFadeAmount() override;
-	void Draw(BSRenderedTexture* apTarget, NiRenderer::ClearFlags aeClearMode,
-		BSRenderedTexture* apSwapTarget) override;
-	bool OnIdle() override;
-	bool Pick(bool abPressed, float* apX, float* apY) override;
-	void Unknown07() override;
-	// Moves the menu root to x 30490 and updates it at time 0.
-	void PostDraw() override;
-	void Unknown08() override;
-	void Initialize() override;
-	void OnMenuOpen() override;
-	void OnMenuClose() override;
+    // The menu object 3D shadow scene node, where the terminal's screen is drawn.
+    NiAVObject* GetParentNodeToRender() override;
+    float GetFadeAmount() override;
+    void
+    Draw(BSRenderedTexture* apTarget, NiRenderer::ClearFlags aeClearMode, BSRenderedTexture* apSwapTarget) override;
+    bool OnIdle() override;
+    bool Pick(bool abPressed, float* apX, float* apY) override;
+    void Unknown07() override;
+    // Moves the menu root to x 30490 and updates it at time 0.
+    void PostDraw() override;
+    void Unknown08() override;
+    void Initialize() override;
+    void OnMenuOpen() override;
+    void OnMenuClose() override;
 
-	// Plays the shutdown sound, lets go of the screen and leaves the rendered menu (the exit button's click).
-	void CloseMenu();
-	// Starts the screen's fade out: the geometry's fade range drops to 0 and OnIdle follows the fade.
-	void FadeOut();
-	void InitLight();
+    // Plays the shutdown sound, lets go of the screen and leaves the rendered menu (the exit button's click).
+    void CloseMenu();
+    // Starts the screen's fade out: the geometry's fade range drops to 0 and OnIdle follows the fade.
+    void FadeOut();
+    void InitLight();
 
-	// Releases the terminal's static geometry.
-	static void ReleaseStaticGeometry();
+    // Releases the terminal's static geometry.
+    static void ReleaseStaticGeometry();
 
-	// The screen geometry's local translation, set on it before each draw.
-	NiPoint3 OriginalPos;
-	// The exit (power) button's geometry.
-	NiPointer<NiTriStrips> spExitButton;
-	// The terminal geometry's fade percent when last updated.
-	float fLastFadePercent;
-	bool bFadingOut;
-	uint8_t paddingED[3];
+    // The screen geometry's local translation, set on it before each draw.
+    NiPoint3 OriginalPos;
+    // The exit (power) button's geometry.
+    NiPointer<NiTriStrips> spExitButton;
+    // The terminal geometry's fade percent when last updated.
+    float fLastFadePercent;
+    bool bFadingOut;
+    uint8_t paddingED[3];
 
-	static NiPointer<BSFadeNode> spGeometry;
+    static NiPointer<BSFadeNode> spGeometry;
 };
 
 // The terminal model's file path.

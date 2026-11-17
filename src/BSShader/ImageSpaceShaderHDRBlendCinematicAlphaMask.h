@@ -4,8 +4,8 @@
 
 class ImageSpaceShaderHDRBlendCinematicAlphaMask : public ImageSpaceShader {
 public:
-	ImageSpaceShaderHDRBlendCinematicAlphaMask();
-	~ImageSpaceShaderHDRBlendCinematicAlphaMask() override;
+    ImageSpaceShaderHDRBlendCinematicAlphaMask();
+    ~ImageSpaceShaderHDRBlendCinematicAlphaMask() override;
 
-	void ReloadShaders() override;
+    void ReloadShaders() override;
 };

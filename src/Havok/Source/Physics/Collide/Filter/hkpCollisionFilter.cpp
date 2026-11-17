@@ -14,35 +14,66 @@
 // the enum, and the enum by pointer.
 using hkpCollisionFilterhkpFilterTypeEnumItemsArray = const hkClassEnum::Item[7];
 static hkpCollisionFilterhkpFilterTypeEnumItemsArray hkpCollisionFilterhkpFilterTypeEnumItems{
-	{hkpCollisionFilter::HK_FILTER_UNKNOWN, "HK_FILTER_UNKNOWN"},
-	{hkpCollisionFilter::HK_FILTER_NULL, "HK_FILTER_NULL"}, {hkpCollisionFilter::HK_FILTER_GROUP, "HK_FILTER_GROUP"},
-	{hkpCollisionFilter::HK_FILTER_LIST, "HK_FILTER_LIST"}, {hkpCollisionFilter::HK_FILTER_CUSTOM, "HK_FILTER_CUSTOM"},
-	{hkpCollisionFilter::HK_FILTER_PAIR, "HK_FILTER_PAIR"},
-	{hkpCollisionFilter::HK_FILTER_CONSTRAINT, "HK_FILTER_CONSTRAINT"}};
+    {hkpCollisionFilter::HK_FILTER_UNKNOWN, "HK_FILTER_UNKNOWN"},
+    {hkpCollisionFilter::HK_FILTER_NULL, "HK_FILTER_NULL"},
+    {hkpCollisionFilter::HK_FILTER_GROUP, "HK_FILTER_GROUP"},
+    {hkpCollisionFilter::HK_FILTER_LIST, "HK_FILTER_LIST"},
+    {hkpCollisionFilter::HK_FILTER_CUSTOM, "HK_FILTER_CUSTOM"},
+    {hkpCollisionFilter::HK_FILTER_PAIR, "HK_FILTER_PAIR"},
+    {hkpCollisionFilter::HK_FILTER_CONSTRAINT, "HK_FILTER_CONSTRAINT"}
+};
 using hkpCollisionFilterEnumsArray = const hkClassEnum[1];
 static hkpCollisionFilterEnumsArray hkpCollisionFilterEnums{
-	{"hkpFilterType", hkpCollisionFilterhkpFilterTypeEnumItems, 7, nullptr, 0}};
+    {"hkpFilterType", hkpCollisionFilterhkpFilterTypeEnumItems, 7, nullptr, 0}
+};
 static const hkClassEnum* hkpCollisionFilterhkpFilterTypeEnum = &hkpCollisionFilterEnums[0];
 // The record's member table. The type member's enum pointer is set directly in its initializer.
 using hkpCollisionFilterClass_MembersArray = hkClassMember[3];
 static hkpCollisionFilterClass_MembersArray hkpCollisionFilterClass_Members{
-	{"prepad", nullptr, nullptr, {hkClassMember::TYPE_UINT32}, {hkClassMember::TYPE_VOID}, 2, 0, 0x18, nullptr},
-	{"type", nullptr, &hkpCollisionFilterEnums[0], {hkClassMember::TYPE_ENUM}, {hkClassMember::TYPE_UINT32}, 0, 0, 0x20,
-		nullptr},
-	{"postpad", nullptr, nullptr, {hkClassMember::TYPE_UINT32}, {hkClassMember::TYPE_VOID}, 3, 0, 0x24, nullptr}};
+    {"prepad", nullptr, nullptr, {hkClassMember::TYPE_UINT32}, {hkClassMember::TYPE_VOID}, 2, 0, 0x18, nullptr},
+    {"type",
+     nullptr,
+     &hkpCollisionFilterEnums[0],
+     {hkClassMember::TYPE_ENUM},
+     {hkClassMember::TYPE_UINT32},
+     0,
+     0,
+     0x20,
+     nullptr},
+    {"postpad", nullptr, nullptr, {hkClassMember::TYPE_UINT32}, {hkClassMember::TYPE_VOID}, 3, 0, 0x24, nullptr}
+};
 // The class record passes four implemented interfaces with no interface table, as the game does.
-hkClass hkpCollisionFilterClass("hkpCollisionFilter", &hkReferencedObjectClass, 48, nullptr, 4, hkpCollisionFilterEnums,
-	1, hkpCollisionFilterClass_Members, 3, nullptr, nullptr, 0, 0);
+hkClass hkpCollisionFilterClass(
+    "hkpCollisionFilter",
+    &hkReferencedObjectClass,
+    48,
+    nullptr,
+    4,
+    hkpCollisionFilterEnums,
+    1,
+    hkpCollisionFilterClass_Members,
+    3,
+    nullptr,
+    nullptr,
+    0,
+    0
+);
 
 hkpCollisionFilter::hkpCollisionFilter() {
-	m_type.m_storage = HK_FILTER_UNKNOWN;
+    m_type.m_storage = HK_FILTER_UNKNOWN;
 }
 
 hkpCollisionFilter::~hkpCollisionFilter() {}
 
 // Every hit counts: the whole capacity is kept.
-int32_t hkpCollisionFilter::numShapeKeyHitsLimitBreached(const hkpCollisionInput& input, const hkpCdBody& bodyA,
-	const hkpCdBody& bodyB, const hkpBvTreeShape* bvTreeShapeB, hkAabb& aabb, uint32_t* shapeKeysInOut,
-	int32_t shapeKeysCapacity) const {
-	return shapeKeysCapacity;
+int32_t hkpCollisionFilter::numShapeKeyHitsLimitBreached(
+    const hkpCollisionInput& input,
+    const hkpCdBody& bodyA,
+    const hkpCdBody& bodyB,
+    const hkpBvTreeShape* bvTreeShapeB,
+    hkAabb& aabb,
+    uint32_t* shapeKeysInOut,
+    int32_t shapeKeysCapacity
+) const {
+    return shapeKeysCapacity;
 }

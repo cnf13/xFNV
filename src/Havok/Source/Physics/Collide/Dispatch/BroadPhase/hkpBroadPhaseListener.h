@@ -6,11 +6,11 @@
 // callbacks are pure.
 class hkpBroadPhaseListener {
 public:
-	virtual ~hkpBroadPhaseListener();
+    virtual ~hkpBroadPhaseListener();
 
-	virtual void addCollisionPair(hkpTypedBroadPhaseHandlePair& pair) = 0;
-	virtual void removeCollisionPair(hkpTypedBroadPhaseHandlePair& pair) = 0;
+    virtual void addCollisionPair(hkpTypedBroadPhaseHandlePair& pair) = 0;
+    virtual void removeCollisionPair(hkpTypedBroadPhaseHandlePair& pair) = 0;
 
-	// DeletingDestruct's free (ourFree).
-	static void operator delete(void* apMemory);
+    // DeletingDestruct's free (ourFree).
+    static void operator delete(void* apMemory);
 };

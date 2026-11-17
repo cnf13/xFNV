@@ -4,8 +4,8 @@
 
 class ImageSpaceShaderVATSScan : public ImageSpaceShader {
 public:
-	ImageSpaceShaderVATSScan();
-	~ImageSpaceShaderVATSScan() override;
+    ImageSpaceShaderVATSScan();
+    ~ImageSpaceShaderVATSScan() override;
 
-	void ReloadShaders() override;
+    void ReloadShaders() override;
 };

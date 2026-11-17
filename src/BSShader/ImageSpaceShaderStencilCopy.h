@@ -4,12 +4,12 @@
 
 class ImageSpaceShaderStencilCopy : public ImageSpaceShader {
 public:
-	ImageSpaceShaderStencilCopy();
-	~ImageSpaceShaderStencilCopy() override;
+    ImageSpaceShaderStencilCopy();
+    ~ImageSpaceShaderStencilCopy() override;
 
-	void ReloadShaders() override;
-	void SetState() override;
+    void ReloadShaders() override;
+    void SetState() override;
 
-	// The stencil reference value the copy compares against.
-	static inline uint32_t uiStencilRef = 128;
+    // The stencil reference value the copy compares against.
+    static inline uint32_t uiStencilRef = 128;
 };

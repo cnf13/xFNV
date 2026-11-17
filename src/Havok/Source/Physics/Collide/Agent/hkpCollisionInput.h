@@ -11,25 +11,27 @@ class hkpConvexListFilter;
 // compression. Not polymorphic.
 class hkpCollisionInput {
 public:
-	// The offsets and scale that pack an AABB into 32 bits.
-	struct Aabb32Info {
-		Aabb32Info();
+    // The offsets and scale that pack an AABB into 32 bits.
+    struct Aabb32Info {
+        Aabb32Info();
 
-		hkVector4 m_bitOffsetLow;
-		hkVector4 m_bitOffsetHigh;
-		hkVector4 m_bitScale;
-	};
+        hkVector4 m_bitOffsetLow;
+        hkVector4 m_bitOffsetHigh;
+        hkVector4 m_bitScale;
+    };
 
-	hkpCollisionInput();
+    hkpCollisionInput();
 
-	void setTolerance(float t) { m_tolerance = t; }
+    void setTolerance(float t) {
+        m_tolerance = t;
+    }
 
-	hkpCollisionDispatcher* m_dispatcher;
-	hkPadSpu<int32_t> m_weldClosestPoints;
-	float m_tolerance;
-	const hkpCollisionFilter* m_filter;
-	hkpConvexListFilter* m_convexListFilter;
-	// Mutable because hkpSimulation::processAgentCollideDiscrete sets it through its const input.
-	mutable hkPadSpu<int32_t> m_createPredictiveAgents;
-	Aabb32Info m_aabb32Info;
+    hkpCollisionDispatcher* m_dispatcher;
+    hkPadSpu<int32_t> m_weldClosestPoints;
+    float m_tolerance;
+    const hkpCollisionFilter* m_filter;
+    hkpConvexListFilter* m_convexListFilter;
+    // Mutable because hkpSimulation::processAgentCollideDiscrete sets it through its const input.
+    mutable hkPadSpu<int32_t> m_createPredictiveAgents;
+    Aabb32Info m_aabb32Info;
 };

@@ -5,5 +5,5 @@
 // The combat planner goal FallBack. It adds no fields to CombatGoal and overrides no virtual.
 class CombatGoalFallBack : public CombatGoal {
 public:
-	CombatGoalFallBack(CombatGoal::COMBAT_GOAL aeType);
+    CombatGoalFallBack(CombatGoal::COMBAT_GOAL aeType);
 };

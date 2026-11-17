@@ -9,34 +9,34 @@
 // and getConstraintInfo; the destructor is hkBaseObject's.
 class hkpStiffSpringConstraintData : public hkpConstraintData {
 public:
-	// The runtime memory of one instance.
-	struct Runtime {
-		hkpSolverResults m_solverResults[1];
-	};
+    // The runtime memory of one instance.
+    struct Runtime {
+        hkpSolverResults m_solverResults[1];
+    };
 
-	// The atoms the constraint is made of.
-	struct Atoms {
-		// Havok SDK signature (hkpDynamics.lib, tied by target).
-		static const hkClass& staticClass();
+    // The atoms the constraint is made of.
+    struct Atoms {
+        // Havok SDK signature (hkpDynamics.lib, tied by target).
+        static const hkClass& staticClass();
 
-		hkpSetLocalTranslationsConstraintAtom m_pivots;
-		hkpStiffSpringConstraintAtom m_spring;
-	};
+        hkpSetLocalTranslationsConstraintAtom m_pivots;
+        hkpStiffSpringConstraintAtom m_spring;
+    };
 
-	hkpStiffSpringConstraintData();
-	// The SDK's finish constructor: the loaded atoms keep their fields.
-	hkpStiffSpringConstraintData(hkFinishLoadedObjectFlag aFlag) : hkpConstraintData(aFlag) {}
+    hkpStiffSpringConstraintData();
+    // The SDK's finish constructor: the loaded atoms keep their fields.
+    hkpStiffSpringConstraintData(hkFinishLoadedObjectFlag aFlag) : hkpConstraintData(aFlag) {}
 
-	hkBool* isValid(hkBool* arResult) const override;
-	int32_t getType() const override;
-	void getRuntimeInfo(hkBool wantRuntime, hkpConstraintData::RuntimeInfo& infoOut) const override;
-	void getConstraintInfo(hkpConstraintData::ConstraintInfo& infoOut) const override;
+    hkBool* isValid(hkBool* arResult) const override;
+    int32_t getType() const override;
+    void getRuntimeInfo(hkBool wantRuntime, hkpConstraintData::RuntimeInfo& infoOut) const override;
+    void getConstraintInfo(hkpConstraintData::ConstraintInfo& infoOut) const override;
 
-	// Havok SDK signature (hkpDynamics.lib, tied by target).
-	static const hkClass& staticClass();
+    // Havok SDK signature (hkpDynamics.lib, tied by target).
+    static const hkClass& staticClass();
 
-	// The atoms start on a 16-byte boundary, so the bytes after the base class are the compiler's alignment padding.
-	alignas(16) Atoms m_atoms;
+    // The atoms start on a 16-byte boundary, so the bytes after the base class are the compiler's alignment padding.
+    alignas(16) Atoms m_atoms;
 };
 
 // The hkTypeInfo records of the reflected types declared here (constant data, the SDK's <Class>Class.cpp).

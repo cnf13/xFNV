@@ -8,12 +8,12 @@
 // filter mode of each. Subclasses carry the effect's own values.
 class ImageSpaceEffectParam {
 public:
-	ImageSpaceEffectParam();
-	virtual ~ImageSpaceEffectParam();
+    ImageSpaceEffectParam();
+    virtual ~ImageSpaceEffectParam();
 
-	// The deleting destructor frees the parameters with ourFree.
-	static void operator delete(void* apMemory);
+    // The deleting destructor frees the parameters with ourFree.
+    static void operator delete(void* apMemory);
 
-	NiTPrimitiveArray<BSTextureManager::eTextureType> pBorrowTextureTypes;
-	NiTPrimitiveArray<NiTexturingProperty::FilterMode> pBorrowTextureFilters;
+    NiTPrimitiveArray<BSTextureManager::eTextureType> pBorrowTextureTypes;
+    NiTPrimitiveArray<NiTexturingProperty::FilterMode> pBorrowTextureFilters;
 };

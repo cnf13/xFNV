@@ -5,7 +5,7 @@
 // The television post-processing shader. InitEffects allocates 0xD0 bytes.
 class ImageSpaceShaderTV : public ImageSpaceShader {
 public:
-	ImageSpaceShaderTV();
+    ImageSpaceShaderTV();
 
-	void ReloadShaders() override;
+    void ReloadShaders() override;
 };

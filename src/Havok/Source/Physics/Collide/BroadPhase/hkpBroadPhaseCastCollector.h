@@ -8,11 +8,11 @@ class hkpBroadPhaseHandle;
 // fraction. It holds no state.
 class hkpBroadPhaseCastCollector {
 public:
-	virtual ~hkpBroadPhaseCastCollector() {}
+    virtual ~hkpBroadPhaseCastCollector() {}
 
-	// Called for each handle a cast reaches; returns the new hit fraction of cast castIndex.
-	virtual float addBroadPhaseHandle(const hkpBroadPhaseHandle* broadPhaseHandle, int32_t castIndex) = 0;
+    // Called for each handle a cast reaches; returns the new hit fraction of cast castIndex.
+    virtual float addBroadPhaseHandle(const hkpBroadPhaseHandle* broadPhaseHandle, int32_t castIndex) = 0;
 
-	// DeletingDestruct's free (MemoryManager::Deallocate).
-	static void operator delete(void* apMemory);
+    // DeletingDestruct's free (MemoryManager::Deallocate).
+    static void operator delete(void* apMemory);
 };

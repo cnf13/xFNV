@@ -7,7 +7,7 @@
 
 // NvAPI_Status: 0 is NVAPI_OK, failures are negative.
 enum NvAPI_Status : int32_t {
-	NVAPI_OK = 0,
+    NVAPI_OK = 0,
 };
 
 // An opaque handle to a display the driver drives.
@@ -15,7 +15,7 @@ struct NvDisplayHandle__;
 using NvDisplayHandle = NvDisplayHandle__*;
 
 // The resolved entry point of NvAPI_EnumNvidiaDisplayHandle (cdecl). Not named in the PDB or IDA; name chosen here.
-using NvAPI_EnumNvidiaDisplayHandle_t = NvAPI_Status(*)(uint32_t thisEnum, NvDisplayHandle* pNvDispHandle);
+using NvAPI_EnumNvidiaDisplayHandle_t = NvAPI_Status (*)(uint32_t thisEnum, NvDisplayHandle* pNvDispHandle);
 
 // The handle of the thisEnum-th NVIDIA display in pNvDispHandle; fails once thisEnum passes the last one. IDA name
 // _sub_9FEAD6; name from the NVAPI SDK, matched by its use (TESRenderer::Init enumerates up to 128 displays with it
@@ -24,22 +24,22 @@ NvAPI_Status NvAPI_EnumNvidiaDisplayHandle(uint32_t thisEnum, NvDisplayHandle* p
 
 // The driver's version and build strings (NVAPI SDK; NV_DISPLAY_DRIVER_VERSION_VER is sizeof | 1 << 16, 0x1008C).
 struct NV_DISPLAY_DRIVER_VERSION {
-	uint32_t version;
-	uint32_t drvVersion;
-	uint32_t bldChangeListNum;
-	char szBuildBranchString[64];
-	char szAdapterString[64];
+    uint32_t version;
+    uint32_t drvVersion;
+    uint32_t bldChangeListNum;
+    char szBuildBranchString[64];
+    char szAdapterString[64];
 };
 
 // The SLI state of a Direct3D device (NVAPI SDK; NV_GET_CURRENT_SLI_STATE_VER is sizeof | 1 << 16, 0x1001C).
 struct NV_GET_CURRENT_SLI_STATE {
-	uint32_t version;
-	uint32_t maxNumAFRGroups;
-	uint32_t numAFRGroups;
-	uint32_t currentAFRIndex;
-	uint32_t nextFrameAFRIndex;
-	uint32_t previousFrameAFRIndex;
-	uint32_t bIsCurAFRGroupNew;
+    uint32_t version;
+    uint32_t maxNumAFRGroups;
+    uint32_t numAFRGroups;
+    uint32_t currentAFRIndex;
+    uint32_t nextFrameAFRIndex;
+    uint32_t previousFrameAFRIndex;
+    uint32_t bIsCurAFRGroupNew;
 };
 
 // Opaque handles to a physical and a logical GPU.
@@ -51,12 +51,11 @@ struct IUnknown;
 
 // The resolved entry points TESRenderer::Init calls (cdecl; NvAPI_Initialize fills the slots). Not named in the PDB or
 // IDA; names chosen here.
-using NvAPI_GetDisplayDriverVersion_t = NvAPI_Status(*)(NvDisplayHandle hNvDisplay,
-	NV_DISPLAY_DRIVER_VERSION* pVersion);
-using NvAPI_EnumLogicalGPUs_t = NvAPI_Status(*)(NvLogicalGpuHandle* nvGPUHandle, uint32_t* pGpuCount);
-using NvAPI_EnumPhysicalGPUs_t = NvAPI_Status(*)(NvPhysicalGpuHandle* nvGPUHandle, uint32_t* pGpuCount);
-using NvAPI_D3D_GetCurrentSLIState_t = NvAPI_Status(*)(IUnknown* pDevice,
-	NV_GET_CURRENT_SLI_STATE* pSliState);
+using NvAPI_GetDisplayDriverVersion_t =
+    NvAPI_Status (*)(NvDisplayHandle hNvDisplay, NV_DISPLAY_DRIVER_VERSION* pVersion);
+using NvAPI_EnumLogicalGPUs_t = NvAPI_Status (*)(NvLogicalGpuHandle* nvGPUHandle, uint32_t* pGpuCount);
+using NvAPI_EnumPhysicalGPUs_t = NvAPI_Status (*)(NvPhysicalGpuHandle* nvGPUHandle, uint32_t* pGpuCount);
+using NvAPI_D3D_GetCurrentSLIState_t = NvAPI_Status (*)(IUnknown* pDevice, NV_GET_CURRENT_SLI_STATE* pSliState);
 extern int32_t g_NvAPI_Initialized;
 extern int32_t g_NvAPI_InitStatus;
 // One entry of the interface table NvAPI_Initialize fills (0x11A6228: 360 entries, then a zero id ends it): the entry
@@ -64,10 +63,10 @@ extern int32_t g_NvAPI_InitStatus;
 // nvapi_QueryInterface resolves the interface id after it. Not named in the PDB or IDA; names chosen here. The entry
 // is a function pointer, the stub's type (the image holds the stub's address), cast to each entry point's type at
 // its call; nvapi_QueryInterface's void* is cast to it when stored.
-using NvAPI_Entry_t = int32_t(*)();
+using NvAPI_Entry_t = int32_t (*)();
 struct NvAPI_InterfaceEntry {
-	NvAPI_Entry_t pEntry;
-	uint32_t uiId;
+    NvAPI_Entry_t pEntry;
+    uint32_t uiId;
 };
 using NvAPI_InterfaceTable_t = NvAPI_InterfaceEntry[361];
 extern NvAPI_InterfaceTable_t g_NvAPI_Interfaces;
@@ -75,20 +74,20 @@ extern NvAPI_InterfaceTable_t g_NvAPI_Interfaces;
 // The table's entries the reconstructed entry points jump through, by index (their slot addresses after each).
 // Names chosen here.
 enum NvAPI_InterfaceIndex : uint32_t {
-	NvAPI_Index_GetDisplayDriverVersion = 2,
-	NvAPI_Index_EnumNvidiaDisplayHandle = 3,
-	NvAPI_Index_EnumPhysicalGPUs = 5,
-	NvAPI_Index_EnumLogicalGPUs = 6,
-	NvAPI_Index_D3D_GetCurrentSLIState = 46,
-	// NvAPI_D3D9_AliasPrimaryFromDevice's, interface id 0x7C20C5BE.
-	NvAPI_Index_D3D9_AliasPrimaryFromDevice = 74,
+    NvAPI_Index_GetDisplayDriverVersion = 2,
+    NvAPI_Index_EnumNvidiaDisplayHandle = 3,
+    NvAPI_Index_EnumPhysicalGPUs = 5,
+    NvAPI_Index_EnumLogicalGPUs = 6,
+    NvAPI_Index_D3D_GetCurrentSLIState = 46,
+    // NvAPI_D3D9_AliasPrimaryFromDevice's, interface id 0x7C20C5BE.
+    NvAPI_Index_D3D9_AliasPrimaryFromDevice = 74,
 };
 
 // nvapi.dll's nvapi_QueryInterface(id): the entry point of an interface id, or null (cdecl; NVAPI SDK).
-using nvapi_QueryInterface_t = void*(*)(uint32_t id);
+using nvapi_QueryInterface_t = void* (*)(uint32_t id);
 // The driver's NvAPI_Initialize entry point, interface id 0x150E828 (NVAPI SDK).
 constexpr uint32_t NvAPI_Id_Initialize = 0x150E828;
-using NvAPI_Initialize_t = NvAPI_Status(*)();
+using NvAPI_Initialize_t = NvAPI_Status (*)();
 
 // The driver version of hNvDisplay (0 for the default display) into *pVersion. IDA name _sub_9FEAD0; name from the
 // NVAPI SDK, matched by its use (the 0x8C-byte versioned struct TESRenderer::Init passes right after

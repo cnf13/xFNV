@@ -17,82 +17,84 @@ class TESObjectREFR;
 
 class LockPickMenu : public Menu {
 public:
-	// The menu's states (eLockState).
-	enum LockState : int32_t {
-		LS_INTRO_ANIM = 0,
-		LS_PICK_INTRO_ANIM = 1,
-		LS_IDLE = 2,
-		LS_TURNING_LOCK = 3,
-		LS_DAMAGING_PICK = 4,
-		LS_BREAKING_PICK = 5,
-		LS_RESETTING_LOCK = 6,
-		LS_CLOSING_MENU = 7,
-		NUM_STATES = 8,
-	};
+    // The menu's states (eLockState).
+    enum LockState : int32_t {
+        LS_INTRO_ANIM = 0,
+        LS_PICK_INTRO_ANIM = 1,
+        LS_IDLE = 2,
+        LS_TURNING_LOCK = 3,
+        LS_DAMAGING_PICK = 4,
+        LS_BREAKING_PICK = 5,
+        LS_RESETTING_LOCK = 6,
+        LS_CLOSING_MENU = 7,
+        NUM_STATES = 8,
+    };
 
-	LockPickMenu();
-	~LockPickMenu() override;
+    LockPickMenu();
+    ~LockPickMenu() override;
 
-	void AttachTileByID(int32_t, Tile*) override;
-	void DoClick(int32_t, Tile*) override;
-	void DoEnter(int32_t, Tile*) override;
-	void DoLeave(int32_t, Tile*) override;
-	void DoIdle() override;
-	int32_t GetClass() override;
+    void AttachTileByID(int32_t, Tile*) override;
+    void DoClick(int32_t, Tile*) override;
+    void DoEnter(int32_t, Tile*) override;
+    void DoLeave(int32_t, Tile*) override;
+    void DoIdle() override;
+    int32_t GetClass() override;
 
-	bool IsWellFormedMenu();
-	bool GetPCInput(int32_t state);
+    bool IsWellFormedMenu();
+    bool GetPCInput(int32_t state);
 
 protected:
-	// Poses the lock rotation animation for the lock turned afAngleOffset past fLockAngle.
-	void RotateLock(float afAngleOffset);
+    // Poses the lock rotation animation for the lock turned afAngleOffset past fLockAngle.
+    void RotateLock(float afAngleOffset);
 
 public:
-	void Prepare3DElements();
-	NiCamera* Create3DCamera();
-	void RotateLockpick();
-	void RotateLockpickModel(float a2);
-	void SetupLockLevelSweetSpots();
+    void Prepare3DElements();
+    NiCamera* Create3DCamera();
+    void RotateLockpick();
+    void RotateLockpickModel(float a2);
+    void SetupLockLevelSweetSpots();
 
-	// Opens the lock pick menu for apTarget.
-	static Tile* Create(TESObjectREFR* apTarget, int32_t aiLockLevel, bool abDebugMode);
-	static void Close();
-	static int32_t GetClassStatic();
-	static Interface::TutorialMessageID GetTutorialMessageID();
-	static void Draw3DElements();
-	static void operator delete(void* apMemory) { ourFree(apMemory); }
+    // Opens the lock pick menu for apTarget.
+    static Tile* Create(TESObjectREFR* apTarget, int32_t aiLockLevel, bool abDebugMode);
+    static void Close();
+    static int32_t GetClassStatic();
+    static Interface::TutorialMessageID GetTutorialMessageID();
+    static void Draw3DElements();
+    static void operator delete(void* apMemory) {
+        ourFree(apMemory);
+    }
 
-	LockState eLockState;
-	Tile* pTiles[16];
-	TESObjectREFR* pLockTarget;
-	LOCK_LEVEL eLockLevel;
-	int32_t iLockpickSkill;
-	float fLockpickSkill;
-	int32_t iPicksRemaining;
-	uint32_t uiPrevIdleTick;
-	float fSweetSpot;
-	int32_t iTotalSweetSpotRadius;
-	float fLockAngle;
-	float fMaxLockAngle;
-	float fPickHealth;
-	bool bForceLockSuccess;
-	bool bShowingTutorial;
-	uint8_t padding9A[2];
-	NiControllerSequence* pIntroAnim;
-	NiControllerSequence* pLockRotateAnim;
-	NiControllerManager* ppickAnimManager;
-	NiControllerSequence* pPickIntroAnim;
-	NiControllerSequence* pPickBendAnim;
-	NiControllerSequence* pPickBreakAnim;
-	NiMatrix3 origPickRotate;
-	NiPoint3 origPickTranslate;
+    LockState eLockState;
+    Tile* pTiles[16];
+    TESObjectREFR* pLockTarget;
+    LOCK_LEVEL eLockLevel;
+    int32_t iLockpickSkill;
+    float fLockpickSkill;
+    int32_t iPicksRemaining;
+    uint32_t uiPrevIdleTick;
+    float fSweetSpot;
+    int32_t iTotalSweetSpotRadius;
+    float fLockAngle;
+    float fMaxLockAngle;
+    float fPickHealth;
+    bool bForceLockSuccess;
+    bool bShowingTutorial;
+    uint8_t padding9A[2];
+    NiControllerSequence* pIntroAnim;
+    NiControllerSequence* pLockRotateAnim;
+    NiControllerManager* ppickAnimManager;
+    NiControllerSequence* pPickIntroAnim;
+    NiControllerSequence* pPickBendAnim;
+    NiControllerSequence* pPickBreakAnim;
+    NiMatrix3 origPickRotate;
+    NiPoint3 origPickTranslate;
 
-	static inline LockPickMenu* pMe;
-	static NiPointer<NiNode> spCameraRoot;
-	static NiPointer<NiCamera> spCamera;
-	static inline float PreviousAngleDelta;
-	static inline int32_t iUT_Value;
-	static inline int32_t iUT_X;
+    static inline LockPickMenu* pMe;
+    static NiPointer<NiNode> spCameraRoot;
+    static NiPointer<NiCamera> spCamera;
+    static inline float PreviousAngleDelta;
+    static inline int32_t iUT_Value;
+    static inline int32_t iUT_X;
 };
 
 inline int32_t g_iconcentricLength;

@@ -4,5 +4,5 @@
 
 class InteriorCellInitialData {
 public:
-	int32_t iDetachTime;
+    int32_t iDetachTime;
 };

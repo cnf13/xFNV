@@ -13,11 +13,16 @@ typedef void hkpAgentData;
 // in a one-element list shape and hands the pair to the collection-collection agent.
 class hkpCollectionAgent3 {
 public:
-	// Registers the agent for a convex shape against a shape collection.
-	static void registerAgent3(hkpCollisionDispatcher* dispatcher);
-	// The SDK's initAgentFunc: hkListAgent3's functions, with this agent's process.
-	static void initAgentFunc(hkpCollisionDispatcher::Agent3Funcs& f);
-	// The agent's process: the body's shape as a one-child list, processed against the other collection.
-	static hkpAgentData* process(const hkpAgent3ProcessInput& input, hkpAgentEntry* entry, hkpAgentData* agentData,
-		hkVector4* separatingNormal, hkpProcessCollisionOutput& output);
+    // Registers the agent for a convex shape against a shape collection.
+    static void registerAgent3(hkpCollisionDispatcher* dispatcher);
+    // The SDK's initAgentFunc: hkListAgent3's functions, with this agent's process.
+    static void initAgentFunc(hkpCollisionDispatcher::Agent3Funcs& f);
+    // The agent's process: the body's shape as a one-child list, processed against the other collection.
+    static hkpAgentData* process(
+        const hkpAgent3ProcessInput& input,
+        hkpAgentEntry* entry,
+        hkpAgentData* agentData,
+        hkVector4* separatingNormal,
+        hkpProcessCollisionOutput& output
+    );
 };

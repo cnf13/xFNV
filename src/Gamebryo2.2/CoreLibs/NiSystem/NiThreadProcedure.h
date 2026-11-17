@@ -8,8 +8,8 @@
 // The class has no data members; it holds only its vtable pointer.
 class NiThreadProcedure : public NiMemObject {
 public:
-	virtual ~NiThreadProcedure();
+    virtual ~NiThreadProcedure();
 
-	// The thread calls this procedure with its argument.
-	virtual uint32_t ThreadProcedure(void* pvArg);
+    // The thread calls this procedure with its argument.
+    virtual uint32_t ThreadProcedure(void* pvArg);
 };

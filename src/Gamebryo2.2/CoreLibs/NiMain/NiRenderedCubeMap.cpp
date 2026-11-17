@@ -15,35 +15,35 @@ NiRenderedCubeMap::~NiRenderedCubeMap() {}
 
 // The width of the first face buffer.
 uint32_t NiRenderedCubeMap::GetWidth() const {
-	return m_aspFaceBuffers[FACE_POS_X]->GetWidth();
+    return m_aspFaceBuffers[FACE_POS_X]->GetWidth();
 }
 
 // The height of the first face buffer.
 uint32_t NiRenderedCubeMap::GetHeight() const {
-	return m_aspFaceBuffers[FACE_POS_X]->GetHeight();
+    return m_aspFaceBuffers[FACE_POS_X]->GetHeight();
 }
 
 // Each face buffer is assigned as an NiPointer assignment does: the old one released before the new one is stored and
 // referenced. The result is stored through even when the allocation failed, as the game does; a cube map the renderer
 // gives no data is deleted.
-NiRenderedCubeMap* NiRenderedCubeMap::Create(uint32_t uiSize, NiRenderer* apkRenderer,
-	const NiTexture::FormatPrefs& kPrefs) {
-	if (!apkRenderer || !uiSize || (uiSize & (uiSize - 1)) != 0) {
-		return nullptr;
-	}
-	void* pMemory = NiMemObject::operator new(sizeof(NiRenderedCubeMap));
-	NiRenderedCubeMap* pkCubeMap = pMemory ? ::new (pMemory) NiRenderedCubeMap : nullptr;
-	pkCubeMap->m_kFormatPrefs = kPrefs;
-	for (uint32_t i = 0; i < FACE_NUM; ++i) {
-		Ni2DBuffer* pkBuffer = Ni2DBuffer::Create_(uiSize, uiSize);
-		pkCubeMap->m_aspFaceBuffers[i] = pkBuffer;
-	}
-	pkCubeMap->bForceD3DFormat = NiRenderedTexture::bStaticForceD3DFormat;
-	pkCubeMap->iForcedD3DFormat = NiRenderedTexture::iStaticForcedD3DFormat;
-	pkCubeMap->bRenderedTexture = NiRenderedTexture::bStaticRenderedTexture;
-	if (!apkRenderer->CreateRenderedCubeMapRendererData(pkCubeMap)) {
-		delete pkCubeMap;
-		return nullptr;
-	}
-	return pkCubeMap;
+NiRenderedCubeMap*
+NiRenderedCubeMap::Create(uint32_t uiSize, NiRenderer* apkRenderer, const NiTexture::FormatPrefs& kPrefs) {
+    if (!apkRenderer || !uiSize || (uiSize & (uiSize - 1)) != 0) {
+        return nullptr;
+    }
+    void* pMemory = NiMemObject::operator new(sizeof(NiRenderedCubeMap));
+    NiRenderedCubeMap* pkCubeMap = pMemory ? ::new (pMemory) NiRenderedCubeMap : nullptr;
+    pkCubeMap->m_kFormatPrefs = kPrefs;
+    for (uint32_t i = 0; i < FACE_NUM; ++i) {
+        Ni2DBuffer* pkBuffer = Ni2DBuffer::Create_(uiSize, uiSize);
+        pkCubeMap->m_aspFaceBuffers[i] = pkBuffer;
+    }
+    pkCubeMap->bForceD3DFormat = NiRenderedTexture::bStaticForceD3DFormat;
+    pkCubeMap->iForcedD3DFormat = NiRenderedTexture::iStaticForcedD3DFormat;
+    pkCubeMap->bRenderedTexture = NiRenderedTexture::bStaticRenderedTexture;
+    if (!apkRenderer->CreateRenderedCubeMapRendererData(pkCubeMap)) {
+        delete pkCubeMap;
+        return nullptr;
+    }
+    return pkCubeMap;
 }

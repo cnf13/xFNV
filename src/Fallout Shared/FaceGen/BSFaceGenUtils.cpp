@@ -6,11 +6,12 @@
 
 // The extra data of apGeom named by T's tag, or null for a null geometry. Defined here, where NiTriBasedGeom is
 // complete; BSFaceGenBaseMorphExtraData is the one instantiation.
-template <class T> NiExtraData* BSFaceGenUtils::GetFaceGenExtraData(NiTriBasedGeom* apGeom) {
-	if (!apGeom) {
-		return nullptr;
-	}
-	return apGeom->GetExtraData(T::Tag());
+template <class T>
+NiExtraData* BSFaceGenUtils::GetFaceGenExtraData(NiTriBasedGeom* apGeom) {
+    if (!apGeom) {
+        return nullptr;
+    }
+    return apGeom->GetExtraData(T::Tag());
 }
 
 template NiExtraData* BSFaceGenUtils::GetFaceGenExtraData<BSFaceGenBaseMorphExtraData>(NiTriBasedGeom* apGeom);

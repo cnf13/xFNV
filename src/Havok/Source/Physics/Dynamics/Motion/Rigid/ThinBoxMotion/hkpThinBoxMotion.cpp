@@ -19,8 +19,8 @@
 #include "Havok/Source/Physics/Dynamics/Constraint/Motor/Position/hkpPositionConstraintMotor.h"
 #include "Havok/Source/Physics/Dynamics/Constraint/Motor/SpringDamper/hkpSpringDamperConstraintMotor.h"
 #include "Havok/Source/Physics/Dynamics/Constraint/Motor/Velocity/hkpVelocityConstraintMotor.h"
-#include "Havok/Source/Physics/Dynamics/Motion/hkpMotion.h"
 #include "Havok/Source/Physics/Dynamics/Motion/Rigid/hkpSphereMotion.h"
+#include "Havok/Source/Physics/Dynamics/Motion/hkpMotion.h"
 #include "Havok/Source/Physics/Internal/Collide/ConvexPieceMesh/hkpConvexPieceStreamData.h"
 #include "Havok/Source/Physics/Utilities/Actions/AngularDashpot/hkpAngularDashpotAction.h"
 #include "Havok/Source/Physics/Utilities/Actions/MouseSpring/hkpMouseSpringAction.h"
@@ -30,36 +30,50 @@
 
 #include <bit>
 
-hkClass hkpThinBoxMotionClass("hkpThinBoxMotion", &hkpBoxMotionClass, 288, nullptr, 0, nullptr, 0, nullptr, 0, nullptr,
-	nullptr, 0, 0);
-hkTypeInfo hkpThinBoxMotionTypeInfo = {"hkpThinBoxMotion", finishLoadedObjecthkpThinBoxMotion,
-	cleanupLoadedObjecthkpThinBoxMotion, getVtablehkpThinBoxMotion(), &typeid(hkpThinBoxMotion),
-	sizeof(hkpThinBoxMotion)};
+hkClass hkpThinBoxMotionClass(
+    "hkpThinBoxMotion",
+    &hkpBoxMotionClass,
+    288,
+    nullptr,
+    0,
+    nullptr,
+    0,
+    nullptr,
+    0,
+    nullptr,
+    nullptr,
+    0,
+    0
+);
+hkTypeInfo hkpThinBoxMotionTypeInfo = {
+    "hkpThinBoxMotion",          finishLoadedObjecthkpThinBoxMotion, cleanupLoadedObjecthkpThinBoxMotion,
+    getVtablehkpThinBoxMotion(), &typeid(hkpThinBoxMotion),          sizeof(hkpThinBoxMotion)
+};
 
 void cleanupLoadedObjecthkpThinBoxMotion(void* p) {
-	static_cast<hkpThinBoxMotion*>(p)->~hkpThinBoxMotion();
+    static_cast<hkpThinBoxMotion*>(p)->~hkpThinBoxMotion();
 }
 
 // The type info's finish-loaded-object callback for hkpThinBoxMotion: runs its finish constructor.
 void finishLoadedObjecthkpThinBoxMotion(void* p, int32_t finishing) {
-	if (p) {
-		hkFinishLoadedObjectFlag kFlag;
-		kFlag.m_finishing = finishing;
-		::new (p) hkpThinBoxMotion(kFlag);
-	}
+    if (p) {
+        hkFinishLoadedObjectFlag kFlag;
+        kFlag.m_finishing = finishing;
+        ::new (p) hkpThinBoxMotion(kFlag);
+    }
 }
 
 const void* getVtablehkpThinBoxMotion() {
-	return hkGetVtableOf<hkpThinBoxMotion>();
+    return hkGetVtableOf<hkpThinBoxMotion>();
 }
 
 hkpThinBoxMotion::hkpThinBoxMotion(hkFinishLoadedObjectFlag flag) : hkpBoxMotion(flag.m_finishing) {}
 
 hkpThinBoxMotion::hkpThinBoxMotion(const hkVector4& position, const hkQuaternion& rotation)
-	: hkpBoxMotion(position, rotation) {
-	m_type.m_storage = MOTION_THIN_BOX_INERTIA;
+  : hkpBoxMotion(position, rotation) {
+    m_type.m_storage = MOTION_THIN_BOX_INERTIA;
 }
 
 const hkClass& hkpThinBoxMotion::staticClass() {
-	return hkpThinBoxMotionClass;
+    return hkpThinBoxMotionClass;
 }

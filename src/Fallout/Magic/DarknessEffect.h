@@ -5,18 +5,18 @@
 // The value modifier effect that also darkens its target's 3D while it runs.
 class DarknessEffect : public ValueModifierEffect {
 public:
-	DarknessEffect(MagicCaster* apCaster, MagicItem* apSpell, EffectItem* apEffect);
+    DarknessEffect(MagicCaster* apCaster, MagicItem* apSpell, EffectItem* apEffect);
 
-	ActiveEffect* Copy() override;
-	void FinishInitLoadGame(Actor* apActor) override;
-	void Revert(Actor* apActor) override;
-	void CopyData(ActiveEffect* apDestination) override;
-	bool CheckTarget(MagicTarget* apTarget) override;
-	void Start() override;
-	void Finish() override;
+    ActiveEffect* Copy() override;
+    void FinishInitLoadGame(Actor* apActor) override;
+    void Revert(Actor* apActor) override;
+    void CopyData(ActiveEffect* apDestination) override;
+    bool CheckTarget(MagicTarget* apTarget) override;
+    void Start() override;
+    void Finish() override;
 
-	using ValueModifierEffect::Revert;
+    using ValueModifierEffect::Revert;
 
-	// Allocates and constructs the effect; its parameters are passed on to Construct unchanged.
-	static ActiveEffect* Instantiate(MagicCaster* apCaster, MagicItem* apSpell, EffectItem* apEffect);
+    // Allocates and constructs the effect; its parameters are passed on to Construct unchanged.
+    static ActiveEffect* Instantiate(MagicCaster* apCaster, MagicItem* apSpell, EffectItem* apEffect);
 };

@@ -12,49 +12,51 @@
 
 // Whether the vampirism archetype took Instantiate; stores RegisterActiveEffect's whole return byte.
 static char bRegistered =
-	EffectArchetypes::RegisterActiveEffect(EffectArchetypes::VAMPIRISM, &VampirismEffect::Instantiate);
+    EffectArchetypes::RegisterActiveEffect(EffectArchetypes::VAMPIRISM, &VampirismEffect::Instantiate);
 
 VampirismEffect::VampirismEffect(MagicCaster* apCaster, MagicItem* apSpell, EffectItem* apEffect)
-	: ActiveEffect(apCaster, apSpell, apEffect) {}
+  : ActiveEffect(apCaster, apSpell, apEffect) {}
 
 VampirismEffect::~VampirismEffect() {}
 
 // Allocates a copy, constructs it from this effect's caster, spell and effect item, then copies the effect data.
 ActiveEffect* VampirismEffect::Copy() {
-	void* pMemory = ourMalloc(sizeof(VampirismEffect));
-	VampirismEffect* pCopy;
-	if (pMemory) {
-		pCopy = ::new (pMemory) VampirismEffect(pCaster, pSpell, pEffect);
-	} else {
-		pCopy = nullptr;
-	}
-	CopyData(pCopy);
-	return pCopy;
+    void* pMemory = ourMalloc(sizeof(VampirismEffect));
+    VampirismEffect* pCopy;
+    if (pMemory) {
+        pCopy = ::new (pMemory) VampirismEffect(pCaster, pSpell, pEffect);
+    }
+    else {
+        pCopy = nullptr;
+    }
+    CopyData(pCopy);
+    return pCopy;
 }
 
 void VampirismEffect::InitLoadGame(Actor* apActor) {
-	ActiveEffect::InitLoadGame(apActor);
-	dynamic_cast<Character*>(apActor);
+    ActiveEffect::InitLoadGame(apActor);
+    dynamic_cast<Character*>(apActor);
 }
 
 void VampirismEffect::Revert(Actor* apActor) {
-	ActiveEffect::Revert(apActor);
+    ActiveEffect::Revert(apActor);
 }
 
 void VampirismEffect::CopyData(ActiveEffect* apDestination) {
-	ActiveEffect::CopyData(apDestination);
+    ActiveEffect::CopyData(apDestination);
 }
 
 // Only characters can be drained.
 bool VampirismEffect::CheckTarget(MagicTarget* apTarget) {
-	return dynamic_cast<Character*>(apTarget) != nullptr;
+    return dynamic_cast<Character*>(apTarget) != nullptr;
 }
 
 ActiveEffect* VampirismEffect::Instantiate(MagicCaster* apCaster, MagicItem* apSpell, EffectItem* apEffect) {
-	VampirismEffect* v5 = static_cast<VampirismEffect*>(ourMalloc(sizeof(VampirismEffect)));
-	if (v5) {
-		return ::new (v5) VampirismEffect(apCaster, apSpell, apEffect);
-	} else {
-		return 0;
-	}
+    VampirismEffect* v5 = static_cast<VampirismEffect*>(ourMalloc(sizeof(VampirismEffect)));
+    if (v5) {
+        return ::new (v5) VampirismEffect(apCaster, apSpell, apEffect);
+    }
+    else {
+        return 0;
+    }
 }

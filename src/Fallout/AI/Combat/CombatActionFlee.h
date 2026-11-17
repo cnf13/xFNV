@@ -5,7 +5,7 @@
 // Flees to a cover location; the constructor adds no fields.
 class CombatActionFlee : public CombatAction {
 public:
-	CombatActionFlee(CombatAction::COMBAT_ACTION aeType);
+    CombatActionFlee(CombatAction::COMBAT_ACTION aeType);
 
-	void Execute(CombatController* apCombatController, int32_t aiActionValue) override;
+    void Execute(CombatController* apCombatController, int32_t aiActionValue) override;
 };

@@ -24,30 +24,30 @@ class NiTriStrips;
 // The game's spring damper motor: Havok's motor with Gamebryo's RTTI and type queries appended to its vtable.
 class bhkSpringDamperConstraintMotor : public hkpSpringDamperConstraintMotor {
 public:
-	bhkSpringDamperConstraintMotor();
-	~bhkSpringDamperConstraintMotor() override;
+    bhkSpringDamperConstraintMotor();
+    ~bhkSpringDamperConstraintMotor() override;
 
-	virtual const NiRTTI* GetRTTI() const;
-	virtual NiNode* IsNode();
-	virtual BSFadeNode* IsFadeNode();
-	virtual BSMultiBoundNode* IsMultiBoundNode();
-	virtual NiGeometry* IsGeometry();
-	virtual NiTriBasedGeom* IsTriBasedGeom();
-	virtual NiTriStrips* IsTriStrips();
-	virtual NiTriShape* IsTriShape();
-	virtual BSSegmentedTriShape* IsSegmentedTriShape();
-	virtual BSResizableTriShape* IsResizableTriShape();
-	virtual NiParticles* IsParticlesGeom();
-	virtual NiLines* IsLinesGeom();
-	virtual bhkNiCollisionObject* IsBhkNiCollisionObject();
-	virtual bhkBlendCollisionObject* IsBhkBlendCollisionObject();
-	virtual bhkRigidBody* IsBhkRigidBody();
-	virtual bhkLimitedHingeConstraint* IsBhkLimitedHingeConstraint();
-	virtual void GetViewerStrings(NiTPrimitiveArray<char*>* pkStrings);
+    virtual const NiRTTI* GetRTTI() const;
+    virtual NiNode* IsNode();
+    virtual BSFadeNode* IsFadeNode();
+    virtual BSMultiBoundNode* IsMultiBoundNode();
+    virtual NiGeometry* IsGeometry();
+    virtual NiTriBasedGeom* IsTriBasedGeom();
+    virtual NiTriStrips* IsTriStrips();
+    virtual NiTriShape* IsTriShape();
+    virtual BSSegmentedTriShape* IsSegmentedTriShape();
+    virtual BSResizableTriShape* IsResizableTriShape();
+    virtual NiParticles* IsParticlesGeom();
+    virtual NiLines* IsLinesGeom();
+    virtual bhkNiCollisionObject* IsBhkNiCollisionObject();
+    virtual bhkBlendCollisionObject* IsBhkBlendCollisionObject();
+    virtual bhkRigidBody* IsBhkRigidBody();
+    virtual bhkLimitedHingeConstraint* IsBhkLimitedHingeConstraint();
+    virtual void GetViewerStrings(NiTPrimitiveArray<char*>* pkStrings);
 
-	void LoadBinary(NiStream& arStream);
-	// Writes the base's force limits, then the spring constant and damping. Called by hkConstraintCinfo::SaveMotor.
-	void SaveBinary(NiStream& arStream);
+    void LoadBinary(NiStream& arStream);
+    // Writes the base's force limits, then the spring constant and damping. Called by hkConstraintCinfo::SaveMotor.
+    void SaveBinary(NiStream& arStream);
 
-	static NiRTTI ms_RTTI;
+    static NiRTTI ms_RTTI;
 };

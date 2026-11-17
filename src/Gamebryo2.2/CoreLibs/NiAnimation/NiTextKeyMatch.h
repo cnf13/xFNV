@@ -7,8 +7,8 @@
 // NiActorManager::TimelineData::m_spMatchObject.
 class NiTextKeyMatch : public NiRefObject {
 public:
-	virtual bool IsKeyMatch(const NiFixedString& kTextKey);
+    virtual bool IsKeyMatch(const NiFixedString& kTextKey);
 
-	NiFixedString m_kLastKeyMatched;
-	NiFixedString m_kMatchKey;
+    NiFixedString m_kLastKeyMatched;
+    NiFixedString m_kMatchKey;
 };

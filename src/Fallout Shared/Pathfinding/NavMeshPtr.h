@@ -9,23 +9,23 @@
 // A smart pointer to a navmesh: NiPointer's reference counting on the navmesh's NiRefObject part.
 class NavMeshPtr : public NiPointer<NavMesh> {
 public:
-	NavMeshPtr();
-	NavMeshPtr(NavMesh* apNavMesh);
-	// Defined in ExtraDataList.cpp.
-	NavMeshPtr(const NavMeshPtr& arPtr);
-	~NavMeshPtr();
+    NavMeshPtr();
+    NavMeshPtr(NavMesh* apNavMesh);
+    // Defined in ExtraDataList.cpp.
+    NavMeshPtr(const NavMeshPtr& arPtr);
+    ~NavMeshPtr();
 
-	// User-declared copy assignment: performs the base NiPointer<NavMesh>'s assignment and returns *this. Defined in
-	// ExtraDataList.cpp.
-	NavMeshPtr& operator=(const NavMeshPtr& ptr);
-	void DecRefCount();
-	bool operator!=(const NavMeshPtr& ptr) const;
-	bool operator==(const NavMeshPtr& ptr) const;
-	// This conversion hides NiPointer's own and returns the pointer through the one-field getter.
-	operator NavMesh*() const;
+    // User-declared copy assignment: performs the base NiPointer<NavMesh>'s assignment and returns *this. Defined in
+    // ExtraDataList.cpp.
+    NavMeshPtr& operator=(const NavMeshPtr& ptr);
+    void DecRefCount();
+    bool operator!=(const NavMeshPtr& ptr) const;
+    bool operator==(const NavMeshPtr& ptr) const;
+    // This conversion hides NiPointer's own and returns the pointer through the one-field getter.
+    operator NavMesh*() const;
 
-	// A pointer holding apNavMesh, constructed in apResult.
-	static NavMeshPtr* MakeNavMeshPtr(NavMeshPtr* apResult, NavMesh* apNavMesh);
-	// Assigns apNavMesh to the existing arPtr through a temporary pointer.
-	static void MakeNavMeshPtr(NavMeshPtr& arPtr, NavMesh* apNavMesh);
+    // A pointer holding apNavMesh, constructed in apResult.
+    static NavMeshPtr* MakeNavMeshPtr(NavMeshPtr* apResult, NavMesh* apNavMesh);
+    // Assigns apNavMesh to the existing arPtr through a temporary pointer.
+    static void MakeNavMeshPtr(NavMeshPtr& arPtr, NavMesh* apNavMesh);
 };

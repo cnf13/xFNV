@@ -5,5 +5,5 @@
 hkpBroadPhaseListener::~hkpBroadPhaseListener() {}
 
 void hkpBroadPhaseListener::operator delete(void* apMemory) {
-	ourFree(apMemory);
+    ourFree(apMemory);
 }

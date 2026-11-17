@@ -8,7 +8,7 @@ class hkpCdBody;
 // existing forward declarations.
 class hkpCdPoint {
 public:
-	hkContactPoint m_contact;
-	const hkpCdBody* m_cdBodyA;
-	const hkpCdBody* m_cdBodyB;
+    hkContactPoint m_contact;
+    const hkpCdBody* m_cdBodyA;
+    const hkpCdBody* m_cdBodyB;
 };

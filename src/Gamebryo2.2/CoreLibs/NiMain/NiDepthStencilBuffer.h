@@ -9,18 +9,25 @@ class NiRenderer;
 // A depth/stencil render buffer.
 class NiDepthStencilBuffer : public Ni2DBuffer {
 public:
-	NiDepthStencilBuffer();
-	~NiDepthStencilBuffer() override;
+    NiDepthStencilBuffer();
+    ~NiDepthStencilBuffer() override;
 
-	const NiRTTI* GetRTTI() const override { return &ms_RTTI; }
+    const NiRTTI* GetRTTI() const override {
+        return &ms_RTTI;
+    }
 
-	static NiDepthStencilBuffer* Create(uint32_t uiWidth, uint32_t uiHeight, NiRenderer* pkRenderer,
-		const NiPixelFormat& kFormat, Ni2DBuffer::MultiSamplePreference eMSAAPref);
-	// A 32-bit depth, 8-bit stencil buffer of pkBuffer's size and multisampling; null without a buffer or renderer.
-	static NiDepthStencilBuffer* CreateCompatible(Ni2DBuffer* pkBuffer, NiRenderer* apkRenderer);
-	static NiDepthStencilBuffer* Create(uint32_t uiWidth, uint32_t uiHeight, Ni2DBuffer::RendererData* pkData);
+    static NiDepthStencilBuffer* Create(
+        uint32_t uiWidth,
+        uint32_t uiHeight,
+        NiRenderer* pkRenderer,
+        const NiPixelFormat& kFormat,
+        Ni2DBuffer::MultiSamplePreference eMSAAPref
+    );
+    // A 32-bit depth, 8-bit stencil buffer of pkBuffer's size and multisampling; null without a buffer or renderer.
+    static NiDepthStencilBuffer* CreateCompatible(Ni2DBuffer* pkBuffer, NiRenderer* apkRenderer);
+    static NiDepthStencilBuffer* Create(uint32_t uiWidth, uint32_t uiHeight, Ni2DBuffer::RendererData* pkData);
 
-	static NiRTTI ms_RTTI;
+    static NiRTTI ms_RTTI;
 };
 
 NiSmartPointer(NiDepthStencilBuffer);

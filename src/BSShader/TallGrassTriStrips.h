@@ -8,27 +8,27 @@ class NiDX9Renderer;
 // Instanced grass geometry: one model drawn iInstanceCount times. Created at runtime, never stored in a NIF.
 class TallGrassTriStrips : public NiTriStrips {
 public:
-	TallGrassTriStrips(NiTriStripsData* usVertices);
-	~TallGrassTriStrips() override;
+    TallGrassTriStrips(NiTriStripsData* usVertices);
+    ~TallGrassTriStrips() override;
 
-	const NiRTTI* GetRTTI() const override;
-	NiObject* CreateClone(NiCloningProcess& arCloneData) override;
-	void GetViewerStrings(NiTPrimitiveArray<char*>* apStrings) override;
-	// copies the local bound to the world bound, draws only when there are instances
-	virtual void RenderImmediate(NiDX9Renderer* apRenderer);
-	virtual void OnlyRenderImmediate(NiDX9Renderer* apRenderer);
-	virtual void SetLocalBound(NiBound apBound);
-	virtual void SetInstanceCount(uint16_t aiCount);
-	virtual NiBound* GetWorldBound();
-	using NiTriStrips::OnlyRenderImmediate;
-	using NiTriStrips::RenderImmediate;
+    const NiRTTI* GetRTTI() const override;
+    NiObject* CreateClone(NiCloningProcess& arCloneData) override;
+    void GetViewerStrings(NiTPrimitiveArray<char*>* apStrings) override;
+    // copies the local bound to the world bound, draws only when there are instances
+    virtual void RenderImmediate(NiDX9Renderer* apRenderer);
+    virtual void OnlyRenderImmediate(NiDX9Renderer* apRenderer);
+    virtual void SetLocalBound(NiBound apBound);
+    virtual void SetInstanceCount(uint16_t aiCount);
+    virtual NiBound* GetWorldBound();
+    using NiTriStrips::OnlyRenderImmediate;
+    using NiTriStrips::RenderImmediate;
 
 protected:
-	void UpdateWorldBound() override;
+    void UpdateWorldBound() override;
 
 public:
-	uint16_t iInstanceCount;
-	NiBound pLocalBound;
+    uint16_t iInstanceCount;
+    NiBound pLocalBound;
 
-	static NiRTTI ms_RTTI;
+    static NiRTTI ms_RTTI;
 };

@@ -10,44 +10,44 @@ class NiD3DVertexShader;
 
 class BSShaderBloodSplatter : public BSShader {
 public:
-	struct Constant {
-		static inline NiVector4 LightLoc{};
-		static inline NiVector4 Ctrl{};
-		static inline NiVector4 Alpha{};
-	};
+    struct Constant {
+        static inline NiVector4 LightLoc{};
+        static inline NiVector4 Ctrl{};
+        static inline NiVector4 Alpha{};
+    };
 
-	BSShaderBloodSplatter();
-	~BSShaderBloodSplatter() override;
+    BSShaderBloodSplatter();
+    ~BSShaderBloodSplatter() override;
 
-	const NiRTTI* GetRTTI() const override;
-	void SetupGeometryTextures(const NiPropertyState* apState) override;
-	void SetupGeometryConstants(const NiPropertyState* apState) override;
-	void InitPass(uint32_t auiCurrentPass) override;
-	void CreateConstantMaps() override;
-	void ReloadShaders() override;
-	void ClearPassStages() override;
+    const NiRTTI* GetRTTI() const override;
+    void SetupGeometryTextures(const NiPropertyState* apState) override;
+    void SetupGeometryConstants(const NiPropertyState* apState) override;
+    void InitPass(uint32_t auiCurrentPass) override;
+    void CreateConstantMaps() override;
+    void ReloadShaders() override;
+    void ClearPassStages() override;
 
 protected:
-	// Loads the vertex and pixel shaders.
-	void LoadShaders();
-	// Creates the passes and sets up their stages; always true.
-	bool LoadStagesAndPasses();
+    // Loads the vertex and pixel shaders.
+    void LoadShaders();
+    // Creates the passes and sets up their stages; always true.
+    bool LoadStagesAndPasses();
 
 public:
-	static void SetFlareMult(float afFlareMult);
-	static void SetGlobalAlpha(float afAlpha);
-	static float GetGlobalAlpha();
-	static void SetFlareOffsetScale(float afScale);
-	static void ComputeScreenSpaceLightLoc(NiCamera* apCamera);
-	static BSShader* CreateShader();
+    static void SetFlareMult(float afFlareMult);
+    static void SetGlobalAlpha(float afAlpha);
+    static float GetGlobalAlpha();
+    static void SetFlareOffsetScale(float afScale);
+    static void ComputeScreenSpaceLightLoc(NiCamera* apCamera);
+    static BSShader* CreateShader();
 
-	NiPointer<NiD3DPass> spPass[2];
-	NiPointer<NiD3DVertexShader> spVertexShader[2];
-	NiPointer<NiD3DPixelShader> spPixelShader[2];
+    NiPointer<NiD3DPass> spPass[2];
+    NiPointer<NiD3DVertexShader> spVertexShader[2];
+    NiPointer<NiD3DPixelShader> spPixelShader[2];
 
-	static inline float fGlobalAlpha = 1.0f;
-	static inline float fFlareMult = 1.0f;
-	static NiRTTI ms_RTTI;
-	static inline float fFlareAlpha;
-	static NiPointer<NiTexture> spDefaultFlareTexture;
+    static inline float fGlobalAlpha = 1.0f;
+    static inline float fFlareMult = 1.0f;
+    static NiRTTI ms_RTTI;
+    static inline float fFlareAlpha;
+    static NiPointer<NiTexture> spDefaultFlareTexture;
 };

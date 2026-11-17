@@ -23,65 +23,68 @@
 static char bRegistered = EffectArchetypes::RegisterActiveEffect(EffectArchetypes::DISPEL, &DispelEffect::Instantiate);
 
 DispelEffect::DispelEffect(MagicCaster* apCaster, MagicItem* apSpell, EffectItem* apEffect)
-	: ActiveEffect(apCaster, apSpell, apEffect) {}
+  : ActiveEffect(apCaster, apSpell, apEffect) {}
 
 DispelEffect::~DispelEffect() {}
 
 // Copies the effect: allocates a new one, constructs it from this effect's caster, spell and effect item, then copies
 // the shared data into it. CopyData is called virtually with this effect as `this`.
 ActiveEffect* DispelEffect::Copy() {
-	DispelEffect* pCopy = static_cast<DispelEffect*>(ourMalloc(sizeof(DispelEffect)));
-	if (pCopy) {
-		pCopy = ::new (pCopy) DispelEffect(pCaster, pSpell, pEffect);
-	} else {
-		pCopy = nullptr;
-	}
-	static_cast<ActiveEffect*>(this)->CopyData(pCopy);
-	return pCopy;
+    DispelEffect* pCopy = static_cast<DispelEffect*>(ourMalloc(sizeof(DispelEffect)));
+    if (pCopy) {
+        pCopy = ::new (pCopy) DispelEffect(pCaster, pSpell, pEffect);
+    }
+    else {
+        pCopy = nullptr;
+    }
+    static_cast<ActiveEffect*>(this)->CopyData(pCopy);
+    return pCopy;
 }
 
 void DispelEffect::CopyData(ActiveEffect* apDestination) {
-	ActiveEffect::CopyData(apDestination);
+    ActiveEffect::CopyData(apDestination);
 }
 
 bool DispelEffect::CheckTarget(MagicTarget* apTarget) {
-	return (dynamic_cast<Character*>(apTarget) != 0);
+    return (dynamic_cast<Character*>(apTarget) != 0);
 }
 
 void DispelEffect::Start() {
-	Actor* pcasterActor;
-	MagicTarget* Target = pTarget;
-	BSSimpleList<ActiveEffect*>* plist = Target->GetActiveEffectList();
-	bool bselfCast = pEffect->data.iRange == 0;
-	if (pCaster) {
-		pcasterActor = pCaster->GetCasterAsActor();
-	} else {
-		pcasterActor = 0;
-	}
-	while (plist && !plist->IsEmpty()) {
-		ActiveEffect* peffect = plist->m_item;
-		BSSimpleList<ActiveEffect*>* pnext = plist->m_pkNext;
-		if (peffect) {
-			if (peffect != this) {
-				MagicItem* pspell = peffect->pSpell;
-				if (pspell->GetSpellType() == MagicSystem::SPELL) {
-					double v2 = pspell->GetCost(bselfCast ? pcasterActor : 0);
-					double SequenceWeight = fMagnitude;
-					if (fMagicDispelMagnitudeMult.Float() * SequenceWeight >= v2) {
-						peffect->Dispel(0);
-					}
-				}
-			}
-		}
-		plist = pnext;
-	}
+    Actor* pcasterActor;
+    MagicTarget* Target = pTarget;
+    BSSimpleList<ActiveEffect*>* plist = Target->GetActiveEffectList();
+    bool bselfCast = pEffect->data.iRange == 0;
+    if (pCaster) {
+        pcasterActor = pCaster->GetCasterAsActor();
+    }
+    else {
+        pcasterActor = 0;
+    }
+    while (plist && !plist->IsEmpty()) {
+        ActiveEffect* peffect = plist->m_item;
+        BSSimpleList<ActiveEffect*>* pnext = plist->m_pkNext;
+        if (peffect) {
+            if (peffect != this) {
+                MagicItem* pspell = peffect->pSpell;
+                if (pspell->GetSpellType() == MagicSystem::SPELL) {
+                    double v2 = pspell->GetCost(bselfCast ? pcasterActor : 0);
+                    double SequenceWeight = fMagnitude;
+                    if (fMagicDispelMagnitudeMult.Float() * SequenceWeight >= v2) {
+                        peffect->Dispel(0);
+                    }
+                }
+            }
+        }
+        plist = pnext;
+    }
 }
 
 ActiveEffect* DispelEffect::Instantiate(MagicCaster* a1, MagicItem* a2, EffectItem* a3) {
-	void* v5 = ourMalloc(sizeof(DispelEffect));
-	if (v5) {
-		return ::new (v5) DispelEffect(a1, a2, a3);
-	} else {
-		return nullptr;
-	}
+    void* v5 = ourMalloc(sizeof(DispelEffect));
+    if (v5) {
+        return ::new (v5) DispelEffect(a1, a2, a3);
+    }
+    else {
+        return nullptr;
+    }
 }

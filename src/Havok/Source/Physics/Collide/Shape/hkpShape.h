@@ -23,85 +23,111 @@ class hkTransform;
 // shape answers (bounding box, ray casts) are virtual; the base implements only the projection and the SPU size.
 class hkpShape : public hkReferencedObject {
 public:
-	// What a shape is told when its size on the SPU is calculated.
-	struct CalcSizeForSpuInput {
-		bool m_midphaseAgent3Registered;
-		bool m_isFixedOrKeyframed;
-		bool m_hasDynamicMotionSaved;
-	};
+    // What a shape is told when its size on the SPU is calculated.
+    struct CalcSizeForSpuInput {
+        bool m_midphaseAgent3Registered;
+        bool m_isFixedOrKeyframed;
+        bool m_hasDynamicMotionSaved;
+    };
 
-	// The table of per-shape-type query functions the SPU-style dispatch uses, each taking the shape as thisObj:
-	// hkPadSpu<function pointer> on PC is the pointer itself.
-	struct ShapeFuncs {
-		using GetSupportingVertexFunc = void (*)(const void* thisObj, const hkVector4& direction,
-			hkpCdVertex& supportingVertexOut);
-		using ConvertVertexIdsToVerticesFunc = void (*)(const void* thisObj, const uint16_t* ids, int32_t numIds,
-			hkpCdVertex* verticesOut);
-		using WeldContactPointFunc = int32_t (*)(const void* thisObj, uint16_t*, uint8_t&, hkVector4&,
-			const hkTransform*, const hkpConvexShape*, const hkTransform*, hkVector4&);
-		using GetCentreFunc = void (*)(const void* thisObj, hkVector4& centreOut);
-		using GetNumCollisionSpheresFunc = int32_t (*)(const void* thisObj);
-		using GetCollisionSpheresFunc = const hkSphere* (*)(const void* thisObj, hkSphere* sphereBuffer);
-		using GetAabbFunc = void (*)(const void* thisObj, const hkTransform& localToWorld, float tolerance,
-			hkAabb& out);
-		using CastRayFunc = hkBool (*)(const void* thisObj, const hkpShapeRayCastInput& input,
-			hkpShapeRayCastOutput& output);
-		using CastRayWithCollectorFunc = void (*)(const void* thisObj, const hkpShapeRayCastInput& input,
-			const hkpCdBody& cdBody, hkpRayHitCollector& collector);
-		using CastRayBundleFunc = hkVector4Comparison (*)(const void* thisObj, const hkpShapeRayBundleCastInput& input,
-			hkpShapeRayBundleCastOutput& output, const hkVector4Comparison& mask);
-		using GetChildShapeFunc = const hkpShape* (*)(const void* thisObj, uint32_t key, char (&buffer)[512]);
-		using GetCollisionFilterInfoFunc = uint32_t (*)(const void* thisObj, uint32_t key);
+    // The table of per-shape-type query functions the SPU-style dispatch uses, each taking the shape as thisObj:
+    // hkPadSpu<function pointer> on PC is the pointer itself.
+    struct ShapeFuncs {
+        using GetSupportingVertexFunc =
+            void (*)(const void* thisObj, const hkVector4& direction, hkpCdVertex& supportingVertexOut);
+        using ConvertVertexIdsToVerticesFunc =
+            void (*)(const void* thisObj, const uint16_t* ids, int32_t numIds, hkpCdVertex* verticesOut);
+        using WeldContactPointFunc = int32_t (*)(
+            const void* thisObj,
+            uint16_t*,
+            uint8_t&,
+            hkVector4&,
+            const hkTransform*,
+            const hkpConvexShape*,
+            const hkTransform*,
+            hkVector4&
+        );
+        using GetCentreFunc = void (*)(const void* thisObj, hkVector4& centreOut);
+        using GetNumCollisionSpheresFunc = int32_t (*)(const void* thisObj);
+        using GetCollisionSpheresFunc = const hkSphere* (*)(const void* thisObj, hkSphere* sphereBuffer);
+        using GetAabbFunc =
+            void (*)(const void* thisObj, const hkTransform& localToWorld, float tolerance, hkAabb& out);
+        using CastRayFunc =
+            hkBool (*)(const void* thisObj, const hkpShapeRayCastInput& input, hkpShapeRayCastOutput& output);
+        using CastRayWithCollectorFunc = void (*)(
+            const void* thisObj,
+            const hkpShapeRayCastInput& input,
+            const hkpCdBody& cdBody,
+            hkpRayHitCollector& collector
+        );
+        using CastRayBundleFunc = hkVector4Comparison (*)(
+            const void* thisObj,
+            const hkpShapeRayBundleCastInput& input,
+            hkpShapeRayBundleCastOutput& output,
+            const hkVector4Comparison& mask
+        );
+        using GetChildShapeFunc = const hkpShape* (*)(const void* thisObj, uint32_t key, char (&buffer)[512]);
+        using GetCollisionFilterInfoFunc = uint32_t (*)(const void* thisObj, uint32_t key);
 
-		hkPadSpu<GetSupportingVertexFunc> m_getSupportingVertexFunc;
-		hkPadSpu<ConvertVertexIdsToVerticesFunc> m_convertVertexIdsToVertices;
-		hkPadSpu<WeldContactPointFunc> m_weldContactPointFunc;
-		hkPadSpu<GetCentreFunc> m_getCentreFunc;
-		hkPadSpu<GetNumCollisionSpheresFunc> m_getNumCollisionSpheresFunc;
-		hkPadSpu<GetCollisionSpheresFunc> m_getCollisionSpheresFunc;
-		hkPadSpu<GetAabbFunc> m_getAabbFunc;
-		hkPadSpu<CastRayFunc> m_castRay;
-		hkPadSpu<CastRayWithCollectorFunc> m_castRayWithCollector;
-		hkPadSpu<CastRayBundleFunc> m_castRayBundle;
-		hkPadSpu<GetChildShapeFunc> m_getChildShapeFunc;
-		hkPadSpu<GetCollisionFilterInfoFunc> m_getCollisionFilterInfoFunc;
-	};
+        hkPadSpu<GetSupportingVertexFunc> m_getSupportingVertexFunc;
+        hkPadSpu<ConvertVertexIdsToVerticesFunc> m_convertVertexIdsToVertices;
+        hkPadSpu<WeldContactPointFunc> m_weldContactPointFunc;
+        hkPadSpu<GetCentreFunc> m_getCentreFunc;
+        hkPadSpu<GetNumCollisionSpheresFunc> m_getNumCollisionSpheresFunc;
+        hkPadSpu<GetCollisionSpheresFunc> m_getCollisionSpheresFunc;
+        hkPadSpu<GetAabbFunc> m_getAabbFunc;
+        hkPadSpu<CastRayFunc> m_castRay;
+        hkPadSpu<CastRayWithCollectorFunc> m_castRayWithCollector;
+        hkPadSpu<CastRayBundleFunc> m_castRayBundle;
+        hkPadSpu<GetChildShapeFunc> m_getChildShapeFunc;
+        hkPadSpu<GetCollisionFilterInfoFunc> m_getCollisionFilterInfoFunc;
+    };
 
-	hkpShape(hkpShapeType a1);
+    hkpShape(hkpShapeType a1);
 
-	// The SDK's finish constructor: a finished shape is invalid until its class sets its type.
-	hkpShape(hkFinishLoadedObjectFlag aFlag) : hkReferencedObject(aFlag) {
-		if (aFlag.m_finishing) {
-			m_type.m_storage = HK_SHAPE_INVALID;
-		}
-	}
+    // The SDK's finish constructor: a finished shape is invalid until its class sets its type.
+    hkpShape(hkFinishLoadedObjectFlag aFlag) : hkReferencedObject(aFlag) {
+        if (aFlag.m_finishing) {
+            m_type.m_storage = HK_SHAPE_INVALID;
+        }
+    }
 
-	~hkpShape() override;
+    ~hkpShape() override;
 
-	virtual float getMaximumProjection(const hkVector4& direction) const;
-	virtual const hkpShapeContainer* getContainer() const { return nullptr; }
-	virtual bool isConvex() const { return false; }
-	virtual int32_t calcSizeForSpu(const hkpShape::CalcSizeForSpuInput&, int32_t) const;
-	virtual void getAabbImpl(const hkTransform& localToWorld, float tolerance, hkAabb& out) const = 0;
-	virtual hkBool castRayImpl(const hkpShapeRayCastInput& input, hkpShapeRayCastOutput& output) const = 0;
-	virtual void castRayWithCollectorImpl(const hkpShapeRayCastInput& input, const hkpCdBody& cdBody,
-		hkpRayHitCollector& collector) const = 0;
-	virtual hkVector4Comparison* castRayBundleImpl(hkVector4Comparison* apResult,
-		const hkpShapeRayBundleCastInput& input, hkpShapeRayBundleCastOutput& output,
-		const hkVector4Comparison& mask) const;
+    virtual float getMaximumProjection(const hkVector4& direction) const;
+    virtual const hkpShapeContainer* getContainer() const {
+        return nullptr;
+    }
+    virtual bool isConvex() const {
+        return false;
+    }
+    virtual int32_t calcSizeForSpu(const hkpShape::CalcSizeForSpuInput&, int32_t) const;
+    virtual void getAabbImpl(const hkTransform& localToWorld, float tolerance, hkAabb& out) const = 0;
+    virtual hkBool castRayImpl(const hkpShapeRayCastInput& input, hkpShapeRayCastOutput& output) const = 0;
+    virtual void castRayWithCollectorImpl(
+        const hkpShapeRayCastInput& input,
+        const hkpCdBody& cdBody,
+        hkpRayHitCollector& collector
+    ) const = 0;
+    virtual hkVector4Comparison* castRayBundleImpl(
+        hkVector4Comparison* apResult,
+        const hkpShapeRayBundleCastInput& input,
+        hkpShapeRayBundleCastOutput& output,
+        const hkVector4Comparison& mask
+    ) const;
 
-	// getAabb dispatches to getAabbImpl through the shape's vtable.
-	void getAabb(const hkTransform& localToWorld, float tolerance, hkAabb& out) const {
-		getAabbImpl(localToWorld, tolerance, out);
-	}
+    // getAabb dispatches to getAabbImpl through the shape's vtable.
+    void getAabb(const hkTransform& localToWorld, float tolerance, hkAabb& out) const {
+        getAabbImpl(localToWorld, tolerance, out);
+    }
 
-	// Returns m_type.
-	hkpShapeType getType() const;
+    // Returns m_type.
+    hkpShapeType getType() const;
 
-	hkBool castRay(const hkpShapeRayCastInput& input, hkpShapeRayCastOutput& output) const {
-		return castRayImpl(input, output);
-	}
+    hkBool castRay(const hkpShapeRayCastInput& input, hkpShapeRayCastOutput& output) const {
+        return castRayImpl(input, output);
+    }
 
-	bhkShape* m_userData;
-	hkEnum<hkpShapeType, uint32_t> m_type;
+    bhkShape* m_userData;
+    hkEnum<hkpShapeType, uint32_t> m_type;
 };

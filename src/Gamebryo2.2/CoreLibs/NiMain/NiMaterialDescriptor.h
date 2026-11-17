@@ -5,6 +5,6 @@
 // The key a fragment material builds its shaders from: an identifier and a bit array of render options.
 class NiMaterialDescriptor {
 public:
-	NiFixedString m_kIdentifier;
-	uint32_t m_auiBitArray[4];
+    NiFixedString m_kIdentifier;
+    uint32_t m_auiBitArray[4];
 };

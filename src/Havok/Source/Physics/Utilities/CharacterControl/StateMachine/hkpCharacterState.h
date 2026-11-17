@@ -11,14 +11,22 @@ struct hkpCharacterOutput;
 // to change state and left. enterState and leaveState do nothing here; the others are supplied by the state.
 class hkpCharacterState : public hkReferencedObject {
 public:
-	// The state type this handler is registered for.
-	virtual hkpCharacterStateType getType() const = 0;
-	virtual void enterState(hkpCharacterContext& context, hkpCharacterStateType prevState,
-		const hkpCharacterInput& input, hkpCharacterOutput& output);
-	virtual void leaveState(hkpCharacterContext& context, hkpCharacterStateType nextState,
-		const hkpCharacterInput& input, hkpCharacterOutput& output);
-	virtual void update(hkpCharacterContext& arContext, const hkpCharacterInput& arInput,
-		hkpCharacterOutput& arOutput) = 0;
-	virtual void change(hkpCharacterContext& arContext, const hkpCharacterInput& arInput,
-		hkpCharacterOutput& arOutput) = 0;
+    // The state type this handler is registered for.
+    virtual hkpCharacterStateType getType() const = 0;
+    virtual void enterState(
+        hkpCharacterContext& context,
+        hkpCharacterStateType prevState,
+        const hkpCharacterInput& input,
+        hkpCharacterOutput& output
+    );
+    virtual void leaveState(
+        hkpCharacterContext& context,
+        hkpCharacterStateType nextState,
+        const hkpCharacterInput& input,
+        hkpCharacterOutput& output
+    );
+    virtual void
+    update(hkpCharacterContext& arContext, const hkpCharacterInput& arInput, hkpCharacterOutput& arOutput) = 0;
+    virtual void
+    change(hkpCharacterContext& arContext, const hkpCharacterInput& arInput, hkpCharacterOutput& arOutput) = 0;
 };

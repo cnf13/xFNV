@@ -31,10 +31,12 @@ static SettingT<GameSettingCollection> fDiffMultXP_E("fDiffMultXPE", 0.75f);
 static SettingT<GameSettingCollection> fDiffMultXP_N("fDiffMultXPN", 1.0f);
 static SettingT<GameSettingCollection> fDiffMultXP_H("fDiffMultXPH", 1.5f);
 static SettingT<GameSettingCollection> fDiffMultXP_VH("fDiffMultXPVH", 2.0f);
-fDiffMultHPToPC_t fDiffMultHPToPC{&fDiffMultHPToPC_VE, &fDiffMultHPToPC_E, &fDiffMultHPToPC_N, &fDiffMultHPToPC_H,
-	&fDiffMultHPToPC_VH};
-fDiffMultHPByPC_t fDiffMultHPByPC{&fDiffMultHPByPC_VE, &fDiffMultHPByPC_E, &fDiffMultHPByPC_N, &fDiffMultHPByPC_H,
-	&fDiffMultHPByPC_VH};
+fDiffMultHPToPC_t fDiffMultHPToPC{
+    &fDiffMultHPToPC_VE, &fDiffMultHPToPC_E, &fDiffMultHPToPC_N, &fDiffMultHPToPC_H, &fDiffMultHPToPC_VH
+};
+fDiffMultHPByPC_t fDiffMultHPByPC{
+    &fDiffMultHPByPC_VE, &fDiffMultHPByPC_E, &fDiffMultHPByPC_N, &fDiffMultHPByPC_H, &fDiffMultHPByPC_VH
+};
 fDiffMultXP_t fDiffMultXP{&fDiffMultXP_VE, &fDiffMultXP_E, &fDiffMultXP_N, &fDiffMultXP_H, &fDiffMultXP_VH};
 
 // The game settings this file defines, with their IDs and values, in initialization order.
@@ -45,8 +47,10 @@ SettingT<GameSettingCollection> fAgilityReloadBase("fAgilityReloadBase", 5.0f);
 SettingT<GameSettingCollection> fAgilityReloadModifier("fAgilityReloadModifier", 0.1f);
 SettingT<GameSettingCollection> fItemDetectionTimer("fItemDetectionTimer", 5.0f);
 SettingT<GameSettingCollection> sAchieveSMMenaceName("sAchieveSMMenaceName", "Mutant Menace");
-SettingT<GameSettingCollection> sAchieveSMMenaceDesc("sAchieveSMMenaceDesc",
-	"Your nuetralization of Super Mutants is legendary and provides a bonus to attacks against them.");
+SettingT<GameSettingCollection> sAchieveSMMenaceDesc(
+    "sAchieveSMMenaceDesc",
+    "Your nuetralization of Super Mutants is legendary and provides a bonus to attacks against them."
+);
 SettingT<GameSettingCollection> sAchieveSMMasterName("sAchieveSMMasterName", "Mutant Master");
 SettingT<GameSettingCollection> sAchieveSMMasterDesc("sAchieveSMMasterDesc", "You kill Super Mutants --  A lot.");
 SettingT<GameSettingCollection> iMolotovTest("iMolotovTest", 0);
@@ -510,503 +514,585 @@ SettingT<GameSettingCollection> fSpeechChallengeDispositionBase("fSpeechChalleng
 SettingT<GameSettingCollection> fSpeechChallengeFailureBase("fSpeechChallengeFailureBase", 10.0f);
 SettingT<GameSettingCollection> fSpeechChallengeFailureMultiplier("fSpeechChallengeFailureMultiplier", 50.0f);
 
-float GamePlayFormulas::GetActorWalkSpeed(ActorValueOwner* apActor, TESObjectWEAP* pWeap, TESObjectARMO* pArmor,
-	bool abSneaking, bool abNoWeapon, bool abIsNpc, bool abOverEncumbered) {
-	float movePenalties = 0.0;
-	if (pArmor) {
-		uint8_t armorWeightClass = pArmor->GetArmorWeight();
-		if (armorWeightClass == 1) {
-			movePenalties = movePenalties + fMoveHeavyArmorPenalty.Float();
-		} else {
-			if (armorWeightClass == 2) {
-				movePenalties = movePenalties + fMoveMediumArmorPenalty.Float();
-			}
-		}
-	}
-	if (pWeap) {
-		if (!abNoWeapon && pWeap->IsTwoHandedWeapon()) {
-			if (pWeap->GetWeaponType() == WEAPON_TWO_HAND_HANDLE ||
-				pWeap->GetWeaponType() == WEAPON_TWO_HAND_LAUNCHER) {
-				movePenalties = movePenalties + fMove2HBigPenalty.Float();
-			} else {
-				if (pWeap->GetWeaponType() != WEAPON_TWO_HAND_MELEE) {
-					movePenalties = movePenalties + fMove2HRPenalty.Float();
-				}
-			}
-		}
-	}
-	double LeftMobility = 1.0 - CombatFormulas::GetBodyPartCondition(apActor, ActorValue::LEFT_MOBILITY_CONDITION, 0);
-	float totalMobility =
-		1.0 - CombatFormulas::GetBodyPartCondition(apActor, ActorValue::RIGHT_MOBILITY_CONDITION, 0) + LeftMobility;
-	float crippledLimbMult = 1.0;
-	if (totalMobility == 1.0) {
-		crippledLimbMult = fMoveOneCrippledLegSpeedMult.Float();
-	} else {
-		if (totalMobility == 2.0) {
-			crippledLimbMult = fMoveTwoCrippledLegsSpeedMult.Float();
-		}
-	}
-	if (!abOverEncumbered) {
-		if (apActor->GetActorValue(ActorValue::IGNORE_CRIPPLED_LIMBS)) {
-			crippledLimbMult = 1.0;
-		}
-	}
-	float speedMult = apActor->GetActorFloatValue(ActorValue::SPEED_MULT) * 0.01;
-	float v11 = speedMult * fMoveBaseSpeed.Float() * crippledLimbMult;
-	float v15 = v11;
-	if (abIsNpc && abNoWeapon) {
-		v15 = v11 * fMoveNoWeaponMult.Float();
-	}
-	float v16 = (1.0 - movePenalties) * v15;
-	if (abSneaking) {
-		v16 = v16 * fMoveSneakMult.Float();
-	}
-	if (!(v16 < 0.0)) {
-		return v16;
-	} else {
-		return 0.0;
-	}
+float GamePlayFormulas::GetActorWalkSpeed(
+    ActorValueOwner* apActor,
+    TESObjectWEAP* pWeap,
+    TESObjectARMO* pArmor,
+    bool abSneaking,
+    bool abNoWeapon,
+    bool abIsNpc,
+    bool abOverEncumbered
+) {
+    float movePenalties = 0.0;
+    if (pArmor) {
+        uint8_t armorWeightClass = pArmor->GetArmorWeight();
+        if (armorWeightClass == 1) {
+            movePenalties = movePenalties + fMoveHeavyArmorPenalty.Float();
+        }
+        else {
+            if (armorWeightClass == 2) {
+                movePenalties = movePenalties + fMoveMediumArmorPenalty.Float();
+            }
+        }
+    }
+    if (pWeap) {
+        if (!abNoWeapon && pWeap->IsTwoHandedWeapon()) {
+            if (pWeap->GetWeaponType() == WEAPON_TWO_HAND_HANDLE ||
+                pWeap->GetWeaponType() == WEAPON_TWO_HAND_LAUNCHER) {
+                movePenalties = movePenalties + fMove2HBigPenalty.Float();
+            }
+            else {
+                if (pWeap->GetWeaponType() != WEAPON_TWO_HAND_MELEE) {
+                    movePenalties = movePenalties + fMove2HRPenalty.Float();
+                }
+            }
+        }
+    }
+    double LeftMobility = 1.0 - CombatFormulas::GetBodyPartCondition(apActor, ActorValue::LEFT_MOBILITY_CONDITION, 0);
+    float totalMobility =
+        1.0 - CombatFormulas::GetBodyPartCondition(apActor, ActorValue::RIGHT_MOBILITY_CONDITION, 0) + LeftMobility;
+    float crippledLimbMult = 1.0;
+    if (totalMobility == 1.0) {
+        crippledLimbMult = fMoveOneCrippledLegSpeedMult.Float();
+    }
+    else {
+        if (totalMobility == 2.0) {
+            crippledLimbMult = fMoveTwoCrippledLegsSpeedMult.Float();
+        }
+    }
+    if (!abOverEncumbered) {
+        if (apActor->GetActorValue(ActorValue::IGNORE_CRIPPLED_LIMBS)) {
+            crippledLimbMult = 1.0;
+        }
+    }
+    float speedMult = apActor->GetActorFloatValue(ActorValue::SPEED_MULT) * 0.01;
+    float v11 = speedMult * fMoveBaseSpeed.Float() * crippledLimbMult;
+    float v15 = v11;
+    if (abIsNpc && abNoWeapon) {
+        v15 = v11 * fMoveNoWeaponMult.Float();
+    }
+    float v16 = (1.0 - movePenalties) * v15;
+    if (abSneaking) {
+        v16 = v16 * fMoveSneakMult.Float();
+    }
+    if (!(v16 < 0.0)) {
+        return v16;
+    }
+    else {
+        return 0.0;
+    }
 }
 
 int32_t GamePlayFormulas::GetLevelUpSkillPoints(int32_t aiIntelligence, int32_t aiLevel) {
-	float v3 = (float)((((double)aiIntelligence) * 0.5) + 10.0);
-	int32_t v4 = (int32_t)std::floor(v3);
-	if ((!(aiLevel % 2)) && ((aiIntelligence % 2) == 1)) {
-		++v4;
-	}
-	return v4;
+    float v3 = (float)((((double)aiIntelligence) * 0.5) + 10.0);
+    int32_t v4 = (int32_t)std::floor(v3);
+    if ((!(aiLevel % 2)) && ((aiIntelligence % 2) == 1)) {
+        ++v4;
+    }
+    return v4;
 }
 
-float GamePlayFormulas::GetDifficultyMultiplier(GamePlayFormulas::DifficultyLevel aeDifficulty,
-	ActorValue::Index aiWhich, bool abToPC) {
-	float fresult = 1.0f;
-	if (aiWhich == ActorValue::HEALTH) {
-		if (abToPC) {
-			return fDiffMultHPToPC[aeDifficulty]->Float();
-		} else {
-			return fDiffMultHPByPC[aeDifficulty]->Float();
-		}
-	} else {
-		if (aiWhich == ActorValue::EXPERIENCE_POINTS) {
-			return fDiffMultXP[aeDifficulty]->Float();
-		}
-	}
-	return fresult;
+float GamePlayFormulas::GetDifficultyMultiplier(
+    GamePlayFormulas::DifficultyLevel aeDifficulty,
+    ActorValue::Index aiWhich,
+    bool abToPC
+) {
+    float fresult = 1.0f;
+    if (aiWhich == ActorValue::HEALTH) {
+        if (abToPC) {
+            return fDiffMultHPToPC[aeDifficulty]->Float();
+        }
+        else {
+            return fDiffMultHPByPC[aeDifficulty]->Float();
+        }
+    }
+    else {
+        if (aiWhich == ActorValue::EXPERIENCE_POINTS) {
+            return fDiffMultXP[aeDifficulty]->Float();
+        }
+    }
+    return fresult;
 }
 
 // The experience multiplier is GetDifficultyMultiplier's aiWhich 24; the product is rounded to a float local.
 float GamePlayFormulas::AdjustExperiencePoints(float afXP, GamePlayFormulas::DifficultyLevel aeDifficulty) {
-	float fXP = afXP;
-	float fMult = GetDifficultyMultiplier(aeDifficulty, ActorValue::EXPERIENCE_POINTS, true);
-	fXP = fXP * fMult;
-	return fXP;
+    float fXP = afXP;
+    float fMult = GetDifficultyMultiplier(aeDifficulty, ActorValue::EXPERIENCE_POINTS, true);
+    fXP = fXP * fMult;
+    return fXP;
 }
 
 int32_t GamePlayFormulas::GetRequiredExperiencePoints(int32_t aiWhichLevel) {
-	int32_t i;
-	if (aiWhichLevel <= 1) {
-		return 0;
-	}
-	uint32_t v3 = (&iXPBase)->UInt();
-	uint32_t v4 = v3;
-	uint32_t v5 = (&::iXPBumpBase)->UInt();
-	for (i = 1; i < (aiWhichLevel - 1); ++i) {
-		v4 += v5;
-		v3 += v4;
-	}
-	return (int32_t)v3;
+    int32_t i;
+    if (aiWhichLevel <= 1) {
+        return 0;
+    }
+    uint32_t v3 = (&iXPBase)->UInt();
+    uint32_t v4 = v3;
+    uint32_t v5 = (&::iXPBumpBase)->UInt();
+    for (i = 1; i < (aiWhichLevel - 1); ++i) {
+        v4 += v5;
+        v3 += v4;
+    }
+    return (int32_t)v3;
 }
 
-float GamePlayFormulas::GetActorRunSpeed(ActorValueOwner* apActor, TESObjectWEAP* pWeap, TESObjectARMO* pArmor,
-	bool abNoWeapon, bool abIsNpc, bool abIsSneaking, bool abOverEncumbered) {
-	float v9 = GamePlayFormulas::GetActorWalkSpeed(apActor, pWeap, pArmor, abIsSneaking, abNoWeapon, abIsNpc,
-				   abOverEncumbered) +
-		((float)0.0);
-	return (float)(v9 * ((&::fMoveRunMult)->Float()));
+float GamePlayFormulas::GetActorRunSpeed(
+    ActorValueOwner* apActor,
+    TESObjectWEAP* pWeap,
+    TESObjectARMO* pArmor,
+    bool abNoWeapon,
+    bool abIsNpc,
+    bool abIsSneaking,
+    bool abOverEncumbered
+) {
+    float v9 = GamePlayFormulas::GetActorWalkSpeed(
+                   apActor, pWeap, pArmor, abIsSneaking, abNoWeapon, abIsNpc, abOverEncumbered
+               ) +
+        ((float)0.0);
+    return (float)(v9 * ((&::fMoveRunMult)->Float()));
 }
 
 float GamePlayFormulas::GetActorClothingDesirability(uint32_t aiClothingValue) {
-	return (float)aiClothingValue;
+    return (float)aiClothingValue;
 }
 
 float GamePlayFormulas::PainChangePerSecond(float afDamagePercent) {
-	return (float)(afDamagePercent * 60.0);
+    return (float)(afDamagePercent * 60.0);
 }
 
 // The share is computed at double precision and stored as a float before the clamps; the product is stored as a
 // float too.
 float GamePlayFormulas::GetRadiationLevel(float afRadiation, float afRadius, float afDistance) {
-	float fShare = static_cast<float>((static_cast<double>(afRadius) - afDistance) / afRadius);
-	float fClamped = BSMIN(1.0f, BSMAX(0.0f, fShare));
-	float fResult = static_cast<float>(static_cast<double>(afRadiation) * fClamped);
-	return fResult;
+    float fShare = static_cast<float>((static_cast<double>(afRadius) - afDistance) / afRadius);
+    float fClamped = BSMIN(1.0f, BSMAX(0.0f, fShare));
+    float fResult = static_cast<float>(static_cast<double>(afRadiation) * fClamped);
+    return fResult;
 }
 
 // A negative health percent counts as 10 (full). A positive value is scaled by the condition curve: the base share plus
 // (1 - base) times mult times health^exp, each intermediate held as a double; a result of magnitude 1 or more is
 // rounded to the nearest whole value.
 float GamePlayFormulas::CalcItemHealthValue(float afItemValue, float afItemHealthPercent) {
-	float fValue = afItemValue;
-	float fHealth = static_cast<float>(afItemHealthPercent / 10.0);
-	if (fHealth < 0.0) {
-		fHealth = 10.0f;
-	}
-	if (fValue > 0.0) {
-		double dBaseless = (1.0 - fItemConditionValueBase.Float()) * fValue;
-		double dScaled = fItemConditionValueMult.Float() * dBaseless;
-		float* pExp = &fItemConditionValueExp.Float();
-		double dCurve = std::pow(fHealth, *pExp) * dScaled;
-		fValue = static_cast<float>(static_cast<double>(fValue) * fItemConditionValueBase.Float() + dCurve);
-	}
-	float fResult;
-	if (std::fabsf(fValue) >= 1.0) {
-		fResult = BSRoundToNearest(fValue, 1.0f);
-	} else {
-		fResult = fValue;
-	}
-	return fResult;
+    float fValue = afItemValue;
+    float fHealth = static_cast<float>(afItemHealthPercent / 10.0);
+    if (fHealth < 0.0) {
+        fHealth = 10.0f;
+    }
+    if (fValue > 0.0) {
+        double dBaseless = (1.0 - fItemConditionValueBase.Float()) * fValue;
+        double dScaled = fItemConditionValueMult.Float() * dBaseless;
+        float* pExp = &fItemConditionValueExp.Float();
+        double dCurve = std::pow(fHealth, *pExp) * dScaled;
+        fValue = static_cast<float>(static_cast<double>(fValue) * fItemConditionValueBase.Float() + dCurve);
+    }
+    float fResult;
+    if (std::fabsf(fValue) >= 1.0) {
+        fResult = BSRoundToNearest(fValue, 1.0f);
+    }
+    else {
+        fResult = fValue;
+    }
+    return fResult;
 }
 
 // Both conditions are scaled down by 10 in place. The result is the better condition plus fRepairMin, the skill's share
 // of fRepairMax - fRepairMin and fRepairScavengeMult times the worse condition. The skill-scaled repair skill base
 // computed next is never used, but its three Float calls are made, as the game does. Every Setting is read through
 // Float and the rounded values are truncated.
-float GamePlayFormulas::GetRepairedCondition(int32_t aiRepairSkill, float afCondition1, float afCondition2,
-	int32_t* apiMinSkillNeeded) {
-	float fRepaired = 0.0f;
-	afCondition1 = static_cast<float>(afCondition1 / 10.0);
-	afCondition2 = static_cast<float>(afCondition2 / 10.0);
-	float* pRepairMax = &fRepairMax.Float();
-	float* pRepairMin = &fRepairMin.Float();
-	float fSkillPart = static_cast<float>((static_cast<double>(*pRepairMax) - *pRepairMin) * aiRepairSkill / 100.0);
-	float* pScavengeMult = &fRepairScavengeMult.Float();
-	float fScavengePart = static_cast<float>(static_cast<double>(BSMIN(afCondition1, afCondition2)) * *pScavengeMult);
-	float* pSkillBase = &fRepairSkillBase.Float();
-	float* pSkillMax = &fRepairSkillMax.Float();
-	float* pSkillBase2 = &fRepairSkillBase.Float();
-	float fSkill =
-		static_cast<float>((static_cast<double>(*pSkillMax) - *pSkillBase2) * aiRepairSkill / 100.0 + *pSkillBase);
-	static_cast<void>(fSkill);
-	float fBest = BSMAX(afCondition1, afCondition2);
-	float* pRepairMin2 = &fRepairMin.Float();
-	fRepaired = static_cast<float>(static_cast<double>(fBest) + *pRepairMin2 + fSkillPart + fScavengePart);
-	if (apiMinSkillNeeded) {
-		float fRepaired100 = static_cast<float>(fRepaired * 100.0);
-		int32_t iRepaired = static_cast<int32_t>(BSRoundToNearest(fRepaired100, 1.0f));
-		float fBest100 = static_cast<float>(fBest * 100.0);
-		if (iRepaired <= static_cast<int32_t>(BSRoundToNearest(fBest100, 1.0f))) {
-			double dTarget = fBest + 0.10000000149011612;
-			double dNeeded = (dTarget - fRepairSkillBase.Float()) * 100.0;
-			float* pNeedMax = &fRepairSkillMax.Float();
-			float* pNeedBase = &fRepairSkillBase.Float();
-			*apiMinSkillNeeded = static_cast<int32_t>(dNeeded / (static_cast<double>(*pNeedMax) - *pNeedBase));
-		}
-	}
-	float fResult = static_cast<float>(fRepaired * 10.0);
-	return fResult;
+float GamePlayFormulas::GetRepairedCondition(
+    int32_t aiRepairSkill,
+    float afCondition1,
+    float afCondition2,
+    int32_t* apiMinSkillNeeded
+) {
+    float fRepaired = 0.0f;
+    afCondition1 = static_cast<float>(afCondition1 / 10.0);
+    afCondition2 = static_cast<float>(afCondition2 / 10.0);
+    float* pRepairMax = &fRepairMax.Float();
+    float* pRepairMin = &fRepairMin.Float();
+    float fSkillPart = static_cast<float>((static_cast<double>(*pRepairMax) - *pRepairMin) * aiRepairSkill / 100.0);
+    float* pScavengeMult = &fRepairScavengeMult.Float();
+    float fScavengePart = static_cast<float>(static_cast<double>(BSMIN(afCondition1, afCondition2)) * *pScavengeMult);
+    float* pSkillBase = &fRepairSkillBase.Float();
+    float* pSkillMax = &fRepairSkillMax.Float();
+    float* pSkillBase2 = &fRepairSkillBase.Float();
+    float fSkill =
+        static_cast<float>((static_cast<double>(*pSkillMax) - *pSkillBase2) * aiRepairSkill / 100.0 + *pSkillBase);
+    static_cast<void>(fSkill);
+    float fBest = BSMAX(afCondition1, afCondition2);
+    float* pRepairMin2 = &fRepairMin.Float();
+    fRepaired = static_cast<float>(static_cast<double>(fBest) + *pRepairMin2 + fSkillPart + fScavengePart);
+    if (apiMinSkillNeeded) {
+        float fRepaired100 = static_cast<float>(fRepaired * 100.0);
+        int32_t iRepaired = static_cast<int32_t>(BSRoundToNearest(fRepaired100, 1.0f));
+        float fBest100 = static_cast<float>(fBest * 100.0);
+        if (iRepaired <= static_cast<int32_t>(BSRoundToNearest(fBest100, 1.0f))) {
+            double dTarget = fBest + 0.10000000149011612;
+            double dNeeded = (dTarget - fRepairSkillBase.Float()) * 100.0;
+            float* pNeedMax = &fRepairSkillMax.Float();
+            float* pNeedBase = &fRepairSkillBase.Float();
+            *apiMinSkillNeeded = static_cast<int32_t>(dNeeded / (static_cast<double>(*pNeedMax) - *pNeedBase));
+        }
+    }
+    float fResult = static_cast<float>(fRepaired * 10.0);
+    return fResult;
 }
 
 // The vendor's effective skill is fRepairSkillBase plus its share of fRepairSkillMax - fRepairSkillBase; afCondition is
 // scaled down by 10 in place. A cost of 0.5 or less (or NaN) is free; otherwise it is rounded and at least 1 (the int
 // BSMAX).
 int32_t GamePlayFormulas::GetRepairCost(int32_t aiVendorRepairSkill, float afCondition, float afValue) {
-	int32_t iCost = 0;
-	float fCost = 0.0f;
-	float* pSkillBase = &fRepairSkillBase.Float();
-	float* pSkillMax = &fRepairSkillMax.Float();
-	float* pSkillBase2 = &fRepairSkillBase.Float();
-	float fSkill = static_cast<float>((static_cast<double>(*pSkillMax) - *pSkillBase2) * aiVendorRepairSkill / 100.0 +
-		*pSkillBase);
-	afCondition = static_cast<float>(afCondition / 10.0);
-	float* pCostMult = &fItemRepairCostMult.Float();
-	fCost = static_cast<float>(static_cast<double>(*pCostMult) * afValue *
-		((static_cast<double>(fSkill) - afCondition) / 10.0));
-	if (fCost > 0.5) {
-		iCost = BSMAX(static_cast<int32_t>(BSRoundToNearest(fCost, 1.0f)), 1);
-	}
-	return iCost;
+    int32_t iCost = 0;
+    float fCost = 0.0f;
+    float* pSkillBase = &fRepairSkillBase.Float();
+    float* pSkillMax = &fRepairSkillMax.Float();
+    float* pSkillBase2 = &fRepairSkillBase.Float();
+    float fSkill = static_cast<float>(
+        (static_cast<double>(*pSkillMax) - *pSkillBase2) * aiVendorRepairSkill / 100.0 + *pSkillBase
+    );
+    afCondition = static_cast<float>(afCondition / 10.0);
+    float* pCostMult = &fItemRepairCostMult.Float();
+    fCost = static_cast<float>(
+        static_cast<double>(*pCostMult) * afValue * ((static_cast<double>(fSkill) - afCondition) / 10.0)
+    );
+    if (fCost > 0.5) {
+        iCost = BSMAX(static_cast<int32_t>(BSRoundToNearest(fCost, 1.0f)), 1);
+    }
+    return iCost;
 }
 
 float GamePlayFormulas::SwimBreathTime(int32_t aiEndurance) {
-	float* v1 = &(&fActorSwimBreathBase)->Float();
-	return (float)((((&::fActorSwimBreathMult)->Float()) * ((double)aiEndurance)) + (*v1));
+    float* v1 = &(&fActorSwimBreathBase)->Float();
+    return (float)((((&::fActorSwimBreathMult)->Float()) * ((double)aiEndurance)) + (*v1));
 }
 
 // The rates are per hour: 3600.0 is a double constant; the waking rate is rounded to a float local.
 float GamePlayFormulas::GetHealingRate(float afHealingRate, bool abIsSleeping) {
-	float fRate = (float)(afHealingRate / 3600.0);
-	if (!abIsSleeping) {
-		return fRate;
-	}
-	double dSleepingBase = fHealingRateSleepingBase.Float() / 3600.0;
-	return (float)(fRate * ::fHealingRateSleepingMult.Float() + dSleepingBase);
+    float fRate = (float)(afHealingRate / 3600.0);
+    if (!abIsSleeping) {
+        return fRate;
+    }
+    double dSleepingBase = fHealingRateSleepingBase.Float() / 3600.0;
+    return (float)(fRate * ::fHealingRateSleepingMult.Float() + dSleepingBase);
 }
 
 // The cases fall through deliberately, as the game does: the retort's bonus also tries the alembic's, and the
 // calcinator's case 3 shares the tail of case 5.
-void GamePlayFormulas::CalculatePotionDurationMagnitude(float& aiMagnitude, float& aiDuration, float afEffectCost,
-	float afPotionStrength, int32_t aiEquipment, bool bhostile, float afRetortQuality, float afAlembicQuality,
-	float afCalcinatorQuality, bool abPoison) {
-	float fExponent = (float)(1.0 / (fMagicCostScale.Float() + 1.0));
-	float fBase = (float)((afPotionStrength * ::fPotionT1MagMult.Float()) / afEffectCost);
-	aiMagnitude = std::pow(fBase, fExponent);
-	// Setting::Float is called before *aiMagnitude is reloaded, so the pow result is read back rounded.
-	float* pMagMult = &::fPotionT1MagMult.Float();
-	double dDuration = (double)(aiMagnitude / *pMagMult);
-	aiDuration = (float)(dDuration / fMagicDurMagBaseCostMult.Float());
-	switch (aiEquipment) {
-	case 1:
-		if (!bhostile && !abPoison) {
-			aiMagnitude = (float)(afRetortQuality * ::fPotionT1RetMagMult.Float() * aiMagnitude + aiMagnitude);
-			aiDuration = (float)(afRetortQuality * ::fPotionT1RetDurMult.Float() * aiDuration + aiDuration);
-		}
-		goto Alembic;
-	case 2:
-	Alembic:
-		if (bhostile && !abPoison) {
-			aiMagnitude = (float)(afAlembicQuality * ::fPotionT1AleMagMult.Float() * aiMagnitude + aiMagnitude);
-			aiDuration = (float)(afAlembicQuality * ::fPotionT1AleDurMult.Float() * aiDuration + aiDuration);
-		}
-		return;
-	case 3:
-		goto Calcinator;
-	case 4: {
-		if (bhostile || abPoison) {
-			goto Calcinator;
-		}
-		double dRetMag = (double)(aiMagnitude * afRetortQuality);
-		double dRetMagBonus = ::fPotionT1RetMagMult.Float() * dRetMag;
-		double dCalMag = (double)(aiDuration * afCalcinatorQuality);
-		aiMagnitude = (float)(::fPotionT1CalMagMult.Float() * dCalMag + dRetMagBonus + aiMagnitude);
-		double dRetDur = (double)(aiDuration * afRetortQuality);
-		double dRetDurBonus = ::fPotionT1RetDurMult.Float() * dRetDur;
-		double dCalDur = (double)(aiDuration * afCalcinatorQuality);
-		aiDuration = (float)(::fPotionT1CalMagMult.Float() * dCalDur + dRetDurBonus + aiDuration);
-		break;
-	}
-	case 5:
-		if (!bhostile || abPoison) {
-			aiMagnitude = (float)(afCalcinatorQuality * ::fPotionT1CalMagMult.Float() * aiMagnitude + aiMagnitude);
-			aiDuration = (float)(afCalcinatorQuality * ::fPotionT1CalMagMult.Float() * aiDuration + aiDuration);
-		} else {
-			double dAleMag = (double)(afAlembicQuality * ::fPotionT1AleMagMult.Float() * aiMagnitude);
-			aiMagnitude =
-				(float)(afCalcinatorQuality * ::fPotionT1CalMagMult.Float() * aiMagnitude + dAleMag + aiMagnitude);
-			double dAleDur = (double)(afAlembicQuality * ::fPotionT1AleDurMult.Float() * aiDuration);
-			aiDuration =
-				(float)(afCalcinatorQuality * ::fPotionT1CalMagMult.Float() * aiDuration + dAleDur + aiDuration);
-		}
-	Calcinator:
-		aiMagnitude = (float)(afCalcinatorQuality * ::fPotionT1CalMagMult.Float() * aiMagnitude + aiMagnitude);
-		aiDuration = (float)(afCalcinatorQuality * ::fPotionT1CalMagMult.Float() * aiDuration + aiDuration);
-		break;
-	default:
-		return;
-	}
+void GamePlayFormulas::CalculatePotionDurationMagnitude(
+    float& aiMagnitude,
+    float& aiDuration,
+    float afEffectCost,
+    float afPotionStrength,
+    int32_t aiEquipment,
+    bool bhostile,
+    float afRetortQuality,
+    float afAlembicQuality,
+    float afCalcinatorQuality,
+    bool abPoison
+) {
+    float fExponent = (float)(1.0 / (fMagicCostScale.Float() + 1.0));
+    float fBase = (float)((afPotionStrength * ::fPotionT1MagMult.Float()) / afEffectCost);
+    aiMagnitude = std::pow(fBase, fExponent);
+    // Setting::Float is called before *aiMagnitude is reloaded, so the pow result is read back rounded.
+    float* pMagMult = &::fPotionT1MagMult.Float();
+    double dDuration = (double)(aiMagnitude / *pMagMult);
+    aiDuration = (float)(dDuration / fMagicDurMagBaseCostMult.Float());
+    switch (aiEquipment) {
+        case 1:
+            if (!bhostile && !abPoison) {
+                aiMagnitude = (float)(afRetortQuality * ::fPotionT1RetMagMult.Float() * aiMagnitude + aiMagnitude);
+                aiDuration = (float)(afRetortQuality * ::fPotionT1RetDurMult.Float() * aiDuration + aiDuration);
+            }
+            goto Alembic;
+        case 2:
+        Alembic:
+            if (bhostile && !abPoison) {
+                aiMagnitude = (float)(afAlembicQuality * ::fPotionT1AleMagMult.Float() * aiMagnitude + aiMagnitude);
+                aiDuration = (float)(afAlembicQuality * ::fPotionT1AleDurMult.Float() * aiDuration + aiDuration);
+            }
+            return;
+        case 3: goto Calcinator;
+        case 4: {
+            if (bhostile || abPoison) {
+                goto Calcinator;
+            }
+            double dRetMag = (double)(aiMagnitude * afRetortQuality);
+            double dRetMagBonus = ::fPotionT1RetMagMult.Float() * dRetMag;
+            double dCalMag = (double)(aiDuration * afCalcinatorQuality);
+            aiMagnitude = (float)(::fPotionT1CalMagMult.Float() * dCalMag + dRetMagBonus + aiMagnitude);
+            double dRetDur = (double)(aiDuration * afRetortQuality);
+            double dRetDurBonus = ::fPotionT1RetDurMult.Float() * dRetDur;
+            double dCalDur = (double)(aiDuration * afCalcinatorQuality);
+            aiDuration = (float)(::fPotionT1CalMagMult.Float() * dCalDur + dRetDurBonus + aiDuration);
+            break;
+        }
+        case 5:
+            if (!bhostile || abPoison) {
+                aiMagnitude = (float)(afCalcinatorQuality * ::fPotionT1CalMagMult.Float() * aiMagnitude + aiMagnitude);
+                aiDuration = (float)(afCalcinatorQuality * ::fPotionT1CalMagMult.Float() * aiDuration + aiDuration);
+            }
+            else {
+                double dAleMag = (double)(afAlembicQuality * ::fPotionT1AleMagMult.Float() * aiMagnitude);
+                aiMagnitude =
+                    (float)(afCalcinatorQuality * ::fPotionT1CalMagMult.Float() * aiMagnitude + dAleMag + aiMagnitude);
+                double dAleDur = (double)(afAlembicQuality * ::fPotionT1AleDurMult.Float() * aiDuration);
+                aiDuration =
+                    (float)(afCalcinatorQuality * ::fPotionT1CalMagMult.Float() * aiDuration + dAleDur + aiDuration);
+            }
+        Calcinator:
+            aiMagnitude = (float)(afCalcinatorQuality * ::fPotionT1CalMagMult.Float() * aiMagnitude + aiMagnitude);
+            aiDuration = (float)(afCalcinatorQuality * ::fPotionT1CalMagMult.Float() * aiDuration + aiDuration);
+            break;
+        default: return;
+    }
 }
 
-void GamePlayFormulas::CalculatePotionDuration(float& aiDuration, float afEffectCost, float afPotionStrength,
-	int32_t aiEquipment, bool bhostile, float afRetortQuality, float afAlembicQuality, float afCalcinatorQuality,
-	bool abPoison) {
-	aiDuration = (float)((afPotionStrength / afEffectCost) / fMagicDurMagBaseCostMult.Float());
-	switch (aiEquipment) {
-	case 1:
-		if (!bhostile && !abPoison) {
-			double dRet = (double)(aiDuration * afRetortQuality);
-			aiDuration = (float)(::fPotionT2RetDurMult.Float() * dRet + aiDuration);
-		}
-		goto Alembic;
-	case 2:
-	Alembic:
-		if (bhostile && !abPoison) {
-			double dAle = (double)(aiDuration * afAlembicQuality);
-			aiDuration = (float)(::fPotionT2AleDurMult.Float() * dAle + aiDuration);
-		}
-		break;
-	case 3: {
-		double dCal = (double)(aiDuration * afCalcinatorQuality);
-		aiDuration = (float)(::fPotionT2CalDurMult.Float() * dCal + aiDuration);
-		break;
-	}
-	case 4:
-		if (bhostile || abPoison) {
-			double dCal = (double)(aiDuration * afCalcinatorQuality);
-			aiDuration = (float)(::fPotionT2CalDurMult.Float() * dCal + aiDuration);
-		} else {
-			double dRet = (double)(aiDuration * afRetortQuality);
-			double dRetBonus = ::fPotionT2RetDurMult.Float() * dRet;
-			double dCal = (double)(aiDuration * afCalcinatorQuality);
-			aiDuration = (float)(::fPotionT2CalDurMult.Float() * dCal + dRetBonus + aiDuration);
-		}
-		break;
-	case 5:
-		if (!bhostile || abPoison) {
-			double dCal = (double)(aiDuration * afCalcinatorQuality);
-			aiDuration = (float)(::fPotionT2CalDurMult.Float() * dCal + aiDuration);
-		} else {
-			double dAle = (double)(aiDuration * afAlembicQuality);
-			double dAleBonus = ::fPotionT2AleDurMult.Float() * dAle;
-			double dCal = (double)(aiDuration * afCalcinatorQuality);
-			aiDuration = (float)(::fPotionT2CalDurMult.Float() * dCal + dAleBonus + aiDuration);
-		}
-		break;
-	default:
-		return;
-	}
+void GamePlayFormulas::CalculatePotionDuration(
+    float& aiDuration,
+    float afEffectCost,
+    float afPotionStrength,
+    int32_t aiEquipment,
+    bool bhostile,
+    float afRetortQuality,
+    float afAlembicQuality,
+    float afCalcinatorQuality,
+    bool abPoison
+) {
+    aiDuration = (float)((afPotionStrength / afEffectCost) / fMagicDurMagBaseCostMult.Float());
+    switch (aiEquipment) {
+        case 1:
+            if (!bhostile && !abPoison) {
+                double dRet = (double)(aiDuration * afRetortQuality);
+                aiDuration = (float)(::fPotionT2RetDurMult.Float() * dRet + aiDuration);
+            }
+            goto Alembic;
+        case 2:
+        Alembic:
+            if (bhostile && !abPoison) {
+                double dAle = (double)(aiDuration * afAlembicQuality);
+                aiDuration = (float)(::fPotionT2AleDurMult.Float() * dAle + aiDuration);
+            }
+            break;
+        case 3: {
+            double dCal = (double)(aiDuration * afCalcinatorQuality);
+            aiDuration = (float)(::fPotionT2CalDurMult.Float() * dCal + aiDuration);
+            break;
+        }
+        case 4:
+            if (bhostile || abPoison) {
+                double dCal = (double)(aiDuration * afCalcinatorQuality);
+                aiDuration = (float)(::fPotionT2CalDurMult.Float() * dCal + aiDuration);
+            }
+            else {
+                double dRet = (double)(aiDuration * afRetortQuality);
+                double dRetBonus = ::fPotionT2RetDurMult.Float() * dRet;
+                double dCal = (double)(aiDuration * afCalcinatorQuality);
+                aiDuration = (float)(::fPotionT2CalDurMult.Float() * dCal + dRetBonus + aiDuration);
+            }
+            break;
+        case 5:
+            if (!bhostile || abPoison) {
+                double dCal = (double)(aiDuration * afCalcinatorQuality);
+                aiDuration = (float)(::fPotionT2CalDurMult.Float() * dCal + aiDuration);
+            }
+            else {
+                double dAle = (double)(aiDuration * afAlembicQuality);
+                double dAleBonus = ::fPotionT2AleDurMult.Float() * dAle;
+                double dCal = (double)(aiDuration * afCalcinatorQuality);
+                aiDuration = (float)(::fPotionT2CalDurMult.Float() * dCal + dAleBonus + aiDuration);
+            }
+            break;
+        default: return;
+    }
 }
 
-void GamePlayFormulas::CalculatePotionMagnitude(float& aiMagnitude, float afEffectCost, float afPotionStrength,
-	int32_t aiEquipment, bool bhostile, float afRetortQuality, float afAlembicQuality, float afCalcinatorQuality,
-	bool abPoison) {
-	float afY = 1.0 / fMagicCostScale.Float();
-	float afX = afPotionStrength / afEffectCost / fMagicDurMagBaseCostMult.Float();
-	aiMagnitude = std::pow(afX, afY);
-	switch (aiEquipment) {
-	case 1: {
-		if (!bhostile && !abPoison) {
-			double v17 = aiMagnitude * afRetortQuality;
-			aiMagnitude = fPotionT3RetMagMult.Float() * v17 + aiMagnitude;
-		}
-		goto LABEL_5;
-	}
-	case 2: {
-	LABEL_5:;
-		if (bhostile && !abPoison) {
-			double v16 = aiMagnitude * afAlembicQuality;
-			aiMagnitude = fPotionT3AleMagMult.Float() * v16 + aiMagnitude;
-		}
-		break;
-	}
-	case 3: {
-		double v15 = aiMagnitude * afCalcinatorQuality;
-		aiMagnitude = fPotionT3CalMagMult.Float() * v15 + aiMagnitude;
-		break;
-	}
-	case 4: {
-		if (bhostile || abPoison) {
-			double v9 = aiMagnitude * afCalcinatorQuality;
-			aiMagnitude = fPotionT3CalMagMult.Float() * v9 + aiMagnitude;
-		} else {
-			double v11 = aiMagnitude * afRetortQuality;
-			double v10 = fPotionT3RetMagMult.Float() * v11 * afCalcinatorQuality;
-			aiMagnitude = fPotionT3CalMagMult.Float() * v10 + aiMagnitude;
-		}
-		break;
-	}
-	case 5: {
-		if (!bhostile || abPoison) {
-			double v12 = aiMagnitude * afCalcinatorQuality;
-			aiMagnitude = fPotionT3CalMagMult.Float() * v12 + aiMagnitude;
-		} else {
-			double v14 = aiMagnitude * afAlembicQuality;
-			double v13 = fPotionT3AleMagMult.Float() * v14 * afCalcinatorQuality;
-			aiMagnitude = fPotionT3CalMagMult.Float() * v13 + aiMagnitude;
-		}
-		break;
-	}
-	default: {
-		return;
-	}
-	}
+void GamePlayFormulas::CalculatePotionMagnitude(
+    float& aiMagnitude,
+    float afEffectCost,
+    float afPotionStrength,
+    int32_t aiEquipment,
+    bool bhostile,
+    float afRetortQuality,
+    float afAlembicQuality,
+    float afCalcinatorQuality,
+    bool abPoison
+) {
+    float afY = 1.0 / fMagicCostScale.Float();
+    float afX = afPotionStrength / afEffectCost / fMagicDurMagBaseCostMult.Float();
+    aiMagnitude = std::pow(afX, afY);
+    switch (aiEquipment) {
+        case 1: {
+            if (!bhostile && !abPoison) {
+                double v17 = aiMagnitude * afRetortQuality;
+                aiMagnitude = fPotionT3RetMagMult.Float() * v17 + aiMagnitude;
+            }
+            goto LABEL_5;
+        }
+        case 2: {
+        LABEL_5:;
+            if (bhostile && !abPoison) {
+                double v16 = aiMagnitude * afAlembicQuality;
+                aiMagnitude = fPotionT3AleMagMult.Float() * v16 + aiMagnitude;
+            }
+            break;
+        }
+        case 3: {
+            double v15 = aiMagnitude * afCalcinatorQuality;
+            aiMagnitude = fPotionT3CalMagMult.Float() * v15 + aiMagnitude;
+            break;
+        }
+        case 4: {
+            if (bhostile || abPoison) {
+                double v9 = aiMagnitude * afCalcinatorQuality;
+                aiMagnitude = fPotionT3CalMagMult.Float() * v9 + aiMagnitude;
+            }
+            else {
+                double v11 = aiMagnitude * afRetortQuality;
+                double v10 = fPotionT3RetMagMult.Float() * v11 * afCalcinatorQuality;
+                aiMagnitude = fPotionT3CalMagMult.Float() * v10 + aiMagnitude;
+            }
+            break;
+        }
+        case 5: {
+            if (!bhostile || abPoison) {
+                double v12 = aiMagnitude * afCalcinatorQuality;
+                aiMagnitude = fPotionT3CalMagMult.Float() * v12 + aiMagnitude;
+            }
+            else {
+                double v14 = aiMagnitude * afAlembicQuality;
+                double v13 = fPotionT3AleMagMult.Float() * v14 * afCalcinatorQuality;
+                aiMagnitude = fPotionT3CalMagMult.Float() * v13 + aiMagnitude;
+            }
+            break;
+        }
+        default: {
+            return;
+        }
+    }
 }
 
 int32_t GamePlayFormulas::GetForceLockChance(int32_t aiPlayerSkill, int32_t aiLockLevelMax) {
-	int32_t iChance = static_cast<int32_t>(fLockSkillBase.Float()) + (aiPlayerSkill - aiLockLevelMax);
-	return BSMAX(BSMIN(iChance, 100), 0);
+    int32_t iChance = static_cast<int32_t>(fLockSkillBase.Float()) + (aiPlayerSkill - aiLockLevelMax);
+    return BSMAX(BSMIN(iChance, 100), 0);
 }
 
 float GamePlayFormulas::SwimBreathDamage(int32_t aiMaxHealth) {
-	return (float)(((&fActorSwimBreathDamage)->Float()) * ((double)aiMaxHealth));
+    return (float)(((&fActorSwimBreathDamage)->Float()) * ((double)aiMaxHealth));
 }
 
-void GamePlayFormulas::CalculateToolResistance(float& afResistanceTime, float& afMagnitude, float& afMouseScalar,
-	float afInjuryPercent, float afPainPercent, int32_t aiMedicineSkill) {
-	afResistanceTime = (float)((((((double)aiMedicineSkill) / 100.0) * 0.699999988079071) +
-								   ((1.0 - afInjuryPercent) * 0.20000000298023224)) +
-		((1.0 - afPainPercent) * 0.10000000149011612));
-	afMagnitude = (float)(((((100.0 - ((double)aiMedicineSkill)) / 100.0) * 0.699999988079071) +
-							  (afInjuryPercent * 0.20000000298023224)) +
-		(afPainPercent * 0.10000000149011612));
-	afMouseScalar = (float)((((((double)aiMedicineSkill) / 100.0) * 0.699999988079071) +
-								((1.0 - afInjuryPercent) * 0.20000000298023224)) +
-		((1.0 - afPainPercent) * 0.10000000149011612));
+void GamePlayFormulas::CalculateToolResistance(
+    float& afResistanceTime,
+    float& afMagnitude,
+    float& afMouseScalar,
+    float afInjuryPercent,
+    float afPainPercent,
+    int32_t aiMedicineSkill
+) {
+    afResistanceTime = (float)((((((double)aiMedicineSkill) / 100.0) * 0.699999988079071) +
+                                ((1.0 - afInjuryPercent) * 0.20000000298023224)) +
+                               ((1.0 - afPainPercent) * 0.10000000149011612));
+    afMagnitude = (float)(((((100.0 - ((double)aiMedicineSkill)) / 100.0) * 0.699999988079071) +
+                           (afInjuryPercent * 0.20000000298023224)) +
+                          (afPainPercent * 0.10000000149011612));
+    afMouseScalar = (float)((((((double)aiMedicineSkill) / 100.0) * 0.699999988079071) +
+                             ((1.0 - afInjuryPercent) * 0.20000000298023224)) +
+                            ((1.0 - afPainPercent) * 0.10000000149011612));
 }
 
 float GamePlayFormulas::GetPainCausedByWound(float afLimbWoundPercent) {
-	return (float)(afLimbWoundPercent * 0.5);
+    return (float)(afLimbWoundPercent * 0.5);
 }
 
-void GamePlayFormulas::GetSurgeryAutoAttemptPercentages(float& afLimbHealPercent, float& afHealthDamagePercent,
-	int32_t aiMedicineSkill, bool abMorphineUsed, float afWoundPercent) {
-	float v10 = (float)(((((double)aiMedicineSkill) * 100.0) / 100.0) * ((((double)abMorphineUsed) * 0.5) + 1.0));
-	BSRandom* singleton = BSRandom::GetSingleton();
-	afLimbHealPercent = singleton->Float(0.0, v10);
-	float v9 = (float)(((((((double)aiMedicineSkill) - 100.0) / 100.0) * ((afWoundPercent - 100.0) / 100.0)) * 100.0) *
-		(1.0 - (((double)abMorphineUsed) * 0.5)));
-	BSRandom* v6 = BSRandom::GetSingleton();
-	double v7 = (double)v6->Float(0.0, v9);
-	float* result = &afHealthDamagePercent;
-	afHealthDamagePercent = (float)v7;
+void GamePlayFormulas::GetSurgeryAutoAttemptPercentages(
+    float& afLimbHealPercent,
+    float& afHealthDamagePercent,
+    int32_t aiMedicineSkill,
+    bool abMorphineUsed,
+    float afWoundPercent
+) {
+    float v10 = (float)(((((double)aiMedicineSkill) * 100.0) / 100.0) * ((((double)abMorphineUsed) * 0.5) + 1.0));
+    BSRandom* singleton = BSRandom::GetSingleton();
+    afLimbHealPercent = singleton->Float(0.0, v10);
+    float v9 = (float)(((((((double)aiMedicineSkill) - 100.0) / 100.0) * ((afWoundPercent - 100.0) / 100.0)) * 100.0) *
+                       (1.0 - (((double)abMorphineUsed) * 0.5)));
+    BSRandom* v6 = BSRandom::GetSingleton();
+    double v7 = (double)v6->Float(0.0, v9);
+    float* result = &afHealthDamagePercent;
+    afHealthDamagePercent = (float)v7;
 }
 
 float GamePlayFormulas::CalcImpactShaderAmount(float afDistance) {
-	if (((&fImpactShaderMaxDistance)->Float()) < ((double)afDistance)) {
-		return 0.0;
-	}
-	float v5 = (float)(1.0 - (afDistance / ((&fImpactShaderMaxDistance)->Float())));
-	float* v2 = &(&::fImpactShaderMinMagnitude)->Float();
-	float* v3 = &(&::fImpactShaderMaxMagnitude)->Float();
-	return (float)((((*v3) - ((&::fImpactShaderMinMagnitude)->Float())) * v5) + (*v2));
+    if (((&fImpactShaderMaxDistance)->Float()) < ((double)afDistance)) {
+        return 0.0;
+    }
+    float v5 = (float)(1.0 - (afDistance / ((&fImpactShaderMaxDistance)->Float())));
+    float* v2 = &(&::fImpactShaderMinMagnitude)->Float();
+    float* v3 = &(&::fImpactShaderMaxMagnitude)->Float();
+    return (float)((((*v3) - ((&::fImpactShaderMinMagnitude)->Float())) * v5) + (*v2));
 }
 
-int32_t GamePlayFormulas::GetSpeechChallengeChance(float afPlayerSpeech, float afTargetDisposition,
-	int32_t aiTopicDifficulty) {
-	float* v3 = &(&fSpeechChallengeMultiplier)->Float();
-	float v8 = (float)((((afPlayerSpeech - ((&::fSpeechChallengeSpeechBase)->Float())) * (*v3)) / 100.0) + 1.0);
-	float* v4 = &(&::fSpeechChallengeDispositionMultiplier)->Float();
-	float v7 =
-		(float)((((afTargetDisposition - ((&::fSpeechChallengeDispositionBase)->Float())) * (*v4)) / 100.0) + 1.0);
-	float v9 = (float)(((double)(100 - aiTopicDifficulty)) / 100.0);
-	float v10 = (v8 * v7) * v9;
-	if (!(((&::fSpeechAutoSuccessThreshold)->Float()) < ((double)v10))) {
-		return (int32_t)((v10 * 100.0) + 0.5);
-	} else {
-		return 100;
-	}
+int32_t
+GamePlayFormulas::GetSpeechChallengeChance(float afPlayerSpeech, float afTargetDisposition, int32_t aiTopicDifficulty) {
+    float* v3 = &(&fSpeechChallengeMultiplier)->Float();
+    float v8 = (float)((((afPlayerSpeech - ((&::fSpeechChallengeSpeechBase)->Float())) * (*v3)) / 100.0) + 1.0);
+    float* v4 = &(&::fSpeechChallengeDispositionMultiplier)->Float();
+    float v7 =
+        (float)((((afTargetDisposition - ((&::fSpeechChallengeDispositionBase)->Float())) * (*v4)) / 100.0) + 1.0);
+    float v9 = (float)(((double)(100 - aiTopicDifficulty)) / 100.0);
+    float v10 = (v8 * v7) * v9;
+    if (!(((&::fSpeechAutoSuccessThreshold)->Float()) < ((double)v10))) {
+        return (int32_t)((v10 * 100.0) + 0.5);
+    }
+    else {
+        return 100;
+    }
 }
 
-float GamePlayFormulas::GetActorSwimWalkSpeed(ActorValueOwner* apActor, TESObjectWEAP* pWeap, TESObjectARMO* pArmor,
-	bool abNoWeapon, bool abIsNpc, bool abOverEncumbered) {
-	return (float)GamePlayFormulas::GetActorWalkSpeed(apActor, pWeap, pArmor, 0, abNoWeapon, abIsNpc, abOverEncumbered);
+float GamePlayFormulas::GetActorSwimWalkSpeed(
+    ActorValueOwner* apActor,
+    TESObjectWEAP* pWeap,
+    TESObjectARMO* pArmor,
+    bool abNoWeapon,
+    bool abIsNpc,
+    bool abOverEncumbered
+) {
+    return (float)GamePlayFormulas::GetActorWalkSpeed(apActor, pWeap, pArmor, 0, abNoWeapon, abIsNpc, abOverEncumbered);
 }
 
-float GamePlayFormulas::GetActorSwimRunSpeed(ActorValueOwner* apActor, TESObjectWEAP* pWeap, TESObjectARMO* pArmor,
-	bool abNoWeapon, bool abIsNpc, bool abOverEncumbered) {
-	return (float)GamePlayFormulas::GetActorRunSpeed(apActor, pWeap, pArmor, abNoWeapon, abIsNpc, 0, abOverEncumbered);
+float GamePlayFormulas::GetActorSwimRunSpeed(
+    ActorValueOwner* apActor,
+    TESObjectWEAP* pWeap,
+    TESObjectARMO* pArmor,
+    bool abNoWeapon,
+    bool abIsNpc,
+    bool abOverEncumbered
+) {
+    return (float)GamePlayFormulas::GetActorRunSpeed(apActor, pWeap, pArmor, abNoWeapon, abIsNpc, 0, abOverEncumbered);
 }
 
 double GamePlayFormulas::CalcFatigueReturn(float aiEndurance) {
-	float* v1 = &(&::fFatigueReturnBase)->Float();
-	return (float)(((aiEndurance * 10.0) * ((&::fFatigueReturnMult)->Float())) + (*v1));
+    float* v1 = &(&::fFatigueReturnBase)->Float();
+    return (float)(((aiEndurance * 10.0) * ((&::fFatigueReturnMult)->Float())) + (*v1));
 }
 
 // The level is read first; Intelligence, capped at 10 by the int BSMIN, is the first argument.
 int32_t GamePlayFormulas::GetLevelUpSkillPoints_0(ActorValueOwner* apOwner) {
-	uint16_t usLevel = apOwner->GetActorLevel();
-	int32_t iIntelligence = BSMIN(apOwner->GetPermanentActorValue(ActorValue::INTELLIGENCE), 10);
-	return GamePlayFormulas::GetLevelUpSkillPoints(iIntelligence, usLevel);
+    uint16_t usLevel = apOwner->GetActorLevel();
+    int32_t iIntelligence = BSMIN(apOwner->GetPermanentActorValue(ActorValue::INTELLIGENCE), 10);
+    return GamePlayFormulas::GetLevelUpSkillPoints(iIntelligence, usLevel);
 }
 
 float GamePlayFormulas::GetSpeechFailPenalty(int32_t aiSuccessChance) {
-	double v4 = -fSpeechChallengeFailureBase.Float();
-	return v4 - (1.0 - static_cast<double>(aiSuccessChance) / 100.0) * fSpeechChallengeFailureMultiplier.Float();
+    double v4 = -fSpeechChallengeFailureBase.Float();
+    return v4 - (1.0 - static_cast<double>(aiSuccessChance) / 100.0) * fSpeechChallengeFailureMultiplier.Float();
 }
 
 float* GamePlayFormulas::GetBarterMultipliers(int32_t a1, float* a2, float* a3) {
-	float* v3 = &fBarterBuyBase.Float();
-	*a2 = static_cast<double>(a1) * fBarterBuyMult.Float() / 100.0 + *v3;
-	float* v4 = &fBarterSellBase.Float();
-	float* result = &fBarterSellMult.Float();
-	*a3 = static_cast<double>(a1) * *result / 100.0 + *v4;
-	return result;
+    float* v3 = &fBarterBuyBase.Float();
+    *a2 = static_cast<double>(a1) * fBarterBuyMult.Float() / 100.0 + *v3;
+    float* v4 = &fBarterSellBase.Float();
+    float* result = &fBarterSellMult.Float();
+    *a3 = static_cast<double>(a1) * *result / 100.0 + *v4;
+    return result;
 }

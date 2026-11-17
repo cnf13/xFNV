@@ -10,5 +10,5 @@
 hkProcessContext::~hkProcessContext() {}
 
 void hkProcessContext::operator delete(void* apMemory) {
-	ourFree(apMemory);
+    ourFree(apMemory);
 }

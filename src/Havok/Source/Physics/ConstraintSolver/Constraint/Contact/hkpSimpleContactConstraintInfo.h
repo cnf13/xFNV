@@ -14,24 +14,28 @@ class hkTypeInfo;
 // HK_ENABLE_ROLLING_FRICITON_CODE is off: seven plain words after the flags and the index).
 class alignas(16) hkpSimpleContactConstraintDataInfo {
 public:
-	enum {
-		HK_FLAG_OK = 0x0,
-		HK_FLAG_POINT_REMOVED = 0x1,
-		HK_FLAG_AREA_CHANGED = 0x4,
-	};
+    enum {
+        HK_FLAG_OK = 0x0,
+        HK_FLAG_POINT_REMOVED = 0x1,
+        HK_FLAG_AREA_CHANGED = 0x4,
+    };
 
-	// Havok SDK signature (hkpDynamics.lib, tied by target).
-	static const hkClass& staticClass();
+    // Havok SDK signature (hkpDynamics.lib, tied by target).
+    static const hkClass& staticClass();
 
-	uint16_t m_flags;
-	uint16_t m_index;
-	uint32_t m_data[7];
+    uint16_t m_flags;
+    uint16_t m_index;
+    uint32_t m_data[7];
 };
 
 // Builds the Jacobians of a simple contact constraint's points; writeHeaderSchemas says whether it writes the header
 // schema first.
-void hkSimpleContactConstraintDataBuildJacobian(hkpSimpleContactConstraintAtom* atom, const hkpConstraintQueryIn& in,
-	hkBool writeHeaderSchemas, hkpConstraintQueryOut& out);
+void hkSimpleContactConstraintDataBuildJacobian(
+    hkpSimpleContactConstraintAtom* atom,
+    const hkpConstraintQueryIn& in,
+    hkBool writeHeaderSchemas,
+    hkpConstraintQueryOut& out
+);
 // Reads m_internalSolverData of arProperties and reads and writes its m_internalDataA; the result is returned as a
 // float.
 float calculateRhs(hkpContactPointProperties& arProperties, float afDistance, float afDeltaTime);
@@ -43,16 +47,16 @@ hkpSimpleContactConstraintDataInfo* clearContactInfo(hkpSimpleContactConstraintD
 // results. Members and layout from Havok's release PDBs (sizeof 0x20: +0, +2, +4, +8).
 class alignas(16) hkpSimpleContactConstraintDataInfoInternal {
 public:
-	enum {
-		HK_FLAG_OK = 0x0,
-		HK_FLAG_POINT_REMOVED = 0x1,
-		HK_FLAG_AREA_CHANGED = 0x4,
-	};
+    enum {
+        HK_FLAG_OK = 0x0,
+        HK_FLAG_POINT_REMOVED = 0x1,
+        HK_FLAG_AREA_CHANGED = 0x4,
+    };
 
-	uint16_t m_flags;
-	uint16_t m_biNormalAxis;
-	float m_contactRadius;
-	alignas(8) hkpSolverResults m_frictionResults[3];
+    uint16_t m_flags;
+    uint16_t m_biNormalAxis;
+    float m_contactRadius;
+    alignas(8) hkpSolverResults m_frictionResults[3];
 };
 
 // The time scale of the linear error recovery.

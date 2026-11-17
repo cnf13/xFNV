@@ -9,19 +9,19 @@
 // Steam types.
 class ISteamApps {
 public:
-	virtual bool BIsSubscribed() = 0;
-	virtual bool BIsLowViolence() = 0;
-	virtual bool BIsCybercafe() = 0;
-	virtual bool BIsVACBanned() = 0;
-	virtual const char* GetCurrentGameLanguage() = 0;
-	virtual const char* GetAvailableGameLanguages() = 0;
-	// SDK: AppId_t.
-	virtual bool BIsSubscribedApp(uint32_t appID) = 0;
-	// SDK: AppId_t.
-	virtual bool BIsDlcInstalled(uint32_t appID) = 0;
+    virtual bool BIsSubscribed() = 0;
+    virtual bool BIsLowViolence() = 0;
+    virtual bool BIsCybercafe() = 0;
+    virtual bool BIsVACBanned() = 0;
+    virtual const char* GetCurrentGameLanguage() = 0;
+    virtual const char* GetAvailableGameLanguages() = 0;
+    // SDK: AppId_t.
+    virtual bool BIsSubscribedApp(uint32_t appID) = 0;
+    // SDK: AppId_t.
+    virtual bool BIsDlcInstalled(uint32_t appID) = 0;
 };
 
 // steam_api.dll's SteamApps (cdecl), through the exe's import slot: the apps interface, or null when Steam is not
 // running.
-using SteamApps_t = ISteamApps*(*)();
+using SteamApps_t = ISteamApps* (*)();
 FNVD_IMPORT(SteamApps_t, SteamApps, 0xFDF494);

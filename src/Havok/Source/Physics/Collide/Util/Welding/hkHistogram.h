@@ -6,9 +6,9 @@
 // One range of a histogram: the angles between m_lo and m_hi and the weight summed over them. Entries are inserted into
 // hkHistogram::m_entries; the histogram is used by hkpMeshWeldingUtility.
 struct hkEntry {
-	float m_lo;
-	float m_hi;
-	float m_value;
+    float m_lo;
+    float m_hi;
+    float m_value;
 };
 
 // The entries' order for hkAlgorithm::quickSort: by m_value.
@@ -18,9 +18,9 @@ hkBool operator<(const hkEntry& a, const hkEntry& b);
 // entries the welding utility accumulates.
 class hkHistogram {
 public:
-	void addEntry(float lo, float hi, float value);
-	float evaluate();
+    void addEntry(float lo, float hi, float value);
+    float evaluate();
 
-	float m_freeAngle;
-	hkArray<hkEntry, hkContainerHeapAllocator> m_entries;
+    float m_freeAngle;
+    hkArray<hkEntry, hkContainerHeapAllocator> m_entries;
 };

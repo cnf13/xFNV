@@ -11,18 +11,18 @@
 NiRTTI bhkHeightFieldShape::ms_RTTI("bhkHeightFieldShape", &bhkShape::ms_RTTI);
 
 bhkHeightFieldShape::~bhkHeightFieldShape() {
-	bhkSerializable::Kill();
-	--iCount;
+    bhkSerializable::Kill();
+    --iCount;
 }
 
 const NiRTTI* bhkHeightFieldShape::GetRTTI() const {
-	return &bhkHeightFieldShape::ms_RTTI;
+    return &bhkHeightFieldShape::ms_RTTI;
 }
 
 void bhkHeightFieldShape::GetViewerStrings(NiTPrimitiveArray<char*>* apStrings) {
-	AutoMemContext kMemContext(MEM_CONTEXT_HAVOK);
+    AutoMemContext kMemContext(MEM_CONTEXT_HAVOK);
 
-	bhkShape::GetViewerStrings(apStrings);
-	char* pcString = NiGetViewerString(ms_RTTI.m_pcName);
-	apStrings->Add(pcString);
+    bhkShape::GetViewerStrings(apStrings);
+    char* pcString = NiGetViewerString(ms_RTTI.m_pcName);
+    apStrings->Add(pcString);
 }

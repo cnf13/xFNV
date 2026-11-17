@@ -8,29 +8,31 @@ class BGSSaveGameBuffer;
 // A combat countdown: the time it was started at and the time it runs out at.
 class CombatTimer {
 public:
-	CombatTimer();
+    CombatTimer();
 
-	void Reset(float afTargetTime);
-	bool Check();
-	// Loads the timer and makes a finite start time absolute again.
-	void LoadGame(BGSLoadGameBuffer* apLoadGameBuffer);
-	// Saves the timer with a finite start time relative to the combat timer.
-	void SaveGame(BGSSaveGameBuffer* apSaveGameBuffer);
-	void ForceTrigger();
-	bool IsSet();
-	bool IsForced();
-	// The timer's time since fStartTime. CombatController's update calls it on kCombatPlanChangeTimer.
-	float ElapsedTime();
-	float GetTargetTime();
-	float GetStartTime() { return fStartTime; }
-	void SetStartTime(float a1);
-	void Clear();
+    void Reset(float afTargetTime);
+    bool Check();
+    // Loads the timer and makes a finite start time absolute again.
+    void LoadGame(BGSLoadGameBuffer* apLoadGameBuffer);
+    // Saves the timer with a finite start time relative to the combat timer.
+    void SaveGame(BGSSaveGameBuffer* apSaveGameBuffer);
+    void ForceTrigger();
+    bool IsSet();
+    bool IsForced();
+    // The timer's time since fStartTime. CombatController's update calls it on kCombatPlanChangeTimer.
+    float ElapsedTime();
+    float GetTargetTime();
+    float GetStartTime() {
+        return fStartTime;
+    }
+    void SetStartTime(float a1);
+    void Clear();
 
-	static float GetTimer();
-	static void UpdateTimer(float afElapsedTime);
+    static float GetTimer();
+    static void UpdateTimer(float afElapsedTime);
 
-	float fStartTime;
-	float fTargetTime;
+    float fStartTime;
+    float fTargetTime;
 
-	static inline float fTimer;
+    static inline float fTimer;
 };

@@ -15,82 +15,129 @@ int32_t CompareFollowerDist(const void* a1, const void* a2);
 // A follower of a follow target and its distances, for spreading several followers around the target
 // (GetFollowRadiusFudgeForMultipleFollowers).
 struct FollowerDist {
-	// Whether this sorts after aFollowerDist: the larger fPackDesiredDist, then the larger
-	// fActualDistSqr.
-	bool operator>(const FollowerDist& aFollowerDist) const;
+    // Whether this sorts after aFollowerDist: the larger fPackDesiredDist, then the larger
+    // fActualDistSqr.
+    bool operator>(const FollowerDist& aFollowerDist) const;
 
-	Actor* pActor;
-	float fActualDistSqr;
-	float fPackDesiredDist;
-	float fActorRadius;
+    Actor* pActor;
+    float fActualDistSqr;
+    float fPackDesiredDist;
+    float fActorRadius;
 };
 
 // The settings of one sandbox activity: when it starts and how long it lasts.
 struct PerActivitySettings {
-	PerActivitySettings(SettingT<GameSettingCollection>& apStartMin, SettingT<GameSettingCollection>& apStartMax,
-		SettingT<GameSettingCollection>& apDurMin, SettingT<GameSettingCollection>& apDurMax);
+    PerActivitySettings(
+        SettingT<GameSettingCollection>& apStartMin,
+        SettingT<GameSettingCollection>& apStartMax,
+        SettingT<GameSettingCollection>& apDurMin,
+        SettingT<GameSettingCollection>& apDurMax
+    );
 
-	SettingT<GameSettingCollection>* StartMin;
-	SettingT<GameSettingCollection>* StartMax;
-	SettingT<GameSettingCollection>* DurMin;
-	SettingT<GameSettingCollection>* DurMax;
+    SettingT<GameSettingCollection>* StartMin;
+    SettingT<GameSettingCollection>* StartMax;
+    SettingT<GameSettingCollection>* DurMin;
+    SettingT<GameSettingCollection>* DurMax;
 };
 
 // Formulas that derive actor values from other actor values
 class AiFormulas {
 public:
-	static float AVDeriveBodyPartCondition(ActorValueOwner* apActor, ActorValue::Index aiWhich);
-	static void AVGetDerivedSkillPrimaryAttributeAndBase(ActorValue::Index aiSkill,
-		ActorValue::Index& aiPrimaryAttribute, float& afBase);
-	static float AVDeriveCriticalChance(ActorValueOwner* apActor, ActorValue::Index aiWhich);
-	static float AVDeriveActionPoints(ActorValueOwner* apActor, ActorValue::Index aiWhich);
-	static float AVDeriveHealth(ActorValueOwner* apActor, ActorValue::Index aiWhich);
-	static float AVDeriveFatigue(ActorValueOwner* apActor, ActorValue::Index aiWhich);
-	static float AVDeriveSkill_0(ActorValueOwner* apOwner, ActorValue::Index aiSkill);
-	static float CalculateDerivedSkillValue(float afSkillBase, float afPrimaryAttribute, float afLuck);
-	static float AVDeriveResistance(ActorValueOwner* apActor, ActorValue::Index aiWhich);
+    static float AVDeriveBodyPartCondition(ActorValueOwner* apActor, ActorValue::Index aiWhich);
+    static void AVGetDerivedSkillPrimaryAttributeAndBase(
+        ActorValue::Index aiSkill,
+        ActorValue::Index& aiPrimaryAttribute,
+        float& afBase
+    );
+    static float AVDeriveCriticalChance(ActorValueOwner* apActor, ActorValue::Index aiWhich);
+    static float AVDeriveActionPoints(ActorValueOwner* apActor, ActorValue::Index aiWhich);
+    static float AVDeriveHealth(ActorValueOwner* apActor, ActorValue::Index aiWhich);
+    static float AVDeriveFatigue(ActorValueOwner* apActor, ActorValue::Index aiWhich);
+    static float AVDeriveSkill_0(ActorValueOwner* apOwner, ActorValue::Index aiSkill);
+    static float CalculateDerivedSkillValue(float afSkillBase, float afPrimaryAttribute, float afLuck);
+    static float AVDeriveResistance(ActorValueOwner* apActor, ActorValue::Index aiWhich);
 
-	static float CalculateDerivedHealth(ActorValueOwner* apActor, float afEndurance);
-	// A random hour between afMin and afMax.
-	static float RandomHour(float afMin, float afMax);
-	static float CalculateDerivedFatigue(ActorValueOwner* apActor, float afEndurance);
-	static float AVDeriveSkill(ActorValueOwner* apActor, ActorValue::Index aiWhich, bool abBaseDerivation);
-	// The detection size class of an actor afHeightOrLength tall.
-	static int32_t GetActorDetectionSize(float afHeightOrLength);
-	// The detection formula: the level at which actor A detects actor B; the sound, visual
-	// and skill subtotals are returned.
-	static int32_t GetActorDetectedTarget(int32_t aiPercepA, int32_t aiSneakB, int32_t aiLineofSite, int32_t aiVisual,
-		float afDistance, int32_t aiLightLevelB, int32_t aiBlindess, bool abInvisibilityB, int32_t aiBootweightB,
-		bool abMovingB, bool abSneakingB, bool abRunning, bool absleeping, bool abAlert, int32_t aiActionSound,
-		int32_t aiTargetSize, bool bExterior, bool abInCombat, int32_t aiAmbushValue, float& afSoundSubtotal,
-		float& afVisualSubtotal, float& afSkillSubtotal, const int32_t iLevelA, const int32_t iLevelB,
-		const int32_t iArmorB);
-	// The disposition formula of an actor towards a target. Every value but abcreature is passed as a 32-bit integer.
-	static int32_t GetActorDispositiontoTarget(int32_t aiActorBaseDisp, int32_t aiCharismaTarget, int32_t aiResponActor,
-		int32_t aiKarmaTarget, int32_t aiRaceReactionTarget, int32_t aiFactionReactionTarget,
-		int32_t aiFactionRankTarget, int32_t aiWeaponStatusTarget, int32_t aiDiseaseStatusTarget, int32_t aiTargetMod,
-		bool abcreature);
-	// The detection level a detection event reaches: the detecting actor's sneak skill, its line of sight and view cone
-	// to the event, the distance, light and action noise.
-	static int32_t GetDetectedEvent(int32_t aiPercep, int32_t aiLineofSite, float afDistance, int32_t aiBlindess,
-		int32_t aiLightLevel, bool absleeping, bool abAlert, bool abInCombat, int32_t aiActionSound, int32_t aiVisual,
-		bool abExterior);
-	// The larger of the radius less fFollowSlowdownZoneWidth and the radius times fFollowStopZoneMinMult.
-	static float GetFollowRadiusStop(float afbasePackRadius);
-	static float GetFollowRadiusSlow(float afbasePackRadius);
-	static float AVDeriveCarryWeight(ActorValueOwner* apActor, ActorValue::Index aiWhich);
-	static float AVDeriveFromPrimary(ActorValueOwner* apActor, ActorValue::Index aiWhich);
-	static float GetFollowRadiusWalk(float afbasePackRadius);
-	static float GetFollowRadiusStartMoving(float afbasePackRadius);
-	static float GetFollowRadiusMatchSpeed(float afbasePackRadius);
-	static int32_t ComputePickpocketSuccess(int32_t aiSneakSkillModed, int32_t aiTargetSneakModed, float fAmountofItem);
-	static void ComputeRandomSandboxActivityStartAndDuration(int32_t aiActivity, float& afStartOut,
-		float& afDurationOut);
-	static float GetFollowRadiusFudgeForMultipleFollowers(Actor* apActor, Actor* apFollowTarget);
-	static float ComputeRandomSandboxSubProcessDuration(int32_t aiEngergyLevel, int32_t aiProcIndex);
-	static float AVDeriveHealingRate(ActorValueOwner* apActor, ActorValue::Index aiWhich);
-	static float AVDeriveUnarmedDamage(ActorValueOwner* apActor, ActorValue::Index aiWhich);
-	static double ComputeTimeTillNextWander(int32_t a1);
+    static float CalculateDerivedHealth(ActorValueOwner* apActor, float afEndurance);
+    // A random hour between afMin and afMax.
+    static float RandomHour(float afMin, float afMax);
+    static float CalculateDerivedFatigue(ActorValueOwner* apActor, float afEndurance);
+    static float AVDeriveSkill(ActorValueOwner* apActor, ActorValue::Index aiWhich, bool abBaseDerivation);
+    // The detection size class of an actor afHeightOrLength tall.
+    static int32_t GetActorDetectionSize(float afHeightOrLength);
+    // The detection formula: the level at which actor A detects actor B; the sound, visual
+    // and skill subtotals are returned.
+    static int32_t GetActorDetectedTarget(
+        int32_t aiPercepA,
+        int32_t aiSneakB,
+        int32_t aiLineofSite,
+        int32_t aiVisual,
+        float afDistance,
+        int32_t aiLightLevelB,
+        int32_t aiBlindess,
+        bool abInvisibilityB,
+        int32_t aiBootweightB,
+        bool abMovingB,
+        bool abSneakingB,
+        bool abRunning,
+        bool absleeping,
+        bool abAlert,
+        int32_t aiActionSound,
+        int32_t aiTargetSize,
+        bool bExterior,
+        bool abInCombat,
+        int32_t aiAmbushValue,
+        float& afSoundSubtotal,
+        float& afVisualSubtotal,
+        float& afSkillSubtotal,
+        const int32_t iLevelA,
+        const int32_t iLevelB,
+        const int32_t iArmorB
+    );
+    // The disposition formula of an actor towards a target. Every value but abcreature is passed as a 32-bit integer.
+    static int32_t GetActorDispositiontoTarget(
+        int32_t aiActorBaseDisp,
+        int32_t aiCharismaTarget,
+        int32_t aiResponActor,
+        int32_t aiKarmaTarget,
+        int32_t aiRaceReactionTarget,
+        int32_t aiFactionReactionTarget,
+        int32_t aiFactionRankTarget,
+        int32_t aiWeaponStatusTarget,
+        int32_t aiDiseaseStatusTarget,
+        int32_t aiTargetMod,
+        bool abcreature
+    );
+    // The detection level a detection event reaches: the detecting actor's sneak skill, its line of sight and view cone
+    // to the event, the distance, light and action noise.
+    static int32_t GetDetectedEvent(
+        int32_t aiPercep,
+        int32_t aiLineofSite,
+        float afDistance,
+        int32_t aiBlindess,
+        int32_t aiLightLevel,
+        bool absleeping,
+        bool abAlert,
+        bool abInCombat,
+        int32_t aiActionSound,
+        int32_t aiVisual,
+        bool abExterior
+    );
+    // The larger of the radius less fFollowSlowdownZoneWidth and the radius times fFollowStopZoneMinMult.
+    static float GetFollowRadiusStop(float afbasePackRadius);
+    static float GetFollowRadiusSlow(float afbasePackRadius);
+    static float AVDeriveCarryWeight(ActorValueOwner* apActor, ActorValue::Index aiWhich);
+    static float AVDeriveFromPrimary(ActorValueOwner* apActor, ActorValue::Index aiWhich);
+    static float GetFollowRadiusWalk(float afbasePackRadius);
+    static float GetFollowRadiusStartMoving(float afbasePackRadius);
+    static float GetFollowRadiusMatchSpeed(float afbasePackRadius);
+    static int32_t ComputePickpocketSuccess(int32_t aiSneakSkillModed, int32_t aiTargetSneakModed, float fAmountofItem);
+    static void
+    ComputeRandomSandboxActivityStartAndDuration(int32_t aiActivity, float& afStartOut, float& afDurationOut);
+    static float GetFollowRadiusFudgeForMultipleFollowers(Actor* apActor, Actor* apFollowTarget);
+    static float ComputeRandomSandboxSubProcessDuration(int32_t aiEngergyLevel, int32_t aiProcIndex);
+    static float AVDeriveHealingRate(ActorValueOwner* apActor, ActorValue::Index aiWhich);
+    static float AVDeriveUnarmedDamage(ActorValueOwner* apActor, ActorValue::Index aiWhich);
+    static double ComputeTimeTillNextWander(int32_t a1);
 };
 
 // The settings of the four sandbox activities (sleep, breakfast, lunch, dinner), filled in at startup.
@@ -99,10 +146,11 @@ extern SandboxActivitySettingsArray SandboxActivitySettings;
 
 // The primary attribute of each of the 14 skills, BARTER first.
 using SkillAttributeArray14 = ActorValue::Index[14];
-inline SkillAttributeArray14 SkillToSpecial{ActorValue::CHARISMA, ActorValue::ENDURANCE, ActorValue::PERCEPTION,
-	ActorValue::PERCEPTION, ActorValue::PERCEPTION, ActorValue::INTELLIGENCE, ActorValue::STRENGTH,
-	ActorValue::INTELLIGENCE, ActorValue::INTELLIGENCE, ActorValue::AGILITY, ActorValue::AGILITY, ActorValue::CHARISMA,
-	ActorValue::ENDURANCE, ActorValue::ENDURANCE};
+inline SkillAttributeArray14 SkillToSpecial{ActorValue::CHARISMA,   ActorValue::ENDURANCE,    ActorValue::PERCEPTION,
+                                            ActorValue::PERCEPTION, ActorValue::PERCEPTION,   ActorValue::INTELLIGENCE,
+                                            ActorValue::STRENGTH,   ActorValue::INTELLIGENCE, ActorValue::INTELLIGENCE,
+                                            ActorValue::AGILITY,    ActorValue::AGILITY,      ActorValue::CHARISMA,
+                                            ActorValue::ENDURANCE,  ActorValue::ENDURANCE};
 
 // The base value setting of each of the 14 skills, BARTER first.
 using SettingPointerArray14 = Setting* [14];

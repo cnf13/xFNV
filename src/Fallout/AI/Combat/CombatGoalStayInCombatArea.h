@@ -5,5 +5,5 @@
 // The combat planner goal StayInCombatArea. It adds no fields to CombatGoal and overrides no virtual.
 class CombatGoalStayInCombatArea : public CombatGoal {
 public:
-	CombatGoalStayInCombatArea(CombatGoal::COMBAT_GOAL aeType);
+    CombatGoalStayInCombatArea(CombatGoal::COMBAT_GOAL aeType);
 };

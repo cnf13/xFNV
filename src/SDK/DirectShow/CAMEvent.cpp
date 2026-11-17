@@ -5,5 +5,5 @@
 CAMEvent::CAMEvent(int32_t bManualReset) : m_event(new BSSystemEvent(bManualReset != 0, false)) {}
 
 CAMEvent::~CAMEvent() {
-	delete m_event;
+    delete m_event;
 }

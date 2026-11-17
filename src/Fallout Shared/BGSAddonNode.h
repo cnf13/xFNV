@@ -7,37 +7,37 @@ class TESSound;
 
 // The particle cap and flags of an addon node.
 struct ADDON_DATA {
-	// Swaps the particle cap read from a big-endian file.
-	void Endian();
+    // Swaps the particle cap read from a big-endian file.
+    void Endian();
 
-	uint16_t usMasterParticleCap;
-	uint8_t cFlags;
-	uint8_t padding03;
+    uint16_t usMasterParticleCap;
+    uint8_t cFlags;
+    uint8_t padding03;
 };
 
 // A model attached to the world by index (a marker or an effect), kept in the data handler's addon array.
 class BGSAddonNode : public TESBoundObject, public TESModelTextureSwap {
 public:
-	BGSAddonNode();
-	~BGSAddonNode() override;
+    BGSAddonNode();
+    ~BGSAddonNode() override;
 
-	void InitializeData() override;
-	bool Load(TESFile* apFile) override;
-	void Save() override;
-	void InitItem() override;
-	void Copy(TESForm* apCopy) override;
-	bool Compare(TESForm* apCompare) override;
+    void InitializeData() override;
+    bool Load(TESFile* apFile) override;
+    void Save() override;
+    void InitItem() override;
+    void Copy(TESForm* apCopy) override;
+    bool Compare(TESForm* apCompare) override;
 
-	using TESForm::Save;
+    using TESForm::Save;
 
-	uint32_t GetIndex();
-	void SetIndex(uint32_t aiIndex);
-	uint16_t GetMasterParticleCap();
-	bool IsMasterParticleSystem();
-	uint32_t GetMasterParticleSystemIndex();
+    uint32_t GetIndex();
+    void SetIndex(uint32_t aiIndex);
+    uint16_t GetMasterParticleCap();
+    bool IsMasterParticleSystem();
+    uint32_t GetMasterParticleSystemIndex();
 
-	uint32_t iIndex;
-	TESSound* pSound;
-	ADDON_DATA Data;
-	uint32_t iMasterParticleSystemIndex;
+    uint32_t iIndex;
+    TESSound* pSound;
+    ADDON_DATA Data;
+    uint32_t iMasterParticleSystemIndex;
 };

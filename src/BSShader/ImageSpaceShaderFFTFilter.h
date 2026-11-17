@@ -4,9 +4,9 @@
 
 class ImageSpaceShaderFFTFilter : public ImageSpaceShader {
 public:
-	ImageSpaceShaderFFTFilter();
-	~ImageSpaceShaderFFTFilter() override;
+    ImageSpaceShaderFFTFilter();
+    ~ImageSpaceShaderFFTFilter() override;
 
-	void ReloadShaders() override;
-	bool LoadStagesAndPasses() override;
+    void ReloadShaders() override;
+    bool LoadStagesAndPasses() override;
 };

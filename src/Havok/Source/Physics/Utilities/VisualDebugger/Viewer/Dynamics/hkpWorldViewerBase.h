@@ -12,17 +12,19 @@
 // overridden here.
 class hkpWorldViewerBase : public hkReferencedObject, public hkProcess, protected hkpPhysicsContextWorldListener {
 public:
-	hkpWorldViewerBase(const hkArray<hkProcessContext*, hkContainerHeapAllocator>& contexts);
-	~hkpWorldViewerBase() override;
+    hkpWorldViewerBase(const hkArray<hkProcessContext*, hkContainerHeapAllocator>& contexts);
+    ~hkpWorldViewerBase() override;
 
-	void worldRemovedCallback(hkpWorld* world) override {}
-	void worldAddedCallback(hkpWorld* world) override {}
+    void worldRemovedCallback(hkpWorld* world) override {}
+    void worldAddedCallback(hkpWorld* world) override {}
 
-	// DeletingDestruct's free (hkReferencedObject's); declared here because hkProcess and the listener base
-	// declare their own and the lookup would be ambiguous.
-	static void operator delete(void* apMemory) { deleteObject(apMemory); }
+    // DeletingDestruct's free (hkReferencedObject's); declared here because hkProcess and the listener base
+    // declare their own and the lookup would be ambiguous.
+    static void operator delete(void* apMemory) {
+        deleteObject(apMemory);
+    }
 
-	hkpPhysicsContext* m_context;
+    hkpPhysicsContext* m_context;
 };
 
 extern int32_t s_movableObjectColor;

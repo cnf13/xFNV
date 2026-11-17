@@ -14,11 +14,18 @@ void transformGeometry(const hkMatrix4& transform, hkGeometry& geometryInOut);
 // Static helpers that build and edit hkGeometry. Only part of the class is declared.
 class hkGeometryUtils {
 public:
-	// Builds a capsule from start to end of the given radius, heightSamples rings along the axis and thetaSamples
-	// vertices around it, transforms its vertices by transform and stores a new hkGeometry in geometryOut.
-	// hkDisplayCapsule::buildGeometry passes its own m_geometry.
-	static void createCapsuleGeometry(const hkVector4& start, const hkVector4& end, float radius, int32_t heightSamples,
-		int32_t thetaSamples, const hkTransform& transform, hkGeometry*& geometryOut);
-	// Havok SDK signature (hkGeometryUtilities.lib, tied by bytes).
-	static void weldVertices(hkGeometry& meshGeometry, float threshold);
+    // Builds a capsule from start to end of the given radius, heightSamples rings along the axis and thetaSamples
+    // vertices around it, transforms its vertices by transform and stores a new hkGeometry in geometryOut.
+    // hkDisplayCapsule::buildGeometry passes its own m_geometry.
+    static void createCapsuleGeometry(
+        const hkVector4& start,
+        const hkVector4& end,
+        float radius,
+        int32_t heightSamples,
+        int32_t thetaSamples,
+        const hkTransform& transform,
+        hkGeometry*& geometryOut
+    );
+    // Havok SDK signature (hkGeometryUtilities.lib, tied by bytes).
+    static void weldVertices(hkGeometry& meshGeometry, float threshold);
 };

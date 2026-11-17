@@ -5,7 +5,7 @@
 #include "Havok/Source/Common/Visualize/Process/hkStatisticsProcess.h"
 
 void hkProcessRegisterUtil::registerAllCommonProcesses() {
-	hkDebugDisplayProcess::registerProcess();
-	hkStatisticsProcess::registerProcess();
-	hkInspectProcess::registerProcess();
+    hkDebugDisplayProcess::registerProcess();
+    hkStatisticsProcess::registerProcess();
+    hkInspectProcess::registerProcess();
 }

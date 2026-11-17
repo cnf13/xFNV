@@ -11,7 +11,11 @@ class hkpConstraintInstance;
 // hkpConstraintViewer::draw builds one for constraint type 1 and calls its drawConstraint.
 class hkpHingeDrawer : public hkpConstraintDrawer {
 public:
-	// Havok SDK signature (hkpUtilities.lib, tied by reloc).
-	void drawConstraint(const hkpConstraintInstance* constraint, hkDebugDisplayHandler* displayHandler, int32_t id,
-		int32_t tag);
+    // Havok SDK signature (hkpUtilities.lib, tied by reloc).
+    void drawConstraint(
+        const hkpConstraintInstance* constraint,
+        hkDebugDisplayHandler* displayHandler,
+        int32_t id,
+        int32_t tag
+    );
 };

@@ -4,8 +4,8 @@
 
 class ImageSpaceShaderAlphaMult : public ImageSpaceShader {
 public:
-	ImageSpaceShaderAlphaMult();
-	~ImageSpaceShaderAlphaMult() override;
+    ImageSpaceShaderAlphaMult();
+    ~ImageSpaceShaderAlphaMult() override;
 
-	void ReloadShaders() override;
+    void ReloadShaders() override;
 };

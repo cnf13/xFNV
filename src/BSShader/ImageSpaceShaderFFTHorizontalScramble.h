@@ -4,9 +4,9 @@
 
 class ImageSpaceShaderFFTHorizontalScramble : public ImageSpaceShader {
 public:
-	ImageSpaceShaderFFTHorizontalScramble();
-	~ImageSpaceShaderFFTHorizontalScramble() override;
+    ImageSpaceShaderFFTHorizontalScramble();
+    ~ImageSpaceShaderFFTHorizontalScramble() override;
 
-	void ReloadShaders() override;
-	bool LoadStagesAndPasses() override;
+    void ReloadShaders() override;
+    bool LoadStagesAndPasses() override;
 };

@@ -12,24 +12,26 @@ class BGSSaveFormBuffer;
 // two.
 class CombatCoverSearchInfo {
 public:
-	CombatCoverSearchInfo();
+    CombatCoverSearchInfo();
 
-	// Clears the search radius, sets the time stamp to the most negative float and empties the cover locations.
-	void Clear();
-	// Copies apCopy, or resets when it is null.
-	void Copy(const CombatCoverSearchInfo* apCopy);
-	void LoadGameBGS(BGSLoadGameBuffer* a2);
-	void SaveGame(BGSSaveFormBuffer* apSaveGameBuffer);
+    // Clears the search radius, sets the time stamp to the most negative float and empties the cover locations.
+    void Clear();
+    // Copies apCopy, or resets when it is null.
+    void Copy(const CombatCoverSearchInfo* apCopy);
+    void LoadGameBGS(BGSLoadGameBuffer* a2);
+    void SaveGame(BGSSaveFormBuffer* apSaveGameBuffer);
 
-	static void operator delete(void* apMemory) { ourFree(apMemory); }
+    static void operator delete(void* apMemory) {
+        ourFree(apMemory);
+    }
 
-	NiPoint3 kSearchLocation;
-	NiPoint3 nipoint3C;
-	float float18;
-	CombatTimeStamp kLastSearch;
-	BSSimpleArray<PathingCoverLocation> kCoverLocations;
-	uint32_t uiPreviousCoverKey;
-	uint32_t uiPreviousState;
-	bool bSearching;
-	uint8_t padding39[3];
+    NiPoint3 kSearchLocation;
+    NiPoint3 nipoint3C;
+    float float18;
+    CombatTimeStamp kLastSearch;
+    BSSimpleArray<PathingCoverLocation> kCoverLocations;
+    uint32_t uiPreviousCoverKey;
+    uint32_t uiPreviousState;
+    bool bSearching;
+    uint8_t padding39[3];
 };

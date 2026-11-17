@@ -7,12 +7,12 @@
 #include "SDK/MSVC/rtti.h"
 
 bool TESRegionObject::IsFormLandTexture() {
-	return pForm && dynamic_cast<TESLandTexture*>(pForm) != 0;
+    return pForm && dynamic_cast<TESLandTexture*>(pForm) != 0;
 }
 
 float TESRegionObject::ConvertNormalToAngle(NiPoint3 aNormal) {
-	NiPoint3 v4 = aNormal;
-	float v3 = (&v4)->UnitizeGetLength();
-	float x_4 = v4.z / v3;
-	return std::acosf(x_4);
+    NiPoint3 v4 = aNormal;
+    float v3 = (&v4)->UnitizeGetLength();
+    float x_4 = v4.z / v3;
+    return std::acosf(x_4);
 }

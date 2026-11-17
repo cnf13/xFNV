@@ -10,20 +10,22 @@ const void* getVtablehkaAnimationPreviewColorContainer();
 // Packed colors used to display animation previews.
 class hkaAnimationPreviewColorContainer : public hkReferencedObject {
 public:
-	hkaAnimationPreviewColorContainer();
+    hkaAnimationPreviewColorContainer();
 
-	hkaAnimationPreviewColorContainer(hkFinishLoadedObjectFlag aFlag)
-		: hkReferencedObject(aFlag), m_previewColor(aFlag) {}
+    hkaAnimationPreviewColorContainer(hkFinishLoadedObjectFlag aFlag)
+      : hkReferencedObject(aFlag), m_previewColor(aFlag) {}
 
-	~hkaAnimationPreviewColorContainer() override;
+    ~hkaAnimationPreviewColorContainer() override;
 
-	void newPreviewColor(uint32_t color);
+    void newPreviewColor(uint32_t color);
 
-	static void operator delete(void* apMemory) { hkReferencedObject::deleteObject(apMemory); }
-	// The reflection class hkaAnimationPreviewColorContainerClass.
-	static const hkClass& staticClass();
+    static void operator delete(void* apMemory) {
+        hkReferencedObject::deleteObject(apMemory);
+    }
+    // The reflection class hkaAnimationPreviewColorContainerClass.
+    static const hkClass& staticClass();
 
-	hkArray<uint32_t> m_previewColor;
+    hkArray<uint32_t> m_previewColor;
 };
 
 extern hkClass hkaAnimationPreviewColorContainerClass;

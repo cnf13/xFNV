@@ -11,73 +11,73 @@
 NiRTTI NiFloatController::ms_RTTI("NiFloatController", &NiTimeController::ms_RTTI);
 
 NiFloatController::~NiFloatController() {
-	m_spFloatData = nullptr;
+    m_spFloatData = nullptr;
 }
 
 void NiFloatController::LoadBinary(NiStream& stream) {
-	NiTimeController::LoadBinary(stream);
-	stream.ReadLinkID();
+    NiTimeController::LoadBinary(stream);
+    stream.ReadLinkID();
 }
 
 void NiFloatController::LinkObject(NiStream& stream) {
-	NiTimeController::LinkObject(stream);
-	m_spFloatData = static_cast<NiFloatData*>(stream.GetObjectFromLinkID());
+    NiTimeController::LinkObject(stream);
+    m_spFloatData = static_cast<NiFloatData*>(stream.GetObjectFromLinkID());
 }
 
 // The float data is taken to be set.
 bool NiFloatController::RegisterStreamables(NiStream& stream) {
-	if (!NiTimeController::RegisterStreamables(stream)) {
-		return false;
-	}
+    if (!NiTimeController::RegisterStreamables(stream)) {
+        return false;
+    }
 
-	m_spFloatData->RegisterStreamables(stream);
-	return true;
+    m_spFloatData->RegisterStreamables(stream);
+    return true;
 }
 
 void NiFloatController::SaveBinary(NiStream& stream) {
-	NiTimeController::SaveBinary(stream);
-	stream.SaveLinkID(m_spFloatData);
+    NiTimeController::SaveBinary(stream);
+    stream.SaveLinkID(m_spFloatData);
 }
 
 // The float data is taken to be set on both.
 bool NiFloatController::IsEqual(NiObject* pObject) {
-	if (!NiTimeController::IsEqual(pObject)) {
-		return false;
-	}
+    if (!NiTimeController::IsEqual(pObject)) {
+        return false;
+    }
 
-	return m_spFloatData->IsEqual(static_cast<NiFloatController*>(pObject)->m_spFloatData);
+    return m_spFloatData->IsEqual(static_cast<NiFloatController*>(pObject)->m_spFloatData);
 }
 
 void NiFloatController::GetViewerStrings(NiTPrimitiveArray<char*>* pStrings) {
-	NiTimeController::GetViewerStrings(pStrings);
-	pStrings->Add(NiGetViewerString(NiFloatController::ms_RTTI.GetName()));
+    NiTimeController::GetViewerStrings(pStrings);
+    pStrings->Add(NiGetViewerString(NiFloatController::ms_RTTI.GetName()));
 }
 
 void NiFloatController::ProcessClone(NiCloningProcess& kCloning) {
-	NiTimeController::ProcessClone(kCloning);
-	if (m_spFloatData) {
-		m_spFloatData->ProcessClone(kCloning);
-	}
+    NiTimeController::ProcessClone(kCloning);
+    if (m_spFloatData) {
+        m_spFloatData->ProcessClone(kCloning);
+    }
 }
 
 void NiFloatController::CopyMembers(NiFloatController* pDest, NiCloningProcess& kCloning) {
-	NiTimeController::CopyMembers(pDest, kCloning);
+    NiTimeController::CopyMembers(pDest, kCloning);
 
-	if (m_spFloatData) {
-		pDest->m_spFloatData = static_cast<NiFloatData*>(m_spFloatData->CreateClone(kCloning));
-	}
+    if (m_spFloatData) {
+        pDest->m_spFloatData = static_cast<NiFloatData*>(m_spFloatData->CreateClone(kCloning));
+    }
 }
 
 NiFloatKey* NiFloatController::GetAnim(uint32_t& uiNumKeys, NiAnimationKey::KeyType& eType, uint8_t& ucSize) const {
-	if (!m_spFloatData) {
-		uiNumKeys = 0;
-		eType = NiFloatKey::NOINTERP;
-		ucSize = 0;
-		return nullptr;
-	}
+    if (!m_spFloatData) {
+        uiNumKeys = 0;
+        eType = NiFloatKey::NOINTERP;
+        ucSize = 0;
+        return nullptr;
+    }
 
-	uiNumKeys = m_spFloatData->m_uiNumKeys;
-	eType = m_spFloatData->m_eType;
-	ucSize = m_spFloatData->m_ucKeySize;
-	return m_spFloatData->m_pkKeys;
+    uiNumKeys = m_spFloatData->m_uiNumKeys;
+    eType = m_spFloatData->m_eType;
+    ucSize = m_spFloatData->m_ucKeySize;
+    return m_spFloatData->m_pkKeys;
 }

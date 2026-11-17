@@ -6,7 +6,9 @@
 // inline.
 class bhkCharacterStateFlying : public bhkCharacterState {
 public:
-	hkpCharacterStateType getType() const override { return HK_CHARACTER_FLYING; }
-	// Flying does nothing per update.
-	void Update(bhkCharacterController& arController) override {}
+    hkpCharacterStateType getType() const override {
+        return HK_CHARACTER_FLYING;
+    }
+    // Flying does nothing per update.
+    void Update(bhkCharacterController& arController) override {}
 };

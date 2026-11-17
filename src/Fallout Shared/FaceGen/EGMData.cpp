@@ -10,7 +10,8 @@
 
 // The basis key and vectors are read from the .egm file apFileName.
 EGMData::EGMData(char* apFileName) {
-	std::basic_string<char, std::char_traits<char>, std::allocator<char>>
-		kFileName(static_cast<const char*>(apFileName));
-	fffReadEgmFile(kFileName, lEGMBasisKey, EGMBasis[0], EGMBasis[1]);
+    std::basic_string<char, std::char_traits<char>, std::allocator<char>> kFileName(
+        static_cast<const char*>(apFileName)
+    );
+    fffReadEgmFile(kFileName, lEGMBasisKey, EGMBasis[0], EGMBasis[1]);
 }

@@ -16,20 +16,31 @@ const void* getVtablehkaFootstepAnalysisInfoContainer();
 // Owns the footstep-analysis previews for an animation.
 class hkaFootstepAnalysisInfoContainer : public hkReferencedObject {
 public:
-	hkaFootstepAnalysisInfoContainer();
+    hkaFootstepAnalysisInfoContainer();
 
-	hkaFootstepAnalysisInfoContainer(hkFinishLoadedObjectFlag aFlag)
-		: hkReferencedObject(aFlag), m_previewInfo(aFlag) {}
+    hkaFootstepAnalysisInfoContainer(hkFinishLoadedObjectFlag aFlag)
+      : hkReferencedObject(aFlag), m_previewInfo(aFlag) {}
 
-	~hkaFootstepAnalysisInfoContainer() override;
+    ~hkaFootstepAnalysisInfoContainer() override;
 
-	hkaFootstepAnalysisInfo* newPreviewInfo(int32_t numFrames, float duration, float posTol, float velTol,
-		const char* name, const char* nameStrike, const char* nameLift, const char* nameLock, const char* nameUnlock);
+    hkaFootstepAnalysisInfo* newPreviewInfo(
+        int32_t numFrames,
+        float duration,
+        float posTol,
+        float velTol,
+        const char* name,
+        const char* nameStrike,
+        const char* nameLift,
+        const char* nameLock,
+        const char* nameUnlock
+    );
 
-	static const hkClass& staticClass();
-	static void operator delete(void* apMemory) { hkReferencedObject::deleteObject(apMemory); }
+    static const hkClass& staticClass();
+    static void operator delete(void* apMemory) {
+        hkReferencedObject::deleteObject(apMemory);
+    }
 
-	hkArray<hkRefPtr<hkaFootstepAnalysisInfo>> m_previewInfo;
+    hkArray<hkRefPtr<hkaFootstepAnalysisInfo>> m_previewInfo;
 };
 
 extern hkClass hkaFootstepAnalysisInfoContainerClass;

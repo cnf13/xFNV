@@ -7,31 +7,31 @@
 // The bool keys an interpolator samples: one key array plus its interpolation type and key size.
 class NiBoolData : public NiObject {
 public:
-	NiBoolData();
-	~NiBoolData() override;
+    NiBoolData();
+    ~NiBoolData() override;
 
-	const NiRTTI* GetRTTI() const override;
-	void LoadBinary(NiStream& kStream) override;
-	void LinkObject(NiStream& stream) override;
-	bool RegisterStreamables(NiStream& stream) override;
-	void SaveBinary(NiStream& kStream) override;
-	bool IsEqual(NiObject* pkObject) override;
-	void GetViewerStrings(NiTPrimitiveArray<char*>* pStrings) override;
+    const NiRTTI* GetRTTI() const override;
+    void LoadBinary(NiStream& kStream) override;
+    void LinkObject(NiStream& stream) override;
+    bool RegisterStreamables(NiStream& stream) override;
+    void SaveBinary(NiStream& kStream) override;
+    bool IsEqual(NiObject* pkObject) override;
+    void GetViewerStrings(NiTPrimitiveArray<char*>* pStrings) override;
 
-	// Adds keys at afStartTime and afEndTime when the data lacks them.
-	void GuaranteeKeysAtStartAndEnd(float fStartTime, float fEndTime);
-	// A new data object holding only the keys between afStartTime and afEndTime.
-	void GetSequenceData(float fStartTime, float fEndTime, NiPointer<NiBoolData>& aspBoolData);
+    // Adds keys at afStartTime and afEndTime when the data lacks them.
+    void GuaranteeKeysAtStartAndEnd(float fStartTime, float fEndTime);
+    // A new data object holding only the keys between afStartTime and afEndTime.
+    void GetSequenceData(float fStartTime, float fEndTime, NiPointer<NiBoolData>& aspBoolData);
 
-	// Frees the current keys and takes over pkKeys.
-	void ReplaceAnim(NiBoolKey* pkKeys, uint32_t uiNumKeys, NiBoolKey::KeyType eType);
+    // Frees the current keys and takes over pkKeys.
+    void ReplaceAnim(NiBoolKey* pkKeys, uint32_t uiNumKeys, NiBoolKey::KeyType eType);
 
-	static NiObject* CreateObject();
+    static NiObject* CreateObject();
 
-	uint32_t m_uiNumKeys;
-	NiBoolKey* m_pkKeys;
-	NiBoolKey::KeyType m_eType;
-	uint8_t m_ucKeySize;
+    uint32_t m_uiNumKeys;
+    NiBoolKey* m_pkKeys;
+    NiBoolKey::KeyType m_eType;
+    uint8_t m_ucKeySize;
 
-	static NiRTTI ms_RTTI;
+    static NiRTTI ms_RTTI;
 };

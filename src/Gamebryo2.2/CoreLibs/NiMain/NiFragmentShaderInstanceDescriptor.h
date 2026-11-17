@@ -7,13 +7,13 @@
 // m_kMatDesc's string is released at +0x4 by the vector deleting destructor.
 class NiFragmentShaderInstanceDescriptor : public NiShader::NiShaderInstanceDescriptor {
 public:
-	const NiRTTI* GetRTTI() const override;
-	~NiFragmentShaderInstanceDescriptor() override;
+    const NiRTTI* GetRTTI() const override;
+    ~NiFragmentShaderInstanceDescriptor() override;
 
-	// Freed through MemoryManager::Deallocate, not NiMemObject's.
-	static void operator delete(void* apMemory);
+    // Freed through MemoryManager::Deallocate, not NiMemObject's.
+    static void operator delete(void* apMemory);
 
-	NiMaterialDescriptor m_kMatDesc;
+    NiMaterialDescriptor m_kMatDesc;
 
-	static NiRTTI ms_RTTI;
+    static NiRTTI ms_RTTI;
 };

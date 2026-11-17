@@ -4,8 +4,8 @@
 
 class ImageSpaceShaderScanlinesBlend : public ImageSpaceShader {
 public:
-	ImageSpaceShaderScanlinesBlend();
-	~ImageSpaceShaderScanlinesBlend() override;
+    ImageSpaceShaderScanlinesBlend();
+    ~ImageSpaceShaderScanlinesBlend() override;
 
-	void ReloadShaders() override;
+    void ReloadShaders() override;
 };

@@ -6,21 +6,21 @@
 // is the id of the thread that holds it for writing.
 class BSReadWriteLock {
 public:
-	BSReadWriteLock();
+    BSReadWriteLock();
 
-	// Waits until the lock is held for reading.
-	void LockForRead();
-	// Waits until the lock is held for writing.
-	void LockForWrite();
-	// Holds the lock for reading if it is not held for writing.
-	bool TryLockForRead();
-	bool TryLockForWriteAndReserve();
-	void UnlockRead();
-	void UnlockWrite();
-	// Whether the calling thread holds the lock for writing.
-	bool IsWritingThread();
-	bool TryLockForWrite();
+    // Waits until the lock is held for reading.
+    void LockForRead();
+    // Waits until the lock is held for writing.
+    void LockForWrite();
+    // Holds the lock for reading if it is not held for writing.
+    bool TryLockForRead();
+    bool TryLockForWriteAndReserve();
+    void UnlockRead();
+    void UnlockWrite();
+    // Whether the calling thread holds the lock for writing.
+    bool IsWritingThread();
+    bool TryLockForWrite();
 
-	uint32_t uiLock;
-	uint32_t uiWriterThread;
+    uint32_t uiLock;
+    uint32_t uiWriterThread;
 };

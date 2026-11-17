@@ -16,62 +16,62 @@ class hkPackedNiTriStripsShapeCinfo;
 
 // One sub part of a packed triangle-strip mesh: its collision filter, vertex count and material.
 struct SubPartData {
-	uint32_t uiFilter;
-	uint32_t uiNumVerts;
-	HavokMaterialType uiMaterial;
+    uint32_t uiFilter;
+    uint32_t uiNumVerts;
+    HavokMaterialType uiMaterial;
 };
 
 // One triangle of a packed triangle-strip mesh: the three vertex indices and the word the format pads them with. 8
 // bytes: LoadBinary allocates 8 per triangle and keeps only the first 8 bytes of the 0x14-byte records older streams
 // store, and getChildShape indexes paTriData by 8.
 struct TriangleData {
-	uint16_t us1;
-	uint16_t us2;
-	uint16_t us3;
-	uint16_t unused;
+    uint16_t us1;
+    uint16_t us2;
+    uint16_t us3;
+    uint16_t unused;
 };
 
 // One triangle as streams before version 33 store it: the TriangleData and a normal, 0x14 bytes. LoadBinary reads each
 // into a local and keeps the first 8 bytes.
 struct OldTriangleData {
-	uint16_t us1;
-	uint16_t us2;
-	uint16_t us3;
-	uint16_t unused;
-	NiPoint3 vNormal;
+    uint16_t us1;
+    uint16_t us2;
+    uint16_t us3;
+    uint16_t unused;
+    NiPoint3 vNormal;
 };
 
 // The streamed mesh of a packed triangle-strip shape: the triangles, the vertices (plain or compressed) and the
 // sub parts.
 class hkPackedNiTriStripsData : public NiObject {
 public:
-	hkPackedNiTriStripsData();
-	~hkPackedNiTriStripsData() override;
+    hkPackedNiTriStripsData();
+    ~hkPackedNiTriStripsData() override;
 
-	const NiRTTI* GetRTTI() const override;
-	// LoadBinary reads an old stream's triangle record into a local that a short read leaves unwritten, as the game
-	// does.
-	void LoadBinary(NiStream& arStream) override;
-	bool RegisterStreamables(NiStream& arStream) override;
-	void SaveBinary(NiStream& arStream) override;
-	bool IsEqual(NiObject* apObject) override;
+    const NiRTTI* GetRTTI() const override;
+    // LoadBinary reads an old stream's triangle record into a local that a short read leaves unwritten, as the game
+    // does.
+    void LoadBinary(NiStream& arStream) override;
+    bool RegisterStreamables(NiStream& arStream) override;
+    void SaveBinary(NiStream& arStream) override;
+    bool IsEqual(NiObject* apObject) override;
 
-	// An empty mesh: the base object, this class's vtable, every count and pointer cleared.
-	static NiObject* CreateObject();
+    // An empty mesh: the base object, this class's vtable, every count and pointer cleared.
+    static NiObject* CreateObject();
 
-	uint32_t uiKeyCount;
-	uint32_t uiVertCount;
-	uint16_t usPartCount;
-	uint8_t padding12[2];
-	TriangleData* paTriData;
-	NiPoint3* paVertData;
-	// SaveBinary writes paCompressedVertData and paSubPartData, and never touches padding1C.
-	uint8_t padding1C[4];
-	uint16_t* paCompressedVertData;
-	SubPartData* paSubPartData;
-	uint8_t padding28[8];
+    uint32_t uiKeyCount;
+    uint32_t uiVertCount;
+    uint16_t usPartCount;
+    uint8_t padding12[2];
+    TriangleData* paTriData;
+    NiPoint3* paVertData;
+    // SaveBinary writes paCompressedVertData and paSubPartData, and never touches padding1C.
+    uint8_t padding1C[4];
+    uint16_t* paCompressedVertData;
+    SubPartData* paSubPartData;
+    uint8_t padding28[8];
 
-	static NiRTTI ms_RTTI;
+    static NiRTTI ms_RTTI;
 };
 
 NiSmartPointer(hkPackedNiTriStripsData);
@@ -80,40 +80,42 @@ NiSmartPointer(hkPackedNiTriStripsData);
 // computed for it (CalcWorldAabb).
 class hkPackedNiTriStripsShape : public hkpShapeCollection {
 public:
-	// Builds the shape from the creation info of the bhk shape it is made for.
-	hkPackedNiTriStripsShape(const hkPackedNiTriStripsShapeCinfo& arInfo);
-	~hkPackedNiTriStripsShape() override;
+    // Builds the shape from the creation info of the bhk shape it is made for.
+    hkPackedNiTriStripsShape(const hkPackedNiTriStripsShapeCinfo& arInfo);
+    ~hkPackedNiTriStripsShape() override;
 
-	void getAabbImpl(const hkTransform& localToWorld, float tolerance, hkAabb& out) const override;
-	virtual hkpShapeType getType() const;
-	// hkpShapeContainer's vtable at +0x10.
-	uint32_t getFirstKey() const override;
-	// hkpShapeContainer's vtable at +0x10.
-	uint32_t getNextKey(uint32_t aOldKey) const override;
-	// hkpShapeContainer's vtable at +0x10.
-	uint32_t getCollisionFilterInfo(uint32_t aKey) const override;
-	// hkpShapeContainer's vtable at +0x10.
-	const hkpShape* getChildShape(uint32_t aKey, char (&arBuffer)[512]) const override;
+    void getAabbImpl(const hkTransform& localToWorld, float tolerance, hkAabb& out) const override;
+    virtual hkpShapeType getType() const;
+    // hkpShapeContainer's vtable at +0x10.
+    uint32_t getFirstKey() const override;
+    // hkpShapeContainer's vtable at +0x10.
+    uint32_t getNextKey(uint32_t aOldKey) const override;
+    // hkpShapeContainer's vtable at +0x10.
+    uint32_t getCollisionFilterInfo(uint32_t aKey) const override;
+    // hkpShapeContainer's vtable at +0x10.
+    const hkpShape* getChildShape(uint32_t aKey, char (&arBuffer)[512]) const override;
 
-	// Copies the mesh, its radius and its scale into arInfo.
-	void CopyCinfo(hkPackedNiTriStripsShapeCinfo& arInfo) const;
-	void CalcWorldAabb(const hkTransform& localToWorld);
+    // Copies the mesh, its radius and its scale into arInfo.
+    void CopyCinfo(hkPackedNiTriStripsShapeCinfo& arInfo) const;
+    void CalcWorldAabb(const hkTransform& localToWorld);
 
-	// Deleting returns the block to the Havok heap, of the size in m_memSizeAndFlags.
-	static void operator delete(void* apMemory) { hkReferencedObject::deleteObject(apMemory); }
+    // Deleting returns the block to the Havok heap, of the size in m_memSizeAndFlags.
+    static void operator delete(void* apMemory) {
+        hkReferencedObject::deleteObject(apMemory);
+    }
 
-	// hkpShapeCollection ends at 0x18; the transform is 16-byte aligned.
-	uint8_t padding18[8];
-	// CalcWorldAabb stores the transform and the box.
-	hkTransform AabbTransform;
-	hkAabb WorldAabb;
-	float fAabbScale;
-	NiPointer<hkPackedNiTriStripsData> spTriStripsData;
-	uint8_t padding88[8];
-	hkVector4 vScale;
-	float fRadius;
-	// Pads the class to the 16-byte alignment of its vectors.
-	uint8_t paddingA4[12];
+    // hkpShapeCollection ends at 0x18; the transform is 16-byte aligned.
+    uint8_t padding18[8];
+    // CalcWorldAabb stores the transform and the box.
+    hkTransform AabbTransform;
+    hkAabb WorldAabb;
+    float fAabbScale;
+    NiPointer<hkPackedNiTriStripsData> spTriStripsData;
+    uint8_t padding88[8];
+    hkVector4 vScale;
+    float fRadius;
+    // Pads the class to the 16-byte alignment of its vectors.
+    uint8_t paddingA4[12];
 };
 
 // The byte-swap size list (one entry, 4) for the vertex and sub part reads in hkPackedNiTriStripsData::LoadBinary.

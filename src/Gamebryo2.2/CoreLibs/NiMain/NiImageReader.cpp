@@ -9,5 +9,5 @@ NiImageReader::NiImageReader() {}
 NiImageReader::~NiImageReader() {}
 
 void NiImageReader::operator delete(void* apMemory) {
-	MemoryManager_Singleton.Deallocate(apMemory);
+    MemoryManager_Singleton.Deallocate(apMemory);
 }

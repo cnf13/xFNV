@@ -13,20 +13,22 @@ hkReferencedObject* hkTypeInfoRegistrycreate();
 // declared.
 class hkTypeInfoRegistry : public hkReferencedObject, public hkSingleton<hkTypeInfoRegistry> {
 public:
-	hkTypeInfoRegistry() { m_finishFlag.m_finishing = 1; }
-	~hkTypeInfoRegistry() override;
+    hkTypeInfoRegistry() {
+        m_finishFlag.m_finishing = 1;
+    }
+    ~hkTypeInfoRegistry() override;
 
-	virtual void registerTypeInfo(const hkTypeInfo* info);
-	virtual const hkTypeInfo* finishLoadedObject(void* obj, const char* className) const;
-	virtual const hkTypeInfo* cleanupLoadedObject(void* obj, const char* className) const;
-	virtual void merge(const hkTypeInfoRegistry& mergeFrom);
-	virtual const hkTypeInfo* getTypeInfo(const char* typeName) const;
+    virtual void registerTypeInfo(const hkTypeInfo* info);
+    virtual const hkTypeInfo* finishLoadedObject(void* obj, const char* className) const;
+    virtual const hkTypeInfo* cleanupLoadedObject(void* obj, const char* className) const;
+    virtual void merge(const hkTypeInfoRegistry& mergeFrom);
+    virtual const hkTypeInfo* getTypeInfo(const char* typeName) const;
 
-	hkStringMap<const hkTypeInfo*> m_map;
-	// The flag the finish functions get.
-	hkFinishLoadedObjectFlag m_finishFlag;
+    hkStringMap<const hkTypeInfo*> m_map;
+    // The flag the finish functions get.
+    hkFinishLoadedObjectFlag m_finishFlag;
 
-	// hkSingleton<hkTypeInfoRegistry>::s_instance.
-	static inline hkTypeInfoRegistry* s_instance;
+    // hkSingleton<hkTypeInfoRegistry>::s_instance.
+    static inline hkTypeInfoRegistry* s_instance;
 };
 inline constexpr fnvd::Vtable hkTypeInfoRegistry_vftable{};

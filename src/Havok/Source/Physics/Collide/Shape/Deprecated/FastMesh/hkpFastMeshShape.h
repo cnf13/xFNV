@@ -10,17 +10,17 @@
 // key as the triangle index (getChildShape). It adds no fields; getChildShape is its only override.
 class hkpFastMeshShape : public hkpMeshShape {
 public:
-	hkpFastMeshShape(hkFinishLoadedObjectFlag aFlag) : hkpMeshShape(aFlag) {
-		if (aFlag.m_finishing) {
-			m_type.m_storage = HK_SHAPE_TRIANGLE_COLLECTION;
-		}
-	}
+    hkpFastMeshShape(hkFinishLoadedObjectFlag aFlag) : hkpMeshShape(aFlag) {
+        if (aFlag.m_finishing) {
+            m_type.m_storage = HK_SHAPE_TRIANGLE_COLLECTION;
+        }
+    }
 
-	hkpFastMeshShape(float radius, int32_t numBitsForSubpartIndex) : hkpMeshShape(radius, numBitsForSubpartIndex) {}
+    hkpFastMeshShape(float radius, int32_t numBitsForSubpartIndex) : hkpMeshShape(radius, numBitsForSubpartIndex) {}
 
-	const hkpShape* getChildShape(uint32_t key, char (&buffer)[512]) const override;
+    const hkpShape* getChildShape(uint32_t key, char (&buffer)[512]) const override;
 
-	static const hkClass& staticClass();
+    static const hkClass& staticClass();
 };
 
 extern hkClass hkpFastMeshShapeClass;

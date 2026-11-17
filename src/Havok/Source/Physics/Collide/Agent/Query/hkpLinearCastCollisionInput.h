@@ -9,8 +9,8 @@ class hkpCollisionAgentConfig;
 // length and the agent configuration. Not polymorphic.
 class hkpLinearCastCollisionInput : public hkpCollisionInput {
 public:
-	hkVector4 m_path;
-	float m_maxExtraPenetration;
-	float m_cachedPathLength;
-	hkpCollisionAgentConfig* m_config;
+    hkVector4 m_path;
+    float m_maxExtraPenetration;
+    float m_cachedPathLength;
+    hkpCollisionAgentConfig* m_config;
 };

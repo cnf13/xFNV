@@ -6,18 +6,20 @@
 // LoadGame are overridden.
 class PathingRequestFlee : public PathingRequest {
 public:
-	PathingRequestFlee();
-	// From Construct_006E5400.
-	PathingRequestFlee(const PathingRequestFlee& aRequest);
-	~PathingRequestFlee() override;
+    PathingRequestFlee();
+    // From Construct_006E5400.
+    PathingRequestFlee(const PathingRequestFlee& aRequest);
+    ~PathingRequestFlee() override;
 
-	void CopyTo(PathingRequest* apDest) const override;
-	uint32_t GetType() const override;
-	void SaveGame(BGSSaveFormBuffer* apSaveGameBuffer) override;
-	void LoadGame(BGSLoadFormBuffer* apLoadGameBuffer) override;
+    void CopyTo(PathingRequest* apDest) const override;
+    uint32_t GetType() const override;
+    void SaveGame(BGSSaveFormBuffer* apSaveGameBuffer) override;
+    void LoadGame(BGSLoadFormBuffer* apLoadGameBuffer) override;
 
-	void SetMinFleeDistance(float afDistance);
-	float GetMinFleeDistance() const { return fMinFleeDistance; }
+    void SetMinFleeDistance(float afDistance);
+    float GetMinFleeDistance() const {
+        return fMinFleeDistance;
+    }
 
-	float fMinFleeDistance;
+    float fMinFleeDistance;
 };

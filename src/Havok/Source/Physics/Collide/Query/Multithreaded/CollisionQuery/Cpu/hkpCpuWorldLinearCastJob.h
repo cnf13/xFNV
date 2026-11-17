@@ -17,38 +17,40 @@ hkJobQueue::JobStatus hkCpuWorldLinearCastJob(hkJobQueue& jobQueue, hkJobQueue::
 // The collector of the CPU world linear cast job: it receives the broad phase handles, k-d tree hits or AABB tree
 // leaves the cast reaches and casts the collidable against each of them into the fixed buffer point collector.
 class hkCpuWorldLinearCastCollector
-	: public hkpBroadPhaseCastCollector,
-	  public hkKdTreeCastCollector,
-	  public hkAabbTreeQueryUtils<hkAabbTreeData::hkAabbTreeAabb, uint16_t>::Collector,
-	  public hkAabbTreeQueryUtils<hkAabbTreeData::hkAabbTreeAabb16, uint16_t>::Collector {
+  : public hkpBroadPhaseCastCollector,
+    public hkKdTreeCastCollector,
+    public hkAabbTreeQueryUtils<hkAabbTreeData::hkAabbTreeAabb, uint16_t>::Collector,
+    public hkAabbTreeQueryUtils<hkAabbTreeData::hkAabbTreeAabb16, uint16_t>::Collector {
 public:
-	// hkpLinearCastCollisionInput's constructor: the penetration starts at HK_REAL_EPSILON.
-	hkCpuWorldLinearCastCollector() { m_input.m_maxExtraPenetration = 1.1920929e-07f; }
-	~hkCpuWorldLinearCastCollector() override;
+    // hkpLinearCastCollisionInput's constructor: the penetration starts at HK_REAL_EPSILON.
+    hkCpuWorldLinearCastCollector() {
+        m_input.m_maxExtraPenetration = 1.1920929e-07f;
+    }
+    ~hkCpuWorldLinearCastCollector() override;
 
-	float addBroadPhaseHandle(const hkpBroadPhaseHandle* broadPhaseHandle, int32_t castIndex) override;
-	// hkKdTreeCastCollector's vtable at +0x4. Casts against the collidable primitiveId and reports a hit.
-	hkBool* addMidPhaseHit(hkBool* arResult, hkPrimitiveId primitiveId) override;
-	// hkKdTreeCastCollector's vtable at +0x4.
-	hkBool* hasHit(hkBool* arResult) override;
-	// hkKdTreeCastCollector's vtable at +0x4.
-	float getHitFraction() override;
-	// hkAabbTreeQueryUtils<hkAabbTreeAabb, uint16_t>::Collector's vtable at +0x8.
-	float addLeaf(const hkAabbTree<hkAabbTreeData::hkAabbTreeAabb, uint16_t>::Node* leaf) override;
-	// hkAabbTreeQueryUtils<hkAabbTreeAabb16, uint16_t>::Collector's vtable at +0xc.
-	float addLeaf(const hkAabbTree<hkAabbTreeData::hkAabbTreeAabb16, uint16_t>::Node* leaf) override;
+    float addBroadPhaseHandle(const hkpBroadPhaseHandle* broadPhaseHandle, int32_t castIndex) override;
+    // hkKdTreeCastCollector's vtable at +0x4. Casts against the collidable primitiveId and reports a hit.
+    hkBool* addMidPhaseHit(hkBool* arResult, hkPrimitiveId primitiveId) override;
+    // hkKdTreeCastCollector's vtable at +0x4.
+    hkBool* hasHit(hkBool* arResult) override;
+    // hkKdTreeCastCollector's vtable at +0x4.
+    float getHitFraction() override;
+    // hkAabbTreeQueryUtils<hkAabbTreeAabb, uint16_t>::Collector's vtable at +0x8.
+    float addLeaf(const hkAabbTree<hkAabbTreeData::hkAabbTreeAabb, uint16_t>::Node* leaf) override;
+    // hkAabbTreeQueryUtils<hkAabbTreeAabb16, uint16_t>::Collector's vtable at +0xc.
+    float addLeaf(const hkAabbTree<hkAabbTreeData::hkAabbTreeAabb16, uint16_t>::Node* leaf) override;
 
-	// Casts m_collidable against collidable unless it is the cast's own or has no shape; returns the early-out
-	// fraction.
-	float testCollidable(const hkpCollidable* collidable);
+    // Casts m_collidable against collidable unless it is the cast's own or has no shape; returns the early-out
+    // fraction.
+    float testCollidable(const hkpCollidable* collidable);
 
-	// DeletingDestruct's free (the thread's Havok heap, blockFree with the object's size); it also settles the four
-	// bases' own.
-	static void operator delete(void* apMemory);
+    // DeletingDestruct's free (the thread's Havok heap, blockFree with the object's size); it also settles the four
+    // bases' own.
+    static void operator delete(void* apMemory);
 
-	const hkpGroupFilter* m_filter;
-	hkpFixedBufferCdPointCollector* m_castCollector;
-	const hkpCollidable* m_collidable;
-	hkpShapeType m_shapeType;
-	hkpLinearCastCollisionInput m_input;
+    const hkpGroupFilter* m_filter;
+    hkpFixedBufferCdPointCollector* m_castCollector;
+    const hkpCollidable* m_collidable;
+    hkpShapeType m_shapeType;
+    hkpLinearCastCollisionInput m_input;
 };

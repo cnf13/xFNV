@@ -4,8 +4,8 @@
 
 class ImageSpaceShaderRadialBlurMedium : public ImageSpaceShader {
 public:
-	ImageSpaceShaderRadialBlurMedium();
-	~ImageSpaceShaderRadialBlurMedium() override;
+    ImageSpaceShaderRadialBlurMedium();
+    ~ImageSpaceShaderRadialBlurMedium() override;
 
-	void ReloadShaders() override;
+    void ReloadShaders() override;
 };

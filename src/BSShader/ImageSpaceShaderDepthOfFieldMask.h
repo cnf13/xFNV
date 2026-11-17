@@ -4,8 +4,8 @@
 
 class ImageSpaceShaderDepthOfFieldMask : public ImageSpaceShader {
 public:
-	ImageSpaceShaderDepthOfFieldMask();
-	~ImageSpaceShaderDepthOfFieldMask() override;
+    ImageSpaceShaderDepthOfFieldMask();
+    ~ImageSpaceShaderDepthOfFieldMask() override;
 
-	void ReloadShaders() override;
+    void ReloadShaders() override;
 };

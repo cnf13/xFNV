@@ -7,20 +7,45 @@
 // The reflected members of hkpSerializedDisplayMarkerList.
 using hkpSerializedDisplayMarkerListClass_MembersArray = const hkClassMember[1];
 static hkpSerializedDisplayMarkerListClass_MembersArray hkpSerializedDisplayMarkerListClass_Members{
-	{"markers", &hkpSerializedDisplayMarkerClass, nullptr, {hkClassMember::TYPE_ARRAY}, {hkClassMember::TYPE_POINTER},
-		0, 0, 0x8, nullptr}};
+    {"markers",
+     &hkpSerializedDisplayMarkerClass,
+     nullptr,
+     {hkClassMember::TYPE_ARRAY},
+     {hkClassMember::TYPE_POINTER},
+     0,
+     0,
+     0x8,
+     nullptr}
+};
 
-hkClass hkpSerializedDisplayMarkerListClass("hkpSerializedDisplayMarkerList", &hkReferencedObjectClass, 20, nullptr, 0,
-	nullptr, 0, hkpSerializedDisplayMarkerListClass_Members, 1, nullptr, nullptr, 0, 0);
-hkTypeInfo hkpSerializedDisplayMarkerListTypeInfo = {"hkpSerializedDisplayMarkerList",
-	finishLoadedObjecthkpSerializedDisplayMarkerList, cleanupLoadedObjecthkpSerializedDisplayMarkerList,
-	getVtablehkpSerializedDisplayMarkerList(), &typeid(hkpSerializedDisplayMarkerList),
-	sizeof(hkpSerializedDisplayMarkerList)};
+hkClass hkpSerializedDisplayMarkerListClass(
+    "hkpSerializedDisplayMarkerList",
+    &hkReferencedObjectClass,
+    20,
+    nullptr,
+    0,
+    nullptr,
+    0,
+    hkpSerializedDisplayMarkerListClass_Members,
+    1,
+    nullptr,
+    nullptr,
+    0,
+    0
+);
+hkTypeInfo hkpSerializedDisplayMarkerListTypeInfo = {
+    "hkpSerializedDisplayMarkerList",
+    finishLoadedObjecthkpSerializedDisplayMarkerList,
+    cleanupLoadedObjecthkpSerializedDisplayMarkerList,
+    getVtablehkpSerializedDisplayMarkerList(),
+    &typeid(hkpSerializedDisplayMarkerList),
+    sizeof(hkpSerializedDisplayMarkerList)
+};
 
 const void* getVtablehkpSerializedDisplayMarkerList() {
-	return hkGetVtableOf<hkpSerializedDisplayMarkerList>();
+    return hkGetVtableOf<hkpSerializedDisplayMarkerList>();
 }
 
 void cleanupLoadedObjecthkpSerializedDisplayMarkerList(void* p) {
-	static_cast<hkpSerializedDisplayMarkerList*>(p)->~hkpSerializedDisplayMarkerList();
+    static_cast<hkpSerializedDisplayMarkerList*>(p)->~hkpSerializedDisplayMarkerList();
 }

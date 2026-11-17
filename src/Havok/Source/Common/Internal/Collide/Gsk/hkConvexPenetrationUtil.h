@@ -17,29 +17,33 @@ void randomVector(float a1, float a2, int32_t r_eax, float* r_edx);
 // hkGskOut, with the distance in m_normalInA's w.
 class hkConvexPenetrationUtil {
 public:
-	// The point of the Minkowski difference furthest along direction, with the support points of A (along direction)
-	// and B (along the negated direction, in B's space) it came from, through each shape's getSupportingVertex.
-	void getPointForSimplex(const hkVector4& direction, hkWingedEdge::Vertex& result);
-	// builtTetrahedron calls addPointToSimplex.
-	void addPointToSimplex(const hkWingedEdge::Vertex& p);
-	// Through getPointForSimplex: the larger of the two distances goes in all four lanes of *apBestDistanceOut, which
-	// is also returned.
-	hkVector4* findBestProjection(hkVector4* apBestDistanceOut, const hkVector4& direction, const hkVector4& from,
-		hkWingedEdge::Vertex& result);
-	// Grows the simplex to a tetrahedron around the origin (HK_SUCCESS), or writes output itself (HK_FAILURE, gjkStatus
-	// OK); gjkStatus 5 where it cannot.
-	hkResult builtTetrahedron(hkGskOut& output, hkGskStatus& gjkStatus);
-	// Works through builtTetrahedron and hkWingedEdge.
-	hkGskStatus calculatePenetrationDepth(hkGskOut& output);
+    // The point of the Minkowski difference furthest along direction, with the support points of A (along direction)
+    // and B (along the negated direction, in B's space) it came from, through each shape's getSupportingVertex.
+    void getPointForSimplex(const hkVector4& direction, hkWingedEdge::Vertex& result);
+    // builtTetrahedron calls addPointToSimplex.
+    void addPointToSimplex(const hkWingedEdge::Vertex& p);
+    // Through getPointForSimplex: the larger of the two distances goes in all four lanes of *apBestDistanceOut, which
+    // is also returned.
+    hkVector4* findBestProjection(
+        hkVector4* apBestDistanceOut,
+        const hkVector4& direction,
+        const hkVector4& from,
+        hkWingedEdge::Vertex& result
+    );
+    // Grows the simplex to a tetrahedron around the origin (HK_SUCCESS), or writes output itself (HK_FAILURE, gjkStatus
+    // OK); gjkStatus 5 where it cannot.
+    hkResult builtTetrahedron(hkGskOut& output, hkGskStatus& gjkStatus);
+    // Works through builtTetrahedron and hkWingedEdge.
+    hkGskStatus calculatePenetrationDepth(hkGskOut& output);
 
-	hkTransform m_aTb;
-	hkVector4 m_epsTol;
-	hkPadSpu<float> m_epsTolSqrd;
-	hkPadSpu<const hkGskShape*> m_shapeA;
-	hkPadSpu<const hkGskShape*> m_shapeB;
-	hkPadSpu<int32_t> m_backupTries;
-	hkPadSpu<hkVector4*> m_pointsAinA;
-	hkPadSpu<hkVector4*> m_pointsBinB;
-	hkPadSpu<hkVector4*> m_simplex;
-	hkPadSpu<int32_t> m_simplexSize;
+    hkTransform m_aTb;
+    hkVector4 m_epsTol;
+    hkPadSpu<float> m_epsTolSqrd;
+    hkPadSpu<const hkGskShape*> m_shapeA;
+    hkPadSpu<const hkGskShape*> m_shapeB;
+    hkPadSpu<int32_t> m_backupTries;
+    hkPadSpu<hkVector4*> m_pointsAinA;
+    hkPadSpu<hkVector4*> m_pointsBinB;
+    hkPadSpu<hkVector4*> m_simplex;
+    hkPadSpu<int32_t> m_simplexSize;
 };

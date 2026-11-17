@@ -10,13 +10,18 @@ class hkpShapeCollection;
 // removes it. Only the destructor is overridden.
 class hkScaledMoppBvTreeShape : public hkpMoppBvTreeShape {
 public:
-	// The constructor over apCode, keeping a reference to the unscaled apOriginal.
-	hkScaledMoppBvTreeShape(const hkpShapeCollection* apCollection, const hkpMoppCode* apCode,
-		const hkpMoppCode* apOriginal);
-	~hkScaledMoppBvTreeShape() override;
+    // The constructor over apCode, keeping a reference to the unscaled apOriginal.
+    hkScaledMoppBvTreeShape(
+        const hkpShapeCollection* apCollection,
+        const hkpMoppCode* apCode,
+        const hkpMoppCode* apOriginal
+    );
+    ~hkScaledMoppBvTreeShape() override;
 
-	// Deleting returns the block to the Havok heap, of the size in m_memSizeAndFlags.
-	static void operator delete(void* apMemory) { hkReferencedObject::deleteObject(apMemory); }
+    // Deleting returns the block to the Havok heap, of the size in m_memSizeAndFlags.
+    static void operator delete(void* apMemory) {
+        hkReferencedObject::deleteObject(apMemory);
+    }
 
-	const hkpMoppCode* pOriginalCode;
+    const hkpMoppCode* pOriginalCode;
 };

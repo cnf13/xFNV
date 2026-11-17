@@ -6,5 +6,5 @@
 // no virtual.
 class CombatActionInvestigate : public CombatAction {
 public:
-	CombatActionInvestigate(CombatAction::COMBAT_ACTION aeType);
+    CombatActionInvestigate(CombatAction::COMBAT_ACTION aeType);
 };

@@ -18,94 +18,97 @@
 
 namespace audio::ds {
 
-namespace {
+    namespace {
 
-struct Vector {
-	float x;
-	float y;
-	float z;
-};
+        struct Vector {
+            float x;
+            float y;
+            float z;
+        };
 
-Vector From(const D3DVECTOR& v) {
-	return Vector{v.x, v.y, v.z};
-}
+        Vector From(const D3DVECTOR& v) {
+            return Vector{v.x, v.y, v.z};
+        }
 
-Vector Minus(Vector a, Vector b) {
-	return Vector{a.x - b.x, a.y - b.y, a.z - b.z};
-}
+        Vector Minus(Vector a, Vector b) {
+            return Vector{a.x - b.x, a.y - b.y, a.z - b.z};
+        }
 
-Vector Scaled(Vector a, float s) {
-	return Vector{a.x * s, a.y * s, a.z * s};
-}
+        Vector Scaled(Vector a, float s) {
+            return Vector{a.x * s, a.y * s, a.z * s};
+        }
 
-float Dot(Vector a, Vector b) {
-	return a.x * b.x + a.y * b.y + a.z * b.z;
-}
+        float Dot(Vector a, Vector b) {
+            return a.x * b.x + a.y * b.y + a.z * b.z;
+        }
 
-// DirectSound's axes are left-handed (x right, y up, z ahead): right = top x front.
-Vector Cross(Vector a, Vector b) {
-	return Vector{a.y * b.z - a.z * b.y, a.z * b.x - a.x * b.z, a.x * b.y - a.y * b.x};
-}
+        // DirectSound's axes are left-handed (x right, y up, z ahead): right = top x front.
+        Vector Cross(Vector a, Vector b) {
+            return Vector{a.y * b.z - a.z * b.y, a.z * b.x - a.x * b.z, a.x * b.y - a.y * b.x};
+        }
 
-float Length(Vector a) {
-	return std::sqrt(Dot(a, a));
-}
+        float Length(Vector a) {
+            return std::sqrt(Dot(a, a));
+        }
 
-Vector Normalised(Vector a, Vector fallback) {
-	const float length = Length(a);
-	return length > 1e-12f ? Scaled(a, 1.0f / length) : fallback;
-}
+        Vector Normalised(Vector a, Vector fallback) {
+            const float length = Length(a);
+            return length > 1e-12f ? Scaled(a, 1.0f / length) : fallback;
+        }
 
-constexpr float kSpeedOfSound = 343.3f;
+        constexpr float kSpeedOfSound = 343.3f;
 
-} // namespace
+    } // namespace
 
-Spatial Compute(const ListenerParams& listener, const SourceParams& source, bool muteAtMax) {
-	Spatial out;
-	if (source.mode == DS3DMODE_DISABLE) {
-		return out;
-	}
-	// The listener's axes: front, top made perpendicular to it, right.
-	Vector front = Normalised(From(listener.front), Vector{0.0f, 0.0f, 1.0f});
-	Vector top = From(listener.top);
-	top = Normalised(Minus(top, Scaled(front, Dot(top, front))), Vector{0.0f, 1.0f, 0.0f});
-	Vector right = Normalised(Cross(top, front), Vector{1.0f, 0.0f, 0.0f});
-	Vector offset;
-	Vector listenerVelocity;
-	if (source.mode == DS3DMODE_HEADRELATIVE) {
-		offset = From(source.position);
-		front = Vector{0.0f, 0.0f, 1.0f};
-		right = Vector{1.0f, 0.0f, 0.0f};
-		listenerVelocity = Vector{0.0f, 0.0f, 0.0f};
-	} else {
-		offset = Minus(From(source.position), From(listener.position));
-		listenerVelocity = From(listener.velocity);
-	}
-	const float distance = Length(offset);
+    Spatial Compute(const ListenerParams& listener, const SourceParams& source, bool muteAtMax) {
+        Spatial out;
+        if (source.mode == DS3DMODE_DISABLE) {
+            return out;
+        }
+        // The listener's axes: front, top made perpendicular to it, right.
+        Vector front = Normalised(From(listener.front), Vector{0.0f, 0.0f, 1.0f});
+        Vector top = From(listener.top);
+        top = Normalised(Minus(top, Scaled(front, Dot(top, front))), Vector{0.0f, 1.0f, 0.0f});
+        Vector right = Normalised(Cross(top, front), Vector{1.0f, 0.0f, 0.0f});
+        Vector offset;
+        Vector listenerVelocity;
+        if (source.mode == DS3DMODE_HEADRELATIVE) {
+            offset = From(source.position);
+            front = Vector{0.0f, 0.0f, 1.0f};
+            right = Vector{1.0f, 0.0f, 0.0f};
+            listenerVelocity = Vector{0.0f, 0.0f, 0.0f};
+        }
+        else {
+            offset = Minus(From(source.position), From(listener.position));
+            listenerVelocity = From(listener.velocity);
+        }
+        const float distance = Length(offset);
 
-	const float minDistance = source.minDistance;
-	const float maxDistance = std::max(source.maxDistance, minDistance);
-	if (muteAtMax && distance > maxDistance) {
-		out.gain = 0.0f;
-	} else {
-		const float clamped = std::clamp(distance, minDistance, maxDistance);
-		out.gain = minDistance / (minDistance + listener.rolloffFactor * (clamped - minDistance));
-	}
+        const float minDistance = source.minDistance;
+        const float maxDistance = std::max(source.maxDistance, minDistance);
+        if (muteAtMax && distance > maxDistance) {
+            out.gain = 0.0f;
+        }
+        else {
+            const float clamped = std::clamp(distance, minDistance, maxDistance);
+            out.gain = minDistance / (minDistance + listener.rolloffFactor * (clamped - minDistance));
+        }
 
-	if (distance > 1e-6f) {
-		const float side = std::clamp(Dot(offset, right) / distance, -1.0f, 1.0f);
-		const float farPower = 1.0f - std::fabs(side);
-		const float attenuation = farPower > 1e-10f ? std::min(-1000.0f * std::log10(farPower), 10000.0f) : 10000.0f;
-		out.pan = static_cast<int32_t>(std::lround(side < 0.0f ? -attenuation : attenuation));
-		// Doppler along the line from the source to the listener.
-		const Vector toListener = Scaled(offset, -1.0f / distance);
-		const float scale = listener.distanceFactor * listener.dopplerFactor;
-		const float limit = kSpeedOfSound * 0.5f;
-		const float sourceSpeed = std::clamp(Dot(From(source.velocity), toListener) * scale, -limit, limit);
-		const float listenerSpeed = std::clamp(Dot(listenerVelocity, toListener) * scale, -limit, limit);
-		out.ratio = (kSpeedOfSound - listenerSpeed) / (kSpeedOfSound - sourceSpeed);
-	}
-	return out;
-}
+        if (distance > 1e-6f) {
+            const float side = std::clamp(Dot(offset, right) / distance, -1.0f, 1.0f);
+            const float farPower = 1.0f - std::fabs(side);
+            const float attenuation =
+                farPower > 1e-10f ? std::min(-1000.0f * std::log10(farPower), 10000.0f) : 10000.0f;
+            out.pan = static_cast<int32_t>(std::lround(side < 0.0f ? -attenuation : attenuation));
+            // Doppler along the line from the source to the listener.
+            const Vector toListener = Scaled(offset, -1.0f / distance);
+            const float scale = listener.distanceFactor * listener.dopplerFactor;
+            const float limit = kSpeedOfSound * 0.5f;
+            const float sourceSpeed = std::clamp(Dot(From(source.velocity), toListener) * scale, -limit, limit);
+            const float listenerSpeed = std::clamp(Dot(listenerVelocity, toListener) * scale, -limit, limit);
+            out.ratio = (kSpeedOfSound - listenerSpeed) / (kSpeedOfSound - sourceSpeed);
+        }
+        return out;
+    }
 
 } // namespace audio::ds

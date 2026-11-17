@@ -7,7 +7,7 @@
 #include "Gamebryo2.2/CoreLibs/NiMain/NiTArray.h"
 
 ImageSpaceShaderAlphaMult::ImageSpaceShaderAlphaMult() {
-	pTextures.SetSize(2u);
+    pTextures.SetSize(2u);
 }
 
 ImageSpaceShaderAlphaMult::~ImageSpaceShaderAlphaMult() {}

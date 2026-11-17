@@ -12,31 +12,31 @@ class ImageSpaceShaderParam;
 // texture.
 class FOHUDEffectManager {
 public:
-	FOHUDEffectManager();
-	~FOHUDEffectManager();
+    FOHUDEffectManager();
+    ~FOHUDEffectManager();
 
-	void SetScanlineFrequencyHUD(float abFrequency);
-	void SetBlurRadiusHUD(float abRadius);
-	void SetBlurIntensityHUD(float abIntensity);
-	void TriggerShudder(float a2, float a3, float a4);
-	void UpdateShudder(float afTime);
-	void OnIdle();
-	BGSMenuPacker* GetPacker();
-	void TriggerShudder_007F78F0(const NiPoint2& aDuration, const NiPoint2& aIntensity, const NiPoint2& aFrequency);
+    void SetScanlineFrequencyHUD(float abFrequency);
+    void SetBlurRadiusHUD(float abRadius);
+    void SetBlurIntensityHUD(float abIntensity);
+    void TriggerShudder(float a2, float a3, float a4);
+    void UpdateShudder(float afTime);
+    void OnIdle();
+    BGSMenuPacker* GetPacker();
+    void TriggerShudder_007F78F0(const NiPoint2& aDuration, const NiPoint2& aIntensity, const NiPoint2& aFrequency);
 
-	NiPointer<NiScreenElements> spPartialScreenGeometry;
-	BGSMenuPacker Packer;
-	bool bShudderActive;
-	float fShudderStartTime;
-	NiPoint2 ShudderDuration;
-	NiPoint2 ShudderIntensity;
-	NiPoint2 ShudderFrequency;
-	NiPoint2 ShudderCurrentPosition;
-	ImageSpaceShaderParam* pUnpackShaderParams;
-	bool bHideHUD;
-	float fCurrentBlurRadiusHUD;
-	float fCurrentScanlineFrequencyHUD;
-	float fCurrentBlurIntensityHUD;
+    NiPointer<NiScreenElements> spPartialScreenGeometry;
+    BGSMenuPacker Packer;
+    bool bShudderActive;
+    float fShudderStartTime;
+    NiPoint2 ShudderDuration;
+    NiPoint2 ShudderIntensity;
+    NiPoint2 ShudderFrequency;
+    NiPoint2 ShudderCurrentPosition;
+    ImageSpaceShaderParam* pUnpackShaderParams;
+    bool bHideHUD;
+    float fCurrentBlurRadiusHUD;
+    float fCurrentScanlineFrequencyHUD;
+    float fCurrentBlurIntensityHUD;
 };
 
 // The game settings FOHUDEffectManager.cpp defines.

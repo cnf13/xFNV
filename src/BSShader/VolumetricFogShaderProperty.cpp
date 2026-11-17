@@ -10,8 +10,8 @@ NiRTTI VolumetricFogShaderProperty::ms_RTTI("VolumetricFogShaderProperty", &BSSh
 
 // The fog is white with a density of 100.
 VolumetricFogShaderProperty::VolumetricFogShaderProperty()
-	: FogProps(NiColorA_WHITE.r, NiColorA_WHITE.g, NiColorA_WHITE.b, 100.0f) {
-	iShaderPropertyType = 22;
+  : FogProps(NiColorA_WHITE.r, NiColorA_WHITE.g, NiColorA_WHITE.b, 100.0f) {
+    iShaderPropertyType = 22;
 }
 
 VolumetricFogShaderProperty::~VolumetricFogShaderProperty() {}
@@ -19,67 +19,68 @@ VolumetricFogShaderProperty::~VolumetricFogShaderProperty() {}
 // CopyMembers still runs when the allocation failed, with a null destination, as the game does; the fog colour is
 // copied afterwards, so it dereferences null there too.
 NiObject* VolumetricFogShaderProperty::CreateClone(NiCloningProcess& arCloneData) {
-	VolumetricFogShaderProperty* pClone =
-		static_cast<VolumetricFogShaderProperty*>(NiMemObject::operator new(sizeof(VolumetricFogShaderProperty)));
-	if (pClone) {
-		pClone = ::new (pClone) VolumetricFogShaderProperty;
-	}
-	CopyMembers(pClone, arCloneData);
-	pClone->FogProps.r = FogProps.r;
-	pClone->FogProps.g = FogProps.g;
-	pClone->FogProps.b = FogProps.b;
-	pClone->FogProps.a = FogProps.a;
-	return pClone;
+    VolumetricFogShaderProperty* pClone =
+        static_cast<VolumetricFogShaderProperty*>(NiMemObject::operator new(sizeof(VolumetricFogShaderProperty)));
+    if (pClone) {
+        pClone = ::new (pClone) VolumetricFogShaderProperty;
+    }
+    CopyMembers(pClone, arCloneData);
+    pClone->FogProps.r = FogProps.r;
+    pClone->FogProps.g = FogProps.g;
+    pClone->FogProps.b = FogProps.b;
+    pClone->FogProps.a = FogProps.a;
+    return pClone;
 }
 
 void VolumetricFogShaderProperty::LoadBinary(NiStream& kStream) {
-	BSShaderProperty::LoadBinary(kStream);
-	FogProps.LoadBinary(kStream);
+    BSShaderProperty::LoadBinary(kStream);
+    FogProps.LoadBinary(kStream);
 }
 
 void VolumetricFogShaderProperty::LinkObject(NiStream& kStream) {
-	BSShaderProperty::LinkObject(kStream);
+    BSShaderProperty::LinkObject(kStream);
 }
 
 bool VolumetricFogShaderProperty::RegisterStreamables(NiStream& kStream) {
-	return BSShaderProperty::RegisterStreamables(kStream);
+    return BSShaderProperty::RegisterStreamables(kStream);
 }
 
 void VolumetricFogShaderProperty::SaveBinary(NiStream& kStream) {
-	BSShaderProperty::SaveBinary(kStream);
-	FogProps.SaveBinary(kStream);
+    BSShaderProperty::SaveBinary(kStream);
+    FogProps.SaveBinary(kStream);
 }
 
 // The type of pkObject is not checked before the cast, as the game does.
 bool VolumetricFogShaderProperty::IsEqual(NiObject* pkObject) {
-	if (static_cast<VolumetricFogShaderProperty*>(pkObject)->FogProps != FogProps)
-		return false;
-	return BSShaderProperty::IsEqual(pkObject);
+    if (static_cast<VolumetricFogShaderProperty*>(pkObject)->FogProps != FogProps) {
+        return false;
+    }
+    return BSShaderProperty::IsEqual(pkObject);
 }
 
 void VolumetricFogShaderProperty::GetViewerStrings(NiTPrimitiveArray<char*>* apStrings) {
-	BSShaderProperty::GetViewerStrings(apStrings);
-	apStrings->Add(NiGetViewerString(VolumetricFogShaderProperty::ms_RTTI.GetName()));
-	apStrings->Add(FogProps.GetViewerString("FogProps"));
+    BSShaderProperty::GetViewerStrings(apStrings);
+    apStrings->Add(NiGetViewerString(VolumetricFogShaderProperty::ms_RTTI.GetName()));
+    apStrings->Add(FogProps.GetViewerString("FogProps"));
 }
 
 void VolumetricFogShaderProperty::CopyMembers(VolumetricFogShaderProperty* pDest, NiCloningProcess& arCloneData) {
-	NiShadeProperty::CopyMembers(pDest, arCloneData);
-	pDest->ulFlags[0] = ulFlags[0];
-	pDest->ulFlags[1] = ulFlags[1];
-	pDest->fAlpha = fAlpha;
-	double fFadeAlpha = this->fFadeAlpha;
-	pDest->iLastRenderPassState = 0;
-	pDest->fFadeAlpha = fFadeAlpha;
-	pDest->iShader = iShader;
-	pDest->fDepthBias = fDepthBias;
+    NiShadeProperty::CopyMembers(pDest, arCloneData);
+    pDest->ulFlags[0] = ulFlags[0];
+    pDest->ulFlags[1] = ulFlags[1];
+    pDest->fAlpha = fAlpha;
+    double fFadeAlpha = this->fFadeAlpha;
+    pDest->iLastRenderPassState = 0;
+    pDest->fFadeAlpha = fFadeAlpha;
+    pDest->iShader = iShader;
+    pDest->fDepthBias = fDepthBias;
 }
 
 NiObject* VolumetricFogShaderProperty::CreateObject() {
-	VolumetricFogShaderProperty* pObject =
-		static_cast<VolumetricFogShaderProperty*>(NiMemObject::operator new(sizeof(VolumetricFogShaderProperty)));
-	if (pObject) {
-		return ::new (pObject) VolumetricFogShaderProperty;
-	}
-	return nullptr;
+    VolumetricFogShaderProperty* pObject =
+        static_cast<VolumetricFogShaderProperty*>(NiMemObject::operator new(sizeof(VolumetricFogShaderProperty)));
+    if (pObject) {
+        return ::new (pObject) VolumetricFogShaderProperty;
+    }
+    return nullptr;
 }

@@ -26,41 +26,59 @@ void writeUlongArray(hkOArchive& oa, int32_t elemsize, int32_t nelem, const hkUl
 // hkBool32 is spelled int32_t.
 class hkObjectCopier : public hkReferencedObject {
 public:
-	enum ObjectCopierFlagBits : int32_t {
-		FLAG_NONE = 0x0,
-		FLAG_APPLY_DEFAULT_IF_SERIALIZE_IGNORED = 0x1,
-		FLAG_RESPECT_SERIALIZE_IGNORED = 0x2,
-	};
+    enum ObjectCopierFlagBits : int32_t {
+        FLAG_NONE = 0x0,
+        FLAG_APPLY_DEFAULT_IF_SERIALIZE_IGNORED = 0x1,
+        FLAG_RESPECT_SERIALIZE_IGNORED = 0x2,
+    };
 
-	hkObjectCopier(const hkStructureLayout& layoutIn, const hkStructureLayout& layoutOut, uint32_t flags);
-	~hkObjectCopier() override;
+    hkObjectCopier(const hkStructureLayout& layoutIn, const hkStructureLayout& layoutOut, uint32_t flags);
+    ~hkObjectCopier() override;
 
-	virtual hkResult copyObject(const void* dataIn, const hkClass& klassIn, hkStreamWriter* dataOut,
-		const hkClass& klassOut, hkRelocationInfo& reloc);
+    virtual hkResult copyObject(
+        const void* dataIn,
+        const hkClass& klassIn,
+        hkStreamWriter* dataOut,
+        const hkClass& klassOut,
+        hkRelocationInfo& reloc
+    );
 
 protected:
-	virtual int32_t areMembersCompatible(const hkClassMember& src, const hkClassMember& dst);
+    virtual int32_t areMembersCompatible(const hkClassMember& src, const hkClassMember& dst);
 
 private:
-	virtual const hkClass* lookupClass(const hkClass& klass) { return &klass; }
+    virtual const hkClass* lookupClass(const hkClass& klass) {
+        return &klass;
+    }
 
 public:
-	const hkStructureLayout& getLayoutOut() const { return m_layoutOut; }
-	const hkStructureLayout& getLayoutIn() const { return m_layoutIn; }
+    const hkStructureLayout& getLayoutOut() const {
+        return m_layoutOut;
+    }
+    const hkStructureLayout& getLayoutIn() const {
+        return m_layoutIn;
+    }
 
 protected:
-	void writeZero(hkOArchive& oa, const hkClassMember& memberOut);
-	int32_t saveBody(const void* dataIn, const hkClass& klassIn, hkOArchive& oa, const hkClass& klassOut);
-	void saveExtras(const void* dataIn, const hkClass& klassIn, hkOArchive& dataOut, const hkClass& klassOut,
-		int32_t classStart, hkRelocationInfo& fixups, int32_t level);
+    void writeZero(hkOArchive& oa, const hkClassMember& memberOut);
+    int32_t saveBody(const void* dataIn, const hkClass& klassIn, hkOArchive& oa, const hkClass& klassOut);
+    void saveExtras(
+        const void* dataIn,
+        const hkClass& klassIn,
+        hkOArchive& dataOut,
+        const hkClass& klassOut,
+        int32_t classStart,
+        hkRelocationInfo& fixups,
+        int32_t level
+    );
 
 public:
-	// Returns member's C-style array size, or 1 when it is no C-style array; writeZero multiplies sizes by it.
-	static int32_t getNumElements(const hkClassMember& member);
-	static void writePodArray(int32_t a1, uint32_t a2, hkOArchive* a3, char* a4, int32_t r_eax);
+    // Returns member's C-style array size, or 1 when it is no C-style array; writeZero multiplies sizes by it.
+    static int32_t getNumElements(const hkClassMember& member);
+    static void writePodArray(int32_t a1, uint32_t a2, hkOArchive* a3, char* a4, int32_t r_eax);
 
-	hkStructureLayout m_layoutIn;
-	hkStructureLayout m_layoutOut;
-	hkFlags<ObjectCopierFlagBits, uint32_t> m_flags;
-	hkBool m_byteSwap;
+    hkStructureLayout m_layoutIn;
+    hkStructureLayout m_layoutOut;
+    hkFlags<ObjectCopierFlagBits, uint32_t> m_flags;
+    hkBool m_byteSwap;
 };

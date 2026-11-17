@@ -17,35 +17,35 @@ void finishLoadedObjecthkpMalleableConstraintData(void* p, int32_t finishing);
 // destructor, isValid, getType, getRuntimeInfo, buildJacobian and getConstraintInfo.
 class hkpMalleableConstraintData : public hkpConstraintData {
 public:
-	// The reflection's member table (hkpMalleableConstraintData::Members).
-	using MembersArray = const hkClassMember[3];
+    // The reflection's member table (hkpMalleableConstraintData::Members).
+    using MembersArray = const hkClassMember[3];
 
-	hkpMalleableConstraintData();
-	hkpMalleableConstraintData(hkFinishLoadedObjectFlag aFlag);
-	hkpMalleableConstraintData(hkpConstraintData* constraintData);
-	~hkpMalleableConstraintData() override;
+    hkpMalleableConstraintData();
+    hkpMalleableConstraintData(hkFinishLoadedObjectFlag aFlag);
+    hkpMalleableConstraintData(hkpConstraintData* constraintData);
+    ~hkpMalleableConstraintData() override;
 
-	hkBool* isValid(hkBool* arResult) const override;
-	int32_t getType() const override;
-	void getRuntimeInfo(hkBool wantRuntime, hkpConstraintData::RuntimeInfo& infoOut) const override;
-	void buildJacobian(const hkpConstraintQueryIn& arInfo, hkpConstraintQueryOut& out) override;
-	void getConstraintInfo(hkpConstraintData::ConstraintInfo& info) const override;
+    hkBool* isValid(hkBool* arResult) const override;
+    int32_t getType() const override;
+    void getRuntimeInfo(hkBool wantRuntime, hkpConstraintData::RuntimeInfo& infoOut) const override;
+    void buildJacobian(const hkpConstraintQueryIn& arInfo, hkpConstraintQueryOut& out) override;
+    void getConstraintInfo(hkpConstraintData::ConstraintInfo& info) const override;
 
-	// The constraint data this one wraps.
-	hkpConstraintData* getWrappedConstraintData();
-	// The same, for a const constraint.
-	const hkpConstraintData* getWrappedConstraintData() const;
-	void setStrength(const float a1);
-	float getStrength() const;
-	void SetWrappedConstraintData(hkpConstraintData* apData);
+    // The constraint data this one wraps.
+    hkpConstraintData* getWrappedConstraintData();
+    // The same, for a const constraint.
+    const hkpConstraintData* getWrappedConstraintData() const;
+    void setStrength(const float a1);
+    float getStrength() const;
+    void SetWrappedConstraintData(hkpConstraintData* apData);
 
-	static const hkClass& staticClass();
+    static const hkClass& staticClass();
 
-	hkpConstraintData* m_constraintData;
-	hkpBridgeAtoms m_atoms;
-	float m_strength;
+    hkpConstraintData* m_constraintData;
+    hkpBridgeAtoms m_atoms;
+    float m_strength;
 
-	static MembersArray Members;
+    static MembersArray Members;
 };
 
 extern hkClass hkpMalleableConstraintDataClass;

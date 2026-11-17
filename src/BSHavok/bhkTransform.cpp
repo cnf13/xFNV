@@ -4,6 +4,6 @@
 bhkTransform::bhkTransform() {}
 
 void bhkTransform::setIdentity() {
-	Rot.setIdentity();
-	Trans.setZero4();
+    Rot.setIdentity();
+    Trans.setZero4();
 }

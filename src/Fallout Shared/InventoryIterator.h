@@ -9,13 +9,13 @@ class ContainerObject;
 // no change covers.
 class InventoryIterator {
 public:
-	InventoryIterator();
-	~InventoryIterator();
+    InventoryIterator();
+    ~InventoryIterator();
 
-	void Reset();
+    void Reset();
 
-	ItemChange TempItemChange;
-	BSSimpleList<ContainerObject*>* pContainerObjectList;
-	BSSimpleList<ItemChange*>* pInventoryChangeList;
-	bool bFinished;
+    ItemChange TempItemChange;
+    BSSimpleList<ContainerObject*>* pContainerObjectList;
+    BSSimpleList<ItemChange*>* pInventoryChangeList;
+    bool bFinished;
 };

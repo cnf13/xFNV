@@ -14,26 +14,28 @@ void DestroyPointerSmallArray(void* apThis, [[maybe_unused]] void* apEdx);
 // the body's default collision filter and ends when the entity is deleted or deactivated.
 class bhkTelekinesisListener : public bhkContactListener, public hkpEntityListener, public hkpEntityActivationListener {
 public:
-	bhkTelekinesisListener(TESObjectREFR* a1, bhkRigidBody* a2, uint32_t a3);
-	~bhkTelekinesisListener() override;
+    bhkTelekinesisListener(TESObjectREFR* a1, bhkRigidBody* a2, uint32_t a3);
+    ~bhkTelekinesisListener() override;
 
-	// hkpEntityListener's vtable at +0x4.
-	void entityDeletedCallback(hkpEntity* apEntity) override;
-	// hkpEntityActivationListener's vtable at +0x8.
-	void entityDeactivatedCallback(hkpEntity* apEntity) override;
-	// Overrides hkpEntityActivationListener's pure virtual; nothing happens.
-	void entityActivatedCallback(hkpEntity*) override {}
+    // hkpEntityListener's vtable at +0x4.
+    void entityDeletedCallback(hkpEntity* apEntity) override;
+    // hkpEntityActivationListener's vtable at +0x8.
+    void entityDeactivatedCallback(hkpEntity* apEntity) override;
+    // Overrides hkpEntityActivationListener's pure virtual; nothing happens.
+    void entityActivatedCallback(hkpEntity*) override {}
 
-	// Ends the effect on the held object.
-	void Finish(hkpEntity* apEntity);
+    // Ends the effect on the held object.
+    void Finish(hkpEntity* apEntity);
 
-	static void Remove(bhkTelekinesisListener* apListener, hkpEntity* apEntity);
-	static void operator delete(void* apMemory) { ourFree(apMemory); }
-	static void AllowToFinish(bhkRigidBody* apBody);
+    static void Remove(bhkTelekinesisListener* apListener, hkpEntity* apEntity);
+    static void operator delete(void* apMemory) {
+        ourFree(apMemory);
+    }
+    static void AllowToFinish(bhkRigidBody* apBody);
 
-	TESObjectREFR* pRef;
-	bhkRigidBody* pBody;
-	CFilter DefaultFilter;
-	bool bCanFinish;
-	uint8_t padding19[3];
+    TESObjectREFR* pRef;
+    bhkRigidBody* pBody;
+    CFilter DefaultFilter;
+    bool bCanFinish;
+    uint8_t padding19[3];
 };

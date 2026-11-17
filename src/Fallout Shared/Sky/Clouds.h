@@ -12,46 +12,46 @@ class Sky;
 // The sky cloud layers: one cloud texture and one colour per layer, plus a transition set.
 class Clouds : public SkyObject {
 public:
-	static const int32_t MAX_LAYERS = 4;
+    static const int32_t MAX_LAYERS = 4;
 
-	Clouds();
-	~Clouds() override;
+    Clouds();
+    ~Clouds() override;
 
-	void Initialize(NiNode* apSkyRoot) override;
-	void Update(Sky* apSky, float afSecondsPassed) override;
+    void Initialize(NiNode* apSkyRoot) override;
+    void Update(Sky* apSky, float afSecondsPassed) override;
 
-	int32_t GetNumLayers() const;
-	void SetNumLayers(int32_t aiNumLayers);
+    int32_t GetNumLayers() const;
+    void SetNumLayers(int32_t aiNumLayers);
 
-	NiColor& GetColor(int32_t aiLayer);
-	void SetColor(int32_t aiLayer, NiColor& aColor);
+    NiColor& GetColor(int32_t aiLayer);
+    void SetColor(int32_t aiLayer, NiColor& aColor);
 
-	// The geometry of layer aiLayer.
-	NiGeometry* GetCloudsGeo(int32_t aiLayer);
+    // The geometry of layer aiLayer.
+    NiGeometry* GetCloudsGeo(int32_t aiLayer);
 
-	void ZeroGeo();
-	// Clears the transition texture of every layer and its sky shader's blend texture and value.
-	void ClearTransTextures();
-	// Clears the texture and texture file of every layer's sky shader.
-	void RemoveTextures();
+    void ZeroGeo();
+    // Clears the transition texture of every layer and its sky shader's blend texture and value.
+    void ClearTransTextures();
+    // Clears the texture and texture file of every layer's sky shader.
+    void RemoveTextures();
 
-	// Makes the next update push the transition textures again.
-	void ForceTransTextureUpdate();
+    // Makes the next update push the transition textures again.
+    void ForceTransTextureUpdate();
 
-	// The cloud geometry of each layer; every assignment goes through NiPointer's operator=.
-	NiPointer<NiGeometry> spClouds[MAX_LAYERS];       // 0x08
+    // The cloud geometry of each layer; every assignment goes through NiPointer's operator=.
+    NiPointer<NiGeometry> spClouds[MAX_LAYERS]; // 0x08
 
-	// The texture each layer blends toward during a weather transition. Its address is handed to
-	// SkyTextureManager::LoadTextureInBackground, which takes a NiPointer<NiTexture>*.
-	NiPointer<NiTexture> spTransTexture[MAX_LAYERS];
+    // The texture each layer blends toward during a weather transition. Its address is handed to
+    // SkyTextureManager::LoadTextureInBackground, which takes a NiPointer<NiTexture>*.
+    NiPointer<NiTexture> spTransTexture[MAX_LAYERS];
 
-	// The colour stored per layer (stride sizeof(NiColor)).
-	NiColor pColors[MAX_LAYERS];           // 0x28
+    // The colour stored per layer (stride sizeof(NiColor)).
+    NiColor pColors[MAX_LAYERS]; // 0x28
 
-	uint16_t usNumLayers;                  // 0x58
+    uint16_t usNumLayers; // 0x58
 
-	// 0x5A: the colour is stale and has to be pushed to the layer again.
-	bool bForceUpdate;                     // 0x5A
+    // 0x5A: the colour is stale and has to be pushed to the layer again.
+    bool bForceUpdate; // 0x5A
 };
 
 // The game settings Clouds.cpp defines.

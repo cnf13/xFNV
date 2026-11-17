@@ -5,10 +5,10 @@
 #include "Gamebryo2.2/CoreLibs/NiMain/NiObject.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiTArray.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiViewerStrings.h"
-#include "Gamebryo2.2/CoreLibs/NiParticle/NiParticleSystem.h"
 #include "Gamebryo2.2/CoreLibs/NiParticle/NiPSysModifierCtlr.h"
 #include "Gamebryo2.2/CoreLibs/NiParticle/NiPSysModifierFloatCtlr.h"
 #include "Gamebryo2.2/CoreLibs/NiParticle/NiPSysRotationModifier.h"
+#include "Gamebryo2.2/CoreLibs/NiParticle/NiParticleSystem.h"
 
 NiRTTI NiPSysInitialRotAngleVarCtlr::ms_RTTI("NiPSysInitialRotAngleVarCtlr", &NiPSysModifierFloatCtlr::ms_RTTI);
 
@@ -17,65 +17,67 @@ NiPSysInitialRotAngleVarCtlr::NiPSysInitialRotAngleVarCtlr() : NiPSysModifierFlo
 NiPSysInitialRotAngleVarCtlr::~NiPSysInitialRotAngleVarCtlr() {}
 
 NiObject* NiPSysInitialRotAngleVarCtlr::CreateClone(NiCloningProcess& kCloning) {
-	NiPSysInitialRotAngleVarCtlr* v3 =
-		static_cast<NiPSysInitialRotAngleVarCtlr*>(NiMemObject::operator new(sizeof(NiPSysInitialRotAngleVarCtlr)));
-	NiPSysModifierCtlr* v4 = v3;
-	if (v3) {
-		::new (v3) NiPSysInitialRotAngleVarCtlr;
-		NiPSysModifierCtlr::CopyMembers(v4, kCloning);
-		return v4;
-	} else {
-		NiPSysModifierCtlr::CopyMembers(nullptr, kCloning);
-		return 0;
-	}
+    NiPSysInitialRotAngleVarCtlr* v3 =
+        static_cast<NiPSysInitialRotAngleVarCtlr*>(NiMemObject::operator new(sizeof(NiPSysInitialRotAngleVarCtlr)));
+    NiPSysModifierCtlr* v4 = v3;
+    if (v3) {
+        ::new (v3) NiPSysInitialRotAngleVarCtlr;
+        NiPSysModifierCtlr::CopyMembers(v4, kCloning);
+        return v4;
+    }
+    else {
+        NiPSysModifierCtlr::CopyMembers(nullptr, kCloning);
+        return 0;
+    }
 }
 
 void NiPSysInitialRotAngleVarCtlr::LoadBinary(NiStream& kStream) {
-	NiPSysModifierFloatCtlr::LoadBinary(kStream);
+    NiPSysModifierFloatCtlr::LoadBinary(kStream);
 }
 
 void NiPSysInitialRotAngleVarCtlr::LinkObject(NiStream& kStream) {
-	NiPSysModifierFloatCtlr::LinkObject(kStream);
+    NiPSysModifierFloatCtlr::LinkObject(kStream);
 }
 
 bool NiPSysInitialRotAngleVarCtlr::RegisterStreamables(NiStream& kStream) {
-	return NiPSysModifierFloatCtlr::RegisterStreamables(kStream);
+    return NiPSysModifierFloatCtlr::RegisterStreamables(kStream);
 }
 
 void NiPSysInitialRotAngleVarCtlr::SaveBinary(NiStream& kStream) {
-	NiPSysModifierFloatCtlr::SaveBinary(kStream);
+    NiPSysModifierFloatCtlr::SaveBinary(kStream);
 }
 
 bool NiPSysInitialRotAngleVarCtlr::IsEqual(NiObject* pkObject) {
-	return NiPSysModifierFloatCtlr::IsEqual(pkObject);
+    return NiPSysModifierFloatCtlr::IsEqual(pkObject);
 }
 
 void NiPSysInitialRotAngleVarCtlr::GetViewerStrings(NiTPrimitiveArray<char*>* pkStrings) {
-	NiPSysModifierFloatCtlr::GetViewerStrings(pkStrings);
-	pkStrings->Add(NiGetViewerString(ms_RTTI.GetName()));
+    NiPSysModifierFloatCtlr::GetViewerStrings(pkStrings);
+    pkStrings->Add(NiGetViewerString(ms_RTTI.GetName()));
 }
 
 bool NiPSysInitialRotAngleVarCtlr::InterpTargetIsCorrectType(NiObjectNET* pkTarget) const {
-	if (!NiPSysModifierCtlr::InterpTargetIsCorrectType(pkTarget))
-		return false;
+    if (!NiPSysModifierCtlr::InterpTargetIsCorrectType(pkTarget)) {
+        return false;
+    }
 
-	NiPSysModifier* pkModifier = static_cast<NiParticleSystem*>(pkTarget)->GetModifierByName(m_kModifierName);
-	return NiObject::IsKindOf(&NiPSysRotationModifier::ms_RTTI, pkModifier);
+    NiPSysModifier* pkModifier = static_cast<NiParticleSystem*>(pkTarget)->GetModifierByName(m_kModifierName);
+    return NiObject::IsKindOf(&NiPSysRotationModifier::ms_RTTI, pkModifier);
 }
 
 void NiPSysInitialRotAngleVarCtlr::GetTargetFloatValue(float& fValue) {
-	fValue = static_cast<NiPSysRotationModifier*>(m_pkModifier)->m_fInitialRotAngleVar;
+    fValue = static_cast<NiPSysRotationModifier*>(m_pkModifier)->m_fInitialRotAngleVar;
 }
 
 void NiPSysInitialRotAngleVarCtlr::SetTargetFloatValue(float fValue) {
-	static_cast<NiPSysRotationModifier*>(m_pkModifier)->m_fInitialRotAngleVar = fValue;
+    static_cast<NiPSysRotationModifier*>(m_pkModifier)->m_fInitialRotAngleVar = fValue;
 }
 
 NiObject* NiPSysInitialRotAngleVarCtlr::CreateObject() {
-	NiPSysInitialRotAngleVarCtlr* v0 =
-		static_cast<NiPSysInitialRotAngleVarCtlr*>(NiMemObject::operator new(sizeof(NiPSysInitialRotAngleVarCtlr)));
-	if (!v0) {
-		return 0;
-	}
-	return ::new (v0) NiPSysInitialRotAngleVarCtlr;
+    NiPSysInitialRotAngleVarCtlr* v0 =
+        static_cast<NiPSysInitialRotAngleVarCtlr*>(NiMemObject::operator new(sizeof(NiPSysInitialRotAngleVarCtlr)));
+    if (!v0) {
+        return 0;
+    }
+    return ::new (v0) NiPSysInitialRotAngleVarCtlr;
 }

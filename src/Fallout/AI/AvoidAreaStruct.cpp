@@ -9,11 +9,11 @@
 #include "SDK/MSVC/rtti.h"
 
 bool AvoidAreaStruct::LoadGameBGS(BGSLoadFormBuffer* arg0) {
-	pAvoidNode.LoadGame(arg0);
-	arg0->LoadData(&fTimeExpire, 4u);
-	arg0->LoadData(&afRadiationLevel, 4u);
-	uint32_t FormID_0 = arg0->LoadFormID();
-	TESForm* FormByNumericID = TESForm::GetFormByNumericID(FormID_0);
-	pRadiationMarker = dynamic_cast<TESObjectSTAT*>(FormByNumericID);
-	return arg0->LoadFormID(pRefObj);
+    pAvoidNode.LoadGame(arg0);
+    arg0->LoadData(&fTimeExpire, 4u);
+    arg0->LoadData(&afRadiationLevel, 4u);
+    uint32_t FormID_0 = arg0->LoadFormID();
+    TESForm* FormByNumericID = TESForm::GetFormByNumericID(FormID_0);
+    pRadiationMarker = dynamic_cast<TESObjectSTAT*>(FormByNumericID);
+    return arg0->LoadFormID(pRefObj);
 }

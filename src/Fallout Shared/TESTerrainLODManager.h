@@ -13,30 +13,51 @@ class TESObjectLAND;
 // The PC constructor initializes shared grass state and does not access instance storage.
 class TESTerrainLODManager {
 public:
-	TESTerrainLODManager();
-	~TESTerrainLODManager();
+    TESTerrainLODManager();
+    ~TESTerrainLODManager();
 
-	static void UpdateGrass(NiPoint3 apCameraPosition, NiPoint3 apCameraDirection, float afUpdateAngle);
-	static void InitGrass();
-	static NiNode* GetGrassNode();
+    static void UpdateGrass(NiPoint3 apCameraPosition, NiPoint3 apCameraDirection, float afUpdateAngle);
+    static void InitGrass();
+    static NiNode* GetGrassNode();
 
 protected:
-	static void UpdateGrassForCell(TESObjectCELL* apCell, NiNode* apGrassNode, NiPoint3 apCameraPosition,
-		NiPoint3 apCameraDirection, float fFadeRange, float fMaxRange, float afUpdateAngle);
+    static void UpdateGrassForCell(
+        TESObjectCELL* apCell,
+        NiNode* apGrassNode,
+        NiPoint3 apCameraPosition,
+        NiPoint3 apCameraDirection,
+        float fFadeRange,
+        float fMaxRange,
+        float afUpdateAngle
+    );
 
 public:
-	static void CreateGrass(int32_t aiCellx, int32_t aiCelly, int32_t aiBlock, TESObjectLAND* apLand, int32_t aiSeed,
-		const NiPoint3& aCoord, NiNode* apGrassNode, NiPoint3 apPosition,
-		TallGrassShaderProperty::GrassParam* apGrassParam, float* apfDensity, float fFadeRange, float fMaxRange,
-		uint16_t iHeightLimit, TESGrass::GRASS_WATER_STATE iWaterState, float afCellWaterHeight, uint8_t aiMinSlope,
-		uint8_t aiMaxSlope);
+    static void CreateGrass(
+        int32_t aiCellx,
+        int32_t aiCelly,
+        int32_t aiBlock,
+        TESObjectLAND* apLand,
+        int32_t aiSeed,
+        const NiPoint3& aCoord,
+        NiNode* apGrassNode,
+        NiPoint3 apPosition,
+        TallGrassShaderProperty::GrassParam* apGrassParam,
+        float* apfDensity,
+        float fFadeRange,
+        float fMaxRange,
+        uint16_t iHeightLimit,
+        TESGrass::GRASS_WATER_STATE iWaterState,
+        float afCellWaterHeight,
+        uint8_t aiMinSlope,
+        uint8_t aiMaxSlope
+    );
 
-	static inline NiNode* pGrassNode;
-	static inline bool bGrassInitialized;
-	static inline float fGrassRadius;
-	static inline NiPoint3* pLowpositions;
-	static inline float* pLowcolors;
-	static inline int32_t iManagerCount;
+    static inline NiNode* pGrassNode;
+    static inline bool bGrassInitialized;
+    static inline float fGrassRadius;
+    static inline NiPoint3* pLowpositions;
+    static inline float* pLowcolors;
+    static inline int32_t iManagerCount;
 };
 
 // Whether the grass is updated with the camera: ToggleGrass sets it when it shows the grass,

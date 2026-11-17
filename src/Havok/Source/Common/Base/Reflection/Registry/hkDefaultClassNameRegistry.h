@@ -10,9 +10,9 @@ hkReferencedObject* hkDefaultClassNameRegistrycreate();
 // vtable repeats hkDynamicClassNameRegistry's slots.
 class hkDefaultClassNameRegistry : public hkDynamicClassNameRegistry, public hkSingleton<hkDefaultClassNameRegistry> {
 public:
-	hkDefaultClassNameRegistry() : hkDynamicClassNameRegistry("Havok-7.1.0-r1") {}
+    hkDefaultClassNameRegistry() : hkDynamicClassNameRegistry("Havok-7.1.0-r1") {}
 
-	// hkSingleton<hkDefaultClassNameRegistry>::s_instance. hkDefaultBuiltinTypeRegistry::getClassNameRegistry
-	// returns it.
-	static inline hkDefaultClassNameRegistry* s_instance;
+    // hkSingleton<hkDefaultClassNameRegistry>::s_instance. hkDefaultBuiltinTypeRegistry::getClassNameRegistry
+    // returns it.
+    static inline hkDefaultClassNameRegistry* s_instance;
 };

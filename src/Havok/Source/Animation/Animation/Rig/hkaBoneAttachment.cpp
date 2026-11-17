@@ -19,40 +19,76 @@ static void cleanupLoadedObjecthkaBoneAttachment(void* p);
 // The class record's member table.
 using hkaBoneAttachmentClassMemberArray = const hkClassMember[5];
 static hkaBoneAttachmentClassMemberArray hkaBoneAttachmentClass_Members{
-	{"originalSkeletonName", nullptr, nullptr, {hkClassMember::TYPE_STRINGPTR}, {hkClassMember::TYPE_VOID}, 0, 0, 0x8,
-		nullptr},
-	{"boneFromAttachment", nullptr, nullptr, {hkClassMember::TYPE_MATRIX4}, {hkClassMember::TYPE_VOID}, 0, 0, 0x10,
-		nullptr},
-	{"attachment", &hkReferencedObjectClass, nullptr, {hkClassMember::TYPE_POINTER}, {hkClassMember::TYPE_STRUCT}, 0, 0,
-		0x50, nullptr},
-	{"name", nullptr, nullptr, {hkClassMember::TYPE_STRINGPTR}, {hkClassMember::TYPE_VOID}, 0, 0, 0x54, nullptr},
-	{"boneIndex", nullptr, nullptr, {hkClassMember::TYPE_INT16}, {hkClassMember::TYPE_VOID}, 0, 0, 0x58, nullptr}};
-hkClass hkaBoneAttachmentClass("hkaBoneAttachment", &hkReferencedObjectClass, 96, nullptr, 0, nullptr, 0,
-	hkaBoneAttachmentClass_Members, 5, nullptr, nullptr, 0, 1);
-hkTypeInfo hkaBoneAttachmentTypeInfo = {"hkaBoneAttachment", finishLoadedObjecthkaBoneAttachment,
-	cleanupLoadedObjecthkaBoneAttachment, getVtablehkaBoneAttachment(), &typeid(hkaBoneAttachment),
-	sizeof(hkaBoneAttachment)};
+    {"originalSkeletonName",
+     nullptr,
+     nullptr,
+     {hkClassMember::TYPE_STRINGPTR},
+     {hkClassMember::TYPE_VOID},
+     0,
+     0,
+     0x8,
+     nullptr},
+    {"boneFromAttachment",
+     nullptr,
+     nullptr,
+     {hkClassMember::TYPE_MATRIX4},
+     {hkClassMember::TYPE_VOID},
+     0,
+     0,
+     0x10,
+     nullptr},
+    {"attachment",
+     &hkReferencedObjectClass,
+     nullptr,
+     {hkClassMember::TYPE_POINTER},
+     {hkClassMember::TYPE_STRUCT},
+     0,
+     0,
+     0x50,
+     nullptr},
+    {"name", nullptr, nullptr, {hkClassMember::TYPE_STRINGPTR}, {hkClassMember::TYPE_VOID}, 0, 0, 0x54, nullptr},
+    {"boneIndex", nullptr, nullptr, {hkClassMember::TYPE_INT16}, {hkClassMember::TYPE_VOID}, 0, 0, 0x58, nullptr}
+};
+hkClass hkaBoneAttachmentClass(
+    "hkaBoneAttachment",
+    &hkReferencedObjectClass,
+    96,
+    nullptr,
+    0,
+    nullptr,
+    0,
+    hkaBoneAttachmentClass_Members,
+    5,
+    nullptr,
+    nullptr,
+    0,
+    1
+);
+hkTypeInfo hkaBoneAttachmentTypeInfo = {
+    "hkaBoneAttachment",          finishLoadedObjecthkaBoneAttachment, cleanupLoadedObjecthkaBoneAttachment,
+    getVtablehkaBoneAttachment(), &typeid(hkaBoneAttachment),          sizeof(hkaBoneAttachment)
+};
 
 // Finishes a loaded hkaBoneAttachment in place, when there is one, by running its finish constructor.
 static void finishLoadedObjecthkaBoneAttachment(void* p, int32_t finishing) {
-	if (p) {
-		hkFinishLoadedObjectFlag kFlag;
-		kFlag.m_finishing = finishing;
-		::new (p) hkaBoneAttachment(kFlag);
-	}
+    if (p) {
+        hkFinishLoadedObjectFlag kFlag;
+        kFlag.m_finishing = finishing;
+        ::new (p) hkaBoneAttachment(kFlag);
+    }
 }
 
 static const void* getVtablehkaBoneAttachment() {
-	return hkGetVtableOf<hkaBoneAttachment>();
+    return hkGetVtableOf<hkaBoneAttachment>();
 }
 
 static void cleanupLoadedObjecthkaBoneAttachment(void* p) {
-	static_cast<hkaBoneAttachment*>(p)->~hkaBoneAttachment();
+    static_cast<hkaBoneAttachment*>(p)->~hkaBoneAttachment();
 }
 
 // The members release the attachment and free the two names.
 hkaBoneAttachment::~hkaBoneAttachment() {}
 
 const hkClass& hkaBoneAttachment::staticClass() {
-	return hkaBoneAttachmentClass;
+    return hkaBoneAttachmentClass;
 }

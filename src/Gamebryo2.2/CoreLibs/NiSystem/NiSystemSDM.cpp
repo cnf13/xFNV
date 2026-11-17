@@ -5,18 +5,18 @@
 #include "Gamebryo2.2/CoreLibs/NiSystem/NiSystemDesc.h"
 
 void NiSystemSDM::Init() {
-	if (!NiSystemSDM::ms_bInitialized) {
-		NiSystemSDM::ms_bInitialized = 1;
-		NiMemManager::_SDMInit();
-		NiSystemDesc::InitSystemDesc();
-		OEI::IO::initialize();
-	}
+    if (!NiSystemSDM::ms_bInitialized) {
+        NiSystemSDM::ms_bInitialized = 1;
+        NiMemManager::_SDMInit();
+        NiSystemDesc::InitSystemDesc();
+        OEI::IO::initialize();
+    }
 }
 
 void NiSystemSDM::Shutdown() {
-	if (NiSystemSDM::ms_bInitialized) {
-		NiSystemSDM::ms_bInitialized = 0;
-		OEI::IO::terminate();
-		NiSystemDesc::ShutdownSystemDesc();
-	}
+    if (NiSystemSDM::ms_bInitialized) {
+        NiSystemSDM::ms_bInitialized = 0;
+        OEI::IO::terminate();
+        NiSystemDesc::ShutdownSystemDesc();
+    }
 }

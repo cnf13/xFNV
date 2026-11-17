@@ -28,36 +28,36 @@ const void* getVtablehkpDisplayBindingData();
 
 // Associates saved physics objects with their display meshes.
 struct hkpDisplayBindingData : public hkReferencedObject {
-	struct RigidBody : public hkReferencedObject {
-		RigidBody(hkFinishLoadedObjectFlag aFlag);
-		~RigidBody() override;
+    struct RigidBody : public hkReferencedObject {
+        RigidBody(hkFinishLoadedObjectFlag aFlag);
+        ~RigidBody() override;
 
-		static const hkClass& staticClass();
+        static const hkClass& staticClass();
 
-		hkRefPtr<hkpRigidBody> m_rigidBody;
-		hkRefPtr<hkxMesh> m_displayObject;
-		hkMatrix4 m_rigidBodyFromDisplayObjectTransform;
-	};
+        hkRefPtr<hkpRigidBody> m_rigidBody;
+        hkRefPtr<hkxMesh> m_displayObject;
+        hkMatrix4 m_rigidBodyFromDisplayObjectTransform;
+    };
 
-	struct PhysicsSystem : public hkReferencedObject {
-		PhysicsSystem(hkFinishLoadedObjectFlag aFlag);
-		~PhysicsSystem() override;
+    struct PhysicsSystem : public hkReferencedObject {
+        PhysicsSystem(hkFinishLoadedObjectFlag aFlag);
+        ~PhysicsSystem() override;
 
-		static const hkClass& staticClass();
+        static const hkClass& staticClass();
 
-		hkArray<hkRefPtr<RigidBody>> m_bindings;
-		hkRefPtr<hkpPhysicsSystem> m_system;
-	};
+        hkArray<hkRefPtr<RigidBody>> m_bindings;
+        hkRefPtr<hkpPhysicsSystem> m_system;
+    };
 
-	hkpDisplayBindingData(hkFinishLoadedObjectFlag aFlag)
-		: hkReferencedObject(aFlag), m_rigidBodyBindings(aFlag), m_physicsSystemBindings(aFlag) {}
+    hkpDisplayBindingData(hkFinishLoadedObjectFlag aFlag)
+      : hkReferencedObject(aFlag), m_rigidBodyBindings(aFlag), m_physicsSystemBindings(aFlag) {}
 
-	~hkpDisplayBindingData() override;
+    ~hkpDisplayBindingData() override;
 
-	static const hkClass& staticClass();
+    static const hkClass& staticClass();
 
-	hkArray<hkRefPtr<RigidBody>> m_rigidBodyBindings;
-	hkArray<hkRefPtr<PhysicsSystem>> m_physicsSystemBindings;
+    hkArray<hkRefPtr<RigidBody>> m_rigidBodyBindings;
+    hkArray<hkRefPtr<PhysicsSystem>> m_physicsSystemBindings;
 };
 
 extern hkClass hkpDisplayBindingDataRigidBodyClass;

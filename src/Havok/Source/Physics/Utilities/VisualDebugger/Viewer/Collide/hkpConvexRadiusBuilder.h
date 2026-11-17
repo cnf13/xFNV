@@ -19,55 +19,67 @@ void addAabbPlanes(const hkpShape* shape, float radius, hkArray<hkVector4>& plan
 // Builds the visual debugger's convex radius display geometries for a shape. Only some of its members are declared.
 class hkpConvexRadiusBuilder : public hkReferencedObject {
 public:
-	// The builder's settings: the smallest convex radius it shows.
-	struct hkpConvexRadiusBuilderEnvironment {
-		hkpConvexRadiusBuilderEnvironment();
+    // The builder's settings: the smallest convex radius it shows.
+    struct hkpConvexRadiusBuilderEnvironment {
+        hkpConvexRadiusBuilderEnvironment();
 
-		float m_minVisibleRadius;
-	};
+        float m_minVisibleRadius;
+    };
 
-	hkpConvexRadiusBuilder(const hkpConvexRadiusBuilderEnvironment& env);
+    hkpConvexRadiusBuilder(const hkpConvexRadiusBuilderEnvironment& env);
 
-	// Empties displayGeometries and appends the display geometries of shape at the identity transform.
-	void buildDisplayGeometries(const hkpShape* shape, hkArray<hkDisplayGeometry*>& displayGeometries);
+    // Empties displayGeometries and appends the display geometries of shape at the identity transform.
+    void buildDisplayGeometries(const hkpShape* shape, hkArray<hkDisplayGeometry*>& displayGeometries);
 
-	// Appends the convex radius display geometries of shape, placed at transform, and recurses into its children.
-	void buildShapeDisplay(const hkpShape* shape, const hkTransform& transform,
-		hkArray<hkDisplayGeometry*>& displayGeometries);
+    // Appends the convex radius display geometries of shape, placed at transform, and recurses into its children.
+    void buildShapeDisplay(
+        const hkpShape* shape,
+        const hkTransform& transform,
+        hkArray<hkDisplayGeometry*>& displayGeometries
+    );
 
-	// Forgets the current raw geometry.
-	void resetCurrentRawGeometry();
-	hkDisplayGeometry* getCurrentRawGeometry(hkArray<hkDisplayGeometry*, hkContainerHeapAllocator>& displayGeometries);
+    // Forgets the current raw geometry.
+    void resetCurrentRawGeometry();
+    hkDisplayGeometry* getCurrentRawGeometry(hkArray<hkDisplayGeometry*, hkContainerHeapAllocator>& displayGeometries);
 
-	// The convex display of the hull of points, each moved by transform, or null when the points have no hull.
-	static hkDisplayConvex* createConvexDisplayFromPoints(const hkArray<hkVector4>& points,
-		const hkTransform& transform);
+    // The convex display of the hull of points, each moved by transform, or null when the points have no hull.
+    static hkDisplayConvex*
+    createConvexDisplayFromPoints(const hkArray<hkVector4>& points, const hkTransform& transform);
 
-	hkpConvexRadiusBuilderEnvironment m_environment;
-	hkDisplayGeometry* m_currentGeometry;
+    hkpConvexRadiusBuilderEnvironment m_environment;
+    hkDisplayGeometry* m_currentGeometry;
 };
 
 // The registry of the functions that build the convex radius display of user shape types, one per shape type.
 class hkpUserConvexRadiusBuilder : public hkReferencedObject, public hkSingleton<hkpUserConvexRadiusBuilder> {
 public:
-	// A user shape type's builder: adds the display geometries of shape, placed at transform.
-	using ConvexRadiusBuilderFunction = void (*)(const hkpShape* shape, const hkTransform& transform,
-		hkArray<hkDisplayGeometry*>& displayGeometries, hkpConvexRadiusBuilder* builder);
+    // A user shape type's builder: adds the display geometries of shape, placed at transform.
+    using ConvexRadiusBuilderFunction = void (*)(
+        const hkpShape* shape,
+        const hkTransform& transform,
+        hkArray<hkDisplayGeometry*>& displayGeometries,
+        hkpConvexRadiusBuilder* builder
+    );
 
-	struct UserShapeBuilder {
-		ConvexRadiusBuilderFunction f;
-		hkpShapeType type;
-	};
+    struct UserShapeBuilder {
+        ConvexRadiusBuilderFunction f;
+        hkpShapeType type;
+    };
 
-	~hkpUserConvexRadiusBuilder() override;
+    ~hkpUserConvexRadiusBuilder() override;
 
-	// Adds f for type unless type has a builder already.
-	void registerUserConvexRadiusDisplayBuilder(void (*f)(const hkpShape*, const hkTransform&,
-													hkArray<hkDisplayGeometry*, hkContainerHeapAllocator>&,
-													hkpConvexRadiusBuilder*),
-		hkpShapeType type);
+    // Adds f for type unless type has a builder already.
+    void registerUserConvexRadiusDisplayBuilder(
+        void (*f)(
+            const hkpShape*,
+            const hkTransform&,
+            hkArray<hkDisplayGeometry*, hkContainerHeapAllocator>&,
+            hkpConvexRadiusBuilder*
+        ),
+        hkpShapeType type
+    );
 
-	hkArray<UserShapeBuilder> m_userConvexRadiusBuilders;
+    hkArray<UserShapeBuilder> m_userConvexRadiusBuilders;
 
-	static inline hkpUserConvexRadiusBuilder* s_instance;
+    static inline hkpUserConvexRadiusBuilder* s_instance;
 };

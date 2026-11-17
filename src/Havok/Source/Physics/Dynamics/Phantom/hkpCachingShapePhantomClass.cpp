@@ -9,40 +9,71 @@
 #include "Havok/Source/Physics/Dynamics/Phantom/hkpShapePhantom.h"
 
 hkpCachingShapePhantom::MembersArray hkpCachingShapePhantom::Members{
-	{"collisionDetails", nullptr, nullptr, {hkClassMember::TYPE_ARRAY}, {hkClassMember::TYPE_VOID}, 0,
-		{hkClassMember::SERIALIZE_IGNORED}, 0x160, nullptr},
-	{"orderDirty", nullptr, nullptr, {hkClassMember::TYPE_BOOL}, {hkClassMember::TYPE_VOID}, 0,
-		{hkClassMember::SERIALIZE_IGNORED}, 0x16C, nullptr}};
+    {"collisionDetails",
+     nullptr,
+     nullptr,
+     {hkClassMember::TYPE_ARRAY},
+     {hkClassMember::TYPE_VOID},
+     0,
+     {hkClassMember::SERIALIZE_IGNORED},
+     0x160,
+     nullptr},
+    {"orderDirty",
+     nullptr,
+     nullptr,
+     {hkClassMember::TYPE_BOOL},
+     {hkClassMember::TYPE_VOID},
+     0,
+     {hkClassMember::SERIALIZE_IGNORED},
+     0x16C,
+     nullptr}
+};
 
-hkClass hkpCachingShapePhantomClass("hkpCachingShapePhantom", &hkpShapePhantomClass, 368, nullptr, 0, nullptr, 0,
-	hkpCachingShapePhantom::Members, 2, nullptr, nullptr, 0, 0);
-hkTypeInfo hkpCachingShapePhantomTypeInfo = {"hkpCachingShapePhantom", finishLoadedObjecthkpCachingShapePhantom,
-	cleanupLoadedObjecthkpCachingShapePhantom, getVtablehkpCachingShapePhantom(), &typeid(hkpCachingShapePhantom),
-	sizeof(hkpCachingShapePhantom)};
+hkClass hkpCachingShapePhantomClass(
+    "hkpCachingShapePhantom",
+    &hkpShapePhantomClass,
+    368,
+    nullptr,
+    0,
+    nullptr,
+    0,
+    hkpCachingShapePhantom::Members,
+    2,
+    nullptr,
+    nullptr,
+    0,
+    0
+);
+hkTypeInfo hkpCachingShapePhantomTypeInfo = {"hkpCachingShapePhantom",
+                                             finishLoadedObjecthkpCachingShapePhantom,
+                                             cleanupLoadedObjecthkpCachingShapePhantom,
+                                             getVtablehkpCachingShapePhantom(),
+                                             &typeid(hkpCachingShapePhantom),
+                                             sizeof(hkpCachingShapePhantom)};
 
 const void* getVtablehkpCachingShapePhantom() {
-	return hkGetVtableOf<hkpCachingShapePhantom>();
+    return hkGetVtableOf<hkpCachingShapePhantom>();
 }
 
 // The class registry's finish-loaded-object callback for a caching shape phantom: the null check, then the class's
 // finish constructor.
 void finishLoadedObjecthkpCachingShapePhantom(void* p, int32_t finishing) {
-	if (!p) {
-		return;
-	}
-	hkFinishLoadedObjectFlag flag;
-	flag.m_finishing = finishing;
-	::new (p) hkpCachingShapePhantom(flag);
+    if (!p) {
+        return;
+    }
+    hkFinishLoadedObjectFlag flag;
+    flag.m_finishing = finishing;
+    ::new (p) hkpCachingShapePhantom(flag);
 }
 
 void cleanupLoadedObjecthkpCachingShapePhantom(void* p) {
-	static_cast<hkpCachingShapePhantom*>(p)->~hkpCachingShapePhantom();
+    static_cast<hkpCachingShapePhantom*>(p)->~hkpCachingShapePhantom();
 }
 
 const hkClass& hkpCachingShapePhantom::staticClass() {
-	return hkpCachingShapePhantomClass;
+    return hkpCachingShapePhantomClass;
 }
 
 const hkClass& hkpCachingShapePhantom::staticClass_00DFD250() {
-	return hkpConvexVerticesShapeClass;
+    return hkpConvexVerticesShapeClass;
 }

@@ -9,71 +9,71 @@
 // function ends by calling cleanupNullPointers on the listener array.
 
 void hkpConstraintCallbackUtil::fireConstraintAdded(hkpConstraintInstance* constraint) {
-	hkSmallArray<hkpConstraintListener*>& listeners = constraint->m_listeners;
-	for (int32_t i = listeners.m_size - 1; i >= 0; --i) {
-		if (listeners.m_data[i]) {
-			HK_TIMER_BEGIN("conAddCb", nullptr);
-			listeners.m_data[i]->constraintAddedCallback(constraint);
-			HK_TIMER_END();
-		}
-	}
-	cleanupNullPointers(listeners);
+    hkSmallArray<hkpConstraintListener*>& listeners = constraint->m_listeners;
+    for (int32_t i = listeners.m_size - 1; i >= 0; --i) {
+        if (listeners.m_data[i]) {
+            HK_TIMER_BEGIN("conAddCb", nullptr);
+            listeners.m_data[i]->constraintAddedCallback(constraint);
+            HK_TIMER_END();
+        }
+    }
+    cleanupNullPointers(listeners);
 }
 
 void hkpConstraintCallbackUtil::fireConstraintRemoved(hkpConstraintInstance* constraint) {
-	hkSmallArray<hkpConstraintListener*>& listeners = constraint->m_listeners;
-	for (int32_t i = listeners.m_size - 1; i >= 0; --i) {
-		if (listeners.m_data[i]) {
-			HK_TIMER_BEGIN("conRemCb", nullptr);
-			listeners.m_data[i]->constraintRemovedCallback(constraint);
-			HK_TIMER_END();
-		}
-	}
-	cleanupNullPointers(listeners);
+    hkSmallArray<hkpConstraintListener*>& listeners = constraint->m_listeners;
+    for (int32_t i = listeners.m_size - 1; i >= 0; --i) {
+        if (listeners.m_data[i]) {
+            HK_TIMER_BEGIN("conRemCb", nullptr);
+            listeners.m_data[i]->constraintRemovedCallback(constraint);
+            HK_TIMER_END();
+        }
+    }
+    cleanupNullPointers(listeners);
 }
 
 void hkpConstraintCallbackUtil::fireConstraintDeleted(hkpConstraintInstance* constraint) {
-	hkSmallArray<hkpConstraintListener*>& listeners = constraint->m_listeners;
-	for (int32_t i = listeners.m_size - 1; i >= 0; --i) {
-		if (listeners.m_data[i]) {
-			HK_TIMER_BEGIN("conDeletedCb", nullptr);
-			listeners.m_data[i]->constraintDeletedCallback(constraint);
-			HK_TIMER_END();
-		}
-	}
-	cleanupNullPointers(listeners);
+    hkSmallArray<hkpConstraintListener*>& listeners = constraint->m_listeners;
+    for (int32_t i = listeners.m_size - 1; i >= 0; --i) {
+        if (listeners.m_data[i]) {
+            HK_TIMER_BEGIN("conDeletedCb", nullptr);
+            listeners.m_data[i]->constraintDeletedCallback(constraint);
+            HK_TIMER_END();
+        }
+    }
+    cleanupNullPointers(listeners);
 }
 
 void hkpConstraintCallbackUtil::fireConstraintBroken(const hkpConstraintBrokenEvent& event) {
-	hkpConstraintInstance* constraint = event.m_constraintInstance;
-	hkSmallArray<hkpConstraintListener*>& listeners = constraint->m_listeners;
-	for (int32_t i = listeners.m_size - 1; i >= 0; --i) {
-		if (listeners.m_data[i]) {
-			HK_TIMER_BEGIN("conBrokenCb", nullptr);
-			listeners.m_data[i]->constraintBreakingCallback(event);
-			HK_TIMER_END();
-		}
-	}
-	cleanupNullPointers(listeners);
+    hkpConstraintInstance* constraint = event.m_constraintInstance;
+    hkSmallArray<hkpConstraintListener*>& listeners = constraint->m_listeners;
+    for (int32_t i = listeners.m_size - 1; i >= 0; --i) {
+        if (listeners.m_data[i]) {
+            HK_TIMER_BEGIN("conBrokenCb", nullptr);
+            listeners.m_data[i]->constraintBreakingCallback(event);
+            HK_TIMER_END();
+        }
+    }
+    cleanupNullPointers(listeners);
 }
 
 void hkpConstraintCallbackUtil::fireConstraintRepaired(const hkpConstraintRepairedEvent& event) {
-	hkpConstraintInstance* constraint = event.m_constraintInstance;
-	hkSmallArray<hkpConstraintListener*>& listeners = constraint->m_listeners;
-	for (int32_t i = listeners.m_size - 1; i >= 0; --i) {
-		if (listeners.m_data[i]) {
-			HK_TIMER_BEGIN("conRepairedCb", nullptr);
-			listeners.m_data[i]->constraintRepairedCallback(event);
-			HK_TIMER_END();
-		}
-	}
-	cleanupNullPointers(listeners);
+    hkpConstraintInstance* constraint = event.m_constraintInstance;
+    hkSmallArray<hkpConstraintListener*>& listeners = constraint->m_listeners;
+    for (int32_t i = listeners.m_size - 1; i >= 0; --i) {
+        if (listeners.m_data[i]) {
+            HK_TIMER_BEGIN("conRepairedCb", nullptr);
+            listeners.m_data[i]->constraintRepairedCallback(event);
+            HK_TIMER_END();
+        }
+    }
+    cleanupNullPointers(listeners);
 }
 
 void hkpConstraintCallbackUtil::cleanupNullPointers(hkSmallArray<hkpConstraintListener*>& arArray) {
-	for (int32_t i = arArray.getSize() - 1; i >= 0; i--) {
-		if (arArray[i] == nullptr) {
-			arArray.removeAtAndCopy(i);
-		}
-	}
+    for (int32_t i = arArray.getSize() - 1; i >= 0; i--) {
+        if (arArray[i] == nullptr) {
+            arArray.removeAtAndCopy(i);
+        }
+    }
 }

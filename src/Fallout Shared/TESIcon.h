@@ -6,8 +6,8 @@
 // An icon texture file name.
 class TESIcon : public TESTexture {
 public:
-	TESIcon();
-	~TESIcon();
+    TESIcon();
+    ~TESIcon();
 
-	const char* GetDefaultPath() const override;
+    const char* GetDefaultPath() const override;
 };

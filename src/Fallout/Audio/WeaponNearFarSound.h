@@ -8,11 +8,11 @@ class Actor;
 // and when.
 class WeaponNearFarSound {
 public:
-	WeaponNearFarSound();
+    WeaponNearFarSound();
 
-	BSSoundHandle soundNear;
-	BSSoundHandle soundFar;
-	Actor* uiIdentifier;
-	uint32_t uiTimestamp;
-	float fRelativeDistance;
+    BSSoundHandle soundNear;
+    BSSoundHandle soundFar;
+    Actor* uiIdentifier;
+    uint32_t uiTimestamp;
+    float fRelativeDistance;
 };

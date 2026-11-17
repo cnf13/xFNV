@@ -7,8 +7,8 @@ class NiStream;
 // own.
 class bhkLimitedForceConstraintMotor {
 public:
-	// Reads the motor's minimum, then its maximum force, each one 4-byte component of the stream.
-	static void LoadBinary(NiStream& arStream, hkpLimitedForceConstraintMotor& arMotor);
-	// Writes the motor's minimum, then its maximum force, each one 4-byte component of the stream.
-	static void SaveBinary(NiStream& arStream, hkpLimitedForceConstraintMotor& arMotor);
+    // Reads the motor's minimum, then its maximum force, each one 4-byte component of the stream.
+    static void LoadBinary(NiStream& arStream, hkpLimitedForceConstraintMotor& arMotor);
+    // Writes the motor's minimum, then its maximum force, each one 4-byte component of the stream.
+    static void SaveBinary(NiStream& arStream, hkpLimitedForceConstraintMotor& arMotor);
 };

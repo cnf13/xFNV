@@ -55,18 +55,17 @@ int _strupr_s(char* apString, size_t astSize);
 
 namespace rt {
 
-// VC9's memcpy copies overlapping ranges right (it picks the direction, as memmove does), and the game relies on it
-// (CombatController::AddFailedCombatProcedure shifts its list down in place); std::memcpy does not promise that.
-inline void* memcpy(void* apDest, const void* apSrc, size_t astCount)
-{
-	return std::memmove(apDest, apSrc, astCount);
-}
+    // VC9's memcpy copies overlapping ranges right (it picks the direction, as memmove does), and the game relies on it
+    // (CombatController::AddFailedCombatProcedure shifts its list down in place); std::memcpy does not promise that.
+    inline void* memcpy(void* apDest, const void* apSrc, size_t astCount) {
+        return std::memmove(apDest, apSrc, astCount);
+    }
 
-// wcslen, 0xECDB00 (cdecl): the length in char16_t elements of a string of the game's 2-byte characters (VC9's
-// wchar_t). Defined and registered in string.cpp.
-size_t wcslen(const char16_t* String);
+    // wcslen, 0xECDB00 (cdecl): the length in char16_t elements of a string of the game's 2-byte characters (VC9's
+    // wchar_t). Defined and registered in string.cpp.
+    size_t wcslen(const char16_t* String);
 
-// _wcsicmp, 0xECC071: _stricmp on the game's 2-byte characters. Defined in string.cpp.
-int32_t _wcsicmp(const char16_t* apStr1, const char16_t* apStr2);
+    // _wcsicmp, 0xECC071: _stricmp on the game's 2-byte characters. Defined in string.cpp.
+    int32_t _wcsicmp(const char16_t* apStr1, const char16_t* apStr2);
 
 } // namespace rt

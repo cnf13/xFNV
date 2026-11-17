@@ -9,11 +9,11 @@ BSWin32TaskletData::BSWin32TaskletData() : pGroupData(nullptr), bRunOnStartup(tr
 
 // Takes the data's spin lock, detaches it from its group and releases the lock.
 BSWin32TaskletData::~BSWin32TaskletData() {
-	while (InterlockedCompareExchange32(reinterpret_cast<int32_t*>(&TaskDataLock), 1, 0)) {
-		Sleep(0);
-	}
-	if (pGroupData) {
-		pGroupData = nullptr;
-	}
-	TaskDataLock = 0;
+    while (InterlockedCompareExchange32(reinterpret_cast<int32_t*>(&TaskDataLock), 1, 0)) {
+        Sleep(0);
+    }
+    if (pGroupData) {
+        pGroupData = nullptr;
+    }
+    TaskDataLock = 0;
 }

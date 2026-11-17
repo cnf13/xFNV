@@ -8,16 +8,16 @@
 // A user channel of a scene mesh section: the indices of the selected triangles. It overrides only the destructor.
 class hkxTriangleSelectionChannel : public hkReferencedObject {
 public:
-	// The SDK's finish constructor: a loaded object keeps the fields the load wrote.
-	hkxTriangleSelectionChannel(hkFinishLoadedObjectFlag aFlag)
-		: hkReferencedObject(aFlag), m_selectedTriangles(aFlag) {}
+    // The SDK's finish constructor: a loaded object keeps the fields the load wrote.
+    hkxTriangleSelectionChannel(hkFinishLoadedObjectFlag aFlag)
+      : hkReferencedObject(aFlag), m_selectedTriangles(aFlag) {}
 
-	~hkxTriangleSelectionChannel() override;
+    ~hkxTriangleSelectionChannel() override;
 
-	// The reflection class hkxTriangleSelectionChannelClass.
-	static const hkClass& staticClass();
+    // The reflection class hkxTriangleSelectionChannelClass.
+    static const hkClass& staticClass();
 
-	hkArray<int32_t> m_selectedTriangles;
+    hkArray<int32_t> m_selectedTriangles;
 };
 
 extern hkClass hkxTriangleSelectionChannelClass;

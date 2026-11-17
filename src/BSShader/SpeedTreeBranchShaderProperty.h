@@ -7,19 +7,21 @@
 // The property that selects the branch shader and its wind for a SpeedTree model.
 class SpeedTreeBranchShaderProperty : public SpeedTreeShaderPPLightingProperty {
 public:
-	SpeedTreeBranchShaderProperty(STSPData* apData);
-	~SpeedTreeBranchShaderProperty() override;
+    SpeedTreeBranchShaderProperty(STSPData* apData);
+    ~SpeedTreeBranchShaderProperty() override;
 
-	const NiRTTI* GetRTTI() const override { return &ms_RTTI; }
-	NiObject* CreateClone(NiCloningProcess& arCloneData) override;
-	void GetViewerStrings(NiTPrimitiveArray<char*>* apStrings) override;
-	NiAdditionalGeometryData* CreateRendererSpecificProperty(NiGeometry* apGeometry) override;
-	SpeedTreeBranchShaderProperty* CreateCopy() override;
+    const NiRTTI* GetRTTI() const override {
+        return &ms_RTTI;
+    }
+    NiObject* CreateClone(NiCloningProcess& arCloneData) override;
+    void GetViewerStrings(NiTPrimitiveArray<char*>* apStrings) override;
+    NiAdditionalGeometryData* CreateRendererSpecificProperty(NiGeometry* apGeometry) override;
+    SpeedTreeBranchShaderProperty* CreateCopy() override;
 
-	// CreateClone calls it on the clone.
-	void CopyMembers(SpeedTreeBranchShaderProperty* apDest, NiCloningProcess& arCloneData);
+    // CreateClone calls it on the clone.
+    void CopyMembers(SpeedTreeBranchShaderProperty* apDest, NiCloningProcess& arCloneData);
 
-	static NiRTTI ms_RTTI;
+    static NiRTTI ms_RTTI;
 };
 
 NiSmartPointer(SpeedTreeBranchShaderProperty);

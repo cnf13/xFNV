@@ -4,8 +4,8 @@
 
 class ImageSpaceShaderFFTDisplayNormals : public ImageSpaceShader {
 public:
-	ImageSpaceShaderFFTDisplayNormals();
-	~ImageSpaceShaderFFTDisplayNormals() override;
+    ImageSpaceShaderFFTDisplayNormals();
+    ~ImageSpaceShaderFFTDisplayNormals() override;
 
-	void ReloadShaders() override;
+    void ReloadShaders() override;
 };

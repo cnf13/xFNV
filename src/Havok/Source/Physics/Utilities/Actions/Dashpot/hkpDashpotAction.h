@@ -18,26 +18,26 @@ void cleanupLoadedObjecthkpDashpotAction(void* p);
 // A spring-damper impulse between two body attachment points.
 class hkpDashpotAction : public hkpBinaryAction {
 public:
-	// The reflected members of hkpDashpotAction.
-	using MembersArray = const hkClassMember[4];
+    // The reflected members of hkpDashpotAction.
+    using MembersArray = const hkClassMember[4];
 
-	// The constructor, on apMemory: the binary action over the two bodies, zero points, strength 0.1 and damping
-	// 0.01; m_impulse is left unwritten.
-	hkpDashpotAction(hkpRigidBody* entityA, hkpRigidBody* entityB, uint32_t userData);
-	hkpDashpotAction(hkFinishLoadedObjectFlag aFlag) : hkpBinaryAction(aFlag) {}
-	~hkpDashpotAction() override;
+    // The constructor, on apMemory: the binary action over the two bodies, zero points, strength 0.1 and damping
+    // 0.01; m_impulse is left unwritten.
+    hkpDashpotAction(hkpRigidBody* entityA, hkpRigidBody* entityB, uint32_t userData);
+    hkpDashpotAction(hkFinishLoadedObjectFlag aFlag) : hkpBinaryAction(aFlag) {}
+    ~hkpDashpotAction() override;
 
-	void applyAction(const hkStepInfo& stepInfo) override;
-	hkpAction* clone(const hkArray<hkpEntity*>& newEntities, const hkArray<hkpPhantom*>& newPhantoms) const override;
+    void applyAction(const hkStepInfo& stepInfo) override;
+    hkpAction* clone(const hkArray<hkpEntity*>& newEntities, const hkArray<hkpPhantom*>& newPhantoms) const override;
 
-	static const hkClass& staticClass();
+    static const hkClass& staticClass();
 
-	hkVector4 m_point[2];
-	float m_strength;
-	float m_damping;
-	hkVector4 m_impulse;
+    hkVector4 m_point[2];
+    float m_strength;
+    float m_damping;
+    hkVector4 m_impulse;
 
-	static MembersArray Members;
+    static MembersArray Members;
 };
 
 extern hkClass hkpDashpotActionClass;

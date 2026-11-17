@@ -2,8 +2,8 @@
 
 // The renderer data's pixel format; null without renderer data.
 const NiPixelFormat* Ni2DBuffer::GetPixelFormat() const {
-	if (!m_spRendererData.operator->()) {
-		return nullptr;
-	}
-	return m_spRendererData.operator->()->GetPixelFormat();
+    if (!m_spRendererData.operator->()) {
+        return nullptr;
+    }
+    return m_spRendererData.operator->()->GetPixelFormat();
 }

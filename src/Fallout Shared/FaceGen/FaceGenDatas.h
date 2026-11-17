@@ -5,6 +5,6 @@
 // The four coordinate matrices FaceGen builds a head from.
 class FaceGenDatas {
 public:
-	// BipedAnim casts the struct to FR2MatrixVTC<float>[2].
-	FR2MatrixVTC<float> kFaceGens[2][2];
+    // BipedAnim casts the struct to FR2MatrixVTC<float>[2].
+    FR2MatrixVTC<float> kFaceGens[2][2];
 };

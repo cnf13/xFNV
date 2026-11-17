@@ -6,19 +6,21 @@
 // The extra data of an addon node that holds the sound it plays.
 class BGSAddonNodeSoundHandleExtra : public NiExtraData {
 public:
-	BGSAddonNodeSoundHandleExtra();
-	~BGSAddonNodeSoundHandleExtra() override;
+    BGSAddonNodeSoundHandleExtra();
+    ~BGSAddonNodeSoundHandleExtra() override;
 
-	const NiRTTI* GetRTTI() const override { return &ms_RTTI; }
+    const NiRTTI* GetRTTI() const override {
+        return &ms_RTTI;
+    }
 
-	// Creates the "ASH" tag.
-	static void InitTag();
-	// The "ASH" tag the extra data is named by.
-	static const NiFixedString& Tag();
-	static NiFixedString* KillSDM();
+    // Creates the "ASH" tag.
+    static void InitTag();
+    // The "ASH" tag the extra data is named by.
+    static const NiFixedString& Tag();
+    static NiFixedString* KillSDM();
 
-	BSSoundHandle SoundHandle;
+    BSSoundHandle SoundHandle;
 
-	static NiRTTI ms_RTTI;
-	static inline NiFixedString* pTag;
+    static NiRTTI ms_RTTI;
+    static inline NiFixedString* pTag;
 };

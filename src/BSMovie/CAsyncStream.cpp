@@ -7,5 +7,5 @@ CAsyncStream::CAsyncStream() {}
 CAsyncStream::~CAsyncStream() {}
 
 void CAsyncStream::operator delete(void* apMemory) {
-	ourFree(apMemory);
+    ourFree(apMemory);
 }

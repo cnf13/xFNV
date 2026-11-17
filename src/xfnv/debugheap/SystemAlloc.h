@@ -9,14 +9,14 @@
 
 namespace fnvd::sysalloc {
 
-// malloc, free, realloc, _msize.
-void* Allocate(size_t aSize);
-void Free(void* apMem);
-void* Reallocate(void* apMem, size_t aSize);
-size_t Size(const void* apMem);
+    // malloc, free, realloc, _msize.
+    void* Allocate(size_t aSize);
+    void Free(void* apMem);
+    void* Reallocate(void* apMem, size_t aSize);
+    size_t Size(const void* apMem);
 
-// _aligned_malloc and _aligned_free (aAlign: a power of two): a pair of their own, never mixed with the four above.
-void* AlignedAllocate(size_t aSize, size_t aAlign);
-void AlignedFree(void* apMem);
+    // _aligned_malloc and _aligned_free (aAlign: a power of two): a pair of their own, never mixed with the four above.
+    void* AlignedAllocate(size_t aSize, size_t aAlign);
+    void AlignedFree(void* apMem);
 
-}  // namespace fnvd::sysalloc
+} // namespace fnvd::sysalloc

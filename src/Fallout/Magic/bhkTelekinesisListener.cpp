@@ -28,81 +28,84 @@
 #include "SDK/MSVC/rtti.h"
 
 void DestroyPointerSmallArray(void* apThis, [[maybe_unused]] void* apEdx) {
-	static_cast<hkSmallArray<void*>*>(apThis)->~hkSmallArray<void*>();
+    static_cast<hkSmallArray<void*>*>(apThis)->~hkSmallArray<void*>();
 }
 
 bhkTelekinesisListener::bhkTelekinesisListener(TESObjectREFR* a1, bhkRigidBody* a2, uint32_t a3)
-	: pRef(a1), pBody(a2), DefaultFilter(a3), bCanFinish(false) {
-	pBody->AddContactListener(this);
-	pBody->AddEntityListener(static_cast<hkpEntityListener*>(this));
-	pBody->AddEntityActivationListener(static_cast<hkpEntityActivationListener*>(this));
+  : pRef(a1), pBody(a2), DefaultFilter(a3), bCanFinish(false) {
+    pBody->AddContactListener(this);
+    pBody->AddEntityListener(static_cast<hkpEntityListener*>(this));
+    pBody->AddEntityActivationListener(static_cast<hkpEntityActivationListener*>(this));
 }
 
 bhkTelekinesisListener::~bhkTelekinesisListener() {}
 
 // Removes the listener from the entity, then deletes it.
 void bhkTelekinesisListener::entityDeletedCallback(hkpEntity* apEntity) {
-	Remove(this, apEntity);
-	delete this;
+    Remove(this, apEntity);
+    delete this;
 }
 
 // Called through the hkpEntityActivationListener vtable at +0x8.
 void bhkTelekinesisListener::entityDeactivatedCallback(hkpEntity* apEntity) {
-	if (bCanFinish)
-		Finish(apEntity);
+    if (bCanFinish) {
+        Finish(apEntity);
+    }
 }
 
 void bhkTelekinesisListener::Finish(hkpEntity* apEntity) {
-	if (pRef) {
-		NiAVObject* pav = pRef->Get3D();
-		BSFadeNode* pavlod = dynamic_cast<BSFadeNode*>(pav);
-		if (pavlod) {
-			pavlod->SetLODMultType(LOD_MULT_ITEMS);
-		}
-	}
-	pBody->SetCollisionFilter(DefaultFilter);
-	bhkTelekinesisListener::Remove(this, apEntity);
-	if (this) {
-		delete this;
-	}
+    if (pRef) {
+        NiAVObject* pav = pRef->Get3D();
+        BSFadeNode* pavlod = dynamic_cast<BSFadeNode*>(pav);
+        if (pavlod) {
+            pavlod->SetLODMultType(LOD_MULT_ITEMS);
+        }
+    }
+    pBody->SetCollisionFilter(DefaultFilter);
+    bhkTelekinesisListener::Remove(this, apEntity);
+    if (this) {
+        delete this;
+    }
 }
 
 void bhkTelekinesisListener::Remove(bhkTelekinesisListener* apListener, hkpEntity* apEntity) {
-	apEntity->removeContactListener(apListener);
-	if (apListener) {
-		apEntity->removeEntityListener(static_cast<hkpEntityListener*>(apListener));
-	} else {
-		apEntity->removeEntityListener(nullptr);
-	}
-	if (apListener) {
-		apEntity->removeEntityActivationListener(static_cast<hkpEntityActivationListener*>(apListener));
-	} else {
-		apEntity->removeEntityActivationListener(nullptr);
-	}
+    apEntity->removeContactListener(apListener);
+    if (apListener) {
+        apEntity->removeEntityListener(static_cast<hkpEntityListener*>(apListener));
+    }
+    else {
+        apEntity->removeEntityListener(nullptr);
+    }
+    if (apListener) {
+        apEntity->removeEntityActivationListener(static_cast<hkpEntityActivationListener*>(apListener));
+    }
+    else {
+        apEntity->removeEntityActivationListener(nullptr);
+    }
 }
 
 void bhkTelekinesisListener::AllowToFinish(bhkRigidBody* apBody) {
-	hkpRigidBody* a2 = apBody->operator*();
-	int32_t i_2 = 0;
-	for (hkpEntity::ExtendedListeners* i = a2->getExtendedListeners(); i_2 < i->m_activationListeners.m_size;
-		i = a2->getExtendedListeners()) {
-		hkpEntity::ExtendedListeners* ExtendedListeners = a2->getExtendedListeners();
-		hkpEntityActivationListener* pListener = ExtendedListeners->m_activationListeners[i_2];
-		bhkTelekinesisListener* ptl = dynamic_cast<bhkTelekinesisListener*>(pListener);
-		if (ptl) {
-			ptl->Finish(a2);
-			i_2 = 0;
-		}
-		++i_2;
-	}
+    hkpRigidBody* a2 = apBody->operator*();
+    int32_t i_2 = 0;
+    for (hkpEntity::ExtendedListeners* i = a2->getExtendedListeners(); i_2 < i->m_activationListeners.m_size;
+         i = a2->getExtendedListeners()) {
+        hkpEntity::ExtendedListeners* ExtendedListeners = a2->getExtendedListeners();
+        hkpEntityActivationListener* pListener = ExtendedListeners->m_activationListeners[i_2];
+        bhkTelekinesisListener* ptl = dynamic_cast<bhkTelekinesisListener*>(pListener);
+        if (ptl) {
+            ptl->Finish(a2);
+            i_2 = 0;
+        }
+        ++i_2;
+    }
 }
 
 void* hkpEntity::ExtendedListeners::operator new(size_t aiNumBytes) noexcept {
-	return hkMemoryRouter::getInstance().m_heap->blockAlloc(static_cast<int32_t>(aiNumBytes));
+    return hkMemoryRouter::getInstance().m_heap->blockAlloc(static_cast<int32_t>(aiNumBytes));
 }
 
 void hkpEntity::ExtendedListeners::operator delete(void* apMemory) {
-	if (apMemory) {
-		hkMemoryRouter::getInstance().heap().blockFree(apMemory, static_cast<int32_t>(sizeof(ExtendedListeners)));
-	}
+    if (apMemory) {
+        hkMemoryRouter::getInstance().heap().blockFree(apMemory, static_cast<int32_t>(sizeof(ExtendedListeners)));
+    }
 }

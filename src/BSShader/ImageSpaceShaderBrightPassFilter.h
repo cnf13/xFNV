@@ -4,8 +4,8 @@
 
 class ImageSpaceShaderBrightPassFilter : public ImageSpaceShader {
 public:
-	ImageSpaceShaderBrightPassFilter();
-	~ImageSpaceShaderBrightPassFilter() override;
+    ImageSpaceShaderBrightPassFilter();
+    ~ImageSpaceShaderBrightPassFilter() override;
 
-	void ReloadShaders() override;
+    void ReloadShaders() override;
 };

@@ -7,10 +7,10 @@ class hkpRayShapeCollectionFilter;
 // A ray cast against a shape: the ray's ends in the shape's space, the filter info of the ray and the filter that
 // decides which children of a shape collection it may hit.
 struct hkpShapeRayCastInput {
-	hkpShapeRayCastInput();
+    hkpShapeRayCastInput();
 
-	hkVector4 m_from;
-	hkVector4 m_to;
-	uint32_t m_filterInfo;
-	const hkpRayShapeCollectionFilter* m_rayShapeCollectionFilter;
+    hkVector4 m_from;
+    hkVector4 m_to;
+    uint32_t m_filterInfo;
+    const hkpRayShapeCollectionFilter* m_rayShapeCollectionFilter;
 };

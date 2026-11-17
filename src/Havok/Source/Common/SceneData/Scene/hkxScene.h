@@ -27,31 +27,31 @@ void cleanupLoadedObjecthkxScene(void* p);
 // The objects, resources and coordinate transform of an exported scene.
 class hkxScene : public hkReferencedObject {
 public:
-	hkxScene();
-	// The SDK's finish constructor: a loaded object keeps the fields the load wrote (defined in hkxScene.cpp, where
-	// the referenced classes are complete).
-	hkxScene(hkFinishLoadedObjectFlag aFlag);
-	~hkxScene() override;
+    hkxScene();
+    // The SDK's finish constructor: a loaded object keeps the fields the load wrote (defined in hkxScene.cpp, where
+    // the referenced classes are complete).
+    hkxScene(hkFinishLoadedObjectFlag aFlag);
+    ~hkxScene() override;
 
-	hkxNode* findNodeByName(const char* name) const;
-	hkResult getFullPathToNode(const hkxNode* theNode, hkArray<const hkxNode*, hkContainerHeapAllocator>& pathOut);
-	hkResult getWorldFromNodeTransform(const hkxNode* theNode, hkMatrix4& worldFromNodeOut, int32_t key);
+    hkxNode* findNodeByName(const char* name) const;
+    hkResult getFullPathToNode(const hkxNode* theNode, hkArray<const hkxNode*, hkContainerHeapAllocator>& pathOut);
+    hkResult getWorldFromNodeTransform(const hkxNode* theNode, hkMatrix4& worldFromNodeOut, int32_t key);
 
-	static const hkClass& staticClass();
+    static const hkClass& staticClass();
 
-	hkStringPtr m_modeller;
-	hkStringPtr m_asset;
-	float m_sceneLength;
-	hkRefPtr<hkxNode> m_rootNode;
-	hkArray<hkRefPtr<hkxNodeSelectionSet>> m_selectionSets;
-	hkArray<hkRefPtr<hkxCamera>> m_cameras;
-	hkArray<hkRefPtr<hkxLight>> m_lights;
-	hkArray<hkRefPtr<hkxMesh>> m_meshes;
-	hkArray<hkRefPtr<hkxMaterial>> m_materials;
-	hkArray<hkRefPtr<hkxTextureInplace>> m_inplaceTextures;
-	hkArray<hkRefPtr<hkxTextureFile>> m_externalTextures;
-	hkArray<hkRefPtr<hkxSkinBinding>> m_skinBindings;
-	hkMatrix3 m_appliedTransform;
+    hkStringPtr m_modeller;
+    hkStringPtr m_asset;
+    float m_sceneLength;
+    hkRefPtr<hkxNode> m_rootNode;
+    hkArray<hkRefPtr<hkxNodeSelectionSet>> m_selectionSets;
+    hkArray<hkRefPtr<hkxCamera>> m_cameras;
+    hkArray<hkRefPtr<hkxLight>> m_lights;
+    hkArray<hkRefPtr<hkxMesh>> m_meshes;
+    hkArray<hkRefPtr<hkxMaterial>> m_materials;
+    hkArray<hkRefPtr<hkxTextureInplace>> m_inplaceTextures;
+    hkArray<hkRefPtr<hkxTextureFile>> m_externalTextures;
+    hkArray<hkRefPtr<hkxSkinBinding>> m_skinBindings;
+    hkMatrix3 m_appliedTransform;
 };
 
 extern hkClass hkxSceneClass;

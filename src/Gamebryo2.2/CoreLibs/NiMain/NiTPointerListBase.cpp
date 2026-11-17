@@ -26,19 +26,21 @@
 #include "Gamebryo2.2/CoreLibs/NiParticle/NiPSysModifier.h"
 
 // The string list's node is a heap block, constructed in place.
-template <> NiTListItem<BSStringT<char>>* NiTPointerListBase<BSStringT<char>>::NewItem() {
-	void* pMemory = ourMalloc(sizeof(NiTListItem<BSStringT<char>>));
-	return pMemory ? new (pMemory) NiTListItem<BSStringT<char>> : nullptr;
+template <>
+NiTListItem<BSStringT<char>>* NiTPointerListBase<BSStringT<char>>::NewItem() {
+    void* pMemory = ourMalloc(sizeof(NiTListItem<BSStringT<char>>));
+    return pMemory ? new (pMemory) NiTListItem<BSStringT<char>> : nullptr;
 }
 
 // Empties the string, then frees the node through its deleting destructor, which destroys the string and gives the
 // block back to the heap with ourFree, the pair of NewItem's ourMalloc.
-template <> void NiTPointerListBase<BSStringT<char>>::DeleteItem(NiTListItem<BSStringT<char>>* pkItem) {
-	pkItem->m_element = static_cast<const char*>(nullptr);
-	pkItem->~NiTListItem();
-	ourFree(pkItem);
+template <>
+void NiTPointerListBase<BSStringT<char>>::DeleteItem(NiTListItem<BSStringT<char>>* pkItem) {
+    pkItem->m_element = static_cast<const char*>(nullptr);
+    pkItem->~NiTListItem();
+    ourFree(pkItem);
 }
 
 void NiAVObjectList_AddHead(NiTPointerListBase<NiAVObject*>* apList, NiAVObject* const& arElement) {
-	apList->AddHead(arElement);
+    apList->AddHead(arElement);
 }

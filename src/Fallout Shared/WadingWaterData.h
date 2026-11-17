@@ -6,9 +6,9 @@
 // Current and previous water displacement offsets, with the reference's last position.
 class WadingWaterData {
 public:
-	WadingWaterData();
+    WadingWaterData();
 
-	NiPoint2 fDisplaceOffset;
-	NiPoint2 fLastDisplaceOffset;
-	NiPoint3 fLastPosition;
+    NiPoint2 fDisplaceOffset;
+    NiPoint2 fLastDisplaceOffset;
+    NiPoint3 fLastPosition;
 };

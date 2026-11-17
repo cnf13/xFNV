@@ -6,6 +6,6 @@
 // The fog a shader is given: its distances and power, and its color.
 class FogProperties {
 public:
-	::FogParameters FogParameters;
-	NiColorA Color;
+    ::FogParameters FogParameters;
+    NiColorA Color;
 };

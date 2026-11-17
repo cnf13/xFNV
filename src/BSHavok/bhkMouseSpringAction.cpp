@@ -30,217 +30,217 @@
 NiRTTI bhkMouseSpringAction::ms_RTTI("bhkMouseSpringAction", &bhkUnaryAction::ms_RTTI);
 
 bhkMouseSpringAction::bhkMouseSpringAction() {
-	++iCount;
+    ++iCount;
 }
 
 bhkMouseSpringAction::bhkMouseSpringAction(const hkMouseSpringActionCinfo& arInfo) {
-	bhkMouseSpringAction::Init(arInfo);
-	++iCount;
+    bhkMouseSpringAction::Init(arInfo);
+    ++iCount;
 }
 
 bhkMouseSpringAction::~bhkMouseSpringAction() {
-	bhkSerializable::Kill();
-	--iCount;
+    bhkSerializable::Kill();
+    --iCount;
 }
 
 NiObject* bhkMouseSpringAction::CreateClone(NiCloningProcess& arCloneData) {
-	AutoMemContext kMemContext(MEM_CONTEXT_HAVOK);
-	bhkSerializable::CloneCritLock();
-	bhkMouseSpringAction* pClone =
-		static_cast<bhkMouseSpringAction*>(NiMemObject::operator new(sizeof(bhkMouseSpringAction)));
-	if (pClone) {
-		::new (pClone) bhkMouseSpringAction;
-	}
-	// The base body is called directly, not through the vtable, so the call is qualified.
-	bhkUnaryAction::CopyMembers(pClone, arCloneData);
-	bhkSerializable::CloneCritUnlock();
-	return pClone;
+    AutoMemContext kMemContext(MEM_CONTEXT_HAVOK);
+    bhkSerializable::CloneCritLock();
+    bhkMouseSpringAction* pClone =
+        static_cast<bhkMouseSpringAction*>(NiMemObject::operator new(sizeof(bhkMouseSpringAction)));
+    if (pClone) {
+        ::new (pClone) bhkMouseSpringAction;
+    }
+    // The base body is called directly, not through the vtable, so the call is qualified.
+    bhkUnaryAction::CopyMembers(pClone, arCloneData);
+    bhkSerializable::CloneCritUnlock();
+    return pClone;
 }
 
 // The base's fields, then, for a big-endian source, the creation info's two positions and its four floats byte-swapped
 // in place. The stream's byte is compared with 1: any other byte swaps. A cinfo built here is not killed. Each float's
 // four bytes are swapped as an untyped 32-bit value, hence the uint32_t views.
 void bhkMouseSpringAction::LoadBinary(NiStream& arStream) {
-	bhkUnaryAction::LoadBinary(arStream);
-	if (*static_cast<const uint8_t*>(static_cast<const void*>(&arStream.m_bSourceIsLittleEndian)) != 1) {
-		bool bCreated;
-		hkMouseSpringActionCinfo& rInfo = static_cast<hkMouseSpringActionCinfo&>(CreateCinfo(bCreated));
-		// EXE-INLINED none: bhkStream::Endian
-		uint32_t* puiPositionInRbLocal = reinterpret_cast<uint32_t*>(&rInfo.m_positionInRbLocal);
-		puiPositionInRbLocal[0] = __builtin_bswap32(puiPositionInRbLocal[0]);
-		puiPositionInRbLocal[1] = __builtin_bswap32(puiPositionInRbLocal[1]);
-		puiPositionInRbLocal[2] = __builtin_bswap32(puiPositionInRbLocal[2]);
-		puiPositionInRbLocal[3] = __builtin_bswap32(puiPositionInRbLocal[3]);
-		// EXE-INLINED none: bhkStream::Endian
-		uint32_t* puiMousePositionInWorld = reinterpret_cast<uint32_t*>(&rInfo.m_mousePositionInWorld);
-		puiMousePositionInWorld[0] = __builtin_bswap32(puiMousePositionInWorld[0]);
-		puiMousePositionInWorld[1] = __builtin_bswap32(puiMousePositionInWorld[1]);
-		puiMousePositionInWorld[2] = __builtin_bswap32(puiMousePositionInWorld[2]);
-		puiMousePositionInWorld[3] = __builtin_bswap32(puiMousePositionInWorld[3]);
-		// EXE-INLINED none: BSEndian
-		uint32_t* puiSpringDamping = reinterpret_cast<uint32_t*>(&rInfo.m_springDamping);
-		*puiSpringDamping = __builtin_bswap32(*puiSpringDamping);
-		// EXE-INLINED none: BSEndian
-		uint32_t* puiSpringElasticity = reinterpret_cast<uint32_t*>(&rInfo.m_springElasticity);
-		*puiSpringElasticity = __builtin_bswap32(*puiSpringElasticity);
-		// EXE-INLINED none: BSEndian
-		uint32_t* puiMaxRelativeForce = reinterpret_cast<uint32_t*>(&rInfo.m_maxRelativeForce);
-		*puiMaxRelativeForce = __builtin_bswap32(*puiMaxRelativeForce);
-		// EXE-INLINED none: BSEndian
-		uint32_t* puiObjectDamping = reinterpret_cast<uint32_t*>(&rInfo.m_objectDamping);
-		*puiObjectDamping = __builtin_bswap32(*puiObjectDamping);
-	}
+    bhkUnaryAction::LoadBinary(arStream);
+    if (*static_cast<const uint8_t*>(static_cast<const void*>(&arStream.m_bSourceIsLittleEndian)) != 1) {
+        bool bCreated;
+        hkMouseSpringActionCinfo& rInfo = static_cast<hkMouseSpringActionCinfo&>(CreateCinfo(bCreated));
+        // EXE-INLINED none: bhkStream::Endian
+        uint32_t* puiPositionInRbLocal = reinterpret_cast<uint32_t*>(&rInfo.m_positionInRbLocal);
+        puiPositionInRbLocal[0] = __builtin_bswap32(puiPositionInRbLocal[0]);
+        puiPositionInRbLocal[1] = __builtin_bswap32(puiPositionInRbLocal[1]);
+        puiPositionInRbLocal[2] = __builtin_bswap32(puiPositionInRbLocal[2]);
+        puiPositionInRbLocal[3] = __builtin_bswap32(puiPositionInRbLocal[3]);
+        // EXE-INLINED none: bhkStream::Endian
+        uint32_t* puiMousePositionInWorld = reinterpret_cast<uint32_t*>(&rInfo.m_mousePositionInWorld);
+        puiMousePositionInWorld[0] = __builtin_bswap32(puiMousePositionInWorld[0]);
+        puiMousePositionInWorld[1] = __builtin_bswap32(puiMousePositionInWorld[1]);
+        puiMousePositionInWorld[2] = __builtin_bswap32(puiMousePositionInWorld[2]);
+        puiMousePositionInWorld[3] = __builtin_bswap32(puiMousePositionInWorld[3]);
+        // EXE-INLINED none: BSEndian
+        uint32_t* puiSpringDamping = reinterpret_cast<uint32_t*>(&rInfo.m_springDamping);
+        *puiSpringDamping = __builtin_bswap32(*puiSpringDamping);
+        // EXE-INLINED none: BSEndian
+        uint32_t* puiSpringElasticity = reinterpret_cast<uint32_t*>(&rInfo.m_springElasticity);
+        *puiSpringElasticity = __builtin_bswap32(*puiSpringElasticity);
+        // EXE-INLINED none: BSEndian
+        uint32_t* puiMaxRelativeForce = reinterpret_cast<uint32_t*>(&rInfo.m_maxRelativeForce);
+        *puiMaxRelativeForce = __builtin_bswap32(*puiMaxRelativeForce);
+        // EXE-INLINED none: BSEndian
+        uint32_t* puiObjectDamping = reinterpret_cast<uint32_t*>(&rInfo.m_objectDamping);
+        *puiObjectDamping = __builtin_bswap32(*puiObjectDamping);
+    }
 }
 
 // For a big-endian save, the creation info's two positions and four floats are byte-swapped in place around the base's
 // write and swapped back after it. The stream's byte is compared with 1 and read again after the base call. Each
 // float's four bytes are swapped as an untyped 32-bit word, hence the uint32_t views.
 void bhkMouseSpringAction::SaveBinary(NiStream& arStream) {
-	bool bCreated;
-	hkMouseSpringActionCinfo& rInfo = static_cast<hkMouseSpringActionCinfo&>(CreateCinfo(bCreated));
-	uint32_t* puiPositionInRbLocal = reinterpret_cast<uint32_t*>(&rInfo.m_positionInRbLocal);
-	uint32_t* puiMousePositionInWorld = reinterpret_cast<uint32_t*>(&rInfo.m_mousePositionInWorld);
-	uint32_t* puiSpringDamping = reinterpret_cast<uint32_t*>(&rInfo.m_springDamping);
-	uint32_t* puiSpringElasticity = reinterpret_cast<uint32_t*>(&rInfo.m_springElasticity);
-	uint32_t* puiMaxRelativeForce = reinterpret_cast<uint32_t*>(&rInfo.m_maxRelativeForce);
-	uint32_t* puiObjectDamping = reinterpret_cast<uint32_t*>(&rInfo.m_objectDamping);
-	if (*static_cast<const uint8_t*>(static_cast<const void*>(&arStream.m_bSaveLittleEndian)) != 1) {
-		// EXE-INLINED none: bhkStream::Endian
-		puiPositionInRbLocal[0] = __builtin_bswap32(puiPositionInRbLocal[0]);
-		puiPositionInRbLocal[1] = __builtin_bswap32(puiPositionInRbLocal[1]);
-		puiPositionInRbLocal[2] = __builtin_bswap32(puiPositionInRbLocal[2]);
-		puiPositionInRbLocal[3] = __builtin_bswap32(puiPositionInRbLocal[3]);
-		// EXE-INLINED none: bhkStream::Endian
-		puiMousePositionInWorld[0] = __builtin_bswap32(puiMousePositionInWorld[0]);
-		puiMousePositionInWorld[1] = __builtin_bswap32(puiMousePositionInWorld[1]);
-		puiMousePositionInWorld[2] = __builtin_bswap32(puiMousePositionInWorld[2]);
-		puiMousePositionInWorld[3] = __builtin_bswap32(puiMousePositionInWorld[3]);
-		// EXE-INLINED none: BSEndian
-		*puiSpringDamping = __builtin_bswap32(*puiSpringDamping);
-		// EXE-INLINED none: BSEndian
-		*puiSpringElasticity = __builtin_bswap32(*puiSpringElasticity);
-		// EXE-INLINED none: BSEndian
-		*puiMaxRelativeForce = __builtin_bswap32(*puiMaxRelativeForce);
-		// EXE-INLINED none: BSEndian
-		*puiObjectDamping = __builtin_bswap32(*puiObjectDamping);
-	}
-	bhkUnaryAction::SaveBinary(arStream);
-	if (*static_cast<const uint8_t*>(static_cast<const void*>(&arStream.m_bSaveLittleEndian)) != 1) {
-		// EXE-INLINED none: bhkStream::Endian
-		puiPositionInRbLocal[0] = __builtin_bswap32(puiPositionInRbLocal[0]);
-		puiPositionInRbLocal[1] = __builtin_bswap32(puiPositionInRbLocal[1]);
-		puiPositionInRbLocal[2] = __builtin_bswap32(puiPositionInRbLocal[2]);
-		puiPositionInRbLocal[3] = __builtin_bswap32(puiPositionInRbLocal[3]);
-		// EXE-INLINED none: bhkStream::Endian
-		puiMousePositionInWorld[0] = __builtin_bswap32(puiMousePositionInWorld[0]);
-		puiMousePositionInWorld[1] = __builtin_bswap32(puiMousePositionInWorld[1]);
-		puiMousePositionInWorld[2] = __builtin_bswap32(puiMousePositionInWorld[2]);
-		puiMousePositionInWorld[3] = __builtin_bswap32(puiMousePositionInWorld[3]);
-		// EXE-INLINED none: BSEndian
-		*puiSpringDamping = __builtin_bswap32(*puiSpringDamping);
-		// EXE-INLINED none: BSEndian
-		*puiSpringElasticity = __builtin_bswap32(*puiSpringElasticity);
-		// EXE-INLINED none: BSEndian
-		*puiMaxRelativeForce = __builtin_bswap32(*puiMaxRelativeForce);
-		// EXE-INLINED none: BSEndian
-		*puiObjectDamping = __builtin_bswap32(*puiObjectDamping);
-	}
+    bool bCreated;
+    hkMouseSpringActionCinfo& rInfo = static_cast<hkMouseSpringActionCinfo&>(CreateCinfo(bCreated));
+    uint32_t* puiPositionInRbLocal = reinterpret_cast<uint32_t*>(&rInfo.m_positionInRbLocal);
+    uint32_t* puiMousePositionInWorld = reinterpret_cast<uint32_t*>(&rInfo.m_mousePositionInWorld);
+    uint32_t* puiSpringDamping = reinterpret_cast<uint32_t*>(&rInfo.m_springDamping);
+    uint32_t* puiSpringElasticity = reinterpret_cast<uint32_t*>(&rInfo.m_springElasticity);
+    uint32_t* puiMaxRelativeForce = reinterpret_cast<uint32_t*>(&rInfo.m_maxRelativeForce);
+    uint32_t* puiObjectDamping = reinterpret_cast<uint32_t*>(&rInfo.m_objectDamping);
+    if (*static_cast<const uint8_t*>(static_cast<const void*>(&arStream.m_bSaveLittleEndian)) != 1) {
+        // EXE-INLINED none: bhkStream::Endian
+        puiPositionInRbLocal[0] = __builtin_bswap32(puiPositionInRbLocal[0]);
+        puiPositionInRbLocal[1] = __builtin_bswap32(puiPositionInRbLocal[1]);
+        puiPositionInRbLocal[2] = __builtin_bswap32(puiPositionInRbLocal[2]);
+        puiPositionInRbLocal[3] = __builtin_bswap32(puiPositionInRbLocal[3]);
+        // EXE-INLINED none: bhkStream::Endian
+        puiMousePositionInWorld[0] = __builtin_bswap32(puiMousePositionInWorld[0]);
+        puiMousePositionInWorld[1] = __builtin_bswap32(puiMousePositionInWorld[1]);
+        puiMousePositionInWorld[2] = __builtin_bswap32(puiMousePositionInWorld[2]);
+        puiMousePositionInWorld[3] = __builtin_bswap32(puiMousePositionInWorld[3]);
+        // EXE-INLINED none: BSEndian
+        *puiSpringDamping = __builtin_bswap32(*puiSpringDamping);
+        // EXE-INLINED none: BSEndian
+        *puiSpringElasticity = __builtin_bswap32(*puiSpringElasticity);
+        // EXE-INLINED none: BSEndian
+        *puiMaxRelativeForce = __builtin_bswap32(*puiMaxRelativeForce);
+        // EXE-INLINED none: BSEndian
+        *puiObjectDamping = __builtin_bswap32(*puiObjectDamping);
+    }
+    bhkUnaryAction::SaveBinary(arStream);
+    if (*static_cast<const uint8_t*>(static_cast<const void*>(&arStream.m_bSaveLittleEndian)) != 1) {
+        // EXE-INLINED none: bhkStream::Endian
+        puiPositionInRbLocal[0] = __builtin_bswap32(puiPositionInRbLocal[0]);
+        puiPositionInRbLocal[1] = __builtin_bswap32(puiPositionInRbLocal[1]);
+        puiPositionInRbLocal[2] = __builtin_bswap32(puiPositionInRbLocal[2]);
+        puiPositionInRbLocal[3] = __builtin_bswap32(puiPositionInRbLocal[3]);
+        // EXE-INLINED none: bhkStream::Endian
+        puiMousePositionInWorld[0] = __builtin_bswap32(puiMousePositionInWorld[0]);
+        puiMousePositionInWorld[1] = __builtin_bswap32(puiMousePositionInWorld[1]);
+        puiMousePositionInWorld[2] = __builtin_bswap32(puiMousePositionInWorld[2]);
+        puiMousePositionInWorld[3] = __builtin_bswap32(puiMousePositionInWorld[3]);
+        // EXE-INLINED none: BSEndian
+        *puiSpringDamping = __builtin_bswap32(*puiSpringDamping);
+        // EXE-INLINED none: BSEndian
+        *puiSpringElasticity = __builtin_bswap32(*puiSpringElasticity);
+        // EXE-INLINED none: BSEndian
+        *puiMaxRelativeForce = __builtin_bswap32(*puiMaxRelativeForce);
+        // EXE-INLINED none: BSEndian
+        *puiObjectDamping = __builtin_bswap32(*puiObjectDamping);
+    }
 }
 
 void bhkMouseSpringAction::GetViewerStrings(NiTPrimitiveArray<char*>* apStrings) {
-	FNVD_INLINED_LOCAL(hkMouseSpringActionCinfo, arInfo, std::nullopt, std::nullopt);
-	TLSData* v3 = GetThreadTLSData();
-	MEM_CONTEXT eMemContext = v3->eMemContext;
-	v3->eMemContext = MEM_CONTEXT_HAVOK;
-	bhkUnaryAction::GetViewerStrings(apStrings);
-	char* ViewerString = NiGetViewerString(bhkMouseSpringAction::ms_RTTI.GetName());
-	uint32_t m_usSize = apStrings->m_usSize;
-	uint32_t m_usMaxSize = apStrings->m_usMaxSize;
-	char* a3 = ViewerString;
-	if (m_usSize >= m_usMaxSize) {
-		apStrings->SetSize(m_usSize + apStrings->m_usGrowBy);
-	}
-	apStrings->SetAt(m_usSize, a3);
-	// MAYBE-INLINED 0xC87473: a write opening hkMouseSpringActionCinfo's uses: may be its inlined constructor
-	arInfo.m_positionInRbLocal.fX = 0.0f;
-	// MAYBE-INLINED 0xC8747B: a write opening hkMouseSpringActionCinfo's uses: may be its inlined constructor
-	arInfo.m_positionInRbLocal.fY = 0.0f;
-	// MAYBE-INLINED 0xC87481: a write opening hkMouseSpringActionCinfo's uses: may be its inlined constructor
-	arInfo.m_positionInRbLocal.fZ = 0.0f;
-	// MAYBE-INLINED 0xC87486: a write opening hkMouseSpringActionCinfo's uses: may be its inlined constructor
-	arInfo.m_positionInRbLocal.fW = 0.0f;
-	// MAYBE-INLINED 0xC8748C: a write opening hkMouseSpringActionCinfo's uses: may be its inlined constructor
-	arInfo.m_mousePositionInWorld.fX = 0.0f;
-	// MAYBE-INLINED 0xC87490: a write opening hkMouseSpringActionCinfo's uses: may be its inlined constructor
-	arInfo.m_userData = 0;
-	// MAYBE-INLINED 0xC87494: a write opening hkMouseSpringActionCinfo's uses: may be its inlined constructor
-	arInfo.m_mousePositionInWorld.fY = 0.0f;
-	// MAYBE-INLINED 0xC87498: a write opening hkMouseSpringActionCinfo's uses: may be its inlined constructor
-	arInfo.m_body = 0;
-	// MAYBE-INLINED 0xC8749C: a write opening hkMouseSpringActionCinfo's uses: may be its inlined constructor
-	arInfo.m_mousePositionInWorld.fZ = 0.0f;
-	// MAYBE-INLINED 0xC874A0: a write opening hkMouseSpringActionCinfo's uses: may be its inlined constructor
-	arInfo.m_mousePositionInWorld.fW = 0.0f;
-	// MAYBE-INLINED 0xC874AA: a write opening hkMouseSpringActionCinfo's uses: may be its inlined constructor
-	arInfo.m_springDamping = 0.5f;
-	// MAYBE-INLINED 0xC874B4: a write opening hkMouseSpringActionCinfo's uses: may be its inlined constructor
-	arInfo.m_springElasticity = 0.3f;
-	// MAYBE-INLINED 0xC874BE: a write opening hkMouseSpringActionCinfo's uses: may be its inlined constructor
-	arInfo.m_maxRelativeForce = 250.0f;
-	// MAYBE-INLINED 0xC874C8: a write opening hkMouseSpringActionCinfo's uses: may be its inlined constructor
-	arInfo.m_objectDamping = 0.95f;
-	CopyCinfo(arInfo);
-	char* ViewerString_7 = NiGetViewerString("Damping", arInfo.m_springDamping);
-	uint32_t v9 = apStrings->m_usSize;
-	uint32_t v10 = apStrings->m_usMaxSize;
-	a3 = ViewerString_7;
-	if (v9 >= v10) {
-		apStrings->SetSize(v9 + apStrings->m_usGrowBy);
-	}
-	apStrings->SetAt(v9, a3);
-	char* v11 = NiGetViewerString("Elasticity", arInfo.m_springElasticity);
-	uint32_t v12 = apStrings->m_usSize;
-	uint32_t v13 = apStrings->m_usMaxSize;
-	a3 = v11;
-	if (v12 >= v13) {
-		apStrings->SetSize(v12 + apStrings->m_usGrowBy);
-	}
-	apStrings->SetAt(v12, a3);
-	char* v14 = NiGetViewerString("Object Damping", arInfo.m_objectDamping);
-	uint32_t v15 = apStrings->m_usSize;
-	uint32_t v16 = apStrings->m_usMaxSize;
-	a3 = v14;
-	if (v15 >= v16) {
-		apStrings->SetSize(v15 + apStrings->m_usGrowBy);
-	}
-	apStrings->SetAt(v15, a3);
-	char* v17 = NiGetViewerString("Max Force", arInfo.m_maxRelativeForce);
-	uint32_t v18 = apStrings->m_usSize;
-	uint32_t v19 = apStrings->m_usMaxSize;
-	a3 = v17;
-	if (v18 >= v19) {
-		apStrings->SetSize(v18 + apStrings->m_usGrowBy);
-	}
-	apStrings->SetAt(v18, a3);
-	v3->eMemContext = eMemContext;
+    FNVD_INLINED_LOCAL(hkMouseSpringActionCinfo, arInfo, std::nullopt, std::nullopt);
+    TLSData* v3 = GetThreadTLSData();
+    MEM_CONTEXT eMemContext = v3->eMemContext;
+    v3->eMemContext = MEM_CONTEXT_HAVOK;
+    bhkUnaryAction::GetViewerStrings(apStrings);
+    char* ViewerString = NiGetViewerString(bhkMouseSpringAction::ms_RTTI.GetName());
+    uint32_t m_usSize = apStrings->m_usSize;
+    uint32_t m_usMaxSize = apStrings->m_usMaxSize;
+    char* a3 = ViewerString;
+    if (m_usSize >= m_usMaxSize) {
+        apStrings->SetSize(m_usSize + apStrings->m_usGrowBy);
+    }
+    apStrings->SetAt(m_usSize, a3);
+    // MAYBE-INLINED 0xC87473: a write opening hkMouseSpringActionCinfo's uses: may be its inlined constructor
+    arInfo.m_positionInRbLocal.fX = 0.0f;
+    // MAYBE-INLINED 0xC8747B: a write opening hkMouseSpringActionCinfo's uses: may be its inlined constructor
+    arInfo.m_positionInRbLocal.fY = 0.0f;
+    // MAYBE-INLINED 0xC87481: a write opening hkMouseSpringActionCinfo's uses: may be its inlined constructor
+    arInfo.m_positionInRbLocal.fZ = 0.0f;
+    // MAYBE-INLINED 0xC87486: a write opening hkMouseSpringActionCinfo's uses: may be its inlined constructor
+    arInfo.m_positionInRbLocal.fW = 0.0f;
+    // MAYBE-INLINED 0xC8748C: a write opening hkMouseSpringActionCinfo's uses: may be its inlined constructor
+    arInfo.m_mousePositionInWorld.fX = 0.0f;
+    // MAYBE-INLINED 0xC87490: a write opening hkMouseSpringActionCinfo's uses: may be its inlined constructor
+    arInfo.m_userData = 0;
+    // MAYBE-INLINED 0xC87494: a write opening hkMouseSpringActionCinfo's uses: may be its inlined constructor
+    arInfo.m_mousePositionInWorld.fY = 0.0f;
+    // MAYBE-INLINED 0xC87498: a write opening hkMouseSpringActionCinfo's uses: may be its inlined constructor
+    arInfo.m_body = 0;
+    // MAYBE-INLINED 0xC8749C: a write opening hkMouseSpringActionCinfo's uses: may be its inlined constructor
+    arInfo.m_mousePositionInWorld.fZ = 0.0f;
+    // MAYBE-INLINED 0xC874A0: a write opening hkMouseSpringActionCinfo's uses: may be its inlined constructor
+    arInfo.m_mousePositionInWorld.fW = 0.0f;
+    // MAYBE-INLINED 0xC874AA: a write opening hkMouseSpringActionCinfo's uses: may be its inlined constructor
+    arInfo.m_springDamping = 0.5f;
+    // MAYBE-INLINED 0xC874B4: a write opening hkMouseSpringActionCinfo's uses: may be its inlined constructor
+    arInfo.m_springElasticity = 0.3f;
+    // MAYBE-INLINED 0xC874BE: a write opening hkMouseSpringActionCinfo's uses: may be its inlined constructor
+    arInfo.m_maxRelativeForce = 250.0f;
+    // MAYBE-INLINED 0xC874C8: a write opening hkMouseSpringActionCinfo's uses: may be its inlined constructor
+    arInfo.m_objectDamping = 0.95f;
+    CopyCinfo(arInfo);
+    char* ViewerString_7 = NiGetViewerString("Damping", arInfo.m_springDamping);
+    uint32_t v9 = apStrings->m_usSize;
+    uint32_t v10 = apStrings->m_usMaxSize;
+    a3 = ViewerString_7;
+    if (v9 >= v10) {
+        apStrings->SetSize(v9 + apStrings->m_usGrowBy);
+    }
+    apStrings->SetAt(v9, a3);
+    char* v11 = NiGetViewerString("Elasticity", arInfo.m_springElasticity);
+    uint32_t v12 = apStrings->m_usSize;
+    uint32_t v13 = apStrings->m_usMaxSize;
+    a3 = v11;
+    if (v12 >= v13) {
+        apStrings->SetSize(v12 + apStrings->m_usGrowBy);
+    }
+    apStrings->SetAt(v12, a3);
+    char* v14 = NiGetViewerString("Object Damping", arInfo.m_objectDamping);
+    uint32_t v15 = apStrings->m_usSize;
+    uint32_t v16 = apStrings->m_usMaxSize;
+    a3 = v14;
+    if (v15 >= v16) {
+        apStrings->SetSize(v15 + apStrings->m_usGrowBy);
+    }
+    apStrings->SetAt(v15, a3);
+    char* v17 = NiGetViewerString("Max Force", arInfo.m_maxRelativeForce);
+    uint32_t v18 = apStrings->m_usSize;
+    uint32_t v19 = apStrings->m_usMaxSize;
+    a3 = v17;
+    if (v18 >= v19) {
+        apStrings->SetSize(v18 + apStrings->m_usGrowBy);
+    }
+    apStrings->SetAt(v18, a3);
+    v3->eMemContext = eMemContext;
 }
 
 // Releases a creation info this action made: the aligned block it sits in, found through the padding byte in front of
 // it, under the Havok heap context.
 void bhkMouseSpringAction::KillCinfo(bool abCreated) {
-	AutoMemContext kMemContext(MEM_CONTEXT_HAVOK);
-	if (abCreated) {
-		if (pInfo) {
-			// The block is treated as raw memory: the alignment padding byte sits in front of the pointer.
-			uint8_t* pMemory = static_cast<uint8_t*>(static_cast<void*>(pInfo));
-			MemoryManager_Singleton.Deallocate(pMemory - pMemory[-1]);
-		}
-		pInfo = nullptr;
-	}
+    AutoMemContext kMemContext(MEM_CONTEXT_HAVOK);
+    if (abCreated) {
+        if (pInfo) {
+            // The block is treated as raw memory: the alignment padding byte sits in front of the pointer.
+            uint8_t* pMemory = static_cast<uint8_t*>(static_cast<void*>(pInfo));
+            MemoryManager_Singleton.Deallocate(pMemory - pMemory[-1]);
+        }
+        pInfo = nullptr;
+    }
 }
 
 uint32_t bhkMouseSpringAction::QCinfoSize() const {
-	return 0x40;
+    return 0x40;
 }
 
 // Builds the wrapped hkpMouseSpringAction in the Havok heap context: a block from the heap allocator with its size word
@@ -248,105 +248,114 @@ uint32_t bhkMouseSpringAction::QCinfoSize() const {
 // 16-byte-aligned local), damping, elasticity, object damping and body and no callbacks, then its force limit,
 // SethkObject, the constructor's reference dropped and PostInit.
 void bhkMouseSpringAction::Init(const hkSerializableCinfo& arInfo) {
-	const hkMouseSpringActionCinfo& cinfo = static_cast<const hkMouseSpringActionCinfo&>(arInfo);
-	TLSData* v3 = GetThreadTLSData();
-	MEM_CONTEXT eMemContext = v3->eMemContext;
-	v3->eMemContext = MEM_CONTEXT_HAVOK;
-	hkpMouseSpringAction* pAction = static_cast<hkpMouseSpringAction*>(hkMemoryRouter::getInstance()
-			.heap()
-			.blockAlloc(sizeof(hkpMouseSpringAction)));
-	pAction->m_memSizeAndFlags = sizeof(hkpMouseSpringAction);
-	hkVector4 kMousePositionInWorld;
-	// EXE-INLINED 0x4B4D10
-	kMousePositionInWorld.set(cinfo.m_mousePositionInWorld.fX, cinfo.m_mousePositionInWorld.fY,
-		cinfo.m_mousePositionInWorld.fZ, cinfo.m_mousePositionInWorld.fW);
-	hkVector4 kPositionInRbLocal;
-	// EXE-INLINED 0x4B4D10
-	kPositionInRbLocal.set(cinfo.m_positionInRbLocal.fX, cinfo.m_positionInRbLocal.fY, cinfo.m_positionInRbLocal.fZ,
-		cinfo.m_positionInRbLocal.fW);
-	pAction = ::new (pAction) hkpMouseSpringAction(kPositionInRbLocal, kMousePositionInWorld, cinfo.m_springDamping,
-		cinfo.m_springElasticity, cinfo.m_objectDamping, cinfo.m_body, nullptr);
-	pAction->setMaxRelativeForce(cinfo.m_maxRelativeForce);
-	bhkSerializable* pSerializable = this;
-	pSerializable->SethkObject(pAction);
-	pAction->removeReference();
-	pSerializable->PostInit(arInfo);
-	v3->eMemContext = eMemContext;
+    const hkMouseSpringActionCinfo& cinfo = static_cast<const hkMouseSpringActionCinfo&>(arInfo);
+    TLSData* v3 = GetThreadTLSData();
+    MEM_CONTEXT eMemContext = v3->eMemContext;
+    v3->eMemContext = MEM_CONTEXT_HAVOK;
+    hkpMouseSpringAction* pAction = static_cast<hkpMouseSpringAction*>(
+        hkMemoryRouter::getInstance().heap().blockAlloc(sizeof(hkpMouseSpringAction))
+    );
+    pAction->m_memSizeAndFlags = sizeof(hkpMouseSpringAction);
+    hkVector4 kMousePositionInWorld;
+    // EXE-INLINED 0x4B4D10
+    kMousePositionInWorld.set(
+        cinfo.m_mousePositionInWorld.fX, cinfo.m_mousePositionInWorld.fY, cinfo.m_mousePositionInWorld.fZ,
+        cinfo.m_mousePositionInWorld.fW
+    );
+    hkVector4 kPositionInRbLocal;
+    // EXE-INLINED 0x4B4D10
+    kPositionInRbLocal.set(
+        cinfo.m_positionInRbLocal.fX, cinfo.m_positionInRbLocal.fY, cinfo.m_positionInRbLocal.fZ,
+        cinfo.m_positionInRbLocal.fW
+    );
+    pAction = ::new (pAction) hkpMouseSpringAction(
+        kPositionInRbLocal, kMousePositionInWorld, cinfo.m_springDamping, cinfo.m_springElasticity,
+        cinfo.m_objectDamping, cinfo.m_body, nullptr
+    );
+    pAction->setMaxRelativeForce(cinfo.m_maxRelativeForce);
+    bhkSerializable* pSerializable = this;
+    pSerializable->SethkObject(pAction);
+    pAction->removeReference();
+    pSerializable->PostInit(arInfo);
+    v3->eMemContext = eMemContext;
 }
 
 hkSerializableCinfo& bhkMouseSpringAction::CreateCinfo(bool& arCreated) {
-	AutoMemContext kMemContext(MEM_CONTEXT_HAVOK);
-	bool bCreated = pInfo == nullptr;
-	arCreated = bCreated;
-	if (bCreated) {
-		// 0x50 bytes: the cinfo (0x40) plus the slack the 16-byte alignment below can consume.
-		void* pRaw = MemoryManager_Singleton.Allocate(sizeof(hkMouseSpringActionCinfo) + 0x10);
-		// Aligns the block up to 16 bytes and keeps the offset in the byte before the cinfo.
-		uint8_t uiOffset = static_cast<uint8_t>(0x10 - (reinterpret_cast<uintptr_t>(pRaw) & 0xF));
-		char* pAligned = static_cast<char*>(pRaw) + uiOffset;
-		pAligned[-1] = static_cast<char>(uiOffset);
-		hkMouseSpringActionCinfo* pCinfo = ::new (pAligned) hkMouseSpringActionCinfo;
-		pInfo = pCinfo;
-		if (phkObject != nullptr) {
-			CopyCinfo(*pCinfo);
-		}
-	}
-	return *pInfo;
+    AutoMemContext kMemContext(MEM_CONTEXT_HAVOK);
+    bool bCreated = pInfo == nullptr;
+    arCreated = bCreated;
+    if (bCreated) {
+        // 0x50 bytes: the cinfo (0x40) plus the slack the 16-byte alignment below can consume.
+        void* pRaw = MemoryManager_Singleton.Allocate(sizeof(hkMouseSpringActionCinfo) + 0x10);
+        // Aligns the block up to 16 bytes and keeps the offset in the byte before the cinfo.
+        uint8_t uiOffset = static_cast<uint8_t>(0x10 - (reinterpret_cast<uintptr_t>(pRaw) & 0xF));
+        char* pAligned = static_cast<char*>(pRaw) + uiOffset;
+        pAligned[-1] = static_cast<char>(uiOffset);
+        hkMouseSpringActionCinfo* pCinfo = ::new (pAligned) hkMouseSpringActionCinfo;
+        pInfo = pCinfo;
+        if (phkObject != nullptr) {
+            CopyCinfo(*pCinfo);
+        }
+    }
+    return *pInfo;
 }
 
 hkpEntity* bhkMouseSpringAction::GetEntity() {
-	hkpMouseSpringAction* pMouseSpringAction = operator*();
-	if (pMouseSpringAction) {
-		return static_cast<hkpEntity*>(pMouseSpringAction->GetEntity());
-	} else {
-		return nullptr;
-	}
+    hkpMouseSpringAction* pMouseSpringAction = operator*();
+    if (pMouseSpringAction) {
+        return static_cast<hkpEntity*>(pMouseSpringAction->GetEntity());
+    }
+    else {
+        return nullptr;
+    }
 }
 
 // Copies the unary action's fields, then the wrapped action's damping, elasticity and object damping through null-safe
 // getters (0 when this or the wrapped object is null). Then, with a wrapped action, its two positions and its force
 // limit; without one, both vectors are zeroed and the limit is 0.
 void bhkMouseSpringAction::CopyCinfo(hkMouseSpringActionCinfo& arInfo) {
-	bhkUnaryAction::CopyCinfo(arInfo);
-	// EXE-INLINED none: bhkMouseSpringAction::GetDamping
-	float fDamping = (this && phkObject) ? static_cast<hkpMouseSpringAction*>(phkObject)->m_springDamping : 0.0f;
-	arInfo.m_springDamping = fDamping;
-	// EXE-INLINED none: bhkMouseSpringAction::GetElasticity
-	float fElasticity = (this && phkObject) ? static_cast<hkpMouseSpringAction*>(phkObject)->m_springElasticity : 0.0f;
-	arInfo.m_springElasticity = fElasticity;
-	// EXE-INLINED none: bhkMouseSpringAction::GetObjectDamping
-	float fObjectDamping = (this && phkObject) ? static_cast<hkpMouseSpringAction*>(phkObject)->m_objectDamping : 0.0f;
-	arInfo.m_objectDamping = fObjectDamping;
-	// EXE-INLINED 0x4AE750
-	hkpMouseSpringAction* pAction = (this && phkObject) ? static_cast<hkpMouseSpringAction*>(phkObject) : nullptr;
-	if (pAction) {
-		arInfo.m_positionInRbLocal = pAction->m_positionInRbLocal;
-		arInfo.m_mousePositionInWorld = pAction->m_mousePositionInWorld;
-		arInfo.m_maxRelativeForce = pAction->m_maxRelativeForce;
-	} else {
-		// EXE-INLINED 0x4B4FC0
-		arInfo.m_positionInRbLocal.fX = 0.0f;
-		arInfo.m_positionInRbLocal.fY = 0.0f;
-		arInfo.m_positionInRbLocal.fZ = 0.0f;
-		arInfo.m_positionInRbLocal.fW = 0.0f;
-		// EXE-INLINED 0x4B4FC0
-		arInfo.m_mousePositionInWorld.fX = 0.0f;
-		arInfo.m_mousePositionInWorld.fY = 0.0f;
-		arInfo.m_mousePositionInWorld.fZ = 0.0f;
-		arInfo.m_mousePositionInWorld.fW = 0.0f;
-		arInfo.m_maxRelativeForce = 0.0f;
-	}
+    bhkUnaryAction::CopyCinfo(arInfo);
+    // EXE-INLINED none: bhkMouseSpringAction::GetDamping
+    float fDamping = (this && phkObject) ? static_cast<hkpMouseSpringAction*>(phkObject)->m_springDamping : 0.0f;
+    arInfo.m_springDamping = fDamping;
+    // EXE-INLINED none: bhkMouseSpringAction::GetElasticity
+    float fElasticity = (this && phkObject) ? static_cast<hkpMouseSpringAction*>(phkObject)->m_springElasticity : 0.0f;
+    arInfo.m_springElasticity = fElasticity;
+    // EXE-INLINED none: bhkMouseSpringAction::GetObjectDamping
+    float fObjectDamping = (this && phkObject) ? static_cast<hkpMouseSpringAction*>(phkObject)->m_objectDamping : 0.0f;
+    arInfo.m_objectDamping = fObjectDamping;
+    // EXE-INLINED 0x4AE750
+    hkpMouseSpringAction* pAction = (this && phkObject) ? static_cast<hkpMouseSpringAction*>(phkObject) : nullptr;
+    if (pAction) {
+        arInfo.m_positionInRbLocal = pAction->m_positionInRbLocal;
+        arInfo.m_mousePositionInWorld = pAction->m_mousePositionInWorld;
+        arInfo.m_maxRelativeForce = pAction->m_maxRelativeForce;
+    }
+    else {
+        // EXE-INLINED 0x4B4FC0
+        arInfo.m_positionInRbLocal.fX = 0.0f;
+        arInfo.m_positionInRbLocal.fY = 0.0f;
+        arInfo.m_positionInRbLocal.fZ = 0.0f;
+        arInfo.m_positionInRbLocal.fW = 0.0f;
+        // EXE-INLINED 0x4B4FC0
+        arInfo.m_mousePositionInWorld.fX = 0.0f;
+        arInfo.m_mousePositionInWorld.fY = 0.0f;
+        arInfo.m_mousePositionInWorld.fZ = 0.0f;
+        arInfo.m_mousePositionInWorld.fW = 0.0f;
+        arInfo.m_maxRelativeForce = 0.0f;
+    }
 }
 
 bhkWorldObject* bhkMouseSpringAction::GetWorldObject() {
-	hkpRigidBody* entity = static_cast<hkpRigidBody*>(GetEntity());
-	return bhkEntity::Getbhk(entity);
+    hkpRigidBody* entity = static_cast<hkpRigidBody*>(GetEntity());
+    return bhkEntity::Getbhk(entity);
 }
 
 NiObject* bhkMouseSpringAction::CreateObject() {
-	bhkMouseSpringAction* pObject =
-		static_cast<bhkMouseSpringAction*>(NiMemObject::operator new(sizeof(bhkMouseSpringAction)));
-	if (!pObject)
-		return nullptr;
-	return ::new (pObject) bhkMouseSpringAction;
+    bhkMouseSpringAction* pObject =
+        static_cast<bhkMouseSpringAction*>(NiMemObject::operator new(sizeof(bhkMouseSpringAction)));
+    if (!pObject) {
+        return nullptr;
+    }
+    return ::new (pObject) bhkMouseSpringAction;
 }

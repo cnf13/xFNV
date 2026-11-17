@@ -11,45 +11,45 @@ class NiD3DVertexShader;
 
 class DistantLODShader : public BSShader {
 public:
-	DistantLODShader(NiDX9ShaderDeclaration* apShaderDecl);
-	~DistantLODShader() override;
+    DistantLODShader(NiDX9ShaderDeclaration* apShaderDecl);
+    ~DistantLODShader() override;
 
-	const NiRTTI* GetRTTI() const override;
-	void RecreateRendererData() override;
-	void CreateConstantMaps() override;
-	void ReloadShaders() override;
-	void ClearPassStages() override;
-	void SetCurrentPass(uint32_t aPass, bool aFirstPass) override;
+    const NiRTTI* GetRTTI() const override;
+    void RecreateRendererData() override;
+    void CreateConstantMaps() override;
+    void ReloadShaders() override;
+    void ClearPassStages() override;
+    void SetCurrentPass(uint32_t aPass, bool aFirstPass) override;
 
 protected:
-	virtual void LoadShaders();
-	virtual bool LoadStagesAndPasses();
+    virtual void LoadShaders();
+    virtual bool LoadStagesAndPasses();
 
-	void PresetStages();
+    void PresetStages();
 
 public:
-	static BSShader* CreateShader();
+    static BSShader* CreateShader();
 
-	NiPointer<NiD3DPass> spPass;
-	float fWindTimer;
-	BSShaderManager::eBSSMPassEnum ePass;
-	bool bFirstPass;
-	uint8_t padding79[3];
-	NiPointer<NiD3DVertexShader> spVertexShaders[4];
-	NiPointer<NiD3DPixelShader> spPixelShaders[2];
-	// iInstanceDataCount instances, allocated by the constructor, handed to the "instance data" entry.
-	DistantLODGroup::DistantLODInstanceData* pDistantLODInstanceData;
-	NiShaderConstantMapEntry* pDistantLODInstanceDataEntry;
-	uint16_t iInstanceDataCount;
-	uint8_t padding9E[2];
-	NiColorA pfAmbientColor;
-	NiPoint4 pfDiffuseDir;
-	NiColorA pfDiffuseColor;
-	NiColorA pfAlphaTestRef;
-	NiPoint4 pEyeVector;
-	NiPoint4 pEyePosition;
+    NiPointer<NiD3DPass> spPass;
+    float fWindTimer;
+    BSShaderManager::eBSSMPassEnum ePass;
+    bool bFirstPass;
+    uint8_t padding79[3];
+    NiPointer<NiD3DVertexShader> spVertexShaders[4];
+    NiPointer<NiD3DPixelShader> spPixelShaders[2];
+    // iInstanceDataCount instances, allocated by the constructor, handed to the "instance data" entry.
+    DistantLODGroup::DistantLODInstanceData* pDistantLODInstanceData;
+    NiShaderConstantMapEntry* pDistantLODInstanceDataEntry;
+    uint16_t iInstanceDataCount;
+    uint8_t padding9E[2];
+    NiColorA pfAmbientColor;
+    NiPoint4 pfDiffuseDir;
+    NiColorA pfDiffuseColor;
+    NiColorA pfAlphaTestRef;
+    NiPoint4 pEyeVector;
+    NiPoint4 pEyePosition;
 
-	static NiRTTI ms_RTTI;
+    static NiRTTI ms_RTTI;
 };
 
 // The terrain LOD shader's two parameters.

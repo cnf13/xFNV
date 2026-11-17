@@ -9,36 +9,36 @@ NiFixedString EmptyFS;
 
 // Gamebryo stores NULL for a null text; this loads NiGlobalStringTable::NULL_STRING instead, as the game does.
 NiFixedString::NiFixedString(const char* pcString) noexcept
-	: m_kHandle(pcString ? NiGlobalStringTable::AddString(pcString) : NiGlobalStringTable::NULL_STRING) {}
+  : m_kHandle(pcString ? NiGlobalStringTable::AddString(pcString) : NiGlobalStringTable::NULL_STRING) {}
 
 NiFixedString::NiFixedString(const NiFixedString& arString) : m_kHandle(arString.m_kHandle) {
-	NiGlobalStringTable::IncHandleRefCount(m_kHandle);
+    NiGlobalStringTable::IncHandleRefCount(m_kHandle);
 }
 
 NiFixedString::~NiFixedString() {
-	NiGlobalStringTable::DecHandleRefCount(m_kHandle);
+    NiGlobalStringTable::DecHandleRefCount(m_kHandle);
 }
 
 bool NiFixedString::Equals(const char* pcStr) const {
-	if (m_kHandle == pcStr) {
-		return true;
-	}
-	return m_kHandle && pcStr && std::strcmp(m_kHandle, pcStr) == 0;
+    if (m_kHandle == pcStr) {
+        return true;
+    }
+    return m_kHandle && pcStr && std::strcmp(m_kHandle, pcStr) == 0;
 }
 
 bool NiFixedString::Bool() const {
-	return m_kHandle != NiGlobalStringTable::NULL_STRING;
+    return m_kHandle != NiGlobalStringTable::NULL_STRING;
 }
 
 void* NiFixedString::Set(char* pcString) {
-	const char* m_kHandle = this->GetHandle();
-	if (this->GetHandle() != pcString) {
-		this->m_kHandle = NiGlobalStringTable::AddString(pcString);
-		NiGlobalStringTable::ReleaseHandle(m_kHandle);
-	}
-	return this;
+    const char* m_kHandle = this->GetHandle();
+    if (this->GetHandle() != pcString) {
+        this->m_kHandle = NiGlobalStringTable::AddString(pcString);
+        NiGlobalStringTable::ReleaseHandle(m_kHandle);
+    }
+    return this;
 }
 
 bool NiFixedString::HandlesEqual(const NiFixedString& arString1, const NiFixedString& arString2) {
-	return arString1.m_kHandle == arString2.m_kHandle;
+    return arString1.m_kHandle == arString2.m_kHandle;
 }

@@ -8,28 +8,28 @@ class TESQuest;
 
 // The DATA chunk of a quest perk entry (8 bytes, padding included): the quest and the stage to set it to.
 struct QuestPerkEntryData {
-	// Swaps the byte order of the first field, pQuest.
-	void Endian();
+    // Swaps the byte order of the first field, pQuest.
+    void Endian();
 
-	TESQuest* pQuest;
-	uint8_t cQuestStage;
-	uint8_t padding05[3];
+    TESQuest* pQuest;
+    uint8_t cQuestStage;
+    uint8_t padding05[3];
 };
 
 // A perk entry that sets a quest to a stage when the perk is applied.
 class BGSQuestPerkEntry : public BGSPerkEntry {
 public:
-	BGSQuestPerkEntry();
-	~BGSQuestPerkEntry() override;
+    BGSQuestPerkEntry();
+    ~BGSQuestPerkEntry() override;
 
-	PERK_ENTRY_TYPE GetType() override;
-	void InitItem(TESForm* apOwner) override;
-	BGSPerkEntry* Duplicate() override;
-	bool Compare(BGSPerkEntry* apCompare) override;
-	void Save() override;
-	bool Load(TESFile* apFile) override;
-	void ApplyPerkEntry(Actor* apActor, bool bAlt) override;
-	void RemovePerkEntry(Actor* apActor, bool bAlt) override {}
+    PERK_ENTRY_TYPE GetType() override;
+    void InitItem(TESForm* apOwner) override;
+    BGSPerkEntry* Duplicate() override;
+    bool Compare(BGSPerkEntry* apCompare) override;
+    void Save() override;
+    bool Load(TESFile* apFile) override;
+    void ApplyPerkEntry(Actor* apActor, bool bAlt) override;
+    void RemovePerkEntry(Actor* apActor, bool bAlt) override {}
 
-	QuestPerkEntryData Data;
+    QuestPerkEntryData Data;
 };

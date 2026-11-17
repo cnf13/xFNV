@@ -9,19 +9,19 @@
 
 // The key's reference is released by its NiFixedString member.
 NiGlobalConstantEntry::~NiGlobalConstantEntry() {
-	_NiFree(m_pvDataSource);
+    _NiFree(m_pvDataSource);
 }
 
 void NiGlobalConstantEntry::SetData(uint32_t uiDataSize, const void* pvDataSource) {
-	if (m_uiDataSize < uiDataSize) {
-		_NiFree(m_pvDataSource);
-		m_pvDataSource = 0;
-		m_uiDataSize = uiDataSize;
-	}
-	if (!m_pvDataSource) {
-		m_pvDataSource = _NiMalloc(m_uiDataSize);
-	}
-	if (pvDataSource) {
-		rt::memcpy(m_pvDataSource, pvDataSource, uiDataSize);
-	}
+    if (m_uiDataSize < uiDataSize) {
+        _NiFree(m_pvDataSource);
+        m_pvDataSource = 0;
+        m_uiDataSize = uiDataSize;
+    }
+    if (!m_pvDataSource) {
+        m_pvDataSource = _NiMalloc(m_uiDataSize);
+    }
+    if (pvDataSource) {
+        rt::memcpy(m_pvDataSource, pvDataSource, uiDataSize);
+    }
 }

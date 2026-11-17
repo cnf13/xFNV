@@ -19,30 +19,30 @@
 NiRTTI bhkAngularDashpotAction::ms_RTTI("bhkAngularDashpotAction", &bhkBinaryAction::ms_RTTI);
 
 bhkAngularDashpotAction::bhkAngularDashpotAction() {
-	++iCount;
+    ++iCount;
 }
 
 bhkAngularDashpotAction::~bhkAngularDashpotAction() {
-	bhkSerializable::Kill();
-	--iCount;
+    bhkSerializable::Kill();
+    --iCount;
 }
 
 const NiRTTI* bhkAngularDashpotAction::GetRTTI() const {
-	return &bhkAngularDashpotAction::ms_RTTI;
+    return &bhkAngularDashpotAction::ms_RTTI;
 }
 
 // Built as in CreateObject, then the members copied through a virtual call.
 NiObject* bhkAngularDashpotAction::CreateClone(NiCloningProcess& arCloneData) {
-	bhkSerializable::CloneCritLock();
-	bhkAngularDashpotAction* pClone =
-		static_cast<bhkAngularDashpotAction*>(NiMemObject::operator new(sizeof(bhkAngularDashpotAction)));
-	if (pClone) {
-		::new (pClone) bhkAngularDashpotAction;
-	}
-	bhkBinaryAction* pAction = this;
-	pAction->CopyMembers(pClone, arCloneData);
-	bhkSerializable::CloneCritUnlock();
-	return pClone;
+    bhkSerializable::CloneCritLock();
+    bhkAngularDashpotAction* pClone =
+        static_cast<bhkAngularDashpotAction*>(NiMemObject::operator new(sizeof(bhkAngularDashpotAction)));
+    if (pClone) {
+        ::new (pClone) bhkAngularDashpotAction;
+    }
+    bhkBinaryAction* pAction = this;
+    pAction->CopyMembers(pClone, arCloneData);
+    bhkSerializable::CloneCritUnlock();
+    return pClone;
 }
 
 // The base's fields, then, for a big-endian source, the creation info's rotation (bhkStream::Endian) and its strength
@@ -50,138 +50,141 @@ NiObject* bhkAngularDashpotAction::CreateClone(NiCloningProcess& arCloneData) {
 // read as a byte rather than a bool tested. A cinfo built here is not killed. Each float's four bytes are swapped as an
 // untyped 32-bit word, hence the uint32_t views.
 void bhkAngularDashpotAction::LoadBinary(NiStream& arStream) {
-	bhkBinaryAction::LoadBinary(arStream);
-	if (*static_cast<const uint8_t*>(static_cast<const void*>(&arStream.m_bSourceIsLittleEndian)) != 1) {
-		bool bCreated;
-		hkAngularDashpotActionCinfo& cinfo = static_cast<hkAngularDashpotActionCinfo&>(CreateCinfo(bCreated));
-		// EXE-INLINED none: bhkStream::Endian
-		uint32_t* puiRotation = reinterpret_cast<uint32_t*>(&cinfo.m_rotation);
-		puiRotation[0] = __builtin_bswap32(puiRotation[0]);
-		puiRotation[1] = __builtin_bswap32(puiRotation[1]);
-		puiRotation[2] = __builtin_bswap32(puiRotation[2]);
-		puiRotation[3] = __builtin_bswap32(puiRotation[3]);
-		// EXE-INLINED none: BSEndian
-		uint32_t* puiStrength = reinterpret_cast<uint32_t*>(&cinfo.m_strength);
-		*puiStrength = __builtin_bswap32(*puiStrength);
-		// EXE-INLINED none: BSEndian
-		uint32_t* puiDamping = reinterpret_cast<uint32_t*>(&cinfo.m_damping);
-		*puiDamping = __builtin_bswap32(*puiDamping);
-	}
+    bhkBinaryAction::LoadBinary(arStream);
+    if (*static_cast<const uint8_t*>(static_cast<const void*>(&arStream.m_bSourceIsLittleEndian)) != 1) {
+        bool bCreated;
+        hkAngularDashpotActionCinfo& cinfo = static_cast<hkAngularDashpotActionCinfo&>(CreateCinfo(bCreated));
+        // EXE-INLINED none: bhkStream::Endian
+        uint32_t* puiRotation = reinterpret_cast<uint32_t*>(&cinfo.m_rotation);
+        puiRotation[0] = __builtin_bswap32(puiRotation[0]);
+        puiRotation[1] = __builtin_bswap32(puiRotation[1]);
+        puiRotation[2] = __builtin_bswap32(puiRotation[2]);
+        puiRotation[3] = __builtin_bswap32(puiRotation[3]);
+        // EXE-INLINED none: BSEndian
+        uint32_t* puiStrength = reinterpret_cast<uint32_t*>(&cinfo.m_strength);
+        *puiStrength = __builtin_bswap32(*puiStrength);
+        // EXE-INLINED none: BSEndian
+        uint32_t* puiDamping = reinterpret_cast<uint32_t*>(&cinfo.m_damping);
+        *puiDamping = __builtin_bswap32(*puiDamping);
+    }
 }
 
 // For a big-endian save, the creation info's rotation, strength and damping are byte-swapped in place around the base's
 // write and swapped back after it. The stream's byte is compared with 1 and read again after the base call. Each
 // float's four bytes are swapped as an untyped 32-bit word, hence the uint32_t views.
 void bhkAngularDashpotAction::SaveBinary(NiStream& arStream) {
-	bool bCreated;
-	hkAngularDashpotActionCinfo& cinfo = static_cast<hkAngularDashpotActionCinfo&>(CreateCinfo(bCreated));
-	uint32_t* puiRotation = reinterpret_cast<uint32_t*>(&cinfo.m_rotation);
-	uint32_t* puiStrength = reinterpret_cast<uint32_t*>(&cinfo.m_strength);
-	uint32_t* puiDamping = reinterpret_cast<uint32_t*>(&cinfo.m_damping);
-	if (*static_cast<const uint8_t*>(static_cast<const void*>(&arStream.m_bSaveLittleEndian)) != 1) {
-		// EXE-INLINED none: bhkStream::Endian
-		puiRotation[0] = __builtin_bswap32(puiRotation[0]);
-		puiRotation[1] = __builtin_bswap32(puiRotation[1]);
-		puiRotation[2] = __builtin_bswap32(puiRotation[2]);
-		puiRotation[3] = __builtin_bswap32(puiRotation[3]);
-		// EXE-INLINED none: BSEndian
-		*puiStrength = __builtin_bswap32(*puiStrength);
-		// EXE-INLINED none: BSEndian
-		*puiDamping = __builtin_bswap32(*puiDamping);
-	}
-	bhkBinaryAction::SaveBinary(arStream);
-	if (*static_cast<const uint8_t*>(static_cast<const void*>(&arStream.m_bSaveLittleEndian)) != 1) {
-		// EXE-INLINED none: bhkStream::Endian
-		puiRotation[0] = __builtin_bswap32(puiRotation[0]);
-		puiRotation[1] = __builtin_bswap32(puiRotation[1]);
-		puiRotation[2] = __builtin_bswap32(puiRotation[2]);
-		puiRotation[3] = __builtin_bswap32(puiRotation[3]);
-		// EXE-INLINED none: BSEndian
-		*puiStrength = __builtin_bswap32(*puiStrength);
-		// EXE-INLINED none: BSEndian
-		*puiDamping = __builtin_bswap32(*puiDamping);
-	}
+    bool bCreated;
+    hkAngularDashpotActionCinfo& cinfo = static_cast<hkAngularDashpotActionCinfo&>(CreateCinfo(bCreated));
+    uint32_t* puiRotation = reinterpret_cast<uint32_t*>(&cinfo.m_rotation);
+    uint32_t* puiStrength = reinterpret_cast<uint32_t*>(&cinfo.m_strength);
+    uint32_t* puiDamping = reinterpret_cast<uint32_t*>(&cinfo.m_damping);
+    if (*static_cast<const uint8_t*>(static_cast<const void*>(&arStream.m_bSaveLittleEndian)) != 1) {
+        // EXE-INLINED none: bhkStream::Endian
+        puiRotation[0] = __builtin_bswap32(puiRotation[0]);
+        puiRotation[1] = __builtin_bswap32(puiRotation[1]);
+        puiRotation[2] = __builtin_bswap32(puiRotation[2]);
+        puiRotation[3] = __builtin_bswap32(puiRotation[3]);
+        // EXE-INLINED none: BSEndian
+        *puiStrength = __builtin_bswap32(*puiStrength);
+        // EXE-INLINED none: BSEndian
+        *puiDamping = __builtin_bswap32(*puiDamping);
+    }
+    bhkBinaryAction::SaveBinary(arStream);
+    if (*static_cast<const uint8_t*>(static_cast<const void*>(&arStream.m_bSaveLittleEndian)) != 1) {
+        // EXE-INLINED none: bhkStream::Endian
+        puiRotation[0] = __builtin_bswap32(puiRotation[0]);
+        puiRotation[1] = __builtin_bswap32(puiRotation[1]);
+        puiRotation[2] = __builtin_bswap32(puiRotation[2]);
+        puiRotation[3] = __builtin_bswap32(puiRotation[3]);
+        // EXE-INLINED none: BSEndian
+        *puiStrength = __builtin_bswap32(*puiStrength);
+        // EXE-INLINED none: BSEndian
+        *puiDamping = __builtin_bswap32(*puiDamping);
+    }
 }
 
 // The class' own viewer line, after the base's.
 void bhkAngularDashpotAction::GetViewerStrings(NiTPrimitiveArray<char*>* apStrings) {
-	AutoMemContext memContext(MEM_CONTEXT_HAVOK);
-	bhkBinaryAction::GetViewerStrings(apStrings);
-	char* pcString = NiGetViewerString(ms_RTTI.m_pcName);
-	apStrings->Add(pcString);
+    AutoMemContext memContext(MEM_CONTEXT_HAVOK);
+    bhkBinaryAction::GetViewerStrings(apStrings);
+    char* pcString = NiGetViewerString(ms_RTTI.m_pcName);
+    apStrings->Add(pcString);
 }
 
 // The size of the action's creation info, hkAngularDashpotActionCinfo.
 uint32_t bhkAngularDashpotAction::QCinfoSize() const {
-	return 0x30;
+    return 0x30;
 }
 
 // Builds the Havok action in the Havok heap: the block's size in its header, the constructor, the creation info's
 // values, then the wrapper's hooks.
 void bhkAngularDashpotAction::Init(const hkSerializableCinfo& arInfo) {
-	AutoMemContext memContext(MEM_CONTEXT_HAVOK);
-	const hkAngularDashpotActionCinfo& rInfo = static_cast<const hkAngularDashpotActionCinfo&>(arInfo);
-	hkpAngularDashpotAction* pAction = static_cast<hkpAngularDashpotAction*>(hkMemoryRouter::getInstance()
-			.heap()
-			.blockAlloc(sizeof(hkpAngularDashpotAction)));
-	// The block's m_memSizeAndFlags holds the size it was allocated with.
-	pAction->m_memSizeAndFlags = sizeof(hkpAngularDashpotAction);
-	::new (pAction) hkpAngularDashpotAction(rInfo.m_bodyA, rInfo.m_bodyB, 0);
-	pAction->m_strength = rInfo.m_strength;
-	pAction->m_damping = rInfo.m_damping;
-	pAction->m_rotation.m_vec.m_quad = rInfo.m_rotation.m_vec.m_quad;
-	bhkSerializable* pSerializable = this;
-	pSerializable->SethkObject(pAction);
-	pAction->removeReference();
-	pSerializable->PostInit(arInfo);
+    AutoMemContext memContext(MEM_CONTEXT_HAVOK);
+    const hkAngularDashpotActionCinfo& rInfo = static_cast<const hkAngularDashpotActionCinfo&>(arInfo);
+    hkpAngularDashpotAction* pAction = static_cast<hkpAngularDashpotAction*>(
+        hkMemoryRouter::getInstance().heap().blockAlloc(sizeof(hkpAngularDashpotAction))
+    );
+    // The block's m_memSizeAndFlags holds the size it was allocated with.
+    pAction->m_memSizeAndFlags = sizeof(hkpAngularDashpotAction);
+    ::new (pAction) hkpAngularDashpotAction(rInfo.m_bodyA, rInfo.m_bodyB, 0);
+    pAction->m_strength = rInfo.m_strength;
+    pAction->m_damping = rInfo.m_damping;
+    pAction->m_rotation.m_vec.m_quad = rInfo.m_rotation.m_vec.m_quad;
+    bhkSerializable* pSerializable = this;
+    pSerializable->SethkObject(pAction);
+    pAction->removeReference();
+    pSerializable->PostInit(arInfo);
 }
 
 // Builds the creation info in Havok's heap context when the action has none yet, and reports whether it built it. The
 // wrapped object, not the cinfo, guards the copy.
 hkSerializableCinfo& bhkAngularDashpotAction::CreateCinfo(bool& arCreated) {
-	AutoMemContext kMemContext(MEM_CONTEXT_HAVOK);
-	arCreated = (pInfo == nullptr);
-	if (arCreated) {
-		hkAngularDashpotActionCinfo* pCinfo = nullptr;
-		void* pMemory = MemoryManager_Singleton.Allocate(sizeof(hkAngularDashpotActionCinfo));
-		if (pMemory)
-			pCinfo = ::new (pMemory) hkAngularDashpotActionCinfo;
-		pInfo = pCinfo;
-		// A failed allocation still reaches the copy, with null.
-		if (phkObject)
-			CopyCinfo(*pCinfo);
-	}
-	return *pInfo;
+    AutoMemContext kMemContext(MEM_CONTEXT_HAVOK);
+    arCreated = (pInfo == nullptr);
+    if (arCreated) {
+        hkAngularDashpotActionCinfo* pCinfo = nullptr;
+        void* pMemory = MemoryManager_Singleton.Allocate(sizeof(hkAngularDashpotActionCinfo));
+        if (pMemory) {
+            pCinfo = ::new (pMemory) hkAngularDashpotActionCinfo;
+        }
+        pInfo = pCinfo;
+        // A failed allocation still reaches the copy, with null.
+        if (phkObject) {
+            CopyCinfo(*pCinfo);
+        }
+    }
+    return *pInfo;
 }
 
 // The base's fields, then the wrapped action's damping, rotation and strength, each through a getter that tests this
 // and the wrapped object for null and falls back to 0 or the identity quaternion.
 void bhkAngularDashpotAction::CopyCinfo(hkAngularDashpotActionCinfo& arInfo) {
-	bhkBinaryAction::CopyCinfo(arInfo);
-	// EXE-INLINED none: bhkAngularDashpotAction::GetDamping
-	float fDamping = (this && phkObject) ? static_cast<hkpAngularDashpotAction*>(phkObject)->m_damping : 0.0f;
-	arInfo.m_damping = fDamping;
-	// EXE-INLINED none: bhkAngularDashpotAction::GethkRotation
-	const hkQuaternion* pRotation =
-		(this && phkObject) ? &static_cast<hkpAngularDashpotAction*>(phkObject)->m_rotation : &hkQuaternionIdentity;
-	// EXE-INLINED 0x4B4DB0
-	arInfo.m_rotation.m_vec(0) = pRotation->m_vec(0);
-	arInfo.m_rotation.m_vec(1) = pRotation->m_vec(1);
-	arInfo.m_rotation.m_vec(2) = pRotation->m_vec(2);
-	arInfo.m_rotation.m_vec(3) = pRotation->m_vec(3);
-	// EXE-INLINED none: bhkAngularDashpotAction::GetStrength
-	float fStrength = (this && phkObject) ? static_cast<hkpAngularDashpotAction*>(phkObject)->m_strength : 0.0f;
-	arInfo.m_strength = fStrength;
+    bhkBinaryAction::CopyCinfo(arInfo);
+    // EXE-INLINED none: bhkAngularDashpotAction::GetDamping
+    float fDamping = (this && phkObject) ? static_cast<hkpAngularDashpotAction*>(phkObject)->m_damping : 0.0f;
+    arInfo.m_damping = fDamping;
+    // EXE-INLINED none: bhkAngularDashpotAction::GethkRotation
+    const hkQuaternion* pRotation =
+        (this && phkObject) ? &static_cast<hkpAngularDashpotAction*>(phkObject)->m_rotation : &hkQuaternionIdentity;
+    // EXE-INLINED 0x4B4DB0
+    arInfo.m_rotation.m_vec(0) = pRotation->m_vec(0);
+    arInfo.m_rotation.m_vec(1) = pRotation->m_vec(1);
+    arInfo.m_rotation.m_vec(2) = pRotation->m_vec(2);
+    arInfo.m_rotation.m_vec(3) = pRotation->m_vec(3);
+    // EXE-INLINED none: bhkAngularDashpotAction::GetStrength
+    float fStrength = (this && phkObject) ? static_cast<hkpAngularDashpotAction*>(phkObject)->m_strength : 0.0f;
+    arInfo.m_strength = fStrength;
 }
 
 NiObject* bhkAngularDashpotAction::CreateObject() {
-	bhkAngularDashpotAction* pObject =
-		static_cast<bhkAngularDashpotAction*>(NiMemObject::operator new(sizeof(bhkAngularDashpotAction)));
-	if (!pObject)
-		return nullptr;
-	return ::new (pObject) bhkAngularDashpotAction;
+    bhkAngularDashpotAction* pObject =
+        static_cast<bhkAngularDashpotAction*>(NiMemObject::operator new(sizeof(bhkAngularDashpotAction)));
+    if (!pObject) {
+        return nullptr;
+    }
+    return ::new (pObject) bhkAngularDashpotAction;
 }
 
 // The base's fields cleared by its constructor, the identity quaternion and the default strength and damping.
 hkAngularDashpotActionCinfo::hkAngularDashpotActionCinfo()
-	: hkBinaryActionCinfo(), m_rotation(hkQuaternionIdentity), m_strength(0.1f), m_damping(0.01f) {}
+  : hkBinaryActionCinfo(), m_rotation(hkQuaternionIdentity), m_strength(0.1f), m_damping(0.01f) {}

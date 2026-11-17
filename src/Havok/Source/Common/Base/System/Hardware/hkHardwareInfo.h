@@ -5,5 +5,5 @@
 // Reports the available hardware thread count.
 class hkHardwareInfo {
 public:
-	int32_t m_numThreads;
+    int32_t m_numThreads;
 };

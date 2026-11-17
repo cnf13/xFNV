@@ -6,8 +6,8 @@
 // does).
 class bhkArrowTargetListener : public bhkEntityListener {
 public:
-	bhkArrowTargetListener();
-	~bhkArrowTargetListener() override;
+    bhkArrowTargetListener();
+    ~bhkArrowTargetListener() override;
 
-	static void operator delete(void* apMemory);
+    static void operator delete(void* apMemory);
 };

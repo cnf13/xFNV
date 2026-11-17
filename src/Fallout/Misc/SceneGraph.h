@@ -6,12 +6,12 @@
 // The game's scene graph roots: the world, the menus and the 3D menus each have one.
 class SceneGraph : public BSSceneGraph {
 public:
-	SceneGraph(const char* apSceneGraphName, bool abMenuSceneGraph, NiCamera* apCamera);
+    SceneGraph(const char* apSceneGraphName, bool abMenuSceneGraph, NiCamera* apCamera);
 
-	const NiRTTI* GetRTTI() const override;
-	float GetFarDistance() override;
+    const NiRTTI* GetRTTI() const override;
+    float GetFarDistance() override;
 
-	static NiRTTI ms_RTTI;
+    static NiRTTI ms_RTTI;
 };
 
 NiSmartPointer(SceneGraph);

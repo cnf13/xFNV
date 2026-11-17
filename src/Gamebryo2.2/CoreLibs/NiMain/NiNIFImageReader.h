@@ -8,12 +8,12 @@
 // pads it from 0x6C4 to 0x700.
 class NiNIFImageReader : public NiImageReader {
 public:
-	NiNIFImageReader();
-	~NiNIFImageReader() override;
+    NiNIFImageReader();
+    ~NiNIFImageReader() override;
 
-	bool CanReadFile(const char*) const override;
-	NiPixelData* ReadFile(NiFile&, NiPixelData*) override;
-	bool ReadHeader(NiFile&, uint32_t&, uint32_t&, NiPixelFormat&, bool&, uint32_t&) override;
+    bool CanReadFile(const char*) const override;
+    NiPixelData* ReadFile(NiFile&, NiPixelData*) override;
+    bool ReadHeader(NiFile&, uint32_t&, uint32_t&, NiPixelFormat&, bool&, uint32_t&) override;
 
-	NiStream m_kStream;
+    NiStream m_kStream;
 };

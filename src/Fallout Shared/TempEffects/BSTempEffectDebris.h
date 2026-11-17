@@ -14,37 +14,64 @@ class TESObjectREFR;
 // lifetime or the debris limit pushes it out.
 class BSTempEffectDebris : public BSTempEffect {
 public:
-	BSTempEffectDebris(TESObjectCELL* apCell, float afLifetime, const char* apFilename, TESObjectREFR* apSourceRef,
-		const NiPoint3& aPosition, NiMatrix3& aRotation, NiPoint3& aStartLinearVelocity,
-		NiPoint3& aStartAngularVelocity, float afScale, bool bUseCache, bool abAddDebrisCount);
-	BSTempEffectDebris(TESObjectCELL* apCell, float afLifetime, const char* apFilename, TESObjectREFR* apSourceRef,
-		const NiPoint3& aPosition, NiPoint3& aDirection, NiPoint3& aStartLinearVelocity,
-		NiPoint3& aStartAngularVelocity, float afScale, bool bUseCache, bool abAddDebrisCount);
-	~BSTempEffectDebris() override;
+    BSTempEffectDebris(
+        TESObjectCELL* apCell,
+        float afLifetime,
+        const char* apFilename,
+        TESObjectREFR* apSourceRef,
+        const NiPoint3& aPosition,
+        NiMatrix3& aRotation,
+        NiPoint3& aStartLinearVelocity,
+        NiPoint3& aStartAngularVelocity,
+        float afScale,
+        bool bUseCache,
+        bool abAddDebrisCount
+    );
+    BSTempEffectDebris(
+        TESObjectCELL* apCell,
+        float afLifetime,
+        const char* apFilename,
+        TESObjectREFR* apSourceRef,
+        const NiPoint3& aPosition,
+        NiPoint3& aDirection,
+        NiPoint3& aStartLinearVelocity,
+        NiPoint3& aStartAngularVelocity,
+        float afScale,
+        bool bUseCache,
+        bool abAddDebrisCount
+    );
+    ~BSTempEffectDebris() override;
 
-	const NiRTTI* GetRTTI() const override;
-	bool Update(float afTimeDelta) override;
-	NiAVObject* Get3D() override;
-	TEMP_EFFECT_TYPE GetType() override;
-	bool IsFirstPerson() override;
+    const NiRTTI* GetRTTI() const override;
+    bool Update(float afTimeDelta) override;
+    NiAVObject* Get3D() override;
+    TEMP_EFFECT_TYPE GetType() override;
+    bool IsFirstPerson() override;
 
-	void SetForceDelete(bool abValue);
-	// Stores abValue in b1stPerson.
-	void SetIs1stPerson(bool abValue);
-	void Init(TESObjectREFR* apSourceRef, const NiPoint3& aPosition, NiMatrix3& aRotation,
-		NiPoint3& aStartLinearVelocity, NiPoint3& aStartAngularVelocity, float afScale, bool bUseCache);
-	void InitHavok(TESObjectREFR* apSourceRef);
+    void SetForceDelete(bool abValue);
+    // Stores abValue in b1stPerson.
+    void SetIs1stPerson(bool abValue);
+    void Init(
+        TESObjectREFR* apSourceRef,
+        const NiPoint3& aPosition,
+        NiMatrix3& aRotation,
+        NiPoint3& aStartLinearVelocity,
+        NiPoint3& aStartAngularVelocity,
+        float afScale,
+        bool bUseCache
+    );
+    void InitHavok(TESObjectREFR* apSourceRef);
 
-	static void AddtoDebrisCounter(BSTempEffectDebris* abDebrisObject);
-	static void RemoveFromDebrisCounter(BSTempEffectDebris* abDebrisObject);
-	static void LimitDebrisObjects();
+    static void AddtoDebrisCounter(BSTempEffectDebris* abDebrisObject);
+    static void RemoveFromDebrisCounter(BSTempEffectDebris* abDebrisObject);
+    static void LimitDebrisObjects();
 
-	NiPointer<NiAVObject> sp3D;
-	const char* pFilename;
-	bool bUseDebrisCounter;
-	bool bForceDelete;
-	bool b1stPerson;
+    NiPointer<NiAVObject> sp3D;
+    const char* pFilename;
+    bool bUseDebrisCounter;
+    bool bForceDelete;
+    bool b1stPerson;
 
-	static NiRTTI ms_RTTI;
-	static BSList<BSTempEffectDebris*> DebrisLimitList;
+    static NiRTTI ms_RTTI;
+    static BSList<BSTempEffectDebris*> DebrisLimitList;
 };

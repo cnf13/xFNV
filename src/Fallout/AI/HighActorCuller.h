@@ -10,16 +10,16 @@
 // Walks the high process actors and culls the ones outside the view, through a multibound sphere.
 class HighActorCuller : public MobIterOperator {
 public:
-	HighActorCuller();
-	~HighActorCuller();
+    HighActorCuller();
+    ~HighActorCuller();
 
-	void Operate(MobileObject* apMob) override;
+    void Operate(MobileObject* apMob) override;
 
-	void Init(NiCamera* apCamera);
-	void Run(NiCamera* apCamera);
+    void Init(NiCamera* apCamera);
+    void Run(NiCamera* apCamera);
 
-	BSFadeNodeCuller Culler;
-	NiPointer<BSMultiBoundNode> spMBNode;
-	NiPointer<BSMultiBound> spMB;
-	NiPointer<BSMultiBoundSphere> spMBSphere;
+    BSFadeNodeCuller Culler;
+    NiPointer<BSMultiBoundNode> spMBNode;
+    NiPointer<BSMultiBound> spMB;
+    NiPointer<BSMultiBoundSphere> spMBSphere;
 };

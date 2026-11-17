@@ -8,25 +8,25 @@ using XPSettingPair = SettingT<GameSettingCollection>* [2];
 // The experience point rules; all members are static and it has no instance layout.
 class ExperiencePoints {
 public:
-	// The activities that award experience.
-	enum Activity : int32_t {
-		ACTIVITY_KILL_CREATURE = 0x0,
-		ACTIVITY_KILL_NPC = 0x1,
-		ACTIVITY_HACK_COMPUTER = 0x2,
-		ACTIVITY_PICK_LOCK = 0x3,
-		ACTIVITY_SPEECH_CHALLENGE = 0x4,
-		ACTIVITY_COUNT = 0x5,
-	};
+    // The activities that award experience.
+    enum Activity : int32_t {
+        ACTIVITY_KILL_CREATURE = 0x0,
+        ACTIVITY_KILL_NPC = 0x1,
+        ACTIVITY_HACK_COMPUTER = 0x2,
+        ACTIVITY_PICK_LOCK = 0x3,
+        ACTIVITY_SPEECH_CHALLENGE = 0x4,
+        ACTIVITY_COUNT = 0x5,
+    };
 
-	// True if the player did more than iXPDeathRewardHealthThreshold percent of the target's original health.
-	static bool CheckDamageThreshold(float afPCDamage, float afOriginalHealth);
+    // True if the player did more than iXPDeathRewardHealthThreshold percent of the target's original health.
+    static bool CheckDamageThreshold(float afPCDamage, float afOriginalHealth);
 
-	// The experience the activity gives at the difficulty.
-	static int32_t GetExperiencePoints(Activity aeActivity, int32_t aiDifficulty);
-	// Walks aiPairCount (difficulty, reward) setting pairs and returns the reward of the first pair whose difficulty
-	// is not below aiDifficulty, else the last pair's reward.
-	static int32_t GetExperiencePoints(int32_t aiDifficulty, XPSettingPair* apDifficultyRewardList,
-		int32_t aiPairCount);
+    // The experience the activity gives at the difficulty.
+    static int32_t GetExperiencePoints(Activity aeActivity, int32_t aiDifficulty);
+    // Walks aiPairCount (difficulty, reward) setting pairs and returns the reward of the first pair whose difficulty
+    // is not below aiDifficulty, else the last pair's reward.
+    static int32_t
+    GetExperiencePoints(int32_t aiDifficulty, XPSettingPair* apDifficultyRewardList, int32_t aiPairCount);
 };
 
 using XPActivitySettingPairs = XPSettingPair[5];

@@ -9,19 +9,19 @@ class Tile;
 // meter tile that shows it.
 class VATSBodyPart {
 public:
-	VATSBodyPart();
+    VATSBodyPart();
 
-	NiPoint2 kScreenPos;
-	NiPoint3 kRelativePos;
-	NiPoint3 kPos;
-	uint32_t eBodyPart;
-	float fPercentVisible;
-	float fChance;
-	bool bOnScreen;
-	bool bChanceCalculated;
-	bool bFirstTimeShown;
-	bool bNeedsRecalc;
-	Tile* pMeter;
-	float unk34;
-	bool byte38;
+    NiPoint2 kScreenPos;
+    NiPoint3 kRelativePos;
+    NiPoint3 kPos;
+    uint32_t eBodyPart;
+    float fPercentVisible;
+    float fChance;
+    bool bOnScreen;
+    bool bChanceCalculated;
+    bool bFirstTimeShown;
+    bool bNeedsRecalc;
+    Tile* pMeter;
+    float unk34;
+    bool byte38;
 };

@@ -11,20 +11,20 @@ enum ANIM_GROUP_SECTION : int32_t;
 // An animation group that has several sequences to choose from.
 class AnimSequenceMultiple : public AnimSequenceBase {
 public:
-	// Takes over apSingleSeq's sequence and deletes apSingleSeq.
-	AnimSequenceMultiple(AnimSequenceSingle* apSingleSeq);
-	~AnimSequenceMultiple() override;
+    // Takes over apSingleSeq's sequence and deletes apSingleSeq.
+    AnimSequenceMultiple(AnimSequenceSingle* apSingleSeq);
+    ~AnimSequenceMultiple() override;
 
-	void SetSequence(BSAnimGroupSequence* apSeq, bool abReleaseModelLoader) override;
-	bool RemoveSequence(BSAnimGroupSequence* apSeq, bool abReleaseModelLoader) override;
-	bool IsSingleSeq() override;
-	BSAnimGroupSequence* GetSequenceToPlay(char aiSequenceIndex) override;
-	BSAnimGroupSequence* GetSequence(TESAnimGroup* apAnimGroup) override;
-	char GetSequenceIndex(BSAnimGroupSequence* apSeq) override;
+    void SetSequence(BSAnimGroupSequence* apSeq, bool abReleaseModelLoader) override;
+    bool RemoveSequence(BSAnimGroupSequence* apSeq, bool abReleaseModelLoader) override;
+    bool IsSingleSeq() override;
+    BSAnimGroupSequence* GetSequenceToPlay(char aiSequenceIndex) override;
+    BSAnimGroupSequence* GetSequence(TESAnimGroup* apAnimGroup) override;
+    char GetSequenceIndex(BSAnimGroupSequence* apSeq) override;
 
-	// The sequence of this multiple sequence that corresponds to apSeq in aeSection.
-	BSAnimGroupSequence* GetCorrespondingSequence(BSAnimGroupSequence* apSeq, ANIM_GROUP_SECTION aeSection);
+    // The sequence of this multiple sequence that corresponds to apSeq in aeSection.
+    BSAnimGroupSequence* GetCorrespondingSequence(BSAnimGroupSequence* apSeq, ANIM_GROUP_SECTION aeSection);
 
-	// The sequences' references are counted by hand, as AnimSequenceSingle does.
-	NiTPointerList<BSAnimGroupSequence*>* pSeqList;
+    // The sequences' references are counted by hand, as AnimSequenceSingle does.
+    NiTPointerList<BSAnimGroupSequence*>* pSeqList;
 };

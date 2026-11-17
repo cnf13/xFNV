@@ -9,14 +9,14 @@
 // Havok's hkSingleton<hkReferencedObjectLock>.
 class hkReferencedObjectLock : public hkReferencedObject, public hkSingleton<hkReferencedObjectLock> {
 public:
-	hkReferencedObjectLock();
-	~hkReferencedObjectLock() override;
+    hkReferencedObjectLock();
+    ~hkReferencedObjectLock() override;
 
-	hkReferencedObject::LockMode m_lockMode;
-	int32_t m_lockCount;
-	hkMultiThreadCheck m_multiThreadCheck;
-	hkCriticalSection m_criticalSection;
+    hkReferencedObject::LockMode m_lockMode;
+    int32_t m_lockCount;
+    hkMultiThreadCheck m_multiThreadCheck;
+    hkCriticalSection m_criticalSection;
 
-	// hkSingleton<hkReferencedObjectLock>::s_instance.
-	static inline hkReferencedObjectLock* s_instance;
+    // hkSingleton<hkReferencedObjectLock>::s_instance.
+    static inline hkReferencedObjectLock* s_instance;
 };

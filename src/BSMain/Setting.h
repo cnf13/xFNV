@@ -9,133 +9,141 @@ class INISettingCollection;
 class RegSettingCollection;
 class RendererSettingCollection;
 
-template <class T> class NiTPrimitiveArray;
+template <class T>
+class NiTPrimitiveArray;
 
 // A named configuration value: a union of the supported value types plus the setting's key.
 class Setting {
 public:
-	union Info {
-		uint32_t uint;
-		int32_t i;
-		float f;
-		char* str;
-		bool b;
-		uint16_t us;
-		// The value's low byte as a raw byte: ST_BINARY and ST_CHAR values are read and written as a byte.
-		uint8_t uc;
-	};
+    union Info {
+        uint32_t uint;
+        int32_t i;
+        float f;
+        char* str;
+        bool b;
+        uint16_t us;
+        // The value's low byte as a raw byte: ST_BINARY and ST_CHAR values are read and written as a byte.
+        uint8_t uc;
+    };
 
-	// The value type GetType derives from the key's prefix.
-	enum SETTING_TYPE {
-		ST_BINARY = 0,
-		ST_CHAR = 1,
-		ST_UCHAR = 2,
-		ST_INT = 3,
-		ST_UINT = 4,
-		ST_FLOAT = 5,
-		ST_STRING = 6,
-		ST_RGB = 7,
-		ST_RGBA = 8,
-		ST_NONE = 9,
-	};
+    // The value type GetType derives from the key's prefix.
+    enum SETTING_TYPE {
+        ST_BINARY = 0,
+        ST_CHAR = 1,
+        ST_UCHAR = 2,
+        ST_INT = 3,
+        ST_UINT = 4,
+        ST_FLOAT = 5,
+        ST_STRING = 6,
+        ST_RGB = 7,
+        ST_RGBA = 8,
+        ST_NONE = 9,
+    };
 
-	Setting(const char* apID, Info aValue);
-	Setting(const char* apID, bool abValue);
-	Setting(const char* apID, float afValue);
-	virtual ~Setting();
+    Setting(const char* apID, Info aValue);
+    Setting(const char* apID, bool abValue);
+    Setting(const char* apID, float afValue);
+    virtual ~Setting();
 
-	// false for a plain setting; the ini preference settings override it
-	virtual bool IsPrefSetting() { return false; }
+    // false for a plain setting; the ini preference settings override it
+    virtual bool IsPrefSetting() {
+        return false;
+    }
 
-	// Stores aiValue as the integer value.
-	void SetInt(int32_t aiValue);
-	// The string value, or null for a null setting.
-	const char* String();
+    // Stores aiValue as the integer value.
+    void SetInt(int32_t aiValue);
+    // The string value, or null for a null setting.
+    const char* String();
 
-	// The accessors below return the stored value; for a null setting they zero DefaultValue and return that.
-	int32_t& Int();
-	uint32_t& UInt();
-	float& Float();
-	bool& Bool();
+    // The accessors below return the stored value; for a null setting they zero DefaultValue and return that.
+    int32_t& Int();
+    uint32_t& UInt();
+    float& Float();
+    bool& Bool();
 
-	operator uint32_t();
-	operator float();
-	operator bool();
-	// The string value through String(). Explicit so the existing implicit conversions stay
-	// unambiguous.
-	explicit operator const char*();
-	// Stores a copy of apValue as the string value, reallocating a Setting key; returns this.
-	Setting& operator=(const char* apValue);
-	// Stores a float value; returns this.
-	Setting& operator=(float afValue);
-	// Stores a boolean value, a null this storing nothing; returns this.
-	Setting& operator=(bool abValue);
+    operator uint32_t();
+    operator float();
+    operator bool();
+    // The string value through String(). Explicit so the existing implicit conversions stay
+    // unambiguous.
+    explicit operator const char*();
+    // Stores a copy of apValue as the string value, reallocating a Setting key; returns this.
+    Setting& operator=(const char* apValue);
+    // Stores a float value; returns this.
+    Setting& operator=(float afValue);
+    // Stores a boolean value, a null this storing nothing; returns this.
+    Setting& operator=(bool abValue);
 
-	// True when the setting exists and its boolean value equals abValue.
-	bool IsEqual(bool abValue);
+    // True when the setting exists and its boolean value equals abValue.
+    bool IsEqual(bool abValue);
 
-	// The setting's type, derived from its key.
-	int32_t GetType();
+    // The setting's type, derived from its key.
+    int32_t GetType();
 
-	// Fills apStrings with this setting's viewer string. Defined in Setting.cpp.
-	void GetViewerStrings(NiTPrimitiveArray<char*>* apStringsA);
-	// The setting's name (pKey).
-	const char* Key() { return pKey; }
-	// Whether the setting exists and its value, read as a 32-bit integer, equals aiValue.
-	bool operator==(int32_t aiValue);
-	uint32_t DataSize();
+    // Fills apStrings with this setting's viewer string. Defined in Setting.cpp.
+    void GetViewerStrings(NiTPrimitiveArray<char*>* apStringsA);
+    // The setting's name (pKey).
+    const char* Key() {
+        return pKey;
+    }
+    // Whether the setting exists and its value, read as a 32-bit integer, equals aiValue.
+    bool operator==(int32_t aiValue);
+    uint32_t DataSize();
 
-	static void operator delete(void* apMemory);
-	// The type letter of the key, as the engine classifies setting names; callers outside Setting use it.
-	static SETTING_TYPE DataType(const char* apKey);
+    static void operator delete(void* apMemory);
+    // The type letter of the key, as the engine classifies setting names; callers outside Setting use it.
+    static SETTING_TYPE DataType(const char* apKey);
 
-	Info uValue;
-	const char* pKey;
+    Info uValue;
+    const char* pKey;
 
-	// The engine's shared scratch value handed out for null settings.
-	static inline Info DefaultValue{};
+    // The engine's shared scratch value handed out for null settings.
+    static inline Info DefaultValue{};
 };
 
 // A setting registered in one settings collection.
-template <class T> class SettingT : public Setting {
+template <class T>
+class SettingT : public Setting {
 public:
-	// Each constructor stores the key and value, then registers the setting in its collection. Defined in
-	// Setting.cpp and instantiated there for every collection: the collections' headers include this one.
-	SettingT(const char* apID, Info aValue);
-	SettingT(const char* apID, bool abValue);
-	SettingT(const char* apID, float afValue);
-	// The int, unsigned and string values are stored directly in the value, as the game's Info constructor does.
-	SettingT(const char* apID, int32_t aiValue);
-	SettingT(const char* apID, uint32_t aiValue);
-	SettingT(const char* apID, const char* apString);
-	// A double value is stored as a float, as the game does.
-	SettingT(const char* apID, double adValue) : SettingT(apID, static_cast<float>(adValue)) {}
-	~SettingT() override;
+    // Each constructor stores the key and value, then registers the setting in its collection. Defined in
+    // Setting.cpp and instantiated there for every collection: the collections' headers include this one.
+    SettingT(const char* apID, Info aValue);
+    SettingT(const char* apID, bool abValue);
+    SettingT(const char* apID, float afValue);
+    // The int, unsigned and string values are stored directly in the value, as the game's Info constructor does.
+    SettingT(const char* apID, int32_t aiValue);
+    SettingT(const char* apID, uint32_t aiValue);
+    SettingT(const char* apID, const char* apString);
+    // A double value is stored as a float, as the game does.
+    SettingT(const char* apID, double adValue) : SettingT(apID, static_cast<float>(adValue)) {}
+    ~SettingT() override;
 
-	// Stores an integer value; returns this.
-	SettingT& operator=(int32_t aiValue);
-	// Stores a boolean value; returns this.
-	SettingT& operator=(bool abValue);
-	// Stores a float value; returns this.
-	SettingT& operator=(float afValue);
-	// Stores a copy of apString as the string value; returns this.
-	SettingT& operator=(const char* apString);
-	// Stores the setting's key and default value in the collection. The value is the whole Info union, not a bool.
-	void InitString(const char* apName, Setting::Info aValue);
-	bool operator!() const { return !uValue.b; }
-	// Whether the setting exists and its boolean value equals abValue.
-	bool operator==(bool abValue);
-	// Whether the setting exists and its value equals aiValue.
-	bool operator==(int32_t aiValue);
+    // Stores an integer value; returns this.
+    SettingT& operator=(int32_t aiValue);
+    // Stores a boolean value; returns this.
+    SettingT& operator=(bool abValue);
+    // Stores a float value; returns this.
+    SettingT& operator=(float afValue);
+    // Stores a copy of apString as the string value; returns this.
+    SettingT& operator=(const char* apString);
+    // Stores the setting's key and default value in the collection. The value is the whole Info union, not a bool.
+    void InitString(const char* apName, Setting::Info aValue);
+    bool operator!() const {
+        return !uValue.b;
+    }
+    // Whether the setting exists and its boolean value equals abValue.
+    bool operator==(bool abValue);
+    // Whether the setting exists and its value equals aiValue.
+    bool operator==(int32_t aiValue);
 
-	// The collection the settings of this kind are registered in, created on first use.
-	static T* GetCollection();
-	// Creates the collection the first time it is needed (one body per collection type).
-	static void InitCollection();
+    // The collection the settings of this kind are registered in, created on first use.
+    static T* GetCollection();
+    // Creates the collection the first time it is needed (one body per collection type).
+    static void InitCollection();
 
-	// The collection the settings of this kind are registered in: the collection's global
-	// (SettingT_<Collection>_pCollection), bound per collection in Setting.cpp.
-	static T*& pCollection;
+    // The collection the settings of this kind are registered in: the collection's global
+    // (SettingT_<Collection>_pCollection), bound per collection in Setting.cpp.
+    static T*& pCollection;
 };
 
 // Settings built with SettingT's constructors in their files' dynamic initialisers.
@@ -224,8 +232,8 @@ extern SettingT<GameSettingCollection> gs_iHoursToRespawnCell;
 extern SettingT<INIPrefSettingCollection> gs_bGeneralSubtitles_Gameplay;
 
 namespace LOD {
-namespace iFadeNodeMinNearDistance {
-void Set(int32_t aiValue);
-uint32_t Get();
-}
-}
+    namespace iFadeNodeMinNearDistance {
+        void Set(int32_t aiValue);
+        uint32_t Get();
+    } // namespace iFadeNodeMinNearDistance
+} // namespace LOD

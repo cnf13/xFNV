@@ -3,86 +3,87 @@
 #include "Gamebryo2.2/CoreLibs/NiMain/NiFixedString.h"
 
 NiFixedString* FixedStrings::GetBip01_Spine() {
-	return reinterpret_cast<
-		NiFixedString*>(static_cast<uintptr_t>(reinterpret_cast<uintptr_t>(FixedStrings::Bip01_Spine)));
+    return reinterpret_cast<NiFixedString*>(
+        static_cast<uintptr_t>(reinterpret_cast<uintptr_t>(FixedStrings::Bip01_Spine))
+    );
 }
 
 NiFixedString& FixedStrings::QPrn() {
-	return *pPrn;
+    return *pPrn;
 }
 
 NiFixedString& FixedStrings::QAttachLight() {
-	return *pAttachLight;
+    return *pAttachLight;
 }
 
 NiFixedString& FixedStrings::QGrass() {
-	return *pGrass;
+    return *pGrass;
 }
 
 NiFixedString& FixedStrings::QBip01Yaw() {
-	return *pBip01Yaw;
+    return *pBip01Yaw;
 }
 
 NiFixedString& FixedStrings::QRaceHeadBiped() {
-	return *pRaceHeadBiped;
+    return *pRaceHeadBiped;
 }
 
 NiFixedString& FixedStrings::QRaceHeadSkinned() {
-	return *pRaceHeadSkinned;
+    return *pRaceHeadSkinned;
 }
 
 NiFixedString& FixedStrings::QHeadAnims() {
-	return *pHeadAnims;
+    return *pHeadAnims;
 }
 
 NiFixedString& FixedStrings::QBip() {
-	return *pBip;
+    return *pBip;
 }
 
 NiFixedString& FixedStrings::QBip01Looking() {
-	return *pBip01Looking;
+    return *pBip01Looking;
 }
 
 NiFixedString& FixedStrings::QCamera1st() {
-	return *pCamera1st;
+    return *pCamera1st;
 }
 
 NiFixedString& FixedStrings::QCamera3rd() {
-	return *pCamera3rd;
+    return *pCamera3rd;
 }
 
 NiFixedString& FixedStrings::QMagicNode() {
-	return *pMagicNode;
+    return *pMagicNode;
 }
 
 NiFixedString* FixedStrings::GetBip01_Head() {
-	return FixedStrings::pBip01_Head;
+    return FixedStrings::pBip01_Head;
 }
 
 NiFixedString* FixedStrings::QBip01LForearm() {
-	return FixedStrings::pBip01LForearm;
+    return FixedStrings::pBip01LForearm;
 }
 
 NiFixedString* FixedStrings::GetDecal() {
-	return FixedStrings::pDecal;
+    return FixedStrings::pDecal;
 }
 
 NiFixedString* FixedStrings::QBip01LUpperArm() {
-	return FixedStrings::pBip01LUpperArm;
+    return FixedStrings::pBip01LUpperArm;
 }
 
 NiFixedString* FixedStrings::GetPermanentDecal() {
-	return FixedStrings::pPermanentDecal;
+    return FixedStrings::pPermanentDecal;
 }
 
 NiFixedString* FixedStrings::QPinnedLimb() {
-	return FixedStrings::pPinnedLimb;
+    return FixedStrings::pPinnedLimb;
 }
 
 NiFixedString* FixedStrings::QBip01RUpperArm() {
-	return FixedStrings::pBip01RUpperArm;
+    return FixedStrings::pBip01RUpperArm;
 }
 
 NiFixedString& FixedStrings::QWeapon() {
-	return *Weapon;
+    return *Weapon;
 }

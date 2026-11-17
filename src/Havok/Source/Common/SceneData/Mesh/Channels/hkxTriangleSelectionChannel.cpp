@@ -8,12 +8,39 @@
 // The reflection data of hkxTriangleSelectionChannel.
 
 using hkxTriangleSelectionChannelClass_MembersArray = const hkClassMember[1];
-static hkxTriangleSelectionChannelClass_MembersArray hkxTriangleSelectionChannelClass_Members{{"selectedTriangles",
-	nullptr, nullptr, {hkClassMember::TYPE_ARRAY}, {hkClassMember::TYPE_INT32}, 0, 0, 0x8, nullptr}};
+static hkxTriangleSelectionChannelClass_MembersArray hkxTriangleSelectionChannelClass_Members{
+    {"selectedTriangles",
+     nullptr,
+     nullptr,
+     {hkClassMember::TYPE_ARRAY},
+     {hkClassMember::TYPE_INT32},
+     0,
+     0,
+     0x8,
+     nullptr}
+};
 
-hkClass hkxTriangleSelectionChannelClass("hkxTriangleSelectionChannel", &hkReferencedObjectClass, 0x14, nullptr, 0,
-	nullptr, 0, hkxTriangleSelectionChannelClass_Members, 1, nullptr, nullptr, 0, 1);
+hkClass hkxTriangleSelectionChannelClass(
+    "hkxTriangleSelectionChannel",
+    &hkReferencedObjectClass,
+    0x14,
+    nullptr,
+    0,
+    nullptr,
+    0,
+    hkxTriangleSelectionChannelClass_Members,
+    1,
+    nullptr,
+    nullptr,
+    0,
+    1
+);
 
-hkTypeInfo hkxTriangleSelectionChannelTypeInfo = {"hkxTriangleSelectionChannel",
-	finishLoadedObjecthkxTriangleSelectionChannel, cleanupLoadedObjecthkxTriangleSelectionChannel,
-	getVtablehkxTriangleSelectionChannel(), &typeid(hkxTriangleSelectionChannel), sizeof(hkxTriangleSelectionChannel)};
+hkTypeInfo hkxTriangleSelectionChannelTypeInfo = {
+    "hkxTriangleSelectionChannel",
+    finishLoadedObjecthkxTriangleSelectionChannel,
+    cleanupLoadedObjecthkxTriangleSelectionChannel,
+    getVtablehkxTriangleSelectionChannel(),
+    &typeid(hkxTriangleSelectionChannel),
+    sizeof(hkxTriangleSelectionChannel)
+};

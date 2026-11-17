@@ -6,9 +6,9 @@
 // Provides a shared null contact manager for pairs that do not need contact processing.
 class hkpNullContactMgrFactory : public hkpContactMgrFactory {
 public:
-	~hkpNullContactMgrFactory() override;
+    ~hkpNullContactMgrFactory() override;
 
-	hkpContactMgr* createContactMgr(const hkpCollidable&, const hkpCollidable&, const hkpCollisionInput&) override;
+    hkpContactMgr* createContactMgr(const hkpCollidable&, const hkpCollidable&, const hkpCollisionInput&) override;
 
-	hkpNullContactMgr m_contactMgr;
+    hkpNullContactMgr m_contactMgr;
 };

@@ -9,15 +9,15 @@
 // A per-vertex data channel of a scene mesh: one vector per vertex. It overrides only the destructor.
 class hkxVertexVectorDataChannel : public hkReferencedObject {
 public:
-	// The SDK's finish constructor: a loaded object keeps the fields the load wrote.
-	hkxVertexVectorDataChannel(hkFinishLoadedObjectFlag aFlag) : hkReferencedObject(aFlag), m_perVertexVectors(aFlag) {}
+    // The SDK's finish constructor: a loaded object keeps the fields the load wrote.
+    hkxVertexVectorDataChannel(hkFinishLoadedObjectFlag aFlag) : hkReferencedObject(aFlag), m_perVertexVectors(aFlag) {}
 
-	~hkxVertexVectorDataChannel() override;
+    ~hkxVertexVectorDataChannel() override;
 
-	// The reflection class hkxVertexVectorDataChannelClass.
-	static const hkClass& staticClass();
+    // The reflection class hkxVertexVectorDataChannelClass.
+    static const hkClass& staticClass();
 
-	hkArray<hkVector4> m_perVertexVectors;
+    hkArray<hkVector4> m_perVertexVectors;
 };
 
 extern hkClass hkxVertexVectorDataChannelClass;

@@ -9,6 +9,6 @@ class hkpConstraintInstance;
 // builds a plain hkpConstraintDrawer for it, for constraint type 14 (CONSTRAINT_TYPE_POINTTOPLANE).
 class hkpPointToPlaneDrawer : public hkpConstraintDrawer {
 public:
-	void drawConstraint(hkpConstraintInstance* constraint, hkDebugDisplayHandler* displayHandler, int32_t id,
-		int32_t tag);
+    void
+    drawConstraint(hkpConstraintInstance* constraint, hkDebugDisplayHandler* displayHandler, int32_t id, int32_t tag);
 };

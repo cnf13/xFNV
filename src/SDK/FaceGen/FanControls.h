@@ -1,7 +1,7 @@
 #pragma once
 
-#include "Fallout Shared/FaceGen/BSFaceGenManager.h"
 #include <memory>
+#include "Fallout Shared/FaceGen/BSFaceGenManager.h"
 
 struct FanLinCtlS;
 

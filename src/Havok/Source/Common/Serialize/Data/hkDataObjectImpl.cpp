@@ -6,8 +6,8 @@
 hkDataRefCounted::~hkDataRefCounted() {}
 
 void hkDataRefCounted::operator delete(void* apMemory) {
-	hkDataRefCounted* pThis = static_cast<hkDataRefCounted*>(apMemory);
-	hkMemoryRouter::getInstance().m_heap->blockFree(apMemory, pThis->m_memSize);
+    hkDataRefCounted* pThis = static_cast<hkDataRefCounted*>(apMemory);
+    hkMemoryRouter::getInstance().m_heap->blockFree(apMemory, pThis->m_memSize);
 }
 
 // The interfaces have no members of their own to destroy.

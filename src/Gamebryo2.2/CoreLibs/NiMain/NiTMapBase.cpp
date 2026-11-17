@@ -30,8 +30,8 @@
 #include "BSShader/ShadowSceneNode.h"
 #include "BSShader/SkyShader.h"
 #include "Fallout Shared/ActorValueOwner.h"
-#include "Fallout Shared/Animation.h"
 #include "Fallout Shared/AnimSequenceBase.h"
+#include "Fallout Shared/Animation.h"
 #include "Fallout Shared/BGSBodyPart.h"
 #include "Fallout Shared/BGSDecalManager.h"
 #include "Fallout Shared/BGSLoadedReferenceCollection.h"
@@ -40,8 +40,8 @@
 #include "Fallout Shared/BGSQuestObjective.h"
 #include "Fallout Shared/BGSRagdoll.h"
 #include "Fallout Shared/BGSTalkingActivator.h"
-#include "Fallout Shared/BipedAnim.h"
 #include "Fallout Shared/BSAnimGroupSequence.h"
+#include "Fallout Shared/BipedAnim.h"
 #include "Fallout Shared/CombatFormulas.h"
 #include "Fallout Shared/ContainerItemExtra.h"
 #include "Fallout Shared/Distant Terrain System/BGSTerrainManager.h"
@@ -62,7 +62,6 @@
 #include "Fallout Shared/PackageEventAction.h"
 #include "Fallout Shared/Pathfinding/FastNavMeshHandles.h"
 #include "Fallout Shared/Pathfinding/NavMesh.h"
-#include "Fallout Shared/Pathfinding/NavMesh_Util.h"
 #include "Fallout Shared/Pathfinding/NavMeshHandles.h"
 #include "Fallout Shared/Pathfinding/NavMeshInfo.h"
 #include "Fallout Shared/Pathfinding/NavMeshInfoMap.h"
@@ -70,14 +69,15 @@
 #include "Fallout Shared/Pathfinding/NavMeshObstacleTask.h"
 #include "Fallout Shared/Pathfinding/NavMeshPOVSearch.h"
 #include "Fallout Shared/Pathfinding/NavMeshRender.h"
+#include "Fallout Shared/Pathfinding/NavMesh_Util.h"
 #include "Fallout Shared/Pathfinding/ObstacleTaskNavMeshOperation.h"
 #include "Fallout Shared/Pathfinding/PathBuilder.h"
+#include "Fallout Shared/Pathfinding/PathManager.h"
 #include "Fallout Shared/Pathfinding/Pathfind.h"
-#include "Fallout Shared/Pathfinding/PathingLocation.h"
 #include "Fallout Shared/Pathfinding/PathingLOSGrid.h"
 #include "Fallout Shared/Pathfinding/PathingLOSGridMap.h"
+#include "Fallout Shared/Pathfinding/PathingLocation.h"
 #include "Fallout Shared/Pathfinding/PathingRequest.h"
-#include "Fallout Shared/Pathfinding/PathManager.h"
 #include "Fallout Shared/Region System/TESRegion.h"
 #include "Fallout Shared/Region System/TESRegionList.h"
 #include "Fallout Shared/Renderer.h"
@@ -147,9 +147,9 @@
 #include "Fallout/Debug/DebugTextManager.h"
 #include "Fallout/Debug/DebugTextPages/IDebugTextPage.h"
 #include "Fallout/Dialogue/DialogueResponse.h"
-#include "Fallout/Interface/FaderManager.h"
 #include "Fallout/Interface/FOPipboyManager.h"
 #include "Fallout/Interface/FORenderedMenuRaceSex.h"
+#include "Fallout/Interface/FaderManager.h"
 #include "Fallout/Interface/Interface.h"
 #include "Fallout/Interface/InterfaceManager.h"
 #include "Fallout/Interface/Menus/LoadingMenu.h"
@@ -181,25 +181,25 @@
 #include "Gamebryo2.2/CoreLibs/NiMain/NiPixelFormat.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiPoint2.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiPoint3.h"
-#include "Gamebryo2.2/CoreLibs/NiMain/NiPointer.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiPointLight.h"
+#include "Gamebryo2.2/CoreLibs/NiMain/NiPointer.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiQuaternion.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiRefCount.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiRefObject.h"
+#include "Gamebryo2.2/CoreLibs/NiMain/NiRenderTargetGroup.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiRenderedCubeMap.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiRenderedTexture.h"
-#include "Gamebryo2.2/CoreLibs/NiMain/NiRenderTargetGroup.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiShader.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiShaderLibrary.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiStream.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiTArray.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiTCollection.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiTDefaultAllocator.h"
-#include "Gamebryo2.2/CoreLibs/NiMain/NiTexture.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiTMap.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiTPointerAllocator.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiTPointerMap.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiTStringMap.h"
+#include "Gamebryo2.2/CoreLibs/NiMain/NiTexture.h"
 #include "Gamebryo2.2/CoreLibs/NiSystem/NiMemoryDefines.h"
 #include "Gamebryo2.2/CoreLibs/NiSystem/NiSystem.h"
 #include "Gamebryo2.2/CoreLibs/NiXenonRenderer/NiD3DPixelShader.h"
@@ -220,7 +220,7 @@ using NiTMapBaseUInt32Bool = NiTMapBase<DFALL<NiTMapItem<uint32_t, bool>>, uint3
 // The save loader's map of form headers by a 1-byte key: the hash is the key's zero-extended value modulo the bucket
 // count, and keys are compared as bytes.
 using NiTMapBaseUInt8LoadFormHeaderList =
-	NiTMapBase<NiTPointerAllocator<size_t>, uint8_t, BSSimpleList<LoadFormHeader*>*>;
+    NiTMapBase<NiTPointerAllocator<size_t>, uint8_t, BSSimpleList<LoadFormHeader*>*>;
 
 using NiTMapBaseCreateFunctions = NiTMapBase<NiTPointerAllocator<size_t>, const char*, NiObject* (*)()>;
 
@@ -245,18 +245,18 @@ using NiTMapBaseStringForm = NiTMapBase<DFALL<NiTMapItem<const char*, TESForm*>>
 using NiTMapBaseIntInt = NiTMapBase<DFALL<NiTMapItem<int32_t, int32_t>>, int32_t, int32_t>;
 
 using NiTMapBase_lNiTPointerAllocator_lunsigned_sint_g_cunsigned_sshort_cAnimSequenceBase_p =
-	NiTMapBase<NiTPointerAllocator<uint32_t>, uint16_t, AnimSequenceBase*>;
+    NiTMapBase<NiTPointerAllocator<uint32_t>, uint16_t, AnimSequenceBase*>;
 
 using NiTMapBase_DFALL_NiTMapItem_NiAVObject_short_NiAVObject_short =
-	NiTMapBase<DFALL<NiTMapItem<NiAVObject*, int16_t>>, NiAVObject*, int16_t>;
+    NiTMapBase<DFALL<NiTMapItem<NiAVObject*, int16_t>>, NiAVObject*, int16_t>;
 
 char* ConstructWorldLocation(void* apThis, [[maybe_unused]] void* apEdx) {
-	::new (apThis) WORLD_LOCATION;
-	return static_cast<char*>(static_cast<void*>(static_cast<int8_t*>(apThis)));
+    ::new (apThis) WORLD_LOCATION;
+    return static_cast<char*>(static_cast<void*>(static_cast<int8_t*>(apThis)));
 }
 
 // Constructs a NiTMapItem<TESForm *, BGSLoadGameSubBuffer> in apThis.
 void* ConstructMapItem(void* apThis, [[maybe_unused]] void* apEdx) {
-	::new (apThis) NiTMapItem<TESForm*, BGSLoadGameSubBuffer>;
-	return apThis;
+    ::new (apThis) NiTMapItem<TESForm*, BGSLoadGameSubBuffer>;
+    return apThis;
 }

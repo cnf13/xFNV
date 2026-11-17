@@ -6,19 +6,21 @@
 // The splatter an object carries for the custom screen splatter.
 class BSCustomSplatterExtraData : public NiExtraData {
 public:
-	BSCustomSplatterExtraData(BSSplatterData* aSplatterData);
+    BSCustomSplatterExtraData(BSSplatterData* aSplatterData);
 
-	~BSCustomSplatterExtraData() override;
+    ~BSCustomSplatterExtraData() override;
 
-	const NiRTTI* GetRTTI() const override { return &ms_RTTI; }
+    const NiRTTI* GetRTTI() const override {
+        return &ms_RTTI;
+    }
 
-	// Creates the "CSD" tag string.
-	static void InitTag();
-	// Returns the "CSD" tag string.
-	static const NiFixedString& Tag();
+    // Creates the "CSD" tag string.
+    static void InitTag();
+    // Returns the "CSD" tag string.
+    static const NiFixedString& Tag();
 
-	BSSplatterData SplatterData;
+    BSSplatterData SplatterData;
 
-	static NiRTTI ms_RTTI;
-	static inline NiFixedString* pTag;
+    static NiRTTI ms_RTTI;
+    static inline NiFixedString* pTag;
 };

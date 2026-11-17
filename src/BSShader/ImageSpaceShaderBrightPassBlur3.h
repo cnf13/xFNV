@@ -4,8 +4,8 @@
 
 class ImageSpaceShaderBrightPassBlur3 : public ImageSpaceShader {
 public:
-	ImageSpaceShaderBrightPassBlur3();
-	~ImageSpaceShaderBrightPassBlur3() override;
+    ImageSpaceShaderBrightPassBlur3();
+    ~ImageSpaceShaderBrightPassBlur3() override;
 
-	void ReloadShaders() override;
+    void ReloadShaders() override;
 };

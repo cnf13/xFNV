@@ -5,10 +5,12 @@
 // Name and description shared by the shader library's descriptions.
 class NiShaderDescBase : public NiRefObject {
 public:
-	~NiShaderDescBase() override;
+    ~NiShaderDescBase() override;
 
-	virtual const char* GetName() const { return m_pcName; }
+    virtual const char* GetName() const {
+        return m_pcName;
+    }
 
-	char* m_pcName;
-	char* m_pcDesc;
+    char* m_pcName;
+    char* m_pcDesc;
 };

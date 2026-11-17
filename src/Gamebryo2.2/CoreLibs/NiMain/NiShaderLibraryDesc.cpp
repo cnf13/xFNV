@@ -5,9 +5,9 @@
 #include "Gamebryo2.2/CoreLibs/NiMain/NiTArray.h"
 
 NiShaderDesc* NiShaderLibraryDesc::GetShaderDesc(uint32_t uiShader) const {
-	return m_kShaderDescs.m_pBase[uiShader].m_pObject;
+    return m_kShaderDescs.m_pBase[uiShader].m_pObject;
 }
 
 uint32_t NiShaderLibraryDesc::GetShaderCount() const {
-	return m_kShaderDescs.m_usESize;
+    return m_kShaderDescs.m_usESize;
 }

@@ -14,45 +14,45 @@ class NiTriShape;
 // The shader of laser and plasma beams: a core color with a glow, animated by a timer.
 class BeamShader : public BSShader {
 public:
-	enum VertexConstants : int32_t {
-		PAS_VC_WORLDVIEWTRANSFORM = 0x0,
-		PAS_VC_VARS = 0x4,
-		PAS_VC_EYEPOS = 0x8,
-	};
+    enum VertexConstants : int32_t {
+        PAS_VC_WORLDVIEWTRANSFORM = 0x0,
+        PAS_VC_VARS = 0x4,
+        PAS_VC_EYEPOS = 0x8,
+    };
 
-	enum PixelConstants : int32_t {
-		BS_PS_CORECOLOR = 0x0,
-		BS_PS_GLOWCOLOR = 0x1,
-	};
+    enum PixelConstants : int32_t {
+        BS_PS_CORECOLOR = 0x0,
+        BS_PS_GLOWCOLOR = 0x1,
+    };
 
-	BeamShader(NiDX9ShaderDeclaration* apShaderDecl);
-	~BeamShader() override;
+    BeamShader(NiDX9ShaderDeclaration* apShaderDecl);
+    ~BeamShader() override;
 
-	const NiRTTI* GetRTTI() const override;
-	bool Initialize() override;
-	void RecreateRendererData() override;
-	void CreateConstantMaps() override;
-	void ReloadShaders() override;
-	void ClearPassStages() override;
-	void SetCurrentPass(uint32_t aPass, bool aFirstPass) override;
-	virtual void LoadShaders();
-	virtual bool LoadStagesAndPasses();
+    const NiRTTI* GetRTTI() const override;
+    bool Initialize() override;
+    void RecreateRendererData() override;
+    void CreateConstantMaps() override;
+    void ReloadShaders() override;
+    void ClearPassStages() override;
+    void SetCurrentPass(uint32_t aPass, bool aFirstPass) override;
+    virtual void LoadShaders();
+    virtual bool LoadStagesAndPasses();
 
-	// Sets up the beam pass's stages.
-	void PresetStages();
+    // Sets up the beam pass's stages.
+    void PresetStages();
 
-	// Releases spBaseGeometry.
-	static void Free();
-	static BSShader* CreateShader();
+    // Releases spBaseGeometry.
+    static void Free();
+    static BSShader* CreateShader();
 
-	BSShaderManager::eBSSMPassEnum ePass;
-	float fTimer;
-	float fVars[16];
-	NiPointer<NiD3DPass> spBeamPass;
-	NiPointer<NiD3DVertexShader> spBeamVertexShader;
-	NiPointer<NiD3DPixelShader> spBeamPixelShader;
+    BSShaderManager::eBSSMPassEnum ePass;
+    float fTimer;
+    float fVars[16];
+    NiPointer<NiD3DPass> spBeamPass;
+    NiPointer<NiD3DVertexShader> spBeamVertexShader;
+    NiPointer<NiD3DPixelShader> spBeamPixelShader;
 
-	static NiRTTI ms_RTTI;
-	// The beams' shared geometry, released at exit.
-	static NiPointer<NiTriShape> spBaseGeometry;
+    static NiRTTI ms_RTTI;
+    // The beams' shared geometry, released at exit.
+    static NiPointer<NiTriShape> spBaseGeometry;
 };

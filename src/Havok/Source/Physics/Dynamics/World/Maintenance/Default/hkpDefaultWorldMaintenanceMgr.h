@@ -9,14 +9,14 @@ struct hkStepInfo;
 // the two limits give.
 class hkpDefaultWorldMaintenanceMgr : public hkpWorldMaintenanceMgr {
 public:
-	hkpDefaultWorldMaintenanceMgr();
+    hkpDefaultWorldMaintenanceMgr();
 
-	void init(hkpWorld* world) override;
-	void performMaintenance(hkpWorld* world, hkStepInfo& stepInfo) override;
-	void performMaintenanceNoSplit(hkpWorld* world, hkStepInfo& stepInfo) override;
+    void init(hkpWorld* world) override;
+    void performMaintenance(hkpWorld* world, hkStepInfo& stepInfo) override;
+    void performMaintenanceNoSplit(hkpWorld* world, hkStepInfo& stepInfo) override;
 
-	void resetWorldTime(hkpWorld* world, hkStepInfo& stepInfo);
+    void resetWorldTime(hkpWorld* world, hkStepInfo& stepInfo);
 
-	float m_minAllowedTimeValue;
-	float m_maxAllowedTimeValue;
+    float m_minAllowedTimeValue;
+    float m_maxAllowedTimeValue;
 };

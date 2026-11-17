@@ -6,11 +6,11 @@ class hkpAction;
 // do nothing.
 class hkpActionListener {
 public:
-	virtual ~hkpActionListener();
+    virtual ~hkpActionListener();
 
-	virtual void actionAddedCallback(hkpAction* action) {}
-	virtual void actionRemovedCallback(hkpAction* action) {}
+    virtual void actionAddedCallback(hkpAction* action) {}
+    virtual void actionRemovedCallback(hkpAction* action) {}
 
-	// DeletingDestruct's free (ourFree).
-	static void operator delete(void* apMemory);
+    // DeletingDestruct's free (ourFree).
+    static void operator delete(void* apMemory);
 };

@@ -9,5 +9,5 @@
 
 // Frees an array of aiCount pointers to the Havok heap. Nothing is returned.
 void releasePointerSmallArrayMemory(void** apData, int32_t aiCount) {
-	hkMemoryRouter::getInstance().heap().blockFree(apData, aiCount * static_cast<int32_t>(sizeof(void*)));
+    hkMemoryRouter::getInstance().heap().blockFree(apData, aiCount * static_cast<int32_t>(sizeof(void*)));
 }

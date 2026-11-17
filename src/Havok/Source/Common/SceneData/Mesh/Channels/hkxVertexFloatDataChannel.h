@@ -10,21 +10,21 @@
 // destructor.
 class hkxVertexFloatDataChannel : public hkReferencedObject {
 public:
-	enum VertexFloatDimensions : int32_t {
-		FLOAT = 0,
-		DISTANCE = 1,
-		ANGLE = 2,
-	};
+    enum VertexFloatDimensions : int32_t {
+        FLOAT = 0,
+        DISTANCE = 1,
+        ANGLE = 2,
+    };
 
-	// The SDK's finish constructor: a loaded object keeps the fields the load wrote.
-	hkxVertexFloatDataChannel(hkFinishLoadedObjectFlag aFlag) : hkReferencedObject(aFlag), m_perVertexFloats(aFlag) {}
-	~hkxVertexFloatDataChannel() override;
+    // The SDK's finish constructor: a loaded object keeps the fields the load wrote.
+    hkxVertexFloatDataChannel(hkFinishLoadedObjectFlag aFlag) : hkReferencedObject(aFlag), m_perVertexFloats(aFlag) {}
+    ~hkxVertexFloatDataChannel() override;
 
-	// The reflection class hkxVertexFloatDataChannelClass.
-	static const hkClass& staticClass();
+    // The reflection class hkxVertexFloatDataChannelClass.
+    static const hkClass& staticClass();
 
-	hkArray<float> m_perVertexFloats;
-	hkEnum<VertexFloatDimensions, uint8_t> m_dimensions;
+    hkArray<float> m_perVertexFloats;
+    hkEnum<VertexFloatDimensions, uint8_t> m_dimensions;
 };
 
 extern hkClass hkxVertexFloatDataChannelClass;

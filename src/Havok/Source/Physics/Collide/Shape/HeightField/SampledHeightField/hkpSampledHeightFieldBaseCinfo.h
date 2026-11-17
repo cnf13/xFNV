@@ -8,12 +8,12 @@
 // constructor and CalcMinMax put its first member at 0x30.
 class hkpSampledHeightFieldBaseCinfo {
 public:
-	hkpSampledHeightFieldBaseCinfo();
+    hkpSampledHeightFieldBaseCinfo();
 
-	hkVector4 m_scale;
-	int32_t m_xRes;
-	int32_t m_zRes;
-	float m_minHeight;
-	float m_maxHeight;
-	hkBool m_useProjectionBasedHeight;
+    hkVector4 m_scale;
+    int32_t m_xRes;
+    int32_t m_zRes;
+    float m_minHeight;
+    float m_maxHeight;
+    hkBool m_useProjectionBasedHeight;
 };

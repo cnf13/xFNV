@@ -60,108 +60,125 @@ class TEX_USER_DATA;
 class WadingWaterData;
 class WaterZone;
 
-template <class T, uint32_t uiGrowStep> class BSSimpleArray;
-template <class TKEY, class TVAL> class NiTMap;
+template <class T, uint32_t uiGrowStep>
+class BSSimpleArray;
+template <class TKEY, class TVAL>
+class NiTMap;
 
 char* ConstructWorldLocation(void* apThis, [[maybe_unused]] void* apEdx);
 void* ConstructMapItem(void* apThis, [[maybe_unused]] void* apEdx);
 
 // One entry of a hash map bucket's singly linked chain.
-template <class TKEY, class TVAL> class NiTMapItem : public NiMemObject {
+template <class TKEY, class TVAL>
+class NiTMapItem : public NiMemObject {
 public:
-	// Constructs the value only; the map sets the key and the link.
-	NiTMapItem() {}
+    // Constructs the value only; the map sets the key and the link.
+    NiTMapItem() {}
 
-	NiTMapItem* m_pkNext;
-	TKEY m_key;
-	TVAL m_val;
+    NiTMapItem* m_pkNext;
+    TKEY m_key;
+    TVAL m_val;
 };
 
 // Chained hash map: m_uiHashSize buckets of items from Allocator. The default hash is the key's integer value modulo
 // the bucket count; derived maps override the hash, the key test and the item handling. A position is an item
 // pointer (null past the end).
-template <class Allocator, class TKEY, class TVAL> class NiTMapBase : public NiMemObject {
+template <class Allocator, class TKEY, class TVAL>
+class NiTMapBase : public NiMemObject {
 public:
-	// The item count rides in the allocator's tail, so an empty allocator adds no size.
-	struct AntiBloatAllocator : public Allocator {
-		uint32_t m_uiCount;
-	};
+    // The item count rides in the allocator's tail, so an empty allocator adds no size.
+    struct AntiBloatAllocator : public Allocator {
+        uint32_t m_uiCount;
+    };
 
-	// auiHashSize cleared buckets, no items (Gamebryo's default 37 buckets).
-	NiTMapBase(uint32_t auiHashSize = 37);
-	// Derived maps empty the table in their own destructor (DeleteItem is theirs); this one frees the table.
-	virtual ~NiTMapBase();
+    // auiHashSize cleared buckets, no items (Gamebryo's default 37 buckets).
+    NiTMapBase(uint32_t auiHashSize = 37);
+    // Derived maps empty the table in their own destructor (DeleteItem is theirs); this one frees the table.
+    virtual ~NiTMapBase();
 
-	virtual uint32_t KeyToHashIndex(TKEY key) const;
-	virtual bool IsKeysEqual(TKEY key1, TKEY key2) const;
-	virtual void SetValue(NiTMapItem<TKEY, TVAL>* pkItem, TKEY key, TVAL val);
-	virtual void ClearValue(NiTMapItem<TKEY, TVAL>*) {}
-	virtual NiTMapItem<TKEY, TVAL>* NewItem() = 0;
-	virtual void DeleteItem(NiTMapItem<TKEY, TVAL>* pkItem) = 0;
+    virtual uint32_t KeyToHashIndex(TKEY key) const;
+    virtual bool IsKeysEqual(TKEY key1, TKEY key2) const;
+    virtual void SetValue(NiTMapItem<TKEY, TVAL>* pkItem, TKEY key, TVAL val);
+    virtual void ClearValue(NiTMapItem<TKEY, TVAL>*) {}
+    virtual NiTMapItem<TKEY, TVAL>* NewItem() = 0;
+    virtual void DeleteItem(NiTMapItem<TKEY, TVAL>* pkItem) = 0;
 
-	uint32_t GetCount() const;
-	bool IsEmpty() const;
+    uint32_t GetCount() const;
+    bool IsEmpty() const;
 
-	// Replaces the value of an existing key, else adds the key at the head of its bucket.
-	void SetAt(TKEY key, TVAL val);
+    // Replaces the value of an existing key, else adds the key at the head of its bucket.
+    void SetAt(TKEY key, TVAL val);
 
-	bool RemoveAt(TKEY key);
-	void RemoveAll();
-	void RemoveAll_0() { RemoveAll(); }
-	void RemoveAll_1() { RemoveAll(); }
-	void SetAt_B57EA0(TKEY key, TVAL val) { SetAt(key, val); }
-	bool GetAt_A53C30(TKEY key, TVAL& val) const { return GetAt(key, val); }
+    bool RemoveAt(TKEY key);
+    void RemoveAll();
+    void RemoveAll_0() {
+        RemoveAll();
+    }
+    void RemoveAll_1() {
+        RemoveAll();
+    }
+    void SetAt_B57EA0(TKEY key, TVAL val) {
+        SetAt(key, val);
+    }
+    bool GetAt_A53C30(TKEY key, TVAL& val) const {
+        return GetAt(key, val);
+    }
 
-	// Copies the key's value to val; false when the key is absent.
-	bool GetAt(TKEY key, TVAL& val) const;
+    // Copies the key's value to val; false when the key is absent.
+    bool GetAt(TKEY key, TVAL& val) const;
 
-	NiTMapItem<TKEY, TVAL>* GetFirstPos() const;
+    NiTMapItem<TKEY, TVAL>* GetFirstPos() const;
 
-	// Returns the item at pos and advances pos along its bucket, then to the next non-empty bucket.
-	void GetNext(NiTMapItem<TKEY, TVAL>*& pos, TKEY& key, TVAL& val) const;
+    // Returns the item at pos and advances pos along its bucket, then to the next non-empty bucket.
+    void GetNext(NiTMapItem<TKEY, TVAL>*& pos, TKEY& key, TVAL& val) const;
 
-	// Sets the bucket count, empties the count and allocates the cleared buckets (definitions in NiTMapBase.cpp).
-	NiTMapBase* Init(uint32_t auiHashSize);
+    // Sets the bucket count, empties the count and allocates the cleared buckets (definitions in NiTMapBase.cpp).
+    NiTMapBase* Init(uint32_t auiHashSize);
 
-	// The deleting destructors free the map through ourFree.
-	static void operator delete(void* apMemory) { ourFree(apMemory); }
+    // The deleting destructors free the map through ourFree.
+    static void operator delete(void* apMemory) {
+        ourFree(apMemory);
+    }
 
-	uint32_t m_uiHashSize;
-	NiTMapItem<TKEY, TVAL>** m_ppkHashTable;
-	AntiBloatAllocator m_kAllocator;
+    uint32_t m_uiHashSize;
+    NiTMapItem<TKEY, TVAL>** m_ppkHashTable;
+    AntiBloatAllocator m_kAllocator;
 };
 
 template <class Allocator, class TKEY, class TVAL>
 NiTMapBase<Allocator, TKEY, TVAL>::NiTMapBase(uint32_t auiHashSize) : m_uiHashSize(auiHashSize) {
-	m_kAllocator.m_uiCount = 0;
-	m_ppkHashTable = static_cast<NiTMapItem<TKEY, TVAL>**>(_NiMalloc(sizeof(NiTMapItem<TKEY, TVAL>*) * m_uiHashSize));
-	std::memset(m_ppkHashTable, 0, sizeof(NiTMapItem<TKEY, TVAL>*) * m_uiHashSize);
+    m_kAllocator.m_uiCount = 0;
+    m_ppkHashTable = static_cast<NiTMapItem<TKEY, TVAL>**>(_NiMalloc(sizeof(NiTMapItem<TKEY, TVAL>*) * m_uiHashSize));
+    std::memset(m_ppkHashTable, 0, sizeof(NiTMapItem<TKEY, TVAL>*) * m_uiHashSize);
 }
 
 // Empties the table (the derived map has already, with its own DeleteItem) and frees the buckets.
-template <class Allocator, class TKEY, class TVAL> NiTMapBase<Allocator, TKEY, TVAL>::~NiTMapBase() {
-	RemoveAll();
-	_NiFree(m_ppkHashTable);
+template <class Allocator, class TKEY, class TVAL>
+NiTMapBase<Allocator, TKEY, TVAL>::~NiTMapBase() {
+    RemoveAll();
+    _NiFree(m_ppkHashTable);
 }
 
 // The constructor's work on a map already in place: the bucket count, an empty count and auiHashSize cleared buckets.
 // The old buckets are deliberately not freed, as the game does.
 template <class Allocator, class TKEY, class TVAL>
 NiTMapBase<Allocator, TKEY, TVAL>* NiTMapBase<Allocator, TKEY, TVAL>::Init(uint32_t auiHashSize) {
-	m_uiHashSize = auiHashSize;
-	m_kAllocator.m_uiCount = 0;
-	m_ppkHashTable = static_cast<NiTMapItem<TKEY, TVAL>**>(_NiMalloc(sizeof(NiTMapItem<TKEY, TVAL>*) * m_uiHashSize));
-	std::memset(m_ppkHashTable, 0, sizeof(NiTMapItem<TKEY, TVAL>*) * m_uiHashSize);
-	return this;
+    m_uiHashSize = auiHashSize;
+    m_kAllocator.m_uiCount = 0;
+    m_ppkHashTable = static_cast<NiTMapItem<TKEY, TVAL>**>(_NiMalloc(sizeof(NiTMapItem<TKEY, TVAL>*) * m_uiHashSize));
+    std::memset(m_ppkHashTable, 0, sizeof(NiTMapItem<TKEY, TVAL>*) * m_uiHashSize);
+    return this;
 }
 
 // The maps Fallout Shared/TESObjectCELL.cpp instantiates. Defined in Fallout Shared/TESObjectCELL.cpp.
 using NiTMapBaseDFALLREFRNode = NiTMapBase<DFALL<NiTMapItem<TESObjectREFR*, NiNode*>>, TESObjectREFR*, NiNode*>;
 using NiTMapBaseDFALLFormREFR = NiTMapBase<DFALL<NiTMapItem<TESForm*, TESObjectREFR*>>, TESForm*, TESObjectREFR*>;
-using NiTMapBaseDFALLREFRBound = NiTMapBase<DFALL<NiTMapItem<TESObjectREFR*, NiPointer<BSMultiBoundNode>>>,
-	TESObjectREFR*, NiPointer<BSMultiBoundNode>>;
+using NiTMapBaseDFALLREFRBound = NiTMapBase<
+    DFALL<NiTMapItem<TESObjectREFR*, NiPointer<BSMultiBoundNode>>>,
+    TESObjectREFR*,
+    NiPointer<BSMultiBoundNode>>;
 using NiTMapBaseDFALLREFRREFR =
-	NiTMapBase<DFALL<NiTMapItem<TESObjectREFR*, TESObjectREFR*>>, TESObjectREFR*, TESObjectREFR*>;
+    NiTMapBase<DFALL<NiTMapItem<TESObjectREFR*, TESObjectREFR*>>, TESObjectREFR*, TESObjectREFR*>;
 
 // The pathing line-of-sight grid map's base. Its constructor is defined in Fallout
 // Shared/Pathfinding/PathingLOSGridMap.cpp.
@@ -187,12 +204,14 @@ using NiTMapBaseWaterZoneInt = NiTMapBase<DFALL<NiTMapItem<WaterZone*, int32_t>>
 
 // The maps Fallout Shared/Pathfinding/NavMeshObstacleManager.cpp instantiates. Defined in Fallout
 // Shared/Pathfinding/NavMeshObstacleManager.cpp.
-using NiTMapBaseUIntRefObstacleArray = NiTMapBase<DFALL<NiTMapItem<uint32_t, NiPointer<ReferenceObstacleArray>>>,
-	uint32_t, NiPointer<ReferenceObstacleArray>>;
+using NiTMapBaseUIntRefObstacleArray = NiTMapBase<
+    DFALL<NiTMapItem<uint32_t, NiPointer<ReferenceObstacleArray>>>,
+    uint32_t,
+    NiPointer<ReferenceObstacleArray>>;
 using NiTMapBaseRigidBodyObstacle =
-	NiTMapBase<DFALL<NiTMapItem<bhkRigidBody*, NiPointer<ObstacleData>>>, bhkRigidBody*, NiPointer<ObstacleData>>;
+    NiTMapBase<DFALL<NiTMapItem<bhkRigidBody*, NiPointer<ObstacleData>>>, bhkRigidBody*, NiPointer<ObstacleData>>;
 using NiTMapBaseUIntObstacleTask =
-	NiTMapBase<DFALL<NiTMapItem<uint32_t, ObstacleTaskData*>>, uint32_t, ObstacleTaskData*>;
+    NiTMapBase<DFALL<NiTMapItem<uint32_t, ObstacleTaskData*>>, uint32_t, ObstacleTaskData*>;
 
 using NiTMapBaseTESObjectTREEModel = NiTMapBase<NiTPointerAllocator<size_t>, TESObjectTREE*, NiPointer<BSTreeModel>*>;
 
@@ -211,34 +230,37 @@ using NiTMapBaseDFALLUInt32REFR = NiTMapBase<DFALL<NiTMapItem<uint32_t, TESObjec
 // The navmesh info maps (NavMeshInfoMap's info map and its two cell key maps). Defined in Fallout
 // Shared/Pathfinding/NavMeshInfoMap.cpp.
 using NiTMapBasePtrUIntNavMeshInfo = NiTMapBase<NiTPointerAllocator<size_t>, uint32_t, NavMeshInfo*>;
-using NiTMapBaseUIntWorldSpaceCellKeyMap =
-	NiTMapBase<DFALL<NiTMapItem<uint32_t, NiTMap<uintptr_t, BSSimpleArray<NavMeshInfo*, 1024>*>*>>, uint32_t,
-		NiTMap<uintptr_t, BSSimpleArray<NavMeshInfo*, 1024>*>*>;
-using NiTMapBaseUIntCellKeyInfoMap = NiTMapBase<DFALL<NiTMapItem<uintptr_t, BSSimpleArray<NavMeshInfo*, 1024>*>>,
-	uintptr_t, BSSimpleArray<NavMeshInfo*, 1024>*>;
+using NiTMapBaseUIntWorldSpaceCellKeyMap = NiTMapBase<
+    DFALL<NiTMapItem<uint32_t, NiTMap<uintptr_t, BSSimpleArray<NavMeshInfo*, 1024>*>*>>,
+    uint32_t,
+    NiTMap<uintptr_t, BSSimpleArray<NavMeshInfo*, 1024>*>*>;
+using NiTMapBaseUIntCellKeyInfoMap = NiTMapBase<
+    DFALL<NiTMapItem<uintptr_t, BSSimpleArray<NavMeshInfo*, 1024>*>>,
+    uintptr_t,
+    BSSimpleArray<NavMeshInfo*, 1024>*>;
 
 // The navmesh maps: the triangle-to-obstacle map and the POV maps of Fallout Shared/Pathfinding/NavMesh.cpp and
 // NavMesh_Util.cpp.
 using NiTMapBaseUShortObstacleData =
-	NiTMapBase<DFALL<NiTMapItem<uint16_t, NiPointer<ObstacleData>>>, uint16_t, NiPointer<ObstacleData>>;
+    NiTMapBase<DFALL<NiTMapItem<uint16_t, NiPointer<ObstacleData>>>, uint16_t, NiPointer<ObstacleData>>;
 using NiTMapBaseUShortNavMeshPOVData =
-	NiTMapBase<DFALL<NiTMapItem<uint16_t, NavMeshPOVData>>, uint16_t, NavMeshPOVData>;
+    NiTMapBase<DFALL<NiTMapItem<uint16_t, NavMeshPOVData>>, uint16_t, NavMeshPOVData>;
 using NiTMapBaseFastVertHandlePOVVertexData =
-	NiTMapBase<DFALL<NiTMapItem<FastNavMeshVertHandle, POVVertexData*>>, FastNavMeshVertHandle, POVVertexData*>;
+    NiTMapBase<DFALL<NiTMapItem<FastNavMeshVertHandle, POVVertexData*>>, FastNavMeshVertHandle, POVVertexData*>;
 
 // The save loader's reconstruction maps, built in Fallout/Misc/SaveLoad/BGSReconstructFormsInAllFilesMap.cpp.
 using NiTMapBaseReconstructFormData =
-	NiTMapBase<DFALL<NiTMapItem<uint32_t, ReconstructFormData>>, uint32_t, ReconstructFormData>;
+    NiTMapBase<DFALL<NiTMapItem<uint32_t, ReconstructFormData>>, uint32_t, ReconstructFormData>;
 using NiTMapBaseBGSReconstructFormsMap =
-	NiTMapBase<DFALL<NiTMapItem<uint32_t, BGSReconstructFormsMap*>>, uint32_t, BGSReconstructFormsMap*>;
+    NiTMapBase<DFALL<NiTMapItem<uint32_t, BGSReconstructFormsMap*>>, uint32_t, BGSReconstructFormsMap*>;
 using NiTMapBaseBGSReconstructCellsMap =
-	NiTMapBase<DFALL<NiTMapItem<uint32_t, BGSReconstructCellsMap*>>, uint32_t, BGSReconstructCellsMap*>;
+    NiTMapBase<DFALL<NiTMapItem<uint32_t, BGSReconstructCellsMap*>>, uint32_t, BGSReconstructCellsMap*>;
 using NiTMapBaseBGSReconstructCellSubBlocksMap =
-	NiTMapBase<DFALL<NiTMapItem<uint32_t, BGSReconstructCellSubBlocksMap*>>, uint32_t, BGSReconstructCellSubBlocksMap*>;
+    NiTMapBase<DFALL<NiTMapItem<uint32_t, BGSReconstructCellSubBlocksMap*>>, uint32_t, BGSReconstructCellSubBlocksMap*>;
 using NiTMapBaseBGSReconstructCellBlocksMap =
-	NiTMapBase<DFALL<NiTMapItem<uint32_t, BGSReconstructCellBlocksMap*>>, uint32_t, BGSReconstructCellBlocksMap*>;
+    NiTMapBase<DFALL<NiTMapItem<uint32_t, BGSReconstructCellBlocksMap*>>, uint32_t, BGSReconstructCellBlocksMap*>;
 using NiTMapBaseBGSReconstructFormsInFileMap =
-	NiTMapBase<DFALL<NiTMapItem<TESFile*, BGSReconstructFormsInFileMap*>>, TESFile*, BGSReconstructFormsInFileMap*>;
+    NiTMapBase<DFALL<NiTMapItem<TESFile*, BGSReconstructFormsInFileMap*>>, TESFile*, BGSReconstructFormsInFileMap*>;
 
 // The maps Fallout Shared/Havok/BGSAcousticSpaceListener.cpp (the acoustic-space removal queue) and Fallout
 // Shared/Havok/LoadedAreaBound.cpp (the loaded area's rigid bodies) build in place: their vtables and the constructor
@@ -249,14 +271,14 @@ using NiTMapBaseRigidBodyUShort = NiTMapBase<DFALL<NiTMapItem<bhkRigidBody*, uin
 // The queued load sub-buffer maps' base (BGSSaveLoadQueuedSubBufferMap's three maps of form to sub-buffer): the vtable,
 // constructor and destructor are defined in Fallout/Misc/SaveLoad/BGSLoadGameSubBuffer.cpp.
 using NiTMapBaseDFALLTESFormBGSLoadGameSubBuffer =
-	NiTMapBase<DFALL<NiTMapItem<TESForm*, BGSLoadGameSubBuffer>>, TESForm*, BGSLoadGameSubBuffer>;
+    NiTMapBase<DFALL<NiTMapItem<TESForm*, BGSLoadGameSubBuffer>>, TESForm*, BGSLoadGameSubBuffer>;
 
 // The player's random-door map (a form ID to a byte) and the cover map's reserved-location map (a cover location ID to
 // a ReservedCoverLocation*): their vtables and destructors are defined in Fallout/AI/PlayerCharacter.cpp and
 // Fallout/AI/Combat/CombatCoverMap.cpp.
 using NiTMapBaseUIntUInt8 = NiTMapBase<DFALL<NiTMapItem<uint32_t, uint8_t>>, uint32_t, uint8_t>;
 using NiTMapBaseUIntReservedCoverLocation =
-	NiTMapBase<DFALL<NiTMapItem<uint32_t, ReservedCoverLocation*>>, uint32_t, ReservedCoverLocation*>;
+    NiTMapBase<DFALL<NiTMapItem<uint32_t, ReservedCoverLocation*>>, uint32_t, ReservedCoverLocation*>;
 
 // The object maps Fallout Shared/BipedAnim.cpp builds in place; their vtables, constructors and destructors are defined
 // in that file.
@@ -273,7 +295,7 @@ using NiTMapBaseREFRUInt = NiTMapBase<DFALL<NiTMapItem<TESObjectREFR*, uint32_t>
 // The debug text page map of Fallout\Debug\DebugTextManager.cpp, the sound map of Fallout\Audio\FalloutAudio.cpp and
 // the impact map of Fallout\Audio\ImpactMixer.cpp: their vtables and constructors are defined in those files.
 using NiTMapBaseDFALLUIntDebugTextPagePtr =
-	NiTMapBase<DFALL<NiTMapItem<uint32_t, IDebugTextPage*>>, uint32_t, IDebugTextPage*>;
+    NiTMapBase<DFALL<NiTMapItem<uint32_t, IDebugTextPage*>>, uint32_t, IDebugTextPage*>;
 using NiTMapBasePtrUIntSoundHandle = NiTMapBase<NiTPointerAllocator<size_t>, uint32_t, BSSoundHandle*>;
 using NiTMapBasePtrIntUInt = NiTMapBase<NiTPointerAllocator<size_t>, int32_t, uint32_t>;
 
@@ -282,7 +304,7 @@ using NiTMapBasePtrIntUInt = NiTMapBase<NiTPointerAllocator<size_t>, int32_t, ui
 using NiTMapBaseTextureUserData = NiTMapBase<DFALL<NiTMapItem<NiTexture*, TEX_USER_DATA*>>, NiTexture*, TEX_USER_DATA*>;
 using NiTMapBaseAVObjectTreeItem = NiTMapBase<DFALL<NiTMapItem<NiAVObject*, _TREEITEM*>>, NiAVObject*, _TREEITEM*>;
 using NiTMapBaseStringIdleAnimRoot =
-	NiTMapBase<DFALL<NiTMapItem<const char*, IDLE_ANIM_ROOT*>>, const char*, IDLE_ANIM_ROOT*>;
+    NiTMapBase<DFALL<NiTMapItem<const char*, IDLE_ANIM_ROOT*>>, const char*, IDLE_ANIM_ROOT*>;
 using NiTMapBaseUIntUInt = NiTMapBase<DFALL<NiTMapItem<uint32_t, uint32_t>>, uint32_t, uint32_t>;
 using NiTMapBasePtrUIntChangeData = NiTMapBase<NiTPointerAllocator<uint32_t>, uint32_t, ChangeData*>;
 using NiTMapBasePtrUIntVoid = NiTMapBase<NiTPointerAllocator<uint32_t>, uint32_t, void*>;
@@ -299,13 +321,13 @@ using NiTMapBaseDFALLNiTextureBool = NiTMapBase<DFALL<NiTMapItem<NiTexture*, boo
 using NiTMapBaseDFALLTESActorBaseBool = NiTMapBase<DFALL<NiTMapItem<TESActorBase*, bool>>, TESActorBase*, bool>;
 using NiTMapBaseDFALLIntInt = NiTMapBase<DFALL<NiTMapItem<int32_t, int32_t>>, int32_t, int32_t>;
 using NiTMapBaseDFALLShadowSceneLightInt =
-	NiTMapBase<DFALL<NiTMapItem<ShadowSceneLight*, int32_t>>, ShadowSceneLight*, int32_t>;
+    NiTMapBase<DFALL<NiTMapItem<ShadowSceneLight*, int32_t>>, ShadowSceneLight*, int32_t>;
 using NiTMapBaseDFALLActorCombatTargetData =
-	NiTMapBase<DFALL<NiTMapItem<Actor*, CombatTargetData*>>, Actor*, CombatTargetData*>;
+    NiTMapBase<DFALL<NiTMapItem<Actor*, CombatTargetData*>>, Actor*, CombatTargetData*>;
 using NiTMapBaseDFALLUIntCombatThreat = NiTMapBase<DFALL<NiTMapItem<uint32_t, CombatThreat*>>, uint32_t, CombatThreat*>;
 
 // The maps from a 4-byte key to a NiPointer; their SetAt is defined in NiTMapBase.cpp.
 using NiTMapBaseUIntNiRefObjectPtr =
-	NiTMapBase<DFALL<NiTMapItem<uint32_t, NiPointer<NiRefObject>>>, uint32_t, NiPointer<NiRefObject>>;
+    NiTMapBase<DFALL<NiTMapItem<uint32_t, NiPointer<NiRefObject>>>, uint32_t, NiPointer<NiRefObject>>;
 
 #include "Gamebryo2.2/CoreLibs/NiMain/NiTMapBase.inl"

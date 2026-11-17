@@ -11,32 +11,32 @@ enum CHUNK_ID : uint32_t;
 // The description text of a form, stored as an offset into its file.
 class TESDescription : public BaseFormComponent {
 public:
-	TESDescription();
+    TESDescription();
 
-	void InitializeDataComponent() override;
-	void ClearDataComponent() override {}
-	void CopyComponent(BaseFormComponent* apCopyFC) override;
-	bool CompareComponent(BaseFormComponent* apCompareFC) override;
+    void InitializeDataComponent() override;
+    void ClearDataComponent() override {}
+    void CopyComponent(BaseFormComponent* apCopyFC) override;
+    bool CompareComponent(BaseFormComponent* apCompareFC) override;
 
-	// The description text of apForm, read from the aeChunk record of its file.
-	virtual const char* GetDescription(TESForm* apForm, CHUNK_ID aeChunk);
+    // The description text of apForm, read from the aeChunk record of its file.
+    virtual const char* GetDescription(TESForm* apForm, CHUNK_ID aeChunk);
 
-	// Loads the description of apForm from its file.
-	void LoadDescription(TESForm* apForm, CHUNK_ID aeChunk);
-	// Stores the description text read from the file and returns what BSStringT<char>::Set returns.
-	bool SetLastDescriptionString(char* apText);
-	void SetDescriptionFileOffset(uint32_t alOffset);
-	void Save();
-	uint32_t GetDescriptionLength();
+    // Loads the description of apForm from its file.
+    void LoadDescription(TESForm* apForm, CHUNK_ID aeChunk);
+    // Stores the description text read from the file and returns what BSStringT<char>::Set returns.
+    bool SetLastDescriptionString(char* apText);
+    void SetDescriptionFileOffset(uint32_t alOffset);
+    void Save();
+    uint32_t GetDescriptionLength();
 
-	// Saves the description of apDesc as chunk aiChunk.
-	static void SaveDescriptionData(TESDescription* apDesc, CHUNK_ID aiChunk);
-	// Points apDesc at the current record of apFile.
-	static void LoadDescriptionData(TESDescription* apDesc, TESFile* apFile);
+    // Saves the description of apDesc as chunk aiChunk.
+    static void SaveDescriptionData(TESDescription* apDesc, CHUNK_ID aiChunk);
+    // Points apDesc at the current record of apFile.
+    static void LoadDescriptionData(TESDescription* apDesc, TESFile* apFile);
 
-	uint32_t lFileOffset;
+    uint32_t lFileOffset;
 
-	// A description string shared by the class's functions.
-	static BSStringT<char> strCurrentDescription;
-	static inline TESDescription* pCurrentDescription;
+    // A description string shared by the class's functions.
+    static BSStringT<char> strCurrentDescription;
+    static inline TESDescription* pCurrentDescription;
 };

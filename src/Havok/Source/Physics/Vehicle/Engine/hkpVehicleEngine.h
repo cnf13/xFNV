@@ -11,20 +11,24 @@ class hkpVehicleInstance;
 // abstract.
 class hkpVehicleEngine : public hkReferencedObject {
 public:
-	// What calcEngineInfo produces for the step.
-	struct EngineOutput {
-		float m_torque;
-		float m_rpm;
-	};
+    // What calcEngineInfo produces for the step.
+    struct EngineOutput {
+        float m_torque;
+        float m_rpm;
+    };
 
-	// The constructor the derived classes' own use, and the SDK's finish constructor of a loaded object (the derived
-	// classes' finish constructors call it): it keeps the fields the load wrote.
-	hkpVehicleEngine() = default;
-	hkpVehicleEngine(hkFinishLoadedObjectFlag flag) : hkReferencedObject(flag) {}
+    // The constructor the derived classes' own use, and the SDK's finish constructor of a loaded object (the derived
+    // classes' finish constructors call it): it keeps the fields the load wrote.
+    hkpVehicleEngine() = default;
+    hkpVehicleEngine(hkFinishLoadedObjectFlag flag) : hkReferencedObject(flag) {}
 
-	virtual void calcEngineInfo(float deltaTime, const hkpVehicleInstance* vehicle,
-		const hkpVehicleDriverInput::FilteredDriverInputOutput& FilteredDriverInputOutput,
-		const hkpVehicleTransmission::TransmissionOutput& TransmissionOutput, EngineOutput& engineOutput) = 0;
+    virtual void calcEngineInfo(
+        float deltaTime,
+        const hkpVehicleInstance* vehicle,
+        const hkpVehicleDriverInput::FilteredDriverInputOutput& FilteredDriverInputOutput,
+        const hkpVehicleTransmission::TransmissionOutput& TransmissionOutput,
+        EngineOutput& engineOutput
+    ) = 0;
 };
 
 // The class's reflection record.

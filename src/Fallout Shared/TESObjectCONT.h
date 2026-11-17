@@ -18,51 +18,62 @@ class TESSound;
 
 // A container's DATA record.
 struct CONT_DATA {
-	char cContFlags;
+    char cContFlags;
 };
 
 // A container base form (CONT). Its own members are not declared yet.
 class TESObjectCONT : public TESBoundAnimObject,
-					  public TESContainer,
-					  public TESFullName,
-					  public TESModelTextureSwap,
-					  public TESScriptableForm,
-					  public TESWeightForm,
-					  public TESMagicCasterForm,
-					  public TESMagicTargetForm,
-					  public BGSDestructibleObjectForm,
-					  public BGSOpenCloseForm {
+                      public TESContainer,
+                      public TESFullName,
+                      public TESModelTextureSwap,
+                      public TESScriptableForm,
+                      public TESWeightForm,
+                      public TESMagicCasterForm,
+                      public TESMagicTargetForm,
+                      public BGSDestructibleObjectForm,
+                      public BGSOpenCloseForm {
 public:
-	TESObjectCONT();
-	~TESObjectCONT() override;
+    TESObjectCONT();
+    ~TESObjectCONT() override;
 
-	void InitializeData() override;
-	bool Load(TESFile* apFile) override;
-	void Save() override;
-	void InitItem() override;
-	void Copy(TESForm* apCopy) override;
-	bool Compare(TESForm* apCompare) override;
-	bool Activate(TESObjectREFR* apItemActivated, TESObjectREFR* apActionRef, bool abIdFlag,
-		TESBoundObject* apObjecttoGet, int32_t aicount) override;
-	void HandleOpenFinish(TESObjectREFR* apItemActivated, TESObjectREFR* apActionRef) override;
-	bool GetBlockActivatesWhileOpening() override { return true; }
+    void InitializeData() override;
+    bool Load(TESFile* apFile) override;
+    void Save() override;
+    void InitItem() override;
+    void Copy(TESForm* apCopy) override;
+    bool Compare(TESForm* apCompare) override;
+    bool Activate(
+        TESObjectREFR* apItemActivated,
+        TESObjectREFR* apActionRef,
+        bool abIdFlag,
+        TESBoundObject* apObjecttoGet,
+        int32_t aicount
+    ) override;
+    void HandleOpenFinish(TESObjectREFR* apItemActivated, TESObjectREFR* apActionRef) override;
+    bool GetBlockActivatesWhileOpening() override {
+        return true;
+    }
 
-	using TESForm::Save;
+    using TESForm::Save;
 
-	TESSound* GetLoopingSound();
-	// Whether the container's contents respawn (flag 2 of Data.cContFlags).
-	bool GetRespawn();
-	TESSound* GetCloseSound() { return pCloseSound; }
-	TESSound* GetOpenSound() { return pOpenSound; }
-	void SetOpenSound(TESSound* apSound);
-	void SetCloseSound(TESSound* apSound);
-	void SetLoopingSound(TESSound* apSound);
-	bool CanActivate(TESObjectREFR* apItemActivated, TESObjectREFR* apActionRef, bool abAllowLockpicking);
+    TESSound* GetLoopingSound();
+    // Whether the container's contents respawn (flag 2 of Data.cContFlags).
+    bool GetRespawn();
+    TESSound* GetCloseSound() {
+        return pCloseSound;
+    }
+    TESSound* GetOpenSound() {
+        return pOpenSound;
+    }
+    void SetOpenSound(TESSound* apSound);
+    void SetCloseSound(TESSound* apSound);
+    void SetLoopingSound(TESSound* apSound);
+    bool CanActivate(TESObjectREFR* apItemActivated, TESObjectREFR* apActionRef, bool abAllowLockpicking);
 
-	TESSound* pOpenSound;
-	TESSound* pCloseSound;
-	TESSound* pLoopingSound;
-	CONT_DATA Data;
+    TESSound* pOpenSound;
+    TESSound* pCloseSound;
+    TESSound* pLoopingSound;
+    CONT_DATA Data;
 };
 
 inline MobileObject* pstaticcontainer;

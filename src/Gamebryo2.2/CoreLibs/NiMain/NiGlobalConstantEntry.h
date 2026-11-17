@@ -8,14 +8,18 @@
 // size, and where the value lives.
 class NiGlobalConstantEntry : public NiRefObject {
 public:
-	NiGlobalConstantEntry(const char* pcKey, NiShaderAttributeDesc::AttributeType eType, uint32_t uiDataSize,
-		const void* pvDataSource);
-	~NiGlobalConstantEntry() override;
+    NiGlobalConstantEntry(
+        const char* pcKey,
+        NiShaderAttributeDesc::AttributeType eType,
+        uint32_t uiDataSize,
+        const void* pvDataSource
+    );
+    ~NiGlobalConstantEntry() override;
 
-	void SetData(uint32_t uiDataSize, const void* pvDataSource);
+    void SetData(uint32_t uiDataSize, const void* pvDataSource);
 
-	NiFixedString m_kKey;
-	NiShaderAttributeDesc::AttributeType m_eType;
-	uint32_t m_uiDataSize;
-	void* m_pvDataSource;
+    NiFixedString m_kKey;
+    NiShaderAttributeDesc::AttributeType m_eType;
+    uint32_t m_uiDataSize;
+    void* m_pvDataSource;
 };

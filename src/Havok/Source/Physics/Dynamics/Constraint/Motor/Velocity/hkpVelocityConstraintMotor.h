@@ -9,19 +9,19 @@ const void* getVtablehkpVelocityConstraintMotor();
 // A motor that drives the constraint at a target velocity.
 class hkpVelocityConstraintMotor : public hkpLimitedForceConstraintMotor {
 public:
-	hkpVelocityConstraintMotor() = default;
-	// The SDK's finish constructor of a loaded object: it keeps the fields the load wrote.
-	hkpVelocityConstraintMotor(hkFinishLoadedObjectFlag f) : hkpLimitedForceConstraintMotor(f) {}
+    hkpVelocityConstraintMotor() = default;
+    // The SDK's finish constructor of a loaded object: it keeps the fields the load wrote.
+    hkpVelocityConstraintMotor(hkFinishLoadedObjectFlag f) : hkpLimitedForceConstraintMotor(f) {}
 
-	hkpConstraintMotor* clone() const override;
+    hkpConstraintMotor* clone() const override;
 
-	// Havok SDK signature (hkpDynamics.lib, tied by target).
-	static const hkClass& staticClass();
+    // Havok SDK signature (hkpDynamics.lib, tied by target).
+    static const hkClass& staticClass();
 
-	float m_tau;
-	float m_velocityTarget;
-	hkBool m_useVelocityTargetFromConstraintTargets;
-	uint8_t padding1D[3];
+    float m_tau;
+    float m_velocityTarget;
+    hkBool m_useVelocityTargetFromConstraintTargets;
+    uint8_t padding1D[3];
 };
 
 extern hkClass hkpVelocityConstraintMotorClass;

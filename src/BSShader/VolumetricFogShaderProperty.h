@@ -7,26 +7,28 @@
 // The shader property of volumetric fog: the fog colour and, in alpha, its density.
 class VolumetricFogShaderProperty : public BSShaderProperty {
 public:
-	VolumetricFogShaderProperty();
-	~VolumetricFogShaderProperty() override;
+    VolumetricFogShaderProperty();
+    ~VolumetricFogShaderProperty() override;
 
-	const NiRTTI* GetRTTI() const override { return &ms_RTTI; }
-	NiObject* CreateClone(NiCloningProcess& arCloneData) override;
-	void LoadBinary(NiStream& kStream) override;
-	void LinkObject(NiStream& kStream) override;
-	bool RegisterStreamables(NiStream& kStream) override;
-	void SaveBinary(NiStream& kStream) override;
-	bool IsEqual(NiObject* pkObject) override;
-	void GetViewerStrings(NiTPrimitiveArray<char*>* apStrings) override;
+    const NiRTTI* GetRTTI() const override {
+        return &ms_RTTI;
+    }
+    NiObject* CreateClone(NiCloningProcess& arCloneData) override;
+    void LoadBinary(NiStream& kStream) override;
+    void LinkObject(NiStream& kStream) override;
+    bool RegisterStreamables(NiStream& kStream) override;
+    void SaveBinary(NiStream& kStream) override;
+    bool IsEqual(NiObject* pkObject) override;
+    void GetViewerStrings(NiTPrimitiveArray<char*>* apStrings) override;
 
 protected:
-	void CopyMembers(VolumetricFogShaderProperty* pDest, NiCloningProcess& arCloneData);
+    void CopyMembers(VolumetricFogShaderProperty* pDest, NiCloningProcess& arCloneData);
 
 public:
-	// The factory the stream loader uses to create a property.
-	static NiObject* CreateObject();
+    // The factory the stream loader uses to create a property.
+    static NiObject* CreateObject();
 
-	NiColorA FogProps;
+    NiColorA FogProps;
 
-	static NiRTTI ms_RTTI;
+    static NiRTTI ms_RTTI;
 };

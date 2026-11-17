@@ -9,14 +9,14 @@ class TESObjectREFR;
 // What a projectile is aimed at: the reference, the part of its model and the offset from that part.
 class ProjectileTarget {
 public:
-	ProjectileTarget();
-	~ProjectileTarget();
+    ProjectileTarget();
+    ~ProjectileTarget();
 
-	NiPoint3* GetWorldLocation(NiPoint3* apResult);
+    NiPoint3* GetWorldLocation(NiPoint3* apResult);
 
-	static void operator delete(void* apMemory);
+    static void operator delete(void* apMemory);
 
-	TESObjectREFR* pReference;
-	NiPointer<NiAVObject> spPart;
-	NiPoint3 kOffset;
+    TESObjectREFR* pReference;
+    NiPointer<NiAVObject> spPart;
+    NiPoint3 kOffset;
 };

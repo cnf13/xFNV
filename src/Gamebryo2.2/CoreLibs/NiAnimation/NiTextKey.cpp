@@ -11,29 +11,31 @@ NiTextKey::NiTextKey() {}
 NiTextKey::~NiTextKey() {}
 
 void NiTextKey::LoadBinary(NiStream& stream) {
-	NiStreamLoadBinary(stream, m_fTime);
+    NiStreamLoadBinary(stream, m_fTime);
 
-	if (stream.GetFileVersion() < NiStream::GetVersion(20, 1, 0, 1))
-		stream.LoadCStringAsFixedString(m_kText);
-	else
-		stream.LoadFixedString(m_kText);
+    if (stream.GetFileVersion() < NiStream::GetVersion(20, 1, 0, 1)) {
+        stream.LoadCStringAsFixedString(m_kText);
+    }
+    else {
+        stream.LoadFixedString(m_kText);
+    }
 }
 
 void NiTextKey::SaveBinary(NiStream& stream) {
-	NiStreamSaveBinary(stream, m_fTime);
-	stream.SaveFixedString(m_kText);
+    NiStreamSaveBinary(stream, m_fTime);
+    stream.SaveFixedString(m_kText);
 }
 
 void NiTextKey::RegisterStreamables(NiStream& stream) {
-	stream.RegisterFixedString(m_kText);
+    stream.RegisterFixedString(m_kText);
 }
 
 void NiTextKey::SetText(const NiFixedString& kText) {
-	const char* m_kHandle = (&kText)->GetHandle();
-	if (m_kText.GetHandle() != (&kText)->GetHandle()) {
-		NiGlobalStringTable::AcquireHandle(m_kHandle);
-		const char* v4 = m_kText.GetHandle();
-		NiGlobalStringTable::ReleaseHandle(v4);
-		m_kText.m_kHandle = m_kHandle;
-	}
+    const char* m_kHandle = (&kText)->GetHandle();
+    if (m_kText.GetHandle() != (&kText)->GetHandle()) {
+        NiGlobalStringTable::AcquireHandle(m_kHandle);
+        const char* v4 = m_kText.GetHandle();
+        NiGlobalStringTable::ReleaseHandle(v4);
+        m_kText.m_kHandle = m_kHandle;
+    }
 }

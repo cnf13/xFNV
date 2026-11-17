@@ -12,22 +12,24 @@ class hkpSimulationIsland;
 // or the inactive ones), after each simulation step.
 class hkpContactPointViewer : public hkpWorldViewerBase, public hkpWorldPostSimulationListener {
 public:
-	hkpContactPointViewer(const hkArray<hkProcessContext*, hkContainerHeapAllocator>& contexts, int32_t color);
-	~hkpContactPointViewer() override;
+    hkpContactPointViewer(const hkArray<hkProcessContext*, hkContainerHeapAllocator>& contexts, int32_t color);
+    ~hkpContactPointViewer() override;
 
-	void init() override;
-	void postSimulationCallback(hkpWorld* world) override;
-	void worldAddedCallback(hkpWorld* w) override;
-	void worldRemovedCallback(hkpWorld* w) override;
-	// The islands whose contact points are drawn.
-	virtual const hkArray<hkpSimulationIsland*>& getIslands(hkpWorld* world) const = 0;
+    void init() override;
+    void postSimulationCallback(hkpWorld* world) override;
+    void worldAddedCallback(hkpWorld* w) override;
+    void worldRemovedCallback(hkpWorld* w) override;
+    // The islands whose contact points are drawn.
+    virtual const hkArray<hkpSimulationIsland*>& getIslands(hkpWorld* world) const = 0;
 
-	void drawAllContactPointsInIsland(const hkpSimulationIsland* island);
+    void drawAllContactPointsInIsland(const hkpSimulationIsland* island);
 
-	// Several bases declare one; the deleting destructor frees through hkReferencedObject's.
-	static void operator delete(void* apMemory) { hkReferencedObject::deleteObject(apMemory); }
+    // Several bases declare one; the deleting destructor frees through hkReferencedObject's.
+    static void operator delete(void* apMemory) {
+        hkReferencedObject::deleteObject(apMemory);
+    }
 
-	float m_limit;
-	// The color the contact points are drawn in (const in the SDK).
-	int32_t m_color;
+    float m_limit;
+    // The color the contact points are drawn in (const in the SDK).
+    int32_t m_color;
 };

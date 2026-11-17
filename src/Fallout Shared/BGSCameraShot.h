@@ -14,100 +14,100 @@ class TESObjectREFR;
 // A camera shot form (CAMS).
 class BGSCameraShot : public TESForm, public TESModel, public TESImageSpaceModifiableForm {
 public:
-	// What the camera does during the shot.
-	enum CAM_ACTION : uint32_t {
-		CA_SHOOT = 0,
-		CA_FLY = 1,
-		CA_HIT = 2,
-		CA_ZOOM = 3,
-		CA_COUNT = 4,
-	};
+    // What the camera does during the shot.
+    enum CAM_ACTION : uint32_t {
+        CA_SHOOT = 0,
+        CA_FLY = 1,
+        CA_HIT = 2,
+        CA_ZOOM = 3,
+        CA_COUNT = 4,
+    };
 
-	// The object a shot's camera is placed at or aimed at.
-	enum CAM_OBJECT : uint32_t {
-		CO_ATTACKER = 0,
-		CO_PROJECTILE = 1,
-		CO_TARGET = 2,
-		CO_COUNT = 3,
-	};
+    // The object a shot's camera is placed at or aimed at.
+    enum CAM_OBJECT : uint32_t {
+        CO_ATTACKER = 0,
+        CO_PROJECTILE = 1,
+        CO_TARGET = 2,
+        CO_COUNT = 3,
+    };
 
-	// The shot's data (DATA).
-	struct CAMERA_SHOT_DATA {
-		// Swaps every field read from a big-endian file.
-		void Endian();
+    // The shot's data (DATA).
+    struct CAMERA_SHOT_DATA {
+        // Swaps every field read from a big-endian file.
+        void Endian();
 
-		CAM_ACTION eCameraAction;
-		CAM_OBJECT eLocation;
-		CAM_OBJECT eTarget;
-		uint32_t iFlags;
-		float fPlayerTimeMult;
-		float fTargetTimeMult;
-		float fGlobalTimeMult;
-		float fMaxTime;
-		float fMinTime;
-		float fTargetPercentBetweenActors;
-	};
+        CAM_ACTION eCameraAction;
+        CAM_OBJECT eLocation;
+        CAM_OBJECT eTarget;
+        uint32_t iFlags;
+        float fPlayerTimeMult;
+        float fTargetTimeMult;
+        float fGlobalTimeMult;
+        float fMaxTime;
+        float fMinTime;
+        float fTargetPercentBetweenActors;
+    };
 
-	// The shot's data as older files store it, without the target time multiplier and the target percentage.
-	struct OLD_CAMERA_SHOT_DATA {
-		// Swaps every field read from a big-endian file.
-		void Endian();
+    // The shot's data as older files store it, without the target time multiplier and the target percentage.
+    struct OLD_CAMERA_SHOT_DATA {
+        // Swaps every field read from a big-endian file.
+        void Endian();
 
-		CAM_ACTION eCameraAction;
-		CAM_OBJECT eLocation;
-		CAM_OBJECT eTarget;
-		uint32_t iFlags;
-		float fPlayerTimeMult;
-		float fGlobalTimeMult;
-		float fMaxTime;
-		float fMinTime;
-	};
+        CAM_ACTION eCameraAction;
+        CAM_OBJECT eLocation;
+        CAM_OBJECT eTarget;
+        uint32_t iFlags;
+        float fPlayerTimeMult;
+        float fGlobalTimeMult;
+        float fMaxTime;
+        float fMinTime;
+    };
 
-	BGSCameraShot();
-	~BGSCameraShot() override;
+    BGSCameraShot();
+    ~BGSCameraShot() override;
 
-	void InitializeData() override;
-	bool Load(TESFile* apFile) override;
-	void Save() override;
-	void InitItem() override;
-	void Copy(TESForm* apCopy) override;
-	bool Compare(TESForm* apCompare) override;
-	using TESForm::Save;
+    void InitializeData() override;
+    bool Load(TESFile* apFile) override;
+    void Save() override;
+    void InitItem() override;
+    void Copy(TESForm* apCopy) override;
+    bool Compare(TESForm* apCompare) override;
+    using TESForm::Save;
 
-	float GetTargetTimeMult();
-	// Returns Data.eCameraAction.
-	CAM_ACTION GetCameraAction();
-	bool GetPosFollowsTarget();
-	bool GetRotFollowsTarget();
-	bool GetIsFirstPersonCamera();
-	bool IsInitialized();
-	bool IsStartAtTimeZero();
-	// Releases the shot's camera.
-	void FreeCamera();
-	bool GetFollowsBone();
-	bool GetNoTracer();
-	// Returns spLocationNode's object.
-	NiAVObject* GetLocationNode();
-	// Returns spTargetNode's object.
-	NiAVObject* GetTargetNode();
-	// Returns spImagespaceTarget's object.
-	NiAVObject* GetImagespaceTarget();
-	void SetCameraLocation(NiAVObject* apLocation);
-	void InitCamera(TESObjectREFR* a1, int32_t a2);
-	void SetCameraTarget(NiAVObject* apTarget);
-	void Update(float afTime);
-	NiPoint3* GetTargetPos(NiPoint3* apResult);
+    float GetTargetTimeMult();
+    // Returns Data.eCameraAction.
+    CAM_ACTION GetCameraAction();
+    bool GetPosFollowsTarget();
+    bool GetRotFollowsTarget();
+    bool GetIsFirstPersonCamera();
+    bool IsInitialized();
+    bool IsStartAtTimeZero();
+    // Releases the shot's camera.
+    void FreeCamera();
+    bool GetFollowsBone();
+    bool GetNoTracer();
+    // Returns spLocationNode's object.
+    NiAVObject* GetLocationNode();
+    // Returns spTargetNode's object.
+    NiAVObject* GetTargetNode();
+    // Returns spImagespaceTarget's object.
+    NiAVObject* GetImagespaceTarget();
+    void SetCameraLocation(NiAVObject* apLocation);
+    void InitCamera(TESObjectREFR* a1, int32_t a2);
+    void SetCameraTarget(NiAVObject* apTarget);
+    void Update(float afTime);
+    NiPoint3* GetTargetPos(NiPoint3* apResult);
 
-	CAMERA_SHOT_DATA Data;
-	NiPointer<NiAVObject> spLocationNode;
-	NiPointer<NiAVObject> spTargetNode;
-	TESObjectREFR* pTargetRef;
-	NiPointer<NiNode> spCameraNode;
-	NiPointer<NiAVObject> spImagespaceTarget;
-	int8_t cCameraHasRotation;
-	bool bCameraTooClose;
-	bool bCameraIsKillCam;
-	uint8_t padding77;
+    CAMERA_SHOT_DATA Data;
+    NiPointer<NiAVObject> spLocationNode;
+    NiPointer<NiAVObject> spTargetNode;
+    TESObjectREFR* pTargetRef;
+    NiPointer<NiNode> spCameraNode;
+    NiPointer<NiAVObject> spImagespaceTarget;
+    int8_t cCameraHasRotation;
+    bool bCameraTooClose;
+    bool bCameraIsKillCam;
+    uint8_t padding77;
 };
 
 inline NiPoint3 kVATSCameraAngle{};

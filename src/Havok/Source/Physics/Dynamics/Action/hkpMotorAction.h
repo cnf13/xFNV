@@ -18,18 +18,18 @@ void cleanupLoadedObjecthkpMotorAction(void* p);
 // The Havok motor action a bhkMotorAction wraps: a unary action that spins its entity about an axis.
 class hkpMotorAction : public hkpUnaryAction {
 public:
-	hkpMotorAction(hkpRigidBody* body, const hkVector4& axis, float spinRate, float gain);
-	hkpMotorAction(hkFinishLoadedObjectFlag aFlag) : hkpUnaryAction(aFlag.m_finishing) {}
+    hkpMotorAction(hkpRigidBody* body, const hkVector4& axis, float spinRate, float gain);
+    hkpMotorAction(hkFinishLoadedObjectFlag aFlag) : hkpUnaryAction(aFlag.m_finishing) {}
 
-	void applyAction(const hkStepInfo& stepInfo) override;
-	hkpAction* clone(const hkArray<hkpEntity*>& newEntities, const hkArray<hkpPhantom*>& newPhantoms) const override;
+    void applyAction(const hkStepInfo& stepInfo) override;
+    hkpAction* clone(const hkArray<hkpEntity*>& newEntities, const hkArray<hkpPhantom*>& newPhantoms) const override;
 
-	static const hkClass& staticClass();
+    static const hkClass& staticClass();
 
-	hkVector4 m_axis;
-	float m_spinRate;
-	float m_gain;
-	hkBool m_active;
+    hkVector4 m_axis;
+    float m_spinRate;
+    float m_gain;
+    hkBool m_active;
 };
 
 extern hkClass hkpMotorActionClass;

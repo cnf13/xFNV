@@ -7,7 +7,7 @@
 #include "Gamebryo2.2/CoreLibs/NiMain/NiTArray.h"
 
 ImageSpaceShaderNULL::ImageSpaceShaderNULL() {
-	pTextures.SetSize(1u);
+    pTextures.SetSize(1u);
 }
 
 ImageSpaceShaderNULL::~ImageSpaceShaderNULL() {}

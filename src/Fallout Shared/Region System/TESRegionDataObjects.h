@@ -9,10 +9,10 @@ class TESRegionObjectList;
 // pObjects and bGeneratedObjects are not declared yet.
 class TESRegionDataObjects : public TESRegionData {
 public:
-	// These virtual functions are declared but never defined, and their order follows TESRegionData's nine.
-	virtual bool LoadRegionDataObjectsOld(TESFile* apFile);
-	virtual bool LoadRegionDataObjects(TESFile* apFile);
-	virtual TESRegionObjectList* GetObjectList();
-	virtual bool GetGeneratedObjects();
-	virtual void SetGeneratedObjects(bool abGeneratedObjects);
+    // These virtual functions are declared but never defined, and their order follows TESRegionData's nine.
+    virtual bool LoadRegionDataObjectsOld(TESFile* apFile);
+    virtual bool LoadRegionDataObjects(TESFile* apFile);
+    virtual TESRegionObjectList* GetObjectList();
+    virtual bool GetGeneratedObjects();
+    virtual void SetGeneratedObjects(bool abGeneratedObjects);
 };

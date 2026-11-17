@@ -3,5 +3,5 @@
 #include "BSCore/MemoryManager.h"
 
 void IDLE_ANIM_ROOT::operator delete(void* apMemory) {
-	ourFree(apMemory);
+    ourFree(apMemory);
 }

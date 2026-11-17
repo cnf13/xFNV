@@ -10,7 +10,7 @@
 
 // Each marker loses its reference; the array's storage goes with m_markers.
 hkpSerializedDisplayMarkerList::~hkpSerializedDisplayMarkerList() {
-	for (int32_t i = 0; i < m_markers.m_size; i++) {
-		m_markers.m_data[i]->removeReference();
-	}
+    for (int32_t i = 0; i < m_markers.m_size; i++) {
+        m_markers.m_data[i]->removeReference();
+    }
 }

@@ -10,8 +10,10 @@
 template <class T, uint32_t uiGrowStep>
 class BSSimpleArrayRefCounted : public BSSimpleArray<T, uiGrowStep>, public NiRefObject {
 public:
-	BSSimpleArrayRefCounted() {}
+    BSSimpleArrayRefCounted() {}
 
-	// The object is freed through NiMemObject's sized delete; declared here, as the array base declares its own.
-	static void operator delete(void* apMemory, size_t aSize) { NiMemObject::operator delete(apMemory, aSize); }
+    // The object is freed through NiMemObject's sized delete; declared here, as the array base declares its own.
+    static void operator delete(void* apMemory, size_t aSize) {
+        NiMemObject::operator delete(apMemory, aSize);
+    }
 };

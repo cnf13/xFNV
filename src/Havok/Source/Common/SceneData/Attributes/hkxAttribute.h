@@ -10,25 +10,25 @@ class hkClassEnum;
 
 // A named attribute of a scene object: its name and its value, any reference counted object. Not polymorphic.
 struct hkxAttribute {
-	enum Hint : int32_t {
-		HINT_NONE = 0,
-		HINT_IGNORE = 1,
-		HINT_TRANSFORM = 2,
-		HINT_SCALE = 4,
-		HINT_TRANSFORM_AND_SCALE = 6,
-		HINT_FLIP = 8,
-	};
+    enum Hint : int32_t {
+        HINT_NONE = 0,
+        HINT_IGNORE = 1,
+        HINT_TRANSFORM = 2,
+        HINT_SCALE = 4,
+        HINT_TRANSFORM_AND_SCALE = 6,
+        HINT_FLIP = 8,
+    };
 
-	hkxAttribute();
-	// A loaded attribute keeps what was loaded.
-	hkxAttribute(hkFinishLoadedObjectFlag flag) : m_name(flag), m_value(flag) {}
+    hkxAttribute();
+    // A loaded attribute keeps what was loaded.
+    hkxAttribute(hkFinishLoadedObjectFlag flag) : m_name(flag), m_value(flag) {}
 
-	void setValue(hkReferencedObject* obj, const hkClass* klass);
+    void setValue(hkReferencedObject* obj, const hkClass* klass);
 
-	static const hkClass& staticClass();
+    static const hkClass& staticClass();
 
-	hkStringPtr m_name;
-	hkRefVariant m_value;
+    hkStringPtr m_name;
+    hkRefVariant m_value;
 };
 
 extern hkClass hkxAttributeClass;

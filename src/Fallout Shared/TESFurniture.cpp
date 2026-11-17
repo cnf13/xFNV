@@ -191,286 +191,299 @@ static SettingT<GameSettingCollection> fFurnitureMarker40HeadingDelta("fFurnitur
 
 // Each marker's X, Y and Z offsets and heading delta, by marker.
 FurnitureMarkerDeltaSettings pFurnitureMarkerDelta{
-	{&fFurnitureMarker01DeltaX, &fFurnitureMarker01DeltaY, &fFurnitureMarker01DeltaZ, &fFurnitureMarker01HeadingDelta},
-	{&fFurnitureMarker02DeltaX, &fFurnitureMarker02DeltaY, &fFurnitureMarker02DeltaZ, &fFurnitureMarker02HeadingDelta},
-	{&fFurnitureMarker03DeltaX, &fFurnitureMarker03DeltaY, &fFurnitureMarker03DeltaZ, &fFurnitureMarker03HeadingDelta},
-	{&fFurnitureMarker04DeltaX, &fFurnitureMarker04DeltaY, &fFurnitureMarker04DeltaZ, &fFurnitureMarker04HeadingDelta},
-	{&fFurnitureMarker05DeltaX, &fFurnitureMarker05DeltaY, &fFurnitureMarker05DeltaZ, &fFurnitureMarker05HeadingDelta},
-	{&fFurnitureMarker06DeltaX, &fFurnitureMarker06DeltaY, &fFurnitureMarker06DeltaZ, &fFurnitureMarker06HeadingDelta},
-	{&fFurnitureMarker07DeltaX, &fFurnitureMarker07DeltaY, &fFurnitureMarker07DeltaZ, &fFurnitureMarker07HeadingDelta},
-	{&fFurnitureMarker08DeltaX, &fFurnitureMarker08DeltaY, &fFurnitureMarker08DeltaZ, &fFurnitureMarker08HeadingDelta},
-	{&fFurnitureMarker09DeltaX, &fFurnitureMarker09DeltaY, &fFurnitureMarker09DeltaZ, &fFurnitureMarker09HeadingDelta},
-	{&fFurnitureMarker10DeltaX, &fFurnitureMarker10DeltaY, &fFurnitureMarker10DeltaZ, &fFurnitureMarker10HeadingDelta},
-	{&fFurnitureMarker11DeltaX, &fFurnitureMarker11DeltaY, &fFurnitureMarker11DeltaZ, &fFurnitureMarker11HeadingDelta},
-	{&fFurnitureMarker12DeltaX, &fFurnitureMarker12DeltaY, &fFurnitureMarker12DeltaZ, &fFurnitureMarker12HeadingDelta},
-	{&fFurnitureMarker13DeltaX, &fFurnitureMarker13DeltaY, &fFurnitureMarker13DeltaZ, &fFurnitureMarker13HeadingDelta},
-	{&fFurnitureMarker14DeltaX, &fFurnitureMarker14DeltaY, &fFurnitureMarker14DeltaZ, &fFurnitureMarker14HeadingDelta},
-	{&fFurnitureMarker15DeltaX, &fFurnitureMarker15DeltaY, &fFurnitureMarker15DeltaZ, &fFurnitureMarker15HeadingDelta},
-	{&fFurnitureMarker16DeltaX, &fFurnitureMarker16DeltaY, &fFurnitureMarker16DeltaZ, &fFurnitureMarker16HeadingDelta},
-	{&fFurnitureMarker17DeltaX, &fFurnitureMarker17DeltaY, &fFurnitureMarker17DeltaZ, &fFurnitureMarker17HeadingDelta},
-	{&fFurnitureMarker18DeltaX, &fFurnitureMarker18DeltaY, &fFurnitureMarker18DeltaZ, &fFurnitureMarker18HeadingDelta},
-	{&fFurnitureMarker19DeltaX, &fFurnitureMarker19DeltaY, &fFurnitureMarker19DeltaZ, &fFurnitureMarker19HeadingDelta},
-	{&fFurnitureMarker20DeltaX, &fFurnitureMarker20DeltaY, &fFurnitureMarker20DeltaZ, &fFurnitureMarker20HeadingDelta},
-	{&fFurnitureMarker21DeltaX, &fFurnitureMarker21DeltaY, &fFurnitureMarker21DeltaZ, &fFurnitureMarker21HeadingDelta},
-	{&fFurnitureMarker22DeltaX, &fFurnitureMarker22DeltaY, &fFurnitureMarker22DeltaZ, &fFurnitureMarker22HeadingDelta},
-	{&fFurnitureMarker23DeltaX, &fFurnitureMarker23DeltaY, &fFurnitureMarker23DeltaZ, &fFurnitureMarker23HeadingDelta},
-	{&fFurnitureMarker24DeltaX, &fFurnitureMarker24DeltaY, &fFurnitureMarker24DeltaZ, &fFurnitureMarker24HeadingDelta},
-	{&fFurnitureMarker25DeltaX, &fFurnitureMarker25DeltaY, &fFurnitureMarker25DeltaZ, &fFurnitureMarker25HeadingDelta},
-	{&fFurnitureMarker26DeltaX, &fFurnitureMarker26DeltaY, &fFurnitureMarker26DeltaZ, &fFurnitureMarker26HeadingDelta},
-	{&fFurnitureMarker27DeltaX, &fFurnitureMarker27DeltaY, &fFurnitureMarker27DeltaZ, &fFurnitureMarker27HeadingDelta},
-	{&fFurnitureMarker28DeltaX, &fFurnitureMarker28DeltaY, &fFurnitureMarker28DeltaZ, &fFurnitureMarker28HeadingDelta},
-	{&fFurnitureMarker29DeltaX, &fFurnitureMarker29DeltaY, &fFurnitureMarker29DeltaZ, &fFurnitureMarker29HeadingDelta},
-	{&fFurnitureMarker30DeltaX, &fFurnitureMarker30DeltaY, &fFurnitureMarker30DeltaZ, &fFurnitureMarker30HeadingDelta},
-	{&fFurnitureMarker31DeltaX, &fFurnitureMarker31DeltaY, &fFurnitureMarker31DeltaZ, &fFurnitureMarker31HeadingDelta},
-	{&fFurnitureMarker32DeltaX, &fFurnitureMarker32DeltaY, &fFurnitureMarker32DeltaZ, &fFurnitureMarker32HeadingDelta},
-	{&fFurnitureMarker33DeltaX, &fFurnitureMarker33DeltaY, &fFurnitureMarker33DeltaZ, &fFurnitureMarker33HeadingDelta},
-	{&fFurnitureMarker34DeltaX, &fFurnitureMarker34DeltaY, &fFurnitureMarker34DeltaZ, &fFurnitureMarker34HeadingDelta},
-	{&fFurnitureMarker35DeltaX, &fFurnitureMarker35DeltaY, &fFurnitureMarker35DeltaZ, &fFurnitureMarker35HeadingDelta},
-	{&fFurnitureMarker36DeltaX, &fFurnitureMarker36DeltaY, &fFurnitureMarker36DeltaZ, &fFurnitureMarker36HeadingDelta},
-	{&fFurnitureMarker37DeltaX, &fFurnitureMarker37DeltaY, &fFurnitureMarker37DeltaZ, &fFurnitureMarker37HeadingDelta},
-	{&fFurnitureMarker38DeltaX, &fFurnitureMarker38DeltaY, &fFurnitureMarker38DeltaZ, &fFurnitureMarker38HeadingDelta},
-	{&fFurnitureMarker39DeltaX, &fFurnitureMarker39DeltaY, &fFurnitureMarker39DeltaZ, &fFurnitureMarker39HeadingDelta},
-	{&fFurnitureMarker40DeltaX, &fFurnitureMarker40DeltaY, &fFurnitureMarker40DeltaZ, &fFurnitureMarker40HeadingDelta}};
+    {&fFurnitureMarker01DeltaX, &fFurnitureMarker01DeltaY, &fFurnitureMarker01DeltaZ, &fFurnitureMarker01HeadingDelta},
+    {&fFurnitureMarker02DeltaX, &fFurnitureMarker02DeltaY, &fFurnitureMarker02DeltaZ, &fFurnitureMarker02HeadingDelta},
+    {&fFurnitureMarker03DeltaX, &fFurnitureMarker03DeltaY, &fFurnitureMarker03DeltaZ, &fFurnitureMarker03HeadingDelta},
+    {&fFurnitureMarker04DeltaX, &fFurnitureMarker04DeltaY, &fFurnitureMarker04DeltaZ, &fFurnitureMarker04HeadingDelta},
+    {&fFurnitureMarker05DeltaX, &fFurnitureMarker05DeltaY, &fFurnitureMarker05DeltaZ, &fFurnitureMarker05HeadingDelta},
+    {&fFurnitureMarker06DeltaX, &fFurnitureMarker06DeltaY, &fFurnitureMarker06DeltaZ, &fFurnitureMarker06HeadingDelta},
+    {&fFurnitureMarker07DeltaX, &fFurnitureMarker07DeltaY, &fFurnitureMarker07DeltaZ, &fFurnitureMarker07HeadingDelta},
+    {&fFurnitureMarker08DeltaX, &fFurnitureMarker08DeltaY, &fFurnitureMarker08DeltaZ, &fFurnitureMarker08HeadingDelta},
+    {&fFurnitureMarker09DeltaX, &fFurnitureMarker09DeltaY, &fFurnitureMarker09DeltaZ, &fFurnitureMarker09HeadingDelta},
+    {&fFurnitureMarker10DeltaX, &fFurnitureMarker10DeltaY, &fFurnitureMarker10DeltaZ, &fFurnitureMarker10HeadingDelta},
+    {&fFurnitureMarker11DeltaX, &fFurnitureMarker11DeltaY, &fFurnitureMarker11DeltaZ, &fFurnitureMarker11HeadingDelta},
+    {&fFurnitureMarker12DeltaX, &fFurnitureMarker12DeltaY, &fFurnitureMarker12DeltaZ, &fFurnitureMarker12HeadingDelta},
+    {&fFurnitureMarker13DeltaX, &fFurnitureMarker13DeltaY, &fFurnitureMarker13DeltaZ, &fFurnitureMarker13HeadingDelta},
+    {&fFurnitureMarker14DeltaX, &fFurnitureMarker14DeltaY, &fFurnitureMarker14DeltaZ, &fFurnitureMarker14HeadingDelta},
+    {&fFurnitureMarker15DeltaX, &fFurnitureMarker15DeltaY, &fFurnitureMarker15DeltaZ, &fFurnitureMarker15HeadingDelta},
+    {&fFurnitureMarker16DeltaX, &fFurnitureMarker16DeltaY, &fFurnitureMarker16DeltaZ, &fFurnitureMarker16HeadingDelta},
+    {&fFurnitureMarker17DeltaX, &fFurnitureMarker17DeltaY, &fFurnitureMarker17DeltaZ, &fFurnitureMarker17HeadingDelta},
+    {&fFurnitureMarker18DeltaX, &fFurnitureMarker18DeltaY, &fFurnitureMarker18DeltaZ, &fFurnitureMarker18HeadingDelta},
+    {&fFurnitureMarker19DeltaX, &fFurnitureMarker19DeltaY, &fFurnitureMarker19DeltaZ, &fFurnitureMarker19HeadingDelta},
+    {&fFurnitureMarker20DeltaX, &fFurnitureMarker20DeltaY, &fFurnitureMarker20DeltaZ, &fFurnitureMarker20HeadingDelta},
+    {&fFurnitureMarker21DeltaX, &fFurnitureMarker21DeltaY, &fFurnitureMarker21DeltaZ, &fFurnitureMarker21HeadingDelta},
+    {&fFurnitureMarker22DeltaX, &fFurnitureMarker22DeltaY, &fFurnitureMarker22DeltaZ, &fFurnitureMarker22HeadingDelta},
+    {&fFurnitureMarker23DeltaX, &fFurnitureMarker23DeltaY, &fFurnitureMarker23DeltaZ, &fFurnitureMarker23HeadingDelta},
+    {&fFurnitureMarker24DeltaX, &fFurnitureMarker24DeltaY, &fFurnitureMarker24DeltaZ, &fFurnitureMarker24HeadingDelta},
+    {&fFurnitureMarker25DeltaX, &fFurnitureMarker25DeltaY, &fFurnitureMarker25DeltaZ, &fFurnitureMarker25HeadingDelta},
+    {&fFurnitureMarker26DeltaX, &fFurnitureMarker26DeltaY, &fFurnitureMarker26DeltaZ, &fFurnitureMarker26HeadingDelta},
+    {&fFurnitureMarker27DeltaX, &fFurnitureMarker27DeltaY, &fFurnitureMarker27DeltaZ, &fFurnitureMarker27HeadingDelta},
+    {&fFurnitureMarker28DeltaX, &fFurnitureMarker28DeltaY, &fFurnitureMarker28DeltaZ, &fFurnitureMarker28HeadingDelta},
+    {&fFurnitureMarker29DeltaX, &fFurnitureMarker29DeltaY, &fFurnitureMarker29DeltaZ, &fFurnitureMarker29HeadingDelta},
+    {&fFurnitureMarker30DeltaX, &fFurnitureMarker30DeltaY, &fFurnitureMarker30DeltaZ, &fFurnitureMarker30HeadingDelta},
+    {&fFurnitureMarker31DeltaX, &fFurnitureMarker31DeltaY, &fFurnitureMarker31DeltaZ, &fFurnitureMarker31HeadingDelta},
+    {&fFurnitureMarker32DeltaX, &fFurnitureMarker32DeltaY, &fFurnitureMarker32DeltaZ, &fFurnitureMarker32HeadingDelta},
+    {&fFurnitureMarker33DeltaX, &fFurnitureMarker33DeltaY, &fFurnitureMarker33DeltaZ, &fFurnitureMarker33HeadingDelta},
+    {&fFurnitureMarker34DeltaX, &fFurnitureMarker34DeltaY, &fFurnitureMarker34DeltaZ, &fFurnitureMarker34HeadingDelta},
+    {&fFurnitureMarker35DeltaX, &fFurnitureMarker35DeltaY, &fFurnitureMarker35DeltaZ, &fFurnitureMarker35HeadingDelta},
+    {&fFurnitureMarker36DeltaX, &fFurnitureMarker36DeltaY, &fFurnitureMarker36DeltaZ, &fFurnitureMarker36HeadingDelta},
+    {&fFurnitureMarker37DeltaX, &fFurnitureMarker37DeltaY, &fFurnitureMarker37DeltaZ, &fFurnitureMarker37HeadingDelta},
+    {&fFurnitureMarker38DeltaX, &fFurnitureMarker38DeltaY, &fFurnitureMarker38DeltaZ, &fFurnitureMarker38HeadingDelta},
+    {&fFurnitureMarker39DeltaX, &fFurnitureMarker39DeltaY, &fFurnitureMarker39DeltaZ, &fFurnitureMarker39HeadingDelta},
+    {&fFurnitureMarker40DeltaX, &fFurnitureMarker40DeltaY, &fFurnitureMarker40DeltaZ, &fFurnitureMarker40HeadingDelta}
+};
 
 TESFurniture::TESFurniture() : TESObjectACTI() {
-	SetFormType(FURN_ID);
-	TESFurniture::InitializeData();
-	SetInitialized(1);
+    SetFormType(FURN_ID);
+    TESFurniture::InitializeData();
+    SetInitialized(1);
 }
 
 TESFurniture::~TESFurniture() {}
 
 void TESFurniture::InitializeData() {
-	iFurnFlags = (uint32_t)0;
-	TESObjectACTI::InitializeData();
+    iFurnFlags = (uint32_t)0;
+    TESObjectACTI::InitializeData();
 }
 
 // Reads the furniture's chunks: the editor ID, the bounds, the model and its texture swaps, the name, the marker
 // flags, the script and the destructible data.
 bool TESFurniture::Load(TESFile* apFile) {
-	LoadForm(apFile);
-	SetInitialized(false);
-	do {
-		uint32_t uiChunk = apFile->GetTESChunk();
-		if (uiChunk == NO_CHUNK) {
-			break;
-		}
-		switch (uiChunk) {
-		case EDID_ID: {
-			// A 16-byte aligned stack buffer of the chunk's size, read up to 0x200.
-			char* pBuffer = static_cast<char*>(__builtin_alloca_with_align(apFile->GetChunkSize(), 128));
-			apFile->GetChunkData(pBuffer, 0x200);
-			SetFormEditorID(pBuffer);
-			break;
-		}
-		case OBND_ID:
-			LoadObjectBound(apFile);
-			break;
-		case MODL_ID:
-		case MODT_ID:
-		case MOSD_ID:
-		case MODD_ID:
-			TESModel::LoadModelChunk(static_cast<TESModel*>(this), apFile);
-			break;
-		case FULL_ID:
-			TESFullName::LoadFullNameChunk(static_cast<TESFullName*>(this), apFile);
-			break;
-		case MODS_ID: {
-			uint32_t uiChunkSize = apFile->GetChunkSize();
-			char* pBuffer = static_cast<char*>(__builtin_alloca_with_align(uiChunkSize, 128));
-			apFile->GetChunkData(pBuffer, uiChunkSize);
-			uint32_t uiVersion = apFile->GetFormVersion();
-			static_cast<TESModelTextureSwap*>(this)->UnpackTextureSwapChunkData(pBuffer, uiChunkSize, uiVersion);
-			break;
-		}
-		case SCRI_ID: {
-			uint32_t uiScriptID = 0;
-			apFile->GetChunkData(uiScriptID);
-			TESScriptableForm* pScriptable = static_cast<TESScriptableForm*>(this);
-			// the script's form ID stands in for the script until the forms are resolved
-			pScriptable->SetFormScript(reinterpret_cast<Script*>(static_cast<uintptr_t>(uiScriptID)));
-			pScriptable->InitItem(this);
-			break;
-		}
-		case DSTD_ID:
-		case DEST_ID:
-			BGSDestructibleObjectForm::LoadChunk(static_cast<BGSDestructibleObjectForm*>(this), apFile);
-			break;
-		case MNAM_ID:
-			apFile->GetChunkData(iFurnFlags);
-			break;
-		}
-	} while (apFile->NextChunk());
-	return true;
+    LoadForm(apFile);
+    SetInitialized(false);
+    do {
+        uint32_t uiChunk = apFile->GetTESChunk();
+        if (uiChunk == NO_CHUNK) {
+            break;
+        }
+        switch (uiChunk) {
+            case EDID_ID: {
+                // A 16-byte aligned stack buffer of the chunk's size, read up to 0x200.
+                char* pBuffer = static_cast<char*>(__builtin_alloca_with_align(apFile->GetChunkSize(), 128));
+                apFile->GetChunkData(pBuffer, 0x200);
+                SetFormEditorID(pBuffer);
+                break;
+            }
+            case OBND_ID: LoadObjectBound(apFile); break;
+            case MODL_ID:
+            case MODT_ID:
+            case MOSD_ID:
+            case MODD_ID: TESModel::LoadModelChunk(static_cast<TESModel*>(this), apFile); break;
+            case FULL_ID: TESFullName::LoadFullNameChunk(static_cast<TESFullName*>(this), apFile); break;
+            case MODS_ID: {
+                uint32_t uiChunkSize = apFile->GetChunkSize();
+                char* pBuffer = static_cast<char*>(__builtin_alloca_with_align(uiChunkSize, 128));
+                apFile->GetChunkData(pBuffer, uiChunkSize);
+                uint32_t uiVersion = apFile->GetFormVersion();
+                static_cast<TESModelTextureSwap*>(this)->UnpackTextureSwapChunkData(pBuffer, uiChunkSize, uiVersion);
+                break;
+            }
+            case SCRI_ID: {
+                uint32_t uiScriptID = 0;
+                apFile->GetChunkData(uiScriptID);
+                TESScriptableForm* pScriptable = static_cast<TESScriptableForm*>(this);
+                // the script's form ID stands in for the script until the forms are resolved
+                pScriptable->SetFormScript(reinterpret_cast<Script*>(static_cast<uintptr_t>(uiScriptID)));
+                pScriptable->InitItem(this);
+                break;
+            }
+            case DSTD_ID:
+            case DEST_ID:
+                BGSDestructibleObjectForm::LoadChunk(static_cast<BGSDestructibleObjectForm*>(this), apFile);
+                break;
+            case MNAM_ID: apFile->GetChunkData(iFurnFlags); break;
+        }
+    }
+    while (apFile->NextChunk());
+    return true;
 }
 
 void TESFurniture::Save() {
-	TESForm::StartForm();
-	static_cast<TESFullName*>(this)->Save();
-	static_cast<TESModelTextureSwap*>(static_cast<TESModel*>(this))->Save(MODL_ID, MODT_ID, MODS_ID);
-	static_cast<TESScriptableForm*>(this)->Save();
-	static_cast<BGSDestructibleObjectForm*>(this)->Save();
-	TESForm::AddChunk(MNAM_ID, iFurnFlags);
-	TESForm::CloseForm();
+    TESForm::StartForm();
+    static_cast<TESFullName*>(this)->Save();
+    static_cast<TESModelTextureSwap*>(static_cast<TESModel*>(this))->Save(MODL_ID, MODT_ID, MODS_ID);
+    static_cast<TESScriptableForm*>(this)->Save();
+    static_cast<BGSDestructibleObjectForm*>(this)->Save();
+    TESForm::AddChunk(MNAM_ID, iFurnFlags);
+    TESForm::CloseForm();
 }
 
 void TESFurniture::InitItem() {
-	if (!TESForm::GetInitialized()) {
-		static_cast<BGSDestructibleObjectForm*>(this)->InitItem(this);
-		VerifyMarkers();
-		TESForm::SetInitialized(1);
-	}
+    if (!TESForm::GetInitialized()) {
+        static_cast<BGSDestructibleObjectForm*>(this)->InitItem(this);
+        VerifyMarkers();
+        TESForm::SetInitialized(1);
+    }
 }
 
 void TESFurniture::Copy(TESForm* apCopy) {
-	TESFurniture* v3 = dynamic_cast<TESFurniture*>(apCopy);
-	if (v3) {
-		TESForm::CopyAllComponents(apCopy);
-		iFurnFlags = v3->iFurnFlags;
-		VerifyMarkers();
-	}
+    TESFurniture* v3 = dynamic_cast<TESFurniture*>(apCopy);
+    if (v3) {
+        TESForm::CopyAllComponents(apCopy);
+        iFurnFlags = v3->iFurnFlags;
+        VerifyMarkers();
+    }
 }
 
 bool TESFurniture::Compare(TESForm* apCompare) {
-	TESFurniture* v4 = dynamic_cast<TESFurniture*>(apCompare);
-	if (!v4) {
-		return (bool)1;
-	}
-	if (TESForm::CompareAllComponents(v4)) {
-		return (bool)1;
-	}
-	return (bool)((uint8_t)(iFurnFlags != v4->iFurnFlags));
+    TESFurniture* v4 = dynamic_cast<TESFurniture*>(apCompare);
+    if (!v4) {
+        return (bool)1;
+    }
+    if (TESForm::CompareAllComponents(v4)) {
+        return (bool)1;
+    }
+    return (bool)((uint8_t)(iFurnFlags != v4->iFurnFlags));
 }
 
-bool TESFurniture::Activate(TESObjectREFR* apItemActivated, TESObjectREFR* apActionRef, bool abIdFlag,
-	TESBoundObject* apObjectToGet, int32_t aicount) {
-	PlayerCharacter* pactor = dynamic_cast<PlayerCharacter*>(apActionRef);
-	if (!pactor) {
-		return 0;
-	}
-	if (pactor->GetSitSleepState()) {
-		pactor->ForceTemp3rdPerson(1);
-		pactor->ClearSitHeadingDelta();
-		pactor->InitiateGetUpPackage();
-	} else {
-		uint32_t iunusedMarker = 0;
-		FurnitureMark marker(255u);
-		const NiPoint3* v7 = &apActionRef->GetLocationOnReference();
-		if (!apItemActivated->GetClosestFreeMarker(*v7, 1, 1, marker, iunusedMarker, 1)) {
-			return 0;
-		}
-		uint32_t Type = marker.GetType();
-		if (TESFurniture::IsSleepMarker(Type)) {
-			if (!apItemActivated->GetOwner() || apItemActivated->IsAnOwner(pactor, 1)) {
-				if (pactor == pPlayer && pPlayer->GetParentCell()->GetCantWaitHere()) {
-					const char* v10 = sNoWaitInCell.String();
-					Interface::ShowMessage(v10, 0, "Interface\\Icons\\Message Icons\\glow_message_vaultboy_sad.dds", 0,
-						2.0f, 0);
-					return 0;
-				}
-				if (pPlayer->IsTresPassing()) {
-					const char* v11 = sNoSleepTrespass.String();
-					Interface::ShowMessage(v11, 0, "Interface\\Icons\\Message Icons\\glow_message_vaultboy_sad.dds", 0,
-						2.0f, 0);
-				} else {
-					bool Interior = pPlayer->GetInterior();
-					if (ReferenceProcessLists.AreHostilActorsNear(Interior)) {
-						const char* v13 = sNoSleepHostileActorsNear.String();
-						Interface::ShowMessage(v13, 0, "Interface\\Icons\\Message Icons\\glow_message_vaultboy_sad.dds",
-							0, 2.0f, 0);
-					} else {
-						if (ReferenceProcessLists.IsPlayerInRadiationArea()) {
-							const char* v14 = sNoSleepInRadiation.String();
-							Interface::ShowMessage(v14, 0,
-								"Interface\\Icons\\Message Icons\\glow_message_vaultboy_sad.dds", 0, 2.0f, 0);
-						} else {
-							if (pPlayer->HasDamageHealthEffect()) {
-								const char* v15 = sNoSleepTakingHealthDamage.String();
-								Interface::ShowMessage(v15, 0,
-									"Interface\\Icons\\Message Icons\\glow_message_vaultboy_sad.dds", 0, 2.0f, 0);
-							} else {
-								Interface::CreateSleepMenu(1);
-							}
-						}
-					}
-				}
-			} else {
-				if (pactor == pPlayer) {
-					const char* v9 = sNoSleepInOwnedBed.String();
-					Interface::ShowMessage(v9, 0, "Interface\\Icons\\Message Icons\\glow_message_vaultboy_sad.dds", 0,
-						2.0f, 0);
-					return 0;
-				}
-			}
-		} else {
-			pactor->ForceTemp3rdPerson(1);
-			pactor->ClearSitHeadingDelta();
-			pactor->InitiateSitSleepPackage(apItemActivated);
-		}
-	}
-	return 1;
+bool TESFurniture::Activate(
+    TESObjectREFR* apItemActivated,
+    TESObjectREFR* apActionRef,
+    bool abIdFlag,
+    TESBoundObject* apObjectToGet,
+    int32_t aicount
+) {
+    PlayerCharacter* pactor = dynamic_cast<PlayerCharacter*>(apActionRef);
+    if (!pactor) {
+        return 0;
+    }
+    if (pactor->GetSitSleepState()) {
+        pactor->ForceTemp3rdPerson(1);
+        pactor->ClearSitHeadingDelta();
+        pactor->InitiateGetUpPackage();
+    }
+    else {
+        uint32_t iunusedMarker = 0;
+        FurnitureMark marker(255u);
+        const NiPoint3* v7 = &apActionRef->GetLocationOnReference();
+        if (!apItemActivated->GetClosestFreeMarker(*v7, 1, 1, marker, iunusedMarker, 1)) {
+            return 0;
+        }
+        uint32_t Type = marker.GetType();
+        if (TESFurniture::IsSleepMarker(Type)) {
+            if (!apItemActivated->GetOwner() || apItemActivated->IsAnOwner(pactor, 1)) {
+                if (pactor == pPlayer && pPlayer->GetParentCell()->GetCantWaitHere()) {
+                    const char* v10 = sNoWaitInCell.String();
+                    Interface::ShowMessage(
+                        v10, 0, "Interface\\Icons\\Message Icons\\glow_message_vaultboy_sad.dds", 0, 2.0f, 0
+                    );
+                    return 0;
+                }
+                if (pPlayer->IsTresPassing()) {
+                    const char* v11 = sNoSleepTrespass.String();
+                    Interface::ShowMessage(
+                        v11, 0, "Interface\\Icons\\Message Icons\\glow_message_vaultboy_sad.dds", 0, 2.0f, 0
+                    );
+                }
+                else {
+                    bool Interior = pPlayer->GetInterior();
+                    if (ReferenceProcessLists.AreHostilActorsNear(Interior)) {
+                        const char* v13 = sNoSleepHostileActorsNear.String();
+                        Interface::ShowMessage(
+                            v13, 0, "Interface\\Icons\\Message Icons\\glow_message_vaultboy_sad.dds", 0, 2.0f, 0
+                        );
+                    }
+                    else {
+                        if (ReferenceProcessLists.IsPlayerInRadiationArea()) {
+                            const char* v14 = sNoSleepInRadiation.String();
+                            Interface::ShowMessage(
+                                v14, 0, "Interface\\Icons\\Message Icons\\glow_message_vaultboy_sad.dds", 0, 2.0f, 0
+                            );
+                        }
+                        else {
+                            if (pPlayer->HasDamageHealthEffect()) {
+                                const char* v15 = sNoSleepTakingHealthDamage.String();
+                                Interface::ShowMessage(
+                                    v15, 0, "Interface\\Icons\\Message Icons\\glow_message_vaultboy_sad.dds", 0, 2.0f, 0
+                                );
+                            }
+                            else {
+                                Interface::CreateSleepMenu(1);
+                            }
+                        }
+                    }
+                }
+            }
+            else {
+                if (pactor == pPlayer) {
+                    const char* v9 = sNoSleepInOwnedBed.String();
+                    Interface::ShowMessage(
+                        v9, 0, "Interface\\Icons\\Message Icons\\glow_message_vaultboy_sad.dds", 0, 2.0f, 0
+                    );
+                    return 0;
+                }
+            }
+        }
+        else {
+            pactor->ForceTemp3rdPerson(1);
+            pactor->ClearSitHeadingDelta();
+            pactor->InitiateSitSleepPackage(apItemActivated);
+        }
+    }
+    return 1;
 }
 
 bool TESFurniture::CanSleepOn() {
-	return ((iFurnFlags & 0x80000000u) != 0);
+    return ((iFurnFlags & 0x80000000u) != 0);
 }
 
 bool TESFurniture::CanSitOn() {
-	return ((iFurnFlags & 1073741824) != 0);
+    return ((iFurnFlags & 1073741824) != 0);
 }
 
 void TESFurniture::VerifyMarkers() {
-	if (!GetTemporary() && !iFurnFlags) {
-		NiAVObject* v1 = Clone3D(static_cast<TESObjectREFR*>(0));
-		if (BSFurnitureMarker::Find(v1)) {
-			Warning("MODELS: You have not selected any FurnitureMarkers for '%s'.", GetFormEditorID());
-		} else {
-			Warning("MODELS: No FurnitureMarkers found in '%s'.", GetModel());
-		}
-		UnClone3D(0);
-	}
+    if (!GetTemporary() && !iFurnFlags) {
+        NiAVObject* v1 = Clone3D(static_cast<TESObjectREFR*>(0));
+        if (BSFurnitureMarker::Find(v1)) {
+            Warning("MODELS: You have not selected any FurnitureMarkers for '%s'.", GetFormEditorID());
+        }
+        else {
+            Warning("MODELS: No FurnitureMarkers found in '%s'.", GetModel());
+        }
+        UnClone3D(0);
+    }
 }
 
 NiPoint3 TESFurniture::GetMarkerTargetOffset(uint32_t aiIndex, float afScale) {
-	NiPoint3 result;
-	NiPoint3 v5 = NiPoint3_ZERO;
-	if (aiIndex) {
-		if (aiIndex <= 40u) {
-			v5.x = pFurnitureMarkerDelta[aiIndex - 1][0]->Float();
-			v5.y = pFurnitureMarkerDelta[aiIndex - 1][1]->Float();
-			v5.z = (afScale - 1.0) * pFurnitureMarkerDelta[aiIndex - 1][2]->Float();
-		}
-	}
-	result = v5;
-	return result;
+    NiPoint3 result;
+    NiPoint3 v5 = NiPoint3_ZERO;
+    if (aiIndex) {
+        if (aiIndex <= 40u) {
+            v5.x = pFurnitureMarkerDelta[aiIndex - 1][0]->Float();
+            v5.y = pFurnitureMarkerDelta[aiIndex - 1][1]->Float();
+            v5.z = (afScale - 1.0) * pFurnitureMarkerDelta[aiIndex - 1][2]->Float();
+        }
+    }
+    result = v5;
+    return result;
 }
 
 float TESFurniture::GetMarkerHeadingOffset(uint32_t aiIndex) {
-	float v4 = 0.0;
-	if (aiIndex) {
-		if (aiIndex <= 40) {
-			return pFurnitureMarkerDelta[aiIndex - 1][3]->Float();
-		}
-	}
-	return v4;
+    float v4 = 0.0;
+    if (aiIndex) {
+        if (aiIndex <= 40) {
+            return pFurnitureMarkerDelta[aiIndex - 1][3]->Float();
+        }
+    }
+    return v4;
 }
 
 bool TESFurniture::GetMarkerEnabled(uint32_t aiMarkerIndex) {
-	uint8_t v3 = 0;
-	if (aiMarkerIndex < 32) {
-		return ((((int32_t)(1 << aiMarkerIndex)) & iFurnFlags) != 0);
-	}
-	return (bool)v3;
+    uint8_t v3 = 0;
+    if (aiMarkerIndex < 32) {
+        return ((((int32_t)(1 << aiMarkerIndex)) & iFurnFlags) != 0);
+    }
+    return (bool)v3;
 }
 
 bool TESFurniture::IsSleepMarker(uint32_t aiNumber) {
-	return (bool)((uint8_t)(aiNumber < 10));
+    return (bool)((uint8_t)(aiNumber < 10));
 }
 
 bool TESFurniture::IsSitMarker(uint32_t aiNumber) {
-	uint8_t v2 = 0;
-	if (((aiNumber >= 10) && (aiNumber <= 20)) || (aiNumber == 26)) {
-		return (bool)1;
-	}
-	return (bool)v2;
+    uint8_t v2 = 0;
+    if (((aiNumber >= 10) && (aiNumber <= 20)) || (aiNumber == 26)) {
+        return (bool)1;
+    }
+    return (bool)v2;
 }

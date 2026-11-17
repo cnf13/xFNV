@@ -14,14 +14,14 @@
 #include "SDK/MSVC/ehvec.h"
 
 FaceGenNpcData::FaceGenNpcData()
-	: pHair(nullptr), iHairColor(0), fHairLength(0.0f), pEyes(nullptr), eSex(TESActorBase::SEX_MALE), pModel(0, 1),
-	  pTexture(0, 1), pHeadPartNodeName(0, 1), spTexBaseMod(0, 1), bFaceGenTexturing(false), bPlayer(false),
-	  eLod(BS_FACEGEN_LOD_NONE) {
-	pModel.RemoveAll();
-	pTexture.RemoveAll();
-	pHeadPartNodeName.RemoveAll();
+  : pHair(nullptr), iHairColor(0), fHairLength(0.0f), pEyes(nullptr), eSex(TESActorBase::SEX_MALE), pModel(0, 1),
+    pTexture(0, 1), pHeadPartNodeName(0, 1), spTexBaseMod(0, 1), bFaceGenTexturing(false), bPlayer(false),
+    eLod(BS_FACEGEN_LOD_NONE) {
+    pModel.RemoveAll();
+    pTexture.RemoveAll();
+    pHeadPartNodeName.RemoveAll();
 }
 
 FaceGenNpcData::~FaceGenNpcData() {
-	Accessories.RemoveAll();
+    Accessories.RemoveAll();
 }

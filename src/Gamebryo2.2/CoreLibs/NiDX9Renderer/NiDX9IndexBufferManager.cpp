@@ -9,8 +9,8 @@
 
 // NiDX9Resource's fields, set here.
 NiDX9IndexBufferManager::NiDX9IBResource::NiDX9IBResource() {
-	m_uiResID = 0xFFFFFFFF;
-	m_eType = NiDX9Resource::TYPE_INVALID;
-	m_ePool = 0;
-	m_pkD3DResource = nullptr;
+    m_uiResID = 0xFFFFFFFF;
+    m_eType = NiDX9Resource::TYPE_INVALID;
+    m_ePool = 0;
+    m_pkD3DResource = nullptr;
 }

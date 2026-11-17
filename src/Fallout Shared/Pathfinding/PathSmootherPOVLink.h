@@ -7,13 +7,13 @@
 // locations they belong to.
 class PathSmootherPOVLink {
 public:
-	PathSmootherPOVLink();
+    PathSmootherPOVLink();
 
-	// Copies the angles, then the edge locations; returns this.
-	PathSmootherPOVLink& operator=(const PathSmootherPOVLink& __that);
+    // Copies the angles, then the edge locations; returns this.
+    PathSmootherPOVLink& operator=(const PathSmootherPOVLink& __that);
 
-	AngleSinCos ExitAngle;
-	AngleSinCos EntryAngle;
-	FastNavMeshEdgeLocation ExitLocation;
-	FastNavMeshEdgeLocation EntryLocation;
+    AngleSinCos ExitAngle;
+    AngleSinCos EntryAngle;
+    FastNavMeshEdgeLocation ExitLocation;
+    FastNavMeshEdgeLocation EntryLocation;
 };

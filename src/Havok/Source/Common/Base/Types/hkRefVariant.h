@@ -9,16 +9,16 @@
 // field is the base's pointer.
 class hkRefVariant : public hkRefPtr<hkReferencedObject> {
 public:
-	// A null variant: the classes holding one as a member build it empty.
-	hkRefVariant() = default;
-	// The SDK's finish constructor: a loaded variant keeps what was loaded.
-	hkRefVariant(hkFinishLoadedObjectFlag flag) : hkRefPtr<hkReferencedObject>(flag) {}
-	hkRefVariant(void* a1, const hkClass* a2);
+    // A null variant: the classes holding one as a member build it empty.
+    hkRefVariant() = default;
+    // The SDK's finish constructor: a loaded variant keeps what was loaded.
+    hkRefVariant(hkFinishLoadedObjectFlag flag) : hkRefPtr<hkReferencedObject>(flag) {}
+    hkRefVariant(void* a1, const hkClass* a2);
 
-	// The object's class from the vtable class registry, or null.
-	const hkClass* getClass() const;
-	// The SDK's hkRefVariant(const hkVariant&) body: takes a reference on the variant's object and holds it; returns
-	// this.
-	hkReferencedObject** assignVariant(const hkVariant& v);
-	void set(void* o, const hkClass* k);
+    // The object's class from the vtable class registry, or null.
+    const hkClass* getClass() const;
+    // The SDK's hkRefVariant(const hkVariant&) body: takes a reference on the variant's object and holds it; returns
+    // this.
+    hkReferencedObject** assignVariant(const hkVariant& v);
+    void set(void* o, const hkClass* k);
 };

@@ -9,15 +9,17 @@ bool IsValidPlayerName(const char* a1);
 // The menu that asks for the player's name.
 class PlayerNameEntryMenu : public Menu {
 public:
-	PlayerNameEntryMenu();
-	~PlayerNameEntryMenu() override;
+    PlayerNameEntryMenu();
+    ~PlayerNameEntryMenu() override;
 
-	void DoIdle() override;
+    void DoIdle() override;
 
-	void SetPlayerName(const char* a1);
+    void SetPlayerName(const char* a1);
 
-	static void operator delete(void* apMemory) { ourFree(apMemory); }
+    static void operator delete(void* apMemory) {
+        ourFree(apMemory);
+    }
 
-	// The player's base form, which receives the name.
-	TESNPC* pPlayerBase;
+    // The player's base form, which receives the name.
+    TESNPC* pPlayerBase;
 };

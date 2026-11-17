@@ -8,19 +8,21 @@ class Sky;
 // Base of the sky objects (Atmosphere, Clouds, Stars, Sun): holds the sky scene root they attach to.
 class SkyObject {
 public:
-	SkyObject();
-	virtual ~SkyObject();
+    SkyObject();
+    virtual ~SkyObject();
 
-	virtual NiNode* GetRoot() { return spRoot; }
+    virtual NiNode* GetRoot() {
+        return spRoot;
+    }
 
-	// The engine's SkyObject::Initialize has SEH and creates the sky root node.
-	virtual void Initialize(NiNode* apSkyRoot);
+    // The engine's SkyObject::Initialize has SEH and creates the sky root node.
+    virtual void Initialize(NiNode* apSkyRoot);
 
-	virtual void Update(Sky*, float) {}
+    virtual void Update(Sky*, float) {}
 
-	// The deleting destructor frees with ourFree.
-	static void operator delete(void* apMemory);
+    // The deleting destructor frees with ourFree.
+    static void operator delete(void* apMemory);
 
-	// The root set up by Initialize. Public because the derived classes read it.
-	NiPointer<NiNode> spRoot;
+    // The root set up by Initialize. Public because the derived classes read it.
+    NiPointer<NiNode> spRoot;
 };

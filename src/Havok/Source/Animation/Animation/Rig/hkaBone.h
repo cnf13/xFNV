@@ -9,12 +9,12 @@
 // One bone of an hkaSkeleton: its name and whether the animation may translate it.
 class hkaBone {
 public:
-	static const hkClass& staticClass();
-	static const hkClass& staticClass_00DFCDA0();
+    static const hkClass& staticClass();
+    static const hkClass& staticClass_00DFCDA0();
 
-	hkStringPtr m_name;
-	hkBool m_lockTranslation;
-	uint8_t padding05[3];
+    hkStringPtr m_name;
+    hkBool m_lockTranslation;
+    uint8_t padding05[3];
 };
 
 extern hkClass hkaBoneClass;

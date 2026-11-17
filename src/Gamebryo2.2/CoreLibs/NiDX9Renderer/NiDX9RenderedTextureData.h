@@ -10,22 +10,22 @@ class NiRenderedTexture;
 // The DX9 renderer's data of a rendered texture (a render target). Only some of its members are declared.
 class NiDX9RenderedTextureData : public NiDX9TextureData {
 public:
-	// The fourth argument is unused (0).
-	NiDX9RenderedTextureData(NiTexture* pkTexture, NiDX9Renderer* pkRenderer, uint32_t auiUnused);
-	~NiDX9RenderedTextureData() override;
+    // The fourth argument is unused (0).
+    NiDX9RenderedTextureData(NiTexture* pkTexture, NiDX9Renderer* pkRenderer, uint32_t auiUnused);
+    ~NiDX9RenderedTextureData() override;
 
-	NiDX9RenderedTextureData* GetAsRenderedTexture() const override {
-		return const_cast<NiDX9RenderedTextureData*>(this);
-	}
+    NiDX9RenderedTextureData* GetAsRenderedTexture() const override {
+        return const_cast<NiDX9RenderedTextureData*>(this);
+    }
 
-	// Creates the render target surface and the texture from the texture's size and preferences; returns the pixel
-	// format it used, null when the device fails.
-	const NiPixelFormat* CreateSurf(const NiRenderedTexture* pkTexture, Ni2DBuffer::MultiSamplePreference eMSAAPref);
+    // Creates the render target surface and the texture from the texture's size and preferences; returns the pixel
+    // format it used, null when the device fails.
+    const NiPixelFormat* CreateSurf(const NiRenderedTexture* pkTexture, Ni2DBuffer::MultiSamplePreference eMSAAPref);
 
-	// Creates the render target of apTexture; aeMultiSample is a Ni2DBuffer::MultiSamplePreference.
-	static NiDX9RenderedTextureData* Create(NiRenderedTexture* apTexture, NiDX9Renderer* apRenderer,
-		uint32_t aeMultiSample);
+    // Creates the render target of apTexture; aeMultiSample is a Ni2DBuffer::MultiSamplePreference.
+    static NiDX9RenderedTextureData*
+    Create(NiRenderedTexture* apTexture, NiDX9Renderer* apRenderer, uint32_t aeMultiSample);
 
-	// The render target surface CreateSurf makes beside the texture.
-	IDirect3DSurface9* m_pkRenderTarget;
+    // The render target surface CreateSurf makes beside the texture.
+    IDirect3DSurface9* m_pkRenderTarget;
 };

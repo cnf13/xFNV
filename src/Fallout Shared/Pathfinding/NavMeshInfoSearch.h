@@ -23,29 +23,37 @@ using NavMeshInfoNodeScrapArray = BSScrapArray<AStarNode<const NavMeshInfo*, TES
 // from a start to a goal location.
 class NavMeshInfoSearch : public AStarSearch<const NavMeshInfo*, TESObjectREFR*> {
 public:
-	NavMeshInfoSearch();
-	~NavMeshInfoSearch() override;
+    NavMeshInfoSearch();
+    ~NavMeshInfoSearch() override;
 
-	bool GetNodeConnections(const AStarNode<const NavMeshInfo*, TESObjectREFR*>* apNode,
-		BSSimpleArray<AStarNode<const NavMeshInfo*, TESObjectREFR*>*, 1024>* apRetNodes) override;
-	bool IsGoalNode(const AStarNode<const NavMeshInfo*, TESObjectREFR*>* apNode) override;
+    bool GetNodeConnections(
+        const AStarNode<const NavMeshInfo*, TESObjectREFR*>* apNode,
+        BSSimpleArray<AStarNode<const NavMeshInfo*, TESObjectREFR*>*, 1024>* apRetNodes
+    ) override;
+    bool IsGoalNode(const AStarNode<const NavMeshInfo*, TESObjectREFR*>* apNode) override;
 
-	// Searches the navmesh infos from apStartMesh at aStartLocation to apGoalMesh at
-	// aGoalLocation; the infos on the way go to apReturnNodes and the doors between them to apReturnLinks.
-	bool Pathfind(ActorLockData* apActorLockData, const NiPoint3& aStartLocation, const NavMeshInfo* apStartMesh,
-		const NiPoint3& aGoalLocation, const NavMeshInfo* apGoalMesh,
-		BSSimpleArray<const NavMeshInfo*, 1024>* apReturnNodes, BSSimpleArray<TESObjectREFR*, 1024>* apReturnLinks,
-		Pathing::DOOR_LOCK_DISPOSITION aeDoorLockDisposition);
+    // Searches the navmesh infos from apStartMesh at aStartLocation to apGoalMesh at
+    // aGoalLocation; the infos on the way go to apReturnNodes and the doors between them to apReturnLinks.
+    bool Pathfind(
+        ActorLockData* apActorLockData,
+        const NiPoint3& aStartLocation,
+        const NavMeshInfo* apStartMesh,
+        const NiPoint3& aGoalLocation,
+        const NavMeshInfo* apGoalMesh,
+        BSSimpleArray<const NavMeshInfo*, 1024>* apReturnNodes,
+        BSSimpleArray<TESObjectREFR*, 1024>* apReturnLinks,
+        Pathing::DOOR_LOCK_DISPOSITION aeDoorLockDisposition
+    );
 
-	static void operator delete(void* apMemory);
+    static void operator delete(void* apMemory);
 
-	NiPoint3 StartLocation;
-	const NavMeshInfo* pStartMesh;
-	NiPoint3 GoalLocation;
-	const NavMeshInfo* pGoalMesh;
-	ActorLockData* pActorLockData;
-	Pathing::DOOR_LOCK_DISPOSITION DoorLockDisposition;
-	bool bSameSpace;
-	uint8_t padding2081[3];
-	DoorLock TempDoorLock;
+    NiPoint3 StartLocation;
+    const NavMeshInfo* pStartMesh;
+    NiPoint3 GoalLocation;
+    const NavMeshInfo* pGoalMesh;
+    ActorLockData* pActorLockData;
+    Pathing::DOOR_LOCK_DISPOSITION DoorLockDisposition;
+    bool bSameSpace;
+    uint8_t padding2081[3];
+    DoorLock TempDoorLock;
 };

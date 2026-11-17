@@ -1,7 +1,7 @@
 #pragma once
 
-#include "SDK/MSVC/string.h"
 #include <cstring>
+#include "SDK/MSVC/string.h"
 
 // The Microsoft-only multibyte functions of VC9's <mbstring.h> the game calls, under their own names. No CRT header
 // the program includes declares them (the Windows CRT's <mbstring.h> is not included), so they are defined here and
@@ -13,24 +13,21 @@
 // unsigned char and char strings are the CRT's own: the same bytes.
 
 // _mbsicmp, 0xEC858A (_mbsicmp_l with a null locale): both pointers checked (EINVAL, 0x7FFFFFFF), then _stricmp_l.
-inline int32_t _mbsicmp(const unsigned char* apStr1, const unsigned char* apStr2)
-{
-	return _stricmp(reinterpret_cast<const char*>(apStr1), reinterpret_cast<const char*>(apStr2));
+inline int32_t _mbsicmp(const unsigned char* apStr1, const unsigned char* apStr2) {
+    return _stricmp(reinterpret_cast<const char*>(apStr1), reinterpret_cast<const char*>(apStr2));
 }
 
 // _mbscmp, 0xEC8244 (_mbscmp_l): both pointers checked (EINVAL, 0x7FFFFFFF), then strcmp. Defined in mbstring.cpp.
 int32_t _mbscmp(const unsigned char* apStr1, const unsigned char* apStr2);
 
 // _mbsnbcmp, 0xECB849 (_mbsnbcmp_l): strncmp, before any argument check.
-inline int32_t _mbsnbcmp(const unsigned char* apStr1, const unsigned char* apStr2, size_t astCount)
-{
-	return std::strncmp(reinterpret_cast<const char*>(apStr1), reinterpret_cast<const char*>(apStr2), astCount);
+inline int32_t _mbsnbcmp(const unsigned char* apStr1, const unsigned char* apStr2, size_t astCount) {
+    return std::strncmp(reinterpret_cast<const char*>(apStr1), reinterpret_cast<const char*>(apStr2), astCount);
 }
 
 // _mbsnbicmp, 0xECBA8E (_mbsnbicmp_l): _strnicmp, before any argument check of its own.
-inline int32_t _mbsnbicmp(const unsigned char* apStr1, const unsigned char* apStr2, size_t astCount)
-{
-	return _strnicmp(reinterpret_cast<const char*>(apStr1), reinterpret_cast<const char*>(apStr2), astCount);
+inline int32_t _mbsnbicmp(const unsigned char* apStr1, const unsigned char* apStr2, size_t astCount) {
+    return _strnicmp(reinterpret_cast<const char*>(apStr1), reinterpret_cast<const char*>(apStr2), astCount);
 }
 
 // _mbsnbcpy, 0xECA903 (_mbsnbcpy_l): a null pointer with a nonzero count is EINVAL (null returned), else strncpy.

@@ -7,14 +7,17 @@
 static hkReferencedObject* hkSystemClockcreate();
 
 // m_value is untyped storage: populate and depopulate move any singleton's instance pointer through it.
-static hkSingletonInitNode hkSingletonRegisterhkSystemClock("hkSystemClock", &hkSystemClockcreate,
-	reinterpret_cast<void**>(&hkSystemClock::s_instance));
+static hkSingletonInitNode hkSingletonRegisterhkSystemClock(
+    "hkSystemClock",
+    &hkSystemClockcreate,
+    reinterpret_cast<void**>(&hkSystemClock::s_instance)
+);
 
 // The singleton's create function: new hkWindowsSystemClock().
 static hkReferencedObject* hkSystemClockcreate() {
-	hkMemoryRouter* Instance = &hkMemoryRouter::getInstance();
-	hkWindowsSystemClock* result =
-		static_cast<hkWindowsSystemClock*>(Instance->m_heap->blockAlloc(sizeof(hkWindowsSystemClock)));
-	result->m_memSizeAndFlags = sizeof(hkWindowsSystemClock);
-	return ::new (result) hkWindowsSystemClock;
+    hkMemoryRouter* Instance = &hkMemoryRouter::getInstance();
+    hkWindowsSystemClock* result =
+        static_cast<hkWindowsSystemClock*>(Instance->m_heap->blockAlloc(sizeof(hkWindowsSystemClock)));
+    result->m_memSizeAndFlags = sizeof(hkWindowsSystemClock);
+    return ::new (result) hkWindowsSystemClock;
 }

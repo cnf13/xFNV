@@ -11,17 +11,17 @@ class hkTransform;
 // data to the hkIArchive base.
 class hkDisplaySerializeIStream : public hkIArchive {
 public:
-	hkDisplaySerializeIStream(hkStreamReader* apStream);
-	~hkDisplaySerializeIStream() override;
+    hkDisplaySerializeIStream(hkStreamReader* apStream);
+    ~hkDisplaySerializeIStream() override;
 
-	// x, y and z read as three reals, w cleared.
-	void readQuadVector4(hkVector4& v);
-	// The rotation and the translation of a transform.
-	void readTransform(hkTransform& t);
-	// The three 4-byte vertex indices of a triangle.
-	void readTriangle(hkGeometry::Triangle& ti);
-	// The vertices and triangles of a geometry.
-	void readGeometry(hkGeometry& g);
-	// A type-tagged display geometry, allocated from the memory router's heap.
-	void readDisplayGeometry(hkDisplayGeometry*& dg);
+    // x, y and z read as three reals, w cleared.
+    void readQuadVector4(hkVector4& v);
+    // The rotation and the translation of a transform.
+    void readTransform(hkTransform& t);
+    // The three 4-byte vertex indices of a triangle.
+    void readTriangle(hkGeometry::Triangle& ti);
+    // The vertices and triangles of a geometry.
+    void readGeometry(hkGeometry& g);
+    // A type-tagged display geometry, allocated from the memory router's heap.
+    void readDisplayGeometry(hkDisplayGeometry*& dg);
 };

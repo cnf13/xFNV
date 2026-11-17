@@ -17,50 +17,56 @@ hkReferencedObject* hkpUserShapePhantomTypeIdentifiercreate();
 // removed). hkpPhantomListener is derived publicly so that a pointer to the viewer can be converted to it (the layout
 // is the same as with protected derivation).
 class hkpPhantomDisplayViewer : public hkpWorldViewerBase,
-								public hkpPhantomListener,
-								protected hkpWorldPostSimulationListener {
+                                public hkpPhantomListener,
+                                protected hkpWorldPostSimulationListener {
 public:
-	hkpPhantomDisplayViewer(const hkArray<hkProcessContext*, hkContainerHeapAllocator>& contexts);
-	~hkpPhantomDisplayViewer() override;
+    hkpPhantomDisplayViewer(const hkArray<hkProcessContext*, hkContainerHeapAllocator>& contexts);
+    ~hkpPhantomDisplayViewer() override;
 
-	int32_t getProcessTag() override { return m_tag; }
-	void init() override;
-	void phantomAddedCallback(hkpPhantom* phantom) override;
-	void phantomRemovedCallback(hkpPhantom* phantom) override;
-	void postSimulationCallback(hkpWorld* world) override;
-	void worldAddedCallback(hkpWorld* world) override;
-	void worldRemovedCallback(hkpWorld* world) override;
+    int32_t getProcessTag() override {
+        return m_tag;
+    }
+    void init() override;
+    void phantomAddedCallback(hkpPhantom* phantom) override;
+    void phantomRemovedCallback(hkpPhantom* phantom) override;
+    void postSimulationCallback(hkpWorld* world) override;
+    void worldAddedCallback(hkpWorld* world) override;
+    void worldRemovedCallback(hkpWorld* world) override;
 
-	void removeAllGeometries();
-	void addWorld(hkpWorld* world);
-	void removeWorld(hkpWorld* world);
+    void removeAllGeometries();
+    void addWorld(hkpWorld* world);
+    void removeWorld(hkpWorld* world);
 
-	// Makes the viewer for the contexts.
-	static hkProcess* create(const hkArray<hkProcessContext*>& contexts);
-	// Registers the viewer under its name with the process factory.
-	static void registerViewer();
-	static const char* getName() { return "Phantoms"; }
-	// Several bases declare one; the deleting destructor frees through hkReferencedObject's.
-	static void operator delete(void* apMemory) { hkReferencedObject::deleteObject(apMemory); }
+    // Makes the viewer for the contexts.
+    static hkProcess* create(const hkArray<hkProcessContext*>& contexts);
+    // Registers the viewer under its name with the process factory.
+    static void registerViewer();
+    static const char* getName() {
+        return "Phantoms";
+    }
+    // Several bases declare one; the deleting destructor frees through hkReferencedObject's.
+    static void operator delete(void* apMemory) {
+        hkReferencedObject::deleteObject(apMemory);
+    }
 
-	hkArray<hkpWorldObject*> m_phantomShapesCreated;
+    hkArray<hkpWorldObject*> m_phantomShapesCreated;
 
-	// The viewer's process tag.
-	static inline int32_t m_tag;
+    // The viewer's process tag.
+    static inline int32_t m_tag;
 };
 
 // The registry of the user phantom types that are shape phantoms (the viewer draws their shapes). Only the destructor
 // is overridden.
 class hkpUserShapePhantomTypeIdentifier : public hkReferencedObject,
-										  public hkSingleton<hkpUserShapePhantomTypeIdentifier> {
+                                          public hkSingleton<hkpUserShapePhantomTypeIdentifier> {
 public:
-	~hkpUserShapePhantomTypeIdentifier() override;
+    ~hkpUserShapePhantomTypeIdentifier() override;
 
-	void registerShapePhantomType(hkpPhantomType t);
+    void registerShapePhantomType(hkpPhantomType t);
 
-	hkArray<hkpPhantomType> m_shapePhantomTypes;
+    hkArray<hkpPhantomType> m_shapePhantomTypes;
 
-	static inline hkpUserShapePhantomTypeIdentifier* s_instance;
+    static inline hkpUserShapePhantomTypeIdentifier* s_instance;
 };
 
 // The colour the viewer gives phantom geometries.

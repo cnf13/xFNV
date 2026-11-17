@@ -7,13 +7,13 @@
 // code reads. The Xbox PDB has no ATL module to confirm them by name.
 namespace ATL {
 
-static const char* const szStringVal = "S";
-static const char* const multiszStringVal = "M";
-static const char* const szDwordVal = "D";
-static const char* const szBinaryVal = "B";
-static const char* const szValToken = "Val";
-static const char* const szForceRemove = "ForceRemove";
-static const char* const szNoRemove = "NoRemove";
-static const char* const szDelete = "Delete";
+    static const char* const szStringVal = "S";
+    static const char* const multiszStringVal = "M";
+    static const char* const szDwordVal = "D";
+    static const char* const szBinaryVal = "B";
+    static const char* const szValToken = "Val";
+    static const char* const szForceRemove = "ForceRemove";
+    static const char* const szNoRemove = "NoRemove";
+    static const char* const szDelete = "Delete";
 
 } // namespace ATL

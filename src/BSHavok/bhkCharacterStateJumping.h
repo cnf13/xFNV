@@ -5,9 +5,9 @@
 // The character state used for jumping.
 class bhkCharacterStateJumping : public bhkCharacterState {
 public:
-	// The constructor, run on apMemory.
-	bhkCharacterStateJumping();
+    // The constructor, run on apMemory.
+    bhkCharacterStateJumping();
 
-	hkpCharacterStateType getType() const override;
-	void Update(bhkCharacterController& arInput) override;
+    hkpCharacterStateType getType() const override;
+    void Update(bhkCharacterController& arInput) override;
 };

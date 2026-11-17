@@ -8,18 +8,18 @@ BSSysInfoSystemUtility::BSSysInfoSystemUtility() : eLanguage(LANGUAGE_UNKNOWN) {
 BSSysInfoSystemUtility::~BSSysInfoSystemUtility() {}
 
 void BSSysInfoSystemUtility::Initialize() {
-	;
+    ;
 }
 
 void BSSysInfoSystemUtility::Destroy() {
-	eLanguage = BSSysInfoSystemUtility::LANGUAGE_UNKNOWN;
+    eLanguage = BSSysInfoSystemUtility::LANGUAGE_UNKNOWN;
 }
 
 void BSSysInfoSystemUtility::operator delete(void* apMemory) {
-	MemoryManager_Singleton.Deallocate(apMemory);
+    MemoryManager_Singleton.Deallocate(apMemory);
 }
 
 BSSysInfoSystemUtility* BSSysInfoSystemUtility::GetSingleton() {
-	static BSSysInfoSystemUtility stsysInfoSystemUtility;
-	return &stsysInfoSystemUtility;
+    static BSSysInfoSystemUtility stsysInfoSystemUtility;
+    return &stsysInfoSystemUtility;
 }

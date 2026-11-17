@@ -12,28 +12,33 @@ void _hkErrorMessage(const char* c);
 // off.
 class hkError : public hkReferencedObject, public hkSingleton<hkError> {
 public:
-	enum Message : int32_t {
-		MESSAGE_REPORT = 0x0,
-		MESSAGE_WARNING = 0x1,
-		MESSAGE_ASSERT = 0x2,
-		MESSAGE_ERROR = 0x3,
-	};
+    enum Message : int32_t {
+        MESSAGE_REPORT = 0x0,
+        MESSAGE_WARNING = 0x1,
+        MESSAGE_ASSERT = 0x2,
+        MESSAGE_ERROR = 0x3,
+    };
 
-	hkError();
-	~hkError() override;
+    hkError();
+    ~hkError() override;
 
-	virtual int32_t message(hkError::Message aiMessage, int32_t aiId, const char* apDescription, const char* apFile,
-		int32_t aiLine) = 0;
-	virtual void setEnabled(int32_t aiId, hkBool abEnabled) = 0;
-	virtual hkBool* isEnabled(hkBool* arResult, int32_t aiId) = 0;
-	virtual void enableAll() = 0;
-	virtual void sectionBegin(int32_t, const char*) {}
-	virtual void sectionEnd() {}
+    virtual int32_t message(
+        hkError::Message aiMessage,
+        int32_t aiId,
+        const char* apDescription,
+        const char* apFile,
+        int32_t aiLine
+    ) = 0;
+    virtual void setEnabled(int32_t aiId, hkBool abEnabled) = 0;
+    virtual hkBool* isEnabled(hkBool* arResult, int32_t aiId) = 0;
+    virtual void enableAll() = 0;
+    virtual void sectionBegin(int32_t, const char*) {}
+    virtual void sectionEnd() {}
 
-	static void hkReferenceCountError(const hkReferencedObject* a1, const char* a2);
+    static void hkReferenceCountError(const hkReferencedObject* a1, const char* a2);
 
-	// hkSingleton<hkError>::s_instance.
-	static inline hkError* s_instance;
+    // hkSingleton<hkError>::s_instance.
+    static inline hkError* s_instance;
 };
 
 // The signature of the function that receives the error reporter's text.
@@ -43,8 +48,8 @@ using hkErrorReportFunction = void (*)(const char* apText, void* apErrorReportOb
 // adds no members and no virtuals.
 class hkErrStream : public hkOstream {
 public:
-	// A stream with no writer (hkOstream()), safe to destroy: the error macros declare the local, then destroy it and
-	// construct it again in place over their buffer. hkErrStream adds no members.
-	hkErrStream() = default;
-	hkErrStream(void* buf, int32_t bufSize);
+    // A stream with no writer (hkOstream()), safe to destroy: the error macros declare the local, then destroy it and
+    // construct it again in place over their buffer. hkErrStream adds no members.
+    hkErrStream() = default;
+    hkErrStream(void* buf, int32_t bufSize);
 };

@@ -12,14 +12,17 @@ class CombatPlanNode;
 // Displays a combat plan and its nodes in the planner's tree control. CombatPlanner supplies the displayed plan.
 class CombatPlannerWindow : public NiTreeCtrl {
 public:
-	CombatPlannerWindow(CombatPlanner* apPlanner, CombatPlan* apPlan,
-		BSScrapArray<CombatPlanNode*, 1024>* arCombatNodes);
+    CombatPlannerWindow(
+        CombatPlanner* apPlanner,
+        CombatPlan* apPlan,
+        BSScrapArray<CombatPlanNode*, 1024>* arCombatNodes
+    );
 
-	void Display();
+    void Display();
 
-	CombatPlanner* pPlanner;
-	CombatPlan* pCombatPlan;
-	// CombatPlanner::CreatePlan passes its node array, built by
-	// BSScrapArray<CombatPlanNode *, 1024>'s constructor.
-	BSScrapArray<CombatPlanNode*, 1024>* pNodeArray;
+    CombatPlanner* pPlanner;
+    CombatPlan* pCombatPlan;
+    // CombatPlanner::CreatePlan passes its node array, built by
+    // BSScrapArray<CombatPlanNode *, 1024>'s constructor.
+    BSScrapArray<CombatPlanNode*, 1024>* pNodeArray;
 };

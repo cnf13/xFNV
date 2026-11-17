@@ -14,18 +14,32 @@ static void cleanupLoadedObjecthkpFastMeshShape(void* p);
 // Havok SDK signature (hkpCollide.lib, tied by bytes,reloc).
 static const void* getVtablehkpFastMeshShape();
 
-hkClass hkpFastMeshShapeClass("hkpFastMeshShape", &hkpMeshShapeClass, 96, nullptr, 0, nullptr, 0, nullptr, 0, nullptr,
-	nullptr, 0, 0);
-hkTypeInfo hkpFastMeshShapeTypeInfo = {"hkpFastMeshShape", finishLoadedObjecthkpFastMeshShape,
-	cleanupLoadedObjecthkpFastMeshShape, getVtablehkpFastMeshShape(), &typeid(hkpFastMeshShape),
-	sizeof(hkpFastMeshShape)};
+hkClass hkpFastMeshShapeClass(
+    "hkpFastMeshShape",
+    &hkpMeshShapeClass,
+    96,
+    nullptr,
+    0,
+    nullptr,
+    0,
+    nullptr,
+    0,
+    nullptr,
+    nullptr,
+    0,
+    0
+);
+hkTypeInfo hkpFastMeshShapeTypeInfo = {
+    "hkpFastMeshShape",          finishLoadedObjecthkpFastMeshShape, cleanupLoadedObjecthkpFastMeshShape,
+    getVtablehkpFastMeshShape(), &typeid(hkpFastMeshShape),          sizeof(hkpFastMeshShape)
+};
 
 static void cleanupLoadedObjecthkpFastMeshShape(void* p) {
-	static_cast<hkpFastMeshShape*>(p)->~hkpFastMeshShape();
+    static_cast<hkpFastMeshShape*>(p)->~hkpFastMeshShape();
 }
 
 static const void* getVtablehkpFastMeshShape() {
-	return hkGetVtableOf<hkpFastMeshShape>();
+    return hkGetVtableOf<hkpFastMeshShape>();
 }
 
 // The triangle of key in the first subpart, built in buffer: the triangle shape's constructor with the mesh's radius,
@@ -33,36 +47,37 @@ static const void* getVtablehkpFastMeshShape() {
 // m_scaling. The indices are 16-bit; a subpart that flips alternate triangles swaps the second and third vertex of odd
 // keys. The buffer is null-checked (placement new), but the vertices are still stored at null, as the game does.
 const hkpShape* hkpFastMeshShape::getChildShape(uint32_t key, char (&buffer)[512]) const {
-	const hkpMeshShape::Subpart& part = m_subparts.m_data[0];
-	const int32_t vertexStriding = part.m_vertexStriding;
-	// The index and vertex buffers are untyped strided memory; indices are read as 16-bit.
-	const uint16_t* indices =
-		reinterpret_cast<const uint16_t*>(static_cast<const char*>(part.m_indexBase) + key * part.m_indexStriding);
-	const uint32_t flip = key & part.m_flipAlternateTriangles;
-	const char* vertexBase = reinterpret_cast<const char*>(part.m_vertexBase);
-	const hkVector4* vertex0 = reinterpret_cast<const hkVector4*>(vertexBase + vertexStriding * indices[0]);
-	const hkVector4* vertex1 = reinterpret_cast<const hkVector4*>(vertexBase + vertexStriding * indices[flip + 1]);
-	const hkVector4* vertex2 =
-		reinterpret_cast<const hkVector4*>(vertexBase + vertexStriding * indices[(flip ^ 1) + 1]);
-	uint16_t weldingInfo;
-	if (m_weldingInfo.m_size) {
-		weldingInfo = m_weldingInfo.m_data[key + part.m_triangleOffset];
-	} else {
-		weldingInfo = 0;
-	}
-	hkpTriangleShape* pTriangle = nullptr;
-	char* pBuffer = buffer;
-	if (pBuffer) {
-		const uint8_t ucWeldingType = m_weldingType.m_storage;
-		pTriangle = ::new (pBuffer)
-			hkpTriangleShape(m_radius, weldingInfo, static_cast<hkpWeldingUtility::WeldingType>(ucWeldingType));
-	}
-	pTriangle->m_vertexA.setMul4(*vertex0, m_scaling);
-	pTriangle->m_vertexB.setMul4(*vertex1, m_scaling);
-	pTriangle->m_vertexC.setMul4(*vertex2, m_scaling);
-	return pTriangle;
+    const hkpMeshShape::Subpart& part = m_subparts.m_data[0];
+    const int32_t vertexStriding = part.m_vertexStriding;
+    // The index and vertex buffers are untyped strided memory; indices are read as 16-bit.
+    const uint16_t* indices =
+        reinterpret_cast<const uint16_t*>(static_cast<const char*>(part.m_indexBase) + key * part.m_indexStriding);
+    const uint32_t flip = key & part.m_flipAlternateTriangles;
+    const char* vertexBase = reinterpret_cast<const char*>(part.m_vertexBase);
+    const hkVector4* vertex0 = reinterpret_cast<const hkVector4*>(vertexBase + vertexStriding * indices[0]);
+    const hkVector4* vertex1 = reinterpret_cast<const hkVector4*>(vertexBase + vertexStriding * indices[flip + 1]);
+    const hkVector4* vertex2 =
+        reinterpret_cast<const hkVector4*>(vertexBase + vertexStriding * indices[(flip ^ 1) + 1]);
+    uint16_t weldingInfo;
+    if (m_weldingInfo.m_size) {
+        weldingInfo = m_weldingInfo.m_data[key + part.m_triangleOffset];
+    }
+    else {
+        weldingInfo = 0;
+    }
+    hkpTriangleShape* pTriangle = nullptr;
+    char* pBuffer = buffer;
+    if (pBuffer) {
+        const uint8_t ucWeldingType = m_weldingType.m_storage;
+        pTriangle = ::new (pBuffer)
+            hkpTriangleShape(m_radius, weldingInfo, static_cast<hkpWeldingUtility::WeldingType>(ucWeldingType));
+    }
+    pTriangle->m_vertexA.setMul4(*vertex0, m_scaling);
+    pTriangle->m_vertexB.setMul4(*vertex1, m_scaling);
+    pTriangle->m_vertexC.setMul4(*vertex2, m_scaling);
+    return pTriangle;
 }
 
 const hkClass& hkpFastMeshShape::staticClass() {
-	return hkpFastMeshShapeClass;
+    return hkpFastMeshShapeClass;
 }

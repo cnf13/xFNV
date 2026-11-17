@@ -6,17 +6,19 @@
 // A static collection form (SCOL). Its own members are not declared yet.
 class BGSStaticCollection : public TESBoundObject, public TESModelTextureSwap {
 public:
-	BGSStaticCollection();
-	~BGSStaticCollection() override;
+    BGSStaticCollection();
+    ~BGSStaticCollection() override;
 
-	void ClearData() override;
-	bool Load(TESFile* apFile) override;
-	void Save() override;
-	void InitItem() override;
-	void Copy(TESForm* apCopy) override;
-	bool Compare(TESForm* apCompare) override;
+    void ClearData() override;
+    bool Load(TESFile* apFile) override;
+    void Save() override;
+    void InitItem() override;
+    void Copy(TESForm* apCopy) override;
+    bool Compare(TESForm* apCompare) override;
 
-	using TESForm::Save;
+    using TESForm::Save;
 
-	static void operator delete(void* apMemory) { ourFree(apMemory); }
+    static void operator delete(void* apMemory) {
+        ourFree(apMemory);
+    }
 };

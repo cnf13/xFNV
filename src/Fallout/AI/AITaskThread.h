@@ -9,23 +9,25 @@
 // Havok memory router and signals FinishedProcessing.
 class AITaskThread : public BSThread {
 public:
-	AITaskThread(uint32_t aiThread);
-	~AITaskThread() override;
+    AITaskThread(uint32_t aiThread);
+    ~AITaskThread() override;
 
-	uint32_t ThreadProc() override;
+    uint32_t ThreadProc() override;
 
-	void OnStartup();
-	void OnShutdown();
-	void StartProcessingTasks();
-	void WaitForCompletion();
+    void OnStartup();
+    void OnShutdown();
+    void StartProcessingTasks();
+    void WaitForCompletion();
 
-	static void operator delete(void* apMemory) { ourFree(apMemory); }
+    static void operator delete(void* apMemory) {
+        ourFree(apMemory);
+    }
 
-	BSSemaphore StartProcessing;
-	BSSemaphore FinishedProcessing;
-	bool bKillThread;
-	uint8_t padding49[3];
-	uint32_t iThread;
-	hkMemoryRouter ThreadMemory;
-	void* pThreadStackBuffer;
+    BSSemaphore StartProcessing;
+    BSSemaphore FinishedProcessing;
+    bool bKillThread;
+    uint8_t padding49[3];
+    uint32_t iThread;
+    hkMemoryRouter ThreadMemory;
+    void* pThreadStackBuffer;
 };

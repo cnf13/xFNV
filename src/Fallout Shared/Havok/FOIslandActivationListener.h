@@ -11,19 +11,19 @@ class hkpWorld;
 // added.
 class FOIslandActivationListener : public hkpIslandActivationListener, public hkpEntityListener {
 public:
-	FOIslandActivationListener();
-	~FOIslandActivationListener() override;
+    FOIslandActivationListener();
+    ~FOIslandActivationListener() override;
 
-	void islandActivatedCallback(hkpSimulationIsland* apIsland) override;
-	void islandDeactivatedCallback(hkpSimulationIsland* apIsland) override;
-	// hkpEntityListener's vtable at +0x4.
-	void entityAddedCallback(hkpEntity* apEntity) override;
+    void islandActivatedCallback(hkpSimulationIsland* apIsland) override;
+    void islandDeactivatedCallback(hkpSimulationIsland* apIsland) override;
+    // hkpEntityListener's vtable at +0x4.
+    void entityAddedCallback(hkpEntity* apEntity) override;
 
-	// Puts the listener on apWorld as an island activation and an entity listener.
-	void AddToWorld(hkpWorld* apWorld);
-	// Takes the listener off apWorld.
-	void RemoveFromWorld(hkpWorld* apWorld);
+    // Puts the listener on apWorld as an island activation and an entity listener.
+    void AddToWorld(hkpWorld* apWorld);
+    // Takes the listener off apWorld.
+    void RemoveFromWorld(hkpWorld* apWorld);
 
-	// DeletingDestruct's free (ourFree); both bases declare one.
-	static void operator delete(void* apMemory);
+    // DeletingDestruct's free (ourFree); both bases declare one.
+    static void operator delete(void* apMemory);
 };

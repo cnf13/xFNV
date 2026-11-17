@@ -12,25 +12,29 @@ class hkpVehicleInstance;
 // wheel's hard point, direction and length. It is abstract.
 class hkpVehicleSuspension : public hkReferencedObject {
 public:
-	// One wheel's suspension geometry, in chassis space.
-	struct SuspensionWheelParameters {
-		// Havok SDK signature (hkpVehicle.lib, tied by target).
-		static const hkClass& staticClass();
+    // One wheel's suspension geometry, in chassis space.
+    struct SuspensionWheelParameters {
+        // Havok SDK signature (hkpVehicle.lib, tied by target).
+        static const hkClass& staticClass();
 
-		hkVector4 m_hardpointChassisSpace;
-		hkVector4 m_directionChassisSpace;
-		float m_length;
-	};
+        hkVector4 m_hardpointChassisSpace;
+        hkVector4 m_directionChassisSpace;
+        float m_length;
+    };
 
-	// The constructor the derived classes' own use, and the SDK's finish constructor of a loaded object (the derived
-	// classes' finish constructors call it): it keeps the fields the load wrote.
-	hkpVehicleSuspension() = default;
-	hkpVehicleSuspension(hkFinishLoadedObjectFlag f) : hkReferencedObject(f), m_wheelParams(f) {}
+    // The constructor the derived classes' own use, and the SDK's finish constructor of a loaded object (the derived
+    // classes' finish constructors call it): it keeps the fields the load wrote.
+    hkpVehicleSuspension() = default;
+    hkpVehicleSuspension(hkFinishLoadedObjectFlag f) : hkReferencedObject(f), m_wheelParams(f) {}
 
-	virtual void calcSuspension(float deltaTime, const hkpVehicleInstance* vehicle,
-		const hkpVehicleWheelCollide::CollisionDetectionWheelOutput* cdInfo, float* suspensionForceOut) = 0;
+    virtual void calcSuspension(
+        float deltaTime,
+        const hkpVehicleInstance* vehicle,
+        const hkpVehicleWheelCollide::CollisionDetectionWheelOutput* cdInfo,
+        float* suspensionForceOut
+    ) = 0;
 
-	hkArray<SuspensionWheelParameters> m_wheelParams;
+    hkArray<SuspensionWheelParameters> m_wheelParams;
 };
 
 // The class's reflection record.

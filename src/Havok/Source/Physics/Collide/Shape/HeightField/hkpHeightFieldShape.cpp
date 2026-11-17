@@ -5,5 +5,18 @@
 
 // The class record of hkpHeightFieldShape, as the SDK's generated file has it (the SDK has no .cpp of the class here:
 // this file holds its reflection data). No members of its own.
-hkClass hkpHeightFieldShapeClass("hkpHeightFieldShape", &hkpShapeClass, 0x10, nullptr, 0, nullptr, 0, nullptr, 0,
-	nullptr, nullptr, 0, 0);
+hkClass hkpHeightFieldShapeClass(
+    "hkpHeightFieldShape",
+    &hkpShapeClass,
+    0x10,
+    nullptr,
+    0,
+    nullptr,
+    0,
+    nullptr,
+    0,
+    nullptr,
+    nullptr,
+    0,
+    0
+);

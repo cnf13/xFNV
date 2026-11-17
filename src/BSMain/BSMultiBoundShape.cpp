@@ -12,35 +12,35 @@ BSMultiBoundShape::~BSMultiBoundShape() {}
 
 // The abstract base clones to itself.
 NiObject* BSMultiBoundShape::CreateClone(NiCloningProcess&) {
-	return this;
+    return this;
 }
 
 void BSMultiBoundShape::LoadBinary(NiStream& arStream) {
-	NiObject::LoadBinary(arStream);
+    NiObject::LoadBinary(arStream);
 }
 
 void BSMultiBoundShape::LinkObject(NiStream& arStream) {
-	NiObject::LinkObject(arStream);
+    NiObject::LinkObject(arStream);
 }
 
 bool BSMultiBoundShape::RegisterStreamables(NiStream& arStream) {
-	return NiObject::RegisterStreamables(arStream);
+    return NiObject::RegisterStreamables(arStream);
 }
 
 void BSMultiBoundShape::SaveBinary(NiStream& arStream) {
-	NiObject::SaveBinary(arStream);
+    NiObject::SaveBinary(arStream);
 }
 
 bool BSMultiBoundShape::IsEqual(NiObject* apObject) {
-	return NiObject::IsEqual(apObject);
+    return NiObject::IsEqual(apObject);
 }
 
 // The shape adds no strings, not even its title.
 void BSMultiBoundShape::GetViewerStrings(NiTPrimitiveArray<char*>* apStrings) {
-	NiObject::GetViewerStrings(apStrings);
+    NiObject::GetViewerStrings(apStrings);
 }
 
 void BSMultiBoundShape::CopyMembers(BSMultiBoundShape* pDest, NiCloningProcess& arCloneData) {
-	NiObject::CopyMembers(pDest, arCloneData);
-	pDest->kCullResult = kCullResult;
+    NiObject::CopyMembers(pDest, arCloneData);
+    pDest->kCullResult = kCullResult;
 }

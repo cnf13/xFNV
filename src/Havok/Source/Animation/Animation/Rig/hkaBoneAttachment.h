@@ -13,20 +13,22 @@
 // Attaches a serialized object to a named skeleton bone through a local transform.
 class hkaBoneAttachment : public hkReferencedObject {
 public:
-	hkaBoneAttachment(hkFinishLoadedObjectFlag aFlag)
-		: hkReferencedObject(aFlag), m_originalSkeletonName(aFlag), m_attachment(aFlag), m_name(aFlag) {}
+    hkaBoneAttachment(hkFinishLoadedObjectFlag aFlag)
+      : hkReferencedObject(aFlag), m_originalSkeletonName(aFlag), m_attachment(aFlag), m_name(aFlag) {}
 
-	~hkaBoneAttachment() override;
+    ~hkaBoneAttachment() override;
 
-	static const hkClass& staticClass();
-	static void operator delete(void* apMemory) { hkReferencedObject::deleteObject(apMemory); }
+    static const hkClass& staticClass();
+    static void operator delete(void* apMemory) {
+        hkReferencedObject::deleteObject(apMemory);
+    }
 
-	hkStringPtr m_originalSkeletonName;
-	// The 16-byte alignment of hkMatrix4 is what pads the class (0xC and, after m_boneIndex, to 0x60).
-	hkMatrix4 m_boneFromAttachment;
-	hkRefVariant m_attachment;
-	hkStringPtr m_name;
-	int16_t m_boneIndex;
+    hkStringPtr m_originalSkeletonName;
+    // The 16-byte alignment of hkMatrix4 is what pads the class (0xC and, after m_boneIndex, to 0x60).
+    hkMatrix4 m_boneFromAttachment;
+    hkRefVariant m_attachment;
+    hkStringPtr m_name;
+    int16_t m_boneIndex;
 };
 
 extern hkClass hkaBoneAttachmentClass;

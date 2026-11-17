@@ -7,12 +7,12 @@
 // The image-space copy shader; it adds no instance data to ImageSpaceShader.
 class ImageSpaceShaderCopy : public ImageSpaceShader {
 public:
-	enum : int32_t {
-		VPARAM_COUNT = 0x0,
-	};
+    enum : int32_t {
+        VPARAM_COUNT = 0x0,
+    };
 
-	ImageSpaceShaderCopy();
-	~ImageSpaceShaderCopy() override;
+    ImageSpaceShaderCopy();
+    ~ImageSpaceShaderCopy() override;
 
-	void ReloadShaders() override;
+    void ReloadShaders() override;
 };

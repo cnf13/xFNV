@@ -13,26 +13,33 @@ class PathingRequestSafeStraightLine;
 // TestedProjectedTriangle) are not declared.
 class NavMeshSearchSLPoint : public NavMeshSearch {
 public:
-	NavMeshSearchSLPoint();
-	~NavMeshSearchSLPoint() override;
+    NavMeshSearchSLPoint();
+    ~NavMeshSearchSLPoint() override;
 
-	bool IsGoalNode(const AStarNode<NavMeshSearchNode, NavMeshSearchLink>* apNode) override;
+    bool IsGoalNode(const AStarNode<NavMeshSearchNode, NavMeshSearchLink>* apNode) override;
 
-	void GetGoalLocation(NiPoint3& aOut) const;
-	bool FindStraightLinePath(PathingRequestSafeStraightLine* apRequest, NavMeshSearchNode& aStartNode,
-		NavMeshSearchNode& aGoalNode);
-	bool BuildPathToSafeStraightLine(PathingRequestSafeStraightLine* apRequest, NavMeshSearchNode& aStartNode,
-		NavMeshSearchNode& aGoalNode, BSSimpleArray<NavMeshSearchNode, 1024>* apNodes,
-		BSSimpleArray<NavMeshSearchLink, 1024>* apLinks);
-	bool CheckPointOnGoalCircle(NiPoint3& aCheck, NiPoint3& aTarget, NavMesh* apMesh, NiPoint3& aOutValidPoint);
+    void GetGoalLocation(NiPoint3& aOut) const;
+    bool FindStraightLinePath(
+        PathingRequestSafeStraightLine* apRequest,
+        NavMeshSearchNode& aStartNode,
+        NavMeshSearchNode& aGoalNode
+    );
+    bool BuildPathToSafeStraightLine(
+        PathingRequestSafeStraightLine* apRequest,
+        NavMeshSearchNode& aStartNode,
+        NavMeshSearchNode& aGoalNode,
+        BSSimpleArray<NavMeshSearchNode, 1024>* apNodes,
+        BSSimpleArray<NavMeshSearchLink, 1024>* apLinks
+    );
+    bool CheckPointOnGoalCircle(NiPoint3& aCheck, NiPoint3& aTarget, NavMesh* apMesh, NiPoint3& aOutValidPoint);
 
-	PathingLocation TargetLocation;
-	NiPoint3 GoalLocation;
-	NiPoint3 RightUnitVector;
-	NiPoint3 TestStartPoint;
-	float fMinValidRadius;
-	float fMaxValidRadius;
-	float fTargetRadius;
-	float fActorRadius;
-	float fZDelta;
+    PathingLocation TargetLocation;
+    NiPoint3 GoalLocation;
+    NiPoint3 RightUnitVector;
+    NiPoint3 TestStartPoint;
+    float fMinValidRadius;
+    float fMaxValidRadius;
+    float fTargetRadius;
+    float fActorRadius;
+    float fZDelta;
 };

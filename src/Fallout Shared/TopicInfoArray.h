@@ -7,10 +7,10 @@ class TESTopicInfo;
 // A dialogue topic's ordered info array; the PC constructor adds no fields to the large primitive array.
 class TopicInfoArray : public NiTLargePrimitiveArray<TESTopicInfo*> {
 public:
-	TopicInfoArray();
-	~TopicInfoArray() override;
+    TopicInfoArray();
+    ~TopicInfoArray() override;
 
-	void InsertInfoAt(uint32_t aiIndex, TESTopicInfo* apInfo);
+    void InsertInfoAt(uint32_t aiIndex, TESTopicInfo* apInfo);
 
-	static void operator delete(void* apMemory);
+    static void operator delete(void* apMemory);
 };

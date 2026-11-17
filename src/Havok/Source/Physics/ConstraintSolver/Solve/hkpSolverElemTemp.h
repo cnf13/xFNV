@@ -4,9 +4,9 @@
 // delta, depending on the solver stage.
 class hkpSolverElemTemp {
 public:
-	union {
-		float m_impulseApplied;
-		float m_usedImpulseFactor;
-		float m_deltaRhs;
-	};
+    union {
+        float m_impulseApplied;
+        float m_usedImpulseFactor;
+        float m_deltaRhs;
+    };
 };

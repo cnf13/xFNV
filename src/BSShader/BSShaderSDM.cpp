@@ -7,17 +7,17 @@
 #include <stdint.h>
 
 void BSShaderSDM::InitSDM() {
-	if (!bShaderInitialized) {
-		BSFadeNode::InitSDM();
-		BSShaderUtil::InitSDM();
-		bShaderInitialized = 1;
-	}
+    if (!bShaderInitialized) {
+        BSFadeNode::InitSDM();
+        BSShaderUtil::InitSDM();
+        bShaderInitialized = 1;
+    }
 }
 
 void BSShaderSDM::KillSDM() {
-	if (bShaderInitialized) {
-		BSFadeNode::KillSDM();
-		BSShaderUtil::KillSDM();
-		bShaderInitialized = 0;
-	}
+    if (bShaderInitialized) {
+        BSFadeNode::KillSDM();
+        BSShaderUtil::KillSDM();
+        bShaderInitialized = 0;
+    }
 }

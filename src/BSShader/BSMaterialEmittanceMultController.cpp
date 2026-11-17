@@ -16,8 +16,8 @@
 
 #include <cfloat>
 
-NiRTTI BSMaterialEmittanceMultController::ms_RTTI("BSMaterialEmittanceMultController",
-	&NiFloatInterpController::ms_RTTI);
+NiRTTI
+    BSMaterialEmittanceMultController::ms_RTTI("BSMaterialEmittanceMultController", &NiFloatInterpController::ms_RTTI);
 
 BSMaterialEmittanceMultController::BSMaterialEmittanceMultController() {}
 
@@ -25,92 +25,98 @@ BSMaterialEmittanceMultController::BSMaterialEmittanceMultController() {}
 BSMaterialEmittanceMultController::~BSMaterialEmittanceMultController() {}
 
 const NiRTTI* BSMaterialEmittanceMultController::GetRTTI() const {
-	return &ms_RTTI;
+    return &ms_RTTI;
 }
 
 // The base copies the members and the cloning process records the clone (a failed allocation is passed through as
 // null).
 NiObject* BSMaterialEmittanceMultController::CreateClone(NiCloningProcess& kCloning) {
-	BSMaterialEmittanceMultController* pkClone = static_cast<
-		BSMaterialEmittanceMultController*>(NiMemObject::operator new(sizeof(BSMaterialEmittanceMultController)));
-	if (pkClone) {
-		::new (pkClone) BSMaterialEmittanceMultController;
-	}
-	CopyMembers(pkClone, kCloning);
-	return pkClone;
+    BSMaterialEmittanceMultController* pkClone = static_cast<BSMaterialEmittanceMultController*>(
+        NiMemObject::operator new(sizeof(BSMaterialEmittanceMultController))
+    );
+    if (pkClone) {
+        ::new (pkClone) BSMaterialEmittanceMultController;
+    }
+    CopyMembers(pkClone, kCloning);
+    return pkClone;
 }
 
 void BSMaterialEmittanceMultController::LoadBinary(NiStream& kStream) {
-	NiFloatInterpController::LoadBinary(kStream);
+    NiFloatInterpController::LoadBinary(kStream);
 }
 
 void BSMaterialEmittanceMultController::LinkObject(NiStream& kStream) {
-	NiFloatInterpController::LinkObject(kStream);
-	if ((&kStream)->GetFileVersion() < 0xA010068) {
-		NiFloatInterpolator* v5;
-		NiFloatData* ObjectFromLinkID = static_cast<NiFloatData*>(kStream.GetObjectFromLinkID());
-		NiFloatInterpolator* v4 =
-			static_cast<NiFloatInterpolator*>(NiMemObject::operator new(sizeof(NiFloatInterpolator)));
-		if (v4) {
-			v5 = ::new (v4) NiFloatInterpolator(ObjectFromLinkID);
-		} else {
-			v5 = 0;
-		}
-		m_spInterpolator = v5;
-		m_spInterpolator.m_pObject->Collapse();
-	}
+    NiFloatInterpController::LinkObject(kStream);
+    if ((&kStream)->GetFileVersion() < 0xA010068) {
+        NiFloatInterpolator* v5;
+        NiFloatData* ObjectFromLinkID = static_cast<NiFloatData*>(kStream.GetObjectFromLinkID());
+        NiFloatInterpolator* v4 =
+            static_cast<NiFloatInterpolator*>(NiMemObject::operator new(sizeof(NiFloatInterpolator)));
+        if (v4) {
+            v5 = ::new (v4) NiFloatInterpolator(ObjectFromLinkID);
+        }
+        else {
+            v5 = 0;
+        }
+        m_spInterpolator = v5;
+        m_spInterpolator.m_pObject->Collapse();
+    }
 }
 
 bool BSMaterialEmittanceMultController::RegisterStreamables(NiStream& kStream) {
-	return NiFloatInterpController::RegisterStreamables(kStream);
+    return NiFloatInterpController::RegisterStreamables(kStream);
 }
 
 void BSMaterialEmittanceMultController::SaveBinary(NiStream& kStream) {
-	NiFloatInterpController::SaveBinary(kStream);
+    NiFloatInterpController::SaveBinary(kStream);
 }
 
 bool BSMaterialEmittanceMultController::IsEqual(NiObject* pkObject) {
-	return NiFloatInterpController::IsEqual(pkObject);
+    return NiFloatInterpController::IsEqual(pkObject);
 }
 
 void BSMaterialEmittanceMultController::GetViewerStrings(NiTPrimitiveArray<char*>* pkStrings) {
-	NiFloatInterpController::GetViewerStrings(pkStrings);
-	pkStrings->Add(NiGetViewerString(ms_RTTI.GetName()));
+    NiFloatInterpController::GetViewerStrings(pkStrings);
+    pkStrings->Add(NiGetViewerString(ms_RTTI.GetName()));
 }
 
 // A manager-controlled controller always samples its interpolator, at the invalid time (-FLT_MAX). The target
 // material is not null-checked.
 void BSMaterialEmittanceMultController::Update(NiUpdateData& UpdateData) {
-	if (m_usFlags & MANAGERCONTROLLED_MASK)
-		m_fScaledTime = -FLT_MAX;
-	else if (DontDoUpdate(UpdateData.fTime) && (!m_spInterpolator || !m_spInterpolator->AlwaysUpdate()))
-		return;
+    if (m_usFlags & MANAGERCONTROLLED_MASK) {
+        m_fScaledTime = -FLT_MAX;
+    }
+    else if (DontDoUpdate(UpdateData.fTime) && (!m_spInterpolator || !m_spInterpolator->AlwaysUpdate())) {
+        return;
+    }
 
-	if (!m_spInterpolator)
-		return;
+    if (!m_spInterpolator) {
+        return;
+    }
 
-	float fValue;
-	if (m_spInterpolator->Update(m_fScaledTime, m_pkTarget, fValue)) {
-		NiMaterialProperty* pkMaterial = static_cast<NiMaterialProperty*>(m_pkTarget);
-		++pkMaterial->m_uiRevID;
-		pkMaterial->m_fEmitMult = fValue;
-	}
+    float fValue;
+    if (m_spInterpolator->Update(m_fScaledTime, m_pkTarget, fValue)) {
+        NiMaterialProperty* pkMaterial = static_cast<NiMaterialProperty*>(m_pkTarget);
+        ++pkMaterial->m_uiRevID;
+        pkMaterial->m_fEmitMult = fValue;
+    }
 }
 
 bool BSMaterialEmittanceMultController::InterpTargetIsCorrectType(NiObjectNET* pkTarget) const {
-	return NiObject::IsKindOf(&NiMaterialProperty::ms_RTTI, pkTarget);
+    return NiObject::IsKindOf(&NiMaterialProperty::ms_RTTI, pkTarget);
 }
 
 void BSMaterialEmittanceMultController::GetTargetFloatValue(float& fValue) {
-	fValue = static_cast<NiMaterialProperty*>(m_pkTarget)->m_fEmitMult;
+    fValue = static_cast<NiMaterialProperty*>(m_pkTarget)->m_fEmitMult;
 }
 
 // Stream factory for this class: returns a new controller, or null.
 NiObject* BSMaterialEmittanceMultController::CreateObject() {
-	BSMaterialEmittanceMultController* pkController = static_cast<
-		BSMaterialEmittanceMultController*>(NiMemObject::operator new(sizeof(BSMaterialEmittanceMultController)));
-	if (pkController) {
-		::new (pkController) BSMaterialEmittanceMultController;
-	}
-	return pkController;
+    BSMaterialEmittanceMultController* pkController = static_cast<BSMaterialEmittanceMultController*>(
+        NiMemObject::operator new(sizeof(BSMaterialEmittanceMultController))
+    );
+    if (pkController) {
+        ::new (pkController) BSMaterialEmittanceMultController;
+    }
+    return pkController;
 }

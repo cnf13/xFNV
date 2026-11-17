@@ -5,8 +5,8 @@
 // A water image-space shader.
 class WaterBlendHeightmaps : public ImageSpaceShader {
 public:
-	WaterBlendHeightmaps();
-	~WaterBlendHeightmaps() override;
+    WaterBlendHeightmaps();
+    ~WaterBlendHeightmaps() override;
 
-	void ReloadShaders() override;
+    void ReloadShaders() override;
 };

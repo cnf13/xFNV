@@ -14,46 +14,68 @@ GUID CLSID_IPersist{268, 0, 0, {192, 0, 0, 0, 0, 0, 0, 70}};
 GUID CLSID_IDirect3DTexture9{0x85C31227, 15845, 20224, {155, 58, 241, 26, 195, 140, 24, 181}};
 
 // Wrappers for the Direct3D / D3DX imports: each calls its dinput8.dll or d3dx9_38.dll import and returns its result.
-HRESULT DirectInput8Create_0(HINSTANCE__* hinst, uint32_t dwVersion, const GUID* riidltf, void** ppvOut,
-	IUnknown* punkOuter) {
-	return imp_DirectInput8Create(hinst, dwVersion, riidltf, ppvOut, punkOuter);
+HRESULT
+DirectInput8Create_0(HINSTANCE__* hinst, uint32_t dwVersion, const GUID* riidltf, void** ppvOut, IUnknown* punkOuter) {
+    return imp_DirectInput8Create(hinst, dwVersion, riidltf, ppvOut, punkOuter);
 }
 
 D3DXVECTOR3* D3DXVec3TransformCoord_Thunk(D3DXVECTOR3* pOut, const D3DXVECTOR3* pV, const D3DXMATRIX* pM) {
-	return D3DXVec3TransformCoord(pOut, pV, pM);
+    return D3DXVec3TransformCoord(pOut, pV, pM);
 }
 
 HRESULT D3DXGetShaderConstantTable_Thunk(const uint32_t* pFunction, ID3DXConstantTable** ppConstantTable) {
-	return D3DXGetShaderConstantTable(pFunction, ppConstantTable);
+    return D3DXGetShaderConstantTable(pFunction, ppConstantTable);
 }
 
 const char* D3DXGetPixelShaderProfile_Thunk(IDirect3DDevice9* pDevice) {
-	return D3DXGetPixelShaderProfile(pDevice);
+    return D3DXGetPixelShaderProfile(pDevice);
 }
 
 HRESULT D3DXCreateBuffer_Thunk(uint32_t NumBytes, ID3DXBuffer** ppBuffer) {
-	return D3DXCreateBuffer(NumBytes, ppBuffer);
+    return D3DXCreateBuffer(NumBytes, ppBuffer);
 }
 
 const char* D3DXGetVertexShaderProfile_Thunk(IDirect3DDevice9* pDevice) {
-	return D3DXGetVertexShaderProfile(pDevice);
+    return D3DXGetVertexShaderProfile(pDevice);
 }
 
-HRESULT D3DXAssembleShaderFromFileA_Thunk(const char* pSrcFile, const D3DXMACRO* pDefines, ID3DXInclude* pInclude,
-	uint32_t Flags, ID3DXBuffer** ppShader, ID3DXBuffer** ppErrorMsgs) {
-	return D3DXAssembleShaderFromFileA(pSrcFile, pDefines, pInclude, Flags, ppShader, ppErrorMsgs);
+HRESULT D3DXAssembleShaderFromFileA_Thunk(
+    const char* pSrcFile,
+    const D3DXMACRO* pDefines,
+    ID3DXInclude* pInclude,
+    uint32_t Flags,
+    ID3DXBuffer** ppShader,
+    ID3DXBuffer** ppErrorMsgs
+) {
+    return D3DXAssembleShaderFromFileA(pSrcFile, pDefines, pInclude, Flags, ppShader, ppErrorMsgs);
 }
 
-HRESULT D3DXCompileShaderFromFileA_Thunk(const char* pSrcFile, const D3DXMACRO* pDefines, ID3DXInclude* pInclude,
-	const char* pFunctionName, const char* pProfile, uint32_t Flags, ID3DXBuffer** ppShader, ID3DXBuffer** ppErrorMsgs,
-	ID3DXConstantTable** ppConstantTable) {
-	return D3DXCompileShaderFromFileA(pSrcFile, pDefines, pInclude, pFunctionName, pProfile, Flags, ppShader,
-		ppErrorMsgs, ppConstantTable);
+HRESULT D3DXCompileShaderFromFileA_Thunk(
+    const char* pSrcFile,
+    const D3DXMACRO* pDefines,
+    ID3DXInclude* pInclude,
+    const char* pFunctionName,
+    const char* pProfile,
+    uint32_t Flags,
+    ID3DXBuffer** ppShader,
+    ID3DXBuffer** ppErrorMsgs,
+    ID3DXConstantTable** ppConstantTable
+) {
+    return D3DXCompileShaderFromFileA(
+        pSrcFile, pDefines, pInclude, pFunctionName, pProfile, Flags, ppShader, ppErrorMsgs, ppConstantTable
+    );
 }
 
-HRESULT D3DXAssembleShader_Thunk(const char* pSrcData, uint32_t SrcDataLen, const D3DXMACRO* pDefines,
-	ID3DXInclude* pInclude, uint32_t Flags, ID3DXBuffer** ppShader, ID3DXBuffer** ppErrorMsgs) {
-	return D3DXAssembleShader(pSrcData, SrcDataLen, pDefines, pInclude, Flags, ppShader, ppErrorMsgs);
+HRESULT D3DXAssembleShader_Thunk(
+    const char* pSrcData,
+    uint32_t SrcDataLen,
+    const D3DXMACRO* pDefines,
+    ID3DXInclude* pInclude,
+    uint32_t Flags,
+    ID3DXBuffer** ppShader,
+    ID3DXBuffer** ppErrorMsgs
+) {
+    return D3DXAssembleShader(pSrcData, SrcDataLen, pDefines, pInclude, Flags, ppShader, ppErrorMsgs);
 }
 
 D3DXPLANE::D3DXPLANE() {}

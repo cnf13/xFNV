@@ -7,12 +7,12 @@
 // A block of memory shared by the objects of one group in old (pre-10.1.0.114) files.
 class NiObjectGroup : public NiMemObject {
 public:
-	NiObjectGroup(uint32_t uiBytes);
+    NiObjectGroup(uint32_t uiBytes);
 
-	void FreeVertexBuffer();
+    void FreeVertexBuffer();
 
-	uint32_t m_uiSize;
-	void* m_pvBuffer;
-	void* m_pvFree;
-	uint32_t m_uiRefCount;
+    uint32_t m_uiSize;
+    void* m_pvBuffer;
+    void* m_pvFree;
+    uint32_t m_uiRefCount;
 };

@@ -11,21 +11,21 @@ class MagicItem;
 // part it targets to its base class.
 class ValueAndConditionsEffect : public ValueModifierEffect {
 public:
-	ValueAndConditionsEffect(MagicCaster* apCaster, MagicItem* apItem, EffectItem* apEffect);
-	~ValueAndConditionsEffect() override;
+    ValueAndConditionsEffect(MagicCaster* apCaster, MagicItem* apItem, EffectItem* apEffect);
+    ~ValueAndConditionsEffect() override;
 
-	ActiveEffect* Copy() override;
-	uint16_t GetSaveSize(Actor* apActor) override;
-	void SaveGame(BGSSaveFormBuffer*) override;
-	void SaveGame(Actor*) override;
-	void LoadGame(BGSLoadFormBuffer*) override;
-	void LoadGame(Actor*) override;
-	void CopyData(ActiveEffect* apDestination) override;
-	void ModifyActorValue(Actor* apActor, float afModifier, ActorValue::Index aeOverrideActorValue) override;
+    ActiveEffect* Copy() override;
+    uint16_t GetSaveSize(Actor* apActor) override;
+    void SaveGame(BGSSaveFormBuffer*) override;
+    void SaveGame(Actor*) override;
+    void LoadGame(BGSLoadFormBuffer*) override;
+    void LoadGame(Actor*) override;
+    void CopyData(ActiveEffect* apDestination) override;
+    void ModifyActorValue(Actor* apActor, float afModifier, ActorValue::Index aeOverrideActorValue) override;
 
-	void SetTargetBodyPart(ActorValue::Index aeWhichBodyPart);
+    void SetTargetBodyPart(ActorValue::Index aeWhichBodyPart);
 
-	static ActiveEffect* Create(MagicCaster* apCaster, MagicItem* apItem, EffectItem* apEffect);
+    static ActiveEffect* Create(MagicCaster* apCaster, MagicItem* apItem, EffectItem* apEffect);
 
-	ActorValue::Index eTargetBodyPart;
+    ActorValue::Index eTargetBodyPart;
 };

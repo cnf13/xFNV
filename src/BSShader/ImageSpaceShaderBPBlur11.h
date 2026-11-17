@@ -4,8 +4,8 @@
 
 class ImageSpaceShaderBPBlur11 : public ImageSpaceShader {
 public:
-	ImageSpaceShaderBPBlur11();
-	~ImageSpaceShaderBPBlur11() override;
+    ImageSpaceShaderBPBlur11();
+    ~ImageSpaceShaderBPBlur11() override;
 
-	void ReloadShaders() override;
+    void ReloadShaders() override;
 };

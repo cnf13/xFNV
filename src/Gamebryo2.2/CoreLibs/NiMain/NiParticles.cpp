@@ -19,75 +19,78 @@ NiParticles::NiParticles() {}
 NiParticles::~NiParticles() {}
 
 NiObject* NiParticles::CreateClone(NiCloningProcess& kCloning) {
-	NiParticles* pkClone = static_cast<NiParticles*>(NiMemObject::operator new(sizeof(NiParticles)));
-	if (pkClone) {
-		::new (pkClone) NiParticles;
-		NiGeometry::CopyMembers(pkClone, kCloning);
-		return pkClone;
-	} else {
-		NiGeometry::CopyMembers(nullptr, kCloning);
-		return nullptr;
-	}
+    NiParticles* pkClone = static_cast<NiParticles*>(NiMemObject::operator new(sizeof(NiParticles)));
+    if (pkClone) {
+        ::new (pkClone) NiParticles;
+        NiGeometry::CopyMembers(pkClone, kCloning);
+        return pkClone;
+    }
+    else {
+        NiGeometry::CopyMembers(nullptr, kCloning);
+        return nullptr;
+    }
 }
 
 void NiParticles::LoadBinary(NiStream& stream) {
-	NiGeometry::LoadBinary(stream);
+    NiGeometry::LoadBinary(stream);
 }
 
 void NiParticles::LinkObject(NiStream& stream) {
-	NiGeometry::LinkObject(stream);
+    NiGeometry::LinkObject(stream);
 }
 
 bool NiParticles::RegisterStreamables(NiStream& stream) {
-	return NiGeometry::RegisterStreamables(stream);
+    return NiGeometry::RegisterStreamables(stream);
 }
 
 void NiParticles::SaveBinary(NiStream& stream) {
-	NiGeometry::SaveBinary(stream);
+    NiGeometry::SaveBinary(stream);
 }
 
 bool NiParticles::IsEqual(NiObject* pObject) {
-	return NiGeometry::IsEqual(pObject);
+    return NiGeometry::IsEqual(pObject);
 }
 
 void NiParticles::GetViewerStrings(NiTPrimitiveArray<char*>* pStrings) {
-	NiGeometry::GetViewerStrings(pStrings);
-	pStrings->Add(NiGetViewerString(ms_RTTI.GetName()));
+    NiGeometry::GetViewerStrings(pStrings);
+    pStrings->Add(NiGetViewerString(ms_RTTI.GetName()));
 }
 
 // Alpha-blended particles with a destination blend mode other than ONE are sorted back to front for the camera before
 // the geometry is appended. The model data is treated as a NiPSysData without a type check, as the game does.
 void NiParticles::OnVisible(NiCullingProcess& kCuller) {
-	NiAlphaProperty* pkAlpha = static_cast<NiAlphaProperty*>(m_PropertyState.m_aspProps[0].m_pObject);
-	if (pkAlpha && (pkAlpha->m_uFlags & NiAlphaProperty::ALPHA_BLEND_MASK) &&
-		(pkAlpha->m_uFlags & NiAlphaProperty::DEST_BLEND_MASK))
-		static_cast<NiPSysData*>(m_spModelData.m_pObject)->AlphaSortVertices(kCuller.m_pkCamera);
-	NiGeometry::OnVisible(kCuller);
+    NiAlphaProperty* pkAlpha = static_cast<NiAlphaProperty*>(m_PropertyState.m_aspProps[0].m_pObject);
+    if (pkAlpha && (pkAlpha->m_uFlags & NiAlphaProperty::ALPHA_BLEND_MASK) &&
+        (pkAlpha->m_uFlags & NiAlphaProperty::DEST_BLEND_MASK)) {
+        static_cast<NiPSysData*>(m_spModelData.m_pObject)->AlphaSortVertices(kCuller.m_pkCamera);
+    }
+    NiGeometry::OnVisible(kCuller);
 }
 
 // Draws the points when the renderer is inside a frame with a render target group set.
 void NiParticles::RenderImmediate(NiRenderer* apkRenderer) {
-	NiGeometry::RenderImmediate(apkRenderer);
-	NiRenderer::EFrameState eFrameState = apkRenderer->m_eFrameState;
-	if ((eFrameState == NiRenderer::FRAMESTATE_INSIDE_FRAME ||
-			eFrameState == NiRenderer::FRAMESTATE_INSIDE_OFFSCREEN_FRAME) &&
-		apkRenderer->m_bRenderTargetGroupActive)
-		static_cast<NiDX9Renderer*>(apkRenderer)->Do_RenderPoints(this);
+    NiGeometry::RenderImmediate(apkRenderer);
+    NiRenderer::EFrameState eFrameState = apkRenderer->m_eFrameState;
+    if ((eFrameState == NiRenderer::FRAMESTATE_INSIDE_FRAME ||
+         eFrameState == NiRenderer::FRAMESTATE_INSIDE_OFFSCREEN_FRAME) &&
+        apkRenderer->m_bRenderTargetGroupActive) {
+        static_cast<NiDX9Renderer*>(apkRenderer)->Do_RenderPoints(this);
+    }
 }
 
 // Particle positions change every frame, so the data is always mutable.
 void NiParticles::CalculateConsistency(bool) {
-	m_spModelData.m_pObject->SetConsistency(NiGeometryData::MUTABLE);
+    m_spModelData.m_pObject->SetConsistency(NiGeometryData::MUTABLE);
 }
 
 void NiParticles::CopyMembers(NiParticles* pDest, NiCloningProcess& kCloning) {
-	NiGeometry::CopyMembers(pDest, kCloning);
+    NiGeometry::CopyMembers(pDest, kCloning);
 }
 
 NiObject* NiParticles::CreateObject() {
-	NiParticles* pkObject = static_cast<NiParticles*>(NiMemObject::operator new(sizeof(NiParticles)));
-	if (!pkObject) {
-		return 0;
-	}
-	return ::new (pkObject) NiParticles;
+    NiParticles* pkObject = static_cast<NiParticles*>(NiMemObject::operator new(sizeof(NiParticles)));
+    if (!pkObject) {
+        return 0;
+    }
+    return ::new (pkObject) NiParticles;
 }

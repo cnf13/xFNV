@@ -6,5 +6,5 @@
 // no virtual.
 class CombatActionAcquireLineOfSight : public CombatAction {
 public:
-	CombatActionAcquireLineOfSight(CombatAction::COMBAT_ACTION aeType);
+    CombatActionAcquireLineOfSight(CombatAction::COMBAT_ACTION aeType);
 };

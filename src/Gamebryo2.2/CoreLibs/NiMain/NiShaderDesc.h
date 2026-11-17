@@ -10,9 +10,9 @@
 // takes. Only the members are declared, not the getters and setters.
 class NiShaderDesc : public NiShaderRequirementDesc {
 public:
-	uint32_t m_uiImplementations;
-	NiTPrimitiveArray<NiShaderRequirementDesc*> m_kImplementationDescs;
-	// The list position of the attribute walk: Gamebryo's NiTListIterator, a void*.
-	void* m_kAttributePos;
-	NiTPointerList<NiPointer<NiShaderAttributeDesc>> m_kAttributeList;
+    uint32_t m_uiImplementations;
+    NiTPrimitiveArray<NiShaderRequirementDesc*> m_kImplementationDescs;
+    // The list position of the attribute walk: Gamebryo's NiTListIterator, a void*.
+    void* m_kAttributePos;
+    NiTPointerList<NiPointer<NiShaderAttributeDesc>> m_kAttributeList;
 };

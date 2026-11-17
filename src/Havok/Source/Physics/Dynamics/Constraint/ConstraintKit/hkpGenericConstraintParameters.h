@@ -10,12 +10,12 @@ class hkTransform;
 // keeps one on its stack, m_rbA at +0xB0, m_rbB at +0xB4 and m_currentResult (cleared) at +0xB8.
 class hkpGenericConstraintDataParameters {
 public:
-	hkVector4 m_pivotAw;
-	hkVector4 m_pivotBw;
-	hkRotation m_linearBasisW;
-	hkRotation m_angularBasisAw;
-	hkRotation m_angularBasisBw;
-	const hkTransform* m_rbA;
-	const hkTransform* m_rbB;
-	int32_t m_currentResult;
+    hkVector4 m_pivotAw;
+    hkVector4 m_pivotBw;
+    hkRotation m_linearBasisW;
+    hkRotation m_angularBasisAw;
+    hkRotation m_angularBasisBw;
+    const hkTransform* m_rbA;
+    const hkTransform* m_rbB;
+    int32_t m_currentResult;
 };

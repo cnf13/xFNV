@@ -11,24 +11,30 @@ class NiAVObject;
 // a streamed object that refers to another one by name
 class BSReference : public NiObject {
 public:
-	BSReference() : pName(nullptr) {}
-	explicit BSReference(const char* apName) : pName(nullptr) { SetName(apName); }
-	~BSReference() override;
+    BSReference() : pName(nullptr) {}
+    explicit BSReference(const char* apName) : pName(nullptr) {
+        SetName(apName);
+    }
+    ~BSReference() override;
 
-	const NiRTTI* GetRTTI() const override { return &ms_RTTI; }
-	void LoadBinary(NiStream& arStream) override;
-	void LinkObject(NiStream&) override {}
-	bool RegisterStreamables(NiStream&) override { return true; }
-	void SaveBinary(NiStream& arStream) override;
-	bool IsEqual(NiObject* apObject) override;
+    const NiRTTI* GetRTTI() const override {
+        return &ms_RTTI;
+    }
+    void LoadBinary(NiStream& arStream) override;
+    void LinkObject(NiStream&) override {}
+    bool RegisterStreamables(NiStream&) override {
+        return true;
+    }
+    void SaveBinary(NiStream& arStream) override;
+    bool IsEqual(NiObject* apObject) override;
 
-	void SetName(const char* apName);
+    void SetName(const char* apName);
 
-	static NiObject* CreateObject();
+    static NiObject* CreateObject();
 
-	char* pName;
+    char* pName;
 
-	static NiRTTI ms_RTTI;
+    static NiRTTI ms_RTTI;
 };
 
 NiSmartPointer(BSReference);
@@ -36,23 +42,27 @@ NiSmartPointer(BSReference);
 // a streamed list of scene graph objects
 class BSNodeReferences : public NiObject {
 public:
-	BSNodeReferences() : RefNodeA(0, 1) {}
-	~BSNodeReferences() override;
+    BSNodeReferences() : RefNodeA(0, 1) {}
+    ~BSNodeReferences() override;
 
-	const NiRTTI* GetRTTI() const override { return &ms_RTTI; }
-	void LoadBinary(NiStream& arStream) override;
-	void LinkObject(NiStream& arStream) override;
-	bool RegisterStreamables(NiStream& arStream) override;
-	void SaveBinary(NiStream& arStream) override;
-	bool IsEqual(NiObject*) override { return false; }
+    const NiRTTI* GetRTTI() const override {
+        return &ms_RTTI;
+    }
+    void LoadBinary(NiStream& arStream) override;
+    void LinkObject(NiStream& arStream) override;
+    bool RegisterStreamables(NiStream& arStream) override;
+    void SaveBinary(NiStream& arStream) override;
+    bool IsEqual(NiObject*) override {
+        return false;
+    }
 
-	// Adds the parent of apObject to the list when apObject is a scene graph object whose parent the stream's
-	// reference map holds; true when it was added.
-	bool AddParentRef(BSStream& arStream, NiObject* apObject);
+    // Adds the parent of apObject to the list when apObject is a scene graph object whose parent the stream's
+    // reference map holds; true when it was added.
+    bool AddParentRef(BSStream& arStream, NiObject* apObject);
 
-	static NiObject* CreateObject();
+    static NiObject* CreateObject();
 
-	NiTPrimitiveArray<NiAVObject*> RefNodeA;
+    NiTPrimitiveArray<NiAVObject*> RefNodeA;
 
-	static NiRTTI ms_RTTI;
+    static NiRTTI ms_RTTI;
 };

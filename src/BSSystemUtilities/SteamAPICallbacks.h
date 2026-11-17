@@ -29,37 +29,37 @@ FNVD_IMPORT(SteamAPI_Init_t, SteamAPI_Init, 0xFDF478);
 // The Steam user-stats callbacks and the Steam state WinMain configures, allocated by GetSingleton.
 class SteamAPICallbacks {
 public:
-	SteamAPICallbacks();
-	~SteamAPICallbacks();
+    SteamAPICallbacks();
+    ~SteamAPICallbacks();
 
-	// WinMain passes false for "-nocloud".
-	void SetNoCloud(bool abUseCloud);
-	// TESMain::OnIdle's per-frame Steam callback dispatch.
-	void RunCallbacks();
-	// Returns SteamUser's BLoggedOn.
-	bool OnUserAuthenticated();
-	// The UserStatsReceived_t handler; returns void, as the callback's func_t does.
-	void OnUserStatsReceived(UserStatsReceived_t* apCallback);
-	// The UserStatsStored_t handler; returns void, as the callback's func_t requires.
-	void OnUserStatsStored(UserStatsStored_t* apCallback);
-	void OnUserStatsStored_Achievement(UserAchievementStored_t* apCallback);
+    // WinMain passes false for "-nocloud".
+    void SetNoCloud(bool abUseCloud);
+    // TESMain::OnIdle's per-frame Steam callback dispatch.
+    void RunCallbacks();
+    // Returns SteamUser's BLoggedOn.
+    bool OnUserAuthenticated();
+    // The UserStatsReceived_t handler; returns void, as the callback's func_t does.
+    void OnUserStatsReceived(UserStatsReceived_t* apCallback);
+    // The UserStatsStored_t handler; returns void, as the callback's func_t requires.
+    void OnUserStatsStored(UserStatsStored_t* apCallback);
+    void OnUserStatsStored_Achievement(UserAchievementStored_t* apCallback);
 
-	// The Steam state, created on first use.
-	static SteamAPICallbacks* GetSingleton();
-	static void operator delete(void* apMemory);
+    // The Steam state, created on first use.
+    static SteamAPICallbacks* GetSingleton();
+    static void operator delete(void* apMemory);
 
-	// The three CCallback members (0x14 bytes each); the constructor builds each with this as m_pObj.
-	CCallback<SteamAPICallbacks, UserStatsReceived_t, false> unk00;
-	CCallback<SteamAPICallbacks, UserStatsStored_t, false> unk14;
-	CCallback<SteamAPICallbacks, UserAchievementStored_t, false> unk28;
-	// SteamAPI_Init's result.
-	bool bSteamInitialized;
-	uint8_t unk3D;
-	// Cleared by "-nocloud"; the constructor sets it.
-	bool bUseCloud;
-	uint8_t padding3F;
-	// The app id SteamUtils reports.
-	uint32_t uiAppID;
+    // The three CCallback members (0x14 bytes each); the constructor builds each with this as m_pObj.
+    CCallback<SteamAPICallbacks, UserStatsReceived_t, false> unk00;
+    CCallback<SteamAPICallbacks, UserStatsStored_t, false> unk14;
+    CCallback<SteamAPICallbacks, UserAchievementStored_t, false> unk28;
+    // SteamAPI_Init's result.
+    bool bSteamInitialized;
+    uint8_t unk3D;
+    // Cleared by "-nocloud"; the constructor sets it.
+    bool bUseCloud;
+    uint8_t padding3F;
+    // The app id SteamUtils reports.
+    uint32_t uiAppID;
 };
 
 using Steam = SteamAPICallbacks;
@@ -67,7 +67,7 @@ using Steam = SteamAPICallbacks;
 using CCallback_SteamAPICallbacks_UserStatsReceived_t_false = CCallback<SteamAPICallbacks, UserStatsReceived_t, false>;
 using CCallback_SteamAPICallbacks_UserStatsStored_t_false = CCallback<SteamAPICallbacks, UserStatsStored_t, false>;
 using CCallback_SteamAPICallbacks_UserAchievementStored_t_false =
-	CCallback<SteamAPICallbacks, UserAchievementStored_t, false>;
+    CCallback<SteamAPICallbacks, UserAchievementStored_t, false>;
 
 // GetSingleton stores the constructed object here.
 inline SteamAPICallbacks* g_steamAPICallbacks;

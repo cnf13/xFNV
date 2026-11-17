@@ -6,9 +6,9 @@
 // The platform's tick counter, one instance for the process.
 class hkSystemClock : public hkReferencedObject, public hkSingleton<hkSystemClock> {
 public:
-	virtual uint64_t getTickCounter() = 0;
-	virtual uint64_t getTicksPerSecond() = 0;
+    virtual uint64_t getTickCounter() = 0;
+    virtual uint64_t getTicksPerSecond() = 0;
 
-	// hkSingleton<hkSystemClock>::s_instance.
-	static inline hkSystemClock* s_instance;
+    // hkSingleton<hkSystemClock>::s_instance.
+    static inline hkSystemClock* s_instance;
 };

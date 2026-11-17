@@ -5,5 +5,5 @@
 hkDebugDisplayHandler::~hkDebugDisplayHandler() {}
 
 void hkDebugDisplayHandler::operator delete(void* apMemory) {
-	ourFree(apMemory);
+    ourFree(apMemory);
 }

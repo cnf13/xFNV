@@ -9,21 +9,22 @@ program supplies zlib (`fnvd_zlib`).
 
 ## What it does
 
-| Function | Stand-in |
-| --- | --- |
-| `D3DXMatrixMultiply`, `MatrixMultiplyTranspose`, `MatrixTranspose`, `Vec3TransformNormal`, `Vec4Transform`, `PlaneTransform` | the DLL's summation order: bit-equal |
-| `Vec3Normalize`, `PlaneNormalize`, `Vec3TransformCoord` | within 3 ulp (the DLL uses SSE estimates) |
-| `MatrixInverse` | the DLL's SSE inverse (Intel's, which its CPU dispatch picks) in the same order of operations: the determinant bit-equal, each element within 2 ulp (the DLL scales by a refined `rcpss` estimate of 1/det, CPU-dependent bits; the stand-in divides) |
-| `MatrixRotationYawPitchRoll` | the C library's sin/cos; within 7e-7 of the output's largest value |
-| `GetImageInfoFromFileInMemory`, `Create{,Cube,Volume}TextureFromFileInMemory` | DDS only (every game texture is DDS): the DLL's defaults (full mip chain, `D3DPOOL_MANAGED`, a format the device lacks becomes X8R8G8B8/A8R8G8B8); missing levels by the DLL's box filter. A file that needs resizing (not a power of two, larger than the device allows) or a format outside the table (`D3DX9Pixels.cpp`) fails with `D3DXERR_INVALIDDATA` and a line on stderr |
-| `LoadSurfaceFromSurface` | whole surface to whole surface of one size (the game's one use): a copy, or decode and encode, with the DLL's ordered dither under `D3DX_DEFAULT`; anything else `E_NOTIMPL` and a stderr line. To DXT: its own encoder (below) |
-| `SaveTextureToFileA` | PNG (the game's one call, `MapMenu`, asks for PNG), RGB or RGBA |
-| `GetShaderConstantTable` | the shader's CTAB: `GetDesc`, `GetConstant`, `GetConstantByName`, `GetConstantDesc` as the DLL; the `Set*` methods return `D3DERR_INVALIDCALL` (the game never calls them) |
-| `GetVertexShaderProfile`, `GetPixelShaderProfile` | the DLL's rules from the device caps |
-| `CreateBuffer` | as the DLL |
-| `CompileShader{,FromFileA}`, `AssembleShader{,FromFileA}` | fail with `E_NOTIMPL`, an error buffer and a stderr line naming the shader: no HLSL compiler. The game compiles only when its shader packages lack a shader |
+| Function                                                                                                                     | Stand-in                                                                                                                                                                                                                                                                                                                                                                          |
+|------------------------------------------------------------------------------------------------------------------------------|-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| `D3DXMatrixMultiply`, `MatrixMultiplyTranspose`, `MatrixTranspose`, `Vec3TransformNormal`, `Vec4Transform`, `PlaneTransform` | the DLL's summation order: bit-equal                                                                                                                                                                                                                                                                                                                                              |
+| `Vec3Normalize`, `PlaneNormalize`, `Vec3TransformCoord`                                                                      | within 3 ulp (the DLL uses SSE estimates)                                                                                                                                                                                                                                                                                                                                         |
+| `MatrixInverse`                                                                                                              | the DLL's SSE inverse (Intel's, which its CPU dispatch picks) in the same order of operations: the determinant bit-equal, each element within 2 ulp (the DLL scales by a refined `rcpss` estimate of 1/det, CPU-dependent bits; the stand-in divides)                                                                                                                             |
+| `MatrixRotationYawPitchRoll`                                                                                                 | the C library's sin/cos; within 7e-7 of the output's largest value                                                                                                                                                                                                                                                                                                                |
+| `GetImageInfoFromFileInMemory`, `Create{,Cube,Volume}TextureFromFileInMemory`                                                | DDS only (every game texture is DDS): the DLL's defaults (full mip chain, `D3DPOOL_MANAGED`, a format the device lacks becomes X8R8G8B8/A8R8G8B8); missing levels by the DLL's box filter. A file that needs resizing (not a power of two, larger than the device allows) or a format outside the table (`D3DX9Pixels.cpp`) fails with `D3DXERR_INVALIDDATA` and a line on stderr |
+| `LoadSurfaceFromSurface`                                                                                                     | whole surface to whole surface of one size (the game's one use): a copy, or decode and encode, with the DLL's ordered dither under `D3DX_DEFAULT`; anything else `E_NOTIMPL` and a stderr line. To DXT: its own encoder (below)                                                                                                                                                   |
+| `SaveTextureToFileA`                                                                                                         | PNG (the game's one call, `MapMenu`, asks for PNG), RGB or RGBA                                                                                                                                                                                                                                                                                                                   |
+| `GetShaderConstantTable`                                                                                                     | the shader's CTAB: `GetDesc`, `GetConstant`, `GetConstantByName`, `GetConstantDesc` as the DLL; the `Set*` methods return `D3DERR_INVALIDCALL` (the game never calls them)                                                                                                                                                                                                        |
+| `GetVertexShaderProfile`, `GetPixelShaderProfile`                                                                            | the DLL's rules from the device caps                                                                                                                                                                                                                                                                                                                                              |
+| `CreateBuffer`                                                                                                               | as the DLL                                                                                                                                                                                                                                                                                                                                                                        |
+| `CompileShader{,FromFileA}`, `AssembleShader{,FromFileA}`                                                                    | fail with `E_NOTIMPL`, an error buffer and a stderr line naming the shader: no HLSL compiler. The game compiles only when its shader packages lack a shader                                                                                                                                                                                                                       |
 
 Not the DLL's bytes by design:
+
 - DXT levels the DLL makes (generated mips; files whose levels are narrower than 4 texels, which the DLL re-encodes
   and the stand-in copies from the file) come from the stand-in's encoder: principal axis, then least squares.
 - `LoadSurfaceFromSurface` to DXT1 from a source with partial alpha: the DLL diffuses the alpha error under
@@ -47,6 +48,7 @@ It prints one line per difference (`FAIL ...`), per-class statistics and the fai
 with the game's data are in the table above and below.
 
 Measured (all 21 BSAs: 26,907 textures; all 16 `.sdp`; 20,000 math cases per function; 0 failures):
+
 - math: multiply (also aliased), multiply-transpose, transpose, `Vec3TransformNormal`, `Vec4Transform`,
   `PlaneTransform` bit-equal; `Vec3Normalize`, `PlaneNormalize`, `Vec3TransformCoord` within 3 ulp (2.3e-7 of the
   output's largest); `MatrixRotationYawPitchRoll` within 6.6e-7 of the output's largest; `MatrixInverse` determinant
@@ -56,22 +58,22 @@ Measured (all 21 BSAs: 26,907 textures; all 16 `.sdp`; 20,000 math cases per fun
 - textures, per class (format, kind): the levels the file holds are byte-equal in every class; the levels the DLL
   makes (mips, DXT levels under a block) are compared decoded, rms and max over the levels that differ, of 255:
 
-  | Class | Files | File levels equal | Made levels: byte-equal | rms | max |
-  | --- | --- | --- | --- | --- | --- |
-  | DXT1 2D, mips | 19,178 | 121,438 of 121,438 | 17,398 of 39,497 | 1.51 | 46 |
-  | DXT1 2D, one level | 253 | 253 of 253 | 80 of 2,449 | 2.64 | 132 |
-  | DXT1 cube, mips | 6 | 144 of 144 | 11 of 72 | 1.21 | 10 |
-  | DXT3 2D, mips | 843 | 6,102 of 6,102 | 902 of 1,891 | 1.69 | 14 |
-  | DXT3 2D, one level | 643 | 643 of 643 | 567 of 4,919 | 2.18 | 126 |
-  | DXT5 2D, mips | 4,658 | 34,777 of 34,777 | 1,836 of 10,053 | 1.49 | 52 |
-  | DXT5 2D, one level | 1,297 | 1,297 of 1,297 | 234 of 10,273 | 3.13 | 193 |
-  | A8R8G8B8 2D, mips | 8 | 72 of 72 | none made | | |
-  | A8R8G8B8 2D, one level | 5 | 5 of 5 | 20 of 21 | 0.18 | 1 |
-  | A4R4G4B4 2D, one level | 8 | 8 of 8 | 69 of 69 | | |
-  | R8G8B8 2D, one level | 8 | (loaded as X8R8G8B8) | 0 of 11 | 0 | 0 (the X byte) |
+  | Class                  | Files  | File levels equal    | Made levels: byte-equal | rms  | max            |
+  |------------------------|--------|----------------------|-------------------------|------|----------------|
+  | DXT1 2D, mips          | 19,178 | 121,438 of 121,438   | 17,398 of 39,497        | 1.51 | 46             |
+  | DXT1 2D, one level     | 253    | 253 of 253           | 80 of 2,449             | 2.64 | 132            |
+  | DXT1 cube, mips        | 6      | 144 of 144           | 11 of 72                | 1.21 | 10             |
+  | DXT3 2D, mips          | 843    | 6,102 of 6,102       | 902 of 1,891            | 1.69 | 14             |
+  | DXT3 2D, one level     | 643    | 643 of 643           | 567 of 4,919            | 2.18 | 126            |
+  | DXT5 2D, mips          | 4,658  | 34,777 of 34,777     | 1,836 of 10,053         | 1.49 | 52             |
+  | DXT5 2D, one level     | 1,297  | 1,297 of 1,297       | 234 of 10,273           | 3.13 | 193            |
+  | A8R8G8B8 2D, mips      | 8      | 72 of 72             | none made               |      |                |
+  | A8R8G8B8 2D, one level | 5      | 5 of 5               | 20 of 21                | 0.18 | 1              |
+  | A4R4G4B4 2D, one level | 8      | 8 of 8               | 69 of 69                |      |                |
+  | R8G8B8 2D, one level   | 8      | (loaded as X8R8G8B8) | 0 of 11                 | 0    | 0 (the X byte) |
 
-  The DXT maxima are the stand-in's encoder against the DLL's on the made levels (by design, above). Made-up files
-  (16 formats, 2D and volume, with and without mips): file levels byte-equal; made levels of 8-bit formats within
+  The DXT maxima are the stand-in's encoder against the DLL's on the made levels (by design, above). Made-up files (16
+  formats, 2D and volume, with and without mips): file levels byte-equal; made levels of 8-bit formats within
   2 of 255, of 4- and 5-bit formats within 17 (one or two steps of the format); A8 refused by both;
 - `LoadSurfaceFromSurface` (every 50th texture): DXT -> A8R8G8B8 539 of 539 byte-equal; A8R8G8B8 -> DXT1/DXT3/DXT5
   on 538, decoded error against the source rms 71.6/1.43/0.99 (the DLL's 70.6/1.55/1.19), stand-in against DLL

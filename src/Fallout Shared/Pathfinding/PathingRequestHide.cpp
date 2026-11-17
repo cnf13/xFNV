@@ -8,44 +8,44 @@
 #include "Gamebryo2.2/CoreLibs/NiMain/NiMemObject.h"
 
 PathingRequestHide::PathingRequestHide() : PathingRequest(), ThreatLocation(), fMinHideDistance(128.0f) {
-	Destination.SetUnused();
+    Destination.SetUnused();
 }
 
 PathingRequestHide::PathingRequestHide(const PathingRequestHide& aRequest)
-	: PathingRequest(aRequest), ThreatLocation(), fMinHideDistance(aRequest.fMinHideDistance) {
-	ThreatLocation = aRequest.GetThreatLocation();
-	Destination.SetUnused();
+  : PathingRequest(aRequest), ThreatLocation(), fMinHideDistance(aRequest.fMinHideDistance) {
+    ThreatLocation = aRequest.GetThreatLocation();
+    Destination.SetUnused();
 }
 
 PathingRequestHide::~PathingRequestHide() {}
 
 void PathingRequestHide::CopyTo(PathingRequest* apDest) const {
-	PathingRequest::CopyTo(apDest);
-	PathingRequestHide* pTarget = static_cast<PathingRequestHide*>(apDest);
-	pTarget->ThreatLocation = ThreatLocation;
-	pTarget->fMinHideDistance = fMinHideDistance;
+    PathingRequest::CopyTo(apDest);
+    PathingRequestHide* pTarget = static_cast<PathingRequestHide*>(apDest);
+    pTarget->ThreatLocation = ThreatLocation;
+    pTarget->fMinHideDistance = fMinHideDistance;
 }
 
 uint32_t PathingRequestHide::GetType() const {
-	return PATHING_REQUEST_HIDE;
+    return PATHING_REQUEST_HIDE;
 }
 
 void PathingRequestHide::SaveGame(BGSSaveFormBuffer* apSaveGameBuffer) {
-	PathingRequest::SaveGame(apSaveGameBuffer);
-	(&ThreatLocation)->SaveGame(apSaveGameBuffer);
-	apSaveGameBuffer->SaveDataEndian(static_cast<char*>(static_cast<void*>(&fMinHideDistance)), 4u, 0);
+    PathingRequest::SaveGame(apSaveGameBuffer);
+    (&ThreatLocation)->SaveGame(apSaveGameBuffer);
+    apSaveGameBuffer->SaveDataEndian(static_cast<char*>(static_cast<void*>(&fMinHideDistance)), 4u, 0);
 }
 
 void PathingRequestHide::LoadGame(BGSLoadFormBuffer* apLoadGameBuffer) {
-	PathingRequest::LoadGame(apLoadGameBuffer);
-	ThreatLocation.LoadGame(apLoadGameBuffer);
-	apLoadGameBuffer->LoadData(reinterpret_cast<char*>(&fMinHideDistance), 4u);
+    PathingRequest::LoadGame(apLoadGameBuffer);
+    ThreatLocation.LoadGame(apLoadGameBuffer);
+    apLoadGameBuffer->LoadData(reinterpret_cast<char*>(&fMinHideDistance), 4u);
 }
 
 void PathingRequestHide::SetMinHideDistance(float afDistance) {
-	fMinHideDistance = afDistance;
+    fMinHideDistance = afDistance;
 }
 
 void PathingRequestHide::SetThreatLocation(const PathingLocation& aThreatLocation) {
-	&(&ThreatLocation)->operator=(aThreatLocation);
+    &(&ThreatLocation)->operator=(aThreatLocation);
 }

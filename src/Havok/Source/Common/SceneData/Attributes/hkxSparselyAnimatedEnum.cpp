@@ -19,20 +19,39 @@ static void cleanupLoadedObjecthkxSparselyAnimatedEnum(void* p);
 // The class record's member table.
 using hkxSparselyAnimatedEnumClassMemberArray = const hkClassMember[1];
 static hkxSparselyAnimatedEnumClassMemberArray hkxSparselyAnimatedEnumClass_Members{
-	{"enum", &hkxEnumClass, nullptr, {hkClassMember::TYPE_POINTER}, {hkClassMember::TYPE_STRUCT}, 0, 0, 0x20, nullptr}};
-hkClass hkxSparselyAnimatedEnumClass("hkxSparselyAnimatedEnum", &hkxSparselyAnimatedIntClass, 36, nullptr, 0, nullptr,
-	0, hkxSparselyAnimatedEnumClass_Members, 1, nullptr, nullptr, 0, 1);
-hkTypeInfo hkxSparselyAnimatedEnumTypeInfo = {"hkxSparselyAnimatedEnum", finishLoadedObjecthkxSparselyAnimatedEnum,
-	cleanupLoadedObjecthkxSparselyAnimatedEnum, getVtablehkxSparselyAnimatedEnum(), &typeid(hkxSparselyAnimatedEnum),
-	sizeof(hkxSparselyAnimatedEnum)};
+    {"enum", &hkxEnumClass, nullptr, {hkClassMember::TYPE_POINTER}, {hkClassMember::TYPE_STRUCT}, 0, 0, 0x20, nullptr}
+};
+hkClass hkxSparselyAnimatedEnumClass(
+    "hkxSparselyAnimatedEnum",
+    &hkxSparselyAnimatedIntClass,
+    36,
+    nullptr,
+    0,
+    nullptr,
+    0,
+    hkxSparselyAnimatedEnumClass_Members,
+    1,
+    nullptr,
+    nullptr,
+    0,
+    1
+);
+hkTypeInfo hkxSparselyAnimatedEnumTypeInfo = {
+    "hkxSparselyAnimatedEnum",
+    finishLoadedObjecthkxSparselyAnimatedEnum,
+    cleanupLoadedObjecthkxSparselyAnimatedEnum,
+    getVtablehkxSparselyAnimatedEnum(),
+    &typeid(hkxSparselyAnimatedEnum),
+    sizeof(hkxSparselyAnimatedEnum)
+};
 
 static void cleanupLoadedObjecthkxSparselyAnimatedEnum(void* p) {
-	static_cast<hkxSparselyAnimatedEnum*>(p)->~hkxSparselyAnimatedEnum();
+    static_cast<hkxSparselyAnimatedEnum*>(p)->~hkxSparselyAnimatedEnum();
 }
 
 // The member releases the enum; the base frees the samples.
 hkxSparselyAnimatedEnum::~hkxSparselyAnimatedEnum() {}
 
 const hkClass& hkxSparselyAnimatedEnum::staticClass() {
-	return hkxSparselyAnimatedEnumClass;
+    return hkxSparselyAnimatedEnumClass;
 }

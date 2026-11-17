@@ -17,11 +17,11 @@ class NiStream;
 // Everything in it is static.
 class NiCollisionSDM {
 public:
-	NiCollisionSDM();
+    NiCollisionSDM();
 
-	static void Init();
-	static void Shutdown();
+    static void Init();
+    static void Shutdown();
 
-	static inline bool ms_bInitialized;
-	static inline int32_t siCounter;
+    static inline bool ms_bInitialized;
+    static inline int32_t siCounter;
 };

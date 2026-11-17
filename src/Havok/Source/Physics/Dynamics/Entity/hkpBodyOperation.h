@@ -10,18 +10,18 @@ class hkpRigidBody;
 // destructor override is not declared yet.
 class hkpBodyOperation : public hkReferencedObject {
 public:
-	enum ExecutionState : int32_t {
-		EXECUTE_SINGLE_THREADED = 0,
-		EXECUTE_MULTI_THREADED = 1,
-	};
+    enum ExecutionState : int32_t {
+        EXECUTE_SINGLE_THREADED = 0,
+        EXECUTE_MULTI_THREADED = 1,
+    };
 
-	// What an operation reports back to the queue that runs it (Havok SDK; the SDK's constructor clears
-	// m_bodyIsDeleted).
-	struct UpdateInfo {
-		hkBool m_bodyIsDeleted;
-	};
+    // What an operation reports back to the queue that runs it (Havok SDK; the SDK's constructor clears
+    // m_bodyIsDeleted).
+    struct UpdateInfo {
+        hkBool m_bodyIsDeleted;
+    };
 
-	// Runs the operation on body. hkpWorldOperationQueue::executeAllPendingBodyOperations passes a freshly cleared
-	// UpdateInfo for each call.
-	virtual void execute(hkpRigidBody* body, UpdateInfo& arUpdateInfo) = 0;
+    // Runs the operation on body. hkpWorldOperationQueue::executeAllPendingBodyOperations passes a freshly cleared
+    // UpdateInfo for each call.
+    virtual void execute(hkpRigidBody* body, UpdateInfo& arUpdateInfo) = 0;
 };

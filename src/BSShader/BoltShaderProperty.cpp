@@ -1,9 +1,9 @@
 #include "BSShader/BoltShaderProperty.h"
 
 #include "BSCore/MemoryManager.h"
-#include "BSShader/BoltShader.h"
 #include "BSShader/BSShaderAccumulator.h"
 #include "BSShader/BSShaderProperty.h"
+#include "BSShader/BoltShader.h"
 #include "BSShader/ShadowSceneLight.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiColor.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiGeometry.h"
@@ -22,473 +22,507 @@ NiRTTI BoltShaderProperty::ms_RTTI("BoltShaderProperty", &BSShaderProperty::ms_R
 
 // The tortuosities are random in [0, 1]; the segment array holds GetMaxSegments() zeroed segments.
 BoltShaderProperty::BoltShaderProperty()
-	: TargetLocation(0.0f, 0.0f, 0.0f), fTimer(0.0f), iLookBack(4), iBoltStartSegment(0), iBoltEndSegment(0),
-	  iTotalSegmentCount(0), fDistanceLong(0.0f), iNumBolts(1), fBoltLength(2048.0f), fBoltsRadius(100.0f),
-	  fBoltsRadiusStrength(3.0f), fBoltSmallWidth(3.0f), fBoltGrowWidth(1.0f),
-	  iSegmentsPerBolt(static_cast<int32_t>(BoltShader::GetMaxSegments())), fSegmentLength(1.0f),
-	  fSegmentVariance(1.0f), iSubSegments(static_cast<uint32_t>(BoltShader::iSubSegments)), fSubSegmentVariance(1.0f),
-	  CoreColor(NiColorA_WHITE), GlowColor(NiColorA_WHITE), bWrapped(0), bMoving(1), bGuided(1), bStartFromPoint(1),
-	  pMyGeometry(nullptr), fDistanceShort(0.0f), iBoltCurrentSegmentCount(0), iTotalAddedSegments(0), fAlpha(1.0f) {
-	BoltShader::GetSegmentIndices();
-	pSegmentData = new BoltShader::SegmentData[BoltShader::GetMaxSegments()]();
-	for (float& rfTortuosity : fTortuosity) {
-		rfTortuosity = static_cast<float>(static_cast<double>(rt::rand()) / 32767.0);
-	}
-	++BoltShaderProperty::iRefCount;
-	iShader = 25;
-	iShaderPropertyType = 15;
+  : TargetLocation(0.0f, 0.0f, 0.0f), fTimer(0.0f), iLookBack(4), iBoltStartSegment(0), iBoltEndSegment(0),
+    iTotalSegmentCount(0), fDistanceLong(0.0f), iNumBolts(1), fBoltLength(2048.0f), fBoltsRadius(100.0f),
+    fBoltsRadiusStrength(3.0f), fBoltSmallWidth(3.0f), fBoltGrowWidth(1.0f),
+    iSegmentsPerBolt(static_cast<int32_t>(BoltShader::GetMaxSegments())), fSegmentLength(1.0f), fSegmentVariance(1.0f),
+    iSubSegments(static_cast<uint32_t>(BoltShader::iSubSegments)), fSubSegmentVariance(1.0f), CoreColor(NiColorA_WHITE),
+    GlowColor(NiColorA_WHITE), bWrapped(0), bMoving(1), bGuided(1), bStartFromPoint(1), pMyGeometry(nullptr),
+    fDistanceShort(0.0f), iBoltCurrentSegmentCount(0), iTotalAddedSegments(0), fAlpha(1.0f) {
+    BoltShader::GetSegmentIndices();
+    pSegmentData = new BoltShader::SegmentData[BoltShader::GetMaxSegments()]();
+    for (float& rfTortuosity : fTortuosity) {
+        rfTortuosity = static_cast<float>(static_cast<double>(rt::rand()) / 32767.0);
+    }
+    ++BoltShaderProperty::iRefCount;
+    iShader = 25;
+    iShaderPropertyType = 15;
 }
 
 // The last bolt property frees the shared bolt data.
 BoltShaderProperty::~BoltShaderProperty() {
-	delete[] pSegmentData;
-	if (!(--iRefCount)) {
-		::au_re_GameHeapFree_36();
-	}
+    delete[] pSegmentData;
+    if (!(--iRefCount)) {
+        ::au_re_GameHeapFree_36();
+    }
 }
 
 const NiRTTI* BoltShaderProperty::GetRTTI() const {
-	return &BoltShaderProperty::ms_RTTI;
+    return &BoltShaderProperty::ms_RTTI;
 }
 
 // The clone is built in an engine block through the constructor, then the copy body fills it in.
 NiObject* BoltShaderProperty::CreateClone(NiCloningProcess& arCloneData) {
-	BoltShaderProperty* pClone =
-		static_cast<BoltShaderProperty*>(NiMemObject::operator new(sizeof(BoltShaderProperty)));
-	if (pClone)
-		pClone = ::new (pClone) BoltShaderProperty;
-	CopyMembers(pClone, arCloneData);
-	return pClone;
+    BoltShaderProperty* pClone =
+        static_cast<BoltShaderProperty*>(NiMemObject::operator new(sizeof(BoltShaderProperty)));
+    if (pClone) {
+        pClone = ::new (pClone) BoltShaderProperty;
+    }
+    CopyMembers(pClone, arCloneData);
+    return pClone;
 }
 
 void BoltShaderProperty::GetViewerStrings(NiTPrimitiveArray<char*>* apStrings) {
-	BSShaderProperty::GetViewerStrings(apStrings);
-	char* ViewerString = NiGetViewerString(BoltShaderProperty::ms_RTTI.GetName());
-	uint32_t m_usSize = apStrings->m_usSize;
-	uint32_t m_usMaxSize = apStrings->m_usMaxSize;
-	char* v6 = ViewerString;
-	if (m_usSize >= m_usMaxSize) {
-		apStrings->SetSize(m_usSize + apStrings->m_usGrowBy);
-	}
-	apStrings->SetAt(m_usSize, v6);
+    BSShaderProperty::GetViewerStrings(apStrings);
+    char* ViewerString = NiGetViewerString(BoltShaderProperty::ms_RTTI.GetName());
+    uint32_t m_usSize = apStrings->m_usSize;
+    uint32_t m_usMaxSize = apStrings->m_usMaxSize;
+    char* v6 = ViewerString;
+    if (m_usSize >= m_usMaxSize) {
+        apStrings->SetSize(m_usSize + apStrings->m_usGrowBy);
+    }
+    apStrings->SetAt(m_usSize, v6);
 }
 
 bool BoltShaderProperty::SetupGeometry(NiGeometry* apGeometry) {
-	pMyGeometry = apGeometry;
-	return (bool)1;
+    pMyGeometry = apGeometry;
+    return (bool)1;
 }
 
-BSShaderProperty::RenderPassArray* BoltShaderProperty::GetRenderPasses(NiGeometry* apGeom, int32_t aiEnabledPasses,
-	uint16_t& asCount, uint32_t auiRenderMode, BSShaderAccumulator* apAccumulator, int32_t abUpdateList) {
-	BSShaderProperty::RenderPassArray* pRenderPassArray;
-	BSShaderProperty::CheckCreateRenderPassArray(1u);
-	pRenderPassArray = this->pRenderPassList;
-	if (!pRenderPassArray->iSize) {
-		pRenderPassArray->Add(apGeom, 0x242u, 1, 0, nullptr, nullptr, nullptr, nullptr);
-		this->pRenderPassList->pPassA.m_pBase[this->pRenderPassList->iSize - 1]->eAccumulationHint =
-			BSShaderProperty::BSSP_HINT_SORT;
-	}
-	return this->pRenderPassList;
+BSShaderProperty::RenderPassArray* BoltShaderProperty::GetRenderPasses(
+    NiGeometry* apGeom,
+    int32_t aiEnabledPasses,
+    uint16_t& asCount,
+    uint32_t auiRenderMode,
+    BSShaderAccumulator* apAccumulator,
+    int32_t abUpdateList
+) {
+    BSShaderProperty::RenderPassArray* pRenderPassArray;
+    BSShaderProperty::CheckCreateRenderPassArray(1u);
+    pRenderPassArray = this->pRenderPassList;
+    if (!pRenderPassArray->iSize) {
+        pRenderPassArray->Add(apGeom, 0x242u, 1, 0, nullptr, nullptr, nullptr, nullptr);
+        this->pRenderPassList->pPassA.m_pBase[this->pRenderPassList->iSize - 1]->eAccumulationHint =
+            BSShaderProperty::BSSP_HINT_SORT;
+    }
+    return this->pRenderPassList;
 }
 
-void BoltShaderProperty::CreateSegment(int32_t aiBolt, int32_t aiSegment, int32_t aiLastSegment,
-	int32_t aiLookBackSegment) {
-	NiPoint3 v25;
-	uint32_t v6 = aiBolt * iSegmentsPerBolt;
-	uint32_t v7 = v6 + aiSegment;
-	BoltShader::SegmentData* pSegmentData = this->pSegmentData;
-	int32_t v9 = aiLastSegment + v6;
-	float x = pSegmentData[v9].fXPos;
-	BoltShader::SegmentData* v11 = &pSegmentData[v9];
-	float y = v11->fYPos;
-	float z = v11->fZPos;
-	float w = v11->fUnused;
-	int32_t aiLastSegmenta = iSegmentsPerBolt;
-	int32_t v13 = aiLookBackSegment + aiBolt * aiLastSegmenta;
-	float v14 = pSegmentData[v13].fYPos;
-	BoltShader::SegmentData* v15 = &pSegmentData[v13];
-	float v30 = v15->fXPos;
-	float v16 = v15->fZPos;
-	float v17 = v15->fUnused;
-	v25.x = x - v30;
-	v25.y = y - v14;
-	v25.z = z - v16;
-	if (v25.y < 0.0) {
-		v25 = NiPoint3_ZERO;
-	}
-	v25.y = v25.y + 1.0;
-	v25.Unitize();
-	float aiBolta = fSegmentLength;
-	v25.x = aiBolta * v25.x;
-	v25.y = aiBolta * v25.y;
-	v25.z = aiBolta * v25.z;
-	float aiBoltb = static_cast<double>(aiSegment) / static_cast<double>(aiLastSegmenta);
-	float aiSegmenta = static_cast<double>(rt::rand()) / 32767.0;
-	float aiSegmentb = fSegmentVariance * aiSegmenta + (v25.x + x) - fSegmentVariance * 0.5;
-	this->pSegmentData[v7].fXPos = aiSegmentb;
-	float aiSegmentc = v25.y + y;
-	this->pSegmentData[v7].fYPos = aiSegmentc;
-	float aiSegmentd = static_cast<double>(rt::rand()) / 32767.0;
-	float aiSegmente = fSegmentVariance * aiSegmentd + (v25.z + z) - fSegmentVariance * 0.5;
-	this->pSegmentData[v7].fZPos = aiSegmente;
-	BoltShader::SegmentData* v19 = &this->pSegmentData[v7];
-	v25.x = TargetLocation.x * aiBoltb - v19->fXPos;
-	v25.y = aiBoltb * TargetLocation.z - v19->fZPos;
-	float aiSegmentf = v25.y * v25.y + v25.x * v25.x;
-	float aiSegmentg = std::sqrt((double)aiSegmentf);
-	double v20 = aiSegmentg;
-	if (fBoltsRadius < static_cast<double>(aiSegmentg)) {
-		double v23;
-		double v21 = v20 - fBoltsRadius;
-		float aiSegmenth = fBoltsRadiusStrength * v21 / v20;
-		double v22 = aiSegmenth;
-		float aiSegmenti = aiSegmenth * v20;
-		float aiSegmentj = std::fabs((double)aiSegmenti);
-		if (!(fBoltsRadius < static_cast<double>(aiSegmentj))) {
-			v23 = v22;
-		} else {
-			float aiSegmentk = v21 / v20;
-			v23 = aiSegmentk;
-		}
-		BoltShader::SegmentData* v24 = this->pSegmentData;
-		v25.x = v25.x * v23;
-		v25.y = v23 * v25.y;
-		v24[v7].fXPos = v24[v7].fXPos + v25.x;
-		this->pSegmentData[v7].fZPos = this->pSegmentData[v7].fZPos + v25.y;
-	}
+void BoltShaderProperty::CreateSegment(
+    int32_t aiBolt,
+    int32_t aiSegment,
+    int32_t aiLastSegment,
+    int32_t aiLookBackSegment
+) {
+    NiPoint3 v25;
+    uint32_t v6 = aiBolt * iSegmentsPerBolt;
+    uint32_t v7 = v6 + aiSegment;
+    BoltShader::SegmentData* pSegmentData = this->pSegmentData;
+    int32_t v9 = aiLastSegment + v6;
+    float x = pSegmentData[v9].fXPos;
+    BoltShader::SegmentData* v11 = &pSegmentData[v9];
+    float y = v11->fYPos;
+    float z = v11->fZPos;
+    float w = v11->fUnused;
+    int32_t aiLastSegmenta = iSegmentsPerBolt;
+    int32_t v13 = aiLookBackSegment + aiBolt * aiLastSegmenta;
+    float v14 = pSegmentData[v13].fYPos;
+    BoltShader::SegmentData* v15 = &pSegmentData[v13];
+    float v30 = v15->fXPos;
+    float v16 = v15->fZPos;
+    float v17 = v15->fUnused;
+    v25.x = x - v30;
+    v25.y = y - v14;
+    v25.z = z - v16;
+    if (v25.y < 0.0) {
+        v25 = NiPoint3_ZERO;
+    }
+    v25.y = v25.y + 1.0;
+    v25.Unitize();
+    float aiBolta = fSegmentLength;
+    v25.x = aiBolta * v25.x;
+    v25.y = aiBolta * v25.y;
+    v25.z = aiBolta * v25.z;
+    float aiBoltb = static_cast<double>(aiSegment) / static_cast<double>(aiLastSegmenta);
+    float aiSegmenta = static_cast<double>(rt::rand()) / 32767.0;
+    float aiSegmentb = fSegmentVariance * aiSegmenta + (v25.x + x) - fSegmentVariance * 0.5;
+    this->pSegmentData[v7].fXPos = aiSegmentb;
+    float aiSegmentc = v25.y + y;
+    this->pSegmentData[v7].fYPos = aiSegmentc;
+    float aiSegmentd = static_cast<double>(rt::rand()) / 32767.0;
+    float aiSegmente = fSegmentVariance * aiSegmentd + (v25.z + z) - fSegmentVariance * 0.5;
+    this->pSegmentData[v7].fZPos = aiSegmente;
+    BoltShader::SegmentData* v19 = &this->pSegmentData[v7];
+    v25.x = TargetLocation.x * aiBoltb - v19->fXPos;
+    v25.y = aiBoltb * TargetLocation.z - v19->fZPos;
+    float aiSegmentf = v25.y * v25.y + v25.x * v25.x;
+    float aiSegmentg = std::sqrt((double)aiSegmentf);
+    double v20 = aiSegmentg;
+    if (fBoltsRadius < static_cast<double>(aiSegmentg)) {
+        double v23;
+        double v21 = v20 - fBoltsRadius;
+        float aiSegmenth = fBoltsRadiusStrength * v21 / v20;
+        double v22 = aiSegmenth;
+        float aiSegmenti = aiSegmenth * v20;
+        float aiSegmentj = std::fabs((double)aiSegmenti);
+        if (!(fBoltsRadius < static_cast<double>(aiSegmentj))) {
+            v23 = v22;
+        }
+        else {
+            float aiSegmentk = v21 / v20;
+            v23 = aiSegmentk;
+        }
+        BoltShader::SegmentData* v24 = this->pSegmentData;
+        v25.x = v25.x * v23;
+        v25.y = v23 * v25.y;
+        v24[v7].fXPos = v24[v7].fXPos + v25.x;
+        this->pSegmentData[v7].fZPos = this->pSegmentData[v7].fZPos + v25.y;
+    }
 }
 
 // Each new segment advances the end of the ring (pushing the start when they meet) and is created for every bolt. The
 // segment fields are compared signed, and bWrapped is re-read after each CreateSegment.
 void BoltShaderProperty::ExtendSegments(int32_t aiNewSegments) {
-	if (aiNewSegments <= 0)
-		return;
-	do {
-		++iBoltEndSegment;
-		int32_t iSegmentsPerBolt_ = static_cast<int32_t>(iSegmentsPerBolt);
-		if (static_cast<int32_t>(iBoltEndSegment) >= iSegmentsPerBolt_)
-			iBoltEndSegment = 0;
-		int32_t iSegment = static_cast<int32_t>(iBoltEndSegment);
-		int32_t iStart = static_cast<int32_t>(iBoltStartSegment);
-		if (iSegment == iStart) {
-			++iStart;
-			iBoltStartSegment = iStart;
-			if (iStart >= iSegmentsPerBolt_)
-				iBoltStartSegment = iStart - iSegmentsPerBolt_;
-		}
-		bWrapped = static_cast<int32_t>(iBoltStartSegment) > iSegment;
-		for (int32_t iBolt = 0; iBolt < static_cast<int32_t>(iNumBolts); ++iBolt) {
-			int32_t iLastSegment;
-			if (iSegment != 0)
-				iLastSegment = iSegment - 1;
-			else if (bWrapped)
-				iLastSegment = static_cast<int32_t>(iSegmentsPerBolt) - 1;
-			else
-				iLastSegment = 0;
-			int32_t iLookBack_ = static_cast<int32_t>(iLookBack);
-			int32_t iLookBackSegment;
-			if (iSegment >= iLookBack_)
-				iLookBackSegment = iSegment - iLookBack_;
-			else if (bWrapped)
-				iLookBackSegment = static_cast<int32_t>(iSegmentsPerBolt) - iLookBack_ + iSegment;
-			else
-				iLookBackSegment = 0;
-			CreateSegment(iBolt, iSegment, iLastSegment, iLookBackSegment);
-		}
-	} while (--aiNewSegments != 0);
+    if (aiNewSegments <= 0) {
+        return;
+    }
+    do {
+        ++iBoltEndSegment;
+        int32_t iSegmentsPerBolt_ = static_cast<int32_t>(iSegmentsPerBolt);
+        if (static_cast<int32_t>(iBoltEndSegment) >= iSegmentsPerBolt_) {
+            iBoltEndSegment = 0;
+        }
+        int32_t iSegment = static_cast<int32_t>(iBoltEndSegment);
+        int32_t iStart = static_cast<int32_t>(iBoltStartSegment);
+        if (iSegment == iStart) {
+            ++iStart;
+            iBoltStartSegment = iStart;
+            if (iStart >= iSegmentsPerBolt_) {
+                iBoltStartSegment = iStart - iSegmentsPerBolt_;
+            }
+        }
+        bWrapped = static_cast<int32_t>(iBoltStartSegment) > iSegment;
+        for (int32_t iBolt = 0; iBolt < static_cast<int32_t>(iNumBolts); ++iBolt) {
+            int32_t iLastSegment;
+            if (iSegment != 0) {
+                iLastSegment = iSegment - 1;
+            }
+            else if (bWrapped) {
+                iLastSegment = static_cast<int32_t>(iSegmentsPerBolt) - 1;
+            }
+            else {
+                iLastSegment = 0;
+            }
+            int32_t iLookBack_ = static_cast<int32_t>(iLookBack);
+            int32_t iLookBackSegment;
+            if (iSegment >= iLookBack_) {
+                iLookBackSegment = iSegment - iLookBack_;
+            }
+            else if (bWrapped) {
+                iLookBackSegment = static_cast<int32_t>(iSegmentsPerBolt) - iLookBack_ + iSegment;
+            }
+            else {
+                iLookBackSegment = 0;
+            }
+            CreateSegment(iBolt, iSegment, iLastSegment, iLookBackSegment);
+        }
+    }
+    while (--aiNewSegments != 0);
 }
 
 // Moves the end back (see CleanupSegments). Signed division and compares.
 void BoltShaderProperty::RemoveSegments(int32_t aiRemoveSegments) {
-	int32_t iSegmentsPerBolt_ = static_cast<int32_t>(iSegmentsPerBolt);
-	int32_t iRemove = aiRemoveSegments % iSegmentsPerBolt_;
-	iBoltEndSegment -= iRemove;
-	int32_t iEnd = static_cast<int32_t>(iBoltEndSegment);
-	if (bWrapped && iEnd < 0) {
-		iBoltStartSegment += iSegmentsPerBolt_;
-		bWrapped = 0;
-	}
-	iBoltCurrentSegmentCount -= iRemove;
-	if (!bWrapped) {
-		int32_t iStart = static_cast<int32_t>(iBoltStartSegment);
-		if (iEnd <= iStart)
-			iBoltEndSegment = iStart;
-	}
+    int32_t iSegmentsPerBolt_ = static_cast<int32_t>(iSegmentsPerBolt);
+    int32_t iRemove = aiRemoveSegments % iSegmentsPerBolt_;
+    iBoltEndSegment -= iRemove;
+    int32_t iEnd = static_cast<int32_t>(iBoltEndSegment);
+    if (bWrapped && iEnd < 0) {
+        iBoltStartSegment += iSegmentsPerBolt_;
+        bWrapped = 0;
+    }
+    iBoltCurrentSegmentCount -= iRemove;
+    if (!bWrapped) {
+        int32_t iStart = static_cast<int32_t>(iBoltStartSegment);
+        if (iEnd <= iStart) {
+            iBoltEndSegment = iStart;
+        }
+    }
 }
 
 // Moves the start forward, dropping the oldest segments; RemoveSegments is the one that moves the end back. The segment
 // fields are divided and compared signed.
 void BoltShaderProperty::CleanupSegments(int32_t aiRemoveSegments) {
-	int32_t iSegmentsPerBolt_ = static_cast<int32_t>(iSegmentsPerBolt);
-	int32_t iRemove = aiRemoveSegments % iSegmentsPerBolt_;
-	iBoltStartSegment += iRemove;
-	int32_t iStart = static_cast<int32_t>(iBoltStartSegment);
-	if (bWrapped && iStart >= iSegmentsPerBolt_) {
-		iBoltStartSegment = iStart - iSegmentsPerBolt_;
-		bWrapped = 0;
-	}
-	iBoltCurrentSegmentCount -= iRemove;
-	if (!bWrapped) {
-		int32_t iEnd = static_cast<int32_t>(iBoltEndSegment);
-		if (static_cast<int32_t>(iBoltStartSegment) >= iEnd)
-			iBoltStartSegment = iEnd;
-	}
+    int32_t iSegmentsPerBolt_ = static_cast<int32_t>(iSegmentsPerBolt);
+    int32_t iRemove = aiRemoveSegments % iSegmentsPerBolt_;
+    iBoltStartSegment += iRemove;
+    int32_t iStart = static_cast<int32_t>(iBoltStartSegment);
+    if (bWrapped && iStart >= iSegmentsPerBolt_) {
+        iBoltStartSegment = iStart - iSegmentsPerBolt_;
+        bWrapped = 0;
+    }
+    iBoltCurrentSegmentCount -= iRemove;
+    if (!bWrapped) {
+        int32_t iEnd = static_cast<int32_t>(iBoltEndSegment);
+        if (static_cast<int32_t>(iBoltStartSegment) >= iEnd) {
+            iBoltStartSegment = iEnd;
+        }
+    }
 }
 
 void BoltShaderProperty::MoveAllSegments(float afMoveDelta) {
-	uint8_t bWrapped = this->bWrapped;
-	int32_t iBoltStartSegment = this->iBoltStartSegment;
-	while (bWrapped && iBoltStartSegment < static_cast<int32_t>(iSegmentsPerBolt)) {
-		int32_t i;
-		float* p_y;
-	LABEL_5:;
-		for (i = 0; i < static_cast<int32_t>(iNumBolts); *p_y = *p_y + afMoveDelta) {
-			p_y = &pSegmentData[iBoltStartSegment + i * iSegmentsPerBolt].fYPos;
-			++i;
-		}
-		if (++iBoltStartSegment >= static_cast<int32_t>(iSegmentsPerBolt)) {
-			if (!bWrapped) {
-				break;
-			}
-			iBoltStartSegment = 0;
-			bWrapped = 0;
-		}
-	}
-	if (iBoltStartSegment <= static_cast<int32_t>(iBoltEndSegment)) {
-		goto LABEL_5;
-	}
+    uint8_t bWrapped = this->bWrapped;
+    int32_t iBoltStartSegment = this->iBoltStartSegment;
+    while (bWrapped && iBoltStartSegment < static_cast<int32_t>(iSegmentsPerBolt)) {
+        int32_t i;
+        float* p_y;
+    LABEL_5:;
+        for (i = 0; i < static_cast<int32_t>(iNumBolts); *p_y = *p_y + afMoveDelta) {
+            p_y = &pSegmentData[iBoltStartSegment + i * iSegmentsPerBolt].fYPos;
+            ++i;
+        }
+        if (++iBoltStartSegment >= static_cast<int32_t>(iSegmentsPerBolt)) {
+            if (!bWrapped) {
+                break;
+            }
+            iBoltStartSegment = 0;
+            bWrapped = 0;
+        }
+    }
+    if (iBoltStartSegment <= static_cast<int32_t>(iBoltEndSegment)) {
+        goto LABEL_5;
+    }
 }
 
 // Does the work of CleanupSegments here, with signed division and compares. The removed count is at least one.
 void BoltShaderProperty::CleanupBolt(float afTimeDelta, float afSpeed) {
-	float fDistance = afTimeDelta * afSpeed;
-	int32_t iRemove = static_cast<int32_t>(afTimeDelta * (static_cast<int32_t>(iTotalAddedSegments) / fTimer));
-	if (iRemove <= 0) {
-		iRemove = 1;
-	}
-	int32_t iSegmentsPerBolt_ = static_cast<int32_t>(iSegmentsPerBolt);
-	int32_t iRemoveMod = iRemove % iSegmentsPerBolt_;
-	iBoltStartSegment += iRemoveMod;
-	int32_t iStart = static_cast<int32_t>(iBoltStartSegment);
-	if (bWrapped && iStart >= iSegmentsPerBolt_) {
-		iBoltStartSegment = iStart - iSegmentsPerBolt_;
-		bWrapped = 0;
-	}
-	if (!bWrapped) {
-		int32_t iEnd = static_cast<int32_t>(iBoltEndSegment);
-		if (static_cast<int32_t>(iBoltStartSegment) >= iEnd)
-			iBoltStartSegment = iEnd;
-	}
-	iBoltCurrentSegmentCount -= iRemoveMod;
-	fDistanceShort = fDistanceShort + fDistance;
+    float fDistance = afTimeDelta * afSpeed;
+    int32_t iRemove = static_cast<int32_t>(afTimeDelta * (static_cast<int32_t>(iTotalAddedSegments) / fTimer));
+    if (iRemove <= 0) {
+        iRemove = 1;
+    }
+    int32_t iSegmentsPerBolt_ = static_cast<int32_t>(iSegmentsPerBolt);
+    int32_t iRemoveMod = iRemove % iSegmentsPerBolt_;
+    iBoltStartSegment += iRemoveMod;
+    int32_t iStart = static_cast<int32_t>(iBoltStartSegment);
+    if (bWrapped && iStart >= iSegmentsPerBolt_) {
+        iBoltStartSegment = iStart - iSegmentsPerBolt_;
+        bWrapped = 0;
+    }
+    if (!bWrapped) {
+        int32_t iEnd = static_cast<int32_t>(iBoltEndSegment);
+        if (static_cast<int32_t>(iBoltStartSegment) >= iEnd) {
+            iBoltStartSegment = iEnd;
+        }
+    }
+    iBoltCurrentSegmentCount -= iRemoveMod;
+    fDistanceShort = fDistanceShort + fDistance;
 }
 
 // The segment count's product with the segment length is loaded signed.
 void BoltShaderProperty::ExtendBolt(float afTimeDelta, float afDesiredBoltDistance) {
-	fTimer = afTimeDelta + fTimer;
-	float a2 = afDesiredBoltDistance - this->fDistanceLong;
-	float a2a = a2 / fSegmentLength;
-	float a2b = std::ceil(static_cast<double>(a2a));
-	this->fDistanceLong = a2b * fSegmentLength + this->fDistanceLong;
-	int32_t v4 = static_cast<int32_t>(a2b);
-	ExtendSegments(v4);
-	float a3 = static_cast<double>(static_cast<int32_t>(iSegmentsPerBolt)) * fSegmentLength;
-	double fDistanceLong = this->fDistanceLong;
-	if (!(a3 > fDistanceLong)) {
-		fDistanceLong = a3;
-	}
-	float a2c = fDistanceLong;
-	float a2d = this->fDistanceLong - a2c;
-	double v6 = a2d;
-	if (a2d < 0.0) {
-		v6 = 0.0;
-	}
-	iTotalAddedSegments += v4;
-	float a2e = v6;
-	fDistanceShort = a2e;
+    fTimer = afTimeDelta + fTimer;
+    float a2 = afDesiredBoltDistance - this->fDistanceLong;
+    float a2a = a2 / fSegmentLength;
+    float a2b = std::ceil(static_cast<double>(a2a));
+    this->fDistanceLong = a2b * fSegmentLength + this->fDistanceLong;
+    int32_t v4 = static_cast<int32_t>(a2b);
+    ExtendSegments(v4);
+    float a3 = static_cast<double>(static_cast<int32_t>(iSegmentsPerBolt)) * fSegmentLength;
+    double fDistanceLong = this->fDistanceLong;
+    if (!(a3 > fDistanceLong)) {
+        fDistanceLong = a3;
+    }
+    float a2c = fDistanceLong;
+    float a2d = this->fDistanceLong - a2c;
+    double v6 = a2d;
+    if (a2d < 0.0) {
+        v6 = 0.0;
+    }
+    iTotalAddedSegments += v4;
+    float a2e = v6;
+    fDistanceShort = a2e;
 }
 
 bool BoltShaderProperty::IsAtMaxLength() {
-	return false;
+    return false;
 }
 
 void BoltShaderProperty::UpdateBolt(float afTimeDelta, float afDesiredBoltDistance, float afSpeed, bool abCleanup) {
-	if (abCleanup) {
-		CleanupBolt(afTimeDelta, afSpeed);
-	} else {
-		ExtendBolt(afTimeDelta, afDesiredBoltDistance);
-	}
+    if (abCleanup) {
+        CleanupBolt(afTimeDelta, afSpeed);
+    }
+    else {
+        ExtendBolt(afTimeDelta, afDesiredBoltDistance);
+    }
 }
 
 void BoltShaderProperty::SetStartFromPoint(bool abStartFromPoint) {
-	bStartFromPoint = abStartFromPoint;
+    bStartFromPoint = abStartFromPoint;
 }
 
 void BoltShaderProperty::SetMoving(bool abMoving) {
-	bMoving = abMoving;
+    bMoving = abMoving;
 }
 
 void BoltShaderProperty::SetAbsorbNumBolts(int32_t a2) {
-	iNumBolts = (uint32_t)a2;
+    iNumBolts = (uint32_t)a2;
 }
 
 void BoltShaderProperty::SetAbsorbCoreColor(float a2, float a3, float a4, float a5) {
-	CoreColor.r = a2;
-	CoreColor.g = a3;
-	CoreColor.b = a4;
-	CoreColor.a = a5;
+    CoreColor.r = a2;
+    CoreColor.g = a3;
+    CoreColor.b = a4;
+    CoreColor.a = a5;
 }
 
 void BoltShaderProperty::SetAbsorbGlowColor(float a2, float a3, float a4, float a5) {
-	GlowColor.r = a2;
-	GlowColor.g = a3;
-	GlowColor.b = a4;
-	GlowColor.a = a5;
+    GlowColor.r = a2;
+    GlowColor.g = a3;
+    GlowColor.b = a4;
+    GlowColor.a = a5;
 }
 
 void BoltShaderProperty::SetAbsorbSegmentLength(float a2) {
-	fSegmentLength = a2;
+    fSegmentLength = a2;
 }
 
 void BoltShaderProperty::SetAbsorbTortuosityVariance(float a2) {
-	fSubSegmentVariance = a2;
+    fSubSegmentVariance = a2;
 }
 
 void BoltShaderProperty::SetBoltsRadius(float afBoltsRadius) {
-	fBoltsRadius = afBoltsRadius;
+    fBoltsRadius = afBoltsRadius;
 }
 
 void BoltShaderProperty::SetBoltsRadiusStrength(float afStrength) {
-	fBoltsRadiusStrength = afStrength;
+    fBoltsRadiusStrength = afStrength;
 }
 
 void BoltShaderProperty::SetBoltSmallWidth(float afBoltSmallWidth) {
-	fBoltSmallWidth = afBoltSmallWidth;
+    fBoltSmallWidth = afBoltSmallWidth;
 }
 
 void BoltShaderProperty::SetBoltGrowWidth(float afBoltGrowWidth) {
-	fBoltGrowWidth = afBoltGrowWidth;
+    fBoltGrowWidth = afBoltGrowWidth;
 }
 
 void BoltShaderProperty::SetSegmentVariance(float afSegmentVariance) {
-	fSegmentVariance = afSegmentVariance;
+    fSegmentVariance = afSegmentVariance;
 }
 
-void BoltShaderProperty::UpdateAndMoveBolt(float afTimeDelta, float afDesiredBoltDistance, float afSpeed,
-	bool abCleanup) {
-	double v7;
-	BoltShader::SegmentData* pSegmentData;
-	uint32_t iBoltStartSegment;
-	double v10;
-	float a1_4b;
-	float a1_4c;
-	float a1_4d;
-	double v5 = (double)afTimeDelta;
-	if (afTimeDelta > 0.10000000149011612) {
-		v5 = (double)0.10000000149011612f;
-	}
-	float a1b = (float)v5;
-	float a1c = a1b * afSpeed;
-	MoveAllSegments(a1c);
-	float a1a = fSegmentLength;
-	if (!(afDesiredBoltDistance < ((double)a1a))) {
-		v7 = (double)afDesiredBoltDistance;
-	} else {
-		v7 = (double)a1a;
-	}
-	pSegmentData = this->pSegmentData;
-	iBoltStartSegment = this->iBoltStartSegment;
-	fDistanceLong = pSegmentData[iBoltEndSegment].fYPos;
-	float a1_4a = pSegmentData[iBoltStartSegment].fYPos;
-	fDistanceShort = a1_4a;
-	if ((-fSegmentLength) >= a1_4a) {
-		a1_4b = (-a1_4a) / fSegmentLength;
-		CleanupSegments((int32_t)a1_4b);
-		fDistanceShort = this->pSegmentData[this->iBoltStartSegment].fYPos;
-	}
-	if (!(fDistanceLong < v7)) {
-		v10 = v7 + fSegmentLength;
-		if (fDistanceLong >= v10) {
-			a1_4d = (float)((fDistanceLong - v10) / fSegmentLength);
-			RemoveSegments((int32_t)a1_4d);
-			fDistanceLong = this->pSegmentData[iBoltEndSegment].fYPos;
-		}
-	} else {
-		a1_4c = (float)((v7 - fDistanceLong) / fSegmentLength);
-		ExtendSegments((int32_t)a1_4c);
-		fDistanceLong = this->pSegmentData[iBoltEndSegment].fYPos;
-	}
+void BoltShaderProperty::UpdateAndMoveBolt(
+    float afTimeDelta,
+    float afDesiredBoltDistance,
+    float afSpeed,
+    bool abCleanup
+) {
+    double v7;
+    BoltShader::SegmentData* pSegmentData;
+    uint32_t iBoltStartSegment;
+    double v10;
+    float a1_4b;
+    float a1_4c;
+    float a1_4d;
+    double v5 = (double)afTimeDelta;
+    if (afTimeDelta > 0.10000000149011612) {
+        v5 = (double)0.10000000149011612f;
+    }
+    float a1b = (float)v5;
+    float a1c = a1b * afSpeed;
+    MoveAllSegments(a1c);
+    float a1a = fSegmentLength;
+    if (!(afDesiredBoltDistance < ((double)a1a))) {
+        v7 = (double)afDesiredBoltDistance;
+    }
+    else {
+        v7 = (double)a1a;
+    }
+    pSegmentData = this->pSegmentData;
+    iBoltStartSegment = this->iBoltStartSegment;
+    fDistanceLong = pSegmentData[iBoltEndSegment].fYPos;
+    float a1_4a = pSegmentData[iBoltStartSegment].fYPos;
+    fDistanceShort = a1_4a;
+    if ((-fSegmentLength) >= a1_4a) {
+        a1_4b = (-a1_4a) / fSegmentLength;
+        CleanupSegments((int32_t)a1_4b);
+        fDistanceShort = this->pSegmentData[this->iBoltStartSegment].fYPos;
+    }
+    if (!(fDistanceLong < v7)) {
+        v10 = v7 + fSegmentLength;
+        if (fDistanceLong >= v10) {
+            a1_4d = (float)((fDistanceLong - v10) / fSegmentLength);
+            RemoveSegments((int32_t)a1_4d);
+            fDistanceLong = this->pSegmentData[iBoltEndSegment].fYPos;
+        }
+    }
+    else {
+        a1_4c = (float)((v7 - fDistanceLong) / fSegmentLength);
+        ExtendSegments((int32_t)a1_4c);
+        fDistanceLong = this->pSegmentData[iBoltEndSegment].fYPos;
+    }
 }
 
 void BoltShaderProperty::InitSegmentData() {
-	int32_t iSegmentsPerBolt;
-	int32_t iNumBolts;
-	int32_t v10;
-	float v11;
-	float v12;
-	float v13;
-	float v14;
-	float v15;
-	float v16;
-	float v17;
-	float v18;
-	int32_t maxSegments = (int32_t)BoltShader::GetMaxSegments();
-	double v3 = 0.0;
-	iSegmentsPerBolt = (int32_t)this->iSegmentsPerBolt;
-	fTimer = (float)0.0;
-	int32_t v5 = (int32_t)(iSegmentsPerBolt * this->iNumBolts);
-	bWrapped = (uint8_t)0;
-	if (maxSegments < v5) {
-		v11 = (float)(((double)(v5 - maxSegments)) / ((double)iSegmentsPerBolt));
-		v12 = (float)std::ceil(static_cast<double>(v11));
-		v3 = 0.0;
-		this->iNumBolts -= ((int32_t)v12);
-	}
-	int32_t v6 = (int32_t)this->iSegmentsPerBolt;
-	uint32_t v7 = 4;
-	if (v6 <= 4) {
-		v7 = this->iSegmentsPerBolt;
-	}
-	iLookBack = v7;
-	iNumBolts = (int32_t)this->iNumBolts;
-	int32_t v9 = 0;
-	iTotalSegmentCount = (uint32_t)(v6 * iNumBolts);
-	if (iNumBolts > 0) {
-		v10 = 0;
-		do {
-			if (bStartFromPoint) {
-				pSegmentData[v10].fXPos = (float)v3;
-				pSegmentData[v10].fYPos = (float)v3;
-				pSegmentData[v10].fZPos = (float)v3;
-			} else {
-				v13 = (float)(((double)rt::rand()) / 32767.0);
-				v14 = (float)((fBoltsRadius * v13) - (fBoltsRadius * 0.5));
-				pSegmentData[v10].fXPos = v14;
-				v15 = (float)(((double)rt::rand()) / 32767.0);
-				v16 = (float)((fBoltsRadius * v15) - (fBoltsRadius * 0.5));
-				pSegmentData[v10].fYPos = v16;
-				v17 = (float)(((double)rt::rand()) / 32767.0);
-				v18 = (float)((fBoltsRadius * v17) - (fBoltsRadius * 0.5));
-				pSegmentData[v10].fZPos = v18;
-				v3 = 0.0;
-			}
-			++v9;
-			++v10;
-		} while (v9 < ((int32_t)this->iNumBolts));
-	}
-	iBoltEndSegment = (uint32_t)0;
-	iBoltStartSegment = (uint32_t)0;
+    int32_t iSegmentsPerBolt;
+    int32_t iNumBolts;
+    int32_t v10;
+    float v11;
+    float v12;
+    float v13;
+    float v14;
+    float v15;
+    float v16;
+    float v17;
+    float v18;
+    int32_t maxSegments = (int32_t)BoltShader::GetMaxSegments();
+    double v3 = 0.0;
+    iSegmentsPerBolt = (int32_t)this->iSegmentsPerBolt;
+    fTimer = (float)0.0;
+    int32_t v5 = (int32_t)(iSegmentsPerBolt * this->iNumBolts);
+    bWrapped = (uint8_t)0;
+    if (maxSegments < v5) {
+        v11 = (float)(((double)(v5 - maxSegments)) / ((double)iSegmentsPerBolt));
+        v12 = (float)std::ceil(static_cast<double>(v11));
+        v3 = 0.0;
+        this->iNumBolts -= ((int32_t)v12);
+    }
+    int32_t v6 = (int32_t)this->iSegmentsPerBolt;
+    uint32_t v7 = 4;
+    if (v6 <= 4) {
+        v7 = this->iSegmentsPerBolt;
+    }
+    iLookBack = v7;
+    iNumBolts = (int32_t)this->iNumBolts;
+    int32_t v9 = 0;
+    iTotalSegmentCount = (uint32_t)(v6 * iNumBolts);
+    if (iNumBolts > 0) {
+        v10 = 0;
+        do {
+            if (bStartFromPoint) {
+                pSegmentData[v10].fXPos = (float)v3;
+                pSegmentData[v10].fYPos = (float)v3;
+                pSegmentData[v10].fZPos = (float)v3;
+            }
+            else {
+                v13 = (float)(((double)rt::rand()) / 32767.0);
+                v14 = (float)((fBoltsRadius * v13) - (fBoltsRadius * 0.5));
+                pSegmentData[v10].fXPos = v14;
+                v15 = (float)(((double)rt::rand()) / 32767.0);
+                v16 = (float)((fBoltsRadius * v15) - (fBoltsRadius * 0.5));
+                pSegmentData[v10].fYPos = v16;
+                v17 = (float)(((double)rt::rand()) / 32767.0);
+                v18 = (float)((fBoltsRadius * v17) - (fBoltsRadius * 0.5));
+                pSegmentData[v10].fZPos = v18;
+                v3 = 0.0;
+            }
+            ++v9;
+            ++v10;
+        }
+        while (v9 < ((int32_t)this->iNumBolts));
+    }
+    iBoltEndSegment = (uint32_t)0;
+    iBoltStartSegment = (uint32_t)0;
 }
 
 void BoltShaderProperty::CopyMembers(BoltShaderProperty* pDest, NiCloningProcess& arCloneData) {
-	NiShadeProperty::CopyMembers(pDest, arCloneData);
-	pDest->ulFlags[0] = ulFlags[0];
-	pDest->ulFlags[1] = ulFlags[1];
-	// The shader's alpha (+0x28), which the bolt's own fAlpha (+0x18C) hides.
-	pDest->BSShaderProperty::fAlpha = BSShaderProperty::fAlpha;
-	double fFadeAlpha = this->fFadeAlpha;
-	pDest->iLastRenderPassState = 0;
-	pDest->fFadeAlpha = fFadeAlpha;
-	pDest->iShader = iShader;
-	pDest->fDepthBias = fDepthBias;
+    NiShadeProperty::CopyMembers(pDest, arCloneData);
+    pDest->ulFlags[0] = ulFlags[0];
+    pDest->ulFlags[1] = ulFlags[1];
+    // The shader's alpha (+0x28), which the bolt's own fAlpha (+0x18C) hides.
+    pDest->BSShaderProperty::fAlpha = BSShaderProperty::fAlpha;
+    double fFadeAlpha = this->fFadeAlpha;
+    pDest->iLastRenderPassState = 0;
+    pDest->fFadeAlpha = fFadeAlpha;
+    pDest->iShader = iShader;
+    pDest->fDepthBias = fDepthBias;
 }

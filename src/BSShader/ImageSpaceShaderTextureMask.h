@@ -6,10 +6,10 @@
 // The texture-mask shader. InitEffects allocates 0xD4 bytes; its constructor retains the window texture.
 class ImageSpaceShaderTextureMask : public ImageSpaceShader {
 public:
-	ImageSpaceShaderTextureMask();
-	~ImageSpaceShaderTextureMask() override;
+    ImageSpaceShaderTextureMask();
+    ~ImageSpaceShaderTextureMask() override;
 
-	void ReloadShaders() override;
+    void ReloadShaders() override;
 
-	NiPointer<NiSourceTexture> pWindowTexture;
+    NiPointer<NiSourceTexture> pWindowTexture;
 };

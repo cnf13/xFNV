@@ -6,18 +6,18 @@
 // ValueModifierEffect.
 class InvisibilityEffect : public ValueModifierEffect {
 public:
-	InvisibilityEffect(MagicCaster* apCaster, MagicItem* apItem, EffectItem* apEffect);
-	~InvisibilityEffect() override;
+    InvisibilityEffect(MagicCaster* apCaster, MagicItem* apItem, EffectItem* apEffect);
+    ~InvisibilityEffect() override;
 
-	ActiveEffect* Copy() override;
-	void Update(float afSecondsElapsed) override;
-	void FinishInitLoadGame(Actor* apActor) override;
-	void Revert(Actor* apActor) override;
-	void CopyData(ActiveEffect* apDestination) override;
-	bool CheckTarget(MagicTarget* apTarget) override;
-	void Start() override;
-	void Finish() override;
-	using ValueModifierEffect::Revert;
+    ActiveEffect* Copy() override;
+    void Update(float afSecondsElapsed) override;
+    void FinishInitLoadGame(Actor* apActor) override;
+    void Revert(Actor* apActor) override;
+    void CopyData(ActiveEffect* apDestination) override;
+    bool CheckTarget(MagicTarget* apTarget) override;
+    void Start() override;
+    void Finish() override;
+    using ValueModifierEffect::Revert;
 
-	static ActiveEffect* Instantiate(MagicCaster* apCaster, MagicItem* apSpell, EffectItem* apEffect);
+    static ActiveEffect* Instantiate(MagicCaster* apCaster, MagicItem* apSpell, EffectItem* apEffect);
 };

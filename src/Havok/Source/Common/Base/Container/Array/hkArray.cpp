@@ -2,8 +2,8 @@
 
 #include "Havok/Source/Animation/Animation/Rig/hkaBone.h"
 #include "Havok/Source/Common/Base/Container/Array/hkArrayUtil.h"
-#include "Havok/Source/Common/Base/Container/hkContainerAllocators.h"
 #include "Havok/Source/Common/Base/Container/String/hkStringPtr.h"
+#include "Havok/Source/Common/Base/Container/hkContainerAllocators.h"
 #include "Havok/Source/Common/Base/Math/QsTransform/hkQsTransform.h"
 #include "Havok/Source/Common/Base/Math/Vector/hkVector4.h"
 #include "Havok/Source/Common/Base/Memory/Allocator/hkMemoryAllocator.h"
@@ -30,7 +30,7 @@ using hkArray_lunsigned_schar_chkContainerHeapAllocator = hkArray<uint8_t, hkCon
 using hkArray_lhkpRigidBody_p_chkContainerHeapAllocator = hkArray<hkpRigidBody*, hkContainerHeapAllocator>;
 
 void clearAndDeallocate(hkArray<hkpRootCdBodyPair, hkContainerHeapAllocator>* apThis, [[maybe_unused]] void* apEdx) {
-	hkContainerHeapAllocator v4 = hkContainerHeapAllocator{};
-	hkMemoryAllocator* v1 = &(&v4)->get(apThis);
-	apThis->_clearAndDeallocate(*v1);
+    hkContainerHeapAllocator v4 = hkContainerHeapAllocator{};
+    hkMemoryAllocator* v1 = &(&v4)->get(apThis);
+    apThis->_clearAndDeallocate(*v1);
 }

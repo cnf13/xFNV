@@ -8,21 +8,21 @@ class TESRace;
 // The race of an NPC.
 class TESRaceForm : public BaseFormComponent {
 public:
-	TESRaceForm();
+    TESRaceForm();
 
-	void InitializeDataComponent() override;
-	void ClearDataComponent() override {}
-	void CopyComponent(BaseFormComponent* apCopyFC) override;
-	bool CompareComponent(BaseFormComponent* apCompareFC) override;
+    void InitializeDataComponent() override;
+    void ClearDataComponent() override {}
+    void CopyComponent(BaseFormComponent* apCopyFC) override;
+    bool CompareComponent(BaseFormComponent* apCompareFC) override;
 
-	TESRace* GetFormRace() const;
-	// Resolves the loaded race form ID for apOwner.
-	void InitItem(TESForm* apOwner);
-	void SetFormRace(TESRace* apRace);
-	void SaveSubRecord();
+    TESRace* GetFormRace() const;
+    // Resolves the loaded race form ID for apOwner.
+    void InitItem(TESForm* apOwner);
+    void SetFormRace(TESRace* apRace);
+    void SaveSubRecord();
 
-	// The race of apForm when it has a race component, else null.
-	static TESRace* GetFormRace(TESForm* apForm);
+    // The race of apForm when it has a race component, else null.
+    static TESRace* GetFormRace(TESForm* apForm);
 
-	TESRace* pFormRace;
+    TESRace* pFormRace;
 };

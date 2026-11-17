@@ -4,9 +4,35 @@
 
 // The reflection data of hkpVehicleDriverInputStatus and hkpVehicleDriverInput: the two class records, with no members
 // of their own.
-hkClass hkpVehicleDriverInputStatusClass("hkpVehicleDriverInputStatus", &hkReferencedObjectClass,
-	sizeof(hkpVehicleDriverInputStatus), nullptr, 0, nullptr, 0, nullptr, 0, nullptr, nullptr, 0, 0);
-hkClass hkpVehicleDriverInputClass("hkpVehicleDriverInput", &hkReferencedObjectClass, sizeof(hkpVehicleDriverInput),
-	nullptr, 0, nullptr, 0, nullptr, 0, nullptr, nullptr, 0, 0);
+hkClass hkpVehicleDriverInputStatusClass(
+    "hkpVehicleDriverInputStatus",
+    &hkReferencedObjectClass,
+    sizeof(hkpVehicleDriverInputStatus),
+    nullptr,
+    0,
+    nullptr,
+    0,
+    nullptr,
+    0,
+    nullptr,
+    nullptr,
+    0,
+    0
+);
+hkClass hkpVehicleDriverInputClass(
+    "hkpVehicleDriverInput",
+    &hkReferencedObjectClass,
+    sizeof(hkpVehicleDriverInput),
+    nullptr,
+    0,
+    nullptr,
+    0,
+    nullptr,
+    0,
+    nullptr,
+    nullptr,
+    0,
+    0
+);
 
 hkpVehicleDriverInputStatus::~hkpVehicleDriverInputStatus() {}

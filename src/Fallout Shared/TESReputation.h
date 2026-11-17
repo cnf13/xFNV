@@ -10,63 +10,63 @@ void FakeModalMessageMenuCallback();
 
 // Which of a reputation's two values changed.
 enum ReputationType : uint32_t {
-	REPUTATION_NEGATIVE = 0,
-	REPUTATION_POSITIVE = 1,
+    REPUTATION_NEGATIVE = 0,
+    REPUTATION_POSITIVE = 1,
 };
 
 // A reputation's DATA chunk: its largest value.
 struct REPUTATION_DATA {
-	// Byte-swaps the value read from a big-endian file.
-	void Endian();
+    // Byte-swaps the value read from a big-endian file.
+    void Endian();
 
-	float fMaximumValue;
+    float fMaximumValue;
 };
 
 // A reputation form (REPU).
 class TESReputation : public TESForm, public TESFullName, public TESIcon, public BGSMessageIcon {
 public:
-	TESReputation();
-	~TESReputation() override;
+    TESReputation();
+    ~TESReputation() override;
 
-	void InitializeData() override;
-	bool Load(TESFile* apFile) override;
-	void Save() override;
-	uint16_t GetSaveSize(uint32_t aiFlags) override;
-	void SaveGame(BGSSaveFormBuffer* apSaveGameBuffer) override;
-	void SaveGame(uint32_t aiFlags) override;
-	void LoadGame(BGSLoadFormBuffer* apLoadGameBuffer) override;
-	void LoadGame(uint32_t aiFlags, uint32_t aiCurrentFlags) override;
-	void Copy(TESForm* apCopy) override;
-	bool Compare(TESForm* apCompare) override;
-	using TESForm::Save;
+    void InitializeData() override;
+    bool Load(TESFile* apFile) override;
+    void Save() override;
+    uint16_t GetSaveSize(uint32_t aiFlags) override;
+    void SaveGame(BGSSaveFormBuffer* apSaveGameBuffer) override;
+    void SaveGame(uint32_t aiFlags) override;
+    void LoadGame(BGSLoadFormBuffer* apLoadGameBuffer) override;
+    void LoadGame(uint32_t aiFlags, uint32_t aiCurrentFlags) override;
+    void Copy(TESForm* apCopy) override;
+    bool Compare(TESForm* apCompare) override;
+    using TESForm::Save;
 
-	// The title of the reputation's current level.
-	const char* GetReputationTitle();
-	REPUTATION_DATA* GetData();
-	const float GetPositiveRatio();
-	const float GetNegativeRatio();
-	const float GetReputationPct(ReputationType RepType);
-	float GetReputationValue(ReputationType RepType);
-	// . aeType goes to GetReputationLevel(ReputationType) as it is.
-	void AddReputationExact(ReputationType aeType, float afAmount);
-	const char GetReputationLevel(ReputationType RepType);
-	void RemoveReputationMinorOrMajorCrime(char a2);
-	const char GetReputationThreshold(const char cAxis);
-	void SetReputation(int32_t a2, float a3);
-	void DisplayReputationTitleChange();
-	void RemoveReputation(ReputationType a1, int32_t a2);
-	// aeType goes to GetReputationLevel(ReputationType) as it is.
-	void RemoveReputationExact(ReputationType aeType, float afAmount);
-	void AddReputation(ReputationType a1, int32_t a2);
-	const char* GetReputationIcon();
-	const char* GetReputationDesc();
-	// The TESIcon's path, or the shared empty string when it has none.
-	const char* GetReputationMainIcon();
+    // The title of the reputation's current level.
+    const char* GetReputationTitle();
+    REPUTATION_DATA* GetData();
+    const float GetPositiveRatio();
+    const float GetNegativeRatio();
+    const float GetReputationPct(ReputationType RepType);
+    float GetReputationValue(ReputationType RepType);
+    // . aeType goes to GetReputationLevel(ReputationType) as it is.
+    void AddReputationExact(ReputationType aeType, float afAmount);
+    const char GetReputationLevel(ReputationType RepType);
+    void RemoveReputationMinorOrMajorCrime(char a2);
+    const char GetReputationThreshold(const char cAxis);
+    void SetReputation(int32_t a2, float a3);
+    void DisplayReputationTitleChange();
+    void RemoveReputation(ReputationType a1, int32_t a2);
+    // aeType goes to GetReputationLevel(ReputationType) as it is.
+    void RemoveReputationExact(ReputationType aeType, float afAmount);
+    void AddReputation(ReputationType a1, int32_t a2);
+    const char* GetReputationIcon();
+    const char* GetReputationDesc();
+    // The TESIcon's path, or the shared empty string when it has none.
+    const char* GetReputationMainIcon();
 
-	REPUTATION_DATA data;
-	float fPositiveValue;
-	float fNegativeValue;
-	ReputationType rSound;
+    REPUTATION_DATA data;
+    float fPositiveValue;
+    float fNegativeValue;
+    ReputationType rSound;
 };
 
 // The game settings TESReputation.cpp defines.

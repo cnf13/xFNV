@@ -9,22 +9,28 @@ class hkpRigidBody;
 // damper.
 class hkOrientHingedBodyAction : public hkpUnaryAction {
 public:
-	hkOrientHingedBodyAction(hkpRigidBody* entityA, const hkVector4& arHingeAxisLS, const hkVector4& arForwardLS,
-		float afStrength, float afDamping, uint32_t userData);
+    hkOrientHingedBodyAction(
+        hkpRigidBody* entityA,
+        const hkVector4& arHingeAxisLS,
+        const hkVector4& arForwardLS,
+        float afStrength,
+        float afDamping,
+        uint32_t userData
+    );
 
-	void applyAction(const hkStepInfo& stepInfo) override;
-	hkpAction* clone(const hkArray<hkpEntity*>& newEntities, const hkArray<hkpPhantom*>& newPhantoms) const override;
+    void applyAction(const hkStepInfo& stepInfo) override;
+    hkpAction* clone(const hkArray<hkpEntity*>& newEntities, const hkArray<hkpPhantom*>& newPhantoms) const override;
 
-	void SetEnabled(bool abEnable);
+    void SetEnabled(bool abEnable);
 
-	// Copies arDir into TargetDirWS.
-	void setTargetDir(const hkVector4& arDir);
+    // Copies arDir into TargetDirWS.
+    void setTargetDir(const hkVector4& arDir);
 
-	hkVector4 HingeAxisLS;
-	hkVector4 ForwardLS;
-	hkVector4 TargetDirWS;
-	float fStrength;
-	float fDamping;
-	float fAngleDiff;
-	bool bEnabled;
+    hkVector4 HingeAxisLS;
+    hkVector4 ForwardLS;
+    hkVector4 TargetDirWS;
+    float fStrength;
+    float fDamping;
+    float fAngleDiff;
+    bool bEnabled;
 };

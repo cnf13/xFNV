@@ -9,11 +9,30 @@
 
 using hkxVertexIntDataChannelClass_MembersArray = const hkClassMember[1];
 static hkxVertexIntDataChannelClass_MembersArray hkxVertexIntDataChannelClass_Members{
-	{"perVertexInts", nullptr, nullptr, {hkClassMember::TYPE_ARRAY}, {hkClassMember::TYPE_INT32}, 0, 0, 0x8, nullptr}};
+    {"perVertexInts", nullptr, nullptr, {hkClassMember::TYPE_ARRAY}, {hkClassMember::TYPE_INT32}, 0, 0, 0x8, nullptr}
+};
 
-hkClass hkxVertexIntDataChannelClass("hkxVertexIntDataChannel", &hkReferencedObjectClass, 0x14, nullptr, 0, nullptr, 0,
-	hkxVertexIntDataChannelClass_Members, 1, nullptr, nullptr, 0, 1);
+hkClass hkxVertexIntDataChannelClass(
+    "hkxVertexIntDataChannel",
+    &hkReferencedObjectClass,
+    0x14,
+    nullptr,
+    0,
+    nullptr,
+    0,
+    hkxVertexIntDataChannelClass_Members,
+    1,
+    nullptr,
+    nullptr,
+    0,
+    1
+);
 
-hkTypeInfo hkxVertexIntDataChannelTypeInfo = {"hkxVertexIntDataChannel", finishLoadedObjecthkxVertexIntDataChannel,
-	cleanupLoadedObjecthkxVertexIntDataChannel, getVtablehkxVertexIntDataChannel(), &typeid(hkxVertexIntDataChannel),
-	sizeof(hkxVertexIntDataChannel)};
+hkTypeInfo hkxVertexIntDataChannelTypeInfo = {
+    "hkxVertexIntDataChannel",
+    finishLoadedObjecthkxVertexIntDataChannel,
+    cleanupLoadedObjecthkxVertexIntDataChannel,
+    getVtablehkxVertexIntDataChannel(),
+    &typeid(hkxVertexIntDataChannel),
+    sizeof(hkxVertexIntDataChannel)
+};

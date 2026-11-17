@@ -7,7 +7,7 @@
 
 // Releases the reference on the unscaled code, then hkpMoppBvTreeShape's.
 hkScaledMoppBvTreeShape::~hkScaledMoppBvTreeShape() {
-	if (pOriginalCode) {
-		pOriginalCode->removeReference();
-	}
+    if (pOriginalCode) {
+        pOriginalCode->removeReference();
+    }
 }

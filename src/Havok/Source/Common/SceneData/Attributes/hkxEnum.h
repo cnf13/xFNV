@@ -14,25 +14,25 @@ void cleanupLoadedObjecthkxEnum(void* p);
 // A scene attribute's mapping between integer values and names.
 class hkxEnum : public hkReferencedObject {
 public:
-	struct Item {
-		static const hkClass& staticClass();
+    struct Item {
+        static const hkClass& staticClass();
 
-		int32_t m_value;
-		hkStringPtr m_name;
-	};
+        int32_t m_value;
+        hkStringPtr m_name;
+    };
 
-	hkxEnum() = default;
-	hkxEnum(hkFinishLoadedObjectFlag aFlag) : hkReferencedObject(aFlag), m_items(aFlag) {}
-	~hkxEnum() override;
+    hkxEnum() = default;
+    hkxEnum(hkFinishLoadedObjectFlag aFlag) : hkReferencedObject(aFlag), m_items(aFlag) {}
+    ~hkxEnum() override;
 
-	// The name of the item whose value is val, without its hkStringPtr flag bit; HK_FAILURE
-	// when no item has it.
-	hkResult getNameOfValue(int32_t val, const char** name) const;
-	hkResult getValueOfName(const char* name, int32_t* val) const;
+    // The name of the item whose value is val, without its hkStringPtr flag bit; HK_FAILURE
+    // when no item has it.
+    hkResult getNameOfValue(int32_t val, const char** name) const;
+    hkResult getValueOfName(const char* name, int32_t* val) const;
 
-	static const hkClass& staticClass();
+    static const hkClass& staticClass();
 
-	hkArray<Item> m_items;
+    hkArray<Item> m_items;
 };
 
 extern hkClass hkxEnumItemClass;

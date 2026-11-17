@@ -12,14 +12,18 @@ class TESObjectREFR;
 // The extra data that lets a reference that is not an actor be the target of spells.
 class NonActorMagicTarget : public BSExtraData, public MagicTarget {
 public:
-	NonActorMagicTarget();
-	NonActorMagicTarget(TESObjectREFR* apTargetObject);
-	~NonActorMagicTarget() override;
+    NonActorMagicTarget();
+    NonActorMagicTarget(TESObjectREFR* apTargetObject);
+    ~NonActorMagicTarget() override;
 
-	bool AddTarget(MagicCaster* apCaster, MagicItem* apSpell, ActiveEffect* apActiveEffect, bool abAreaTarget) override;
-	TESObjectREFR* GetTargetStatsObject() override { return pTargetObject; }
-	BSSimpleList<ActiveEffect*>* GetActiveEffectList() override { return &lActiveEffectList; }
+    bool AddTarget(MagicCaster* apCaster, MagicItem* apSpell, ActiveEffect* apActiveEffect, bool abAreaTarget) override;
+    TESObjectREFR* GetTargetStatsObject() override {
+        return pTargetObject;
+    }
+    BSSimpleList<ActiveEffect*>* GetActiveEffectList() override {
+        return &lActiveEffectList;
+    }
 
-	TESObjectREFR* pTargetObject;
-	BSSimpleList<ActiveEffect*> lActiveEffectList;
+    TESObjectREFR* pTargetObject;
+    BSSimpleList<ActiveEffect*> lActiveEffectList;
 };

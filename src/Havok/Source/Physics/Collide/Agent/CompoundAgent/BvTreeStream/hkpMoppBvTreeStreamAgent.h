@@ -8,7 +8,7 @@ class hkpCollisionDispatcher;
 // registerAgent.
 class hkpMoppBvTreeStreamAgent {
 public:
-	// Registers the agent for MOPP shapes against convex shapes, both ways round, and MOPP
-	// against MOPP.
-	static void registerAgent(hkpCollisionDispatcher* dispatcher);
+    // Registers the agent for MOPP shapes against convex shapes, both ways round, and MOPP
+    // against MOPP.
+    static void registerAgent(hkpCollisionDispatcher* dispatcher);
 };

@@ -16,9 +16,9 @@
 #include "Gamebryo2.2/CoreLibs/NiMain/NiStream.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiStreamMacros.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiTArray.h"
-#include "Gamebryo2.2/CoreLibs/NiMain/NiTimeController.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiTListBase.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiTPointerList.h"
+#include "Gamebryo2.2/CoreLibs/NiMain/NiTimeController.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiUpdateData.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiViewerStrings.h"
 #include "Gamebryo2.2/CoreLibs/NiParticle/NiPSysData.h"
@@ -38,384 +38,395 @@ static GamebryoVersionText acGamebryoVersion{"NiParticle Gamebryo Version 2.2.0.
 NiRTTI NiParticleSystem::ms_RTTI("NiParticleSystem", &NiParticles::ms_RTTI);
 
 NiParticleSystem::NiParticleSystem()
-	: m_bWorldSpace(true), m_fLastTime(-3.4028235e+38f), m_bResetSystem(false), m_bDynamicBounds(false) {}
+  : m_bWorldSpace(true), m_fLastTime(-3.4028235e+38f), m_bResetSystem(false), m_bDynamicBounds(false) {}
 
 // The destructor body is empty because the modifier list's own destructor empties the list.
 NiParticleSystem::~NiParticleSystem() {}
 
 NiObject* NiParticleSystem::CreateClone(NiCloningProcess& kCloning) {
-	NiParticleSystem* v3 = static_cast<NiParticleSystem*>(NiMemObject::operator new(sizeof(NiParticleSystem)));
-	if (v3) {
-		NiParticleSystem* pkObject = ::new (v3) NiParticleSystem;
-		CopyMembers(pkObject, kCloning);
-		return pkObject;
-	} else {
-		CopyMembers(0, kCloning);
-		return 0;
-	}
+    NiParticleSystem* v3 = static_cast<NiParticleSystem*>(NiMemObject::operator new(sizeof(NiParticleSystem)));
+    if (v3) {
+        NiParticleSystem* pkObject = ::new (v3) NiParticleSystem;
+        CopyMembers(pkObject, kCloning);
+        return pkObject;
+    }
+    else {
+        CopyMembers(0, kCloning);
+        return 0;
+    }
 }
 
 // The modifier link IDs are queued here and resolved in LinkObject. A short read leaves ucWorldSpace uninitialised.
 void NiParticleSystem::LoadBinary(NiStream& kStream) {
-	NiParticles::LoadBinary(kStream);
+    NiParticles::LoadBinary(kStream);
 
-	uint8_t ucWorldSpace;
-	NiStreamLoadBinary(kStream, ucWorldSpace);
-	m_bWorldSpace = ucWorldSpace != 0;
-	kStream.ReadMultipleLinkIDs();
+    uint8_t ucWorldSpace;
+    NiStreamLoadBinary(kStream, ucWorldSpace);
+    m_bWorldSpace = ucWorldSpace != 0;
+    kStream.ReadMultipleLinkIDs();
 }
 
 // Each linked object is added as a modifier without a type check.
 void NiParticleSystem::LinkObject(NiStream& kStream) {
-	NiParticles::LinkObject(kStream);
+    NiParticles::LinkObject(kStream);
 
-	uint32_t uiNumModifiers = kStream.GetNumberOfLinkIDs();
-	for (uint32_t i = 0; i < uiNumModifiers; i++) {
-		AddModifier(static_cast<NiPSysModifier*>(kStream.GetObjectFromLinkID()));
-	}
+    uint32_t uiNumModifiers = kStream.GetNumberOfLinkIDs();
+    for (uint32_t i = 0; i < uiNumModifiers; i++) {
+        AddModifier(static_cast<NiPSysModifier*>(kStream.GetObjectFromLinkID()));
+    }
 }
 
 // The modifiers' results are ignored, and the list elements are not null-checked.
 bool NiParticleSystem::RegisterStreamables(NiStream& kStream) {
-	if (!NiParticles::RegisterStreamables(kStream)) {
-		return false;
-	}
+    if (!NiParticles::RegisterStreamables(kStream)) {
+        return false;
+    }
 
-	NiTListItem<NiPointer<NiPSysModifier>>* kPos = m_kModifierList.GetHeadPos();
-	while (kPos) {
-		NiPSysModifier* pkModifier = m_kModifierList.GetNext(kPos);
-		pkModifier->RegisterStreamables(kStream);
-	}
-	return true;
+    NiTListItem<NiPointer<NiPSysModifier>>* kPos = m_kModifierList.GetHeadPos();
+    while (kPos) {
+        NiPSysModifier* pkModifier = m_kModifierList.GetNext(kPos);
+        pkModifier->RegisterStreamables(kStream);
+    }
+    return true;
 }
 
 void NiParticleSystem::SaveBinary(NiStream& kStream) {
-	NiParticles::SaveBinary(kStream);
+    NiParticles::SaveBinary(kStream);
 
-	uint8_t ucWorldSpace = m_bWorldSpace;
-	NiStreamSaveBinary(kStream, ucWorldSpace);
-	uint32_t uiCount = m_kModifierList.m_uiCount;
-	NiStreamSaveBinary(kStream, uiCount);
-	NiTListItem<NiPointer<NiPSysModifier>>* kPos = m_kModifierList.GetHeadPos();
-	while (kPos) {
-		kStream.SaveLinkID(m_kModifierList.GetNext(kPos));
-	}
+    uint8_t ucWorldSpace = m_bWorldSpace;
+    NiStreamSaveBinary(kStream, ucWorldSpace);
+    uint32_t uiCount = m_kModifierList.m_uiCount;
+    NiStreamSaveBinary(kStream, uiCount);
+    NiTListItem<NiPointer<NiPSysModifier>>* kPos = m_kModifierList.GetHeadPos();
+    while (kPos) {
+        kStream.SaveLinkID(m_kModifierList.GetNext(kPos));
+    }
 }
 
 // Each modifier is compared with the other system's modifier of the same name (null when there is none).
 bool NiParticleSystem::IsEqual(NiObject* pkObject) {
-	if (!NiParticles::IsEqual(pkObject)) {
-		return false;
-	}
+    if (!NiParticles::IsEqual(pkObject)) {
+        return false;
+    }
 
-	NiParticleSystem* pkOther = static_cast<NiParticleSystem*>(pkObject);
-	if (m_bWorldSpace != pkOther->m_bWorldSpace) {
-		return false;
-	}
-	if (m_bDynamicBounds != pkOther->m_bDynamicBounds) {
-		return false;
-	}
+    NiParticleSystem* pkOther = static_cast<NiParticleSystem*>(pkObject);
+    if (m_bWorldSpace != pkOther->m_bWorldSpace) {
+        return false;
+    }
+    if (m_bDynamicBounds != pkOther->m_bDynamicBounds) {
+        return false;
+    }
 
-	NiTListItem<NiPointer<NiPSysModifier>>* kPos = m_kModifierList.GetHeadPos();
-	while (kPos) {
-		NiPSysModifier* pkModifier = m_kModifierList.GetNext(kPos);
-		// EXE-INLINED 0xC1B0F0
-		NiPSysModifier* pkOtherModifier = nullptr;
-		NiTListItem<NiPointer<NiPSysModifier>>* kOtherPos = pkOther->m_kModifierList.GetHeadPos();
-		while (kOtherPos) {
-			NiPSysModifier* pkCandidate = pkOther->m_kModifierList.GetNext(kOtherPos);
-			if (pkCandidate && pkCandidate->m_kName == pkModifier->m_kName) {
-				pkOtherModifier = pkCandidate;
-				break;
-			}
-		}
-		if (!pkModifier->IsEqual(pkOtherModifier)) {
-			return false;
-		}
-	}
-	return true;
+    NiTListItem<NiPointer<NiPSysModifier>>* kPos = m_kModifierList.GetHeadPos();
+    while (kPos) {
+        NiPSysModifier* pkModifier = m_kModifierList.GetNext(kPos);
+        // EXE-INLINED 0xC1B0F0
+        NiPSysModifier* pkOtherModifier = nullptr;
+        NiTListItem<NiPointer<NiPSysModifier>>* kOtherPos = pkOther->m_kModifierList.GetHeadPos();
+        while (kOtherPos) {
+            NiPSysModifier* pkCandidate = pkOther->m_kModifierList.GetNext(kOtherPos);
+            if (pkCandidate && pkCandidate->m_kName == pkModifier->m_kName) {
+                pkOtherModifier = pkCandidate;
+                break;
+            }
+        }
+        if (!pkModifier->IsEqual(pkOtherModifier)) {
+            return false;
+        }
+    }
+    return true;
 }
 
 // The model data is read as particle data without a null check.
 void NiParticleSystem::GetViewerStrings(NiTPrimitiveArray<char*>* pkStrings) {
-	NiParticles::GetViewerStrings(pkStrings);
+    NiParticles::GetViewerStrings(pkStrings);
 
-	pkStrings->Add(NiGetViewerString(ms_RTTI.GetName()));
-	pkStrings->Add(NiGetViewerString("World Space", m_bWorldSpace));
-	pkStrings->Add(NiGetViewerString("NumMods", m_kModifierList.m_uiCount));
-	pkStrings->Add(NiGetViewerString("NumParticles",
-		static_cast<NiParticlesData*>(m_spModelData.m_pObject)->m_usActive));
-	pkStrings->Add(NiGetViewerString("MaxParticles",
-		static_cast<NiParticlesData*>(m_spModelData.m_pObject)->m_usVertices));
+    pkStrings->Add(NiGetViewerString(ms_RTTI.GetName()));
+    pkStrings->Add(NiGetViewerString("World Space", m_bWorldSpace));
+    pkStrings->Add(NiGetViewerString("NumMods", m_kModifierList.m_uiCount));
+    pkStrings->Add(
+        NiGetViewerString("NumParticles", static_cast<NiParticlesData*>(m_spModelData.m_pObject)->m_usActive)
+    );
+    pkStrings->Add(
+        NiGetViewerString("MaxParticles", static_cast<NiParticlesData*>(m_spModelData.m_pObject)->m_usVertices)
+    );
 }
 
 // The clone is looked up and never used; the modifiers and the model data are not null-checked.
 void NiParticleSystem::ProcessClone(NiCloningProcess& kCloning) {
-	NiParticles::ProcessClone(kCloning);
+    NiParticles::ProcessClone(kCloning);
 
-	NiObject* pkObject = nullptr;
-	kCloning.m_pkCloneMap->GetAt(this, pkObject);
-	NiTListItem<NiPointer<NiPSysModifier>>* kPos = m_kModifierList.GetHeadPos();
-	while (kPos) {
-		NiPSysModifier* pkModifier = m_kModifierList.GetNext(kPos);
-		pkModifier->ProcessClone(kCloning);
-	}
-	m_spModelData.m_pObject->ProcessClone(kCloning);
+    NiObject* pkObject = nullptr;
+    kCloning.m_pkCloneMap->GetAt(this, pkObject);
+    NiTListItem<NiPointer<NiPSysModifier>>* kPos = m_kModifierList.GetHeadPos();
+    while (kPos) {
+        NiPSysModifier* pkModifier = m_kModifierList.GetNext(kPos);
+        pkModifier->ProcessClone(kCloning);
+    }
+    m_spModelData.m_pObject->ProcessClone(kCloning);
 }
 
 // A particle system always takes part in selective updates and is never rigid; the transform and controller bits are
 // always set.
 void NiParticleSystem::SetSelectiveUpdateFlags(bool& bSelectiveUpdate, int32_t, bool& bRigid) {
-	bSelectiveUpdate = true;
-	bRigid = false;
-	// EXE-INLINED 0x43B370
-	if (bSelectiveUpdate) {
-		m_uFlags = NiFlags(m_uFlags | SELECTIVE_UPDATE);
-	} else {
-		m_uFlags = NiFlags(m_uFlags & ~SELECTIVE_UPDATE);
-	}
-	m_uFlags = NiFlags(m_uFlags | SELECTIVE_UPDATE_TRANSFORMS | SELECTIVE_UPDATE_CONTROLLER);
-	// EXE-INLINED 0x43B370
-	if (bRigid) {
-		m_uFlags = NiFlags(m_uFlags | SELECTIVE_UPDATE_RIGID);
-	} else {
-		m_uFlags = NiFlags(m_uFlags & ~SELECTIVE_UPDATE_RIGID);
-	}
+    bSelectiveUpdate = true;
+    bRigid = false;
+    // EXE-INLINED 0x43B370
+    if (bSelectiveUpdate) {
+        m_uFlags = NiFlags(m_uFlags | SELECTIVE_UPDATE);
+    }
+    else {
+        m_uFlags = NiFlags(m_uFlags & ~SELECTIVE_UPDATE);
+    }
+    m_uFlags = NiFlags(m_uFlags | SELECTIVE_UPDATE_TRANSFORMS | SELECTIVE_UPDATE_CONTROLLER);
+    // EXE-INLINED 0x43B370
+    if (bRigid) {
+        m_uFlags = NiFlags(m_uFlags | SELECTIVE_UPDATE_RIGID);
+    }
+    else {
+        m_uFlags = NiFlags(m_uFlags & ~SELECTIVE_UPDATE_RIGID);
+    }
 }
 
 // During a parallel update the system only reports that particles were found.
 void NiParticleSystem::UpdateDownwardPass(NiUpdateData& UpdateData, uint32_t uFlags) {
-	if (UpdateData.bParallelUpdate) {
-		UpdateData.bFoundParticles = true;
-		return;
-	}
+    if (UpdateData.bParallelUpdate) {
+        UpdateData.bFoundParticles = true;
+        return;
+    }
 
-	UpdateWorldData(UpdateData);
-	NiParticles::UpdateDownwardPass(UpdateData, uFlags);
+    UpdateWorldData(UpdateData);
+    NiParticles::UpdateDownwardPass(UpdateData, uFlags);
 }
 
 // UpdateRigidDownwardPass uses the same function.
 void NiParticleSystem::UpdateSelectedDownwardPass(NiUpdateData& UpdateData, uint32_t uFlags) {
-	if (UpdateData.bParallelUpdate) {
-		UpdateData.bFoundParticles = true;
-		return;
-	}
+    if (UpdateData.bParallelUpdate) {
+        UpdateData.bFoundParticles = true;
+        return;
+    }
 
-	if (m_uFlags & SELECTIVE_UPDATE_TRANSFORMS) {
-		UpdateWorldData(UpdateData);
-	}
-	NiParticles::UpdateSelectedDownwardPass(UpdateData, uFlags);
+    if (m_uFlags & SELECTIVE_UPDATE_TRANSFORMS) {
+        UpdateWorldData(UpdateData);
+    }
+    NiParticles::UpdateSelectedDownwardPass(UpdateData, uFlags);
 }
 
 void NiParticleSystem::UpdateRigidDownwardPass(NiUpdateData& UpdateData, uint32_t uFlags) {
-	if (UpdateData.bParallelUpdate) {
-		UpdateData.bFoundParticles = true;
-		return;
-	}
+    if (UpdateData.bParallelUpdate) {
+        UpdateData.bFoundParticles = true;
+        return;
+    }
 
-	if (m_uFlags & SELECTIVE_UPDATE_TRANSFORMS) {
-		UpdateWorldData(UpdateData);
-	}
-	NiParticles::UpdateSelectedDownwardPass(UpdateData, uFlags);
+    if (m_uFlags & SELECTIVE_UPDATE_TRANSFORMS) {
+        UpdateWorldData(UpdateData);
+    }
+    NiParticles::UpdateSelectedDownwardPass(UpdateData, uFlags);
 }
 
 // The world transform before the world-space override is kept for the bound; a world-space system then drops its
 // translation and rotation (the scale stays).
 void NiParticleSystem::UpdateWorldData(NiUpdateData& UpdateData) {
-	NiParticles::UpdateWorldData(UpdateData);
+    NiParticles::UpdateWorldData(UpdateData);
 
-	m_kUnmodifiedWorld = m_kWorld;
-	if (m_bWorldSpace) {
-		m_kWorld.m_Translate = NiPoint3_ZERO;
-		m_kWorld.m_Rotate = NiMatrix3_IDENTITY;
-	}
+    m_kUnmodifiedWorld = m_kWorld;
+    if (m_bWorldSpace) {
+        m_kWorld.m_Translate = NiPoint3_ZERO;
+        m_kWorld.m_Rotate = NiMatrix3_IDENTITY;
+    }
 }
 
 // A world-space system's particles are already in world space: a dynamic bound is only scaled, a static one is moved
 // by the unmodified world transform.
 void NiParticleSystem::UpdateWorldBound() {
-	NiParticles::UpdateWorldBound();
+    NiParticles::UpdateWorldBound();
 
-	if (m_bWorldSpace) {
-		NiBound& rkModelBound = m_spModelData.m_pObject->m_kBound;
-		if (m_bDynamicBounds) {
-			*m_kWorldBound = rkModelBound;
-			float fScale = m_kWorld.m_fScale;
-			// EXE-INLINED 0x45BB20
-			NiPoint3 kCenter;
-			kCenter.x = m_kWorldBound->m_kCenter.x * fScale;
-			kCenter.y = m_kWorldBound->m_kCenter.y * fScale;
-			kCenter.z = m_kWorldBound->m_kCenter.z * fScale;
-			m_kWorldBound->m_kCenter = kCenter;
-			m_kWorldBound->m_fRadius *= m_kWorld.m_fScale;
-		} else {
-			m_kWorldBound->Update(rkModelBound, m_kUnmodifiedWorld);
-		}
-	}
+    if (m_bWorldSpace) {
+        NiBound& rkModelBound = m_spModelData.m_pObject->m_kBound;
+        if (m_bDynamicBounds) {
+            *m_kWorldBound = rkModelBound;
+            float fScale = m_kWorld.m_fScale;
+            // EXE-INLINED 0x45BB20
+            NiPoint3 kCenter;
+            kCenter.x = m_kWorldBound->m_kCenter.x * fScale;
+            kCenter.y = m_kWorldBound->m_kCenter.y * fScale;
+            kCenter.z = m_kWorldBound->m_kCenter.z * fScale;
+            m_kWorldBound->m_kCenter = kCenter;
+            m_kWorldBound->m_fRadius *= m_kWorld.m_fScale;
+        }
+        else {
+            m_kWorldBound->Update(rkModelBound, m_kUnmodifiedWorld);
+        }
+    }
 }
 
 void NiParticleSystem::SetModelData(NiGeometryData* pkModelData) {
-	NiParticles::SetModelData(pkModelData);
+    NiParticles::SetModelData(pkModelData);
 }
 
 // Queues the update on the parallel update manager when it runs and this is the update thread; a task the manager
 // does not take goes back to the pool, and the system updates itself.
 void NiParticleSystem::UpdateSystem(float fTime) {
-	if (NiParticleSystem::ms_bParallelUpdateEnabled) {
-		if (NiParallelUpdateTaskManager::ms_pkManager) {
-			if (NiParallelUpdateTaskManager::ms_pkManager->m_bActive &&
-				(m_spModelData.m_pObject->m_kBound.m_fRadius > 0.0f &&
-					GetCurrentThreadId() == NiParticleSystem::iThreadID)) {
-				NiPSysUpdateTask* pkTask = NiPSysUpdateTask::GetFreeObject();
-				if (pkTask) {
-					pkTask->Init(this, fTime);
-					if (NiParallelUpdateTaskManager::ms_pkManager->AddTask(pkTask,
-							NiParticleSystem::ms_eParallelUpdatePriority)) {
-						return;
-					}
-					pkTask->Clear();
-				}
-			}
-		}
-	}
-	Do_UpdateSystem(fTime);
+    if (NiParticleSystem::ms_bParallelUpdateEnabled) {
+        if (NiParallelUpdateTaskManager::ms_pkManager) {
+            if (NiParallelUpdateTaskManager::ms_pkManager->m_bActive &&
+                (m_spModelData.m_pObject->m_kBound.m_fRadius > 0.0f &&
+                 GetCurrentThreadId() == NiParticleSystem::iThreadID)) {
+                NiPSysUpdateTask* pkTask = NiPSysUpdateTask::GetFreeObject();
+                if (pkTask) {
+                    pkTask->Init(this, fTime);
+                    if (NiParallelUpdateTaskManager::ms_pkManager->AddTask(
+                            pkTask, NiParticleSystem::ms_eParallelUpdatePriority
+                        )) {
+                        return;
+                    }
+                    pkTask->Clear();
+                }
+            }
+        }
+    }
+    Do_UpdateSystem(fTime);
 }
 
 // Strip update modifiers run after all the others (the last one found wins). A system whose bound radius becomes
 // non-zero flags its nearest fade node ancestor so that the world bound is recomputed.
 void NiParticleSystem::Do_UpdateSystem(float fTime) {
-	NiPSysData* pkData = static_cast<NiPSysData*>(m_spModelData.m_pObject);
-	bool bNoBound = pkData->m_kBound.m_iRadiusAsInt == 0;
-	pkData->ResolveAddedParticles();
+    NiPSysData* pkData = static_cast<NiPSysData*>(m_spModelData.m_pObject);
+    bool bNoBound = pkData->m_kBound.m_iRadiusAsInt == 0;
+    pkData->ResolveAddedParticles();
 
-	if (m_bResetSystem || fTime < m_fLastTime) {
-		PerformSystemReset();
-		m_bResetSystem = false;
-	}
-	if (m_fLastTime == -FLT_MAX) {
-		m_fLastTime = fTime;
-	}
+    if (m_bResetSystem || fTime < m_fLastTime) {
+        PerformSystemReset();
+        m_bResetSystem = false;
+    }
+    if (m_fLastTime == -FLT_MAX) {
+        m_fLastTime = fTime;
+    }
 
-	NiPSysModifier* pkStripUpdate = nullptr;
-	NiTListItem<NiPointer<NiPSysModifier>>* kPos = m_kModifierList.GetHeadPos();
-	while (kPos) {
-		NiPSysModifier* pkModifier = m_kModifierList.GetNext(kPos);
-		if (pkModifier->IsBSPSysStripUpdateModifier()) {
-			pkStripUpdate = pkModifier;
-		} else if (pkModifier->m_bActive) {
-			pkModifier->Update(fTime, pkData);
-		}
-	}
-	if (pkStripUpdate && pkStripUpdate->m_bActive) {
-		pkStripUpdate->Update(fTime, pkData);
-	}
+    NiPSysModifier* pkStripUpdate = nullptr;
+    NiTListItem<NiPointer<NiPSysModifier>>* kPos = m_kModifierList.GetHeadPos();
+    while (kPos) {
+        NiPSysModifier* pkModifier = m_kModifierList.GetNext(kPos);
+        if (pkModifier->IsBSPSysStripUpdateModifier()) {
+            pkStripUpdate = pkModifier;
+        }
+        else if (pkModifier->m_bActive) {
+            pkModifier->Update(fTime, pkData);
+        }
+    }
+    if (pkStripUpdate && pkStripUpdate->m_bActive) {
+        pkStripUpdate->Update(fTime, pkData);
+    }
 
-	pkData->MarkAsChanged(7);
-	m_fLastTime = fTime;
+    pkData->MarkAsChanged(7);
+    m_fLastTime = fTime;
 
-	if (bNoBound && pkData->m_kBound.m_iRadiusAsInt != 0) {
-		for (NiNode* pkParent = m_pkParent; pkParent; pkParent = pkParent->m_pkParent) {
-			if (pkParent->IsFadeNode()) {
-				pkParent->m_uFlags = NiFlags(pkParent->m_uFlags | WORLD_BOUND_CHANGE);
-				return;
-			}
-		}
-	}
+    if (bNoBound && pkData->m_kBound.m_iRadiusAsInt != 0) {
+        for (NiNode* pkParent = m_pkParent; pkParent; pkParent = pkParent->m_pkParent) {
+            if (pkParent->IsFadeNode()) {
+                pkParent->m_uFlags = NiFlags(pkParent->m_uFlags | WORLD_BOUND_CHANGE);
+                return;
+            }
+        }
+    }
 }
 
 // The model data is read once, before the list is walked.
 void NiParticleSystem::InitializeNewParticle(uint16_t usNewParticle) {
-	NiPSysData* pkData = static_cast<NiPSysData*>(m_spModelData.m_pObject);
-	NiTListItem<NiPointer<NiPSysModifier>>* kPos = m_kModifierList.GetHeadPos();
-	while (kPos) {
-		NiPSysModifier* pkModifier = m_kModifierList.GetNext(kPos);
-		pkModifier->Initialize(pkData, usNewParticle);
-	}
+    NiPSysData* pkData = static_cast<NiPSysData*>(m_spModelData.m_pObject);
+    NiTListItem<NiPointer<NiPSysModifier>>* kPos = m_kModifierList.GetHeadPos();
+    while (kPos) {
+        NiPSysModifier* pkModifier = m_kModifierList.GetNext(kPos);
+        pkModifier->Initialize(pkData, usNewParticle);
+    }
 }
 
 NiPSysModifier* NiParticleSystem::GetModifierByName(const NiFixedString& kName) {
-	NiTListItem<NiPointer<NiPSysModifier>>* kPos = m_kModifierList.GetHeadPos();
-	while (kPos) {
-		NiPSysModifier* pkModifier = m_kModifierList.GetNext(kPos);
-		if (pkModifier && pkModifier->m_kName == kName) {
-			return pkModifier;
-		}
-	}
-	return nullptr;
+    NiTListItem<NiPointer<NiPSysModifier>>* kPos = m_kModifierList.GetHeadPos();
+    while (kPos) {
+        NiPSysModifier* pkModifier = m_kModifierList.GetNext(kPos);
+        if (pkModifier && pkModifier->m_kName == kName) {
+            return pkModifier;
+        }
+    }
+    return nullptr;
 }
 
 // An empty list is detected by its head, not its count.
 void NiParticleSystem::AddModifier(NiPSysModifier* pkModifier) {
-	NiTListItem<NiPointer<NiPSysModifier>>* kPos = m_kModifierList.GetHeadPos();
-	if (!kPos) {
-		m_kModifierList.AddHead(pkModifier);
-	} else {
-		while (kPos && kPos->m_element->m_uiOrder <= pkModifier->m_uiOrder) {
-			kPos = kPos->m_pkNext;
-		}
-		if (kPos) {
-			m_kModifierList.InsertBefore(kPos, pkModifier);
-		} else {
-			m_kModifierList.AddTail(pkModifier);
-		}
-	}
-	pkModifier->SetSystemPointer(this);
+    NiTListItem<NiPointer<NiPSysModifier>>* kPos = m_kModifierList.GetHeadPos();
+    if (!kPos) {
+        m_kModifierList.AddHead(pkModifier);
+    }
+    else {
+        while (kPos && kPos->m_element->m_uiOrder <= pkModifier->m_uiOrder) {
+            kPos = kPos->m_pkNext;
+        }
+        if (kPos) {
+            m_kModifierList.InsertBefore(kPos, pkModifier);
+        }
+        else {
+            m_kModifierList.AddTail(pkModifier);
+        }
+    }
+    pkModifier->SetSystemPointer(this);
 }
 
 uint32_t NiParticleSystem::GetModifierCount() {
-	return (&m_kModifierList)->m_uiCount;
+    return (&m_kModifierList)->m_uiCount;
 }
 
 uint16_t NiParticleSystem::GetMaxNumParticles() {
-	NiGeometryData* v2 = (&m_spModelData)->operator->();
-	return v2->NiGeometryData::GetVertexCount();
+    NiGeometryData* v2 = (&m_spModelData)->operator->();
+    return v2->NiGeometryData::GetVertexCount();
 }
 
 // NiParticles' copy is the engine's NiTriShape::CopyMembers. Each modifier's clone is held in a NiPointer
 // across the AddTail; the model data's clone is assigned through the NiPointer.
 void NiParticleSystem::CopyMembers(NiParticleSystem* pkDest, NiCloningProcess& kCloning) {
-	NiParticles::CopyMembers(pkDest, kCloning);
-	pkDest->m_bWorldSpace = m_bWorldSpace;
-	NiTListItem<NiPointer<NiPSysModifier>>* pkPos = m_kModifierList.m_pkHead;
-	while (pkPos) {
-		NiPSysModifier* pkModifier = pkPos->m_element.m_pObject;
-		pkPos = pkPos->m_pkNext;
-		NiPointer<NiPSysModifier> spClone = static_cast<NiPSysModifier*>(pkModifier->CreateClone(kCloning));
-		pkDest->m_kModifierList.AddTail(spClone);
-	}
-	pkDest->m_fLastTime = m_fLastTime;
-	pkDest->m_bDynamicBounds = m_bDynamicBounds;
-	pkDest->m_spModelData = static_cast<NiGeometryData*>(m_spModelData.m_pObject->CreateClone(kCloning));
+    NiParticles::CopyMembers(pkDest, kCloning);
+    pkDest->m_bWorldSpace = m_bWorldSpace;
+    NiTListItem<NiPointer<NiPSysModifier>>* pkPos = m_kModifierList.m_pkHead;
+    while (pkPos) {
+        NiPSysModifier* pkModifier = pkPos->m_element.m_pObject;
+        pkPos = pkPos->m_pkNext;
+        NiPointer<NiPSysModifier> spClone = static_cast<NiPSysModifier*>(pkModifier->CreateClone(kCloning));
+        pkDest->m_kModifierList.AddTail(spClone);
+    }
+    pkDest->m_fLastTime = m_fLastTime;
+    pkDest->m_bDynamicBounds = m_bDynamicBounds;
+    pkDest->m_spModelData = static_cast<NiGeometryData*>(m_spModelData.m_pObject->CreateClone(kCloning));
 }
 
 // The modifier controllers are found by walking the controller chain with a type check.
 void NiParticleSystem::PerformSystemReset() {
-	NiPSysData* pkData = static_cast<NiPSysData*>(m_spModelData.m_pObject);
-	pkData->SetActiveVertexCount(0);
-	pkData->m_usNumAddedParticles = 0;
-	pkData->m_usAddedParticlesBase = 0;
-	m_fLastTime = -FLT_MAX;
+    NiPSysData* pkData = static_cast<NiPSysData*>(m_spModelData.m_pObject);
+    pkData->SetActiveVertexCount(0);
+    pkData->m_usNumAddedParticles = 0;
+    pkData->m_usAddedParticlesBase = 0;
+    m_fLastTime = -FLT_MAX;
 
-	NiTListItem<NiPointer<NiPSysModifier>>* kPos = m_kModifierList.GetHeadPos();
-	while (kPos) {
-		NiPSysModifier* pkModifier = m_kModifierList.GetNext(kPos);
-		pkModifier->HandleReset();
-	}
+    NiTListItem<NiPointer<NiPSysModifier>>* kPos = m_kModifierList.GetHeadPos();
+    while (kPos) {
+        NiPSysModifier* pkModifier = m_kModifierList.GetNext(kPos);
+        pkModifier->HandleReset();
+    }
 
-	for (NiTimeController* pkCtlr = m_spControllers; pkCtlr; pkCtlr = pkCtlr->m_spNext.m_pObject) {
-		NiPSysModifierCtlr* pkModifierCtlr =
-			static_cast<NiPSysModifierCtlr*>(pkCtlr->DynamicCast(&NiPSysModifierCtlr::ms_RTTI));
-		if (pkModifierCtlr) {
-			pkModifierCtlr->HandleReset();
-		}
-	}
+    for (NiTimeController* pkCtlr = m_spControllers; pkCtlr; pkCtlr = pkCtlr->m_spNext.m_pObject) {
+        NiPSysModifierCtlr* pkModifierCtlr =
+            static_cast<NiPSysModifierCtlr*>(pkCtlr->DynamicCast(&NiPSysModifierCtlr::ms_RTTI));
+        if (pkModifierCtlr) {
+            pkModifierCtlr->HandleReset();
+        }
+    }
 }
 
 NiObject* NiParticleSystem::CreateObject() {
-	void* v0 = NiMemObject::operator new(sizeof(NiParticleSystem));
-	if (v0) {
-		return ::new (v0) NiParticleSystem;
-	} else {
-		return nullptr;
-	}
+    void* v0 = NiMemObject::operator new(sizeof(NiParticleSystem));
+    if (v0) {
+        return ::new (v0) NiParticleSystem;
+    }
+    else {
+        return nullptr;
+    }
 }

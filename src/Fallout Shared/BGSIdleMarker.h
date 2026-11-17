@@ -7,18 +7,20 @@
 // yet.
 class BGSIdleMarker : public TESBoundObject, public BGSIdleCollection {
 public:
-	BGSIdleMarker();
-	~BGSIdleMarker() override;
+    BGSIdleMarker();
+    ~BGSIdleMarker() override;
 
-	bool Load(TESFile* apFile) override;
-	void Save() override;
-	void InitItem() override;
-	void Copy(TESForm* apCopy) override;
-	bool Compare(TESForm* apCompare) override;
-	void UnClone3D(TESObjectREFR*) override {}
-	NiAVObject* Clone3D(TESObjectREFR* apRequester) override;
-	using TESBoundObject::Clone3D;
-	using TESForm::Save;
+    bool Load(TESFile* apFile) override;
+    void Save() override;
+    void InitItem() override;
+    void Copy(TESForm* apCopy) override;
+    bool Compare(TESForm* apCompare) override;
+    void UnClone3D(TESObjectREFR*) override {}
+    NiAVObject* Clone3D(TESObjectREFR* apRequester) override;
+    using TESBoundObject::Clone3D;
+    using TESForm::Save;
 
-	static void operator delete(void* apMemory) { ourFree(apMemory); }
+    static void operator delete(void* apMemory) {
+        ourFree(apMemory);
+    }
 };

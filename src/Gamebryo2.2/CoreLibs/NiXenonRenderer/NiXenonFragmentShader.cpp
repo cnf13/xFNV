@@ -7,12 +7,12 @@
 #include "Gamebryo2.2/CoreLibs/NiMain/NiShader.h"
 
 const NiRTTI* NiFragmentShaderInstanceDescriptor::GetRTTI() const {
-	return &NiFragmentShaderInstanceDescriptor::ms_RTTI;
+    return &NiFragmentShaderInstanceDescriptor::ms_RTTI;
 }
 
 // m_kMatDesc's identifier releases its own handle.
 NiFragmentShaderInstanceDescriptor::~NiFragmentShaderInstanceDescriptor() {}
 
 void NiFragmentShaderInstanceDescriptor::operator delete(void* apMemory) {
-	MemoryManager_Singleton.Deallocate(apMemory);
+    MemoryManager_Singleton.Deallocate(apMemory);
 }

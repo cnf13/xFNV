@@ -4,6 +4,6 @@
 // BSBound, BSXFlags ...) once. Everything in it is static.
 class BSMain {
 public:
-	static void InitSDM();
-	static void KillSDM();
+    static void InitSDM();
+    static void KillSDM();
 };

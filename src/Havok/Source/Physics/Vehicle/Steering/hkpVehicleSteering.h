@@ -11,20 +11,23 @@ class hkpVehicleInstance;
 // abstract.
 class hkpVehicleSteering : public hkReferencedObject {
 public:
-	// What calcSteering produces for the step.
-	struct SteeringAnglesOutput {
-		float m_mainSteeringAngle;
-		hkArray<float> m_wheelsSteeringAngle;
-	};
+    // What calcSteering produces for the step.
+    struct SteeringAnglesOutput {
+        float m_mainSteeringAngle;
+        hkArray<float> m_wheelsSteeringAngle;
+    };
 
-	// The constructor the derived classes' own use, and the SDK's finish constructor of a loaded object (the derived
-	// classes' finish constructors call it): it keeps the fields the load wrote.
-	hkpVehicleSteering() = default;
-	hkpVehicleSteering(hkFinishLoadedObjectFlag flag) : hkReferencedObject(flag) {}
+    // The constructor the derived classes' own use, and the SDK's finish constructor of a loaded object (the derived
+    // classes' finish constructors call it): it keeps the fields the load wrote.
+    hkpVehicleSteering() = default;
+    hkpVehicleSteering(hkFinishLoadedObjectFlag flag) : hkReferencedObject(flag) {}
 
-	virtual void calcSteering(float deltaTime, const hkpVehicleInstance* vehicle,
-		const hkpVehicleDriverInput::FilteredDriverInputOutput& filteredInfoOutput,
-		SteeringAnglesOutput& steeringOutput) = 0;
+    virtual void calcSteering(
+        float deltaTime,
+        const hkpVehicleInstance* vehicle,
+        const hkpVehicleDriverInput::FilteredDriverInputOutput& filteredInfoOutput,
+        SteeringAnglesOutput& steeringOutput
+    ) = 0;
 };
 
 // The class's reflection record.

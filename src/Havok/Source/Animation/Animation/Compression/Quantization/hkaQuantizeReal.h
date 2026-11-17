@@ -5,10 +5,10 @@
 // One track's quantization: the bit width of its quantized samples, whether the first sample is kept as it is, and the
 // offset and scale that map the samples to their quantized form.
 struct hkaQuantizeDesc {
-	uint8_t m_bitWidth;
-	uint8_t m_preserved;
-	float m_scale;
-	float m_offset;
+    uint8_t m_bitWidth;
+    uint8_t m_preserved;
+    float m_scale;
+    float m_offset;
 };
 
 // Fills desc from data's values after the first preserve of them: the offset and scale of

@@ -2,8 +2,8 @@
 
 #include "BSCore/RTTI.h"
 #include "Havok/Source/Common/Base/Container/Array/hkArray.h"
-#include "Havok/Source/Common/Base/Container/hkContainerAllocators.h"
 #include "Havok/Source/Common/Base/Container/String/hkStringPtr.h"
+#include "Havok/Source/Common/Base/Container/hkContainerAllocators.h"
 #include "Havok/Source/Common/Base/Memory/Allocator/hkMemoryAllocator.h"
 #include "Havok/Source/Common/Base/Memory/Router/hkMemoryRouter.h"
 #include "Havok/Source/Common/Base/Object/hkBaseObject.h"
@@ -19,24 +19,38 @@ static void cleanupLoadedObjecthkxTextureInplace(void* p);
 // The reflected members of hkxTextureInplace.
 using hkxTextureInplaceClass_MembersArray = const hkClassMember[4];
 static hkxTextureInplaceClass_MembersArray hkxTextureInplaceClass_Members{
-	{"fileType", nullptr, nullptr, hkClassMember::TYPE_CHAR, hkClassMember::TYPE_VOID, 4, 0, 0x8, nullptr},
-	{"data", nullptr, nullptr, hkClassMember::TYPE_ARRAY, hkClassMember::TYPE_UINT8, 0, 0, 0xC, nullptr},
-	{"name", nullptr, nullptr, hkClassMember::TYPE_STRINGPTR, hkClassMember::TYPE_VOID, 0, 0, 0x18, nullptr},
-	{"originalFilename", nullptr, nullptr, hkClassMember::TYPE_STRINGPTR, hkClassMember::TYPE_VOID, 0, 0, 0x1C,
-		nullptr}};
-hkClass hkxTextureInplaceClass("hkxTextureInplace", &hkReferencedObjectClass, 0x20, nullptr, 0, nullptr, 0,
-	hkxTextureInplaceClass_Members, 4, nullptr, nullptr, 0, 1);
-hkTypeInfo hkxTextureInplaceTypeInfo = {"hkxTextureInplace", finishLoadedObjecthkxTextureInplace,
-	cleanupLoadedObjecthkxTextureInplace, getVtablehkxTextureInplace(), &typeid(hkxTextureInplace),
-	sizeof(hkxTextureInplace)};
+    {"fileType", nullptr, nullptr, hkClassMember::TYPE_CHAR, hkClassMember::TYPE_VOID, 4, 0, 0x8, nullptr},
+    {"data", nullptr, nullptr, hkClassMember::TYPE_ARRAY, hkClassMember::TYPE_UINT8, 0, 0, 0xC, nullptr},
+    {"name", nullptr, nullptr, hkClassMember::TYPE_STRINGPTR, hkClassMember::TYPE_VOID, 0, 0, 0x18, nullptr},
+    {"originalFilename", nullptr, nullptr, hkClassMember::TYPE_STRINGPTR, hkClassMember::TYPE_VOID, 0, 0, 0x1C, nullptr}
+};
+hkClass hkxTextureInplaceClass(
+    "hkxTextureInplace",
+    &hkReferencedObjectClass,
+    0x20,
+    nullptr,
+    0,
+    nullptr,
+    0,
+    hkxTextureInplaceClass_Members,
+    4,
+    nullptr,
+    nullptr,
+    0,
+    1
+);
+hkTypeInfo hkxTextureInplaceTypeInfo = {
+    "hkxTextureInplace",          finishLoadedObjecthkxTextureInplace, cleanupLoadedObjecthkxTextureInplace,
+    getVtablehkxTextureInplace(), &typeid(hkxTextureInplace),          sizeof(hkxTextureInplace)
+};
 
 static void cleanupLoadedObjecthkxTextureInplace(void* p) {
-	static_cast<hkxTextureInplace*>(p)->~hkxTextureInplace();
+    static_cast<hkxTextureInplace*>(p)->~hkxTextureInplace();
 }
 
 // The members' destructors release the strings and free m_data.
 hkxTextureInplace::~hkxTextureInplace() {}
 
 const hkClass& hkxTextureInplace::staticClass() {
-	return hkxTextureInplaceClass;
+    return hkxTextureInplaceClass;
 }

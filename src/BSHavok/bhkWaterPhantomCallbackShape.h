@@ -12,12 +12,18 @@ struct hkpShapeRayCastInput;
 // ray cast against the water's own shape. It adds no data to hkpPhantomCallbackShape.
 class bhkWaterPhantomCallbackShape : public hkpPhantomCallbackShape {
 public:
-	bhkWaterPhantomCallbackShape();
+    bhkWaterPhantomCallbackShape();
 
-	void phantomEnterEvent(const hkpCollidable* collidableA, const hkpCollidable* collidableB,
-		const hkpCollisionInput& env) override;
-	void phantomLeaveEvent(const hkpCollidable* collidableA, const hkpCollidable* collidableB) override;
-	// A new virtual function introduced by this class.
-	virtual void castRayWithCollector(const hkpShapeRayCastInput& input, const hkpCdBody& cdBody,
-		hkpRayHitCollector& collector) const;
+    void phantomEnterEvent(
+        const hkpCollidable* collidableA,
+        const hkpCollidable* collidableB,
+        const hkpCollisionInput& env
+    ) override;
+    void phantomLeaveEvent(const hkpCollidable* collidableA, const hkpCollidable* collidableB) override;
+    // A new virtual function introduced by this class.
+    virtual void castRayWithCollector(
+        const hkpShapeRayCastInput& input,
+        const hkpCdBody& cdBody,
+        hkpRayHitCollector& collector
+    ) const;
 };

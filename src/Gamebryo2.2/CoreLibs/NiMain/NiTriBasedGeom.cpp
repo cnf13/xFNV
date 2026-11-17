@@ -17,40 +17,40 @@ NiTriBasedGeom::NiTriBasedGeom(NiTriBasedGeomData* pkModelData) : NiGeometry(pkM
 NiTriBasedGeom::~NiTriBasedGeom() {}
 
 void NiTriBasedGeom::LoadBinary(NiStream& kStream) {
-	NiGeometry::LoadBinary(kStream);
+    NiGeometry::LoadBinary(kStream);
 }
 
 void NiTriBasedGeom::LinkObject(NiStream& kStream) {
-	NiGeometry::LinkObject(kStream);
+    NiGeometry::LinkObject(kStream);
 }
 
 bool NiTriBasedGeom::RegisterStreamables(NiStream& kStream) {
-	return NiGeometry::RegisterStreamables(kStream);
+    return NiGeometry::RegisterStreamables(kStream);
 }
 
 void NiTriBasedGeom::SaveBinary(NiStream& kStream) {
-	NiGeometry::SaveBinary(kStream);
+    NiGeometry::SaveBinary(kStream);
 }
 
 bool NiTriBasedGeom::IsEqual(NiObject* pkObject) {
-	return NiGeometry::IsEqual(pkObject);
+    return NiGeometry::IsEqual(pkObject);
 }
 
 void NiTriBasedGeom::GetViewerStrings(NiTPrimitiveArray<char*>* pkStrings) {
-	NiGeometry::GetViewerStrings(pkStrings);
-	pkStrings->Add(NiGetViewerString(ms_RTTI.m_pcName));
+    NiGeometry::GetViewerStrings(pkStrings);
+    pkStrings->Add(NiGetViewerString(ms_RTTI.m_pcName));
 }
 
 void NiTriBasedGeom::SetModelData(NiGeometryData* pkModelData) {
-	NiGeometry::SetModelData(pkModelData);
+    NiGeometry::SetModelData(pkModelData);
 }
 
 uint16_t NiTriBasedGeom::GetActiveTriangleCount() const {
-	NiGeometryData* modelData = NiGeometry::GetModelData();
-	return static_cast<NiTriBasedGeomData*>(modelData)->GetActiveTriangleCount();
+    NiGeometryData* modelData = NiGeometry::GetModelData();
+    return static_cast<NiTriBasedGeomData*>(modelData)->GetActiveTriangleCount();
 }
 
 uint16_t NiTriBasedGeom::GetTriCount() {
-	NiGeometryData* v2 = (&m_spModelData)->operator->();
-	return static_cast<NiTriBasedGeomData*>(v2)->GetTriCount();
+    NiGeometryData* v2 = (&m_spModelData)->operator->();
+    return static_cast<NiTriBasedGeomData*>(v2)->GetTriCount();
 }

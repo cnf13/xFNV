@@ -9,17 +9,17 @@
 // and STRUNCATE is VC9's own.
 namespace rt {
 
-enum : int32_t {
-	kENOENT = 2,
-	kEACCES = 13,
-	kEINVAL = 22,
-	kERANGE = 34,
-	kEILSEQ = 42,
-	kSTRUNCATE = 80,
-	kEOVERFLOW = 132,
-};
+    enum : int32_t {
+        kENOENT = 2,
+        kEACCES = 13,
+        kEINVAL = 22,
+        kERANGE = 34,
+        kEILSEQ = 42,
+        kSTRUNCATE = 80,
+        kEOVERFLOW = 132,
+    };
 
-// VC9's _TRUNCATE: the count that asks strncpy_s and wcstombs_s to truncate instead of failing.
-constexpr size_t kTRUNCATE = static_cast<size_t>(-1);
+    // VC9's _TRUNCATE: the count that asks strncpy_s and wcstombs_s to truncate instead of failing.
+    constexpr size_t kTRUNCATE = static_cast<size_t>(-1);
 
 } // namespace rt

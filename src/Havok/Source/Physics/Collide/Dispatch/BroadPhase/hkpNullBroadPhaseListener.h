@@ -7,16 +7,18 @@
 // without a listener.
 class hkpNullBroadPhaseListener : public hkReferencedObject, public hkpBroadPhaseListener {
 public:
-	~hkpNullBroadPhaseListener() override;
+    ~hkpNullBroadPhaseListener() override;
 
-	// hkpBroadPhaseListener's vtable at +0x8.
-	void addCollisionPair(hkpTypedBroadPhaseHandlePair& pair) override;
-	// hkpBroadPhaseListener's vtable at +0x8.
-	void removeCollisionPair(hkpTypedBroadPhaseHandlePair& pair) override;
+    // hkpBroadPhaseListener's vtable at +0x8.
+    void addCollisionPair(hkpTypedBroadPhaseHandlePair& pair) override;
+    // hkpBroadPhaseListener's vtable at +0x8.
+    void removeCollisionPair(hkpTypedBroadPhaseHandlePair& pair) override;
 
-	void addCollisionPair_00D554E0(hkpTypedBroadPhaseHandlePair& pair);
-	void removeCollisionPair_00D554F0(hkpTypedBroadPhaseHandlePair& pair);
+    void addCollisionPair_00D554E0(hkpTypedBroadPhaseHandlePair& pair);
+    void removeCollisionPair_00D554F0(hkpTypedBroadPhaseHandlePair& pair);
 
-	// The free is hkReferencedObject's; hkpBroadPhaseListener declares one too.
-	static void operator delete(void* apMemory) { hkReferencedObject::deleteObject(apMemory); }
+    // The free is hkReferencedObject's; hkpBroadPhaseListener declares one too.
+    static void operator delete(void* apMemory) {
+        hkReferencedObject::deleteObject(apMemory);
+    }
 };

@@ -14,52 +14,68 @@ class NiColorA;
 // A shader property that draws a texture without lighting.
 class BSShaderNoLightingProperty : public BSShaderProperty {
 public:
-	struct FallOffData {
-		float fFalloffStartAngle;
-		float fFalloffStopAngle;
-		float fFalloffStartOpacity;
-		float fFalloffStopOpacity;
-	};
+    struct FallOffData {
+        float fFalloffStartAngle;
+        float fFalloffStopAngle;
+        float fFalloffStartOpacity;
+        float fFalloffStopOpacity;
+    };
 
-	BSShaderNoLightingProperty();
-	~BSShaderNoLightingProperty() override;
+    BSShaderNoLightingProperty();
+    ~BSShaderNoLightingProperty() override;
 
-	const NiRTTI* GetRTTI() const override { return &ms_RTTI; }
-	NiObject* CreateClone(NiCloningProcess& arCloneData) override;
-	void LoadBinary(NiStream& kStream) override;
-	void LinkObject(NiStream& kStream) override;
-	bool RegisterStreamables(NiStream& kStream) override;
-	void SaveBinary(NiStream& kStream) override;
-	void GetViewerStrings(NiTPrimitiveArray<char*>* apStrings) override;
-	void PostLinkObject(NiStream& kStream) override;
-	bool SetupGeometry(NiGeometry* apGeometry) override;
-	BSShaderProperty::RenderPassArray* GetRenderPasses(NiGeometry* apGeom, int32_t aiEnabledPasses, uint16_t& asCount,
-		uint32_t auiRenderMode, BSShaderAccumulator* apAccumulator, int32_t abUpdateList) override;
-	NiTexture* GetBaseTexture() override { return spBaseMap; }
-	BSShaderProperty::RenderPassArray* GetWaterFogPassList(NiGeometry* apGeom) override;
-	void GetTextureUse(void (*apTextureUseCB)(NiTexture*, uint32_t, void*), void* apParam) override;
-	void PrecacheTextures() override;
-	// The D3DTEXTUREADDRESS of the texture.
-	virtual D3DTEXTUREADDRESS GetClampD3D() const { return D3DTADDRESS_WRAP; }
-	virtual void SetClampD3D(D3DTEXTUREADDRESS aClampMode);
-	virtual NiTexturingProperty::ClampMode GetClampNI() const { return TextureClampMode; }
-	virtual void SetClampNI(NiTexturingProperty::ClampMode aClampMode) { TextureClampMode = aClampMode; }
+    const NiRTTI* GetRTTI() const override {
+        return &ms_RTTI;
+    }
+    NiObject* CreateClone(NiCloningProcess& arCloneData) override;
+    void LoadBinary(NiStream& kStream) override;
+    void LinkObject(NiStream& kStream) override;
+    bool RegisterStreamables(NiStream& kStream) override;
+    void SaveBinary(NiStream& kStream) override;
+    void GetViewerStrings(NiTPrimitiveArray<char*>* apStrings) override;
+    void PostLinkObject(NiStream& kStream) override;
+    bool SetupGeometry(NiGeometry* apGeometry) override;
+    BSShaderProperty::RenderPassArray* GetRenderPasses(
+        NiGeometry* apGeom,
+        int32_t aiEnabledPasses,
+        uint16_t& asCount,
+        uint32_t auiRenderMode,
+        BSShaderAccumulator* apAccumulator,
+        int32_t abUpdateList
+    ) override;
+    NiTexture* GetBaseTexture() override {
+        return spBaseMap;
+    }
+    BSShaderProperty::RenderPassArray* GetWaterFogPassList(NiGeometry* apGeom) override;
+    void GetTextureUse(void (*apTextureUseCB)(NiTexture*, uint32_t, void*), void* apParam) override;
+    void PrecacheTextures() override;
+    // The D3DTEXTUREADDRESS of the texture.
+    virtual D3DTEXTUREADDRESS GetClampD3D() const {
+        return D3DTADDRESS_WRAP;
+    }
+    virtual void SetClampD3D(D3DTEXTUREADDRESS aClampMode);
+    virtual NiTexturingProperty::ClampMode GetClampNI() const {
+        return TextureClampMode;
+    }
+    virtual void SetClampNI(NiTexturingProperty::ClampMode aClampMode) {
+        TextureClampMode = aClampMode;
+    }
 
-	// Copies the property into pDest.
-	void CopyMembers(BSShaderNoLightingProperty* pDest, NiCloningProcess& arCloneData);
-	void SetBaseMap(NiTexture* apBaseMap);
-	void SetFalloffData(const NiColorA& aFalloffData);
+    // Copies the property into pDest.
+    void CopyMembers(BSShaderNoLightingProperty* pDest, NiCloningProcess& arCloneData);
+    void SetBaseMap(NiTexture* apBaseMap);
+    void SetFalloffData(const NiColorA& aFalloffData);
 
-	static void RegisterRTTI();
-	// The stream factory: a property in a new 0x80-byte block.
-	static NiObject* CreateObject();
-	// Sets aFalloffData on the no-lighting shader properties under apObject.
-	static void SetFalloffRecurse(NiAVObject* apObject, const NiColorA& aFalloffData);
+    static void RegisterRTTI();
+    // The stream factory: a property in a new 0x80-byte block.
+    static NiObject* CreateObject();
+    // Sets aFalloffData on the no-lighting shader properties under apObject.
+    static void SetFalloffRecurse(NiAVObject* apObject, const NiColorA& aFalloffData);
 
-	NiPointer<NiTexture> spBaseMap;
-	BSStringT<char> TextureFilename;
-	NiTexturingProperty::ClampMode TextureClampMode;
-	FallOffData FalloffData;
+    NiPointer<NiTexture> spBaseMap;
+    BSStringT<char> TextureFilename;
+    NiTexturingProperty::ClampMode TextureClampMode;
+    FallOffData FalloffData;
 
-	static NiRTTI ms_RTTI;
+    static NiRTTI ms_RTTI;
 };

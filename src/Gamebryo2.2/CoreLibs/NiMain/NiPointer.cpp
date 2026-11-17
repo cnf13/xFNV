@@ -26,32 +26,32 @@
 #include "Gamebryo2.2/CoreLibs/NiXenonRenderer/NiD3DTextureStage.h"
 
 void NiPointerDefaultConstructor(NiPointer<NiRefObject>* apThis) {
-	::new (apThis) NiPointer<NiRefObject>(static_cast<NiRefObject*>(0));
+    ::new (apThis) NiPointer<NiRefObject>(static_cast<NiRefObject*>(0));
 }
 
 void NiPointer_DefaultConstructorClosure_B54620(NiPointer<NiRefObject>* apThis) {
-	apThis->m_pObject = 0;
+    apThis->m_pObject = 0;
 }
 
 void NiPointer_Destruct_AE9290(NiPointer<NiRefObject>* apThis) {
-	NiRefObject* m_pObject = apThis->m_pObject;
-	if (apThis->m_pObject) {
-		NiDecRefCount(m_pObject);
-	}
+    NiRefObject* m_pObject = apThis->m_pObject;
+    if (apThis->m_pObject) {
+        NiDecRefCount(m_pObject);
+    }
 }
 
 void NiPointer_Destruct_B66F20(NiPointer<NiRefObject>* apThis) {
-	NiRefObject* m_pObject = apThis->m_pObject;
-	if (apThis->m_pObject) {
-		NiDecRefCount(m_pObject);
-	}
+    NiRefObject* m_pObject = apThis->m_pObject;
+    if (apThis->m_pObject) {
+        NiDecRefCount(m_pObject);
+    }
 }
 
-NiPointer<ActorPathingMessageQueue>* NiPointer_Construct_6EBF60(NiPointer<ActorPathingMessageQueue>* apThis,
-	ActorPathingMessageQueue* apObject) {
-	apThis->m_pObject = apObject;
-	if (apThis->m_pObject) {
-		apThis->m_pObject->IncRefCount();
-	}
-	return apThis;
+NiPointer<ActorPathingMessageQueue>*
+NiPointer_Construct_6EBF60(NiPointer<ActorPathingMessageQueue>* apThis, ActorPathingMessageQueue* apObject) {
+    apThis->m_pObject = apObject;
+    if (apThis->m_pObject) {
+        apThis->m_pObject->IncRefCount();
+    }
+    return apThis;
 }

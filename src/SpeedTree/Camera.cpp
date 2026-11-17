@@ -10,12 +10,12 @@ CIdvCamera::CIdvCamera() : m_cPosition(0.0f, 0.0f, 0.0f) {}
 CIdvCamera::~CIdvCamera() {}
 
 const CIdvCamera& CIdvCamera::operator=(const CIdvCamera& cRight) {
-	if (&cRight != this) {
-		m_cPosition = cRight.m_cPosition;
-	}
-	return *this;
+    if (&cRight != this) {
+        m_cPosition = cRight.m_cPosition;
+    }
+    return *this;
 }
 
 void CIdvCamera::operator delete(void* apMemory) {
-	ourFree(apMemory);
+    ourFree(apMemory);
 }

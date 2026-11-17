@@ -6,15 +6,15 @@
 // FREE_VALUE for an unused id.
 class hkpDynamicsCpIdMgr {
 public:
-	enum : uint8_t {
-		FREE_VALUE = 0xFF,
-	};
+    enum : uint8_t {
+        FREE_VALUE = 0xFF,
+    };
 
-	// Shifts every used index above relIndex down by one, after the point at relIndex was removed.
-	void decrementValuesGreater(int32_t relIndex);
-	void getAllUsedIds(hkArray<uint16_t, hkContainerHeapAllocator>& ids) const;
-	int32_t newId(int32_t value);
+    // Shifts every used index above relIndex down by one, after the point at relIndex was removed.
+    void decrementValuesGreater(int32_t relIndex);
+    void getAllUsedIds(hkArray<uint16_t, hkContainerHeapAllocator>& ids) const;
+    int32_t newId(int32_t value);
 
-	// The id map lives in the object until it grows past 8 points.
-	hkInplaceArray<uint8_t, 8, hkContainerHeapAllocator> m_values;
+    // The id map lives in the object until it grows past 8 points.
+    hkInplaceArray<uint8_t, 8, hkContainerHeapAllocator> m_values;
 };

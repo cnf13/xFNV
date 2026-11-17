@@ -14,20 +14,63 @@ using ProcedureNameTable = const char* [55];
 static ProcedureSteps3 ExploreWander{PROCEDURE_TRAVEL, PROCEDURE_WANDER, PROCEDURE_DONE};
 
 // The name of each PROCEDURE, indexed by its value.
-static ProcedureNameTable PackageProcedureNames{"PROCEDURE_TRAVEL", "PROCEDURE_WANDER", "PROCEDURE_ACTIVATE",
-	"PROCEDURE_ACQUIRE", "PROCEDURE_SLEEP", "PROCEDURE_EAT", "PROCEDURE_FOLLOW", "PROCEDURE_ESCORT", "PROCEDURE_ALARM",
-	"PROCEDURE_COMBAT", "PROCEDURE_FLEE", "PROCEDURE_YIELD", "PROCEDURE_DIALOGUE", "PROCEDURE_WAIT",
-	"PROCEDURE_TRAVEL_TARGET", "PROCEDURE_PURSUE", "PROCEDURE_GREET", "PROCEDURE_CREATE_FOLLOW",
-	"PROCEDURE_OBSERVE_COMBAT", "PROCEDURE_OBSERVE_DIALOGUE", "PROCEDURE_GREET_DEAD", "PROCEDURE_WARN",
-	"PROCEDURE_GET_UP", "PROCEDURE_MOUNT_HORSE", "PROCEDURE_DISMOUNT_HORSE", "PROCEDURE_DO_NOTHING", "PROCEDURE_NOTIFY",
-	"PROCEDURE_ACCOMPANY", "PROCEDURE_USE_ITEM_AT", "PROCEDURE_FEED", "PROCEDURE_AMBUSH_WAIT", "PROCEDURE_SURFACE",
-	"PROCEDURE_WAIT_FOR_SPELL", "PROCEDURE_CHOOSE_CAST", "PROCEDURE_FLEE_NON_COMBAT", "PROCEDURE_REMOVE_WORN_ITEMS",
-	"PROCEDURE_SEARCH", "PROCEDURE_CLEAR_MOUNT_POSITION", "PROCEDURE_SUMMON_CREATURE_DEFEND",
-	"PROCEDURE_AVOID_RADIATION", "PROCEDURE_UNEQUIP_ARMOR", "PROCEDURE_TAKE_BACK_ITEM", "PROCEDURE_SANDBOX",
-	"PROCEDURE_USE_IDLE_MARKER", "PROCEDURE_PATROL", "PROCEDURE_EXPLOSION_REACTION",
-	"PROCEDURE_GRENADE_MINE_PICKUP_THROW", "PROCEDURE_GUARD", "PROCEDURE_ALERT_SEARCH", "PROCEDURE_DIALOGUE_ACTIVATE",
-	"PROCEDURE_USE_WEAPON", "PROCEDURE_MOVEMENT_BLOCKED", "PROCEDURE_CANNIBAL_FEED", "PROCEDURE_BACK_UP",
-	"PROCEDURE_DONE"};
+static ProcedureNameTable PackageProcedureNames{
+    "PROCEDURE_TRAVEL",
+    "PROCEDURE_WANDER",
+    "PROCEDURE_ACTIVATE",
+    "PROCEDURE_ACQUIRE",
+    "PROCEDURE_SLEEP",
+    "PROCEDURE_EAT",
+    "PROCEDURE_FOLLOW",
+    "PROCEDURE_ESCORT",
+    "PROCEDURE_ALARM",
+    "PROCEDURE_COMBAT",
+    "PROCEDURE_FLEE",
+    "PROCEDURE_YIELD",
+    "PROCEDURE_DIALOGUE",
+    "PROCEDURE_WAIT",
+    "PROCEDURE_TRAVEL_TARGET",
+    "PROCEDURE_PURSUE",
+    "PROCEDURE_GREET",
+    "PROCEDURE_CREATE_FOLLOW",
+    "PROCEDURE_OBSERVE_COMBAT",
+    "PROCEDURE_OBSERVE_DIALOGUE",
+    "PROCEDURE_GREET_DEAD",
+    "PROCEDURE_WARN",
+    "PROCEDURE_GET_UP",
+    "PROCEDURE_MOUNT_HORSE",
+    "PROCEDURE_DISMOUNT_HORSE",
+    "PROCEDURE_DO_NOTHING",
+    "PROCEDURE_NOTIFY",
+    "PROCEDURE_ACCOMPANY",
+    "PROCEDURE_USE_ITEM_AT",
+    "PROCEDURE_FEED",
+    "PROCEDURE_AMBUSH_WAIT",
+    "PROCEDURE_SURFACE",
+    "PROCEDURE_WAIT_FOR_SPELL",
+    "PROCEDURE_CHOOSE_CAST",
+    "PROCEDURE_FLEE_NON_COMBAT",
+    "PROCEDURE_REMOVE_WORN_ITEMS",
+    "PROCEDURE_SEARCH",
+    "PROCEDURE_CLEAR_MOUNT_POSITION",
+    "PROCEDURE_SUMMON_CREATURE_DEFEND",
+    "PROCEDURE_AVOID_RADIATION",
+    "PROCEDURE_UNEQUIP_ARMOR",
+    "PROCEDURE_TAKE_BACK_ITEM",
+    "PROCEDURE_SANDBOX",
+    "PROCEDURE_USE_IDLE_MARKER",
+    "PROCEDURE_PATROL",
+    "PROCEDURE_EXPLOSION_REACTION",
+    "PROCEDURE_GRENADE_MINE_PICKUP_THROW",
+    "PROCEDURE_GUARD",
+    "PROCEDURE_ALERT_SEARCH",
+    "PROCEDURE_DIALOGUE_ACTIVATE",
+    "PROCEDURE_USE_WEAPON",
+    "PROCEDURE_MOVEMENT_BLOCKED",
+    "PROCEDURE_CANNIBAL_FEED",
+    "PROCEDURE_BACK_UP",
+    "PROCEDURE_DONE"
+};
 static ProcedureSteps2 ExploreTravel{PROCEDURE_TRAVEL, PROCEDURE_DONE};
 static ProcedureSteps3 ExploreActivate{PROCEDURE_TRAVEL, PROCEDURE_ACTIVATE, PROCEDURE_DONE};
 static ProcedureSteps4 ExploreNPC{PROCEDURE_TRAVEL, PROCEDURE_ACTIVATE, PROCEDURE_WAIT, PROCEDURE_DONE};
@@ -37,13 +80,16 @@ static ProcedureSteps4 SleepProcess{PROCEDURE_TRAVEL, PROCEDURE_SLEEP, PROCEDURE
 static ProcedureSteps4 Eat{PROCEDURE_TRAVEL, PROCEDURE_EAT, PROCEDURE_WANDER, PROCEDURE_DONE};
 static ProcedureSteps3 Follow{PROCEDURE_WAIT, PROCEDURE_FOLLOW, PROCEDURE_DONE};
 static ProcedureSteps4 AmbushFollow{PROCEDURE_TRAVEL, PROCEDURE_WAIT, PROCEDURE_FOLLOW, PROCEDURE_DONE};
-static ProcedureSteps5 EscortActor{PROCEDURE_CREATE_FOLLOW, PROCEDURE_TRAVEL_TARGET, PROCEDURE_WAIT, PROCEDURE_ESCORT,
-	PROCEDURE_DONE};
+static ProcedureSteps5 EscortActor{
+    PROCEDURE_CREATE_FOLLOW, PROCEDURE_TRAVEL_TARGET, PROCEDURE_WAIT, PROCEDURE_ESCORT, PROCEDURE_DONE
+};
 static ProcedureSteps3 EscortObject{PROCEDURE_ACQUIRE, PROCEDURE_ESCORT, PROCEDURE_DONE};
-static ProcedureSteps5 DialogueInterrupt{PROCEDURE_TRAVEL, PROCEDURE_DIALOGUE_ACTIVATE, PROCEDURE_WAIT,
-	PROCEDURE_DIALOGUE, PROCEDURE_DONE};
-static ProcedureSteps5 AlarmInterrupt{PROCEDURE_ALARM, PROCEDURE_PURSUE, PROCEDURE_FLEE_NON_COMBAT,
-	PROCEDURE_TAKE_BACK_ITEM, PROCEDURE_DONE};
+static ProcedureSteps5 DialogueInterrupt{
+    PROCEDURE_TRAVEL, PROCEDURE_DIALOGUE_ACTIVATE, PROCEDURE_WAIT, PROCEDURE_DIALOGUE, PROCEDURE_DONE
+};
+static ProcedureSteps5 AlarmInterrupt{
+    PROCEDURE_ALARM, PROCEDURE_PURSUE, PROCEDURE_FLEE_NON_COMBAT, PROCEDURE_TAKE_BACK_ITEM, PROCEDURE_DONE
+};
 static ProcedureSteps2 CombatInterrupt{PROCEDURE_COMBAT, PROCEDURE_DONE};
 static ProcedureSteps3 ActivateInterrupt{PROCEDURE_TRAVEL_TARGET, PROCEDURE_ACTIVATE, PROCEDURE_DONE};
 static ProcedureSteps2 GreetInterrupt{PROCEDURE_GREET, PROCEDURE_DONE};
@@ -79,18 +125,63 @@ static ProcedureSteps2 Follow_No_Escort{PROCEDURE_FOLLOW, PROCEDURE_DONE};
 static ProcedureSteps2 MovementBlocked{PROCEDURE_MOVEMENT_BLOCKED, PROCEDURE_DONE};
 static ProcedureSteps2 Cannibal{PROCEDURE_CANNIBAL_FEED, PROCEDURE_DONE};
 static ProcedureSteps2 Back_Up{PROCEDURE_BACK_UP, PROCEDURE_DONE};
-ProcedureActionTable Procedure_Action{ExploreTravel, ExploreWander, ExploreActivate, ExploreAcquire, SleepProcess, Eat,
-	Follow, AmbushFollow, EscortActor, EscortObject, DialogueInterrupt, AlarmInterrupt, CombatInterrupt,
-	ActivateInterrupt, GreetInterrupt, ObserveCombat, ObserveDialogue, ReacttoDead, CombatNotInHigh, Flee,
-	TressPassWarning, GetUp, ExploreNPC, MountHorse, DismountHorse, DoNothing, ExploreAcquireGeneric, Accompany,
-	UseItemAt, SandmanFeed, Ambush, Surface, FleeNonCombat, SearchForAttacker, ClearMountPosition, SummonCreatureDefend,
-	AvoidRadiation, Sandbox, Patrol, ExplosionReaction, GrenadeMineReaction, Guard, StealWarn, PickPocketWarn,
-	UseWeapon, Follow_No_Escort, MovementBlocked, Cannibal, Back_Up};
+ProcedureActionTable Procedure_Action{
+    ExploreTravel,
+    ExploreWander,
+    ExploreActivate,
+    ExploreAcquire,
+    SleepProcess,
+    Eat,
+    Follow,
+    AmbushFollow,
+    EscortActor,
+    EscortObject,
+    DialogueInterrupt,
+    AlarmInterrupt,
+    CombatInterrupt,
+    ActivateInterrupt,
+    GreetInterrupt,
+    ObserveCombat,
+    ObserveDialogue,
+    ReacttoDead,
+    CombatNotInHigh,
+    Flee,
+    TressPassWarning,
+    GetUp,
+    ExploreNPC,
+    MountHorse,
+    DismountHorse,
+    DoNothing,
+    ExploreAcquireGeneric,
+    Accompany,
+    UseItemAt,
+    SandmanFeed,
+    Ambush,
+    Surface,
+    FleeNonCombat,
+    SearchForAttacker,
+    ClearMountPosition,
+    SummonCreatureDefend,
+    AvoidRadiation,
+    Sandbox,
+    Patrol,
+    ExplosionReaction,
+    GrenadeMineReaction,
+    Guard,
+    StealWarn,
+    PickPocketWarn,
+    UseWeapon,
+    Follow_No_Escort,
+    MovementBlocked,
+    Cannibal,
+    Back_Up
+};
 
 int32_t Procedure::GetProcedureCount(PACKAGE_PROCEDURE_TYPE aetype) {
-	if (((uint32_t)aetype) > 48) {
-		return (-1);
-	} else {
-		return (int32_t)ProcedureCount[(int32_t)aetype];
-	}
+    if (((uint32_t)aetype) > 48) {
+        return (-1);
+    }
+    else {
+        return (int32_t)ProcedureCount[(int32_t)aetype];
+    }
 }

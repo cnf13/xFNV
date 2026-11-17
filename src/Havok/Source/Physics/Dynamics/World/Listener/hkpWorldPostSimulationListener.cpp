@@ -6,5 +6,5 @@
 hkpWorldPostSimulationListener::~hkpWorldPostSimulationListener() {}
 
 void hkpWorldPostSimulationListener::operator delete(void* apMemory) {
-	ourFree(apMemory);
+    ourFree(apMemory);
 }

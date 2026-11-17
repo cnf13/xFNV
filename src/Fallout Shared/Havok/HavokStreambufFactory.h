@@ -8,12 +8,12 @@
 // of its own.
 class HavokStreambufFactory : public hkFileSystem {
 public:
-	HavokStreambufFactory();
-	~HavokStreambufFactory() override;
+    HavokStreambufFactory();
+    ~HavokStreambufFactory() override;
 
-	hkStreamReader* openReader(const char* apName) override;
-	hkStreamWriter* openWriter(const char* apName) override;
+    hkStreamReader* openReader(const char* apName) override;
+    hkStreamWriter* openWriter(const char* apName) override;
 
-	// The deleting destructor frees through hkReferencedObject::deleteObject.
-	static void operator delete(void* apMemory);
+    // The deleting destructor frees through hkReferencedObject::deleteObject.
+    static void operator delete(void* apMemory);
 };

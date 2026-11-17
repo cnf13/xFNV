@@ -13,29 +13,29 @@ NiTPrimitiveSet<NiMaterialLibrary*> NiMaterialLibrary::ms_kMaterialLibraries;
 
 // The name takes a reference on its handle, then the library joins the engine's set.
 NiMaterialLibrary::NiMaterialLibrary(const NiFixedString& kName) {
-	m_kName = kName;
-	ms_kMaterialLibraries.Add(this);
+    m_kName = kName;
+    ms_kMaterialLibraries.Add(this);
 }
 
 // The library leaves the set (the last entry takes its place); the name's reference is released by its NiFixedString
 // member.
 NiMaterialLibrary::~NiMaterialLibrary() {
-	ms_kMaterialLibraries.Remove(this);
+    ms_kMaterialLibraries.Remove(this);
 }
 
 NiMaterial* NiMaterialLibrary::GetMaterial(const NiFixedString&) {
-	return nullptr;
+    return nullptr;
 }
 
 const char* NiMaterialLibrary::GetMaterialName(uint32_t) {
-	return nullptr;
+    return nullptr;
 }
 
 uint32_t NiMaterialLibrary::GetMaterialCount() const {
-	return 0;
+    return 0;
 }
 
 void NiMaterialLibrary::_SDMShutdown() {
-	ms_kMaterialLibraries.RemoveAll();
-	ms_kMaterialLibraries.Realloc(0);
+    ms_kMaterialLibraries.RemoveAll();
+    ms_kMaterialLibraries.Realloc(0);
 }

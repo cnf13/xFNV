@@ -9,46 +9,46 @@ class NiCloningProcess;
 // A parent/child pair of attach point names.
 class BSAttachPointPair {
 public:
-	BSAttachPointPair(const NiFixedString& arParent, const NiFixedString& arChild);
-	~BSAttachPointPair();
+    BSAttachPointPair(const NiFixedString& arParent, const NiFixedString& arChild);
+    ~BSAttachPointPair();
 
-	// Assigns the parent name.
-	void SetParent(const NiFixedString& arParent);
-	// Assigns the child name.
-	void SetChild(const NiFixedString& arChild);
+    // Assigns the parent name.
+    void SetParent(const NiFixedString& arParent);
+    // Assigns the child name.
+    void SetChild(const NiFixedString& arChild);
 
-	NiFixedString Parent;
-	NiFixedString Child;
+    NiFixedString Parent;
+    NiFixedString Child;
 };
 
 // Extra data on a model that lists its named attach points (the nodes other models are attached to).
 class BSAttachPoints : public NiExtraData {
 public:
-	BSAttachPoints();
-	~BSAttachPoints() override;
+    BSAttachPoints();
+    ~BSAttachPoints() override;
 
-	const NiRTTI* GetRTTI() const override;
-	NiObject* CreateClone(NiCloningProcess& arCloneData) override;
-	void LoadBinary(NiStream& arStream) override;
-	void LinkObject(NiStream& arStream) override;
-	bool RegisterStreamables(NiStream& arStream) override;
-	void SaveBinary(NiStream& arStream) override;
-	bool IsEqual(NiObject* apObject) override;
-	void GetViewerStrings(NiTPrimitiveArray<char*>* apStrings) override;
-	virtual void CopyMembers(BSAttachPoints* pDest, NiCloningProcess& arCloneData);
+    const NiRTTI* GetRTTI() const override;
+    NiObject* CreateClone(NiCloningProcess& arCloneData) override;
+    void LoadBinary(NiStream& arStream) override;
+    void LinkObject(NiStream& arStream) override;
+    bool RegisterStreamables(NiStream& arStream) override;
+    void SaveBinary(NiStream& arStream) override;
+    bool IsEqual(NiObject* apObject) override;
+    void GetViewerStrings(NiTPrimitiveArray<char*>* apStrings) override;
+    virtual void CopyMembers(BSAttachPoints* pDest, NiCloningProcess& arCloneData);
 
-	using NiExtraData::CopyMembers;
+    using NiExtraData::CopyMembers;
 
-	// Adds the pair of strings.
-	void AddPair(const NiFixedString& arParent, const NiFixedString& arChild);
+    // Adds the pair of strings.
+    void AddPair(const NiFixedString& arParent, const NiFixedString& arChild);
 
-	// Creates the "ATP" tag.
-	static void InitSDM();
-	static NiObject* CreateObject();
-	static void KillSDM();
+    // Creates the "ATP" tag.
+    static void InitSDM();
+    static NiObject* CreateObject();
+    static void KillSDM();
 
-	NiTPrimitiveArray<BSAttachPointPair*> pAttachPointsA;
+    NiTPrimitiveArray<BSAttachPointPair*> pAttachPointsA;
 
-	static inline NiFixedString* pTag;
-	static NiRTTI ms_RTTI;
+    static inline NiFixedString* pTag;
+    static NiRTTI ms_RTTI;
 };

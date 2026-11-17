@@ -8,17 +8,17 @@
 hkpNullBroadPhaseListener::~hkpNullBroadPhaseListener() {}
 
 void hkpNullBroadPhaseListener::addCollisionPair(hkpTypedBroadPhaseHandlePair& pair) {
-	;
+    ;
 }
 
 void hkpNullBroadPhaseListener::removeCollisionPair(hkpTypedBroadPhaseHandlePair& pair) {
-	;
+    ;
 }
 
 void hkpNullBroadPhaseListener::addCollisionPair_00D554E0(hkpTypedBroadPhaseHandlePair& pair) {
-	;
+    ;
 }
 
 void hkpNullBroadPhaseListener::removeCollisionPair_00D554F0(hkpTypedBroadPhaseHandlePair& pair) {
-	;
+    ;
 }

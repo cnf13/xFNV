@@ -12,15 +12,15 @@ struct RagdollFeedbackData;
 // ragdoll skeleton, the feedback data and the look IK data.
 class bhkRagdollShareData : public NiObject {
 public:
-	bhkRagdollShareData();
-	~bhkRagdollShareData() override;
+    bhkRagdollShareData();
+    ~bhkRagdollShareData() override;
 
-	hkaSkeleton* pLowSkel;
-	hkaSkeleton* pHighSkel;
-	hkaSkeletonMapper* pSGToRagdoll;
-	hkaSkeletonMapper* pRagdollToSG;
-	RagdollFeedbackData* pFeedbackData;
-	bhkLookIKData* pSharedLookData;
+    hkaSkeleton* pLowSkel;
+    hkaSkeleton* pHighSkel;
+    hkaSkeletonMapper* pSGToRagdoll;
+    hkaSkeletonMapper* pRagdollToSG;
+    RagdollFeedbackData* pFeedbackData;
+    bhkLookIKData* pSharedLookData;
 };
 
 NiSmartPointer(bhkRagdollShareData);

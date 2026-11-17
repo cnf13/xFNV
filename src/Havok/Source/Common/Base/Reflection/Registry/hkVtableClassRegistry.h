@@ -12,18 +12,18 @@ hkReferencedObject* hkVtableClassRegistrycreate();
 // declared.
 class hkVtableClassRegistry : public hkReferencedObject, public hkSingleton<hkVtableClassRegistry> {
 public:
-	~hkVtableClassRegistry() override;
+    ~hkVtableClassRegistry() override;
 
-	virtual void registerVtable(const void* vtable, const hkClass* klass);
-	virtual const hkClass* getClassFromVirtualInstance(const void* obj) const;
-	virtual void getClasses(hkArray<const hkClass*>& classes) const;
+    virtual void registerVtable(const void* vtable, const hkClass* klass);
+    virtual const hkClass* getClassFromVirtualInstance(const void* obj) const;
+    virtual void getClasses(hkArray<const hkClass*>& classes) const;
 
-	// Havok SDK signature (hkBase.lib, tied by bytes,reloc).
-	void registerList(const hkTypeInfo* const* infos, const hkClass* const* classes);
-	void merge(const hkVtableClassRegistry& mergeFrom);
+    // Havok SDK signature (hkBase.lib, tied by bytes,reloc).
+    void registerList(const hkTypeInfo* const* infos, const hkClass* const* classes);
+    void merge(const hkVtableClassRegistry& mergeFrom);
 
-	hkPointerMap<const void*, const hkClass*> m_map;
+    hkPointerMap<const void*, const hkClass*> m_map;
 
-	// hkSingleton<hkVtableClassRegistry>::s_instance.
-	static inline hkVtableClassRegistry* s_instance;
+    // hkSingleton<hkVtableClassRegistry>::s_instance.
+    static inline hkVtableClassRegistry* s_instance;
 };

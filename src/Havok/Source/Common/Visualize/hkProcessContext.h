@@ -9,21 +9,23 @@ class hkVisualDebugger;
 // convert to it.
 class hkProcessContext {
 public:
-	virtual ~hkProcessContext();
+    virtual ~hkProcessContext();
 
-	// The context's type name (pure in the SDK).
-	virtual const char* getType() = 0;
-	// Sets m_owner (the SDK's inline body).
-	virtual void setOwner(hkVisualDebugger* vdb) { m_owner = vdb; }
+    // The context's type name (pure in the SDK).
+    virtual const char* getType() = 0;
+    // Sets m_owner (the SDK's inline body).
+    virtual void setOwner(hkVisualDebugger* vdb) {
+        m_owner = vdb;
+    }
 
-	void syncTimers(hkJobThreadPool* threadPool);
-	void addThreadPoolTimers(hkJobThreadPool* threadPool);
+    void syncTimers(hkJobThreadPool* threadPool);
+    void addThreadPoolTimers(hkJobThreadPool* threadPool);
 
-	// DeletingDestruct's free (ourFree).
-	static void operator delete(void* apMemory);
+    // DeletingDestruct's free (ourFree).
+    static void operator delete(void* apMemory);
 
-	// The visual debugger serving the context.
-	hkVisualDebugger* m_owner;
-	hkInplaceArray<const char*, 6> m_monitorStreamBegins;
-	hkInplaceArray<const char*, 6> m_monitorStreamEnds;
+    // The visual debugger serving the context.
+    hkVisualDebugger* m_owner;
+    hkInplaceArray<const char*, 6> m_monitorStreamBegins;
+    hkInplaceArray<const char*, 6> m_monitorStreamEnds;
 };

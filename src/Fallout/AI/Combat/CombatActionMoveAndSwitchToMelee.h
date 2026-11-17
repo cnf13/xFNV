@@ -5,7 +5,7 @@
 // Moves while switching to a melee weapon; the constructor adds no fields.
 class CombatActionMoveAndSwitchToMelee : public CombatActionMove {
 public:
-	CombatActionMoveAndSwitchToMelee(CombatAction::COMBAT_ACTION aeType);
+    CombatActionMoveAndSwitchToMelee(CombatAction::COMBAT_ACTION aeType);
 
-	void Execute(CombatController* apCombatController, int32_t aiActionValue) override;
+    void Execute(CombatController* apCombatController, int32_t aiActionValue) override;
 };

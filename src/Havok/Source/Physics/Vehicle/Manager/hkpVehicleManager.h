@@ -13,21 +13,21 @@ const void* getVtablehkpVehicleManager();
 // The registry of a world's vehicles, stepping each one a step at a time.
 class hkpVehicleManager : public hkReferencedObject {
 public:
-	hkpVehicleManager(hkFinishLoadedObjectFlag aFlag) : hkReferencedObject(aFlag), m_registeredVehicles(aFlag) {}
-	~hkpVehicleManager() override;
+    hkpVehicleManager(hkFinishLoadedObjectFlag aFlag) : hkReferencedObject(aFlag), m_registeredVehicles(aFlag) {}
+    ~hkpVehicleManager() override;
 
-	virtual void addVehicle(hkpVehicleInstance* vehicle);
-	virtual void removeVehicle(hkpVehicleInstance* vehicle);
-	virtual void stepVehicles(const hkStepInfo& stepInfo);
+    virtual void addVehicle(hkpVehicleInstance* vehicle);
+    virtual void removeVehicle(hkpVehicleInstance* vehicle);
+    virtual void stepVehicles(const hkStepInfo& stepInfo);
 
-	// Havok SDK signature (hkpVehicle.lib, tied by bytes).
-	void addToWorld(hkpWorld* world);
-	void removeFromWorld();
+    // Havok SDK signature (hkpVehicle.lib, tied by bytes).
+    void addToWorld(hkpWorld* world);
+    void removeFromWorld();
 
-	// Havok SDK signature (hkpVehicle.lib, tied by target).
-	static const hkClass& staticClass();
+    // Havok SDK signature (hkpVehicle.lib, tied by target).
+    static const hkClass& staticClass();
 
-	hkArray<hkpVehicleInstance*> m_registeredVehicles;
+    hkArray<hkpVehicleInstance*> m_registeredVehicles;
 };
 
 extern hkClass hkpVehicleManagerClass;

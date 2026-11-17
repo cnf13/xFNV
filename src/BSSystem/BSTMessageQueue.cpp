@@ -17,98 +17,101 @@
 
 // Spins until the lock is free, then pushes under it.
 bool BSTCommonMessageQueue::Push(const void* aMessage) {
-	bool bResult;
-	while (true) {
-		if (!BSAtomicCompareExchange(&uiLock, 0u, 1u)) {
-			InitializationFlow();
-			bResult = DoTryPush(aMessage);
-			InitializationFlow();
-			BSAtomicCompareExchange(&uiLock, 1u, 0u);
-			break;
-		}
-	}
-	return bResult;
+    bool bResult;
+    while (true) {
+        if (!BSAtomicCompareExchange(&uiLock, 0u, 1u)) {
+            InitializationFlow();
+            bResult = DoTryPush(aMessage);
+            InitializationFlow();
+            BSAtomicCompareExchange(&uiLock, 1u, 0u);
+            break;
+        }
+    }
+    return bResult;
 }
 
 bool BSTCommonMessageQueue::TryPush(const void* aMessage) {
-	bool bResult;
-	if (BSAtomicCompareExchange(&uiLock, 0u, 1u)) {
-		bResult = false;
-	} else {
-		InitializationFlow();
-		bResult = DoTryPush(aMessage);
-		InitializationFlow();
-		BSAtomicCompareExchange(&uiLock, 1u, 0u);
-	}
-	return bResult;
+    bool bResult;
+    if (BSAtomicCompareExchange(&uiLock, 0u, 1u)) {
+        bResult = false;
+    }
+    else {
+        InitializationFlow();
+        bResult = DoTryPush(aMessage);
+        InitializationFlow();
+        BSAtomicCompareExchange(&uiLock, 1u, 0u);
+    }
+    return bResult;
 }
 
 // Spins until the lock is free, then pops under it.
 bool BSTCommonMessageQueue::Pop(void* aMessage) {
-	bool bResult;
-	while (true) {
-		if (!BSAtomicCompareExchange(&uiLock, 0u, 1u)) {
-			InitializationFlow();
-			bResult = DoTryPop(aMessage);
-			InitializationFlow();
-			BSAtomicCompareExchange(&uiLock, 1u, 0u);
-			break;
-		}
-	}
-	return bResult;
+    bool bResult;
+    while (true) {
+        if (!BSAtomicCompareExchange(&uiLock, 0u, 1u)) {
+            InitializationFlow();
+            bResult = DoTryPop(aMessage);
+            InitializationFlow();
+            BSAtomicCompareExchange(&uiLock, 1u, 0u);
+            break;
+        }
+    }
+    return bResult;
 }
 
 bool BSTCommonMessageQueue::TryPop(void* aMessage) {
-	bool bResult;
-	if (BSAtomicCompareExchange(&uiLock, 0u, 1u)) {
-		bResult = false;
-	} else {
-		InitializationFlow();
-		bResult = DoTryPop(aMessage);
-		InitializationFlow();
-		BSAtomicCompareExchange(&uiLock, 1u, 0u);
-	}
-	return bResult;
+    bool bResult;
+    if (BSAtomicCompareExchange(&uiLock, 0u, 1u)) {
+        bResult = false;
+    }
+    else {
+        InitializationFlow();
+        bResult = DoTryPop(aMessage);
+        InitializationFlow();
+        BSAtomicCompareExchange(&uiLock, 1u, 0u);
+    }
+    return bResult;
 }
 
 bool BSTCommonScrapHeapMessageQueue::DoTryPush(const void* aMessage) {
-	BSScrapHeapQueueElem<BSPackedTask>* pElem = static_cast<BSScrapHeapQueueElem<BSPackedTask>*>(pScrapHeap
-			->Allocate(sizeof(BSScrapHeapQueueElem<BSPackedTask>), ScrapHeap::ALIGNMENT));
-	BSScrapHeapQueueElem<BSPackedTask>* apMemory =
-		static_cast<BSScrapHeapQueueElem<BSPackedTask>*>(::operator new(sizeof(BSScrapHeapQueueElem<BSPackedTask>),
-			pElem));
-	if (apMemory) {
-		::new (apMemory) BSScrapHeapQueueElem<BSPackedTask>;
-	}
-	rt::memcpy(&pElem->Elem, aMessage, sizeof(pElem->Elem));
-	if (!pHead) {
-		ppTail = &pHead;
-	}
-	*ppTail = pElem;
-	pElem->pNext = 0;
-	ppTail = &pElem->pNext;
-	return 1;
+    BSScrapHeapQueueElem<BSPackedTask>* pElem = static_cast<BSScrapHeapQueueElem<BSPackedTask>*>(
+        pScrapHeap->Allocate(sizeof(BSScrapHeapQueueElem<BSPackedTask>), ScrapHeap::ALIGNMENT)
+    );
+    BSScrapHeapQueueElem<BSPackedTask>* apMemory = static_cast<BSScrapHeapQueueElem<BSPackedTask>*>(
+        ::operator new(sizeof(BSScrapHeapQueueElem<BSPackedTask>), pElem)
+    );
+    if (apMemory) {
+        ::new (apMemory) BSScrapHeapQueueElem<BSPackedTask>;
+    }
+    rt::memcpy(&pElem->Elem, aMessage, sizeof(pElem->Elem));
+    if (!pHead) {
+        ppTail = &pHead;
+    }
+    *ppTail = pElem;
+    pElem->pNext = 0;
+    ppTail = &pElem->pNext;
+    return 1;
 }
 
 bool BSTCommonScrapHeapMessageQueue::DoTryPop(void* aMessage) {
-	BSScrapHeapQueueElem<BSPackedTask>* pElem = pHead;
-	if (!pElem) {
-		return false;
-	}
-	rt::memcpy(aMessage, &pElem->Elem, sizeof(pElem->Elem));
-	pHead = pElem->pNext;
-	pElem->~BSScrapHeapQueueElem<BSPackedTask>();
-	pScrapHeap->Deallocate(pElem);
-	return true;
+    BSScrapHeapQueueElem<BSPackedTask>* pElem = pHead;
+    if (!pElem) {
+        return false;
+    }
+    rt::memcpy(aMessage, &pElem->Elem, sizeof(pElem->Elem));
+    pHead = pElem->pNext;
+    pElem->~BSScrapHeapQueueElem<BSPackedTask>();
+    pScrapHeap->Deallocate(pElem);
+    return true;
 }
 
 bool BSTCommonScrapHeapMessageQueue::IsEmpty() const {
-	return pHead == nullptr;
+    return pHead == nullptr;
 }
 
 void Clear(BSTCommonScrapHeapMessageQueue* apThis, [[maybe_unused]] void* apEdx) {
-	BSPackedTask v2;
-	while (apThis->TryPop(&v2)) {
-		;
-	}
+    BSPackedTask v2;
+    while (apThis->TryPop(&v2)) {
+        ;
+    }
 }

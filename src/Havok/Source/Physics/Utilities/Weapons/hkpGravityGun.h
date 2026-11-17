@@ -16,33 +16,39 @@ void cleanupLoadedObjecthkpGravityGun(void* p);
 // carrying and throwing helpers are private in the SDK and not declared here.
 class hkpGravityGun : public hkpFirstPersonGun {
 public:
-	hkpGravityGun();
-	hkpGravityGun(hkFinishLoadedObjectFlag flag);
-	~hkpGravityGun() override;
+    hkpGravityGun();
+    hkpGravityGun(hkFinishLoadedObjectFlag flag);
+    ~hkpGravityGun() override;
 
-	void stepGun(float timeStep, hkpWorld* world, const hkpRigidBody* body, const hkTransform& viewTransform, bool fire,
-		bool fireRmb) override;
-	void reset(hkpWorld* world) override;
+    void stepGun(
+        float timeStep,
+        hkpWorld* world,
+        const hkpRigidBody* body,
+        const hkTransform& viewTransform,
+        bool fire,
+        bool fireRmb
+    ) override;
+    void reset(hkpWorld* world) override;
 
-	hkpRigidBody* pickBody(const hkTransform& viewTransform, const hkpRigidBody* characterBody, const hkpWorld* world);
-	void gravityGunStep(float timeStep, const hkTransform& viewTransform, const hkpRigidBody* characterBody);
-	hkpRigidBody* dropObject(int32_t index);
-	void gravityGunPush(const hkTransform& viewTransform, const hkpRigidBody* characterBody, const hkpWorld* world);
-	void gravityGunPutDown(const hkTransform& viewTransform, const hkpRigidBody* characterBody, const hkpWorld* world);
-	void takeObject(hkpRigidBody* body);
-	void gravityGunPull(const hkTransform& viewTransform, const hkpRigidBody* characterBody, const hkpWorld* world);
+    hkpRigidBody* pickBody(const hkTransform& viewTransform, const hkpRigidBody* characterBody, const hkpWorld* world);
+    void gravityGunStep(float timeStep, const hkTransform& viewTransform, const hkpRigidBody* characterBody);
+    hkpRigidBody* dropObject(int32_t index);
+    void gravityGunPush(const hkTransform& viewTransform, const hkpRigidBody* characterBody, const hkpWorld* world);
+    void gravityGunPutDown(const hkTransform& viewTransform, const hkpRigidBody* characterBody, const hkpWorld* world);
+    void takeObject(hkpRigidBody* body);
+    void gravityGunPull(const hkTransform& viewTransform, const hkpRigidBody* characterBody, const hkpWorld* world);
 
-	// Havok SDK signature (hkpUtilities.lib, tied by target).
-	static const hkClass& staticClass();
+    // Havok SDK signature (hkpUtilities.lib, tied by target).
+    static const hkClass& staticClass();
 
-	hkArray<hkpRigidBody*> m_grabbedBodies;
-	int32_t m_maxNumObjectsPicked;
-	float m_maxMassOfObjectPicked;
-	float m_maxDistOfObjectPicked;
-	float m_impulseAppliedWhenObjectNotPicked;
-	float m_throwVelocity;
-	hkVector4 m_capturedObjectPosition;
-	hkVector4 m_capturedObjectsOffset;
+    hkArray<hkpRigidBody*> m_grabbedBodies;
+    int32_t m_maxNumObjectsPicked;
+    float m_maxMassOfObjectPicked;
+    float m_maxDistOfObjectPicked;
+    float m_impulseAppliedWhenObjectNotPicked;
+    float m_throwVelocity;
+    hkVector4 m_capturedObjectPosition;
+    hkVector4 m_capturedObjectsOffset;
 };
 
 extern hkClass hkpGravityGunClass;

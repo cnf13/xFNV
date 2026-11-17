@@ -25,83 +25,84 @@ BSResizableTriShape::BSResizableTriShape(NiTriShapeData* usVertices) : NiTriShap
 BSResizableTriShape::~BSResizableTriShape() {}
 
 const NiRTTI* BSResizableTriShape::GetRTTI() const {
-	return &ms_RTTI;
+    return &ms_RTTI;
 }
 
 NiObject* BSResizableTriShape::CreateClone(NiCloningProcess& kCloning) {
-	void* v3 = NiMemObject::operator new(sizeof(BSResizableTriShape));
-	BSResizableTriShape* v4 = static_cast<BSResizableTriShape*>(v3);
-	if (v3) {
-		::new (v3) BSResizableTriShape;
-	} else {
-		v4 = nullptr;
-	}
-	CopyMembers(v4, kCloning);
-	v4->uiNumPrimitives = uiNumPrimitives;
-	return v4;
+    void* v3 = NiMemObject::operator new(sizeof(BSResizableTriShape));
+    BSResizableTriShape* v4 = static_cast<BSResizableTriShape*>(v3);
+    if (v3) {
+        ::new (v3) BSResizableTriShape;
+    }
+    else {
+        v4 = nullptr;
+    }
+    CopyMembers(v4, kCloning);
+    v4->uiNumPrimitives = uiNumPrimitives;
+    return v4;
 }
 
 void BSResizableTriShape::LoadBinary(NiStream& kStream) {
-	NiTriShape::LoadBinary(kStream);
-	NiStreamLoadBinary(kStream, uiNumPrimitives);
+    NiTriShape::LoadBinary(kStream);
+    NiStreamLoadBinary(kStream, uiNumPrimitives);
 }
 
 void BSResizableTriShape::LinkObject(NiStream& kStream) {
-	NiTriShape::LinkObject(kStream);
+    NiTriShape::LinkObject(kStream);
 }
 
 bool BSResizableTriShape::RegisterStreamables(NiStream& kStream) {
-	return NiTriShape::RegisterStreamables(kStream);
+    return NiTriShape::RegisterStreamables(kStream);
 }
 
 void BSResizableTriShape::SaveBinary(NiStream& kStream) {
-	NiTriShape::SaveBinary(kStream);
-	NiStreamSaveBinary(kStream, uiNumPrimitives);
+    NiTriShape::SaveBinary(kStream);
+    NiStreamSaveBinary(kStream, uiNumPrimitives);
 }
 
 bool BSResizableTriShape::IsEqual(NiObject* pkObject) {
-	return NiTriShape::IsEqual(pkObject);
+    return NiTriShape::IsEqual(pkObject);
 }
 
 void BSResizableTriShape::GetViewerStrings(NiTPrimitiveArray<char*>* pkStrings) {
-	NiTriShape::GetViewerStrings(pkStrings);
-	pkStrings->Add(NiGetViewerString(ms_RTTI.GetName()));
-	pkStrings->Add(NiGetViewerString("Num Active Primitives", uiNumPrimitives));
+    NiTriShape::GetViewerStrings(pkStrings);
+    pkStrings->Add(NiGetViewerString(ms_RTTI.GetName()));
+    pkStrings->Add(NiGetViewerString("Num Active Primitives", uiNumPrimitives));
 }
 
 // Creates a zero world bound if there is none, then moves the local bound into world space. TallGrassTriStrips uses
 // the same function.
 void BSResizableTriShape::UpdateWorldBound() {
-	if (!m_kWorldBound) {
-		SetBound(static_cast<BSNiBound*>(MemoryManager_Singleton.Allocate(sizeof(NiBound))));
-		m_kWorldBound->m_kCenter = NiPoint3_ZERO;
-		m_kWorldBound->m_fRadius = 0.0f;
-	}
-	m_kWorldBound->Update(LocalBound, m_kWorld);
+    if (!m_kWorldBound) {
+        SetBound(static_cast<BSNiBound*>(MemoryManager_Singleton.Allocate(sizeof(NiBound))));
+        m_kWorldBound->m_kCenter = NiPoint3_ZERO;
+        m_kWorldBound->m_fRadius = 0.0f;
+    }
+    m_kWorldBound->Update(LocalBound, m_kWorld);
 }
 
 // Draws with the local bound as the world bound.
 void BSResizableTriShape::RenderImmediate(NiRenderer* apRenderer) {
-	*m_kWorldBound = LocalBound;
-	NiTriShape::RenderImmediate(apRenderer);
+    *m_kWorldBound = LocalBound;
+    NiTriShape::RenderImmediate(apRenderer);
 }
 
 void BSResizableTriShape::OnlyRenderImmediate(NiRenderer* apRenderer) {
-	*m_kWorldBound = LocalBound;
-	NiTriShape::OnlyRenderImmediate(apRenderer);
+    *m_kWorldBound = LocalBound;
+    NiTriShape::OnlyRenderImmediate(apRenderer);
 }
 
 // TallGrassTriShape uses the same function.
 void BSResizableTriShape::SetLocalBound(NiBound aBound) {
-	LocalBound = aBound;
-	*m_kWorldBound = aBound;
+    LocalBound = aBound;
+    *m_kWorldBound = aBound;
 }
 
 // The local bound stands in for the world bound. TallGrassTriShape and TallGrassTriStrips use the same function.
 const NiBound& BSResizableTriShape::GetWorldBound() {
-	return LocalBound;
+    return LocalBound;
 }
 
 void BSResizableTriShape::CopyMembers(BSResizableTriShape* pkDest, NiCloningProcess& kCloning) {
-	NiTriShape::CopyMembers(pkDest, kCloning);
+    NiTriShape::CopyMembers(pkDest, kCloning);
 }

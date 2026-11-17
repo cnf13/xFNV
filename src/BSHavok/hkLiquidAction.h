@@ -21,17 +21,17 @@ void cleanupLoadedObject(void* p);
 // copies Force.
 class hkLiquidAction : public hkpUnaryAction {
 public:
-	// Constructor from the entity it acts on and its user data.
-	hkLiquidAction(hkpRigidBody* entityA, uint32_t userData);
-	hkLiquidAction(int32_t aiFinishing);
+    // Constructor from the entity it acts on and its user data.
+    hkLiquidAction(hkpRigidBody* entityA, uint32_t userData);
+    hkLiquidAction(int32_t aiFinishing);
 
-	// Slot 3.
-	void applyAction(const hkStepInfo& stepInfo) override;
-	// Slot 7: a copy on newEntities[0] with this action's user data and Force; none unless
-	// newEntities holds 2 and newPhantoms none.
-	hkpAction* clone(const hkArray<hkpEntity*>& newEntities, const hkArray<hkpPhantom*>& newPhantoms) const override;
+    // Slot 3.
+    void applyAction(const hkStepInfo& stepInfo) override;
+    // Slot 7: a copy on newEntities[0] with this action's user data and Force; none unless
+    // newEntities holds 2 and newPhantoms none.
+    hkpAction* clone(const hkArray<hkpEntity*>& newEntities, const hkArray<hkpPhantom*>& newPhantoms) const override;
 
-	hkVector4 Force;
+    hkVector4 Force;
 };
 
 // The class's reflection record.

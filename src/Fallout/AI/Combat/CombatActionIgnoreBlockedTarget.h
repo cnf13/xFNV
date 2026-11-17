@@ -6,7 +6,7 @@
 // Execute.
 class CombatActionIgnoreBlockedTarget : public CombatAction {
 public:
-	CombatActionIgnoreBlockedTarget(CombatAction::COMBAT_ACTION aeType);
+    CombatActionIgnoreBlockedTarget(CombatAction::COMBAT_ACTION aeType);
 
-	void Execute(CombatController* apCombatController, int32_t aiActionValue) override;
+    void Execute(CombatController* apCombatController, int32_t aiActionValue) override;
 };

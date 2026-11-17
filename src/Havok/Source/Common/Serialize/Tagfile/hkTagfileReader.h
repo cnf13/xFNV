@@ -11,14 +11,14 @@ class hkStreamReader;
 // data of its own. Abstract.
 class hkTagfileReader : public hkReferencedObject {
 public:
-	enum FormatType : int32_t {
-		FORMAT_ERROR = 0,
-		FORMAT_UNKNOWN = 1,
-		FORMAT_BINARY = 2,
-	};
+    enum FormatType : int32_t {
+        FORMAT_ERROR = 0,
+        FORMAT_UNKNOWN = 1,
+        FORMAT_BINARY = 2,
+    };
 
-	virtual hkDataObject load(hkStreamReader* stream, hkDataWorld& world) = 0;
+    virtual hkDataObject load(hkStreamReader* stream, hkDataWorld& world) = 0;
 
-	static hkEnum<hkTagfileReader::FormatType, int32_t>*
-	detectFormat(hkEnum<hkTagfileReader::FormatType, int32_t>* apResult, hkStreamReader* stream);
+    static hkEnum<hkTagfileReader::FormatType, int32_t>*
+    detectFormat(hkEnum<hkTagfileReader::FormatType, int32_t>* apResult, hkStreamReader* stream);
 };

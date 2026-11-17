@@ -27,8 +27,12 @@ void unpackSignedQuaternion32(const uint8_t* in8, hkQuaternion* out);
 // Unpacks five bytes.
 void unpackSignedQuaternion40(const uint8_t* in, hkQuaternion* out);
 // The start of a track's packed NURBS data in block of base.
-const uint8_t* computePackedNurbsOffsets(const uint8_t* base, const uint32_t* m_blockOffsets, uint32_t block,
-	uint32_t maskAndQuantizationSize);
+const uint8_t* computePackedNurbsOffsets(
+    const uint8_t* base,
+    const uint32_t* m_blockOffsets,
+    uint32_t block,
+    uint32_t maskAndQuantizationSize
+);
 // endianfunc's POLAR32 entry, reversing four bytes in place.
 void handleEndianSignedQuaternion32(uint8_t* dataInOut);
 void handleEndianSignedQuaternion48(uint8_t* dataInOut);

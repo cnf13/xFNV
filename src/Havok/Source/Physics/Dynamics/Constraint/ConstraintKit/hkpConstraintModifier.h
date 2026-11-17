@@ -9,7 +9,7 @@ class hkpGenericConstraintDataParameters;
 // has empty inline bodies.
 class hkpConstraintModifier {
 public:
-	virtual ~hkpConstraintModifier() {}
+    virtual ~hkpConstraintModifier() {}
 
-	virtual void modify(hkpGenericConstraintDataParameters& vars, int32_t userData) {}
+    virtual void modify(hkpGenericConstraintDataParameters& vars, int32_t userData) {}
 };

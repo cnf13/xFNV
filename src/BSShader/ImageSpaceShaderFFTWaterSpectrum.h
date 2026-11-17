@@ -4,9 +4,9 @@
 
 class ImageSpaceShaderFFTWaterSpectrum : public ImageSpaceShader {
 public:
-	ImageSpaceShaderFFTWaterSpectrum();
-	~ImageSpaceShaderFFTWaterSpectrum() override;
+    ImageSpaceShaderFFTWaterSpectrum();
+    ~ImageSpaceShaderFFTWaterSpectrum() override;
 
-	void ReloadShaders() override;
-	bool LoadStagesAndPasses() override;
+    void ReloadShaders() override;
+    bool LoadStagesAndPasses() override;
 };

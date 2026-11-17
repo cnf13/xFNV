@@ -4,9 +4,9 @@
 
 class ImageSpaceShaderFFTNormals : public ImageSpaceShader {
 public:
-	ImageSpaceShaderFFTNormals();
-	~ImageSpaceShaderFFTNormals() override;
+    ImageSpaceShaderFFTNormals();
+    ~ImageSpaceShaderFFTNormals() override;
 
-	void ReloadShaders() override;
-	bool LoadStagesAndPasses() override;
+    void ReloadShaders() override;
+    bool LoadStagesAndPasses() override;
 };

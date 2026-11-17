@@ -8,14 +8,14 @@
 // A per-vertex data channel of a scene mesh: one int per vertex. It overrides only the destructor.
 class hkxVertexIntDataChannel : public hkReferencedObject {
 public:
-	// The SDK's finish constructor: a loaded object keeps the fields the load wrote.
-	hkxVertexIntDataChannel(hkFinishLoadedObjectFlag aFlag) : hkReferencedObject(aFlag), m_perVertexInts(aFlag) {}
-	~hkxVertexIntDataChannel() override;
+    // The SDK's finish constructor: a loaded object keeps the fields the load wrote.
+    hkxVertexIntDataChannel(hkFinishLoadedObjectFlag aFlag) : hkReferencedObject(aFlag), m_perVertexInts(aFlag) {}
+    ~hkxVertexIntDataChannel() override;
 
-	// The reflection class hkxVertexIntDataChannelClass.
-	static const hkClass& staticClass();
+    // The reflection class hkxVertexIntDataChannelClass.
+    static const hkClass& staticClass();
 
-	hkArray<int32_t> m_perVertexInts;
+    hkArray<int32_t> m_perVertexInts;
 };
 
 extern hkClass hkxVertexIntDataChannelClass;

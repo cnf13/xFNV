@@ -22,42 +22,42 @@ int32_t sub_D4B390(int32_t numTriangles, int32_t indicesPerTriangle);
 // vertices, indices and materials.
 class hkpStorageMeshShape : public hkpMeshShape {
 public:
-	// The copies of one subpart's data.
-	class SubpartStorage : public hkReferencedObject {
-	public:
-		SubpartStorage();
-		SubpartStorage(int32_t a1);
-		// The SDK's finish constructor, which getVtablehkpStorageMeshShapeSubpartStorage builds: the one above with
-		// the flag's m_finishing.
-		SubpartStorage(hkFinishLoadedObjectFlag flag) : SubpartStorage(flag.m_finishing) {}
-		~SubpartStorage() override;
+    // The copies of one subpart's data.
+    class SubpartStorage : public hkReferencedObject {
+    public:
+        SubpartStorage();
+        SubpartStorage(int32_t a1);
+        // The SDK's finish constructor, which getVtablehkpStorageMeshShapeSubpartStorage builds: the one above with
+        // the flag's m_finishing.
+        SubpartStorage(hkFinishLoadedObjectFlag flag) : SubpartStorage(flag.m_finishing) {}
+        ~SubpartStorage() override;
 
-		static const hkClass& staticClass();
+        static const hkClass& staticClass();
 
-		hkArray<float> m_vertices;
-		hkArray<uint16_t> m_indices16;
-		hkArray<uint32_t> m_indices32;
-		hkArray<uint8_t> m_materialIndices;
-		hkArray<uint32_t> m_materials;
-		hkArray<uint16_t> m_materialIndices16;
-	};
+        hkArray<float> m_vertices;
+        hkArray<uint16_t> m_indices16;
+        hkArray<uint32_t> m_indices32;
+        hkArray<uint8_t> m_materialIndices;
+        hkArray<uint32_t> m_materials;
+        hkArray<uint16_t> m_materialIndices16;
+    };
 
-	hkpStorageMeshShape(hkpShapeType a1);
+    hkpStorageMeshShape(hkpShapeType a1);
 
-	// The SDK's finish constructor, which getVtablehkpStorageMeshShape builds: the one above, whose argument is the
-	// flag's m_finishing.
-	hkpStorageMeshShape(hkFinishLoadedObjectFlag flag)
-		: hkpStorageMeshShape(static_cast<hkpShapeType>(flag.m_finishing)) {}
+    // The SDK's finish constructor, which getVtablehkpStorageMeshShape builds: the one above, whose argument is the
+    // flag's m_finishing.
+    hkpStorageMeshShape(hkFinishLoadedObjectFlag flag)
+      : hkpStorageMeshShape(static_cast<hkpShapeType>(flag.m_finishing)) {}
 
-	hkpStorageMeshShape(float radius, int32_t numbits);
-	hkpStorageMeshShape(const hkpMeshShape* mesh);
-	~hkpStorageMeshShape() override;
+    hkpStorageMeshShape(float radius, int32_t numbits);
+    hkpStorageMeshShape(const hkpMeshShape* mesh);
+    ~hkpStorageMeshShape() override;
 
-	void addSubpart(const Subpart& partIn) override;
+    void addSubpart(const Subpart& partIn) override;
 
-	static const hkClass& staticClass();
+    static const hkClass& staticClass();
 
-	hkArray<SubpartStorage*> m_storage;
+    hkArray<SubpartStorage*> m_storage;
 };
 
 extern hkClass hkpStorageMeshShapeSubpartStorageClass;

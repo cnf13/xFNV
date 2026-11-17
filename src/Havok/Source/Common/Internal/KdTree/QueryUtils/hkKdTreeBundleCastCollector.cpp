@@ -5,5 +5,5 @@
 hkKdTreeBundleCastCollector::~hkKdTreeBundleCastCollector() {}
 
 void hkKdTreeBundleCastCollector::operator delete(void* apMemory) {
-	ourFree(apMemory);
+    ourFree(apMemory);
 }

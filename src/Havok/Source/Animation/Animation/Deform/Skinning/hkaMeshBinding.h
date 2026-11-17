@@ -16,27 +16,29 @@ class hkxMesh;
 // Binds a scene mesh to the skeleton that deforms it: per mesh section, the bone each skin palette entry stands for.
 class hkaMeshBinding : public hkReferencedObject {
 public:
-	// For one mesh section: the skeleton bone of each palette index.
-	struct Mapping {
-		static const hkClass& staticClass();
-		static const hkClass& staticClass_00DFC760();
+    // For one mesh section: the skeleton bone of each palette index.
+    struct Mapping {
+        static const hkClass& staticClass();
+        static const hkClass& staticClass_00DFC760();
 
-		hkArray<int16_t> m_mapping;
-	};
+        hkArray<int16_t> m_mapping;
+    };
 
-	hkaMeshBinding();
-	hkaMeshBinding(hkFinishLoadedObjectFlag aFlag);
-	~hkaMeshBinding() override;
+    hkaMeshBinding();
+    hkaMeshBinding(hkFinishLoadedObjectFlag aFlag);
+    ~hkaMeshBinding() override;
 
-	static void operator delete(void* apMemory) { hkReferencedObject::deleteObject(apMemory); }
-	static const hkClass& staticClass();
-	static const hkClass& staticClass_00DFC7C0();
+    static void operator delete(void* apMemory) {
+        hkReferencedObject::deleteObject(apMemory);
+    }
+    static const hkClass& staticClass();
+    static const hkClass& staticClass_00DFC7C0();
 
-	hkRefPtr<hkxMesh> m_mesh;
-	hkStringPtr m_originalSkeletonName;
-	hkRefPtr<hkaSkeleton> m_skeleton;
-	hkArray<Mapping> m_mappings;
-	hkArray<hkTransform> m_boneFromSkinMeshTransforms;
+    hkRefPtr<hkxMesh> m_mesh;
+    hkStringPtr m_originalSkeletonName;
+    hkRefPtr<hkaSkeleton> m_skeleton;
+    hkArray<Mapping> m_mappings;
+    hkArray<hkTransform> m_boneFromSkinMeshTransforms;
 };
 
 extern hkTypeInfo hkMemoryResourceHandleTypeInfo;

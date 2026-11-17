@@ -7,7 +7,7 @@ struct hkStepInfo;
 // hkpWorldCallbackUtil::fireIslandPostIntegrateCallback calls postIntegrateCallback with the island and the step.
 class hkpIslandPostIntegrateListener {
 public:
-	virtual ~hkpIslandPostIntegrateListener();
+    virtual ~hkpIslandPostIntegrateListener();
 
-	virtual void postIntegrateCallback(hkpSimulationIsland* island, const hkStepInfo& stepInfo) = 0;
+    virtual void postIntegrateCallback(hkpSimulationIsland* island, const hkStepInfo& stepInfo) = 0;
 };

@@ -10,71 +10,73 @@
 #include "Fallout/Misc/SaveLoad/BGSSaveFormBuffer.h"
 
 GuardActorPackageData::GuardActorPackageData()
-	: eState(GuardActorPackageData::GUARD_STATE_INIT), pGuardWarnedActor(nullptr), iWarningCount(0), fGuardTimer(0.0f) {
-}
+  : eState(GuardActorPackageData::GUARD_STATE_INIT), pGuardWarnedActor(nullptr), iWarningCount(0), fGuardTimer(0.0f) {}
 
 GuardActorPackageData::~GuardActorPackageData() {}
 
 // The guard's warned actor is held as a form pointer, so its deletion arrives here: the guard forgets it.
 void GuardActorPackageData::HandleDeletedReference(TESObjectREFR* pDeletedObj) {
-	if (pDeletedObj == static_cast<TESObjectREFR*>(pGuardWarnedActor)) {
-		pGuardWarnedActor = nullptr;
-	}
+    if (pDeletedObj == static_cast<TESObjectREFR*>(pGuardWarnedActor)) {
+        pGuardWarnedActor = nullptr;
+    }
 }
 
 PACKAGE_TYPE GuardActorPackageData::GetPackageType() {
-	return PACKAGE_TYPE_GUARD;
+    return PACKAGE_TYPE_GUARD;
 }
 
 // The state, timer and warning count, then the warned actor's form ID.
 void GuardActorPackageData::SaveGame(BGSSaveFormBuffer* apSaveGameBuffer) {
-	apSaveGameBuffer->SaveDataEndian(reinterpret_cast<char*>(&eState), 4, 0);
-	apSaveGameBuffer->SaveDataEndian(reinterpret_cast<char*>(&fGuardTimer), 4, 0);
-	apSaveGameBuffer->SaveDataEndian(reinterpret_cast<char*>(&iWarningCount), 4, 0);
-	apSaveGameBuffer->SaveFormID(pGuardWarnedActor, 0);
+    apSaveGameBuffer->SaveDataEndian(reinterpret_cast<char*>(&eState), 4, 0);
+    apSaveGameBuffer->SaveDataEndian(reinterpret_cast<char*>(&fGuardTimer), 4, 0);
+    apSaveGameBuffer->SaveDataEndian(reinterpret_cast<char*>(&iWarningCount), 4, 0);
+    apSaveGameBuffer->SaveFormID(pGuardWarnedActor, 0);
 }
 
 // The warned actor is loaded as its form ID; InitLoadGame resolves it. The loads go eState, fGuardTimer, iWarningCount,
 // then pGuardWarnedActor, as SaveGame writes them.
 void GuardActorPackageData::LoadGame(BGSLoadFormBuffer* apLoadGameBuffer) {
-	apLoadGameBuffer->LoadData(reinterpret_cast<char*>(&eState), 4);
-	apLoadGameBuffer->LoadData(reinterpret_cast<char*>(&fGuardTimer), 4);
-	apLoadGameBuffer->LoadData(reinterpret_cast<char*>(&iWarningCount), 4);
-	apLoadGameBuffer->LoadFormID(pGuardWarnedActor);
+    apLoadGameBuffer->LoadData(reinterpret_cast<char*>(&eState), 4);
+    apLoadGameBuffer->LoadData(reinterpret_cast<char*>(&fGuardTimer), 4);
+    apLoadGameBuffer->LoadData(reinterpret_cast<char*>(&iWarningCount), 4);
+    apLoadGameBuffer->LoadFormID(pGuardWarnedActor);
 }
 
 // The warned actor field holds its form ID until the load game resolves it. With a null field the null is still stored
 // back.
 void GuardActorPackageData::InitLoadGame(BGSLoadFormBuffer* apLoadGameBuffer) {
-	Actor* pActor;
-	if (pGuardWarnedActor) {
-		pActor = dynamic_cast<
-			Actor*>(TESForm::GetFormByNumericID(static_cast<uint32_t>(reinterpret_cast<uintptr_t>(pGuardWarnedActor))));
-	} else {
-		pActor = nullptr;
-	}
-	pGuardWarnedActor = pActor;
-	if (pGuardWarnedActor)
-		pGuardWarnedActor->TESObjectREFR::SetTargeted(1);
+    Actor* pActor;
+    if (pGuardWarnedActor) {
+        pActor = dynamic_cast<Actor*>(
+            TESForm::GetFormByNumericID(static_cast<uint32_t>(reinterpret_cast<uintptr_t>(pGuardWarnedActor)))
+        );
+    }
+    else {
+        pActor = nullptr;
+    }
+    pGuardWarnedActor = pActor;
+    if (pGuardWarnedActor) {
+        pGuardWarnedActor->TESObjectREFR::SetTargeted(1);
+    }
 }
 
 void GuardActorPackageData::IncWarningCount() {
-	++iWarningCount;
+    ++iWarningCount;
 }
 
 void GuardActorPackageData::ClearWarningCount() {
-	iWarningCount = 0;
+    iWarningCount = 0;
 }
 
 void GuardActorPackageData::UpdateWarningTimer(float a2) {
-	fGuardTimer = (float)(fGuardTimer + a2);
+    fGuardTimer = (float)(fGuardTimer + a2);
 }
 
 void GuardActorPackageData::SetTarget(Actor* a2) {
-	pGuardWarnedActor = a2;
-	pGuardWarnedActor->TESObjectREFR::SetTargeted(1);
+    pGuardWarnedActor = a2;
+    pGuardWarnedActor->TESObjectREFR::SetTargeted(1);
 }
 
 void GuardActorPackageData::ClearWarningTimer() {
-	fGuardTimer = (float)0.0;
+    fGuardTimer = (float)0.0;
 }

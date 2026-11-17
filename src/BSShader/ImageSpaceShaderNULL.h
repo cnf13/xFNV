@@ -4,8 +4,8 @@
 
 class ImageSpaceShaderNULL : public ImageSpaceShader {
 public:
-	ImageSpaceShaderNULL();
-	~ImageSpaceShaderNULL() override;
+    ImageSpaceShaderNULL();
+    ~ImageSpaceShaderNULL() override;
 
-	void ReloadShaders() override;
+    void ReloadShaders() override;
 };

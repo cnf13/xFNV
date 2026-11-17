@@ -19,37 +19,70 @@ void finishLoadedObjecthkpConvexPieceMeshShape(void* p, int32_t finishing);
 // hkpConvexPieceMeshShape's reflected members.
 using hkpConvexPieceMeshShapeClass_MembersArray = const hkClassMember[3];
 static hkpConvexPieceMeshShapeClass_MembersArray hkpConvexPieceMeshShapeClass_Members{
-	{"convexPieceStream", &hkpConvexPieceStreamDataClass, nullptr, {hkClassMember::TYPE_POINTER},
-		{hkClassMember::TYPE_STRUCT}, 0, {0}, 0x18, nullptr},
-	{"displayMesh", &hkpShapeCollectionClass, nullptr, {hkClassMember::TYPE_POINTER}, {hkClassMember::TYPE_STRUCT}, 0,
-		{0}, 0x1C, nullptr},
-	{"radius", nullptr, nullptr, {hkClassMember::TYPE_REAL}, {hkClassMember::TYPE_VOID}, 0, {0}, 0x20, nullptr}};
+    {"convexPieceStream",
+     &hkpConvexPieceStreamDataClass,
+     nullptr,
+     {hkClassMember::TYPE_POINTER},
+     {hkClassMember::TYPE_STRUCT},
+     0,
+     {0},
+     0x18,
+     nullptr},
+    {"displayMesh",
+     &hkpShapeCollectionClass,
+     nullptr,
+     {hkClassMember::TYPE_POINTER},
+     {hkClassMember::TYPE_STRUCT},
+     0,
+     {0},
+     0x1C,
+     nullptr},
+    {"radius", nullptr, nullptr, {hkClassMember::TYPE_REAL}, {hkClassMember::TYPE_VOID}, 0, {0}, 0x20, nullptr}
+};
 
-hkClass hkpConvexPieceMeshShapeClass("hkpConvexPieceMeshShape", &hkpShapeCollectionClass, 0x24, nullptr, 0, nullptr, 0,
-	hkpConvexPieceMeshShapeClass_Members, 3, nullptr, nullptr, 0, 0);
-hkTypeInfo hkpConvexPieceMeshShapeTypeInfo = {"hkpConvexPieceMeshShape", finishLoadedObjecthkpConvexPieceMeshShape,
-	cleanupLoadedObjecthkpConvexPieceMeshShape, getVtablehkpConvexPieceMeshShape(), &typeid(hkpConvexPieceMeshShape),
-	sizeof(hkpConvexPieceMeshShape)};
+hkClass hkpConvexPieceMeshShapeClass(
+    "hkpConvexPieceMeshShape",
+    &hkpShapeCollectionClass,
+    0x24,
+    nullptr,
+    0,
+    nullptr,
+    0,
+    hkpConvexPieceMeshShapeClass_Members,
+    3,
+    nullptr,
+    nullptr,
+    0,
+    0
+);
+hkTypeInfo hkpConvexPieceMeshShapeTypeInfo = {
+    "hkpConvexPieceMeshShape",
+    finishLoadedObjecthkpConvexPieceMeshShape,
+    cleanupLoadedObjecthkpConvexPieceMeshShape,
+    getVtablehkpConvexPieceMeshShape(),
+    &typeid(hkpConvexPieceMeshShape),
+    sizeof(hkpConvexPieceMeshShape)
+};
 
 // The class registry's finish-loaded-object callback of hkpConvexPieceMeshShape: the null check, then its finish
 // constructor.
 void finishLoadedObjecthkpConvexPieceMeshShape(void* p, int32_t finishing) {
-	if (!p) {
-		return;
-	}
-	hkFinishLoadedObjectFlag kFlag;
-	kFlag.m_finishing = finishing;
-	::new (p) hkpConvexPieceMeshShape(kFlag);
+    if (!p) {
+        return;
+    }
+    hkFinishLoadedObjectFlag kFlag;
+    kFlag.m_finishing = finishing;
+    ::new (p) hkpConvexPieceMeshShape(kFlag);
 }
 
 const void* getVtablehkpConvexPieceMeshShape() {
-	return hkGetVtableOf<hkpConvexPieceMeshShape>();
+    return hkGetVtableOf<hkpConvexPieceMeshShape>();
 }
 
 void cleanupLoadedObjecthkpConvexPieceMeshShape(void* p) {
-	static_cast<hkpConvexPieceMeshShape*>(p)->~hkpConvexPieceMeshShape();
+    static_cast<hkpConvexPieceMeshShape*>(p)->~hkpConvexPieceMeshShape();
 }
 
 const hkClass& hkpConvexPieceMeshShape::staticClass() {
-	return hkpConvexPieceMeshShapeClass;
+    return hkpConvexPieceMeshShapeClass;
 }

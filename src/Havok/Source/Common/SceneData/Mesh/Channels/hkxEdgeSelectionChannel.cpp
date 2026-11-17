@@ -15,33 +15,52 @@ static void cleanupLoadedObjecthkxEdgeSelectionChannel(void* p);
 // The class record's member table.
 using hkxEdgeSelectionChannelClassMemberArray = const hkClassMember[1];
 static hkxEdgeSelectionChannelClassMemberArray hkxEdgeSelectionChannelClass_Members{
-	{"selectedEdges", nullptr, nullptr, {hkClassMember::TYPE_ARRAY}, {hkClassMember::TYPE_INT32}, 0, 0, 0x8, nullptr}};
-hkClass hkxEdgeSelectionChannelClass("hkxEdgeSelectionChannel", &hkReferencedObjectClass, 20, nullptr, 0, nullptr, 0,
-	hkxEdgeSelectionChannelClass_Members, 1, nullptr, nullptr, 0, 1);
-hkTypeInfo hkxEdgeSelectionChannelTypeInfo = {"hkxEdgeSelectionChannel", finishLoadedObjecthkxEdgeSelectionChannel,
-	cleanupLoadedObjecthkxEdgeSelectionChannel, getVtablehkxEdgeSelectionChannel(), &typeid(hkxEdgeSelectionChannel),
-	sizeof(hkxEdgeSelectionChannel)};
+    {"selectedEdges", nullptr, nullptr, {hkClassMember::TYPE_ARRAY}, {hkClassMember::TYPE_INT32}, 0, 0, 0x8, nullptr}
+};
+hkClass hkxEdgeSelectionChannelClass(
+    "hkxEdgeSelectionChannel",
+    &hkReferencedObjectClass,
+    20,
+    nullptr,
+    0,
+    nullptr,
+    0,
+    hkxEdgeSelectionChannelClass_Members,
+    1,
+    nullptr,
+    nullptr,
+    0,
+    1
+);
+hkTypeInfo hkxEdgeSelectionChannelTypeInfo = {
+    "hkxEdgeSelectionChannel",
+    finishLoadedObjecthkxEdgeSelectionChannel,
+    cleanupLoadedObjecthkxEdgeSelectionChannel,
+    getVtablehkxEdgeSelectionChannel(),
+    &typeid(hkxEdgeSelectionChannel),
+    sizeof(hkxEdgeSelectionChannel)
+};
 
 // The type info's finish-loaded-object callback for hkxEdgeSelectionChannel: its finish constructor, when the
 // object is not null.
 static void finishLoadedObjecthkxEdgeSelectionChannel(void* p, int32_t finishing) {
-	if (p) {
-		hkFinishLoadedObjectFlag flag;
-		flag.m_finishing = finishing;
-		::new (p) hkxEdgeSelectionChannel(flag);
-	}
+    if (p) {
+        hkFinishLoadedObjectFlag flag;
+        flag.m_finishing = finishing;
+        ::new (p) hkxEdgeSelectionChannel(flag);
+    }
 }
 
 static const void* getVtablehkxEdgeSelectionChannel() {
-	return hkGetVtableOf<hkxEdgeSelectionChannel>();
+    return hkGetVtableOf<hkxEdgeSelectionChannel>();
 }
 
 static void cleanupLoadedObjecthkxEdgeSelectionChannel(void* p) {
-	static_cast<hkxEdgeSelectionChannel*>(p)->~hkxEdgeSelectionChannel();
+    static_cast<hkxEdgeSelectionChannel*>(p)->~hkxEdgeSelectionChannel();
 }
 
 // hkxEdgeSelectionChannel's reflection data and objects.
 
 const hkClass& hkxEdgeSelectionChannel::staticClass() {
-	return hkxEdgeSelectionChannelClass;
+    return hkxEdgeSelectionChannelClass;
 }

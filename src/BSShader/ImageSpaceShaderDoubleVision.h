@@ -4,8 +4,8 @@
 
 class ImageSpaceShaderDoubleVision : public ImageSpaceShader {
 public:
-	ImageSpaceShaderDoubleVision();
-	~ImageSpaceShaderDoubleVision() override;
+    ImageSpaceShaderDoubleVision();
+    ~ImageSpaceShaderDoubleVision() override;
 
-	void ReloadShaders() override;
+    void ReloadShaders() override;
 };

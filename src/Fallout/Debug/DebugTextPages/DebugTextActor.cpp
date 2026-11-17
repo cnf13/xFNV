@@ -4,17 +4,19 @@
 #include "Fallout/AI/CachedValues.h"
 
 bool bhkRagdollController::QRagdollFeedbackActive() {
-	return bActiveRagdollFeedback;
+    return bActiveRagdollFeedback;
 }
 
 float BaseProcess::GetCachedEndurance(CachedValuesOwner* apOwner) {
-	if (pCachedValues) {
-		if (pCachedValues->IsDirty(CachedValues::CVF_ENDURANCE)) {
-			return apOwner->CalculateCachedEndurance();
-		} else {
-			return pCachedValues->fCachedEndurance;
-		}
-	} else {
-		return 0.0f;
-	}
+    if (pCachedValues) {
+        if (pCachedValues->IsDirty(CachedValues::CVF_ENDURANCE)) {
+            return apOwner->CalculateCachedEndurance();
+        }
+        else {
+            return pCachedValues->fCachedEndurance;
+        }
+    }
+    else {
+        return 0.0f;
+    }
 }

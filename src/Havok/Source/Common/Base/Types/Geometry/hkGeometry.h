@@ -9,28 +9,28 @@
 // A triangle mesh: the vertices and the triangles that index them.
 class hkGeometry {
 public:
-	// A triangle: the three vertex indices and a material.
-	struct Triangle {
-		// The SDK's: its arrays treat it as plain data (hkTypeTraits.h).
-		HK_DECLARE_POD_TYPE();
+    // A triangle: the three vertex indices and a material.
+    struct Triangle {
+        // The SDK's: its arrays treat it as plain data (hkTypeTraits.h).
+        HK_DECLARE_POD_TYPE();
 
-		static const hkClass& staticClass();
-		static const hkClass& staticClass_00DFE1E0();
+        static const hkClass& staticClass();
+        static const hkClass& staticClass_00DFE1E0();
 
-		int32_t m_a;
-		int32_t m_b;
-		int32_t m_c;
-		int32_t m_material;
-	};
+        int32_t m_a;
+        int32_t m_b;
+        int32_t m_c;
+        int32_t m_material;
+    };
 
-	hkGeometry();
-	~hkGeometry();
+    hkGeometry();
+    ~hkGeometry();
 
-	static const hkClass& staticClass();
-	static const hkClass& staticClass_00DFE1F0();
+    static const hkClass& staticClass();
+    static const hkClass& staticClass_00DFE1F0();
 
-	hkArray<hkVector4> m_vertices;
-	hkArray<Triangle> m_triangles;
+    hkArray<hkVector4> m_vertices;
+    hkArray<Triangle> m_triangles;
 };
 
 // The SDK's hkGeometryUtils::quantize.

@@ -99,8 +99,8 @@ SettingT<GameSettingCollection> fMagicTelekinesisSpringElasticity("fMagicTelekin
 SettingT<GameSettingCollection> fMagicTelekinesisObjectDamping("fMagicTelekinesisObjectDamping", 0.95f);
 SettingT<GameSettingCollection> fMagicTelekinesisMaxForce("fMagicTelekinesisMaxForce", 1000.0f);
 SettingT<GameSettingCollection> fMagicTelekinesisComplexSpringDamping("fMagicTelekinesisComplexSpringDamping", 0.9f);
-SettingT<GameSettingCollection> fMagicTelekinesisComplexSpringElasticity("fMagicTelekinesisComplexSpringElasticity",
-	0.1f);
+SettingT<GameSettingCollection>
+    fMagicTelekinesisComplexSpringElasticity("fMagicTelekinesisComplexSpringElasticity", 0.1f);
 SettingT<GameSettingCollection> fMagicTelekinesisComplexObjectDamping("fMagicTelekinesisComplexObjectDamping", 0.7f);
 SettingT<GameSettingCollection> fMagicTelekinesisComplexMaxForce("fMagicTelekinesisComplexMaxForce", 1000.0f);
 SettingT<GameSettingCollection> fMagicTelekinesisLiftPowerMult("fMagicTelekinesisLiftPowerMult", 0.5f);
@@ -179,141 +179,169 @@ SettingT<GameSettingCollection> fMagicSurvivalSkillBase("fMagicSurvivalSkillBase
 SettingT<GameSettingCollection> fMagicSurvivalSkillMult("fMagicSurvivalSkillMult", 0.5f);
 
 float hypotf_3(float X, float Y) {
-	return std::pow(X, Y);
+    return std::pow(X, Y);
 }
 
-float MagicFormulas::CalcSunDamage(float afMagnitude, float afTimeOfDay, float afSunrise, float afSunset,
-	bool abSunVisible, float afWeatherScale, bool abUnderWater) {
-	if (!(afSunrise > static_cast<double>(afTimeOfDay)) && !(afSunset < static_cast<double>(afTimeOfDay))) {
-		double v8;
-		float v10;
-		float v11;
-		float v15 = 12.0f;
-		if (!(12.0f < static_cast<double>(afTimeOfDay))) {
-			v8 = v15 - afSunrise;
-		} else {
-			v8 = v15 - afSunset;
-		}
-		float X = (v15 - afTimeOfDay) / v8;
-		float v17 = 1.0 - hypotf_3(X, 4.0f);
-		double v12 = (1.0 - fMagicSunDamageMinWeather.Float()) * afWeatherScale;
-		float v13 = fMagicSunDamageMinWeather.Float() + v12;
-		if (abSunVisible) {
-			v11 = 1.0;
-		} else {
-			v11 = fMagicSunDamageSunHiddenScale.Float();
-		}
-		if (abUnderWater) {
-			v10 = fMagicSunDamageWaterScale.Float();
-		} else {
-			v10 = 1.0;
-		}
-		return fMagicSunDamageBaseDamage.Float() * afMagnitude * v17 * v13 * v10 * v11;
-	} else {
-		return 0.0;
-	}
+float MagicFormulas::CalcSunDamage(
+    float afMagnitude,
+    float afTimeOfDay,
+    float afSunrise,
+    float afSunset,
+    bool abSunVisible,
+    float afWeatherScale,
+    bool abUnderWater
+) {
+    if (!(afSunrise > static_cast<double>(afTimeOfDay)) && !(afSunset < static_cast<double>(afTimeOfDay))) {
+        double v8;
+        float v10;
+        float v11;
+        float v15 = 12.0f;
+        if (!(12.0f < static_cast<double>(afTimeOfDay))) {
+            v8 = v15 - afSunrise;
+        }
+        else {
+            v8 = v15 - afSunset;
+        }
+        float X = (v15 - afTimeOfDay) / v8;
+        float v17 = 1.0 - hypotf_3(X, 4.0f);
+        double v12 = (1.0 - fMagicSunDamageMinWeather.Float()) * afWeatherScale;
+        float v13 = fMagicSunDamageMinWeather.Float() + v12;
+        if (abSunVisible) {
+            v11 = 1.0;
+        }
+        else {
+            v11 = fMagicSunDamageSunHiddenScale.Float();
+        }
+        if (abUnderWater) {
+            v10 = fMagicSunDamageWaterScale.Float();
+        }
+        else {
+            v10 = 1.0;
+        }
+        return fMagicSunDamageBaseDamage.Float() * afMagnitude * v17 * v13 * v10 * v11;
+    }
+    else {
+        return 0.0;
+    }
 }
 
 // Each factor is rounded to a float local; the settings are read through Float, and the float BSMAX and the float
 // overload of pow are used.
-float MagicFormulas::GetMagicEffectCost(float afBaseEffectCost, int32_t aiArea, int32_t aiDuration, int32_t aiMagnitude,
-	bool abIsRangeTarget) {
-	float fArea = static_cast<float>(aiArea * static_cast<double>(fMagicAreaBaseCostMult.Float()));
-	float fAreaMult = BSMAX(fArea, 1.0f);
-	float fDuration;
-	if (aiDuration) {
-		fDuration = static_cast<float>(aiDuration);
-	} else {
-		fDuration = 1.0f;
-	}
-	float* pDurMagMult = &fMagicDurMagBaseCostMult.Float();
-	float fDurMag = static_cast<float>(static_cast<double>(afBaseEffectCost) * *pDurMagMult * fDuration);
-	float fMagnitude;
-	if (aiMagnitude) {
-		float* pCostScale = &fMagicCostScale.Float();
-		fMagnitude = std::pow(static_cast<float>(aiMagnitude), *pCostScale);
-	} else {
-		fMagnitude = 1.0f;
-	}
-	float fMagnitudeMult = fMagnitude;
-	float fCost = static_cast<float>(static_cast<double>(fAreaMult) * fDurMag * fMagnitudeMult);
-	float fRangeMult;
-	if (abIsRangeTarget) {
-		fRangeMult = fMagicRangeTargetCostMult.Float();
-	} else {
-		fRangeMult = 1.0f;
-	}
-	float fResult = static_cast<float>(static_cast<double>(fRangeMult) * fCost);
-	return fResult;
+float MagicFormulas::GetMagicEffectCost(
+    float afBaseEffectCost,
+    int32_t aiArea,
+    int32_t aiDuration,
+    int32_t aiMagnitude,
+    bool abIsRangeTarget
+) {
+    float fArea = static_cast<float>(aiArea * static_cast<double>(fMagicAreaBaseCostMult.Float()));
+    float fAreaMult = BSMAX(fArea, 1.0f);
+    float fDuration;
+    if (aiDuration) {
+        fDuration = static_cast<float>(aiDuration);
+    }
+    else {
+        fDuration = 1.0f;
+    }
+    float* pDurMagMult = &fMagicDurMagBaseCostMult.Float();
+    float fDurMag = static_cast<float>(static_cast<double>(afBaseEffectCost) * *pDurMagMult * fDuration);
+    float fMagnitude;
+    if (aiMagnitude) {
+        float* pCostScale = &fMagicCostScale.Float();
+        fMagnitude = std::pow(static_cast<float>(aiMagnitude), *pCostScale);
+    }
+    else {
+        fMagnitude = 1.0f;
+    }
+    float fMagnitudeMult = fMagnitude;
+    float fCost = static_cast<float>(static_cast<double>(fAreaMult) * fDurMag * fMagnitudeMult);
+    float fRangeMult;
+    if (abIsRangeTarget) {
+        fRangeMult = fMagicRangeTargetCostMult.Float();
+    }
+    else {
+        fRangeMult = 1.0f;
+    }
+    float fResult = static_cast<float>(static_cast<double>(fRangeMult) * fCost);
+    return fResult;
 }
 
 float MagicFormulas::AdjustMagicSpellCost(float afSpellCost, int32_t aiCasterSkill, int32_t aiCasterLuck) {
-	float v8 = static_cast<double>(aiCasterSkill) / 100.0;
-	float* v3 = &fMagicCasterSkillCostBase.Float();
-	float v7 = fMagicCasterSkillCostMult.Float() * (1.0 - v8) + *v3;
-	return afSpellCost * v7;
+    float v8 = static_cast<double>(aiCasterSkill) / 100.0;
+    float* v3 = &fMagicCasterSkillCostBase.Float();
+    float v7 = fMagicCasterSkillCostMult.Float() * (1.0 - v8) + *v3;
+    return afSpellCost * v7;
 }
 
 // Both compares are against the double 100.0 and a NaN resistance passes them; each fraction is rounded to a float
 // local, and the result is rounded to float.
 float MagicFormulas::GetMagicTargetResistance(float afTargetMagicTypeResistance, float afTargetEffectResistance) {
-	if (afTargetMagicTypeResistance >= 100.0 || afTargetEffectResistance >= 100.0)
-		return 0.0f;
-	float fMagicTypeResistance = static_cast<float>(afTargetMagicTypeResistance / 100.0);
-	float fEffectResistance = static_cast<float>(afTargetEffectResistance / 100.0);
-	float fResult = static_cast<float>(1.0 - ((1.0 - fMagicTypeResistance) * fEffectResistance + fMagicTypeResistance));
-	return fResult;
+    if (afTargetMagicTypeResistance >= 100.0 || afTargetEffectResistance >= 100.0) {
+        return 0.0f;
+    }
+    float fMagicTypeResistance = static_cast<float>(afTargetMagicTypeResistance / 100.0);
+    float fEffectResistance = static_cast<float>(afTargetEffectResistance / 100.0);
+    float fResult = static_cast<float>(1.0 - ((1.0 - fMagicTypeResistance) * fEffectResistance + fMagicTypeResistance));
+    return fResult;
 }
 
 bool MagicFormulas::CheckTargetLevelMagnitude(int32_t aiTargetLevel, float afMagnitude) {
-	float v3 = afMagnitude * ((&::fMagicLevelMagnitudeMult)->Float());
-	return (bool)((uint8_t)((v3 >= ((double)((int32_t)((&::iMagnitudeLevelAffectsAll)->UInt())))) ||
-		(v3 >= ((double)aiTargetLevel))));
+    float v3 = afMagnitude * ((&::fMagicLevelMagnitudeMult)->Float());
+    return (bool)((uint8_t)((v3 >= ((double)((int32_t)((&::iMagnitudeLevelAffectsAll)->UInt())))) ||
+                            (v3 >= ((double)aiTargetLevel))));
 }
 
-float MagicFormulas::CheckExplosionStrength(int32_t aiCost, int32_t aiArea, float afDistance, int32_t aiAgility,
-	[[maybe_unused]] int32_t aiLuck, [[maybe_unused]] float afFatiguePercentage) {
-	float fFalloff;
-	if (aiArea <= 0) {
-		fFalloff = 1.0f;
-	} else {
-		float fDistanceRatio = afDistance / static_cast<double>(aiArea);
-		float fRatioSquared = fDistanceRatio * fDistanceRatio;
-		fFalloff = 1.0 - fRatioSquared;
-	}
-	double dScaledCost = fMagicExplosionPowerMult.Float() * fFalloff * static_cast<double>(aiCost);
-	float fStrength = fMagicExplosionPowerBase.Float() + dScaledCost;
-	float fAgility = static_cast<float>(aiAgility);
-	return fStrength - fAgility * fMagicExplosionAgilityMult.Float();
+float MagicFormulas::CheckExplosionStrength(
+    int32_t aiCost,
+    int32_t aiArea,
+    float afDistance,
+    int32_t aiAgility,
+    [[maybe_unused]] int32_t aiLuck,
+    [[maybe_unused]] float afFatiguePercentage
+) {
+    float fFalloff;
+    if (aiArea <= 0) {
+        fFalloff = 1.0f;
+    }
+    else {
+        float fDistanceRatio = afDistance / static_cast<double>(aiArea);
+        float fRatioSquared = fDistanceRatio * fDistanceRatio;
+        fFalloff = 1.0 - fRatioSquared;
+    }
+    double dScaledCost = fMagicExplosionPowerMult.Float() * fFalloff * static_cast<double>(aiCost);
+    float fStrength = fMagicExplosionPowerBase.Float() + dScaledCost;
+    float fAgility = static_cast<float>(aiAgility);
+    return fStrength - fAgility * fMagicExplosionAgilityMult.Float();
 }
 
 float MagicFormulas::CalcMedicineEffectivenessMult(ActorValueOwner* apActor) {
-	float fMedicinePercent = (float)(apActor->GetClampedActorFloatValue(ActorValue::MEDICINE) / 100.0);
-	float* fBase = &(&::fMagicMedicineSkillBase)->Float();
-	return (float)((fMedicinePercent * ((&::fMagicMedicineSkillMult)->Float())) + (*fBase));
+    float fMedicinePercent = (float)(apActor->GetClampedActorFloatValue(ActorValue::MEDICINE) / 100.0);
+    float* fBase = &(&::fMagicMedicineSkillBase)->Float();
+    return (float)((fMedicinePercent * ((&::fMagicMedicineSkillMult)->Float())) + (*fBase));
 }
 
 float MagicFormulas::CalcSurvivalEffectivenessMult(ActorValueOwner* apActor) {
-	float v5 = (float)(apActor->GetClampedActorFloatValue(ActorValue::SURVIVAL) / 100.0);
-	float* v1 = &(&::fMagicSurvivalSkillBase)->Float();
-	return (float)((v5 * ((&::fMagicSurvivalSkillMult)->Float())) + (*v1));
+    float v5 = (float)(apActor->GetClampedActorFloatValue(ActorValue::SURVIVAL) / 100.0);
+    float* v1 = &(&::fMagicSurvivalSkillBase)->Float();
+    return (float)((v5 * ((&::fMagicSurvivalSkillMult)->Float())) + (*v1));
 }
 
 SkillLevel::Value MagicFormulas::GetMagicSpellLevel(float afSpellCost) {
-	float* v1 = &fMagicSpellLevelCostBase.Float();
-	float v7 = fMagicSpellLevelCostMult.Float() * afSpellCost + *v1;
-	if (fMagicSpellLevelApprenticeMin.Float() > static_cast<double>(v7)) {
-		return SkillLevel::NOVICE;
-	}
-	if (fMagicSpellLevelJourneymanMin.Float() > static_cast<double>(v7)) {
-		return SkillLevel::APPRENTICE;
-	}
-	if (fMagicSpellLevelExpertMin.Float() > static_cast<double>(v7)) {
-		return SkillLevel::JOURNEYMAN;
-	}
-	if (!(fMagicSpellLevelMasterMin.Float() > static_cast<double>(v7))) {
-		return SkillLevel::MASTER;
-	} else {
-		return SkillLevel::EXPERT;
-	}
+    float* v1 = &fMagicSpellLevelCostBase.Float();
+    float v7 = fMagicSpellLevelCostMult.Float() * afSpellCost + *v1;
+    if (fMagicSpellLevelApprenticeMin.Float() > static_cast<double>(v7)) {
+        return SkillLevel::NOVICE;
+    }
+    if (fMagicSpellLevelJourneymanMin.Float() > static_cast<double>(v7)) {
+        return SkillLevel::APPRENTICE;
+    }
+    if (fMagicSpellLevelExpertMin.Float() > static_cast<double>(v7)) {
+        return SkillLevel::JOURNEYMAN;
+    }
+    if (!(fMagicSpellLevelMasterMin.Float() > static_cast<double>(v7))) {
+        return SkillLevel::MASTER;
+    }
+    else {
+        return SkillLevel::EXPERT;
+    }
 }

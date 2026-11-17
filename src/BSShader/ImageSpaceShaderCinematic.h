@@ -4,8 +4,8 @@
 
 class ImageSpaceShaderCinematic : public ImageSpaceShader {
 public:
-	ImageSpaceShaderCinematic();
-	~ImageSpaceShaderCinematic() override;
+    ImageSpaceShaderCinematic();
+    ~ImageSpaceShaderCinematic() override;
 
-	void ReloadShaders() override;
+    void ReloadShaders() override;
 };

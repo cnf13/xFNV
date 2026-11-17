@@ -10,29 +10,29 @@ class TESObjectREFR;
 // node. Only some of its members are declared.
 class CheckWithinMultiBoundTask : public IOTask {
 public:
-	// The references the task attaches.
-	using AttachMapType = NiTMap<TESObjectREFR*, TESObjectREFR*>;
+    // The references the task attaches.
+    using AttachMapType = NiTMap<TESObjectREFR*, TESObjectREFR*>;
 
-	CheckWithinMultiBoundTask(TESObjectREFR* apBoundRef, NiAVObject* ap3D);
-	// Declared so the NiPointer member of the incomplete BSMultiBound is not destroyed here.
-	~CheckWithinMultiBoundTask() override;
+    CheckWithinMultiBoundTask(TESObjectREFR* apBoundRef, NiAVObject* ap3D);
+    // Declared so the NiPointer member of the incomplete BSMultiBound is not destroyed here.
+    ~CheckWithinMultiBoundTask() override;
 
-	void Run() override;
-	void Finish() override;
-	void PostProcess() override;
+    void Run() override;
+    void Finish() override;
+    void PostProcess() override;
 
-	// Frees through ourFree.
-	static void operator delete(void* apMemory);
-	// Drops apMoribundRef from AttachMap, so the task does not attach it.
-	static void CancelAttachment(TESObjectREFR* apMoribundRef);
-	// Moves each reference in AttachMap whose 3D is not already under its cell's dynamic node to its bound
-	// reference's multibound node, then empties AttachMap.
-	static void DoAttachments();
+    // Frees through ourFree.
+    static void operator delete(void* apMemory);
+    // Drops apMoribundRef from AttachMap, so the task does not attach it.
+    static void CancelAttachment(TESObjectREFR* apMoribundRef);
+    // Moves each reference in AttachMap whose 3D is not already under its cell's dynamic node to its bound
+    // reference's multibound node, then empties AttachMap.
+    static void DoAttachments();
 
-	TESObjectREFR* pBoundRef;
-	NiPointer<NiAVObject> sp3D;
-	NiPointer<BSMultiBound> spBound;
-	bool bWithin;
+    TESObjectREFR* pBoundRef;
+    NiPointer<NiAVObject> sp3D;
+    NiPointer<BSMultiBound> spBound;
+    bool bWithin;
 
-	static AttachMapType AttachMap;
+    static AttachMapType AttachMap;
 };

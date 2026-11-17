@@ -11,35 +11,35 @@ NiSequenceStreamHelper::NiSequenceStreamHelper() : NiObjectNET() {}
 NiSequenceStreamHelper::~NiSequenceStreamHelper() {}
 
 const NiRTTI* NiSequenceStreamHelper::GetRTTI() const {
-	return &ms_RTTI;
+    return &ms_RTTI;
 }
 
 // The streaming slots below are jumps to the NiObjectNET bodies, shared with other NiObjectNET subclasses.
 void NiSequenceStreamHelper::LoadBinary(NiStream& stream) {
-	NiObjectNET::LoadBinary(stream);
+    NiObjectNET::LoadBinary(stream);
 }
 
 void NiSequenceStreamHelper::LinkObject(NiStream& stream) {
-	NiObjectNET::LinkObject(stream);
+    NiObjectNET::LinkObject(stream);
 }
 
 bool NiSequenceStreamHelper::RegisterStreamables(NiStream& stream) {
-	return NiObjectNET::RegisterStreamables(stream);
+    return NiObjectNET::RegisterStreamables(stream);
 }
 
 void NiSequenceStreamHelper::SaveBinary(NiStream& stream) {
-	NiObjectNET::SaveBinary(stream);
+    NiObjectNET::SaveBinary(stream);
 }
 
 bool NiSequenceStreamHelper::IsEqual(NiObject* pObject) {
-	return NiObjectNET::IsEqual(pObject);
+    return NiObjectNET::IsEqual(pObject);
 }
 
 NiObject* NiSequenceStreamHelper::CreateObject() {
-	NiSequenceStreamHelper* pkObject =
-		static_cast<NiSequenceStreamHelper*>(NiMemObject::operator new(sizeof(NiSequenceStreamHelper)));
-	if (!pkObject) {
-		return 0;
-	}
-	return ::new (pkObject) NiSequenceStreamHelper;
+    NiSequenceStreamHelper* pkObject =
+        static_cast<NiSequenceStreamHelper*>(NiMemObject::operator new(sizeof(NiSequenceStreamHelper)));
+    if (!pkObject) {
+        return 0;
+    }
+    return ::new (pkObject) NiSequenceStreamHelper;
 }

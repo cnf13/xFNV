@@ -16,12 +16,12 @@
 #include "Havok/Source/Physics/ConstraintSolver/Constraint/Bridge/hkpBridgeAtoms.h"
 #include "Havok/Source/Physics/Dynamics/Constraint/Bilateral/PointToPath/hkpPointToPathConstraintData.h"
 #include "Havok/Source/Physics/Dynamics/Constraint/Malleable/hkpMalleableConstraintData.h"
-#include "Havok/Source/Physics/Dynamics/Constraint/Motor/hkpConstraintMotor.h"
 #include "Havok/Source/Physics/Dynamics/Constraint/Motor/Position/hkpPositionConstraintMotor.h"
 #include "Havok/Source/Physics/Dynamics/Constraint/Motor/SpringDamper/hkpSpringDamperConstraintMotor.h"
-#include "Havok/Source/Physics/Dynamics/Motion/hkpMotion.h"
-#include "Havok/Source/Physics/Dynamics/Motion/Rigid/hkpSphereMotion.h"
+#include "Havok/Source/Physics/Dynamics/Constraint/Motor/hkpConstraintMotor.h"
 #include "Havok/Source/Physics/Dynamics/Motion/Rigid/ThinBoxMotion/hkpThinBoxMotion.h"
+#include "Havok/Source/Physics/Dynamics/Motion/Rigid/hkpSphereMotion.h"
+#include "Havok/Source/Physics/Dynamics/Motion/hkpMotion.h"
 #include "Havok/Source/Physics/Internal/Collide/ConvexPieceMesh/hkpConvexPieceStreamData.h"
 #include "Havok/Source/Physics/Utilities/Actions/AngularDashpot/hkpAngularDashpotAction.h"
 #include "Havok/Source/Physics/Utilities/Actions/MouseSpring/hkpMouseSpringAction.h"
@@ -34,43 +34,69 @@ static void cleanupLoadedObjecthkpVelocityConstraintMotor(void* p);
 // The reflected members of hkpVelocityConstraintMotor.
 using hkpVelocityConstraintMotorClass_MembersArray = const hkClassMember[3];
 static hkpVelocityConstraintMotorClass_MembersArray hkpVelocityConstraintMotorClass_Members{
-	{"tau", nullptr, nullptr, {hkClassMember::TYPE_REAL}, {hkClassMember::TYPE_VOID}, 0, {0}, 0x14, nullptr},
-	{"velocityTarget", nullptr, nullptr, {hkClassMember::TYPE_REAL}, {hkClassMember::TYPE_VOID}, 0, {0}, 0x18, nullptr},
-	{"useVelocityTargetFromConstraintTargets", nullptr, nullptr, {hkClassMember::TYPE_BOOL}, {hkClassMember::TYPE_VOID},
-		0, {0}, 0x1C, nullptr}};
-hkClass hkpVelocityConstraintMotorClass("hkpVelocityConstraintMotor", &hkpLimitedForceConstraintMotorClass, 32, nullptr,
-	0, nullptr, 0, hkpVelocityConstraintMotorClass_Members, 3, nullptr, nullptr, 0, 0);
-hkTypeInfo hkpVelocityConstraintMotorTypeInfo = {"hkpVelocityConstraintMotor",
-	finishLoadedObjecthkpVelocityConstraintMotor, cleanupLoadedObjecthkpVelocityConstraintMotor,
-	getVtablehkpVelocityConstraintMotor(), &typeid(hkpVelocityConstraintMotor), sizeof(hkpVelocityConstraintMotor)};
+    {"tau", nullptr, nullptr, {hkClassMember::TYPE_REAL}, {hkClassMember::TYPE_VOID}, 0, {0}, 0x14, nullptr},
+    {"velocityTarget", nullptr, nullptr, {hkClassMember::TYPE_REAL}, {hkClassMember::TYPE_VOID}, 0, {0}, 0x18, nullptr},
+    {"useVelocityTargetFromConstraintTargets",
+     nullptr,
+     nullptr,
+     {hkClassMember::TYPE_BOOL},
+     {hkClassMember::TYPE_VOID},
+     0,
+     {0},
+     0x1C,
+     nullptr}
+};
+hkClass hkpVelocityConstraintMotorClass(
+    "hkpVelocityConstraintMotor",
+    &hkpLimitedForceConstraintMotorClass,
+    32,
+    nullptr,
+    0,
+    nullptr,
+    0,
+    hkpVelocityConstraintMotorClass_Members,
+    3,
+    nullptr,
+    nullptr,
+    0,
+    0
+);
+hkTypeInfo hkpVelocityConstraintMotorTypeInfo = {
+    "hkpVelocityConstraintMotor",
+    finishLoadedObjecthkpVelocityConstraintMotor,
+    cleanupLoadedObjecthkpVelocityConstraintMotor,
+    getVtablehkpVelocityConstraintMotor(),
+    &typeid(hkpVelocityConstraintMotor),
+    sizeof(hkpVelocityConstraintMotor)
+};
 
 static void cleanupLoadedObjecthkpVelocityConstraintMotor(void* p) {
-	static_cast<hkpVelocityConstraintMotor*>(p)->~hkpVelocityConstraintMotor();
+    static_cast<hkpVelocityConstraintMotor*>(p)->~hkpVelocityConstraintMotor();
 }
 
 // The type info's finish-loaded-object callback for hkpVelocityConstraintMotor: its finish constructor.
 void finishLoadedObjecthkpVelocityConstraintMotor(void* p, int32_t finishing) {
-	if (p) {
-		hkFinishLoadedObjectFlag flag;
-		flag.m_finishing = finishing;
-		::new (p) hkpVelocityConstraintMotor(flag);
-	}
+    if (p) {
+        hkFinishLoadedObjectFlag flag;
+        flag.m_finishing = finishing;
+        ::new (p) hkpVelocityConstraintMotor(flag);
+    }
 }
 
 const void* getVtablehkpVelocityConstraintMotor() {
-	return hkGetVtableOf<hkpVelocityConstraintMotor>();
+    return hkGetVtableOf<hkpVelocityConstraintMotor>();
 }
 
 // Equivalent to `new hkpVelocityConstraintMotor(*this)`: hkReferencedObject's operator new (the block and its size),
 // then the copy constructor.
 hkpConstraintMotor* hkpVelocityConstraintMotor::clone() const {
-	hkMemoryRouter* pRouter = &hkMemoryRouter::getInstance();
-	hkpVelocityConstraintMotor* pResult =
-		static_cast<hkpVelocityConstraintMotor*>(pRouter->m_heap->blockAlloc(sizeof(hkpVelocityConstraintMotor)));
-	pResult->m_memSizeAndFlags = static_cast<uint16_t>(sizeof(hkpVelocityConstraintMotor));
-	return ::new (pResult) hkpVelocityConstraintMotor(*this);
+    hkMemoryRouter* pRouter = &hkMemoryRouter::getInstance();
+    hkpVelocityConstraintMotor* pResult =
+        static_cast<hkpVelocityConstraintMotor*>(pRouter->m_heap->blockAlloc(sizeof(hkpVelocityConstraintMotor)));
+    pResult->m_memSizeAndFlags = static_cast<uint16_t>(sizeof(hkpVelocityConstraintMotor));
+    return ::new (pResult) hkpVelocityConstraintMotor(*this);
 }
 
 const hkClass& hkpVelocityConstraintMotor::staticClass() {
-	return hkpVelocityConstraintMotorClass;
+    return hkpVelocityConstraintMotorClass;
 }

@@ -8,7 +8,7 @@ class NiPoint3;
 // iterator.
 class NiGeometryDataIteratorNiPoint3 : public NiTConvertingStrideIterator<NiPoint3> {
 public:
-	// Writes kValue's 12 bytes to element iIndex after an empty bounds check. Callers
-	// (BSFaceGenModel::ApplyCoordinateToExistingMesh, BeamProjectile) pass a NiPoint3.
-	void Set(int32_t iIndex, const NiPoint3& kValue);
+    // Writes kValue's 12 bytes to element iIndex after an empty bounds check. Callers
+    // (BSFaceGenModel::ApplyCoordinateToExistingMesh, BeamProjectile) pass a NiPoint3.
+    void Set(int32_t iIndex, const NiPoint3& kValue);
 };

@@ -8,15 +8,15 @@
 // HK_DISPLAY_SPHERE and moves the transform to the sphere's centre.
 class hkDisplaySphere : public hkDisplayGeometry {
 public:
-	hkDisplaySphere(const hkSphere& sphere, int32_t xRes, int32_t yRes);
+    hkDisplaySphere(const hkSphere& sphere, int32_t xRes, int32_t yRes);
 
-	// Does nothing.
-	void getWireframeGeometry(hkArrayBase<hkVector4>& lines, hkMemoryAllocator& a) override;
-	void buildGeometry() override;
+    // Does nothing.
+    void getWireframeGeometry(hkArrayBase<hkVector4>& lines, hkMemoryAllocator& a) override;
+    void buildGeometry() override;
 
-	using hkDisplayGeometry::getWireframeGeometry;
+    using hkDisplayGeometry::getWireframeGeometry;
 
-	hkSphere m_sphere;
-	int32_t m_xRes;
-	int32_t m_yRes;
+    hkSphere m_sphere;
+    int32_t m_xRes;
+    int32_t m_yRes;
 };

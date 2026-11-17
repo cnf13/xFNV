@@ -9,5 +9,5 @@ VATSTarget::VATSTarget() {}
 VATSTarget::~VATSTarget() {}
 
 void VATSTarget::operator delete(void* apMemory) {
-	ourFree(apMemory);
+    ourFree(apMemory);
 }

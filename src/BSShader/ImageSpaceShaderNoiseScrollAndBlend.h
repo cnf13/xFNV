@@ -4,9 +4,9 @@
 
 class ImageSpaceShaderNoiseScrollAndBlend : public ImageSpaceShader {
 public:
-	ImageSpaceShaderNoiseScrollAndBlend();
-	~ImageSpaceShaderNoiseScrollAndBlend() override;
+    ImageSpaceShaderNoiseScrollAndBlend();
+    ~ImageSpaceShaderNoiseScrollAndBlend() override;
 
-	void ReloadShaders() override;
-	bool LoadStagesAndPasses() override;
+    void ReloadShaders() override;
+    bool LoadStagesAndPasses() override;
 };

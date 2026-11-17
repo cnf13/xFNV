@@ -9,10 +9,10 @@
 // destructor; every other slot is the base's.
 class RendererSettingCollection : public INISettingCollection {
 public:
-	RendererSettingCollection();
-	~RendererSettingCollection() override;
+    RendererSettingCollection();
+    ~RendererSettingCollection() override;
 
-	static void operator delete(void* apMemory);
+    static void operator delete(void* apMemory);
 };
 
 // SettingT<RendererSettingCollection>::pCollection, the template's per-collection static, which SettingT does not

@@ -4,7 +4,7 @@
 
 // The settings of the multithreaded simulation.
 struct hkpMultithreadConfig {
-	hkpMultithreadConfig();
+    hkpMultithreadConfig();
 
-	int32_t m_maxNumConstraintsSolvedSingleThreaded;
+    int32_t m_maxNumConstraintsSolvedSingleThreaded;
 };

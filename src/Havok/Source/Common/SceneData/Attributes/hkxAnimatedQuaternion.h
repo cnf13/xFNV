@@ -8,14 +8,14 @@
 // Stores sampled quaternion values for an animated scene attribute.
 class hkxAnimatedQuaternion : public hkReferencedObject {
 public:
-	hkxAnimatedQuaternion() = default;
-	hkxAnimatedQuaternion(hkFinishLoadedObjectFlag aFlag) : hkReferencedObject(aFlag), m_quaternions(aFlag) {}
-	~hkxAnimatedQuaternion() override;
+    hkxAnimatedQuaternion() = default;
+    hkxAnimatedQuaternion(hkFinishLoadedObjectFlag aFlag) : hkReferencedObject(aFlag), m_quaternions(aFlag) {}
+    ~hkxAnimatedQuaternion() override;
 
-	// The reflection class hkxAnimatedQuaternionClass.
-	static const hkClass& staticClass();
+    // The reflection class hkxAnimatedQuaternionClass.
+    static const hkClass& staticClass();
 
-	hkArray<hkQuaternion, hkContainerHeapAllocator> m_quaternions;
+    hkArray<hkQuaternion, hkContainerHeapAllocator> m_quaternions;
 };
 
 extern hkClass hkxAnimatedQuaternionClass;

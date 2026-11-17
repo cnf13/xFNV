@@ -8,13 +8,13 @@ void FreeMemoryBlocks();
 // down. Everything in it is static.
 class NiMainSDM {
 public:
-	NiMainSDM();
+    NiMainSDM();
 
-	static void Init();
-	static void Shutdown();
+    static void Init();
+    static void Shutdown();
 
-	// Whether Init has run (tested and set by Init).
-	static inline bool ms_bInitialized;
+    // Whether Init has run (tested and set by Init).
+    static inline bool ms_bInitialized;
 };
 
 inline int32_t siCounter;

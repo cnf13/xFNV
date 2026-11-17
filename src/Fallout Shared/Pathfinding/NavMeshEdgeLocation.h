@@ -8,16 +8,16 @@
 
 class NavMeshEdgeLocation : public NavMeshEdgeHandle {
 public:
-	// Leaves the handle and the point unset, as the game does.
-	NavMeshEdgeLocation() {}
+    // Leaves the handle and the point unset, as the game does.
+    NavMeshEdgeLocation() {}
 
-	NavMeshEdgeLocation(const NavMeshEdgeLocation& aLocation)
-		: NavMeshEdgeHandle(aLocation), Location(aLocation.Location) {}
+    NavMeshEdgeLocation(const NavMeshEdgeLocation& aLocation)
+      : NavMeshEdgeHandle(aLocation), Location(aLocation.Location) {}
 
-	// The location of aFastEdgeLocation: its edge's handle by info record, then the point.
-	NavMeshEdgeLocation(const FastNavMeshEdgeLocation& aFastEdgeLocation);
+    // The location of aFastEdgeLocation: its edge's handle by info record, then the point.
+    NavMeshEdgeLocation(const FastNavMeshEdgeLocation& aFastEdgeLocation);
 
-	NavMeshEdgeLocation& operator=(const NavMeshEdgeLocation& aTriHandle);
+    NavMeshEdgeLocation& operator=(const NavMeshEdgeLocation& aTriHandle);
 
-	NiPoint3 Location;
+    NiPoint3 Location;
 };

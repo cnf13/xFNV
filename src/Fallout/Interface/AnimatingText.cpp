@@ -9,177 +9,184 @@
 #include <stdint.h>
 
 HackingText::HackingText() {
-	init();
+    init();
 }
 
 // strText is destroyed by its own destructor; the display buffer is a raw allocation.
 HackingText::~HackingText() {
-	ourFree(pCurrentlyDisplayedText);
+    ourFree(pCurrentlyDisplayedText);
 }
 
 void HackingText::SetTraits(Tile::Value* apStringTrait, Tile::Value* apVisTrait) {
-	pTileText = apStringTrait;
-	pTileValueVisibility = apVisTrait;
+    pTileText = apStringTrait;
+    pTileValueVisibility = apVisTrait;
 }
 
 bool HackingText::GetAnimationMode(int32_t aiType) {
-	return (ucFlags & aiType) != 0;
+    return (ucFlags & aiType) != 0;
 }
 
 bool HackingText::GetDisplayMode() {
-	return GetAnimationMode(1);
+    return GetAnimationMode(1);
 }
 
 bool HackingText::GetFlashMode() {
-	return GetAnimationMode(2);
+    return GetAnimationMode(2);
 }
 
 void HackingText::ResetBuffer() {
-	char* v2;
-	ourFree(pCurrentlyDisplayedText);
-	if (strText.pString) {
-		uint32_t Length = strText.GetLength();
-		v2 = static_cast<char*>(ourCalloc(Length + 1, 1u));
-	} else {
-		v2 = 0;
-	}
-	pCurrentlyDisplayedText = v2;
-	bIsTextRemaining = 0;
-	uiNextDisplayTime = 0;
+    char* v2;
+    ourFree(pCurrentlyDisplayedText);
+    if (strText.pString) {
+        uint32_t Length = strText.GetLength();
+        v2 = static_cast<char*>(ourCalloc(Length + 1, 1u));
+    }
+    else {
+        v2 = 0;
+    }
+    pCurrentlyDisplayedText = v2;
+    bIsTextRemaining = 0;
+    uiNextDisplayTime = 0;
 }
 
 HackingText* HackingText::init() {
-	SetTraits(0, 0);
-	uiDisplayRate = g_iComputersDisplayRateForCurrentMenu;
-	uiFlashOnDuration = g_iHackingFlashOnDuration;
-	uiFlashOffDuration = g_iHackingFlashOffDuration;
-	uiNextBlinkTime = 0;
-	uiNextDisplayTime = 0;
-	pCurrentlyDisplayedText = 0;
-	ucFlags = 1;
-	bIsTextRemaining = 0;
-	return this;
+    SetTraits(0, 0);
+    uiDisplayRate = g_iComputersDisplayRateForCurrentMenu;
+    uiFlashOnDuration = g_iHackingFlashOnDuration;
+    uiFlashOffDuration = g_iHackingFlashOffDuration;
+    uiNextBlinkTime = 0;
+    uiNextDisplayTime = 0;
+    pCurrentlyDisplayedText = 0;
+    ucFlags = 1;
+    bIsTextRemaining = 0;
+    return this;
 }
 
 char HackingText::Update() {
-	uint32_t v1;
-	if (GetDisplayMode() && BSGetTickCount() >= uiNextDisplayTime && !bIsTextRemaining) {
-		if (pTileValueVisibility) {
-			if (!GetFlashMode()) {
-				pTileValueVisibility->SetFloat(1.0f, 1);
-			}
-		}
-		if (pTileValueVisibility) {
-			if (pTileText) {
-				if (!strText.pString) {
-					pTileValueVisibility->SetFloat(0.0f, 1);
-				}
-			}
-		}
-		if (pTileText &&
-			(pCurrentlyDisplayedText && strText.operator!=(static_cast<const char*>(pCurrentlyDisplayedText)))) {
-			uint32_t v3;
-			uint32_t v6 = BSstrlen(pCurrentlyDisplayedText);
-			if (uiNextDisplayTime) {
-				v3 = (BSGetTickCount() - uiNextDisplayTime) / uiDisplayRate + 1;
-			} else {
-				v3 = 1;
-			}
-			size_t aCount = v3;
-			if (v3 > strText.GetLength() - v6) {
-				aCount = strText.GetLength() - v6;
-				bIsTextRemaining = 1;
-			}
-			ourMemcpy(&pCurrentlyDisplayedText[v6], &strText.pString[v6], aCount);
-			pTileText->SetString(pCurrentlyDisplayedText, 1);
-		} else {
-			bIsTextRemaining = 1;
-		}
-		uiNextDisplayTime = uiDisplayRate + BSGetTickCount();
-	}
-	v1 = static_cast<uint32_t>((static_cast<uint32_t>(v1) & 0xFFFFFF00u) |
-		(static_cast<uint32_t>(static_cast<uint8_t>(GetFlashMode()))));
-	if (static_cast<uint8_t>(v1)) {
-		v1 = BSGetTickCount();
-		if (v1 >= uiNextBlinkTime) {
-			if (pTileValueVisibility->fValue == 1.0) {
-				pTileValueVisibility->SetFloat(0.0f, 1);
-				v1 = uiFlashOffDuration + BSGetTickCount();
-			} else {
-				pTileValueVisibility->SetFloat(1.0f, 1);
-				v1 = uiFlashOnDuration + BSGetTickCount();
-			}
-			uiNextBlinkTime = v1;
-		}
-	}
-	return v1;
+    uint32_t v1;
+    if (GetDisplayMode() && BSGetTickCount() >= uiNextDisplayTime && !bIsTextRemaining) {
+        if (pTileValueVisibility) {
+            if (!GetFlashMode()) {
+                pTileValueVisibility->SetFloat(1.0f, 1);
+            }
+        }
+        if (pTileValueVisibility) {
+            if (pTileText) {
+                if (!strText.pString) {
+                    pTileValueVisibility->SetFloat(0.0f, 1);
+                }
+            }
+        }
+        if (pTileText &&
+            (pCurrentlyDisplayedText && strText.operator!=(static_cast<const char*>(pCurrentlyDisplayedText)))) {
+            uint32_t v3;
+            uint32_t v6 = BSstrlen(pCurrentlyDisplayedText);
+            if (uiNextDisplayTime) {
+                v3 = (BSGetTickCount() - uiNextDisplayTime) / uiDisplayRate + 1;
+            }
+            else {
+                v3 = 1;
+            }
+            size_t aCount = v3;
+            if (v3 > strText.GetLength() - v6) {
+                aCount = strText.GetLength() - v6;
+                bIsTextRemaining = 1;
+            }
+            ourMemcpy(&pCurrentlyDisplayedText[v6], &strText.pString[v6], aCount);
+            pTileText->SetString(pCurrentlyDisplayedText, 1);
+        }
+        else {
+            bIsTextRemaining = 1;
+        }
+        uiNextDisplayTime = uiDisplayRate + BSGetTickCount();
+    }
+    v1 = static_cast<uint32_t>(
+        (static_cast<uint32_t>(v1) & 0xFFFFFF00u) | (static_cast<uint32_t>(static_cast<uint8_t>(GetFlashMode())))
+    );
+    if (static_cast<uint8_t>(v1)) {
+        v1 = BSGetTickCount();
+        if (v1 >= uiNextBlinkTime) {
+            if (pTileValueVisibility->fValue == 1.0) {
+                pTileValueVisibility->SetFloat(0.0f, 1);
+                v1 = uiFlashOffDuration + BSGetTickCount();
+            }
+            else {
+                pTileValueVisibility->SetFloat(1.0f, 1);
+                v1 = uiFlashOnDuration + BSGetTickCount();
+            }
+            uiNextBlinkTime = v1;
+        }
+    }
+    return v1;
 }
 
 void HackingText::ForceFinish() {
-	if (GetDisplayMode() && !bIsTextRemaining) {
-		if (pTileValueVisibility) {
-			if (!GetFlashMode()) {
-				pTileValueVisibility->SetFloat(1.0f, 1);
-			}
-		}
-		if (pTileValueVisibility) {
-			if (pTileText) {
-				if (!strText.pString) {
-					pTileValueVisibility->SetFloat(0.0f, 1);
-				}
-			}
-		}
-		if (pTileText) {
-			if (pCurrentlyDisplayedText) {
-				uint32_t v1 = BSstrlen(strText.pString);
-				ourMemcpy(pCurrentlyDisplayedText, strText.pString, v1);
-				pTileText->SetString(pCurrentlyDisplayedText, 1);
-				bIsTextRemaining = 1;
-			}
-		}
-	}
+    if (GetDisplayMode() && !bIsTextRemaining) {
+        if (pTileValueVisibility) {
+            if (!GetFlashMode()) {
+                pTileValueVisibility->SetFloat(1.0f, 1);
+            }
+        }
+        if (pTileValueVisibility) {
+            if (pTileText) {
+                if (!strText.pString) {
+                    pTileValueVisibility->SetFloat(0.0f, 1);
+                }
+            }
+        }
+        if (pTileText) {
+            if (pCurrentlyDisplayedText) {
+                uint32_t v1 = BSstrlen(strText.pString);
+                ourMemcpy(pCurrentlyDisplayedText, strText.pString, v1);
+                pTileText->SetString(pCurrentlyDisplayedText, 1);
+                bIsTextRemaining = 1;
+            }
+        }
+    }
 }
 
 Tile* HackingText::GetParent() {
-	if (pTileText && (pTileValueVisibility && pTileText->pParent == pTileValueVisibility->pParent)) {
-		return pTileText->pParent;
-	}
-	if (pTileText && !pTileValueVisibility) {
-		return pTileText->pParent;
-	}
-	if (pTileText || !pTileValueVisibility) {
-		return nullptr;
-	}
-	return pTileValueVisibility->pParent;
+    if (pTileText && (pTileValueVisibility && pTileText->pParent == pTileValueVisibility->pParent)) {
+        return pTileText->pParent;
+    }
+    if (pTileText && !pTileValueVisibility) {
+        return pTileText->pParent;
+    }
+    if (pTileText || !pTileValueVisibility) {
+        return nullptr;
+    }
+    return pTileValueVisibility->pParent;
 }
 
 HackingText* HackingText::HackingText_() {
-	strText.~BSStringT<char>();
-	::new (&strText) BSStringT<char>;
-	init();
-	return this;
+    strText.~BSStringT<char>();
+    ::new (&strText) BSStringT<char>;
+    init();
+    return this;
 }
 
 void HackingText::SetShouldBlink(bool abBlink) {
-	SetFlagBit(2, abBlink);
+    SetFlagBit(2, abBlink);
 }
 
 void HackingText::SetFlagBit(uint32_t auiFlag, bool abSet) {
-	if (abSet) {
-		ucFlags |= auiFlag;
-	} else {
-		ucFlags &= ~auiFlag;
-	}
+    if (abSet) {
+        ucFlags |= auiFlag;
+    }
+    else {
+        ucFlags &= ~auiFlag;
+    }
 }
 
 void HackingText::SetVisibility(bool abOn) {
-	if (pTileValueVisibility) {
-		float afValue;
-		if (abOn) {
-			afValue = 1.0;
-		} else {
-			afValue = 0.0;
-		}
-		pTileValueVisibility->SetFloat(afValue, 1);
-	}
+    if (pTileValueVisibility) {
+        float afValue;
+        if (abOn) {
+            afValue = 1.0;
+        }
+        else {
+            afValue = 0.0;
+        }
+        pTileValueVisibility->SetFloat(afValue, 1);
+    }
 }

@@ -29,15 +29,50 @@
 
 #include <stdint.h>
 
-ActionPoints::SettingPointerArray ActionPoints::pCosts{&fActionPointsAttackUnarmed, &fActionPointsAttackOneHandMelee,
-	&fActionPointsAttackTwoHandMelee, &fActionPointsAttackPistol, &fActionPointsAttackRifle, &fActionPointsAttackHandle,
-	&fActionPointsAttackLauncher, &fActionPointsAttackGrenade, &fActionPointsAttackMine, &fActionPointsReload,
-	&fActionPointsCrouch, &fActionPointsStand, &fActionPointsSwitchWeapon, &fActionPointsToggleWeaponDrawn,
-	&fActionPointsHeal, nullptr, nullptr, nullptr, nullptr, &fActionPointsAttackThrown};
-ActionPoints::SettingPointerArray ActionPoints::pNames{&sActionPointsPunch, &sActionPointsAttack, &sActionPointsAttack,
-	&sActionPointsShoot, &sActionPointsShoot, &sActionPointsShoot, &sActionPointsShoot, &sActionPointsThrow,
-	&sActionPointsDrop, &sActionPointsReload, &sActionPointsCrouch, &sActionPointsStand, &sActionPointsSwitchWeapon,
-	&sActionPointsToggleWeaponDrawn, &sActionPointsHeal, nullptr, nullptr, nullptr, nullptr, &sActionPointsThrow};
+ActionPoints::SettingPointerArray ActionPoints::pCosts{
+    &fActionPointsAttackUnarmed,
+    &fActionPointsAttackOneHandMelee,
+    &fActionPointsAttackTwoHandMelee,
+    &fActionPointsAttackPistol,
+    &fActionPointsAttackRifle,
+    &fActionPointsAttackHandle,
+    &fActionPointsAttackLauncher,
+    &fActionPointsAttackGrenade,
+    &fActionPointsAttackMine,
+    &fActionPointsReload,
+    &fActionPointsCrouch,
+    &fActionPointsStand,
+    &fActionPointsSwitchWeapon,
+    &fActionPointsToggleWeaponDrawn,
+    &fActionPointsHeal,
+    nullptr,
+    nullptr,
+    nullptr,
+    nullptr,
+    &fActionPointsAttackThrown
+};
+ActionPoints::SettingPointerArray ActionPoints::pNames{
+    &sActionPointsPunch,
+    &sActionPointsAttack,
+    &sActionPointsAttack,
+    &sActionPointsShoot,
+    &sActionPointsShoot,
+    &sActionPointsShoot,
+    &sActionPointsShoot,
+    &sActionPointsThrow,
+    &sActionPointsDrop,
+    &sActionPointsReload,
+    &sActionPointsCrouch,
+    &sActionPointsStand,
+    &sActionPointsSwitchWeapon,
+    &sActionPointsToggleWeaponDrawn,
+    &sActionPointsHeal,
+    nullptr,
+    nullptr,
+    nullptr,
+    nullptr,
+    &sActionPointsThrow
+};
 
 // The game settings this file defines, with their IDs and values, in initialization order.
 SettingT<GameSettingCollection> fActionPointsAttackUnarmed("fActionPointsAttackUnarmed", 1.0f);
@@ -77,144 +112,127 @@ SettingT<GameSettingCollection> fActionPointsVATSMeleeMult("fActionPointsVATSMel
 SettingT<GameSettingCollection> fActionPointsRestoreRate("fActionPointsRestoreRate", 1.0f);
 
 double get_fActionPointsRestoreRate() {
-	return (&fActionPointsRestoreRate)->Float();
+    return (&fActionPointsRestoreRate)->Float();
 }
 
 float ActionPoints::GetBaseActionPoints(uint32_t auiAction) {
-	float v3 = (float)0.0;
-	if (auiAction <= 21) {
-		return (float)(ActionPoints::pCosts[auiAction]->Float());
-	}
-	return (float)(v3);
+    float v3 = (float)0.0;
+    if (auiAction <= 21) {
+        return (float)(ActionPoints::pCosts[auiAction]->Float());
+    }
+    return (float)(v3);
 }
 
 // The cost and the scaled cost are rounded to float before they are returned.
 float ActionPoints::GetRequiredAPForAction(uint32_t auiAction, bool abVATS) {
-	float fCost = GetBaseActionPoints(auiAction);
-	if (!abVATS) {
-		float fScaled = fCost * fActionPointsRunAndGunMult.Float();
-		return fScaled;
-	}
-	return fCost;
+    float fCost = GetBaseActionPoints(auiAction);
+    if (!abVATS) {
+        float fScaled = fCost * fActionPointsRunAndGunMult.Float();
+        return fScaled;
+    }
+    return fCost;
 }
 
 // The lunchbox mine has no attack action of its own.
 ActionPoints::Action ActionPoints::GetAttackAction(WEAPON_TYPE aeWeaponType) {
-	ActionPoints::Action eAction = ACTION_COUNT;
-	switch (aeWeaponType) {
-	case WEAPON_HAND_TO_HAND:
-		eAction = ACTION_ATTACK_UNARMED;
-		break;
-	case WEAPON_ONE_HAND_MELEE:
-		eAction = ACTION_ATTACK_ONE_HAND_MELEE;
-		break;
-	case WEAPON_TWO_HAND_MELEE:
-		eAction = ACTION_ATTACK_TWO_HAND_MELEE;
-		break;
-	case WEAPON_ONE_HAND_PISTOL:
-	case WEAPON_ONE_HAND_PISTOL_ENERGY:
-		eAction = ACTION_ATTACK_PISTOL;
-		break;
-	case WEAPON_TWO_HAND_RIFLE:
-	case WEAPON_TWO_HAND_AUTOMATIC:
-	case WEAPON_TWO_HAND_RIFLE_ENERGY:
-		eAction = ACTION_ATTACK_RIFLE;
-		break;
-	case WEAPON_TWO_HAND_HANDLE:
-		eAction = ACTION_ATTACK_HANDLE;
-		break;
-	case WEAPON_TWO_HAND_LAUNCHER:
-		eAction = ACTION_ATTACK_LAUNCHER;
-		break;
-	case WEAPON_ONE_HAND_GRENADE:
-		eAction = ACTION_ATTACK_GRENADE;
-		break;
-	case WEAPON_ONE_HAND_MINE:
-		eAction = ACTION_ATTACK_MINE;
-		break;
-	case WEAPON_ONE_HAND_THROWN:
-		eAction = ACTION_ATTACK_THROWN;
-		break;
-	default:
-		break;
-	}
-	return eAction;
+    ActionPoints::Action eAction = ACTION_COUNT;
+    switch (aeWeaponType) {
+        case WEAPON_HAND_TO_HAND: eAction = ACTION_ATTACK_UNARMED; break;
+        case WEAPON_ONE_HAND_MELEE: eAction = ACTION_ATTACK_ONE_HAND_MELEE; break;
+        case WEAPON_TWO_HAND_MELEE: eAction = ACTION_ATTACK_TWO_HAND_MELEE; break;
+        case WEAPON_ONE_HAND_PISTOL:
+        case WEAPON_ONE_HAND_PISTOL_ENERGY: eAction = ACTION_ATTACK_PISTOL; break;
+        case WEAPON_TWO_HAND_RIFLE:
+        case WEAPON_TWO_HAND_AUTOMATIC:
+        case WEAPON_TWO_HAND_RIFLE_ENERGY: eAction = ACTION_ATTACK_RIFLE; break;
+        case WEAPON_TWO_HAND_HANDLE: eAction = ACTION_ATTACK_HANDLE; break;
+        case WEAPON_TWO_HAND_LAUNCHER: eAction = ACTION_ATTACK_LAUNCHER; break;
+        case WEAPON_ONE_HAND_GRENADE: eAction = ACTION_ATTACK_GRENADE; break;
+        case WEAPON_ONE_HAND_MINE: eAction = ACTION_ATTACK_MINE; break;
+        case WEAPON_ONE_HAND_THROWN: eAction = ACTION_ATTACK_THROWN; break;
+        default: break;
+    }
+    return eAction;
 }
 
 bool ActionPoints::IsAttackAction(ActionPoints::Action aeAction) {
-	int8_t result;
-	switch ((int32_t)aeAction) {
-	case 0:
-	case 1:
-	case 2:
-	case 3:
-	case 4:
-	case 5:
-	case 6:
-	case 7:
-	case 8:
-	case 16:
-	case 17:
-	case 19:
-	case 20:
-	case 21: {
-		result = 1;
-		break;
-	}
-	default: {
-		result = 0;
-		break;
-	}
-	}
-	return (bool)result;
+    int8_t result;
+    switch ((int32_t)aeAction) {
+        case 0:
+        case 1:
+        case 2:
+        case 3:
+        case 4:
+        case 5:
+        case 6:
+        case 7:
+        case 8:
+        case 16:
+        case 17:
+        case 19:
+        case 20:
+        case 21: {
+            result = 1;
+            break;
+        }
+        default: {
+            result = 0;
+            break;
+        }
+    }
+    return (bool)result;
 }
 
 bool ActionPoints::IsMeleeAttackAction(ActionPoints::Action aeAction) {
-	uint8_t result;
-	switch ((int32_t)aeAction) {
-	case 0:
-	case 1:
-	case 2:
-	case 16:
-	case 17:
-	case 20:
-	case 21: {
-		result = 1;
-		break;
-	}
-	default: {
-		result = 0;
-		break;
-	}
-	}
-	return (bool)result;
+    uint8_t result;
+    switch ((int32_t)aeAction) {
+        case 0:
+        case 1:
+        case 2:
+        case 16:
+        case 17:
+        case 20:
+        case 21: {
+            result = 1;
+            break;
+        }
+        default: {
+            result = 0;
+            break;
+        }
+    }
+    return (bool)result;
 }
 
 float ActionPoints::GetWeaponAttackActionPoints(TESObjectWEAP* apWeapon, bool abVATS, bool abSpecialAttack) {
-	int32_t attackAction;
-	int32_t weaponType;
-	if (apWeapon) {
-		weaponType = apWeapon->GetWeaponType();
-		attackAction = (int32_t)ActionPoints::GetAttackAction(static_cast<WEAPON_TYPE>(weaponType));
-	} else {
-		attackAction = (int32_t)ActionPoints::GetAttackAction(WEAPON_HAND_TO_HAND);
-	}
-	uint32_t v7 = (uint32_t)attackAction;
-	float footWeight = (float)0.0;
-	if (apWeapon && apWeapon->IsActionPointOverride()) {
-		footWeight = apWeapon->data.fActionPoints;
-	} else {
-		footWeight = ActionPoints::GetBaseActionPoints(v7);
-	}
-	if (apWeapon) {
-		BGSEntryPoint::HandleEntryPoint(BGSEntryPoint::ACTION_POINT_COST_MODIFIER_ENTRY, pPlayer, apWeapon,
-			&footWeight);
-	} else {
-		BGSEntryPoint::HandleEntryPoint(BGSEntryPoint::ACTION_POINT_COST_MODIFIER_ENTRY, pPlayer, pFists, &footWeight);
-	}
-	return footWeight;
+    int32_t attackAction;
+    int32_t weaponType;
+    if (apWeapon) {
+        weaponType = apWeapon->GetWeaponType();
+        attackAction = (int32_t)ActionPoints::GetAttackAction(static_cast<WEAPON_TYPE>(weaponType));
+    }
+    else {
+        attackAction = (int32_t)ActionPoints::GetAttackAction(WEAPON_HAND_TO_HAND);
+    }
+    uint32_t v7 = (uint32_t)attackAction;
+    float footWeight = (float)0.0;
+    if (apWeapon && apWeapon->IsActionPointOverride()) {
+        footWeight = apWeapon->data.fActionPoints;
+    }
+    else {
+        footWeight = ActionPoints::GetBaseActionPoints(v7);
+    }
+    if (apWeapon) {
+        BGSEntryPoint::HandleEntryPoint(
+            BGSEntryPoint::ACTION_POINT_COST_MODIFIER_ENTRY, pPlayer, apWeapon, &footWeight
+        );
+    }
+    else {
+        BGSEntryPoint::HandleEntryPoint(BGSEntryPoint::ACTION_POINT_COST_MODIFIER_ENTRY, pPlayer, pFists, &footWeight);
+    }
+    return footWeight;
 }
 
 const char* ActionPoints::GetActionPointsString(ActionPoints::Action aeAction) {
-	return ActionPoints::pNames[(int32_t)aeAction]->String();
+    return ActionPoints::pNames[(int32_t)aeAction]->String();
 }

@@ -5,8 +5,8 @@
 // a segment swept by a sphere
 class NiCapsule {
 public:
-	bool operator==(const NiCapsule& kCapsule) const;
+    bool operator==(const NiCapsule& kCapsule) const;
 
-	NiSegment m_kSegment;
-	float m_fRadius;
+    NiSegment m_kSegment;
+    float m_fRadius;
 };

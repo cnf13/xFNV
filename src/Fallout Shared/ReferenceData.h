@@ -5,10 +5,10 @@
 // The saved location and orientation of a reference.
 class ReferenceData {
 public:
-	// The constructor deliberately leaves Loc and Angle unset, as the game does.
-	ReferenceData();
+    // The constructor deliberately leaves Loc and Angle unset, as the game does.
+    ReferenceData();
 
-	uint32_t iLocationID;
-	NiPoint3 Loc;
-	NiPoint3 Angle;
+    uint32_t iLocationID;
+    NiPoint3 Loc;
+    NiPoint3 Angle;
 };

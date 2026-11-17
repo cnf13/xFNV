@@ -15,85 +15,66 @@
 #include "Fallout Shared/TESObjectWEAP.h"
 
 TESWeightForm::TESWeightForm() {
-	TESWeightForm::InitializeDataComponent();
+    TESWeightForm::InitializeDataComponent();
 }
 
 void TESWeightForm::InitializeDataComponent() {
-	fWeight = (float)0.0;
+    fWeight = (float)0.0;
 }
 
 void TESWeightForm::CopyComponent(BaseFormComponent* apCopyFC) {
-	TESWeightForm* pCopy = dynamic_cast<TESWeightForm*>(apCopyFC);
-	if (pCopy) {
-		SetFormWeight(pCopy->GetWeight());
-	}
+    TESWeightForm* pCopy = dynamic_cast<TESWeightForm*>(apCopyFC);
+    if (pCopy) {
+        SetFormWeight(pCopy->GetWeight());
+    }
 }
 
 bool TESWeightForm::CompareComponent(BaseFormComponent* apCompareFC) {
-	TESWeightForm* v5 = dynamic_cast<TESWeightForm*>(apCompareFC);
-	if (!v5) {
-		return (bool)1;
-	}
-	double flt004 = (double)GetWeight();
-	return (bool)((uint8_t)(flt004 != v5->GetWeight()));
+    TESWeightForm* v5 = dynamic_cast<TESWeightForm*>(apCompareFC);
+    if (!v5) {
+        return (bool)1;
+    }
+    double flt004 = (double)GetWeight();
+    return (bool)((uint8_t)(flt004 != v5->GetWeight()));
 }
 
 void TESWeightForm::SetFormWeight(float afWeight) {
-	fWeight = afWeight;
+    fWeight = afWeight;
 }
 
 float TESWeightForm::GetFormWeight(TESForm* apForm, bool abIsHardcore) {
-	TESWeightForm* pweight = nullptr;
-	float fWeightOverride = 0.0f;
-	if (apForm) {
-		switch (apForm->GetFormType()) {
-		case ARMO_ID:
-			pweight = static_cast<TESObjectARMO*>(apForm);
-			break;
-		case BOOK_ID:
-			pweight = static_cast<TESObjectBOOK*>(apForm);
-			break;
-		case CLOT_ID:
-			pweight = static_cast<TESObjectCLOT*>(apForm);
-			break;
-		case CONT_ID:
-			pweight = static_cast<TESObjectCONT*>(apForm);
-			break;
-		case INGR_ID:
-			pweight = static_cast<IngredientItem*>(apForm);
-			break;
-		case LIGH_ID:
-			pweight = static_cast<TESObjectLIGH*>(apForm);
-			break;
-		// All four types use the MISC weight offset.
-		case MISC_ID:
-		case KEYM_ID:
-		case COBJ_ID:
-		case IMOD_ID:
-			pweight = static_cast<TESObjectMISC*>(apForm);
-			break;
-		case WEAP_ID:
-			pweight = static_cast<TESObjectWEAP*>(apForm);
-			break;
-		case AMMO_ID:
-			if (abIsHardcore) {
-				fWeightOverride = static_cast<TESAmmo*>(apForm)->GetWeight();
-			}
-			break;
-		case ALCH_ID:
-			pweight = static_cast<AlchemyItem*>(apForm);
-			break;
-		default:
-			break;
-		}
-	}
-	// The weight form's value is used only when the override compares ordered-equal to 0.0, so a NaN override is
-	// returned.
-	if (fWeightOverride != 0.0) {
-		return fWeightOverride;
-	}
-	if (pweight) {
-		return pweight->GetWeight();
-	}
-	return -1.0f;
+    TESWeightForm* pweight = nullptr;
+    float fWeightOverride = 0.0f;
+    if (apForm) {
+        switch (apForm->GetFormType()) {
+            case ARMO_ID: pweight = static_cast<TESObjectARMO*>(apForm); break;
+            case BOOK_ID: pweight = static_cast<TESObjectBOOK*>(apForm); break;
+            case CLOT_ID: pweight = static_cast<TESObjectCLOT*>(apForm); break;
+            case CONT_ID: pweight = static_cast<TESObjectCONT*>(apForm); break;
+            case INGR_ID: pweight = static_cast<IngredientItem*>(apForm); break;
+            case LIGH_ID: pweight = static_cast<TESObjectLIGH*>(apForm); break;
+            // All four types use the MISC weight offset.
+            case MISC_ID:
+            case KEYM_ID:
+            case COBJ_ID:
+            case IMOD_ID: pweight = static_cast<TESObjectMISC*>(apForm); break;
+            case WEAP_ID: pweight = static_cast<TESObjectWEAP*>(apForm); break;
+            case AMMO_ID:
+                if (abIsHardcore) {
+                    fWeightOverride = static_cast<TESAmmo*>(apForm)->GetWeight();
+                }
+                break;
+            case ALCH_ID: pweight = static_cast<AlchemyItem*>(apForm); break;
+            default: break;
+        }
+    }
+    // The weight form's value is used only when the override compares ordered-equal to 0.0, so a NaN override is
+    // returned.
+    if (fWeightOverride != 0.0) {
+        return fWeightOverride;
+    }
+    if (pweight) {
+        return pweight->GetWeight();
+    }
+    return -1.0f;
 }

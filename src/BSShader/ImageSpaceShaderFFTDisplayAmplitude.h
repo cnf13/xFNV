@@ -4,8 +4,8 @@
 
 class ImageSpaceShaderFFTDisplayAmplitude : public ImageSpaceShader {
 public:
-	ImageSpaceShaderFFTDisplayAmplitude();
-	~ImageSpaceShaderFFTDisplayAmplitude() override;
+    ImageSpaceShaderFFTDisplayAmplitude();
+    ~ImageSpaceShaderFFTDisplayAmplitude() override;
 
-	void ReloadShaders() override;
+    void ReloadShaders() override;
 };

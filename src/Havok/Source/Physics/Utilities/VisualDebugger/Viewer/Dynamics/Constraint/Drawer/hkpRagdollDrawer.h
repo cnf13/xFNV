@@ -10,14 +10,14 @@ class hkpConstraintInstance;
 // Draws a ragdoll constraint: both twist axes, the twist cone, the plane and the two plane cones. No vtable.
 class hkpRagdollDrawer : public hkpConstraintDrawer {
 public:
-	hkpRagdollDrawer();
-	~hkpRagdollDrawer();
+    hkpRagdollDrawer();
+    ~hkpRagdollDrawer();
 
-	void drawConstraint(hkpConstraintInstance* constraint, hkDebugDisplayHandler* displayHandler, int32_t id,
-		int32_t tag);
+    void
+    drawConstraint(hkpConstraintInstance* constraint, hkDebugDisplayHandler* displayHandler, int32_t id, int32_t tag);
 
-	hkDisplayCone m_twistCone;
-	hkDisplayCone m_planeCone1;
-	hkDisplayCone m_planeCone2;
-	hkDisplayPlane m_plane;
+    hkDisplayCone m_twistCone;
+    hkDisplayCone m_planeCone1;
+    hkDisplayCone m_planeCone2;
+    hkDisplayPlane m_plane;
 };

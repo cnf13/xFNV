@@ -12,29 +12,35 @@ class hkTypeInfo;
 // A point where two bodies touch: its position, and the separating normal whose w holds the distance.
 class hkContactPoint {
 public:
-	// The reflection's member table.
-	using MembersArray = const hkClassMember[2];
+    // The reflection's member table.
+    using MembersArray = const hkClassMember[2];
 
-	// Sets the position and the separating normal, with dist in the normal's w.
-	void set(const hkVector4& position, const hkVector4& normal, float dist) {
-		m_position = position;
-		m_separatingNormal = normal;
-		m_separatingNormal(3) = dist;
-	}
+    // Sets the position and the separating normal, with dist in the normal's w.
+    void set(const hkVector4& position, const hkVector4& normal, float dist) {
+        m_position = position;
+        m_separatingNormal = normal;
+        m_separatingNormal(3) = dist;
+    }
 
-	// Sets the separating normal's x, y and z to normal's, keeping the distance in w.
-	void setNormal(const hkVector4& normal) { m_separatingNormal.setXYZ(normal); }
-	hkContactPoint& operator=(const hkContactPoint& __that) = default;
-	const hkVector4& getPosition() const { return m_position; }
-	const hkVector4& getNormal() const { return m_separatingNormal; }
+    // Sets the separating normal's x, y and z to normal's, keeping the distance in w.
+    void setNormal(const hkVector4& normal) {
+        m_separatingNormal.setXYZ(normal);
+    }
+    hkContactPoint& operator=(const hkContactPoint& __that) = default;
+    const hkVector4& getPosition() const {
+        return m_position;
+    }
+    const hkVector4& getNormal() const {
+        return m_separatingNormal;
+    }
 
-	// Havok SDK signature (hkBase.lib, tied by target).
-	static const hkClass& staticClass();
+    // Havok SDK signature (hkBase.lib, tied by target).
+    static const hkClass& staticClass();
 
-	hkVector4 m_position;
-	hkVector4 m_separatingNormal;
+    hkVector4 m_position;
+    hkVector4 m_separatingNormal;
 
-	static MembersArray Members;
+    static MembersArray Members;
 };
 
 // The class's reflection record.
