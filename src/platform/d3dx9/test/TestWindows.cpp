@@ -2,8 +2,9 @@
 // and the DLL loader. Kept apart because it includes the Windows SDK's headers, which clash with the game's own
 // Direct3D declarations the rest of the program uses.
 
-#include <d3d9.h>
 #include <windows.h>
+
+#include <d3d9.h>
 
 extern "C" void* TestCreateDevice() {
     HWND hWindow =

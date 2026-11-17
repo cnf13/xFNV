@@ -8,8 +8,9 @@
 
 #define WIN32_LEAN_AND_MEAN
 #define NOMINMAX
-#include <shellapi.h>
 #include <windows.h>
+
+#include <shellapi.h>
 
 namespace platform {
 
