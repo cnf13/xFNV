@@ -92,15 +92,15 @@ const char* hkDataArrayNative::asString(int32_t index) const {
     }
 #else
     if (v2 == 29) {
-        return reinterpret_cast<const char*>(static_cast<uintptr_t>(*reinterpret_cast<uint32_t*>(static_cast<uintptr_t>(
-            ((int32_t)(index * ((uint32_t)m_elementStride))) + reinterpret_cast<uintptr_t>(m_address)
-        ))));
+        return reinterpret_cast<const char*>(static_cast<uintptr_t>(*reinterpret_cast<uint32_t*>(
+            (((int32_t)(index * ((uint32_t)m_elementStride))) + reinterpret_cast<uintptr_t>(m_address))
+        )));
     }
     if (v2 == 33) {
         return reinterpret_cast<const char*>(static_cast<uintptr_t>(
-            (*reinterpret_cast<uint32_t*>(static_cast<uintptr_t>(
-                ((int32_t)(index * ((uint32_t)m_elementStride))) + reinterpret_cast<uintptr_t>(m_address)
-            ))) &
+            (*reinterpret_cast<uint32_t*>(
+                (((int32_t)(index * ((uint32_t)m_elementStride))) + reinterpret_cast<uintptr_t>(m_address))
+            )) &
             0xFFFFFFFEu
         ));
     }

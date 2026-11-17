@@ -12,8 +12,8 @@
 #include "xfnv/crashlog/CrashLog.hpp"
 
 #include <csignal>
+#include <cstdlib>
 #include <intrin.h>
-#include <stdlib.h>
 
 #include <windows.h>
 

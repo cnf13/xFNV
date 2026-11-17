@@ -5,8 +5,8 @@
 
 #include <windows.h>
 
+#include <cstdlib>
 #include <malloc.h>
-#include <stdlib.h>
 
 namespace fnvd::debugheap::platform {
     namespace {

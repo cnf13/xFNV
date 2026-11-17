@@ -21,9 +21,9 @@ NiAVObject* BSTextureData::GetValue(uint32_t aiIndex) const {
     // The exe reads the 4-byte element at pBuffer + 4 * aiIndex: the element, at the pointer's own width.
     return pObjects.pBuffer[static_cast<int32_t>(aiIndex)];
 #else
-    return reinterpret_cast<NiAVObject*>(static_cast<uintptr_t>(*reinterpret_cast<uint32_t*>(
-        static_cast<uintptr_t>(reinterpret_cast<uintptr_t>(pObjects.pBuffer) + (4 * ((int32_t)aiIndex)))
-    )));
+    return reinterpret_cast<NiAVObject*>(static_cast<uintptr_t>(
+        *reinterpret_cast<uint32_t*>((reinterpret_cast<uintptr_t>(pObjects.pBuffer) + (4 * ((int32_t)aiIndex))))
+    ));
 #endif
 }
 
